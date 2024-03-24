@@ -1,6 +1,16 @@
+'use client';
+
 import Image from 'next/image';
+import { signIn } from 'next-auth/react';
 
 export default function Login() {
+  const handleKakao = async () => {
+    await signIn('kakao', {
+      redirect: true,
+      callbackUrl: '/',
+    });
+  };
+
   return (
     <main className="w-full h-[100vh] flex flex-col justify-center items-center">
       <Image
@@ -10,7 +20,7 @@ export default function Login() {
         alt="bottle-note-logo"
       />
       <section className="flex flex-col mt-5 space-y-3">
-        <button>카카오톡 로그인</button>
+        <button onClick={handleKakao}>카카오톡 로그인</button>
         <button>네이버 로그인</button>
         <button>구글 로그인</button>
         <button>애플 로그인</button>
