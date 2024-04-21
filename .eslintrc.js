@@ -164,6 +164,11 @@ module.exports = {
             position: 'after',
           },
           {
+            pattern: './**',
+            group: 'internal',
+            position: 'after',
+          },
+          {
             pattern: 'public/**',
             group: 'internal',
             position: 'after',
