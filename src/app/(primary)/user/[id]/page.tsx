@@ -55,11 +55,16 @@ export default function User() {
           <button>Menu btn</button>
         </article>
 
-        <UserInfo />
+        <UserInfo
+          profileImgSrc={null}
+          follower={323}
+          following={12}
+          isFollowing
+        />
         <HistoryOverview />
       </section>
 
-      <section className="px-7.5 pt-9">
+      <section className="px-5 pt-9">
         <ListManager />
         <section>
           {MOCK_LIST_ITEM.map((item) => (
