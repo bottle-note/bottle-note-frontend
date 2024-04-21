@@ -2,7 +2,7 @@ import Image from 'next/image';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 // TODO: api dto 에 맞출것
-interface UserInfoProps {
+interface Props {
   profileImgSrc: string | null;
   follower: number;
   following: number;
@@ -14,7 +14,7 @@ const UserInfo = ({
   follower,
   following,
   isFollowing,
-}: UserInfoProps) => {
+}: Props) => {
   const buttonConfig = [
     {
       type: 'follow',
