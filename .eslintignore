@@ -4,3 +4,4 @@ public/*
 /node_modules
 .eslintrc.js
 src/types/**/*.ts
+next.config.mjs

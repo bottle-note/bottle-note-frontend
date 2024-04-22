@@ -22,7 +22,7 @@ export default function User() {
       eng_name: 'glen fi',
       rating: 3.5,
       category: 'single molt',
-      image_path: 'https://i.imgur.com/TE2nmYV.png',
+      image_path: 'https://i.imgur.com/ALxdcpJ.jpeg',
     },
     {
       whisky_id: 2,
@@ -30,7 +30,7 @@ export default function User() {
       eng_name: 'glen fi',
       rating: 3.5,
       category: 'single molt',
-      image_path: 'https://i.imgur.com/TE2nmYV.png',
+      image_path: 'https://i.imgur.com/ALxdcpJ.jpeg',
     },
     {
       whisky_id: 3,
@@ -38,7 +38,7 @@ export default function User() {
       eng_name: 'glen fi',
       rating: 3.5,
       category: 'single molt',
-      image_path: 'https://i.imgur.com/TE2nmYV.png',
+      image_path: 'https://i.imgur.com/ALxdcpJ.jpeg',
     },
     {
       whisky_id: 4,
@@ -46,7 +46,7 @@ export default function User() {
       eng_name: 'glen fi',
       rating: 3.5,
       category: 'single molt',
-      image_path: 'https://i.imgur.com/TE2nmYV.png',
+      image_path: 'https://i.imgur.com/ALxdcpJ.jpeg',
     },
   ];
 
@@ -75,7 +75,7 @@ export default function User() {
         <ListManager />
         <section>
           {MOCK_LIST_ITEM.map((item) => (
-            <ListItem key={item.whisky_id} />
+            <ListItem key={item.whisky_id} data={item} />
           ))}
         </section>
       </section>
