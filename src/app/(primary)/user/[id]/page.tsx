@@ -1,12 +1,10 @@
 import React from 'react';
-import Image from 'next/image';
-// import Navbar from '@/components/Navbar';
+import Navbar from '@/components/Navbar';
 import ListManager from '@/components/ListManager';
 import ListItem from '@/components/ListItem';
 import UserInfo from './_components/UserInfo';
 import HistoryOverview from './_components/HistoryOverview';
-import Logo from 'public/Logo_2.svg';
-import Menu from 'public/Menu_Sub_Coral.svg';
+import SidebarHeader from './_components/SidebarHeader';
 
 // NOTE: 해당 data 에 좋아요 여부, 리뷰 여부 포함되어야 함.
 
@@ -53,14 +51,7 @@ export default function User() {
   return (
     <main className="w-full h-full text-mainBlack mb-24">
       <section className="bg-bgGray p-7.5 pb-7">
-        <article className="flex justify-between pb-6">
-          <button>
-            <Image src={Logo} alt="보틀노트" />
-          </button>
-          <button>
-            <Image src={Menu} alt="메뉴 열기" />
-          </button>
-        </article>
+        <SidebarHeader />
 
         <UserInfo
           profileImgSrc={null}
