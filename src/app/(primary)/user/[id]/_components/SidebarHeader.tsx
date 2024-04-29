@@ -11,33 +11,46 @@ import { SIDEBAR_MENUS } from '../_constants';
 
 // TODO: block scroll when sidebar is open
 // TODO: add animation
+
+const Header = ({
+  handleOpen,
+  isOpen,
+}: {
+  handleOpen: () => void;
+  isOpen: boolean;
+}) => {
+  const logoSrc = isOpen ? LogoWhite : Logo;
+  const menuSrc = isOpen ? MenuWhite : Menu;
+  const menuAlt = isOpen ? '메뉴 닫기' : '메뉴 열기';
+  const bgColor = isOpen ? 'bg-subCoral' : '';
+  const padding = isOpen ? 'p-7.5' : 'pb-6';
+
+  return (
+    <article className={`flex justify-between ${bgColor} ${padding}`}>
+      <button>
+        <Image src={logoSrc} alt="보틀노트" />
+      </button>
+      <button onClick={handleOpen}>
+        <Image src={menuSrc} alt={menuAlt} />
+      </button>
+    </article>
+  );
+};
+
 const SidebarHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleOpen = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
     <>
-      <article className="flex justify-between pb-6">
-        <button>
-          <Image src={Logo} alt="보틀노트" />
-        </button>
+      <Header isOpen={isOpen} handleOpen={handleOpen} />
 
-        <button onClick={() => setIsOpen(true)}>
-          <Image src={Menu} alt="메뉴 열기" />
-        </button>
-      </article>
-
-      {/* FIXME: 중복되는 상단 헤더 분리하기 */}
       {isOpen && (
         <aside className="z-10 bg-[#F0996E] bg-opacity-85 fixed inset-0 backdrop-blur-sm">
-          <article className="flex justify-between bg-subCoral p-7.5">
-            <button>
-              <Image src={LogoWhite} alt="보틀노트" />
-            </button>
-
-            <button onClick={() => setIsOpen(false)}>
-              <Image src={MenuWhite} alt="메뉴 닫기" />
-            </button>
-          </article>
+          <Header isOpen={isOpen} handleOpen={handleOpen} />
 
           <section className="flex flex-col gap-14 p-7.5 pt-14">
             <article className="flex">
