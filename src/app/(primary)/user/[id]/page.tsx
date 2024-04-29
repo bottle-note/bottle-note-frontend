@@ -1,5 +1,4 @@
 import React from 'react';
-import Navbar from '@/components/Navbar';
 import ListManager from '@/components/ListManager';
 import ListItem from '@/components/ListItem';
 import UserInfo from './_components/UserInfo';
@@ -20,7 +19,8 @@ export default function User() {
       eng_name: 'glen fi',
       rating: 3.5,
       category: 'single molt',
-      image_path: 'https://i.imgur.com/ALxdcpJ.jpeg',
+      image_path:
+        'https://images.unsplash.com/photo-1580537922571-ca7180cd700e?q=80&w=986&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
     {
       whisky_id: 2,
@@ -36,7 +36,8 @@ export default function User() {
       eng_name: 'glen fi',
       rating: 3.5,
       category: 'single molt',
-      image_path: 'https://i.imgur.com/ALxdcpJ.jpeg',
+      image_path:
+        'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
     {
       whisky_id: 4,
@@ -44,7 +45,8 @@ export default function User() {
       eng_name: 'glen fi',
       rating: 3.5,
       category: 'single molt',
-      image_path: 'https://i.imgur.com/ALxdcpJ.jpeg',
+      image_path:
+        'https://images.unsplash.com/photo-1569977621579-58987bec59cd?q=80&w=997&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
   ];
 
@@ -70,7 +72,6 @@ export default function User() {
           ))}
         </section>
       </section>
-      {/* <Navbar /> */}
     </main>
   );
 }

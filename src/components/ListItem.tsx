@@ -33,18 +33,12 @@ const ListItem = ({ data }: Props) => {
   } = data;
 
   return (
-    <article className="flex items-center space-x-4 text-mainBlack border-mainBlack border-b">
-      <div className="w-16 h-16">
-        <Image
-          src={image_path}
-          alt="위스키 이미지"
-          width={60}
-          height={80}
-          objectFit="cover"
-        />
+    <article className="flex items-center space-x-4 text-mainBlack border-mainBlack border-b h-[90px]">
+      <div className="relative w-[89px] h-[89px]">
+        <Image src={image_path} alt="위스키 이미지" fill objectFit="cover" />
       </div>
 
-      <section className="flex-1 space-y-1.5">
+      <section className="flex-1 space-y-1.">
         <article className="flex justify-between items-center ">
           <h2 className="whitespace-pre text-sm leading-sm font-bold line">
             {kor_name}
@@ -52,7 +46,7 @@ const ListItem = ({ data }: Props) => {
           <div className="flex flex-col">
             {/* rating이 null 혹은 0인 경우 invisible */}
             <Star rating={rating} />
-            {review_count ?? (
+            {review_count && (
               <span className="text-[0.625rem] justify-self-end row-start-2 text-right">
                 {`${review_count}`}
               </span>
