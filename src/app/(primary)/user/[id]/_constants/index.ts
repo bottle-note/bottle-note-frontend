@@ -1,3 +1,4 @@
+// TODO: 디자인/기획 픽스된 후 수정
 export const SIDEBAR_MENUS = [
   {
     text: '로그아웃',
