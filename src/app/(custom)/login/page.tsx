@@ -17,7 +17,7 @@ export default function Login() {
       <section className="flex flex-col mt-5 space-y-3">
         <button onClick={() => signIn('kakao')}>카카오톡 로그인</button>
         <button>네이버 로그인</button>
-        <button>구글 로그인</button>
+        <button onClick={() => signIn('google')}>구글 로그인</button>
         <button>애플 로그인</button>
       </section>
       <section className="flex flex-col mt-5 space-y-3">
