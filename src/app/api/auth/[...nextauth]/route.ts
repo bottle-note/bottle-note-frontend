@@ -19,10 +19,17 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn(data) {
+    async signIn({ user, account }) {
       try {
+        const body = {
+          email: user.email,
+          gender: null,
+          age: null,
+          socialType: account?.provider,
+        };
+
         // TODO: 백엔드 회원가입/로그인 api 요청 here
-        console.log(data);
+        console.log(body);
         return true;
       } catch {
         return false;
