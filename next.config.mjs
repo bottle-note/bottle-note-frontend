@@ -19,7 +19,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'static.whiskybase.com'',
+        hostname: 'static.whiskybase.com',
         port: '',
         pathname: '/**',
       },

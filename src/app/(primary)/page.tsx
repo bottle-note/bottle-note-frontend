@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import CategoryTitle from '@/components/CategoryTitle';
 import HorizontalScroll from '@/components/HorizontalScroll';
 import Header from '@/app/(primary)/_components/Header';
-import { AlcoholAPI, Alcohol } from '@/types/Alcohol';
+import { Alcohol } from '@/types/Alcohol';
 import CategoryList from './_components/CategoryList';
 
 export default function Home() {
@@ -13,30 +13,14 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/popular/week`,
-        );
-        if (response.ok) {
-          const result = await response.json();
-          if (result.data.totalCount !== 0) {
-            const formattedData = result.data?.alcohols.map(
-              (alcohol: AlcoholAPI) => ({
-                whiskyId: alcohol.whiskyId,
-                korName: alcohol.korName,
-                engName: alcohol.engName,
-                rating: alcohol.rating,
-                engCategory: alcohol.engCategory,
-                imageUrl: alcohol.imageUrl,
-                path: `/search/${alcohol.whiskyId}`,
-              }),
-            );
-            setWeeklyData(formattedData);
-          }
-        } else {
-          throw new Error('Failed to fetch data');
+        const response = await fetch('/api/alcohols?popular');
+        if (!response.ok) {
+          throw new Error('Failed to fetch');
         }
+        const data = await response.json();
+        setWeeklyData(data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Fetching error:', error);
       }
     };
 
