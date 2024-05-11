@@ -1,6 +1,4 @@
 import React from 'react';
-
-import Image from 'next/image';
 import ListManager from '@/components/ListManager';
 import ListItem from '@/components/ListItem';
 import UserInfo from './_components/UserInfo';
