@@ -6,12 +6,13 @@ import Review from '@/app/(primary)/user/[id]/_components/ReviewBtn';
 
 interface Props {
   data: {
-    whisky_id: number;
-    kor_name: string;
-    eng_name: string;
+    whiskyId: number;
+    korName: string;
+    engName: string;
     rating: number;
-    category: string;
-    image_path: string;
+    engCategory: string;
+    korCategory: string;
+    imageUrl: string;
     // TODO: api dto 논의를 통해 아래 조건들도 옵셔널로 필요
     isLiked?: boolean;
     isReviewed?: boolean;
@@ -22,10 +23,10 @@ interface Props {
 // TODO: Props 적용
 const ListItem = ({ data }: Props) => {
   const {
-    kor_name,
-    eng_name,
-    category,
-    image_path,
+    korCategory,
+    korName,
+    engName,
+    imageUrl,
     rating,
     isLiked,
     isReviewed,
@@ -35,13 +36,13 @@ const ListItem = ({ data }: Props) => {
   return (
     <article className="flex items-center space-x-4 text-mainBlack border-mainBlack border-b h-[90px]">
       <div className="relative w-[89px] h-[89px]">
-        <Image src={image_path} alt="위스키 이미지" fill objectFit="cover" />
+        <Image src={imageUrl} alt="위스키 이미지" fill objectFit="cover" />
       </div>
 
       <section className="flex-1 space-y-1.">
         <article className="flex justify-between items-center ">
           <h2 className="whitespace-pre text-sm leading-sm font-bold line">
-            {kor_name}
+            {korName}
           </h2>
           <div className="flex flex-col">
             {/* rating이 null 혹은 0인 경우 invisible */}
@@ -56,8 +57,8 @@ const ListItem = ({ data }: Props) => {
 
         <article className="flex justify-between">
           <p className="text-xxs">
-            <span>{truncStr(eng_name, 16)}</span>
-            <span> · {category}</span>
+            <span>{truncStr(engName, 16)}</span>
+            <span> · {korCategory}</span>
           </p>
           <div className="space-x-1.5 flex items-center">
             {isReviewed && <Review />}
