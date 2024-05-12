@@ -9,6 +9,7 @@ interface Props {
   isFollowing?: boolean; // NOTE: 내가 following 중인 상태,
 }
 
+// TODO: 버튼 스타일 공통화
 const UserInfo = ({
   profileImgSrc = null,
   follower,
