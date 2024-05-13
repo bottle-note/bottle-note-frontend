@@ -1,6 +1,6 @@
 import React from 'react';
-import ListManager from '@/components/ListManager';
-import ListItem from '@/components/ListItem';
+import ListManager from '@/components/List/ListManager';
+import ListItem from '@/components/List/ListItem';
 import { MOCK_LIST_ITEM } from 'mock/alcohol';
 import UserInfo from './_components/UserInfo';
 import HistoryOverview from './_components/HistoryOverview';
