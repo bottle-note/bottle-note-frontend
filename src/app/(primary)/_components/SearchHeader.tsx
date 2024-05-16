@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import SearchBar from '@/components/SearchBar';
 
+// TODO: 최근 검색어 화면도 여기에 포함되어야 할 것 같다.
 export default function SearchHeader() {
   const [scrollPosition, setScrollPosition] = useState(0);
 
