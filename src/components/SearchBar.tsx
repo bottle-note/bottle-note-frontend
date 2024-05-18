@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import EnterIcon from 'public/search.svg';
 
 interface Props {
   type?: 'Link' | 'Search';
@@ -54,12 +55,7 @@ export default function SearchBar({ type = 'Search', handleSearch }: Props) {
             className="px-2 w-10 absolute top-0 right-1 h-full"
             onClick={handleOnClick}
           >
-            <Image
-              src="search.svg"
-              width={80}
-              height={80}
-              alt="search button"
-            />
+            <Image src={EnterIcon} alt="search button" />
           </button>
         </>
       )}
