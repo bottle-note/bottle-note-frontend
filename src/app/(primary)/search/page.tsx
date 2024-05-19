@@ -11,7 +11,7 @@ import SearchList from './_components/SearchList';
 export default function Search() {
   return (
     <>
-      <CategorySelector currentValue="전체" />
+      <CategorySelector />
       <section>
         <CategoryTitle subTitle="위클리 HOT 5" />
         <SearchList data={MOCK_LIST_ITEM} />
