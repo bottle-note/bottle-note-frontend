@@ -8,7 +8,7 @@ import CategoryTitle from './CategoryTitle';
 function CategorySelector() {
   const router = useRouter();
   // FIXME: 상수에 공백 없애야 함
-  const currentCategory = usePathname().split('/')[2].replace('%20', ' ');
+  const currentCategory = usePathname().split('/')[2]?.replace('%20', ' ');
 
   const [categories, setCategories] = useState<
     {
