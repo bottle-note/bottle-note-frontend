@@ -1,10 +1,31 @@
 import { AlcoholAPI, RegionApi } from '@/types/Alcohol';
 import { ApiResponse } from '@/types/common';
+import { decode, getToken } from 'next-auth/jwt';
+import { NextRequest } from 'next/server';
 
 export const AlcoholsApi = {
-  async getPopular() {
+  async getPopular(req: NextRequest) {
+    // FIXME: 토큰 심는 로직 공통 로직으로 빼기
+    const sessionJWT = await getToken({
+      req,
+      raw: true,
+      cookieName: 'next-auth.session-token',
+    });
+
+    const decoded = await decode({
+      token: sessionJWT,
+      secret: process.env.NEXTAUTH_SECRET as string,
+    });
+
+    const accessToken = decoded?.accessToken as string;
+
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/popular/week`,
+      {
+        headers: {
+          Authorization: accessToken,
+        },
+      },
     );
     if (!response.ok) {
       throw new Error('Failed to fetch data');
