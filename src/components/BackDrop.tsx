@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { useBlockScroll } from '@/style/useBlockScroll';
+import { useBlockScroll } from '@/hooks/useBlockScroll';
 
 interface Props {
   isShow: boolean;
