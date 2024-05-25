@@ -1,7 +1,9 @@
-import NextAuth from 'next-auth';
+/* eslint-disable no-param-reassign */
 import KakaoProvider from 'next-auth/providers/kakao';
 import GoogleProvider from 'next-auth/providers/google';
 import NaverProvider from 'next-auth/providers/naver';
+import NextAuth from 'next-auth';
+import { AuthApi } from '../../AuthApi';
 
 const handler = NextAuth({
   providers: [
@@ -18,31 +20,22 @@ const handler = NextAuth({
       clientSecret: `${process.env.NAVER_CLIENT_SECRET}`,
     }),
   ],
+  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: 'jwt',
+  },
   callbacks: {
     async signIn({ user, account }) {
       try {
         const body = {
-          email: user.email,
+          email: user.email as string,
           gender: null,
           age: null,
-          socialType: account?.provider,
+          socialType: account?.provider as string,
         };
 
-        const res = await fetch(`${process.env.SERVER_URL}/oauth/login`, {
-          method: 'POST',
-          body: JSON.stringify(body),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        const { data } = await res.json();
-        console.log(data);
-
-        // TODO:
-        // 1. 토큰 저장
-        // 2. 토큰 갱신을 어떻게 할 것인지 생각 (모든 요청을 route handler 나 서버쪽에서 담당하면 토큰관리는 어떻게 함? 흠....? 클라이언트에서 해야겠구나...)
-        // 3. 응답값 공통 타입 적용
+        const token = await AuthApi.login(body);
+        if (account) account.accessToken = token;
 
         return true;
       } catch {
@@ -50,12 +43,18 @@ const handler = NextAuth({
       }
     },
 
-    async jwt({ token, user }) {
-      return { ...token, ...user };
+    // 요청시에 이 토큰이 자동으로 쿠키에 박히는지 여부를 확인해야겠다.
+    async jwt({ token, account }) {
+      if (account && account.accessToken) {
+        token.accessToken = account.accessToken;
+      }
+
+      return token;
     },
 
     async session({ session, token }) {
-      return { ...session, user: token };
+      session.user.accessToken = token.accessToken as string;
+      return { ...session, token };
     },
   },
   pages: {
