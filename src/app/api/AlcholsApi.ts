@@ -6,6 +6,11 @@ import { NextRequest } from 'next/server';
 export const AlcoholsApi = {
   async getPopular(req: NextRequest) {
     // FIXME: 토큰 심는 로직 공통 로직으로 빼기
+    /**
+     * 아래 코드가 토큰을 가져와서 심어주는 부분입니다.
+     * NextAuth 라우터에서 로그인을 처리한 후 우리쪽 액세스 토큰을 받아와서 jwt 토큰에 심어주었습니다.
+     * 이 토큰을 api 요청시에 가져다가 사용하는 그런 로직입니다.
+     */
     const sessionJWT = await getToken({
       req,
       raw: true,
