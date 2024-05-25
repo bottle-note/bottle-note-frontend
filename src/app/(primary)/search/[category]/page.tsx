@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { MOCK_LIST_ITEM } from 'mock/alcohol';
 import CategorySelector from '@/components/CategorySelector';
@@ -13,12 +13,20 @@ export default function Category() {
     router.push(`/search/${value}`);
   };
 
+  const [filterOptions, setFilterOptions] = useState<
+    { id: number; value: string }[] | null
+  >(null);
+
   const SORT_OPTIONS = ['인기도순', '별점순', '찜하기순', '댓글순'];
-  const FILTER_OPTIONS = [
-    '국가/전체',
-    '스코틀랜드/로우랜드',
-    '스코틀랜드/하이랜드',
-  ]; // TODO: 국가 정보 조회하여 불러와야됌
+
+  useEffect(() => {
+    (async () => {
+      const result = await fetch('/api/alcohols?region');
+      const regions = await result.json();
+
+      setFilterOptions(regions);
+    })();
+  }, []);
 
   return (
     <>
@@ -29,12 +37,14 @@ export default function Category() {
 
       <section>
         <List>
-          <List.Manager
-            total={52}
-            sortOptions={SORT_OPTIONS}
-            hanldeSortOption={(value) => console.log(value)}
-            filterOptions={FILTER_OPTIONS}
-          />
+          {filterOptions && (
+            <List.Manager
+              total={52}
+              sortOptions={SORT_OPTIONS}
+              hanldeSortOption={(value) => console.log(value)}
+              filterOptions={filterOptions}
+            />
+          )}
           {MOCK_LIST_ITEM.map((item: any) => (
             <List.Item key={item.alcoholId} data={item} />
           ))}

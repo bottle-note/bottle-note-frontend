@@ -8,6 +8,7 @@ export interface AlcoholAPI {
   engCategory: string;
   korCategory: string;
   imageUrl: string;
+  isPicked: false;
 }
 export interface Alcohol extends AlcoholAPI {
   path: string;
@@ -49,4 +50,11 @@ export interface AlcoholDetails {
     bestReviewInfos: Review[];
     recentReviewInfos: Review[];
   };
+}
+
+export interface RegionApi {
+  regionId: number;
+  korName: string;
+  engName: string;
+  description: string;
 }

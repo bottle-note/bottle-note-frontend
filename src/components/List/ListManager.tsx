@@ -10,7 +10,7 @@ interface Props {
   total: number;
   sortOptions?: string[];
   hanldeSortOption?: (value: string) => void;
-  filterOptions?: string[];
+  filterOptions?: { id: number; value: string }[];
 }
 
 // SORT, ORDER(Ascending, Descending), FILTER,
@@ -47,7 +47,7 @@ const ListManager = ({
                 className="label-default flex items-center gap-1 px-2.5 py-1 rounded-md text-xxs"
                 onClick={handleOptionsShow}
               >
-                <span>{filterOptions[0]}</span>
+                <span>{filterOptions[0].value}</span>
                 <Image src={ArrowDownIcon} alt="필터" />
               </button>
             )}
