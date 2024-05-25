@@ -1,6 +1,6 @@
 import { AlcoholAPI } from '@/types/Alcohol';
 
-export const MOCK_LIST_ITEM: AlcoholAPI[] = [
+export const MOCK_LIST_ITEM: Omit<AlcoholAPI, 'isPicked'>[] = [
   {
     alcoholId: 1,
     korName: '글렌피딕',
