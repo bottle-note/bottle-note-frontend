@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const { search } = new URL(request.url);
 
   if (search.includes('popular')) {
-    const result = await apiWrapper(() => AlcoholsApi.getPopular(request));
+    const result = await apiWrapper(() => AlcoholsApi.getPopular());
 
     return NextResponse.json(result);
   }

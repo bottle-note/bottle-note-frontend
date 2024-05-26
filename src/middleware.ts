@@ -29,9 +29,9 @@ export async function middleware(request: NextRequest) {
   const accessToken = decoded?.accessToken;
 
   // FIXME: 리디렉션 정상 동작 X
-  if (!accessToken) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
+  // if (!accessToken) {
+  //   return NextResponse.redirect(new URL('/login', request.url));
+  // }
 
   return NextResponse.next();
 }
