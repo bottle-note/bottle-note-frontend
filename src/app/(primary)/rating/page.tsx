@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import CategorySelector from '@/components/CategorySelector';
-import CategoryTitle from '@/components/CategoryTitle';
 import List from '@/components/List/List';
 import { Alcohol } from '@/types/Alcohol';
 
@@ -12,7 +11,7 @@ export default function Rating() {
   const [populars, setPopulars] = useState<Alcohol[]>([]);
   const [currentCategory, setCurrentCategory] = useState('All');
   const handleCategory = (value: string) => {
-    if (value !== currentCategory) router.push(`/search/${value}`);
+    if (value !== currentCategory) router.push(`/rating?category=${value}`);
     setCurrentCategory(value);
   };
 
@@ -60,7 +59,7 @@ export default function Rating() {
           )}
 
           {populars.map((item: any) => (
-            <List.Item key={item.alcoholId} data={item} />
+            <List.Rating key={item.alcoholId} data={item} />
           ))}
         </List>
       </section>

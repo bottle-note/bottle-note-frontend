@@ -16,24 +16,12 @@ interface Props {
     engCategory: string;
     korCategory: string;
     imageUrl: string;
-    // TODO: api dto 논의를 통해 아래 조건들도 옵셔널로 필요
-    isLiked?: boolean;
-    isReviewed?: boolean;
-    review_count?: number;
+    isPicked?: boolean;
   };
 }
 
-const ListItem = ({ data }: Props) => {
-  const {
-    korCategory,
-    korName,
-    engName,
-    imageUrl,
-    rating,
-    isLiked,
-    isReviewed,
-    review_count,
-  } = data;
+const ListItemRating = ({ data }: Props) => {
+  const { korCategory, korName, engName, imageUrl, rating, isPicked } = data;
 
   return (
     <article className="flex items-center space-x-2 text-mainBlack border-mainBlack border-b h-[90px]">
@@ -42,30 +30,21 @@ const ListItem = ({ data }: Props) => {
       </div>
 
       <section className="flex-1 space-y-1">
-        <article className="flex justify-between items-center ">
+        <article className="flex flex-col">
           <h2 className="whitespace-pre text-sm leading-sm font-bold line">
-            {addNewLine(korName)}
+            {korName}
           </h2>
-          <div className="flex flex-col">
-            {/* rating이 null 혹은 0인 경우 invisible */}
-            <Star rating={rating} />
-            {review_count && (
-              <span className="text-[0.625rem] justify-self-end row-start-2 text-right">
-                {`${review_count}`}
-              </span>
-            )}
-          </div>
+          <p className="text-xxs">
+            <span>{engName}</span>
+            <span> · {korCategory}</span>
+          </p>
         </article>
 
         <article className="flex justify-between">
-          <p className="text-xxs">
-            <span>{truncStr(engName, 16)}</span>
-            <span> · {korCategory}</span>
-          </p>
+          <div>여기에 별점을...</div>
           <div className="space-x-1.5 flex items-center">
-            {isReviewed && <Review />}
             {/* TODO: 유저가 로그인 상태인지 확인하여 조건부 렌더링 */}
-            <LikeBtn isLiked={isLiked} />
+            <LikeBtn isLiked={isPicked} />
           </div>
         </article>
       </section>
@@ -73,4 +52,4 @@ const ListItem = ({ data }: Props) => {
   );
 };
 
-export default ListItem;
+export default ListItemRating;
