@@ -1,11 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import Star from '@/components/Star';
-import { truncStr } from '@/utils/truncStr';
 import LikeBtn from '@/app/(primary)/user/[id]/_components/LikeBtn'; // 위치이동!
-import Review from '@/app/(primary)/user/[id]/_components/ReviewBtn';
-import { addNewLine } from '@/utils/addNewLine';
+import StarRating from '../StarRaiting';
 
 interface Props {
   data: {
@@ -41,7 +38,7 @@ const ListItemRating = ({ data }: Props) => {
         </article>
 
         <article className="flex justify-between">
-          <div>여기에 별점을...</div>
+          <StarRating />
           <div className="space-x-1.5 flex items-center">
             {/* TODO: 유저가 로그인 상태인지 확인하여 조건부 렌더링 */}
             <LikeBtn isLiked={isPicked} />
