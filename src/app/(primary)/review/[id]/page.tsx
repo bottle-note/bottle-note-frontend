@@ -132,7 +132,7 @@ export default function ReviewDetail() {
                   <div className="text-xs flex">
                     <Image
                       className="mr-1"
-                      src="/like-filled-subcoral-white.svg"
+                      src="/like-filled-white.svg"
                       alt="like"
                       width={16}
                       height={16}
