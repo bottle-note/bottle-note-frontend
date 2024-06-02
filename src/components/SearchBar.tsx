@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import EnterIcon from 'public/search-subcoral.svg';
+import EnterIcon from 'public/icon/search-subcoral.svg';
 
 interface Props {
   type?: 'Link' | 'Search';

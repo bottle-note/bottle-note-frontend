@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import Logo from 'public/logo-text-subcoral.svg';
-import LogoWhite from 'public/logo-text-white.svg';
-import Menu from 'public/menu-subcoral.svg';
-import MenuWhite from 'public/menu-white.svg';
+import Logo from 'public/icon/logo-text-subcoral.svg';
+import LogoWhite from 'public/icon/logo-text-white.svg';
+import Menu from 'public/icon/menu-subcoral.svg';
+import MenuWhite from 'public/icon/menu-white.svg';
 import SidebarDeco from 'public/sidebar-deco.png';
 import { SIDEBAR_MENUS } from '../_constants';
 

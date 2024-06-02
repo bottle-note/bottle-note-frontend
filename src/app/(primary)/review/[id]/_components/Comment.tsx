@@ -56,7 +56,7 @@ function Comment({ data }: Props) {
               }}
             >
               <Image
-                src={'/ellipsis-darkgray.svg'}
+                src={'/icon/ellipsis-darkgray.svg'}
                 width={10}
                 height={10}
                 alt="report"

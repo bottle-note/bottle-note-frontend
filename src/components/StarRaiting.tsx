@@ -28,11 +28,11 @@ const Star = ({ size = 30, index, rate, handleRate }: StarProps) => {
     }
   };
 
-  let src = '/star-outlined-subcoral.svg';
+  let src = '/icon/star-outlined-subcoral.svg';
   if (rate >= index) {
-    src = '/star-filled-subcoral.svg';
+    src = '/icon/star-filled-subcoral.svg';
   } else if (rate === index - 0.5) {
-    src = '/star-half-subcoral.svg';
+    src = '/icon/star-half-subcoral.svg';
   }
 
   // FIXME: 별점 렌더링시 약간의 위치 움직임 있음

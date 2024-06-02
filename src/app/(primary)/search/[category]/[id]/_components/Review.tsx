@@ -66,14 +66,14 @@ function Review({ data, isBest = false, isMine = false }: Props) {
             {isBest && (
               <Label
                 name="베스트"
-                icon="/thumbup-filled-white.svg"
+                icon="/icon/thumbup-filled-white.svg"
                 style="bg-mainCoral text-white px-2 py-[0.1rem] text-xxs border-mainCoral rounded"
               />
             )}
             {isMine && (
               <Label
                 name="나의 코멘트"
-                icon="/user-outlined-subcoral.svg"
+                icon="/icon/user-outlined-subcoral.svg"
                 style="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-xxs rounded"
               />
             )}
@@ -85,7 +85,7 @@ function Review({ data, isBest = false, isMine = false }: Props) {
             src={
               sizeType === 'bottle'
                 ? '/bottle.svg'
-                : '/glass-filled-subcoral.svg'
+                : '/icon/glass-filled-subcoral.svg'
             }
             width={12}
             height={12}
@@ -123,8 +123,8 @@ function Review({ data, isBest = false, isMine = false }: Props) {
               <Image
                 src={
                   isMyLike
-                    ? '/thumbup-filled-subcoral.svg'
-                    : '/thumbup-outlined-gray.svg'
+                    ? '/icon/thumbup-filled-subcoral.svg'
+                    : '/icon/thumbup-outlined-gray.svg'
                 }
                 width={12}
                 height={12}
@@ -135,7 +135,9 @@ function Review({ data, isBest = false, isMine = false }: Props) {
             <div className="flex items-center space-x-1">
               <Image
                 src={
-                  isMyReply ? '/commentFill.svg' : '/comment-outlined-graysvg'
+                  isMyReply
+                    ? '/commentFill.svg'
+                    : '/icon/comment-outlined-graysvg'
                 }
                 width={12}
                 height={12}
@@ -160,7 +162,7 @@ function Review({ data, isBest = false, isMine = false }: Props) {
               }}
             >
               <Image
-                src={'/ellipsis-darkgray.svg'}
+                src={'/icon/ellipsis-darkgray.svg'}
                 width={10}
                 height={10}
                 alt="report"

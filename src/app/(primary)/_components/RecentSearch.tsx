@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import DeleteIcon from 'public/close-subcoral.svg';
+import DeleteIcon from 'public/icon/close-subcoral.svg';
 
 // TODO: 로컬스토리지와 연계하여 데이터 보여줄 것
 export default function RecentSearch() {

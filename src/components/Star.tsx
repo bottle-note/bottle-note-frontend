@@ -17,14 +17,14 @@ const Star = ({
     <div className="flex items-center space-x-1 justify-self-end">
       {color === 'main' ? (
         <Image
-          src="/star-filled-subcoral.svg"
+          src="/icon/star-filled-subcoral.svg"
           width={size}
           height={size}
           alt="star"
         />
       ) : (
         <Image
-          src="/star-filled-white.svg"
+          src="/icon/star-filled-white.svg"
           width={size}
           height={size}
           alt="star"

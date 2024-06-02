@@ -35,7 +35,7 @@ function LinkButton({
           </div>
           {icon && (
             <Image
-              src="/arrow-right-white.svg"
+              src="/icon/arrow-right-white.svg"
               alt="arrowIcon"
               width={23}
               height={23}
