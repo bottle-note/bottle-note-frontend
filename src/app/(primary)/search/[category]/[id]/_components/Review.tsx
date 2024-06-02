@@ -66,14 +66,14 @@ function Review({ data, isBest = false, isMine = false }: Props) {
             {isBest && (
               <Label
                 name="베스트"
-                icon="/thumbUpWhite.svg"
+                icon="/thumbup-filled-white.svg"
                 style="bg-mainCoral text-white px-2 py-[0.1rem] text-xxs border-mainCoral rounded"
               />
             )}
             {isMine && (
               <Label
                 name="나의 코멘트"
-                icon="/user.svg"
+                icon="/user-outlined-subcoral.svg"
                 style="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-xxs rounded"
               />
             )}
@@ -82,7 +82,11 @@ function Review({ data, isBest = false, isMine = false }: Props) {
         </div>
         <div className="flex items-center space-x-1">
           <Image
-            src={sizeType === 'bottle' ? '/bottle.svg' : '/glass.svg'}
+            src={
+              sizeType === 'bottle'
+                ? '/bottle.svg'
+                : '/glass-filled-subcoral.svg'
+            }
             width={12}
             height={12}
             alt={sizeType === 'bottle' ? 'Bottle Price' : 'Glass Price'}
@@ -117,7 +121,11 @@ function Review({ data, isBest = false, isMine = false }: Props) {
           <div className="flex space-x-3">
             <div className="flex items-center space-x-1">
               <Image
-                src={isMyLike ? '/thumbUpCoral.svg' : '/thumbUpOutline.svg'}
+                src={
+                  isMyLike
+                    ? '/thumbup-filled-subcoral.svg'
+                    : '/thumbup-outlined-gray.svg'
+                }
                 width={12}
                 height={12}
                 alt="like"
@@ -126,7 +134,9 @@ function Review({ data, isBest = false, isMine = false }: Props) {
             </div>
             <div className="flex items-center space-x-1">
               <Image
-                src={isMyReply ? '/commentFill.svg' : '/commentOutline.svg'}
+                src={
+                  isMyReply ? '/commentFill.svg' : '/comment-outlined-graysvg'
+                }
                 width={12}
                 height={12}
                 alt="comment"
@@ -150,7 +160,7 @@ function Review({ data, isBest = false, isMine = false }: Props) {
               }}
             >
               <Image
-                src={'/ellipsis.svg'}
+                src={'/ellipsis-darkgray.svg'}
                 width={10}
                 height={10}
                 alt="report"

@@ -85,7 +85,7 @@ function SearchCategory() {
             }}
           >
             <Image
-              src="/arrowLeft.svg"
+              src="/arrow-left-white.svg"
               alt="arrowIcon"
               width={23}
               height={23}
@@ -94,7 +94,7 @@ function SearchCategory() {
           <SubHeader.Right onClick={() => {}}>
             {/* 브라우저는 복사, 핸드폰은 공유하기 */}
             <Image
-              src="/externalLink.svg"
+              src="/externallink-outlined-white.svg"
               alt="linkIcon"
               width={23}
               height={23}
@@ -149,7 +149,7 @@ function SearchCategory() {
                     <div className="text-xs flex">
                       <Image
                         className="mr-1"
-                        src="/edit-white.svg"
+                        src="/edit-outlined-white.svg"
                         alt="write"
                         width={16}
                         height={16}
@@ -160,7 +160,7 @@ function SearchCategory() {
                     <div className="text-xs flex">
                       <Image
                         className="mr-1"
-                        src="/like-filled-white.svg"
+                        src="/like-filled-subcoral-white.svg"
                         alt="like"
                         width={16}
                         height={16}

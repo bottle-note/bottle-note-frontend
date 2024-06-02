@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import EnterIcon from 'public/search.svg';
+import EnterIcon from 'public/search-subcoral.svg';
 
 interface Props {
   type?: 'Link' | 'Search';
@@ -27,7 +27,7 @@ export default function SearchBar({ type = 'Search', handleSearch }: Props) {
             </p>
             <div className="w-6 absolute right-3 hover:pointer">
               <Image
-                src="search.svg"
+                src="search-subcoral.svg"
                 width={50}
                 height={50}
                 alt="search button"

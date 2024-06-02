@@ -61,7 +61,7 @@ export default function ReviewDetail() {
             }}
           >
             <Image
-              src="/arrowLeft.svg"
+              src="/arrow-left-white.svg"
               alt="arrowIcon"
               width={23}
               height={23}
@@ -73,7 +73,7 @@ export default function ReviewDetail() {
           <SubHeader.Right onClick={() => {}}>
             {/* 브라우저는 복사, 핸드폰은 공유하기 */}
             <Image
-              src="/externalLink.svg"
+              src="/externallink-outlined-white.svg"
               alt="linkIcon"
               width={23}
               height={23}
@@ -121,7 +121,7 @@ export default function ReviewDetail() {
                   >
                     <Image
                       className="mr-1"
-                      src="/edit-white.svg"
+                      src="/edit-outlined-white.svg"
                       alt="write"
                       width={16}
                       height={16}
@@ -132,7 +132,7 @@ export default function ReviewDetail() {
                   <div className="text-xs flex">
                     <Image
                       className="mr-1"
-                      src="/like-filled-white.svg"
+                      src="/like-filled-subcoral-white.svg"
                       alt="like"
                       width={16}
                       height={16}
@@ -168,14 +168,14 @@ export default function ReviewDetail() {
           {/* {isBest && ( */}
           <Label
             name="베스트"
-            icon="/thumbUpWhite.svg"
+            icon="/thumbup-filled-white.svg"
             style="bg-mainCoral text-white px-2 py-[0.1rem] border-mainCoral text-xxs rounded"
           />
           {/* )} */}
           {/* {isMine && ( */}
           <Label
             name="나의 코멘트"
-            icon="/user.svg"
+            icon="/user-outlined-subcoral.svg"
             style="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-xxs rounded"
           />
           {/* )} */}
@@ -223,7 +223,12 @@ export default function ReviewDetail() {
               setIsOptionShow(true);
             }}
           >
-            <Image src={'/ellipsis.svg'} width={10} height={10} alt="report" />
+            <Image
+              src={'/ellipsis-darkgray.svg'}
+              width={10}
+              height={10}
+              alt="report"
+            />
           </button>
         </div>
       </section>
@@ -231,7 +236,11 @@ export default function ReviewDetail() {
       <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 ">
         <div className="flex items-center space-x-1">
           <Image
-            src={sizeType === 'bottle' ? '/bottle.svg' : '/glass.svg'}
+            src={
+              sizeType === 'bottle'
+                ? '/bottle.svg'
+                : '/glass-filled-subcoral.svg'
+            }
             width={12}
             height={12}
             alt={sizeType === 'bottle' ? 'Bottle Price' : 'Glass Price'}
@@ -245,7 +254,7 @@ export default function ReviewDetail() {
         </div>
         <div className="flex items-start space-x-1">
           <Image
-            src={'/placePoint.svg'}
+            src={'/placepoint-subcoral.svg'}
             width={12}
             height={12}
             alt={'address'}
@@ -265,8 +274,8 @@ export default function ReviewDetail() {
       <section className="mx-5 py-5 flex items-center space-x-4">
         <div className="flex-1 flex text-center justify-center items-center space-x-1">
           <Image
-            src={'/thumbUpOutline.svg'}
-            // src={isMyLike ? '/thumbUpCoral.svg' : '/thumbUpOutline.svg'}
+            src={'/thumbup-outlined-gray.svg'}
+            // src={isMyLike ? '/thumbup-filled-subcoral.svg' : '/thumbup-outlined-gray.svg'}
             width={16}
             height={16}
             alt="like"
@@ -277,7 +286,7 @@ export default function ReviewDetail() {
         <span className="border-[0.01rem] w-px border-mainGray opacity-40 h-4" />
         <div className="flex-1 flex text-center justify-center items-center space-x-1">
           <Image
-            src={'/commentOutline.svg'}
+            src={'/comment-outlined-gray.svg'}
             width={16}
             height={16}
             alt="comment"
@@ -289,7 +298,7 @@ export default function ReviewDetail() {
         <span className="border-[0.01rem] w-px border-mainGray opacity-40 h-4" />
         <div className="flex-1 flex text-center justify-center items-center space-x-1">
           <Image
-            src={'/externalLinkGray.svg'}
+            src={'/externallink-outlined-whiteGray.svg'}
             alt="linkIcon"
             width={16}
             height={16}

@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import ArrowDownIcon from 'public/Arrow-Down_Sub_Coral.svg';
-import DescendingIcon from 'public/Descending_Sub_Coral.svg';
+import ArrowDownIcon from 'public/arrow-down-subcoral.svg';
+import DescendingIcon from 'public/descending-subcoral.svg';
 import OptionDropdown from '../OptionDropdown';
 
 interface Props {

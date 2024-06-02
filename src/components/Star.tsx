@@ -16,9 +16,19 @@ const Star = ({
   return (
     <div className="flex items-center space-x-1 justify-self-end">
       {color === 'main' ? (
-        <Image src="/star.svg" width={size} height={size} alt="star" />
+        <Image
+          src="/star-filled-subcoral.svg"
+          width={size}
+          height={size}
+          alt="star"
+        />
       ) : (
-        <Image src="/starWhite.svg" width={size} height={size} alt="star" />
+        <Image
+          src="/star-filled-white.svg"
+          width={size}
+          height={size}
+          alt="star"
+        />
       )}
       <div className={`${style}`}>{rating.toFixed(1)}</div>
     </div>
