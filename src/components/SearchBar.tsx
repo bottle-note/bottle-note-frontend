@@ -27,7 +27,7 @@ export default function SearchBar({ type = 'Search', handleSearch }: Props) {
             </p>
             <div className="w-6 absolute right-3 hover:pointer">
               <Image
-                src="search-subcoral.svg"
+                src="/icon/search-subcoral.svg"
                 width={50}
                 height={50}
                 alt="search button"
