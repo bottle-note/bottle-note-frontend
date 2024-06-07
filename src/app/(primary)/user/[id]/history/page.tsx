@@ -22,7 +22,7 @@ export default function UserHistory() {
   }, [historyType]);
 
   useEffect(() => {
-    router.push(`?type=${currentTab.id}`);
+    router.replace(`?type=${currentTab.id}`);
   }, [currentTab]);
 
   return (
