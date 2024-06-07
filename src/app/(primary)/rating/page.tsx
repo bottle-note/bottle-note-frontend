@@ -8,6 +8,7 @@ import { Alcohol } from '@/types/Alcohol';
 
 export default function Rating() {
   const router = useRouter();
+  // TODO: & FIXME: 실제 데이터로 변경 && 무한 스크롤 적용
   const [populars, setPopulars] = useState<Alcohol[]>([]);
   const [currentCategory, setCurrentCategory] = useState('All');
   const handleCategory = (value: string) => {
