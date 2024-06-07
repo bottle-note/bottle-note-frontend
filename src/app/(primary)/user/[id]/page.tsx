@@ -11,7 +11,7 @@ import SidebarHeader from './_components/SidebarHeader';
 // 1. 유저 데이터 가져오는 api 연동
 // 2. 활동 내역 가져오는 api 연동
 // 3. 기타 버튼 액션과 관련된 api 연동
-export default function User() {
+export default function User({ params: { id } }: { params: { id: string } }) {
   return (
     <main className="w-full h-full text-mainBlack mb-24">
       <section className="bg-bgGray p-7.5 pb-7">
@@ -22,7 +22,7 @@ export default function User() {
           following={12}
           isFollowing
         />
-        <HistoryOverview rates={52} reviews={12} likes={14} />
+        <HistoryOverview rates={52} reviews={12} likes={14} id={Number(id)} />
       </section>
 
       <section className="px-5 pt-9">
