@@ -3,9 +3,7 @@ import { ApiResponse } from '@/types/common';
 
 export const AlcoholsApi = {
   async getPopular() {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/popular/week`,
-    );
+    const response = await fetch(`/bottle-api/popular/week`);
     if (!response.ok) {
       throw new Error('Failed to fetch data');
     }
@@ -24,9 +22,7 @@ export const AlcoholsApi = {
   },
 
   async getRegion() {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/regions`,
-    );
+    const response = await fetch(`/bottle-api/regions`);
     if (!response.ok) {
       throw new Error('Failed to fetch data');
     }

@@ -1,8 +1,14 @@
 /** @type {import('next').NextConfig} */
 
+const BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 const WHITE_LIST = ['*'];
 
 const nextConfig = {
+  async rewrites() {
+    return [
+      { source: '/bottle-api/:path*', destination: BASE_URL + '/:path*' },
+    ];
+  },
   images: {
     remotePatterns: [
       {
