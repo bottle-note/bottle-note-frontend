@@ -15,7 +15,7 @@ export async function fetchWithAuth(url: string, options?: RequestInit) {
   const session = await getSession();
   console.log(session);
 
-  const requestUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}${url}`;
+  const requestUrl = `${url}`;
 
   try {
     const response = await fetch(requestUrl, defaultOptions);

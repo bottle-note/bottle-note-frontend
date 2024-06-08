@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { MOCK_LIST_ITEM } from 'mock/alcohol';
 import CategorySelector from '@/components/CategorySelector';
 import List from '@/components/List/List';
+import { AlcoholsApi } from '@/app/api/AlcholsApi';
 
 export default function Category() {
   const router = useRouter();
@@ -21,10 +22,9 @@ export default function Category() {
 
   useEffect(() => {
     (async () => {
-      const result = await fetch('/api/alcohols?region');
-      const regions = await result.json();
+      const result = await AlcoholsApi.getRegion();
 
-      setFilterOptions(regions);
+      setFilterOptions(result);
     })();
   }, []);
 

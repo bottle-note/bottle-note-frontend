@@ -5,7 +5,7 @@ export const AuthApi = {
     accessToken: string;
     refreshToken: string;
   }> {
-    const response = await fetch(`${process.env.SERVER_URL}/oauth/login`, {
+    const response = await fetch(`/bottle-api/oauth/login`, {
       method: 'POST',
       body: JSON.stringify(body),
       headers: {
@@ -29,7 +29,7 @@ export const AuthApi = {
   },
 
   async updateAccessToken() {
-    const response = await fetch(`${process.env.SERVER_URL}/oauth/reissue`, {
+    const response = await fetch(`/bottle-api/oauth/reissue`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

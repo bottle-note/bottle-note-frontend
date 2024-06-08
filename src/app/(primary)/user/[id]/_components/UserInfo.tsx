@@ -1,3 +1,7 @@
+'use client';
+
+import { CommonApi } from '@/app/api/CommonApi';
+import { UserApi } from '@/app/api/UserApi';
 import Image from 'next/image';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
@@ -26,6 +30,7 @@ const UserInfo = ({
       type: 'profile',
       text: '프로필 수정',
       style: 'bg-white text-subCoral',
+      onClick: async () => await UserApi.changeNickname(),
     },
     {
       type: 'share',
@@ -34,6 +39,11 @@ const UserInfo = ({
     },
   ];
 
+  const getUrl = async () => {
+    const result = await CommonApi.getUploadUrl({});
+    console.log(result);
+  };
+
   return (
     <section className="flex space-x-5.25 py-8.75 border-b border-t border-subCoral">
       <Image
@@ -41,6 +51,7 @@ const UserInfo = ({
         alt="프로필 이미지"
         width={104}
         height={104}
+        onClick={getUrl}
       />
 
       <article className="space-y-2.5">
@@ -57,10 +68,11 @@ const UserInfo = ({
         </div>
 
         <div className="space-x-1 text-sm">
-          {buttonConfig.map(({ type, text, style }) => (
+          {buttonConfig.map(({ type, text, style, onClick }) => (
             <button
               key={type}
               className={`border border-subCoral px-2.5 py-1 rounded-md text-xxs ${style}`}
+              onClick={onClick}
             >
               {text}
             </button>
