@@ -2,9 +2,20 @@
 
 import Image from 'next/image';
 import { signIn, signOut, useSession } from 'next-auth/react';
+import { useEffect } from 'react';
+import { accessTokenService } from '@/utils/TokenService';
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
+  const router = useRouter();
   const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.user.accessToken) {
+      accessTokenService.save(session?.user.accessToken);
+      router.replace('/');
+    }
+  }, [session]);
 
   return (
     <main className="w-full h-[100vh] flex flex-col justify-center items-center">
