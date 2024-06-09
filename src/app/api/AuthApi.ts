@@ -5,7 +5,7 @@ export const AuthApi = {
     accessToken: string;
     refreshToken: string;
   }> {
-    const response = await fetch(`/bottle-api/oauth/login`, {
+    const response = await fetch(`${process.env.SERVER_URL}/oauth/login`, {
       method: 'POST',
       body: JSON.stringify(body),
       headers: {
