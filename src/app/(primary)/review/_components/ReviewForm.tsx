@@ -93,7 +93,7 @@ function ReviewForm() {
             <input
               type="number"
               placeholder="얼마에 마셨는지 기록해보세요!"
-              className="text-xxs font-brightGray w-full text-mainDarkGray text-right"
+              className="text-xxs font-[#BFBFBF] w-full text-mainDarkGray text-right"
             />
             <Image
               src="/icon/won-subcoral.svg"

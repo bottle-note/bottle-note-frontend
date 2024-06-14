@@ -61,7 +61,7 @@ export default function SelectFlavor() {
                 maxLength={12}
               />
               <button
-                className={`text-xxs py-[0.13rem] px-2 rounded border  w-16 ${DATA.length !== 10 ? 'border-subCoral text-subCoral' : 'border-brightGray text-brightGray'}`}
+                className={`text-xxs py-[0.13rem] px-2 rounded border  w-16 ${DATA.length !== 10 ? 'border-subCoral text-subCoral' : 'border-[#BFBFBF] text-[#BFBFBF]'}`}
                 disabled={DATA.length === 10}
               >
                 태그 등록
