@@ -9,7 +9,7 @@ interface Props {
 export default function NavLayout({ showNavbar = true, children }: Props) {
   return (
     <>
-      {children}
+      <main>{children}</main>
       {showNavbar && <Navbar maxWidth="430px" />}
     </>
   );
