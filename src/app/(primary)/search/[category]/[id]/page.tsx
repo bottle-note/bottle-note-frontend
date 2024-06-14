@@ -12,6 +12,8 @@ import FlavorTag from '../../../_components/FlavorTag';
 import Review from '@/app/(primary)/search/[category]/[id]/_components/Review';
 import { AlcoholDetails } from '@/types/Alcohol';
 import LinkButton from '@/components/LinkButton';
+import NavLayout from '@/app/(primary)/_components/NavLayout';
+import StarRating from '@/components/StarRaiting';
 
 type Details = {
   title: string;
@@ -69,7 +71,7 @@ function SearchCategory() {
   }, []);
 
   return (
-    <div>
+    <NavLayout>
       <div className="relative">
         {data?.alcohols?.alcoholUrlImg && (
           <div
@@ -150,7 +152,6 @@ function SearchCategory() {
                       className="text-xs flex"
                       onClick={() => {
                         router.push('/review/register');
-                        console.log('!!!');
                       }}
                     >
                       <Image
@@ -181,7 +182,15 @@ function SearchCategory() {
         </section>
       </div>
       <div className="mb-5">
-        {/* 혜정님 별점 컴포넌트 완성되면 공통으로 사용하기 */}
+        <article className="grid place-items-center space-y-2 py-5">
+          <p className="text-xxs text-mainDarkGray">
+            이 술에 대한 평가를 남겨보세요.
+          </p>
+          {/* 추후 로직 확인 후 수정 필요 */}
+          <div>
+            <StarRating size={40} />
+          </div>
+        </article>
         <section className="mx-5 py-5 border-y border-mainGray/30 grid grid-cols-2 gap-2">
           {details.map((data) => (
             <div
@@ -231,6 +240,7 @@ function SearchCategory() {
           )}
         </section>
       </div>
+      {/* 없을 때 화면 넣기 */}
       {data?.reviews && data.reviews.totalReviewCount !== 0 && (
         <>
           <div className="h-4 bg-sectionWhite" />
@@ -279,7 +289,7 @@ function SearchCategory() {
           </section>
         </>
       )}
-    </div>
+    </NavLayout>
   );
 }
 

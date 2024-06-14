@@ -16,6 +16,7 @@ import ReportModal from '@/app/(primary)/_components/ReportModal';
 import dummyImg from '/public/whiskey_img1.png';
 import userImg from 'public/user_img.png';
 import Comment from './_components/Comment';
+import NavLayout from '@/app/(primary)/_components/NavLayout';
 
 export default function ReviewDetail() {
   const router = useRouter();
@@ -44,8 +45,8 @@ export default function ReviewDetail() {
   };
 
   return (
-    <>
-      <div className="relative">
+    <NavLayout>
+      <div className="relative pb-5">
         {/* {data?.alcohols?.alcoholUrlImg && ( */}
         <div
           className={`absolute w-full h-full  bg-cover bg-center`}
@@ -322,6 +323,6 @@ export default function ReviewDetail() {
         </>
       )}
       {isOptionShow && <ReportModal handleClose={handleOptionsShow} />}
-    </>
+    </NavLayout>
   );
 }
