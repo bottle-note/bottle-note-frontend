@@ -9,6 +9,9 @@ import Menu from 'public/icon/menu-subcoral.svg';
 import MenuWhite from 'public/icon/menu-white.svg';
 import SidebarDeco from 'public/sidebar-deco.png';
 import { SIDEBAR_MENUS } from '../_constants';
+import Link from 'next/link';
+import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 // TODO: block scroll when sidebar is open
 
@@ -38,6 +41,7 @@ const Header = ({
 };
 
 const SidebarHeader = () => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpen = () => {
@@ -64,6 +68,10 @@ const SidebarHeader = () => {
         stiffness: 100,
       },
     }),
+  };
+
+  const onLogout = () => {
+    signOut({ callbackUrl: '/', redirect: true });
   };
 
   return (
@@ -97,7 +105,15 @@ const SidebarHeader = () => {
                 >
                   <span>{menu.text}</span>
                   {/* FIXME: 아이콘으로 변경 */}
-                  <button> {'>'} </button>
+                  {menu.link && <Link href={menu.link}>{'>'}</Link>}
+                  {menu.text === '로그아웃' && (
+                    <button onClick={onLogout}>{'>'}</button>
+                  )}
+                  {menu.text === '서비스 탈퇴' && (
+                    <button onClick={() => confirm('탈퇴...하시게요...?')}>
+                      {'>'}
+                    </button>
+                  )}
                 </motion.li>
               ))}
             </ul>
