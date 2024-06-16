@@ -37,10 +37,7 @@ export async function PATCH(req: NextRequest, res: NextResponse) {
 
     updateCookie(newSessionToken, req, res);
 
-    return NextResponse.json(
-      { accessToken: newTokens.accessToken },
-      { status: 200 },
-    );
+    return NextResponse.json({ data: newTokens }, { status: 200 });
   } catch (e) {
     const error = e as Error;
 

@@ -52,12 +52,11 @@ export const AuthApi = {
   async renewAccessToken(refreshToken: string) {
     if (!refreshToken) throw new Error('리프레시 토큰이 존재하지 않습니다.');
 
-    // NOTE: 아니 왜 헤더를 넣었는데 헤더가 없대?! 토큰 넣었는데 왜 토큰이 없대?!
     try {
       const response = await fetch(`${process.env.SERVER_URL}/oauth/reissue`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${refreshToken}`,
+          'refresh-token': `${refreshToken}`,
           'Content-Type': 'application/json',
         },
       });
