@@ -27,7 +27,28 @@ export const AuthApi = {
       refreshToken,
     };
   },
+  async renewAccessTokenClientSide() {
+    try {
+      const response = await fetch('/api/token', {
+        method: 'PATCH',
+      });
 
+      if (!response.ok) {
+        const body = await response.json();
+        throw new Error(`HTTP error! message: ${body.errors.message}`);
+      }
+
+      const { data } = await response.json();
+
+      return data;
+    } catch (e) {
+      const error = e as Error;
+
+      console.error(
+        `토큰 업데이트 도중 에러가 발생했습니다. 사유: ${error.message}`,
+      );
+    }
+  },
   async renewAccessToken(refreshToken: string) {
     if (!refreshToken) throw new Error('리프레시 토큰이 존재하지 않습니다.');
 

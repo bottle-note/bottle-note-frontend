@@ -1,3 +1,4 @@
+import { AuthApi } from '@/app/api/AuthApi';
 import { accessTokenService } from './TokenService';
 import { ApiResponse } from '@/types/common';
 
@@ -32,12 +33,10 @@ export const fetchWithAuth: FetchWithAuth = async (
       // case 1: 에러 코드가 403인 경우 -> 기간 만료이므로 리프레시 토큰으로 갱신
       if (res.code === 403 && retryCount < 1) {
         try {
-          const response = await fetch('/api/token', {
-            method: 'PATCH',
-          });
-          const { data } = await response.json();
+          const data = await AuthApi.renewAccessTokenClientSide();
 
-          accessTokenService.save(data.accessToken);
+          accessTokenService.save(data.accessToken ?? '');
+
           return fetchWithAuth(url, options, retryCount + 1);
         } catch (e) {
           const error = e as Error;

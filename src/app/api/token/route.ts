@@ -43,6 +43,7 @@ export async function PATCH(req: NextRequest, res: NextResponse) {
     );
   } catch (e) {
     const error = e as Error;
-    return NextResponse.json({ error: error.message });
+
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }
