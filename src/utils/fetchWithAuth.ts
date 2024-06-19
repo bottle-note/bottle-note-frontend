@@ -33,9 +33,11 @@ export const fetchWithAuth: FetchWithAuth = async (
       // case 1: 에러 코드가 403인 경우 -> 기간 만료이므로 리프레시 토큰으로 갱신
       if (res.code === 403 && retryCount < 1) {
         try {
-          const data = await AuthApi.renewAccessTokenClientSide();
+          const accessToken = await AuthApi.renewAccessTokenClientSide();
 
-          accessTokenService.save(data.accessToken ?? '');
+          console.log(accessToken, '새로 발급받은 액세스 토큰');
+
+          accessTokenService.save(accessToken);
 
           return fetchWithAuth(url, options, retryCount + 1);
         } catch (e) {

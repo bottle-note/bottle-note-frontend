@@ -1,4 +1,5 @@
 import { LoginReq } from '@/types/Auth';
+import { decode } from 'next-auth/jwt';
 
 export const AuthApi = {
   async login(body: LoginReq): Promise<{
@@ -56,7 +57,7 @@ export const AuthApi = {
       const response = await fetch(`${process.env.SERVER_URL}/oauth/reissue`, {
         method: 'POST',
         headers: {
-          'refresh-token': `${refreshToken}`,
+          'refresh-token': refreshToken,
           'Content-Type': 'application/json',
         },
       });

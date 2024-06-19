@@ -1,46 +1,22 @@
+import { decode } from 'next-auth/jwt';
 import { NextRequest, NextResponse } from 'next/server';
-import { AuthApi } from '../AuthApi';
-import { encode, getToken } from 'next-auth/jwt';
-import { updateCookie } from '@/utils/updateCookie';
 
-export async function PATCH(req: NextRequest, res: NextResponse) {
-  const jwt = await getToken({ req });
+export async function PATCH(req: NextRequest) {
+  const sessionCookie = process.env.NEXTAUTH_URL?.startsWith('https://')
+    ? '__Secure-next-auth.session-token'
+    : 'next-auth.session-token';
 
-  if (!jwt) {
-    return NextResponse.json(
-      { error: '세션이 존재하지 않습니다.' },
-      { status: 401 },
-    );
-  }
+  const updatedSessionToken = req.cookies.get(sessionCookie);
 
-  const refreshToken = jwt?.refreshToken as string;
+  const updatedTokenDecoded = await decode({
+    token: updatedSessionToken?.value,
+    secret: process.env.NEXTAUTH_SECRET ?? '',
+  });
 
-  if (!refreshToken) {
-    return NextResponse.json(
-      { error: '리프레시 토큰이 존재하지 않습니다.' },
-      { status: 401 },
-    );
-  }
+  console.log('3. 갱신되었을 것으로 생각되는 세션', updatedTokenDecoded);
 
-  try {
-    const newTokens = await AuthApi.renewAccessToken(refreshToken);
-
-    // TODO: 새로운 세션 쿠키를 만들어서 저장해준다.
-    const newSessionToken = await encode({
-      secret: process.env.NEXTAUTH_SECRET!,
-      token: {
-        ...jwt,
-        ...newTokens,
-      },
-      maxAge: 604800,
-    });
-
-    updateCookie(newSessionToken, req, res);
-
-    return NextResponse.json({ data: newTokens }, { status: 200 });
-  } catch (e) {
-    const error = e as Error;
-
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
+  return NextResponse.json(
+    { data: updatedTokenDecoded?.accessToken },
+    { status: 200 },
+  );
 }

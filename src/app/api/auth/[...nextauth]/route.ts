@@ -64,7 +64,7 @@ const handler = NextAuth({
         refreshToken: refreshToken as string,
       };
 
-      return { ...session, token };
+      return session;
     },
   },
   pages: {
