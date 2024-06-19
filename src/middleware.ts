@@ -17,7 +17,7 @@ export async function middleware(request: NextRequest) {
     return response;
   };
 
-  if (pathname.startsWith('/api/token')) {
+  if (pathname.startsWith('/api/token/renew')) {
     const cookiesList = request.cookies.getAll();
     const sessionCookie = process.env.NEXTAUTH_URL?.startsWith('https://')
       ? '__Secure-next-auth.session-token'
@@ -40,8 +40,6 @@ export async function middleware(request: NextRequest) {
     const json = await session.json();
     const data = Object.keys(json).length > 0 ? json : null;
 
-    console.log('1. 갱신 전 세션', data);
-
     // 세션토큰이 유효하지 않은 경우 역시 로그인 페이지로 이동 및 쿠키 삭제
     if (!session.ok || !data?.user) {
       resetCookie();
@@ -62,15 +60,6 @@ export async function middleware(request: NextRequest) {
       },
       maxAge: 30 * 24 * 60 * 60,
     });
-
-    const sessionUpdated = await decode({
-      token: newSessionToken,
-      secret: process.env.NEXTAUTH_SECRET ?? '',
-    });
-
-    console.log('1.3. 기존 데이터', data);
-    console.log('1.5. 새로 발급받은 토큰', newTokens);
-    console.log('2. 갱신 후 세션', sessionUpdated);
 
     response.cookies.set(sessionCookie, newSessionToken);
 

@@ -8,15 +8,13 @@ export async function PATCH(req: NextRequest) {
 
   const updatedSessionToken = req.cookies.get(sessionCookie);
 
-  const updatedTokenDecoded = await decode({
+  const updatedTokenDecoded: any = await decode({
     token: updatedSessionToken?.value,
     secret: process.env.NEXTAUTH_SECRET ?? '',
   });
 
-  console.log('3. 갱신되었을 것으로 생각되는 세션', updatedTokenDecoded);
-
   return NextResponse.json(
-    { data: updatedTokenDecoded?.accessToken },
+    { data: updatedTokenDecoded?.user?.accessToken },
     { status: 200 },
   );
 }
