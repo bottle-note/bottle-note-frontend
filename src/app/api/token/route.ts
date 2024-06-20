@@ -14,7 +14,7 @@ export async function PATCH(req: NextRequest) {
   });
 
   return NextResponse.json(
-    { data: updatedTokenDecoded?.user?.accessToken },
+    { data: updatedTokenDecoded?.accessToken },
     { status: 200 },
   );
 }

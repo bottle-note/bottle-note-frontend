@@ -11,8 +11,8 @@ export default function Login() {
   const { data: session } = useSession();
 
   useEffect(() => {
-    if (session?.user.token) {
-      accessTokenService.save(session?.user.token.accessToken);
+    if (session?.user) {
+      accessTokenService.save(session?.user.accessToken);
       router.replace('/');
     }
   }, [session]);

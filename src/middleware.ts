@@ -28,42 +28,40 @@ export async function middleware(request: NextRequest) {
       resetCookie();
     }
 
-    const session = await fetch(
-      `${process.env.NEXTAUTH_URL}/api/auth/session`,
-      {
-        headers: {
-          'content-type': 'application/json',
-          cookie: request.cookies.toString(),
-        },
-      } satisfies RequestInit,
-    );
-    const json = await session.json();
-    const data = Object.keys(json).length > 0 ? json : null;
-
-    // 세션토큰이 유효하지 않은 경우 역시 로그인 페이지로 이동 및 쿠키 삭제
-    if (!session.ok || !data?.user) {
-      resetCookie();
-    }
-
-    // 새롭게 발급받은 토큰 정보로 현재 세션 쿠키 업데이트
-    const newTokens = await AuthApi.renewAccessToken(
-      data.user.token.refreshToken,
-    );
-    const response = NextResponse.next();
-    const newSessionToken = await encode({
-      secret: process.env.NEXTAUTH_SECRET as string,
-      token: {
-        ...data,
-        user: {
-          ...newTokens,
-        },
-      },
-      maxAge: 30 * 24 * 60 * 60,
+    const session = request.cookies.get(sessionCookie);
+    const sessionDecoded: any = await decode({
+      token: session?.value,
+      secret: process.env.NEXTAUTH_SECRET ?? '',
     });
 
-    response.cookies.set(sessionCookie, newSessionToken);
+    // 새롭게 발급받은 토큰 정보로 현재 세션 쿠키 업데이트
+    try {
+      const newTokens = await AuthApi.renewAccessToken(
+        sessionDecoded?.refreshToken,
+      );
 
-    return response;
+      const newSessionToken = await encode({
+        secret: process.env.NEXTAUTH_SECRET as string,
+        token: {
+          ...sessionDecoded,
+          ...newTokens,
+        },
+        maxAge: 30 * 24 * 60 * 60,
+      });
+
+      request.cookies.set(sessionCookie, newSessionToken);
+      const response = NextResponse.next({
+        request: {
+          headers: request.headers,
+        },
+      });
+
+      response.cookies.set(sessionCookie, newSessionToken);
+
+      return response;
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   return NextResponse.next();

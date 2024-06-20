@@ -59,9 +59,12 @@ const handler = NextAuth({
 
     async session({ session, token }) {
       const { accessToken, refreshToken } = token;
-      session.user.token = {
-        accessToken: accessToken as string,
-        refreshToken: refreshToken as string,
+      session.user = {
+        ...session.user,
+        ...{
+          accessToken: accessToken as string,
+          refreshToken: refreshToken as string,
+        },
       };
 
       return session;

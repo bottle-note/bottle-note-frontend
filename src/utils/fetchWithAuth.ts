@@ -33,11 +33,17 @@ export const fetchWithAuth: FetchWithAuth = async (
       // case 1: 에러 코드가 403인 경우 -> 기간 만료이므로 리프레시 토큰으로 갱신
       if (res.code === 403 && retryCount < 1) {
         try {
+          // 1. 미들웨어 호출
           await fetch('/api/token/renew', {
             method: 'POST',
           });
 
+          // 2. 미들웨어에서 업데이트 된 토큰을 가져옴
           const accessToken = await AuthApi.renewAccessTokenClientSide();
+
+          if (!accessToken) {
+            throw new Error('갱신된 액세스 토큰이 존재하지 않습니다.');
+          }
 
           accessTokenService.save(accessToken);
 
