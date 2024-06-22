@@ -27,5 +27,3 @@ export class TokenService implements ITokenService {
     this.#storage.removeItem(this.#key);
   }
 }
-
-export const accessTokenService = new TokenService('accessToken');

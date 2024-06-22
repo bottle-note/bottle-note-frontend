@@ -1,6 +1,6 @@
 import { AuthApi } from '@/app/api/AuthApi';
-import { accessTokenService } from './TokenService';
 import { ApiResponse } from '@/types/common';
+import { getSession } from 'next-auth/react';
 
 type FetchWithAuth = (
   url: string,
@@ -13,11 +13,13 @@ export const fetchWithAuth: FetchWithAuth = async (
   options,
   retryCount = 0,
 ) => {
+  const session = await getSession();
+
   const defaultOptions = {
     ...options,
     headers: {
       ...options?.headers,
-      Authorization: `Bearer ${accessTokenService.get()}`,
+      Authorization: `Bearer ${session?.user.accessToken}`,
       'Content-Type': 'application/json',
     },
   };
@@ -33,24 +35,15 @@ export const fetchWithAuth: FetchWithAuth = async (
       // case 1: 에러 코드가 403인 경우 -> 기간 만료이므로 리프레시 토큰으로 갱신
       if (res.code === 403 && retryCount < 1) {
         try {
-          // 1. 미들웨어 호출
-          await fetch('/api/token/renew', {
-            method: 'POST',
-          });
+          const newAccessToken = await AuthApi.renewAccessTokenClientSide();
 
-          // 2. 미들웨어에서 업데이트 된 토큰을 가져옴
-          const accessToken = await AuthApi.renewAccessTokenClientSide();
-
-          if (!accessToken) {
+          if (!newAccessToken) {
             throw new Error('갱신된 액세스 토큰이 존재하지 않습니다.');
           }
 
-          accessTokenService.save(accessToken);
-
           return fetchWithAuth(url, options, retryCount + 1);
         } catch (e) {
-          const error = e as Error;
-          console.error(error.message);
+          throw new Error(`HTTP error! ${e}`);
         }
       }
 

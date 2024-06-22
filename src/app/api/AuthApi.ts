@@ -1,5 +1,6 @@
 import { LoginReq } from '@/types/Auth';
 import { decode } from 'next-auth/jwt';
+import { getSession } from 'next-auth/react';
 
 export const AuthApi = {
   async login(body: LoginReq): Promise<{
@@ -30,8 +31,8 @@ export const AuthApi = {
   },
   async renewAccessTokenClientSide() {
     try {
-      const response = await fetch('/api/token', {
-        method: 'PATCH',
+      const response = await fetch('/api/token/renew', {
+        method: 'POST',
       });
 
       if (!response.ok) {
@@ -39,9 +40,10 @@ export const AuthApi = {
         throw new Error(`HTTP error! message: ${body.errors.message}`);
       }
 
-      const { data } = await response.json();
+      const newSession = await getSession();
+      const newAccessToken = newSession?.user.accessToken;
 
-      return data;
+      return newAccessToken;
     } catch (e) {
       const error = e as Error;
 
