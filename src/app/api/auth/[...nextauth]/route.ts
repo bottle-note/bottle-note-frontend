@@ -5,6 +5,8 @@ import NaverProvider from 'next-auth/providers/naver';
 import NextAuth from 'next-auth';
 import { AuthApi } from '../../AuthApi';
 
+const jwt = require('jsonwebtoken');
+
 const handler = NextAuth({
   providers: [
     KakaoProvider({
@@ -36,9 +38,12 @@ const handler = NextAuth({
 
         const { accessToken, refreshToken } = await AuthApi.login(body);
 
+        const info = jwt.decode(accessToken);
+
         if (account) {
           account.accessToken = accessToken;
           account.refreshToken = refreshToken;
+          account.userId = info.userId;
         }
 
         return true;
@@ -52,18 +57,20 @@ const handler = NextAuth({
       if (account && account.accessToken) {
         token.accessToken = account.accessToken;
         token.refreshToken = account.refreshToken;
+        token.userId = account.userId;
       }
 
       return token;
     },
 
     async session({ session, token }) {
-      const { accessToken, refreshToken } = token;
+      const { accessToken, refreshToken, userId } = token;
       session.user = {
         ...session.user,
         ...{
           accessToken: accessToken as string,
           refreshToken: refreshToken as string,
+          userId: userId as number,
         },
       };
 

@@ -1,48 +1,33 @@
 'use client';
 
-import { CommonApi } from '@/app/api/CommonApi';
-import { UserApi } from '@/app/api/UserApi';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import ProfileDefaultImg from 'public/profile-default.svg';
+import { useEffect, useState } from 'react';
 
-// TODO: api dto 에 맞출것
 interface Props {
   profileImgSrc: string | null;
   follower: number;
   following: number;
-  isFollowing?: boolean; // NOTE: 내가 following 중인 상태,
+  currentId: string;
+  isFollowing?: boolean;
 }
 
-// TODO: 버튼 스타일 공통화
+// 이 아이의 역할
+// 3. 내 프로필일 경우 프로필 수정 페이지로 이동
 const UserInfo = ({
   profileImgSrc = null,
   follower,
   following,
   isFollowing,
+  currentId,
 }: Props) => {
-  const buttonConfig = [
-    {
-      type: 'follow',
-      text: isFollowing ? '팔로잉' : '팔로우',
-      style: isFollowing ? 'bg-subCoral text-white' : 'bg-white text-subCoral',
-    },
-    {
-      type: 'profile',
-      text: '프로필 수정',
-      style: 'bg-white text-subCoral',
-      onClick: async () => await UserApi.changeNickname(),
-    },
-    {
-      type: 'share',
-      text: '공유',
-      style: 'bg-white text-subCoral',
-    },
-  ];
+  const { data: session } = useSession();
+  const [isMatchUser, setIsMatchUser] = useState(false);
 
-  const getUrl = async () => {
-    const result = await CommonApi.getUploadUrl({});
-    console.log(result);
-  };
+  useEffect(() => {
+    setIsMatchUser(session?.user.userId === Number(currentId));
+  }, [session]);
 
   return (
     <section className="flex space-x-5.25 py-8.75 border-b border-t border-subCoral">
@@ -51,7 +36,6 @@ const UserInfo = ({
         alt="프로필 이미지"
         width={104}
         height={104}
-        onClick={getUrl}
       />
 
       <article className="space-y-2.5">
@@ -68,15 +52,35 @@ const UserInfo = ({
         </div>
 
         <div className="space-x-1 text-sm">
-          {buttonConfig.map(({ type, text, style, onClick }) => (
+          {isMatchUser && (
             <button
-              key={type}
-              className={`border border-subCoral px-2.5 py-1 rounded-md text-xxs ${style}`}
-              onClick={onClick}
+              className={`border border-subCoral px-2.5 py-1 rounded-md text-10 bg-white text-subCoral`}
+              onClick={() => alert('수정 페이지로 이동합니다옹...')}
             >
-              {text}
+              프로필 수정
             </button>
-          ))}
+          )}
+
+          {!isMatchUser &&
+            (isFollowing ? (
+              <button
+                className={`px-2.5 py-1 text-10 label-selected`}
+                onClick={() =>
+                  alert('팔로우를 끊고 isFollowing -> false 다옹...')
+                }
+              >
+                팔로잉
+              </button>
+            ) : (
+              <button
+                className={`px-2.5 py-1 text-10 label-default`}
+                onClick={() =>
+                  alert('팔로잉을 하고 isFollowing -> true 다옹...')
+                }
+              >
+                팔로우
+              </button>
+            ))}
         </div>
       </article>
     </section>

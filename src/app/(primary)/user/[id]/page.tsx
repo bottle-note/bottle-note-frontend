@@ -20,12 +20,14 @@ export default function User({ params: { id } }: { params: { id: string } }) {
           profileImgSrc={null}
           follower={323}
           following={12}
-          isFollowing
+          isFollowing={false}
+          currentId={id}
         />
         <HistoryOverview rates={52} reviews={12} likes={14} id={Number(id)} />
       </section>
 
       <section className="px-5 pt-9">
+        {/* TODO: 별도 리스트 컴포넌트로 분리 필요 (얘만 따로 클라이언트 사이드 렌더링?) */}
         <List>
           <List.Manager total={33} />
           {MOCK_LIST_ITEM.map((item) => (
