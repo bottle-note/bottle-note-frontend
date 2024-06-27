@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  input {
+    @apply outline-none;
+  }
+}
+
 @layer components {
   .label-default {
     @apply bg-white text-subCoral border border-subCoral rounded-md;
@@ -9,6 +15,10 @@
 
   .label-selected {
     @apply bg-subCoral text-white border border-subCoral rounded-md;
+  }
+
+  .label-disabled {
+    @apply bg-bgGray text-white border border-bgGray rounded-md;
   }
 
   .tab-default {

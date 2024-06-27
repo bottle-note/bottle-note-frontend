@@ -2,6 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import { useEffect, useState } from 'react';
 
@@ -24,6 +25,7 @@ const UserInfo = ({
 }: Props) => {
   const { data: session } = useSession();
   const [isMatchUser, setIsMatchUser] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setIsMatchUser(session?.user.userId === Number(currentId));
@@ -55,7 +57,7 @@ const UserInfo = ({
           {isMatchUser && (
             <button
               className={`border border-subCoral px-2.5 py-1 rounded-md text-10 bg-white text-subCoral`}
-              onClick={() => alert('수정 페이지로 이동합니다옹...')}
+              onClick={() => router.push(`/user/${currentId}/edit`)}
             >
               프로필 수정
             </button>
