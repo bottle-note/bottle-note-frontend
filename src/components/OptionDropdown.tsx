@@ -4,6 +4,7 @@ interface Props {
   handleClose: () => void;
 }
 
+// TODO: 옵션, 타입 props 로 받아오도록 수정
 export default function OptionDropdown({ handleClose }: Props) {
   const MOCK_OPTIONS = ['인기도순', '별점순', '찜하기순', '댓글순'];
   const type = '정렬';
