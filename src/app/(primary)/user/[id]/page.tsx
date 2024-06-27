@@ -42,6 +42,7 @@ export default function User({ params: { id } }: { params: { id: string } }) {
               engName: 'HISTORY',
               korName: '활동 히스토리',
               linkSrc: `/user/${id}/history?type=all`,
+              icon: true,
             }}
           />
         </section>
