@@ -23,7 +23,12 @@ const ListItemRating = ({ data }: Props) => {
   return (
     <article className="flex items-center space-x-2 text-mainBlack border-mainBlack border-b h-[90px]">
       <div className="w-[89px] h-[89px] relative flex shrink-0">
-        <Image src={imageUrl} alt="위스키 이미지" fill objectFit="cover" />
+        <Image
+          src={imageUrl}
+          alt="위스키 이미지"
+          fill
+          className="object-contain"
+        />
       </div>
 
       <section className="flex-1 space-y-1">
