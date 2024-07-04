@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import LikeBtn from '@/app/(primary)/user/[id]/_components/LikeBtn'; // 위치이동!
 import StarRating from '../StarRaiting';
+import Fallback from 'public/bottle.svg';
+import { useState } from 'react';
 
 interface Props {
   data: {
@@ -19,16 +21,19 @@ interface Props {
 
 const ListItemRating = ({ data }: Props) => {
   const { korCategory, korName, engName, imageUrl, rating, isPicked } = data;
+  const [imgSrc, setImgSrc] = useState(imageUrl);
 
   return (
     <article className="flex items-center space-x-2 text-mainBlack border-mainBlack border-b h-[90px]">
       <div className="w-[89px] h-[89px] relative flex shrink-0">
         <Image
-          src={imageUrl}
+          src={imgSrc}
           alt="위스키 이미지"
           fill
-          className="object-contain"
+          className="object-contain w-auto h-auto"
           priority
+          sizes="89px"
+          onError={() => setImgSrc(Fallback)}
         />
       </div>
 
