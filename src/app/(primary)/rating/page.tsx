@@ -11,7 +11,7 @@ import Loading from '@/components/Loading';
 import NavLayout from '../_components/NavLayout';
 import LinkButton from '@/components/LinkButton';
 import { RateApi } from '@/app/api/RateApi';
-import { ApiResponse, SORT_ORDER, SORT_TYPE } from '@/types/common';
+import { SORT_ORDER, SORT_TYPE } from '@/types/common';
 import { useFilter } from '@/hooks/useFilter';
 import { RateAPI } from '@/types/Rate';
 
@@ -26,28 +26,24 @@ export default function Rating() {
     setRegionId,
   } = useFilter();
 
-  const { data: ratingList, isLoading } = usePaginatedQuery<{
+  const {
+    data: ratingList,
+    isLoading,
+    fetchNextPage,
+  } = usePaginatedQuery<{
     ratings: RateAPI[];
   }>({
     queryKey: ['rating', filterState],
-    queryFn: ({ pageParam = 0 }) =>
-      RateApi.getList({
+    queryFn: ({ pageParam }) => {
+      return RateApi.getList({
         ...filterState,
         ...{
           cursor: pageParam,
           pageSize: 10,
         },
-      }),
+      });
+    },
   });
-
-  useEffect(() => {
-    setSortOrder(SORT_ORDER.DESC);
-    setSortType(SORT_TYPE.RANDOM);
-  }, []);
-
-  useEffect(() => {
-    console.log(ratingList, '목록 불러와유');
-  }, [ratingList]);
 
   // TODO: useCatogory 로 공통화
   const [currentCategory, setCurrentCategory] = useState('All');
@@ -62,6 +58,11 @@ export default function Rating() {
   >(null);
 
   useEffect(() => {
+    setSortOrder(SORT_ORDER.DESC);
+    setSortType(SORT_TYPE.RANDOM);
+  }, []);
+
+  useEffect(() => {
     (async () => {
       const result = await AlcoholsApi.getRegion();
 
@@ -71,6 +72,8 @@ export default function Rating() {
 
   // TODO: useSortOptions 로 공통화
   const SORT_OPTIONS = ['인기도순', '별점순', '찜하기순', '댓글순'];
+
+  if (isLoading) return <Loading />;
 
   return (
     <NavLayout>
@@ -91,14 +94,17 @@ export default function Rating() {
               />
             )}
 
-            {isLoading && <Loading />}
             {!isLoading && !ratingList && <EmptyView />}
             {ratingList &&
-              ratingList.map((item: any) => (
-                <List.Rating key={item.alcoholId} data={item} />
-              ))}
+              [...ratingList.map((list) => list.data.ratings)]
+                .flat()
+                .map((item: any) => (
+                  <List.Rating key={item.alcoholId} data={item} />
+                ))}
           </List>
         </section>
+
+        <button onClick={() => fetchNextPage()}>load more</button>
 
         <LinkButton
           data={{

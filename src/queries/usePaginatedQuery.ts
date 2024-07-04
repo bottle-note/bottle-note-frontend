@@ -1,5 +1,6 @@
 import { ApiResponse } from '@/types/common';
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 interface Props<T> {
   queryKey: [string, any];
@@ -13,18 +14,25 @@ export const usePaginatedQuery = <T>({ queryKey, queryFn }: Props<T>) => {
       queryFn,
       getNextPageParam: (lastPage: ApiResponse<T>) => {
         if (lastPage.meta.pageable?.hasNext) {
-          lastPage.meta.pageable.currentCursor + 1;
+          return lastPage.meta.pageable.currentCursor + 10;
         }
         return null;
       },
       initialPageParam: 0,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
     });
+
+  const handleFetchNextPage = async () => {
+    const data = (await fetchNextPage()).data;
+    console.log(data);
+  };
 
   return {
     data: data?.pages,
     error,
     isLoading,
-    fetchNextPage,
+    fetchNextPage: handleFetchNextPage,
     hasNextPage,
   };
 };
