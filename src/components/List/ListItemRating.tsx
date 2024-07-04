@@ -5,22 +5,14 @@ import LikeBtn from '@/app/(primary)/user/[id]/_components/LikeBtn'; // 위치�
 import StarRating from '../StarRaiting';
 import Fallback from 'public/bottle.svg';
 import { useState } from 'react';
+import { RateAPI } from '@/types/Rate';
 
 interface Props {
-  data: {
-    alcoholId: number;
-    korName: string;
-    engName: string;
-    rating: number;
-    engCategory: string;
-    korCategory: string;
-    imageUrl: string;
-    isPicked?: boolean;
-  };
+  data: RateAPI;
 }
 
 const ListItemRating = ({ data }: Props) => {
-  const { korCategory, korName, engName, imageUrl, rating, isPicked } = data;
+  const { korCategory, korName, engName, imageUrl, isPicked } = data;
   const [imgSrc, setImgSrc] = useState(imageUrl);
 
   return (

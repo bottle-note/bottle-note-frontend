@@ -98,8 +98,8 @@ export default function Rating() {
             {ratingList &&
               [...ratingList.map((list) => list.data.ratings)]
                 .flat()
-                .map((item: any) => (
-                  <List.Rating key={item.alcoholId} data={item} />
+                .map((item: RateAPI, idx) => (
+                  <List.Rating key={`${item.alcoholId}_${idx}`} data={item} />
                 ))}
           </List>
         </section>
