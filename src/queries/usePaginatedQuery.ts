@@ -23,16 +23,11 @@ export const usePaginatedQuery = <T>({ queryKey, queryFn }: Props<T>) => {
       refetchOnWindowFocus: false,
     });
 
-  const handleFetchNextPage = async () => {
-    const data = (await fetchNextPage()).data;
-    console.log(data);
-  };
-
   return {
     data: data?.pages,
     error,
     isLoading,
-    fetchNextPage: handleFetchNextPage,
+    fetchNextPage,
     hasNextPage,
   };
 };
