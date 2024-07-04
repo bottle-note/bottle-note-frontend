@@ -8,5 +8,29 @@ export interface ApiResponse<T> {
     serverVersion: string;
     serverPathVersion: string;
     serverResponseTime: string;
+    pageable?: { pageSize: number; hasNext: boolean; currentCursor: number };
   };
+}
+
+export const enum SORT_TYPE {
+  POPULAR = 'POPULAR',
+  RATING = 'RATING',
+  PICK = 'PICK',
+  REVIEW = 'REVIEW',
+  RANDOM = 'RANDOM',
+}
+
+export const enum SORT_ORDER {
+  DESC = 'DESC',
+  ASC = 'ASC',
+}
+
+export interface ListQueryParams {
+  keyword?: string;
+  category?: string;
+  regionId?: number | '';
+  sortType?: SORT_TYPE;
+  sortOrder?: SORT_ORDER;
+  cursor?: number;
+  pageSize?: number;
 }

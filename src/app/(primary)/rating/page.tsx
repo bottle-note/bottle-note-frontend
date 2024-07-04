@@ -4,33 +4,62 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import CategorySelector from '@/components/CategorySelector';
 import List from '@/components/List/List';
-import { Alcohol } from '@/types/Alcohol';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
+import EmptyView from '../_components/EmptyView';
+import Loading from '@/components/Loading';
+import NavLayout from '../_components/NavLayout';
+import LinkButton from '@/components/LinkButton';
+import { RateApi } from '@/app/api/RateApi';
+import { ApiResponse, SORT_ORDER, SORT_TYPE } from '@/types/common';
+import { useFilter } from '@/hooks/useFilter';
+import { RateAPI } from '@/types/Rate';
 
 export default function Rating() {
   const router = useRouter();
-  // TODO: & FIXME: 실제 데이터로 변경 && 무한 스크롤 적용
-  const [populars, setPopulars] = useState<Alcohol[]>([]);
+  const {
+    state: filterState,
+    setKeyword,
+    setCategory,
+    setSortOrder,
+    setSortType,
+    setRegionId,
+  } = useFilter();
+
+  const { data: ratingList, isLoading } = usePaginatedQuery<{
+    ratings: RateAPI[];
+  }>({
+    queryKey: ['rating', filterState],
+    queryFn: ({ pageParam = 0 }) =>
+      RateApi.getList({
+        ...filterState,
+        ...{
+          cursor: pageParam,
+          pageSize: 10,
+        },
+      }),
+  });
+
+  useEffect(() => {
+    setSortOrder(SORT_ORDER.DESC);
+    setSortType(SORT_TYPE.RANDOM);
+  }, []);
+
+  useEffect(() => {
+    console.log(ratingList, '목록 불러와유');
+  }, [ratingList]);
+
+  // TODO: useCatogory 로 공통화
   const [currentCategory, setCurrentCategory] = useState('All');
   const handleCategory = (value: string) => {
     if (value !== currentCategory) router.push(`/rating?category=${value}`);
     setCurrentCategory(value);
   };
 
-  // TODO: 공통 훅으로 빼기
-  useEffect(() => {
-    (async () => {
-      const result = await AlcoholsApi.getPopular();
-
-      setPopulars(result);
-    })();
-  }, []);
-
+  // TODO: useFilterOptions 로 공통화
   const [filterOptions, setFilterOptions] = useState<
     { id: number; value: string }[] | null
   >(null);
-
-  const SORT_OPTIONS = ['인기도순', '별점순', '찜하기순', '댓글순'];
 
   useEffect(() => {
     (async () => {
@@ -40,29 +69,46 @@ export default function Rating() {
     })();
   }, []);
 
+  // TODO: useSortOptions 로 공통화
+  const SORT_OPTIONS = ['인기도순', '별점순', '찜하기순', '댓글순'];
+
   return (
-    <>
-      <CategorySelector
-        selectedCategory={currentCategory}
-        handleCategory={handleCategory}
-      />
+    <NavLayout>
+      <main className="flex flex-col gap-7">
+        <CategorySelector
+          selectedCategory={currentCategory}
+          handleCategory={handleCategory}
+        />
 
-      <section>
-        <List>
-          {filterOptions && (
-            <List.Manager
-              total={52}
-              sortOptions={SORT_OPTIONS}
-              hanldeSortOption={(value) => console.log(value)}
-              filterOptions={filterOptions}
-            />
-          )}
+        <section>
+          <List>
+            {filterOptions && (
+              <List.Manager
+                total={52}
+                sortOptions={SORT_OPTIONS}
+                hanldeSortOption={(value) => console.log(value)}
+                filterOptions={filterOptions}
+              />
+            )}
 
-          {populars.map((item: any) => (
-            <List.Rating key={item.alcoholId} data={item} />
-          ))}
-        </List>
-      </section>
-    </>
+            {isLoading && <Loading />}
+            {!isLoading && !ratingList && <EmptyView />}
+            {ratingList &&
+              ratingList.map((item: any) => (
+                <List.Rating key={item.alcoholId} data={item} />
+              ))}
+          </List>
+        </section>
+
+        <LinkButton
+          data={{
+            korName: '혹시 찾는 술이 없으신가요?',
+            engName: 'NO RESULTS',
+            icon: true,
+            linkSrc: '/search',
+          }}
+        />
+      </main>
+    </NavLayout>
   );
 }
