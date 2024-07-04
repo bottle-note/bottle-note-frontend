@@ -8,7 +8,7 @@ export interface AlcoholAPI {
   engCategory: string;
   korCategory: string;
   imageUrl: string;
-  isPicked: false;
+  isPicked?: false;
 }
 export interface Alcohol extends AlcoholAPI {
   path: string | { pathname: string; query?: any };

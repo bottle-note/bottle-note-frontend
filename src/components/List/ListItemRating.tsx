@@ -28,6 +28,7 @@ const ListItemRating = ({ data }: Props) => {
           alt="위스키 이미지"
           fill
           className="object-contain"
+          priority
         />
       </div>
 

@@ -7,6 +7,7 @@ import CategoryTitle from '@/components/CategoryTitle';
 import List from '@/components/List/List';
 import { Alcohol } from '@/types/Alcohol';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import NavLayout from '../_components/NavLayout';
 
 export default function Search() {
   const router = useRouter();
@@ -26,20 +27,22 @@ export default function Search() {
   }, []);
 
   return (
-    <>
-      <CategorySelector
-        selectedCategory={currentCategory}
-        handleCategory={handleCategory}
-      />
+    <NavLayout>
+      <main className="flex flex-col gap-7">
+        <CategorySelector
+          selectedCategory={currentCategory}
+          handleCategory={handleCategory}
+        />
 
-      <section>
-        <CategoryTitle subTitle="위클리 HOT 5" />
-        <List>
-          {populars.map((item: any) => (
-            <List.Item key={item.alcoholId} data={item} />
-          ))}
-        </List>
-      </section>
-    </>
+        <section>
+          <CategoryTitle subTitle="위클리 HOT 5" />
+          <List>
+            {populars.map((item: any) => (
+              <List.Item key={item.alcoholId} data={item} />
+            ))}
+          </List>
+        </section>
+      </main>
+    </NavLayout>
   );
 }
