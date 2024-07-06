@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { useEffect } from 'react';
-import { accessTokenService } from '@/utils/TokenService';
 import { useRouter } from 'next/navigation';
 
 export default function Login() {
