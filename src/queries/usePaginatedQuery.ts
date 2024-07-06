@@ -6,16 +6,21 @@ import { useState } from 'react';
 interface Props<T> {
   queryKey: [string, any];
   queryFn: (params: any) => Promise<ApiResponse<T>>;
+  pageSize?: number;
 }
 
-export const usePaginatedQuery = <T>({ queryKey, queryFn }: Props<T>) => {
+export const usePaginatedQuery = <T>({
+  queryKey,
+  queryFn,
+  pageSize = 10,
+}: Props<T>) => {
   const { data, error, isLoading, fetchNextPage, hasNextPage, isFetching } =
     useInfiniteQuery({
       queryKey,
       queryFn,
       getNextPageParam: (lastPage: ApiResponse<T>) => {
         if (lastPage.meta.pageable?.hasNext) {
-          return lastPage.meta.pageable.currentCursor + 10;
+          return lastPage.meta.pageable.currentCursor + pageSize;
         }
         return null;
       },
