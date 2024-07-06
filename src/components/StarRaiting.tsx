@@ -52,15 +52,12 @@ const Star = ({ size = 30, index, rate, handleRate }: StarProps) => {
 
 interface StarRatingProps {
   size?: number;
+  rate: number;
+  handleRate: (rate: number) => void;
 }
 
-const StarRating = ({ size = 30 }: StarRatingProps) => {
-  const [rate, setRate] = useState(0);
+const StarRating = ({ size = 30, rate, handleRate }: StarRatingProps) => {
   const maxRating = 10;
-
-  const handleRating = (selectedRate: number) => {
-    setRate(selectedRate);
-  };
 
   return (
     <div className="relative w-full h-full">
@@ -71,7 +68,7 @@ const StarRating = ({ size = 30 }: StarRatingProps) => {
             size={size}
             index={i + 1}
             rate={rate}
-            handleRate={handleRating}
+            handleRate={handleRate}
           />
         ))}
       </div>

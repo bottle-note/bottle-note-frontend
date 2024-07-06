@@ -14,6 +14,12 @@ interface Props {
 const ListItemRating = ({ data }: Props) => {
   const { korCategory, korName, engName, imageUrl, isPicked } = data;
   const [imgSrc, setImgSrc] = useState(imageUrl);
+  const [rate, setRate] = useState(0);
+
+  const handleRate = (selectedRate: number) => {
+    setRate(selectedRate);
+    // TODO: 서버에 별점 업데이트 요청
+  };
 
   return (
     <article className="flex items-center space-x-2 text-mainBlack border-mainBlack border-b h-[90px]">
@@ -41,7 +47,7 @@ const ListItemRating = ({ data }: Props) => {
         </article>
 
         <article className="flex justify-between">
-          <StarRating />
+          <StarRating rate={rate} handleRate={handleRate} />
           <div className="space-x-1.5 flex items-center">
             {/* TODO: 유저가 로그인 상태인지 확인하여 조건부 렌더링 */}
             <LikeBtn isLiked={isPicked} />
