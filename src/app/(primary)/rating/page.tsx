@@ -75,8 +75,6 @@ export default function Rating() {
   // TODO: useSortOptions 로 공통화
   const SORT_OPTIONS = ['인기도순', '별점순', '찜하기순', '댓글순'];
 
-  if (isLoading || isFetching) return <Loading />;
-
   return (
     <NavLayout>
       <main className="flex flex-col gap-7">
@@ -86,6 +84,7 @@ export default function Rating() {
         />
 
         <section>
+          {(isLoading || isFetching) && <Loading />}
           <List>
             {filterOptions && (
               <List.Manager
