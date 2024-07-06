@@ -29,7 +29,9 @@ export default function Rating() {
   const {
     data: ratingList,
     isLoading,
-    fetchNextPage,
+    isFetching,
+    hasNextPage,
+    targetRef,
   } = usePaginatedQuery<{
     ratings: RateAPI[];
   }>({
@@ -73,7 +75,7 @@ export default function Rating() {
   // TODO: useSortOptions 로 공통화
   const SORT_OPTIONS = ['인기도순', '별점순', '찜하기순', '댓글순'];
 
-  if (isLoading) return <Loading />;
+  if (isLoading || isFetching) return <Loading />;
 
   return (
     <NavLayout>
@@ -104,16 +106,18 @@ export default function Rating() {
           </List>
         </section>
 
-        <button onClick={() => fetchNextPage()}>load more</button>
+        <div ref={targetRef} />
 
-        <LinkButton
-          data={{
-            korName: '혹시 찾는 술이 없으신가요?',
-            engName: 'NO RESULTS',
-            icon: true,
-            linkSrc: '/search',
-          }}
-        />
+        {!hasNextPage && (
+          <LinkButton
+            data={{
+              korName: '혹시 찾는 술이 없으신가요?',
+              engName: 'NO RESULTS',
+              icon: true,
+              linkSrc: '/search',
+            }}
+          />
+        )}
       </main>
     </NavLayout>
   );

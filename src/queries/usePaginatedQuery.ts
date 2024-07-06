@@ -1,3 +1,4 @@
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { ApiResponse } from '@/types/common';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -8,7 +9,7 @@ interface Props<T> {
 }
 
 export const usePaginatedQuery = <T>({ queryKey, queryFn }: Props<T>) => {
-  const { data, error, isLoading, fetchNextPage, hasNextPage } =
+  const { data, error, isLoading, fetchNextPage, hasNextPage, isFetching } =
     useInfiniteQuery({
       queryKey,
       queryFn,
@@ -23,11 +24,17 @@ export const usePaginatedQuery = <T>({ queryKey, queryFn }: Props<T>) => {
       refetchOnWindowFocus: false,
     });
 
+  const { targetRef } = useInfiniteScroll({
+    fetchNextPage,
+  });
+
   return {
     data: data?.pages,
     error,
     isLoading,
+    isFetching,
     fetchNextPage,
     hasNextPage,
+    targetRef,
   };
 };
