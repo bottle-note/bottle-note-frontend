@@ -11,20 +11,30 @@ import Loading from '@/components/Loading';
 import NavLayout from '../_components/NavLayout';
 import LinkButton from '@/components/LinkButton';
 import { RateApi } from '@/app/api/RateApi';
-import { SORT_ORDER, SORT_TYPE } from '@/types/common';
+import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
 import { useFilter } from '@/hooks/useFilter';
 import { RateAPI } from '@/types/Rate';
 
+interface InitialState {
+  keyword: string;
+  category: Category | '';
+  regionId: RegionId;
+  sortType: SORT_TYPE.RANDOM;
+  sortOrder: SORT_ORDER.DESC;
+}
+
 export default function Rating() {
   const router = useRouter();
-  const {
-    state: filterState,
-    setKeyword,
-    setCategory,
-    setSortOrder,
-    setSortType,
-    setRegionId,
-  } = useFilter();
+
+  const initialState: InitialState = {
+    keyword: '',
+    category: '',
+    regionId: '',
+    sortType: SORT_TYPE.RANDOM,
+    sortOrder: SORT_ORDER.DESC,
+  };
+
+  const { state: filterState, handleFilter } = useFilter(initialState);
 
   const {
     data: ratingList,
@@ -51,17 +61,13 @@ export default function Rating() {
   const handleCategory = (value: string) => {
     if (value !== currentCategory) router.push(`/rating?category=${value}`);
     setCurrentCategory(value);
+    handleFilter('category', value);
   };
 
   // TODO: useFilterOptions 로 공통화
   const [filterOptions, setFilterOptions] = useState<
     { id: number; value: string }[] | null
   >(null);
-
-  useEffect(() => {
-    setSortOrder(SORT_ORDER.DESC);
-    setSortType(SORT_TYPE.RANDOM);
-  }, []);
 
   useEffect(() => {
     (async () => {

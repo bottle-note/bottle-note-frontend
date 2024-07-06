@@ -1,3 +1,5 @@
+import { CATEGORY_MENUS, REGIONS } from '@/constants/common';
+
 export interface ApiResponse<T> {
   success: boolean;
   code: number;
@@ -34,3 +36,6 @@ export interface ListQueryParams {
   cursor?: number;
   pageSize?: number;
 }
+
+export type Category = keyof typeof CATEGORY_MENUS;
+export type RegionId = (typeof REGIONS)[number]['regionId'];

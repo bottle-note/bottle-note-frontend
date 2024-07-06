@@ -13,7 +13,7 @@ export const RateApi = {
     pageSize,
   }: ListQueryParams) {
     const response = await fetch(
-      `/bottle-api/rating?keyword=${keyword}&category=${category}&regionId=${regionId ?? ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
+      `/bottle-api/rating?keyword=${keyword}&category=${category}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
       {
         method: 'GET',
         headers: {
@@ -21,6 +21,7 @@ export const RateApi = {
         },
       },
     );
+
     if (!response.ok) {
       throw new Error('Failed to fetch data');
     }

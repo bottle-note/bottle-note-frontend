@@ -1,69 +1,31 @@
-import { ListQueryParams, SORT_ORDER, SORT_TYPE } from '@/types/common';
 import { useReducer } from 'react';
 
-const initialState: ListQueryParams = {
-  keyword: '',
-  category: '',
-  sortOrder: SORT_ORDER.DESC,
-  sortType: SORT_TYPE.POPULAR,
-  regionId: '',
+type Action<TState> = {
+  type: keyof TState | 'initialize';
+  payload: any; // 각 state의 payload 타입이 다른데 이걸 어떻게 추론하지?
 };
 
-type State = typeof initialState;
+function reducer<TState>(state: TState, action: Action<TState>): TState {
+  const { type, payload } = action;
 
-type Action =
-  | { type: 'SET_KEYWORD'; payload: string }
-  | { type: 'SET_CATEGORY'; payload: string }
-  | { type: 'SET_SORT_ORDER'; payload: SORT_ORDER }
-  | { type: 'SET_SORT_TYPE'; payload: SORT_TYPE }
-  | { type: 'SET_REGION_ID'; payload: number };
-
-function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case 'SET_KEYWORD':
-      return { ...state, keyword: action.payload };
-    case 'SET_CATEGORY':
-      return { ...state, category: action.payload };
-    case 'SET_SORT_ORDER':
-      return { ...state, sortOrder: action.payload };
-    case 'SET_SORT_TYPE':
-      return { ...state, sortType: action.payload };
-    case 'SET_REGION_ID':
-      return { ...state, regionId: action.payload || '' };
-    default:
-      return state;
-  }
+  if (type === 'initialize') return { ...payload };
+  return { ...state, [String(type)]: payload };
 }
 
-export const useFilter = () => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+export const useFilter = <TState>(initialState: TState) => {
+  const [state, dispatch] = useReducer(reducer<TState>, initialState);
 
-  const setKeyword = (keyword: string) => {
-    dispatch({ type: 'SET_KEYWORD', payload: keyword });
+  const handleFilter = (name: keyof TState, value: string) => {
+    if (name) return dispatch({ type: name, payload: value });
   };
 
-  const setCategory = (category: string) => {
-    dispatch({ type: 'SET_CATEGORY', payload: category });
-  };
-
-  const setSortOrder = (sortOrder: SORT_ORDER) => {
-    dispatch({ type: 'SET_SORT_ORDER', payload: sortOrder });
-  };
-
-  const setSortType = (sortType: SORT_TYPE) => {
-    dispatch({ type: 'SET_SORT_TYPE', payload: sortType });
-  };
-
-  const setRegionId = (regionId: number) => {
-    dispatch({ type: 'SET_REGION_ID', payload: regionId });
+  const handleInit = () => {
+    dispatch({ type: 'initialize', payload: initialState });
   };
 
   return {
     state,
-    setKeyword,
-    setCategory,
-    setSortOrder,
-    setSortType,
-    setRegionId,
+    handleFilter,
+    handleInit,
   };
 };
