@@ -28,8 +28,7 @@ export default function Rating() {
 
   const {
     data: ratingList,
-    isLoading,
-    isFetching,
+    isLoading: isFirstLoading,
     hasNextPage,
     targetRef,
   } = usePaginatedQuery<{
@@ -84,7 +83,6 @@ export default function Rating() {
         />
 
         <section>
-          {(isLoading || isFetching) && <Loading />}
           <List>
             {filterOptions && (
               <List.Manager
@@ -94,8 +92,9 @@ export default function Rating() {
                 filterOptions={filterOptions}
               />
             )}
-
-            {!isLoading && !ratingList && <EmptyView />}
+            {isFirstLoading && <Loading />}
+            {/* TODO: 리스트 연속 로딩 관련 컴포넌트 추가! */}
+            {!isFirstLoading && !ratingList && <EmptyView />}
             {ratingList &&
               [...ratingList.map((list) => list.data.ratings)]
                 .flat()
