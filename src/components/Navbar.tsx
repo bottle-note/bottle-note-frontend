@@ -16,7 +16,11 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   const navItems: NavItem[] = [
     { name: '홈', link: '/', icon: '/icon/home-outlined-subcoral.svg' },
     { name: '검색', link: '/search', icon: '/icon/search-subcoral.svg' },
-    { name: '별점', link: '/rating', icon: '/icon/star-filled-subcoral.svg' },
+    {
+      name: '별점',
+      link: '/rating?category=All',
+      icon: '/icon/star-filled-subcoral.svg',
+    },
     { name: '마이', link: '/user/1', icon: '/icon/user-outlined-subcoral.svg' }, // 추후 수정 필요 with pathname
   ];
 

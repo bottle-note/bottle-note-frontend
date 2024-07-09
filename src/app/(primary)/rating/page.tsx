@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import CategorySelector from '@/components/CategorySelector';
 import List from '@/components/List/List';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
@@ -25,6 +25,9 @@ interface InitialState {
 }
 
 export default function Rating() {
+  const router = useRouter();
+  const currentCategory = useSearchParams().get('category');
+
   const initialState: InitialState = {
     keyword: '',
     category: '',
@@ -57,6 +60,7 @@ export default function Rating() {
 
   const handleCategoryCallback = (value: string) => {
     handleFilter('category', value === 'All' ? '' : value);
+    if (value !== currentCategory) router.push(`/rating?category=${value}`);
   };
 
   // TODO: useFilterOptions 로 공통화
