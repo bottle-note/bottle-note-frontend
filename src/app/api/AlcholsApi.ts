@@ -1,4 +1,4 @@
-import { AlcoholAPI, RegionApi } from '@/types/Alcohol';
+import { AlcoholAPI, CategoryApi, RegionApi } from '@/types/Alcohol';
 import { ApiResponse } from '@/types/common';
 
 export const AlcoholsApi = {
@@ -39,5 +39,28 @@ export const AlcoholsApi = {
     regions.unshift({ id: -1, value: '국가(전체)' });
 
     return regions;
+  },
+
+  async getCategory(type = 'WHISKY') {
+    const response = await fetch(
+      `/bottle-api/alcohols/categories?type=${type}`,
+      { cache: 'force-cache' },
+    );
+    if (!response.ok) {
+      throw new Error('Failed to fetch data');
+    }
+
+    const result: ApiResponse<CategoryApi[]> = await response.json();
+
+    const categories = result.data.map((category) => {
+      if (category.korCategory === '버번') {
+        return { ...category, korCategory: '아메리칸(버번)' };
+      }
+      return category;
+    });
+
+    categories.unshift({ korCategory: '전체', engCategory: 'All' });
+
+    return categories;
   },
 };

@@ -12,7 +12,6 @@ export const CATEGORY_MENUS = {
   Other: { kor: '기타', eng: 'Other', link: 'other' },
 } as const;
 
-// NOTE: api 를 통해 조회가 가능한데 프론트에서 값을 가지고 있는게 맞는지? 고민 후 수정
 export const REGIONS = [
   { regionId: '', korName: '전체', engName: 'All' },
   {

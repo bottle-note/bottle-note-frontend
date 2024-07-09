@@ -58,3 +58,8 @@ export interface RegionApi {
   engName: string;
   description: string;
 }
+
+export interface CategoryApi {
+  korCategory: string;
+  engCategory: string;
+}

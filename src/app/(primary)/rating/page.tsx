@@ -25,8 +25,6 @@ interface InitialState {
 }
 
 export default function Rating() {
-  const router = useRouter();
-
   const initialState: InitialState = {
     keyword: '',
     category: '',
@@ -57,12 +55,8 @@ export default function Rating() {
     },
   });
 
-  // TODO: useCatogory 로 공통화
-  const [currentCategory, setCurrentCategory] = useState('All');
-  const handleCategory = (value: string) => {
-    if (value !== currentCategory) router.push(`/rating?category=${value}`);
-    setCurrentCategory(value);
-    handleFilter('category', value);
+  const handleCategoryCallback = (value: string) => {
+    handleFilter('category', value === 'All' ? '' : value);
   };
 
   // TODO: useFilterOptions 로 공통화
@@ -85,10 +79,7 @@ export default function Rating() {
     <Layout>
       <NavLayout>
         <main className="flex flex-col gap-7">
-          <CategorySelector
-            selectedCategory={currentCategory}
-            handleCategory={handleCategory}
-          />
+          <CategorySelector handleCategoryCallback={handleCategoryCallback} />
 
           <section>
             <List>
@@ -100,9 +91,10 @@ export default function Rating() {
                   filterOptions={filterOptions}
                 />
               )}
-              {isFirstLoading && <Loading />}
+
               {/* TODO: 리스트 연속 로딩 관련 컴포넌트 추가! */}
-              {!isFirstLoading && !ratingList && <EmptyView />}
+              {isFirstLoading && <Loading />}
+              {!ratingList?.length && <EmptyView />}
               {ratingList &&
                 [...ratingList.map((list) => list.data.ratings)]
                   .flat()
