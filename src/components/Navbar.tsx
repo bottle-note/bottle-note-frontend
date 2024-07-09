@@ -35,7 +35,8 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
               className={`flex flex-col items-center space-y-1 ${
                 (menu.link === '/' && pathname === '/') ||
                 (menu.link === '/search' && pathname === '/search') ||
-                (menu.link === '/rating' && pathname === '/rating') ||
+                (menu.link === '/rating?category=All' &&
+                  pathname === '/rating') ||
                 (menu.link.startsWith('/user/') &&
                   pathname.startsWith('/user/'))
                   ? ''
