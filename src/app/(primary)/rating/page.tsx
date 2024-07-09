@@ -14,6 +14,7 @@ import { RateApi } from '@/app/api/RateApi';
 import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
 import { useFilter } from '@/hooks/useFilter';
 import { RateAPI } from '@/types/Rate';
+import Layout from '../search/layout';
 
 interface InitialState {
   keyword: string;
@@ -81,48 +82,50 @@ export default function Rating() {
   const SORT_OPTIONS = ['인기도순', '별점순', '찜하기순', '댓글순'];
 
   return (
-    <NavLayout>
-      <main className="flex flex-col gap-7">
-        <CategorySelector
-          selectedCategory={currentCategory}
-          handleCategory={handleCategory}
-        />
-
-        <section>
-          <List>
-            {filterOptions && (
-              <List.Manager
-                total={52}
-                sortOptions={SORT_OPTIONS}
-                hanldeSortOption={(value) => console.log(value)}
-                filterOptions={filterOptions}
-              />
-            )}
-            {isFirstLoading && <Loading />}
-            {/* TODO: 리스트 연속 로딩 관련 컴포넌트 추가! */}
-            {!isFirstLoading && !ratingList && <EmptyView />}
-            {ratingList &&
-              [...ratingList.map((list) => list.data.ratings)]
-                .flat()
-                .map((item: RateAPI, idx) => (
-                  <List.Rating key={`${item.alcoholId}_${idx}`} data={item} />
-                ))}
-          </List>
-        </section>
-
-        <div ref={targetRef} />
-
-        {!hasNextPage && (
-          <LinkButton
-            data={{
-              korName: '혹시 찾는 술이 없으신가요?',
-              engName: 'NO RESULTS',
-              icon: true,
-              linkSrc: '/search',
-            }}
+    <Layout>
+      <NavLayout>
+        <main className="flex flex-col gap-7">
+          <CategorySelector
+            selectedCategory={currentCategory}
+            handleCategory={handleCategory}
           />
-        )}
-      </main>
-    </NavLayout>
+
+          <section>
+            <List>
+              {filterOptions && (
+                <List.Manager
+                  total={52}
+                  sortOptions={SORT_OPTIONS}
+                  hanldeSortOption={(value) => console.log(value)}
+                  filterOptions={filterOptions}
+                />
+              )}
+              {isFirstLoading && <Loading />}
+              {/* TODO: 리스트 연속 로딩 관련 컴포넌트 추가! */}
+              {!isFirstLoading && !ratingList && <EmptyView />}
+              {ratingList &&
+                [...ratingList.map((list) => list.data.ratings)]
+                  .flat()
+                  .map((item: RateAPI, idx) => (
+                    <List.Rating key={`${item.alcoholId}_${idx}`} data={item} />
+                  ))}
+            </List>
+          </section>
+
+          <div ref={targetRef} />
+
+          {!hasNextPage && (
+            <LinkButton
+              data={{
+                korName: '혹시 찾는 술이 없으신가요?',
+                engName: 'NO RESULTS',
+                icon: true,
+                linkSrc: '/search',
+              }}
+            />
+          )}
+        </main>
+      </NavLayout>
+    </Layout>
   );
 }

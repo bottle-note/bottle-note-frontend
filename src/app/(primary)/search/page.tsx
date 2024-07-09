@@ -27,22 +27,20 @@ export default function Search() {
   }, []);
 
   return (
-    <NavLayout>
-      <main className="flex flex-col gap-7">
-        <CategorySelector
-          selectedCategory={currentCategory}
-          handleCategory={handleCategory}
-        />
+    <main className="flex flex-col gap-7">
+      <CategorySelector
+        selectedCategory={currentCategory}
+        handleCategory={handleCategory}
+      />
 
-        <section>
-          <CategoryTitle subTitle="위클리 HOT 5" />
-          <List>
-            {populars.map((item: any) => (
-              <List.Item key={item.alcoholId} data={item} />
-            ))}
-          </List>
-        </section>
-      </main>
-    </NavLayout>
+      <section>
+        <CategoryTitle subTitle="위클리 HOT 5" />
+        <List>
+          {populars.map((item: any) => (
+            <List.Item key={item.alcoholId} data={item} />
+          ))}
+        </List>
+      </section>
+    </main>
   );
 }

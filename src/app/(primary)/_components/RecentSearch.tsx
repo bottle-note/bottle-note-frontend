@@ -2,6 +2,7 @@ import Image from 'next/image';
 import DeleteIcon from 'public/icon/close-subcoral.svg';
 
 // TODO: 로컬스토리지와 연계하여 데이터 보여줄 것
+// FIXME:  스타일 수정할 것
 export default function RecentSearch() {
   return (
     <section className=" bg-white w-full h-full z-100">

@@ -8,9 +8,15 @@ import EnterIcon from 'public/icon/search-subcoral.svg';
 interface Props {
   type?: 'Link' | 'Search';
   handleSearch: (value: string) => void;
+  handleFocus?: () => void;
 }
 
-export default function SearchBar({ type = 'Search', handleSearch }: Props) {
+// FIXME: focus, blur 에 대한 이벤트 리스닝 대신 입력 값에 대한 리스닝으로 변경할 것
+export default function SearchBar({
+  type = 'Search',
+  handleSearch,
+  handleFocus,
+}: Props) {
   const [searchText, setSearchText] = useState<string>('');
 
   const handleOnClick = () => {
@@ -50,6 +56,8 @@ export default function SearchBar({ type = 'Search', handleSearch }: Props) {
                 handleOnClick();
               }
             }}
+            onFocus={handleFocus}
+            onBlur={handleFocus}
           />
           <button
             className="px-2 w-10 absolute top-0 right-1 h-full"

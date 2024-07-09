@@ -42,7 +42,9 @@ const ListItem = ({ data }: Props) => {
           src={imageUrl}
           alt="위스키 이미지"
           fill
-          className="object-contain"
+          className="object-contain w-auto h-auto"
+          priority
+          sizes="89px"
         />
       </div>
 
