@@ -41,19 +41,27 @@ const ListMain = ({
   });
 
   const isEmpty = items.length === 0 && ratingItems.length === 0;
+  const isManageExist = Boolean(
+    title.length ||
+      totalDisplay.length ||
+      sortOrderToggle.length ||
+      optionSelect.length,
+  );
 
   return (
     <section>
-      <article className="flex justify-between items-center text-mainGray text-sm pb-3.25 border-brightGray border-b">
-        <div className="flex gap-1">
-          {title}
-          {totalDisplay}
-        </div>
-        <div className="flex gap-1.5 w-full justify-end">
-          {sortOrderToggle}
-          {optionSelect}
-        </div>
-      </article>
+      {isManageExist && (
+        <article className="flex justify-between items-center text-mainGray text-sm pb-3.25 border-brightGray border-b">
+          <div className="flex gap-1">
+            {title}
+            {totalDisplay}
+          </div>
+          <div className="flex gap-1.5 w-full justify-end">
+            {sortOrderToggle}
+            {optionSelect}
+          </div>
+        </article>
+      )}
       <article>
         {isEmpty ? (
           <EmptyView text={emptyViewText} />

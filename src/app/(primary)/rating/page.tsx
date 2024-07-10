@@ -38,7 +38,6 @@ export default function Rating() {
     data: ratingList,
     isLoading: isFirstLoading,
     isFetching,
-    hasNextPage,
     targetRef,
   } = usePaginatedQuery<{
     ratings: RateAPI[];
@@ -92,7 +91,6 @@ export default function Rating() {
             handleOptionCallback={(value) => handleFilter('regionId', value)}
           />
 
-          {/* TODO: 리스트 연속 로딩 관련 컴포넌트 추가! */}
           {ratingList &&
             [...ratingList.map((list) => list.data.ratings)]
               .flat()
