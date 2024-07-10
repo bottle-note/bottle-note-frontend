@@ -13,16 +13,18 @@ const ItemImage = ({ src, alt }: Props) => {
   const [imgSrc, setImgSrc] = useState(src);
 
   return (
-    <div className="w-[89px] h-[89px] relative flex shrink-0">
-      <Image
-        src={imgSrc}
-        alt={alt}
-        fill
-        className="object-contain w-auto h-auto"
-        priority
-        sizes="89px"
-        onError={() => setImgSrc(Fallback)}
-      />
+    <div className="w-[89px] h-[89px] flex shrink-0 p-2 justify-center items-center">
+      <div className="w-full h-full relative">
+        <Image
+          src={imgSrc}
+          alt={alt}
+          fill
+          sizes="85px"
+          className="object-contain w-auto h-auto"
+          priority
+          onError={() => setImgSrc(Fallback)}
+        />
+      </div>
     </div>
   );
 };
