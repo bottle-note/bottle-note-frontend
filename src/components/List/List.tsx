@@ -7,6 +7,7 @@ import OptionSelect from './OptionSelect';
 import Title from './Title';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
 import Loading from '../Loading';
+import { Children } from 'react';
 
 interface ListMainProps {
   children: React.ReactNode;
@@ -15,7 +16,7 @@ interface ListMainProps {
   isScrollLoading?: boolean;
 }
 
-// TODO: children 이외에 다른 아이템도 여기에 포함될 수 있어야 함!
+// TODO: 여러 종류의 리스트 아이템을 렌더링 할 수 있으면서, emptyView 에 대한 처리도 유연하게 할 수 있도록 개선 필요
 const ListMain = ({
   children,
   emptyViewText,
@@ -27,6 +28,17 @@ const ListMain = ({
   const optionSelect = filterChildComponent(children, OptionSelect);
   const items = filterChildComponent(children, ListItem);
   const ratingItems = filterChildComponent(children, ListItemRating);
+
+  const filteredChildren = Children.toArray(children).filter((child: any) => {
+    return ![
+      Title,
+      Total,
+      SortOrderToggle,
+      OptionSelect,
+      ListItem,
+      ListItemRating,
+    ].includes(child.type);
+  });
 
   const isEmpty = items.length === 0 && ratingItems.length === 0;
 
@@ -52,6 +64,7 @@ const ListMain = ({
           </>
         )}
         {isListFirstLoading && <Loading />}
+        {filteredChildren}
       </article>
     </section>
   );
