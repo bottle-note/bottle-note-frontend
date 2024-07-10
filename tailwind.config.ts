@@ -38,6 +38,7 @@ const config: Config = {
         mainCoral: '#EF9A6E',
         subCoral: '#E58257',
         bgGray: '#E6E6DD',
+        brightGray: '#BFBFBF',
         mainBlack: '#101010',
         mainDarkGray: '#252525',
         mainGray: '#666666',

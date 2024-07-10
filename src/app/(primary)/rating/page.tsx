@@ -4,9 +4,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import CategorySelector from '@/components/CategorySelector';
 import List from '@/components/List/List';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import EmptyView from '../_components/EmptyView';
-import Loading from '@/components/Loading';
-import NavLayout from '../_components/NavLayout';
 import LinkButton from '@/components/LinkButton';
 import { RateApi } from '@/app/api/RateApi';
 import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
@@ -14,7 +11,6 @@ import { useFilter } from '@/hooks/useFilter';
 import { RateAPI } from '@/types/Rate';
 import Layout from '../search/layout';
 import { REGIONS } from '@/constants/common';
-import { useEffect } from 'react';
 
 interface InitialState {
   keyword: string;
@@ -41,10 +37,12 @@ export default function Rating() {
   const {
     data: ratingList,
     isLoading: isFirstLoading,
+    isFetching,
     hasNextPage,
     targetRef,
   } = usePaginatedQuery<{
     ratings: RateAPI[];
+    totalCount: number;
   }>({
     queryKey: ['rating', filterState],
     queryFn: ({ pageParam }) => {
@@ -73,59 +71,47 @@ export default function Rating() {
 
   return (
     <Layout>
-      <NavLayout>
-        <main className="flex flex-col gap-7">
-          <CategorySelector handleCategoryCallback={handleCategoryCallback} />
+      <section className="flex flex-col gap-7">
+        <CategorySelector handleCategoryCallback={handleCategoryCallback} />
 
-          <section>
-            <List>
-              <List.Total total={ratingList?.length ?? 0} />
-              <List.SortOrderToggle
-                type={filterState.sortOrder}
-                handleSortOrder={(value) => handleFilter('sortOrder', value)}
-              />
-              <List.OptionSelect
-                options={SORT_OPTIONS}
-                handleOptionCallback={(value) =>
-                  handleFilter('sortType', value)
-                }
-              />
-              <List.OptionSelect
-                options={REGIONS.map((region) => ({
-                  type: String(region.regionId),
-                  name: region.korName,
-                }))}
-                handleOptionCallback={(value) =>
-                  handleFilter('regionId', value)
-                }
-              />
+        <List isListFirstLoading={isFirstLoading} isScrollLoading={isFetching}>
+          <List.Total total={ratingList ? ratingList[0].data.totalCount : 0} />
+          <List.SortOrderToggle
+            type={filterState.sortOrder}
+            handleSortOrder={(value) => handleFilter('sortOrder', value)}
+          />
+          <List.OptionSelect
+            options={SORT_OPTIONS}
+            handleOptionCallback={(value) => handleFilter('sortType', value)}
+          />
+          <List.OptionSelect
+            options={REGIONS.map((region) => ({
+              type: String(region.regionId),
+              name: region.korName,
+            }))}
+            handleOptionCallback={(value) => handleFilter('regionId', value)}
+          />
 
-              {/* TODO: 리스트 연속 로딩 관련 컴포넌트 추가! */}
-              {isFirstLoading && <Loading />}
-              {!ratingList?.length && <EmptyView />}
-              {ratingList &&
-                [...ratingList.map((list) => list.data.ratings)]
-                  .flat()
-                  .map((item: RateAPI, idx) => (
-                    <List.Rating key={`${item.alcoholId}_${idx}`} data={item} />
-                  ))}
-            </List>
-          </section>
+          {/* TODO: 리스트 연속 로딩 관련 컴포넌트 추가! */}
+          {ratingList &&
+            [...ratingList.map((list) => list.data.ratings)]
+              .flat()
+              .map((item: RateAPI, idx) => (
+                <List.Rating key={`${item.alcoholId}_${idx}`} data={item} />
+              ))}
+        </List>
 
-          {/* <div ref={targetRef} /> */}
+        <div ref={targetRef} />
 
-          {!hasNextPage && (
-            <LinkButton
-              data={{
-                korName: '혹시 찾는 술이 없으신가요?',
-                engName: 'NO RESULTS',
-                icon: true,
-                linkSrc: '/search',
-              }}
-            />
-          )}
-        </main>
-      </NavLayout>
+        <LinkButton
+          data={{
+            korName: '혹시 찾는 술이 없으신가요?',
+            engName: 'NO RESULTS',
+            icon: true,
+            linkSrc: '/search',
+          }}
+        />
+      </section>
     </Layout>
   );
 }

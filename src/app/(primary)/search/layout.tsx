@@ -10,11 +10,11 @@ export default function Layout({
 }>) {
   return (
     <NavLayout>
-      <main className="mb-24 w-full h-full">
+      <section className="mb-24 w-full h-full">
         <SearchContainer />
 
         <section className="p-5 space-y-7">{children}</section>
-      </main>
+      </section>
     </NavLayout>
   );
 }

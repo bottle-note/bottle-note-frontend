@@ -26,7 +26,8 @@ export const RateApi = {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<{ ratings: RateAPI[] }> = await response.json();
+    const result: ApiResponse<{ ratings: RateAPI[]; totalCount: number }> =
+      await response.json();
 
     return result;
   },
