@@ -13,7 +13,7 @@ export const CATEGORY_MENUS = {
 } as const;
 
 export const REGIONS = [
-  { regionId: '', korName: '전체', engName: 'All' },
+  { regionId: '', korName: '국가(전체)', engName: 'All' },
   {
     regionId: 1,
     korName: '호주',

@@ -1,10 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CategorySelector from '@/components/CategorySelector';
 import List from '@/components/List/List';
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import EmptyView from '../_components/EmptyView';
 import Loading from '@/components/Loading';
@@ -15,6 +13,8 @@ import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
 import { useFilter } from '@/hooks/useFilter';
 import { RateAPI } from '@/types/Rate';
 import Layout from '../search/layout';
+import { REGIONS } from '@/constants/common';
+import { useEffect } from 'react';
 
 interface InitialState {
   keyword: string;
@@ -63,21 +63,13 @@ export default function Rating() {
     if (value !== currentCategory) router.push(`/rating?category=${value}`);
   };
 
-  // TODO: useFilterOptions 로 공통화
-  const [filterOptions, setFilterOptions] = useState<
-    { id: number; value: string }[] | null
-  >(null);
-
-  useEffect(() => {
-    (async () => {
-      const result = await AlcoholsApi.getRegion();
-
-      setFilterOptions(result);
-    })();
-  }, []);
-
-  // TODO: useSortOptions 로 공통화
-  const SORT_OPTIONS = ['인기도순', '별점순', '찜하기순', '댓글순'];
+  const SORT_OPTIONS = [
+    { name: '랜덤순', type: SORT_TYPE.RANDOM },
+    { name: '인기도순', type: SORT_TYPE.POPULAR },
+    { name: '별점순', type: SORT_TYPE.RATING },
+    { name: '찜하기순', type: SORT_TYPE.PICK },
+    { name: '댓글순', type: SORT_TYPE.REVIEW },
+  ];
 
   return (
     <Layout>
@@ -87,14 +79,26 @@ export default function Rating() {
 
           <section>
             <List>
-              {filterOptions && (
-                <List.Manager
-                  total={52}
-                  sortOptions={SORT_OPTIONS}
-                  hanldeSortOption={(value) => console.log(value)}
-                  filterOptions={filterOptions}
-                />
-              )}
+              <List.Total total={ratingList?.length ?? 0} />
+              <List.SortOrderToggle
+                type={filterState.sortOrder}
+                handleSortOrder={(value) => handleFilter('sortOrder', value)}
+              />
+              <List.OptionSelect
+                options={SORT_OPTIONS}
+                handleOptionCallback={(value) =>
+                  handleFilter('sortType', value)
+                }
+              />
+              <List.OptionSelect
+                options={REGIONS.map((region) => ({
+                  type: String(region.regionId),
+                  name: region.korName,
+                }))}
+                handleOptionCallback={(value) =>
+                  handleFilter('regionId', value)
+                }
+              />
 
               {/* TODO: 리스트 연속 로딩 관련 컴포넌트 추가! */}
               {isFirstLoading && <Loading />}
@@ -108,7 +112,7 @@ export default function Rating() {
             </List>
           </section>
 
-          <div ref={targetRef} />
+          {/* <div ref={targetRef} /> */}
 
           {!hasNextPage && (
             <LinkButton
