@@ -1,17 +1,23 @@
 import { Review } from '@/types/Review';
-// category는 정확히 정해지면 타입 지정하기
+
 export interface AlcoholAPI {
   alcoholId: number;
+  imageUrl: string;
   korName: string;
   engName: string;
+  korCategoryName: string;
+  engCategoryName: string;
   rating: number;
-  engCategory: string;
-  korCategory: string;
-  imageUrl: string;
+  ratingCount: number;
+  reviewCount: number;
+  pickCount: string;
   isPicked?: false;
 }
-export interface Alcohol extends AlcoholAPI {
+export interface WeeklyAlcohol
+  extends Omit<Omit<AlcoholAPI, 'korCategoryName'>, 'engCategoryName'> {
   path: string | { pathname: string; query?: any };
+  korCategory: string;
+  engCategory: string;
 }
 
 export interface AlcoholDetails {

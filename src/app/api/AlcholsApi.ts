@@ -1,5 +1,10 @@
-import { AlcoholAPI, CategoryApi, RegionApi } from '@/types/Alcohol';
-import { ApiResponse } from '@/types/common';
+import {
+  AlcoholAPI,
+  CategoryApi,
+  RegionApi,
+  WeeklyAlcohol,
+} from '@/types/Alcohol';
+import { ApiResponse, ListQueryParams } from '@/types/common';
 
 export const AlcoholsApi = {
   async getPopular() {
@@ -8,10 +13,10 @@ export const AlcoholsApi = {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<{ alcohols: AlcoholAPI[] }> =
+    const result: ApiResponse<{ alcohols: WeeklyAlcohol[] }> =
       await response.json();
 
-    const formattedData = result.data.alcohols.map((alcohol: AlcoholAPI) => {
+    const formattedData = result.data.alcohols.map((alcohol: WeeklyAlcohol) => {
       return {
         ...alcohol,
         path: `/search/${alcohol.alcoholId}`,
@@ -62,5 +67,35 @@ export const AlcoholsApi = {
     categories.unshift({ korCategory: '전체', engCategory: 'All' });
 
     return categories;
+  },
+
+  async getList({
+    keyword,
+    category,
+    regionId,
+    sortType,
+    sortOrder,
+    cursor,
+    pageSize,
+  }: ListQueryParams) {
+    const response = await fetch(
+      `/bottle-api/alcohols/search?keyword=${keyword}&category=${category}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch data');
+    }
+
+    // TODO: 카테고리 필드 명 변경하여 수정해주기
+    const result: ApiResponse<{ alcohols: AlcoholAPI[]; totalCount: number }> =
+      await response.json();
+
+    return result;
   },
 };

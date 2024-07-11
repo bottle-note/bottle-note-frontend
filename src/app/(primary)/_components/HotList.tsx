@@ -1,26 +1,16 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Alcohol } from '@/types/Alcohol';
 import HorizontalItem from '@/components/HorizontalItem';
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import { usePopular } from '@/hooks/usePopular';
 
 function HotList() {
-  const [weeklyData, setWeeklyData] = useState<[] | Alcohol[]>([]);
+  const { populars } = usePopular();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const result = await AlcoholsApi.getPopular();
-      setWeeklyData(result);
-    };
-
-    fetchData();
-  }, []);
   return (
     <>
-      {weeklyData.length !== 0 && (
+      {populars.length !== 0 && (
         <div className="whitespace-nowrap overflow-x-auto flex space-x-2">
-          {weeklyData.map((item) => {
+          {populars.map((item) => {
             return (
               <div key={item.alcoholId} className="flex-shrink-0">
                 <HorizontalItem data={item} />
