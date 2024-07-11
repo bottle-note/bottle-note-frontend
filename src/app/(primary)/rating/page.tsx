@@ -9,8 +9,8 @@ import { RateApi } from '@/app/api/RateApi';
 import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
 import { useFilter } from '@/hooks/useFilter';
 import { RateAPI } from '@/types/Rate';
-import Layout from '../search/layout';
 import { REGIONS } from '@/constants/common';
+import SearchContainer from '../search/_components/SearchContainer';
 
 interface InitialState {
   keyword: string;
@@ -69,8 +69,9 @@ export default function Rating() {
   ];
 
   return (
-    <Layout>
-      <section className="flex flex-col gap-7">
+    <main className="mb-24 w-full h-full">
+      <SearchContainer />
+      <section className="flex flex-col gap-7  p-5">
         <CategorySelector handleCategoryCallback={handleCategoryCallback} />
 
         <List isListFirstLoading={isFirstLoading} isScrollLoading={isFetching}>
@@ -110,6 +111,6 @@ export default function Rating() {
           }}
         />
       </section>
-    </Layout>
+    </main>
   );
 }
