@@ -1,3 +1,5 @@
+import { truncStr } from '@/utils/truncStr';
+
 interface Props {
   korName: string;
   engName: string;
@@ -11,7 +13,7 @@ const ItemInfo = ({ korName, engName, korCategory, engCategory }: Props) => (
       {korName}
     </h2>
     <p className="text-xxs">
-      <span>{engName}</span>
+      <span>{truncStr(engName.toUpperCase(), 20)}</span>
       <span> · {korCategory}</span>
       {engCategory && <span> · {engCategory}</span>}
     </p>

@@ -7,32 +7,21 @@ import Review from '@/app/(primary)/user/[id]/_components/ReviewBtn';
 import { addNewLine } from '@/utils/addNewLine';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
+import { AlcoholAPI } from '@/types/Alcohol';
 
 interface Props {
-  data: {
-    alcoholId: number;
-    korName: string;
-    engName: string;
-    rating: number;
-    engCategory: string;
-    korCategory: string;
-    imageUrl: string;
-    isLiked?: boolean;
-    isReviewed?: boolean;
-    review_count?: number;
-  };
+  data: AlcoholAPI;
 }
 
 const ListItem = ({ data }: Props) => {
   const {
-    korCategory,
+    korCategoryName,
     korName,
     engName,
     imageUrl,
     rating,
-    isLiked,
-    isReviewed,
-    review_count,
+    isPicked,
+    ratingCount,
   } = data;
 
   return (
@@ -42,20 +31,19 @@ const ListItem = ({ data }: Props) => {
         <ItemInfo
           korName={addNewLine(korName)}
           engName={truncStr(engName, 16)}
-          korCategory={korCategory}
+          korCategory={korCategoryName}
         />
         <article className="flex justify-between">
           <div className="flex flex-col">
             <Star rating={rating} />
-            {review_count && (
+            {ratingCount && (
               <span className="text-[0.625rem] justify-self-end row-start-2 text-right">
-                {`${review_count}`}
+                {`${ratingCount}`}
               </span>
             )}
           </div>
           <div className="space-x-1.5 flex items-center">
-            {isReviewed && <Review />}
-            <LikeBtn isLiked={isLiked} />
+            <LikeBtn isLiked={isPicked} />
           </div>
         </article>
       </section>
