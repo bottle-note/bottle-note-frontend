@@ -1,4 +1,5 @@
 import { Review } from '@/types/Review';
+import { Category } from './common';
 
 export interface AlcoholAPI {
   alcoholId: number;
@@ -68,4 +69,5 @@ export interface RegionApi {
 export interface CategoryApi {
   korCategory: string;
   engCategory: string;
+  categoryGroup: Category;
 }

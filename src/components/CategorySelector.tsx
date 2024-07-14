@@ -3,16 +3,17 @@
 import React, { useEffect, useRef } from 'react';
 import CategoryTitle from './CategoryTitle';
 import { useCategory } from '@/hooks/useCategory';
+import { Category } from '@/types/common';
 
 interface Props {
-  handleCategoryCallback: (value: string) => void;
+  handleCategoryCallback: (value: Category) => void;
 }
 
 function CategorySelector({ handleCategoryCallback }: Props) {
   const { categories, handleCategory, selectedCategory } = useCategory();
   const selectedRef = useRef<HTMLButtonElement>(null);
 
-  const onSelectCategory = (value: string) => {
+  const onSelectCategory = (value: Category) => {
     handleCategory(value, handleCategoryCallback);
   };
 
@@ -33,14 +34,14 @@ function CategorySelector({ handleCategoryCallback }: Props) {
         {categories.map((category) => {
           return (
             <button
-              key={category.engCategory}
-              className={`${selectedCategory === category.engCategory ? 'label-selected' : 'label-default'} px-2.5 py-1`}
-              onClick={() => onSelectCategory(category.engCategory)}
+              key={category.eng}
+              className={`${selectedCategory === category.categoryGroup ? 'label-selected' : 'label-default'} px-2.5 py-1`}
+              onClick={() => onSelectCategory(category.categoryGroup)}
               ref={
-                category.engCategory === selectedCategory ? selectedRef : null
+                category.categoryGroup === selectedCategory ? selectedRef : null
               }
             >
-              <span className="text-sm font-light">{category.korCategory}</span>
+              <span className="text-sm font-light">{category.kor}</span>
             </button>
           );
         })}

@@ -37,5 +37,6 @@ export interface ListQueryParams {
   pageSize?: number;
 }
 
-export type Category = keyof typeof CATEGORY_MENUS;
+export type Category =
+  (typeof CATEGORY_MENUS)[keyof typeof CATEGORY_MENUS]['categoryGroup'];
 export type RegionId = (typeof REGIONS)[number]['regionId'];

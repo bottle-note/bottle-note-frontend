@@ -1,22 +1,18 @@
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
-import { CategoryApi } from '@/types/Alcohol';
-import { useLayoutEffect, useState } from 'react';
+import { CATEGORY_MENUS } from '@/constants/common';
+import { Category } from '@/types/common';
+import { useState } from 'react';
 
 export const useCategory = () => {
-  const [categories, setCategories] = useState<CategoryApi[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const categories = Object.values(CATEGORY_MENUS);
+  const [selectedCategory, setSelectedCategory] = useState<Category>('');
 
-  const handleCategory = (value: string, callback: (param: string) => void) => {
+  const handleCategory = (
+    value: Category,
+    callback: (param: Category) => void,
+  ) => {
     setSelectedCategory(value);
     callback(value);
   };
-
-  useLayoutEffect(() => {
-    (async () => {
-      const cat = await AlcoholsApi.getCategory();
-      setCategories(cat);
-    })();
-  }, []);
 
   return { categories, selectedCategory, handleCategory };
 };

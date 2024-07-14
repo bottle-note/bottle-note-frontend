@@ -1,15 +1,31 @@
 export const CATEGORY_MENUS = {
-  All: { kor: '전체', eng: 'All', link: 'all' },
-  SingleMalt: { kor: '싱글몰트', eng: 'Single malt', link: 'singleMalt' },
+  All: { kor: '전체', eng: 'All', link: 'all', categoryGroup: '' },
+  SingleMalt: {
+    kor: '싱글몰트',
+    eng: 'Single malt',
+    link: 'singleMalt',
+    categoryGroup: 'SINGLE_MALT',
+  },
   BlendedMalt: {
     kor: '블렌디드 몰트',
     eng: 'Blended malt',
     link: 'blendedMalt',
+    categoryGroup: 'BLENDED_MALT',
   },
-  Blended: { kor: '블렌디드', eng: 'Blended', link: 'blended' },
-  America: { kor: '아메리카(버번)', eng: 'America(Bourbon)', link: 'america' },
-  Rye: { kor: '라이', eng: 'Rye', link: 'rye' },
-  Other: { kor: '기타', eng: 'Other', link: 'other' },
+  Blended: {
+    kor: '블렌디드',
+    eng: 'Blended',
+    link: 'blended',
+    categoryGroup: 'BLEND',
+  },
+  America: {
+    kor: '아메리카(버번)',
+    eng: 'America(Bourbon)',
+    link: 'america',
+    categoryGroup: 'BOURBON',
+  },
+  Rye: { kor: '라이', eng: 'Rye', link: 'rye', categoryGroup: 'RYE' },
+  Other: { kor: '기타', eng: 'Other', link: 'other', categoryGroup: 'OTHER' },
 } as const;
 
 export const REGIONS = [
