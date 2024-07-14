@@ -14,12 +14,15 @@ export interface ApiResponse<T> {
   };
 }
 
+// TODO: 두 개의 sort type 으로 분리할 것 (리뷰, 위스키 조회 ...)
 export const enum SORT_TYPE {
   POPULAR = 'POPULAR',
   RATING = 'RATING',
   PICK = 'PICK',
   REVIEW = 'REVIEW',
   RANDOM = 'RANDOM',
+  BOTTLE_ASC = 'BOTTLE_ASC',
+  GLASS_ASC = 'GLASS_ASC',
 }
 
 export const enum SORT_ORDER {
