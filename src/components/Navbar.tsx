@@ -18,7 +18,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
     { name: '검색', link: '/search', icon: '/icon/search-subcoral.svg' },
     {
       name: '별점',
-      link: '/rating?category=All',
+      link: '/rating',
       icon: '/icon/star-filled-subcoral.svg',
     },
     { name: '마이', link: '/user/1', icon: '/icon/user-outlined-subcoral.svg' }, // 추후 수정 필요 with pathname
@@ -35,8 +35,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
               className={`flex flex-col items-center space-y-1 ${
                 (menu.link === '/' && pathname === '/') ||
                 (menu.link === '/search' && pathname === '/search') ||
-                (menu.link === '/rating?category=All' &&
-                  pathname === '/rating') ||
+                (menu.link === '/rating' && pathname === '/rating') ||
                 (menu.link.startsWith('/user/') &&
                   pathname.startsWith('/user/'))
                   ? ''

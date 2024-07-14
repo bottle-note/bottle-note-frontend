@@ -22,7 +22,8 @@ interface InitialState {
 
 export default function Rating() {
   const router = useRouter();
-  const currentCategory = useSearchParams().get('category');
+  const currCategory = useSearchParams().get('category');
+  const currSearchKeyword = useSearchParams().get('query');
 
   const initialState: InitialState = {
     keyword: '',
@@ -55,9 +56,18 @@ export default function Rating() {
     },
   });
 
-  const handleCategoryCallback = (value: string) => {
-    handleFilter('category', value === 'All' ? '' : value);
-    if (value !== currentCategory) router.push(`/rating?category=${value}`);
+  const handleSearchCallback = (searchedKeyword: string) => {
+    handleFilter('keyword', searchedKeyword);
+    router.replace(
+      `/rating?category=${currCategory ?? ''}&query=${searchedKeyword ?? ''}`,
+    );
+  };
+
+  const handleCategoryCallback = (selectedCategory: Category) => {
+    handleFilter('category', selectedCategory);
+    router.replace(
+      `/rating?category=${selectedCategory}&query=${currSearchKeyword ?? ''}`,
+    );
   };
 
   const SORT_OPTIONS = [
@@ -70,7 +80,7 @@ export default function Rating() {
 
   return (
     <main className="mb-24 w-full h-full">
-      <SearchContainer />
+      <SearchContainer handleSearchCallback={handleSearchCallback} />
       <section className="flex flex-col gap-7  p-5">
         <CategorySelector handleCategoryCallback={handleCategoryCallback} />
 
