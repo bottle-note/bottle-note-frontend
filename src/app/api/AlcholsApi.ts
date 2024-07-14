@@ -6,9 +6,12 @@ import {
 } from '@/types/Alcohol';
 import { ApiResponse, ListQueryParams } from '@/types/common';
 
+// TODO: 캐싱, 프리페칭을 적용해 반복적인 데이터 요청 작업에 대한 최적화 진행 필요
 export const AlcoholsApi = {
   async getPopular() {
-    const response = await fetch(`/bottle-api/popular/week`);
+    const response = await fetch(`/bottle-api/popular/week`, {
+      cache: 'force-cache',
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch data');
     }
@@ -64,7 +67,11 @@ export const AlcoholsApi = {
       return category;
     });
 
-    categories.unshift({ korCategory: '전체', engCategory: 'All' });
+    categories.unshift({
+      korCategory: '전체',
+      engCategory: 'All',
+      categoryGroup: '',
+    });
 
     return categories;
   },
@@ -79,7 +86,7 @@ export const AlcoholsApi = {
     pageSize,
   }: ListQueryParams) {
     const response = await fetch(
-      `/bottle-api/alcohols/search?keyword=${keyword}&category=${category}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
+      `/bottle-api/alcohols/search?keyword=${decodeURI(keyword ?? '')}&category=${category}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
       {
         method: 'GET',
         headers: {
