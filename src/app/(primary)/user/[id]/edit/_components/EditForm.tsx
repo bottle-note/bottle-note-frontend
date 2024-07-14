@@ -56,7 +56,8 @@ function EditForm() {
         <div className="text-right clear-start text-mainGray text-10 mt-1">{`${nickName.length}/20`}</div>
       </div>
 
-      <div>
+      {/* NOTE: 본인인증, 성별 관련하여 변동 가능성 있어 주석처리 */}
+      {/* <div>
         <article className="flex flex-col relative">
           <label className="text-13 text-mainDarkGray">생년월일</label>
           <div className="flex border-b border-mainGray">
@@ -85,9 +86,9 @@ function EditForm() {
             </button>
           </div>
         </article>
-      </div>
+      </div> */}
 
-      <div>
+      {/* <div>
         <article className="flex flex-col relative">
           <label className="text-13 text-mainDarkGray">
             성별
@@ -108,7 +109,7 @@ function EditForm() {
             </button>
           </div>
         </article>
-      </div>
+      </div> */}
     </div>
   );
 }
