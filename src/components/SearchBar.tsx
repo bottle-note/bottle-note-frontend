@@ -12,7 +12,6 @@ interface Props {
   handleFocus?: (status: boolean) => void;
 }
 
-// FIXME: focus, blur 에 대한 이벤트 리스닝 대신 입력 값에 대한 리스닝으로 변경할 것
 export default function SearchBar({
   type = 'Search',
   handleSearch,
@@ -29,8 +28,12 @@ export default function SearchBar({
     if (handleFocus) handleFocus(false);
   };
 
-  const handleOnSearch = () => {
+  const handleOnFocus = () => {
     if (handleFocus) handleFocus(true);
+  };
+
+  const handleOnBlur = () => {
+    if (handleFocus) handleFocus(false);
   };
 
   useEffect(() => {
@@ -70,11 +73,12 @@ export default function SearchBar({
                 handleSubmit();
               }
             }}
-            onFocus={handleOnSearch}
+            onFocus={handleOnFocus}
+            onBlur={handleOnBlur}
           />
           <button
             className="px-2 w-10 absolute top-0 right-1 h-full"
-            onClick={handleSubmit}
+            onMouseDown={handleSubmit}
           >
             <Image src={EnterIcon} alt="search button" />
           </button>

@@ -32,8 +32,8 @@ export default function RecentSearch({ handleSearch }: Props) {
             className="flex justify-between items-center py-3 text-subCoral border-b border-subCoral"
             key={`${text}_${idx}`}
           >
-            <span onClick={() => handleSearch(text)}>{text}</span>
-            <button onClick={() => handleDeleteOne(text)}>
+            <span onMouseDown={() => handleSearch(text)}>{text}</span>
+            <button onMouseDown={() => handleDeleteOne(text)}>
               <Image src={DeleteIcon} alt="delete" />
             </button>
           </article>
@@ -47,7 +47,10 @@ export default function RecentSearch({ handleSearch }: Props) {
       </article>
 
       {list.length > 0 && (
-        <button className="text-xxs text-mainGray" onClick={handleDeleteAll}>
+        <button
+          className="text-xxs text-mainGray"
+          onMouseDown={handleDeleteAll}
+        >
           전체기록삭제
         </button>
       )}
