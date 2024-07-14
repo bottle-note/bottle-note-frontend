@@ -65,7 +65,6 @@ export default function SearchBar({
               }
             }}
             onFocus={handleOnSearch}
-            onBlur={handleSubmit}
           />
           <button
             className="px-2 w-10 absolute top-0 right-1 h-full"

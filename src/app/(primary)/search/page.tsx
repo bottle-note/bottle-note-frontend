@@ -8,14 +8,14 @@ import { usePopular } from '@/hooks/usePopular';
 import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
 import { useFilter } from '@/hooks/useFilter';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import { AlcoholAPI } from '@/types/Alcohol';
+import { AlcoholAPI, WeeklyAlcohol } from '@/types/Alcohol';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { REGIONS } from '@/constants/common';
 import SearchContainer from './_components/SearchContainer';
 
 interface InitialState {
   keyword: string;
-  category: Category | '';
+  category: Category;
   regionId: RegionId;
   sortType: SORT_TYPE;
   sortOrder: SORT_ORDER;
@@ -24,7 +24,9 @@ interface InitialState {
 export default function Search() {
   const router = useRouter();
   const { populars } = usePopular();
-  const currentCategory = useSearchParams().get('category');
+
+  const currCategory = useSearchParams().get('category');
+  const currSearchKeyword = useSearchParams().get('query');
 
   const initialState: InitialState = {
     keyword: '',
@@ -57,9 +59,18 @@ export default function Search() {
     },
   });
 
-  const handleCategoryCallback = (value: string) => {
-    handleFilter('category', value === 'All' ? '' : value);
-    if (value !== currentCategory) router.push(`/search?category=${value}`);
+  const handleSearchCallback = (searchedKeyword: string) => {
+    handleFilter('keyword', searchedKeyword);
+    router.replace(
+      `/search?category=${currCategory ?? ''}&query=${searchedKeyword ?? ''}`,
+    );
+  };
+
+  const handleCategoryCallback = (selectedCategory: Category) => {
+    handleFilter('category', selectedCategory);
+    router.replace(
+      `/search?category=${selectedCategory}&query=${currSearchKeyword ?? ''}`,
+    );
   };
 
   const SORT_OPTIONS = [
@@ -71,54 +82,66 @@ export default function Search() {
 
   return (
     <main className="mb-24 w-full h-full">
-      <SearchContainer />
+      <SearchContainer handleSearchCallback={handleSearchCallback} />
 
       <section className="flex flex-col gap-7 p-5">
         <CategorySelector handleCategoryCallback={handleCategoryCallback} />
 
-        {!currentCategory && (
+        {!currCategory && !currSearchKeyword ? (
           <section>
             <CategoryTitle subTitle="위클리 HOT 5" />
 
             <List>
-              {populars.map((item: any) => (
-                <List.Item key={item.alcoholId} data={item} />
+              {populars.map((item: WeeklyAlcohol) => (
+                <List.Item
+                  key={item.alcoholId}
+                  data={{
+                    ...item,
+                    korCategoryName: item.korCategory,
+                    engCategoryName: item.engCategory,
+                  }}
+                />
               ))}
             </List>
           </section>
-        )}
+        ) : (
+          <>
+            <List
+              isListFirstLoading={isFirstLoading}
+              isScrollLoading={isFetching}
+            >
+              <List.Total
+                total={alcoholList ? alcoholList[0].data.totalCount : 0}
+              />
+              <List.SortOrderToggle
+                type={filterState.sortOrder}
+                handleSortOrder={(value) => handleFilter('sortOrder', value)}
+              />
+              <List.OptionSelect
+                options={SORT_OPTIONS}
+                handleOptionCallback={(value) =>
+                  handleFilter('sortType', value)
+                }
+              />
+              <List.OptionSelect
+                options={REGIONS.map((region) => ({
+                  type: String(region.regionId),
+                  name: region.korName,
+                }))}
+                handleOptionCallback={(value) =>
+                  handleFilter('regionId', value)
+                }
+              />
 
-        {currentCategory && (
-          <List
-            isListFirstLoading={isFirstLoading}
-            isScrollLoading={isFetching}
-          >
-            <List.Total
-              total={alcoholList ? alcoholList[0].data.totalCount : 0}
-            />
-            <List.SortOrderToggle
-              type={filterState.sortOrder}
-              handleSortOrder={(value) => handleFilter('sortOrder', value)}
-            />
-            <List.OptionSelect
-              options={SORT_OPTIONS}
-              handleOptionCallback={(value) => handleFilter('sortType', value)}
-            />
-            <List.OptionSelect
-              options={REGIONS.map((region) => ({
-                type: String(region.regionId),
-                name: region.korName,
-              }))}
-              handleOptionCallback={(value) => handleFilter('regionId', value)}
-            />
-
-            {alcoholList &&
-              [...alcoholList.map((list) => list.data.alcohols)]
-                .flat()
-                .map((item: AlcoholAPI, idx) => (
-                  <List.Item key={`${item.alcoholId}_${idx}`} data={item} />
-                ))}
-          </List>
+              {alcoholList &&
+                [...alcoholList.map((list) => list.data.alcohols)]
+                  .flat()
+                  .map((item: AlcoholAPI, idx) => (
+                    <List.Item key={`${item.alcoholId}_${idx}`} data={item} />
+                  ))}
+            </List>
+            <div ref={targetRef} />
+          </>
         )}
       </section>
     </main>
