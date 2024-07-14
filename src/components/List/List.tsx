@@ -36,7 +36,8 @@ const ListMain = ({
   const isEmpty =
     !items.length &&
     !ratingItems.length &&
-    !Children.count((listSection[0] as React.ReactElement).props.children);
+    listSection &&
+    !Children.count((listSection[0] as React.ReactElement)?.props?.children);
 
   const isManageExist = Boolean(
     title.length ||

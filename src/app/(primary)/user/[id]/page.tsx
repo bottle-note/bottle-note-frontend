@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { MOCK_LIST_ITEM } from 'mock/alcohol';
 import List from '@/components/List/List';
@@ -30,10 +32,10 @@ export default function User({ params: { id } }: { params: { id: string } }) {
         </section>
 
         <section className="px-5 pt-9 flex flex-col gap-5">
-          <List>
-            <List.Manager total={33} />
+          <List emptyViewText={`아직 활동한\n보틀이 없어요!`}>
+            <List.Total total={33} />
             {MOCK_LIST_ITEM.map((item) => (
-              <List.Item key={item.alcoholId} data={item} />
+              <List.Item data={item} />
             ))}
           </List>
 

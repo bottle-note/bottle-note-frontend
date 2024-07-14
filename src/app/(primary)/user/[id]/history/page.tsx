@@ -1,23 +1,25 @@
 'use client';
 
-import EmptyView from '@/app/(primary)/_components/EmptyView';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import List from '@/components/List/List';
 import Tab from '@/components/Tab';
+import { REGIONS } from '@/constants/common';
 import { HISTORY_TYPES } from '@/constants/user';
+import { usePopular } from '@/hooks/usePopular';
 import { useTab } from '@/hooks/useTab';
-import { Alcohol } from '@/types/Alcohol';
+import { SORT_TYPE } from '@/types/common';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 export default function UserHistory() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const historyType = searchParams.get('type');
+  const historyType = useSearchParams().get('type');
   const { currentTab, handleTab, tabList } = useTab({ tabList: HISTORY_TYPES });
-  const [populars, setPopulars] = useState<Alcohol[]>([]);
+  // FIXME: 실제 히스토리 API 연동하여 변경
+  const { populars } = usePopular();
+  const [currHistoryType, setCurrHistoryType] = useState('');
   const [filterOptions, setFilterOptions] = useState<
     { id: number; value: string }[] | null
   >(null);
@@ -32,22 +34,27 @@ export default function UserHistory() {
     router.replace(`?type=${currentTab.id}`);
   }, [currentTab]);
 
-  const SORT_OPTIONS = ['인기도순', '별점순', '찜하기순', '댓글순'];
+  const SORT_OPTIONS = [
+    { name: '인기도순', type: SORT_TYPE.POPULAR },
+    { name: '별점순', type: SORT_TYPE.RATING },
+    { name: '찜하기순', type: SORT_TYPE.PICK },
+    { name: '댓글순', type: SORT_TYPE.REVIEW },
+  ];
 
   useEffect(() => {
     (async () => {
-      console.log('호출되나용?');
       const result = await AlcoholsApi.getRegion();
       setFilterOptions(result);
     })();
   }, []);
 
+  // FIXME: 타입 가드 추가
   useEffect(() => {
-    (async () => {
-      const result = await AlcoholsApi.getPopular();
-      setPopulars(result);
-    })();
-  }, []);
+    if (currentTab.id === 'all') return setCurrHistoryType('나의 활동');
+    if (currentTab.id === 'rating') return setCurrHistoryType('나의 별점');
+    if (currentTab.id === 'review') return setCurrHistoryType('나의 리뷰');
+    if (currentTab.id === 'pick') return setCurrHistoryType('나의 찜');
+  }, [currentTab]);
 
   return (
     <main>
@@ -72,21 +79,25 @@ export default function UserHistory() {
       <section className="pt-10 px-5 space-y-7.5">
         <Tab currentTab={currentTab} handleTab={handleTab} />
 
-        <List>
-          {filterOptions && (
-            <List.Manager
-              total={populars.length}
-              sortOptions={SORT_OPTIONS}
-              hanldeSortOption={(value) => console.log(value)}
-              filterOptions={filterOptions}
-            />
-          )}
+        {/* TODO: 실제 데이터로 변동 */}
+        <List emptyViewText={`아직 활동한\n보틀이 없어요!`}>
+          <List.Title title={currHistoryType} />
+          <List.Total total={populars.length} />
+          <List.OptionSelect
+            options={SORT_OPTIONS}
+            handleOptionCallback={(value) => console.log(value)}
+          />
+          <List.OptionSelect
+            options={REGIONS.map((region) => ({
+              type: String(region.regionId),
+              name: region.korName,
+            }))}
+            handleOptionCallback={(value) => console.log(value)}
+          />
 
           {populars.map((item: any) => (
             <List.Item key={item.alcoholId} data={item} />
           ))}
-
-          {!populars.length && <EmptyView />}
         </List>
       </section>
     </main>
