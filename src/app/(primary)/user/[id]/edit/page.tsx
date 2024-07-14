@@ -15,6 +15,25 @@ export default function UserEditPage() {
   const { data: session } = useSession();
   const [isOptionShow, setIsOptionShow] = useState(false);
 
+  const SELECT_OPTIONS = [
+    { type: 'camera', name: '카메라' },
+    { type: 'album', name: '앨범에서 선택' },
+    { type: 'delete', name: '현재 이미지 삭제하기' },
+  ];
+
+  // TODO: 타입 가드 추가
+  const handleOptionSelect = ({
+    type,
+    name,
+  }: {
+    type: string;
+    name: string;
+  }) => {
+    setIsOptionShow(false);
+    console.log(type, name);
+    // TODO: type 에 따른 로직 추가
+  };
+
   return (
     <main>
       <SubHeader bgColor="bg-bgGray">
@@ -58,7 +77,12 @@ export default function UserEditPage() {
         <EditForm />
       </section>
       {isOptionShow && (
-        <OptionDropdown handleClose={() => setIsOptionShow(false)} />
+        <OptionDropdown
+          title="프로필 사진 변경"
+          options={SELECT_OPTIONS}
+          handleOptionSelect={handleOptionSelect}
+          handleClose={() => setIsOptionShow(false)}
+        />
       )}
     </main>
   );
