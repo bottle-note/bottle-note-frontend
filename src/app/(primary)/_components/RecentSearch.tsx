@@ -5,14 +5,13 @@ import Image from 'next/image';
 import DeleteIcon from 'public/icon/close-subcoral.svg';
 import { useState } from 'react';
 
-// TODO: 여기에 검색어로 서치 파라미터 추가하는 기능을 넣어줘!!!
-export default function RecentSearch() {
+interface Props {
+  handleSearch: (keyword: string) => void;
+}
+
+export default function RecentSearch({ handleSearch }: Props) {
   const SearchHistory = new SearchHistoryService();
   const [list, setList] = useState(SearchHistory.get());
-
-  const handleSearch = (keyword: string) => {
-    // TODO: 해당 키워드로 현재 서치 파라미터를 변경해야될 필요 있음!
-  };
 
   const handleDeleteAll = () => {
     SearchHistory.removeAll();

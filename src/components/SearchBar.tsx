@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import EnterIcon from 'public/icon/search-subcoral.svg';
+import { useSearchParams } from 'next/navigation';
 
 interface Props {
   type?: 'Link' | 'Search';
@@ -17,7 +18,8 @@ export default function SearchBar({
   handleSearch,
   handleFocus,
 }: Props) {
-  const [searchText, setSearchText] = useState<string>('');
+  const currSearchKeyword = useSearchParams().get('query');
+  const [searchText, setSearchText] = useState<string>(currSearchKeyword ?? '');
 
   const handleSubmit = () => {
     if (searchText) {
@@ -30,6 +32,10 @@ export default function SearchBar({
   const handleOnSearch = () => {
     if (handleFocus) handleFocus(true);
   };
+
+  useEffect(() => {
+    setSearchText(currSearchKeyword ?? '');
+  }, [currSearchKeyword]);
 
   return (
     <div className="relative">

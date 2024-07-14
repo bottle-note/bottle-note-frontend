@@ -7,7 +7,7 @@ import { SearchHistoryService } from '@/lib/SearchHistoryService';
 import { useBlockScroll } from '@/hooks/useBlockScroll';
 
 interface Props {
-  handleSearchCallback?: (value: string) => void;
+  handleSearchCallback: (value: string) => void;
 }
 
 function SearchContainer({ handleSearchCallback }: Props) {
@@ -21,6 +21,8 @@ function SearchContainer({ handleSearchCallback }: Props) {
     if (handleSearchCallback) {
       handleSearchCallback(value);
     }
+
+    setIsOnSearch(false);
   };
 
   useEffect(() => {
@@ -46,7 +48,7 @@ function SearchContainer({ handleSearchCallback }: Props) {
 
       {isOnSearch && (
         <div className="absolute w-full h-full z-10 p-5">
-          <RecentSearch />
+          <RecentSearch handleSearch={onSearch} />
         </div>
       )}
     </>
