@@ -8,7 +8,7 @@ import EnterIcon from 'public/icon/search-subcoral.svg';
 interface Props {
   type?: 'Link' | 'Search';
   handleSearch: (value: string) => void;
-  handleFocus?: () => void;
+  handleFocus?: (status: boolean) => void;
 }
 
 // FIXME: focus, blur 에 대한 이벤트 리스닝 대신 입력 값에 대한 리스닝으로 변경할 것
@@ -19,8 +19,16 @@ export default function SearchBar({
 }: Props) {
   const [searchText, setSearchText] = useState<string>('');
 
-  const handleOnClick = () => {
-    handleSearch(searchText);
+  const handleSubmit = () => {
+    if (searchText) {
+      handleSearch(searchText);
+    }
+
+    if (handleFocus) handleFocus(false);
+  };
+
+  const handleOnSearch = () => {
+    if (handleFocus) handleFocus(true);
   };
 
   return (
@@ -53,15 +61,15 @@ export default function SearchBar({
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                handleOnClick();
+                handleSubmit();
               }
             }}
-            onFocus={handleFocus}
-            onBlur={handleFocus}
+            onFocus={handleOnSearch}
+            onBlur={handleSubmit}
           />
           <button
             className="px-2 w-10 absolute top-0 right-1 h-full"
-            onClick={handleOnClick}
+            onClick={handleSubmit}
           >
             <Image src={EnterIcon} alt="search button" />
           </button>

@@ -9,6 +9,7 @@ export class Storage {
     if (typeof window !== 'undefined') {
       return localStorage.getItem(key);
     }
+
     return null;
   }
 
