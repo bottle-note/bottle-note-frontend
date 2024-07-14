@@ -44,7 +44,7 @@ function Review({ data, isBest = false, isMine = false }: Props) {
   };
   return (
     <>
-      <div className="space-y-2">
+      <div className="space-y-2 border-b border-mainGray/30 pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1">
             <Link href={`/user/${userId}`}>

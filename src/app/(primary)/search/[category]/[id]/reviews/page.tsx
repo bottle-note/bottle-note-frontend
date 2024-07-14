@@ -11,8 +11,15 @@ import Link from 'next/link';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
 import { truncStr } from '@/utils/truncStr';
 import ReviewLayout from '../layout';
+import List from '@/components/List/List';
+import { SORT_TYPE } from '@/types/common';
 
-const SORT_OPTIONS = ['인기도순', '별점순', '병 가격 순', '잔 가격 순'];
+const SORT_OPTIONS = [
+  { name: '인기도순', type: SORT_TYPE.POPULAR },
+  { name: '별점순', type: SORT_TYPE.RATING },
+  { name: '병 가격 순', type: SORT_TYPE.BOTTLE_ASC },
+  { name: '잔 가격 순', type: SORT_TYPE.GLASS_ASC },
+];
 
 function Reviews() {
   const router = useRouter();
@@ -86,36 +93,33 @@ function Reviews() {
         <div>
           {activeTab === 'tab1' && (
             <>
-              {/* 추후 컴포넌트 완성되면 적용 필요 */}
-              <ListManager total={5} sortOptions={SORT_OPTIONS} />
-              <section className="py-3 space-y-4">
-                {data &&
-                  data.length !== 0 &&
-                  data.map((review, index) => (
-                    <React.Fragment key={review.userId + index}>
-                      <Review data={review} />
-                      <div className="border-b border-mainGray/30" />
-                    </React.Fragment>
-                  ))}
-              </section>
+              <List emptyViewText="작성한 리뷰가 없어요!">
+                <List.Total total={data?.length ?? 0} />
+                <List.OptionSelect options={SORT_OPTIONS} />
+                <List.Section className="py-3 space-y-4">
+                  {data &&
+                    data.length !== 0 &&
+                    data.map((review, index) => (
+                      <Review data={review} key={review.userId + index} />
+                    ))}
+                </List.Section>
+              </List>
             </>
           )}
+
           {activeTab === 'tab2' && (
             <>
-              {/* 추후 컴포넌트 완성되면 적용 필요 */}
-              <ListManager total={5} sortOptions={SORT_OPTIONS} />
-              <section className="py-3 space-y-4">
-                {data && data.length !== 0 ? (
-                  data.map((review, index) => (
-                    <React.Fragment key={review.userId + index}>
-                      <Review data={review} />
-                      <div className="border-b border-mainGray/30" />
-                    </React.Fragment>
-                  ))
-                ) : (
-                  <EmptyView text="작성한 리뷰가 없어요!" />
-                )}
-              </section>
+              <List emptyViewText="작성한 리뷰가 없어요!">
+                <List.Total total={data?.length ?? 0} />
+                <List.OptionSelect options={SORT_OPTIONS} />
+                <List.Section className="py-3 space-y-4">
+                  {data &&
+                    data.length !== 0 &&
+                    data.map((review, index) => (
+                      <Review data={review} key={review.userId + index} />
+                    ))}
+                </List.Section>
+              </List>
             </>
           )}
         </div>

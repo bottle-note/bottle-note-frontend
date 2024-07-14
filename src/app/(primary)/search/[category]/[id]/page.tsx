@@ -276,13 +276,11 @@ function SearchCategory() {
                     />
                   </>
                 )}
-              <div className="border-b border-mainGray/30" />
               {data?.reviews?.recentReviewInfos &&
                 data.reviews.recentReviewInfos.length > 0 &&
                 data.reviews.recentReviewInfos.map((review, index) => (
                   <React.Fragment key={review.userId + index}>
                     <Review data={review} />
-                    <div className="border-b border-mainGray/30" />
                   </React.Fragment>
                 ))}
             </section>
