@@ -2,7 +2,7 @@ import { filterChildComponent } from '@/utils/filterChildComponent';
 import ListItem from './ListItem';
 import ListItemRating from './ListItemRating';
 import Total from './Total';
-import SortOrderToggle from './SortOrderToggle';
+import SortOrderSwitch from './SortOrderSwitch';
 import OptionSelect from './OptionSelect';
 import Title from './Title';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
@@ -24,7 +24,7 @@ const ListMain = ({
 }: ListMainProps) => {
   const title = filterChildComponent(children, Title);
   const totalDisplay = filterChildComponent(children, Total);
-  const sortOrderToggle = filterChildComponent(children, SortOrderToggle);
+  const sortOrderSwitch = filterChildComponent(children, SortOrderSwitch);
   const optionSelect = filterChildComponent(children, OptionSelect);
   const items = filterChildComponent(children, ListItem);
   const ratingItems = filterChildComponent(children, ListItemRating);
@@ -42,7 +42,7 @@ const ListMain = ({
   const isManageExist = Boolean(
     title.length ||
       totalDisplay.length ||
-      sortOrderToggle.length ||
+      sortOrderSwitch.length ||
       optionSelect.length,
   );
 
@@ -55,7 +55,7 @@ const ListMain = ({
             {totalDisplay}
           </div>
           <div className="flex gap-1.5 w-full justify-end">
-            {sortOrderToggle}
+            {sortOrderSwitch}
             {optionSelect}
           </div>
         </article>
@@ -81,7 +81,7 @@ const ListMain = ({
 const List = Object.assign(ListMain, {
   Title,
   Total,
-  SortOrderToggle,
+  SortOrderSwitch,
   OptionSelect,
   Item: ListItem,
   Rating: ListItemRating,

@@ -8,7 +8,7 @@ interface Props {
   handleSortOrder: (value: SORT_ORDER) => void;
 }
 
-const SortOrderToggle = ({ type, handleSortOrder }: Props) => {
+const SortOrderSwitch = ({ type, handleSortOrder }: Props) => {
   if (type === SORT_ORDER.ASC)
     return (
       <button onClick={() => handleSortOrder(SORT_ORDER.DESC)}>
@@ -23,4 +23,4 @@ const SortOrderToggle = ({ type, handleSortOrder }: Props) => {
   );
 };
 
-export default SortOrderToggle;
+export default SortOrderSwitch;

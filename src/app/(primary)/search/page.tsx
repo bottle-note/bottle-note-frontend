@@ -112,7 +112,7 @@ export default function Search() {
               <List.Total
                 total={alcoholList ? alcoholList[0].data.totalCount : 0}
               />
-              <List.SortOrderToggle
+              <List.SortOrderSwitch
                 type={filterState.sortOrder}
                 handleSortOrder={(value) => handleFilter('sortOrder', value)}
               />

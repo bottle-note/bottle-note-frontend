@@ -86,7 +86,7 @@ export default function Rating() {
 
         <List isListFirstLoading={isFirstLoading} isScrollLoading={isFetching}>
           <List.Total total={ratingList ? ratingList[0].data.totalCount : 0} />
-          <List.SortOrderToggle
+          <List.SortOrderSwitch
             type={filterState.sortOrder}
             handleSortOrder={(value) => handleFilter('sortOrder', value)}
           />
