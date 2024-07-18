@@ -1,19 +1,27 @@
 'use client';
 
-import LikeBtn from '@/app/(primary)/user/[id]/_components/LikeBtn';
 import StarRating from '../StarRaiting';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
 import { useState } from 'react';
 import { RateAPI } from '@/types/Rate';
+import PickBtn from '@/app/(primary)/_components/PickBtn';
 
 interface Props {
   data: RateAPI;
 }
 
 const ListItemRating = ({ data }: Props) => {
-  const { korCategory, korName, engName, imageUrl, isPicked } = data;
+  const {
+    korCategory,
+    korName,
+    engName,
+    imageUrl,
+    isPicked: initialIsPicked,
+    alcoholId,
+  } = data;
   const [rate, setRate] = useState(0);
+  const [isPicked, setIsPicked] = useState(initialIsPicked);
 
   const handleRate = (selectedRate: number) => {
     setRate(selectedRate);
@@ -31,8 +39,13 @@ const ListItemRating = ({ data }: Props) => {
         />
         <article className="flex justify-between">
           <StarRating rate={rate} handleRate={handleRate} />
-          <div className="space-x-1.5 flex items-center">
-            <LikeBtn isLiked={isPicked} />
+          <div className="space-x-1.5 flex items-end">
+            <PickBtn
+              isPicked={isPicked}
+              setIsPicked={setIsPicked}
+              alcoholId={alcoholId}
+              iconColor="subcoral"
+            />
           </div>
         </article>
       </section>

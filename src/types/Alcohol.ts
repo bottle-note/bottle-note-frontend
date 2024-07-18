@@ -12,7 +12,7 @@ export interface AlcoholAPI {
   ratingCount: number;
   reviewCount: number;
   pickCount: number;
-  isPicked?: boolean;
+  isPicked: boolean;
 }
 
 export interface AlcoholDetails {
@@ -70,5 +70,4 @@ export interface CategoryApi {
   korCategory: string;
   engCategory: string;
   categoryGroup: Category;
-
 }
