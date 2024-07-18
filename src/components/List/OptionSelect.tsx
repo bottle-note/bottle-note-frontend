@@ -6,9 +6,14 @@ import OptionDropdown from '../OptionDropdown';
 interface SortOptionProps {
   options: { type: string; name: string }[];
   handleOptionCallback?: (type: string) => void;
+  title?: string;
 }
 
-const OptionSelect = ({ options, handleOptionCallback }: SortOptionProps) => {
+const OptionSelect = ({
+  options,
+  handleOptionCallback,
+  title,
+}: SortOptionProps) => {
   const [selectedOption, setSelectedOption] = useState(options[0].name);
   const [isDropDownShow, setIsDropDownShow] = useState(false);
 
@@ -43,6 +48,7 @@ const OptionSelect = ({ options, handleOptionCallback }: SortOptionProps) => {
           handleClose={handleSortOptionsShow}
           options={options}
           handleOptionSelect={handleOptionSelect}
+          title={title}
         />
       )}
     </>

@@ -129,6 +129,7 @@ export default function Search() {
                 handleOptionCallback={(value) =>
                   handleFilter('regionId', value)
                 }
+                title="국가"
               />
 
               {alcoholList &&
