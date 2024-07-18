@@ -8,7 +8,7 @@ import HistoryOverview from './_components/HistoryOverview';
 import SidebarHeader from './_components/SidebarHeader';
 import NavLayout from '../../_components/NavLayout';
 import LinkButton from '@/components/LinkButton';
-import { usePopular } from '@/hooks/usePopular';
+import { usePopularList } from '@/hooks/usePopularList';
 
 // TODO:
 // 1. 유저 데이터 가져오는 api 연동
@@ -16,7 +16,7 @@ import { usePopular } from '@/hooks/usePopular';
 // 3. 기타 버튼 액션과 관련된 api 연동
 export default function User({ params: { id } }: { params: { id: string } }) {
   // FIXME: 활동 내역 가져오기 데이터로 변동
-  const { populars } = usePopular();
+  const { popularList } = usePopularList();
 
   return (
     <NavLayout>
@@ -36,7 +36,7 @@ export default function User({ params: { id } }: { params: { id: string } }) {
         <section className="px-5 pt-9 flex flex-col gap-5">
           <List emptyViewText={`아직 활동한\n보틀이 없어요!`}>
             <List.Total total={33} />
-            {populars.map((item) => (
+            {popularList.map((item) => (
               <List.Item data={item} />
             ))}
           </List>

@@ -1,16 +1,16 @@
 'use client';
 
 import HorizontalItem from '@/components/HorizontalItem';
-import { usePopular } from '@/hooks/usePopular';
+import { usePopularList } from '@/hooks/usePopularList';
 
 function HotList() {
-  const { populars } = usePopular();
+  const { popularList } = usePopularList();
 
   return (
     <>
-      {populars.length !== 0 && (
+      {popularList.length !== 0 && (
         <div className="whitespace-nowrap overflow-x-auto flex space-x-2">
-          {populars.map((item) => {
+          {popularList.map((item) => {
             return (
               <div key={item.alcoholId} className="flex-shrink-0">
                 <HorizontalItem data={item} />

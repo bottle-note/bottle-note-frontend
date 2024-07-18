@@ -6,7 +6,7 @@ import List from '@/components/List/List';
 import Tab from '@/components/Tab';
 import { REGIONS } from '@/constants/common';
 import { HISTORY_TYPES } from '@/constants/user';
-import { usePopular } from '@/hooks/usePopular';
+import { usePopularList } from '@/hooks/usePopularList';
 import { useTab } from '@/hooks/useTab';
 import { SORT_TYPE } from '@/types/common';
 import Image from 'next/image';
@@ -18,7 +18,7 @@ export default function UserHistory() {
   const historyType = useSearchParams().get('type');
   const { currentTab, handleTab, tabList } = useTab({ tabList: HISTORY_TYPES });
   // FIXME: 실제 히스토리 API 연동하여 변경
-  const { populars } = usePopular();
+  const { popularList } = usePopularList();
   const [currHistoryType, setCurrHistoryType] = useState('');
   const [filterOptions, setFilterOptions] = useState<
     { id: number; value: string }[] | null
@@ -82,7 +82,7 @@ export default function UserHistory() {
         {/* TODO: 실제 데이터로 변동 */}
         <List emptyViewText={`아직 활동한\n보틀이 없어요!`}>
           <List.Title title={currHistoryType} />
-          <List.Total total={populars.length} />
+          <List.Total total={popularList.length} />
           <List.OptionSelect
             options={SORT_OPTIONS}
             handleOptionCallback={(value) => console.log(value)}
@@ -95,7 +95,7 @@ export default function UserHistory() {
             handleOptionCallback={(value) => console.log(value)}
           />
 
-          {populars.map((item: any) => (
+          {popularList.map((item: any) => (
             <List.Item key={item.alcoholId} data={item} />
           ))}
         </List>

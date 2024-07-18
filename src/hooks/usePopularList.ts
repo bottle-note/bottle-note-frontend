@@ -2,7 +2,7 @@ import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { AlcoholAPI } from '@/types/Alcohol';
 import { useLayoutEffect, useState } from 'react';
 
-export const usePopular = () => {
+export const usePopularList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [populars, setPopulars] = useState<(AlcoholAPI & { path: string })[]>(
     [],
@@ -18,5 +18,5 @@ export const usePopular = () => {
     })();
   }, []);
 
-  return { populars, isLoading };
+  return { popularList: populars, isLoading };
 };

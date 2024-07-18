@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import CategorySelector from '@/components/CategorySelector';
 import CategoryTitle from '@/components/CategoryTitle';
 import List from '@/components/List/List';
-import { usePopular } from '@/hooks/usePopular';
+import { usePopularList } from '@/hooks/usePopularList';
 import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
 import { useFilter } from '@/hooks/useFilter';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
@@ -12,7 +12,6 @@ import { AlcoholAPI } from '@/types/Alcohol';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { REGIONS } from '@/constants/common';
 import SearchContainer from './_components/SearchContainer';
-import { useEffect } from 'react';
 
 interface InitialState {
   keyword: string;
@@ -24,7 +23,7 @@ interface InitialState {
 
 export default function Search() {
   const router = useRouter();
-  const { populars } = usePopular();
+  const { popularList } = usePopularList();
 
   const currCategory = useSearchParams().get('category');
   const currSearchKeyword = useSearchParams().get('query');
@@ -93,7 +92,7 @@ export default function Search() {
             <CategoryTitle subTitle="위클리 HOT 5" />
 
             <List>
-              {populars.map((item: AlcoholAPI) => (
+              {popularList.map((item: AlcoholAPI) => (
                 <List.Item
                   key={item.alcoholId}
                   data={{
