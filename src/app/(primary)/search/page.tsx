@@ -12,6 +12,7 @@ import { AlcoholAPI } from '@/types/Alcohol';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { REGIONS } from '@/constants/common';
 import SearchContainer from './_components/SearchContainer';
+import { useEffect } from 'react';
 
 interface InitialState {
   keyword: string;
@@ -87,7 +88,7 @@ export default function Search() {
       <section className="flex flex-col gap-7 p-5">
         <CategorySelector handleCategoryCallback={handleCategoryCallback} />
 
-        {!currCategory && !currSearchKeyword ? (
+        {currCategory === null && currSearchKeyword === null ? (
           <section>
             <CategoryTitle subTitle="위클리 HOT 5" />
 
