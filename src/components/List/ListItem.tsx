@@ -13,8 +13,8 @@ interface Props {
 
 const ListItem = ({ data }: Props) => {
   const {
-    korCategoryName,
-    engCategoryName,
+    korCategory,
+    engCategory,
     korName,
     engName,
     imageUrl,
@@ -25,14 +25,14 @@ const ListItem = ({ data }: Props) => {
   } = data;
 
   return (
-    <Link href={`/search/${engCategoryName}/${alcoholId}`}>
+    <Link href={`/search/${engCategory}/${alcoholId}`}>
       <article className="flex items-center space-x-2 text-mainBlack border-mainBlack border-b h-[90px]">
         <ItemImage src={imageUrl} alt="위스키 이미지" />
         <section className="flex-1 space-y-1">
           <ItemInfo
             korName={addNewLine(korName)}
             engName={truncStr(engName, 16)}
-            korCategory={korCategoryName}
+            korCategory={korCategory}
           />
           <article className="flex justify-between">
             <div className="flex flex-col">

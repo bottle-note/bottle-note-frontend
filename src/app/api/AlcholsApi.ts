@@ -1,10 +1,11 @@
+import { ApiResponse, ListQueryParams } from '@/types/common';
 import {
   AlcoholAPI,
-  CategoryApi,
   RegionApi,
-  WeeklyAlcohol,
+  CategoryApi,
+  AlcoholDetails,
 } from '@/types/Alcohol';
-import { ApiResponse, ListQueryParams } from '@/types/common';
+import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 // TODO: 캐싱, 프리페칭을 적용해 반복적인 데이터 요청 작업에 대한 최적화 진행 필요
 export const AlcoholsApi = {
@@ -16,13 +17,13 @@ export const AlcoholsApi = {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<{ alcohols: WeeklyAlcohol[] }> =
+    const result: ApiResponse<{ alcohols: AlcoholAPI[] }> =
       await response.json();
 
-    const formattedData = result.data.alcohols.map((alcohol: WeeklyAlcohol) => {
+    const formattedData = result.data.alcohols.map((alcohol: AlcoholAPI) => {
       return {
         ...alcohol,
-        path: `/search/${alcohol.alcoholId}`,
+        path: `/search/${alcohol.engCategory}/${alcohol.alcoholId}`,
       };
     });
 
@@ -52,11 +53,10 @@ export const AlcoholsApi = {
   async getCategory(type = 'WHISKY') {
     const response = await fetch(
       `/bottle-api/alcohols/categories?type=${type}`,
-      { cache: 'force-cache' },
+      {
+        cache: 'force-cache',
+      },
     );
-    if (!response.ok) {
-      throw new Error('Failed to fetch data');
-    }
 
     const result: ApiResponse<CategoryApi[]> = await response.json();
 
@@ -100,9 +100,47 @@ export const AlcoholsApi = {
     }
 
     // TODO: 카테고리 필드 명 변경하여 수정해주기
-    const result: ApiResponse<{ alcohols: AlcoholAPI[]; totalCount: number }> =
+    const result: ApiResponse<{ alcohols: any[]; totalCount: number }> =
       await response.json();
 
-    return result;
+    const formattedResult: ApiResponse<{
+      alcohols: AlcoholAPI[];
+      totalCount: number;
+    }> = {
+      ...result,
+      data: {
+        ...result.data,
+        alcohols: result.data.alcohols.map((item) => ({
+          ...item,
+          engCategory: item.engCategoryName,
+          korCategory: item.korCategoryName,
+        })),
+      },
+    };
+
+    return formattedResult;
+  },
+
+  async getAlcoholDetails(alcoholId: string) {
+    const response = await fetch(`/bottle-api/alcohols/${alcoholId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch data');
+    }
+
+    const result: ApiResponse<AlcoholDetails> = await response.json();
+
+    return result.data;
+  },
+
+  async putLike(alcoholId: string | number, isPicked: boolean) {
+    const response = await fetchWithAuth(`/bottle-api/picks`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        alcoholId,
+        isPicked: isPicked ? 'PICK' : 'UNPICK',
+      }),
+    });
+
+    return await response.data;
   },
 };

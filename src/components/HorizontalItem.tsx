@@ -3,10 +3,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Star from '@/components/Star';
 import { truncStr } from '@/utils/truncStr';
-import { WeeklyAlcohol } from '@/types/Alcohol';
+import { AlcoholAPI } from '@/types/Alcohol';
 
 interface Props {
-  data: WeeklyAlcohol;
+  data: AlcoholAPI & { path: string };
 }
 
 export default function HorizontalItem({ data }: Props) {

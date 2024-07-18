@@ -9,6 +9,9 @@ export const MOCK_LIST_ITEM: Omit<AlcoholAPI, 'isPicked'>[] = [
     korCategory: '싱글 몰트',
     engCategory: 'single molt',
     imageUrl: 'https://i.imgur.com/Bdh6kRH.jpeg',
+    ratingCount: 0,
+    reviewCount: 0,
+    pickCount: 0,
   },
   {
     alcoholId: 2,
@@ -18,6 +21,9 @@ export const MOCK_LIST_ITEM: Omit<AlcoholAPI, 'isPicked'>[] = [
     korCategory: '싱글 몰트',
     engCategory: 'single molt',
     imageUrl: 'https://i.imgur.com/Bdh6kRH.jpeg',
+    ratingCount: 0,
+    reviewCount: 0,
+    pickCount: 0,
   },
   {
     alcoholId: 3,
@@ -27,6 +33,9 @@ export const MOCK_LIST_ITEM: Omit<AlcoholAPI, 'isPicked'>[] = [
     korCategory: '싱글 몰트',
     engCategory: 'single molt',
     imageUrl: 'https://i.imgur.com/Bdh6kRH.jpeg',
+    ratingCount: 0,
+    reviewCount: 0,
+    pickCount: 0,
   },
   {
     alcoholId: 4,
@@ -36,6 +45,9 @@ export const MOCK_LIST_ITEM: Omit<AlcoholAPI, 'isPicked'>[] = [
     korCategory: '싱글 몰트',
     engCategory: 'single molt',
     imageUrl: 'https://i.imgur.com/Bdh6kRH.jpeg',
+    ratingCount: 0,
+    reviewCount: 0,
+    pickCount: 0,
   },
   {
     alcoholId: 5,
@@ -45,5 +57,8 @@ export const MOCK_LIST_ITEM: Omit<AlcoholAPI, 'isPicked'>[] = [
     korCategory: '싱글 몰트',
     engCategory: 'single molt',
     imageUrl: 'https://i.imgur.com/Bdh6kRH.jpeg',
+    ratingCount: 0,
+    reviewCount: 0,
+    pickCount: 0,
   },
 ];

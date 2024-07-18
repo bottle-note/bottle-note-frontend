@@ -28,6 +28,11 @@ export const CATEGORY_MENUS = {
   Other: { kor: '기타', eng: 'Other', link: 'other', categoryGroup: 'OTHER' },
 } as const;
 
+export const S3_URL_PATH = {
+  review: 'review',
+  userProfile: 'user/profile',
+};
+
 export const REGIONS = [
   { regionId: '', korName: '국가(전체)', engName: 'All' },
   {

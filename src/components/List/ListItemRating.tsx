@@ -12,7 +12,7 @@ interface Props {
 }
 
 const ListItemRating = ({ data }: Props) => {
-  const { korCategoryName, korName, engName, imageUrl, isPicked } = data;
+  const { korCategory, korName, engName, imageUrl, isPicked } = data;
   const [rate, setRate] = useState(0);
 
   const handleRate = (selectedRate: number) => {
@@ -27,7 +27,7 @@ const ListItemRating = ({ data }: Props) => {
         <ItemInfo
           korName={korName}
           engName={engName}
-          korCategory={korCategoryName}
+          korCategory={korCategory}
         />
         <article className="flex justify-between">
           <StarRating rate={rate} handleRate={handleRate} />

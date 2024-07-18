@@ -8,7 +8,7 @@ import { usePopular } from '@/hooks/usePopular';
 import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
 import { useFilter } from '@/hooks/useFilter';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import { AlcoholAPI, WeeklyAlcohol } from '@/types/Alcohol';
+import { AlcoholAPI } from '@/types/Alcohol';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { REGIONS } from '@/constants/common';
 import SearchContainer from './_components/SearchContainer';
@@ -92,13 +92,11 @@ export default function Search() {
             <CategoryTitle subTitle="위클리 HOT 5" />
 
             <List>
-              {populars.map((item: WeeklyAlcohol) => (
+              {populars.map((item: AlcoholAPI) => (
                 <List.Item
                   key={item.alcoholId}
                   data={{
                     ...item,
-                    korCategoryName: item.korCategory,
-                    engCategoryName: item.engCategory,
                   }}
                 />
               ))}
