@@ -1,5 +1,6 @@
-import { RateAPI } from '@/types/Rate';
+import { RateAPI, UserRatingApi } from '@/types/Rate';
 import { ApiResponse, ListQueryParams } from '@/types/common';
+import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 // TODO: API 수정되면 요청 방식 변경
 export const RateApi = {
@@ -30,5 +31,32 @@ export const RateApi = {
       await response.json();
 
     return result;
+  },
+
+  async getUserRating(alcoholId: string) {
+    const response = await fetchWithAuth(`/bottle-api/rating/${alcoholId}`);
+
+    if (response.errors.length !== 0) {
+      throw new Error('Failed to fetch data');
+    }
+
+    const result: ApiResponse<UserRatingApi> = await response;
+
+    return result.data;
+  },
+
+  async postRating(params: { alcoholId: string; rating: number }) {
+    const response = await fetchWithAuth(`/bottle-api/rating/register`, {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+
+    if (response.errors.length !== 0) {
+      throw new Error('Failed to fetch data');
+    }
+
+    const result: ApiResponse<{ message: string; rating: string }> =
+      await response;
+    return result.data;
   },
 };

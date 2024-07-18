@@ -41,6 +41,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'dzjkrmkt5t9bn.cloudfront.net',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   domains: WHITE_LIST,

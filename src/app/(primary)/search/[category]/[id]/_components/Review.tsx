@@ -11,7 +11,7 @@ import Star from '@/components/Star';
 import { numberWithCommas } from '@/utils/formatNum';
 import { formatDate } from '@/utils/formatDate';
 import Toggle from '@/app/(primary)/_components/Toggle';
-import ReportModal from '@/app/(primary)/_components/ReportModal';
+import OptionModal from '@/app/(primary)/_components/OptionModal';
 
 interface Props {
   isBest?: boolean;
@@ -99,6 +99,7 @@ function Review({ data, isBest = false, isMine = false }: Props) {
         </div>
         <div className="grid grid-cols-5 space-x-2" onClick={() => {}}>
           <p className="col-span-4 text-mainDarkGray text-10">
+            {/* 클릭 범위 고민 필요 */}
             <Link href={`/review/${reviewId}`}>
               {truncStr(reviewContent, 135)}
               {reviewContent.length > 135 && (
@@ -149,6 +150,7 @@ function Review({ data, isBest = false, isMine = false }: Props) {
                 defaultState={status === 'PUBLIC'}
                 offValue="리뷰 비공개"
                 onValue="리뷰 공개"
+                onChange={() => {}}
               />
             )}
           </div>
@@ -170,7 +172,15 @@ function Review({ data, isBest = false, isMine = false }: Props) {
           </div>
         </div>
       </div>
-      {isOptionShow && <ReportModal handleClose={handleOptionsShow} />}
+      {isOptionShow && (
+        <OptionModal
+          options={[
+            { name: '리뷰 신고', path: '' },
+            { name: '유저 신고', path: '' },
+          ]}
+          handleClose={handleOptionsShow}
+        />
+      )}
     </>
   );
 }

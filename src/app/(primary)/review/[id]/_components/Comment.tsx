@@ -4,23 +4,23 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { truncStr } from '@/utils/truncStr';
 import { formatDate } from '@/utils/formatDate';
-import { StaticImageData } from 'next/image';
 import userImg from 'public/user_img.png';
 import Label from '@/app/(primary)/_components/Label';
-import ReportModal from '@/app/(primary)/_components/ReportModal';
+import OptionModal from '@/app/(primary)/_components/OptionModal';
 
 interface Props {
   data: {
-    userId: string;
+    userId: number;
+    imageUrl: string;
     nickName: string;
-    comment: string;
+    reviewReplyId: number;
+    reviewReplyContent: string;
     createAt: string;
-    userImg: StaticImageData;
   };
 }
 
 function Comment({ data }: Props) {
-  const { userId, nickName, comment, createAt } = data;
+  const { userId, nickName, reviewReplyContent, createAt } = data;
   const [isOptionShow, setIsOptionShow] = useState(false);
   const handleOptionsShow = () => {
     setIsOptionShow((prev) => !prev);
@@ -64,9 +64,17 @@ function Comment({ data }: Props) {
             </button>
           </div>
         </div>
-        <div className="text-10 text-mainDarkGray">{comment}</div>
+        <div className="text-10 text-mainDarkGray">{reviewReplyContent}</div>
       </div>
-      {isOptionShow && <ReportModal handleClose={handleOptionsShow} />}
+      {isOptionShow && (
+        <OptionModal
+          options={[
+            { name: '리뷰 신고', path: '' },
+            { name: '유저 신고', path: '' },
+          ]}
+          handleClose={handleOptionsShow}
+        />
+      )}
     </>
   );
 }

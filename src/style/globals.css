@@ -28,6 +28,10 @@
   .tab-selected {
     @apply text-subCoral border-subCoral border-b;
   }
+
+  .line-border {
+    @apply border-t border-mainGray/30 my-3;
+  }
 }
 
 @layer utilities {

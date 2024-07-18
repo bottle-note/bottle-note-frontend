@@ -14,15 +14,9 @@ export default function HorizontalItem({ data }: Props) {
 
   return (
     <Link href={path}>
-      <div className="w-[10rem] h-[15.5rem] bg-bgGray border-t-[0.13rem] border-b-[0.13rem] border-subCoral">
-        <div className="w-full h-40 relative">
-          <Image
-            className="max-w-full max-h-full"
-            src={imageUrl}
-            alt="위스키 image"
-            width={160}
-            height={160}
-          />
+      <div className="w-[10rem] h-[15.5rem] bg-bgGray">
+        <div className="w-[166px] h-[166px] relative flex shrink-0">
+          <Image src={imageUrl} alt="위스키 image" fill objectFit="cover" />
         </div>
         <div className="px-2 pt-[0.625rem] space-y-2 border-t-[1px] border-subCoral">
           <div

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Star from '@/components/Star';
@@ -25,6 +26,7 @@ type Details = {
 function SearchCategory() {
   const router = useRouter();
   const params = useParams();
+  const { data: session } = useSession();
   const alcoholId = params?.id;
   const [data, setData] = useState<AlcoholDetails | null>(null);
   const [details, setDetails] = useState<Details[]>([]);
@@ -164,9 +166,13 @@ function SearchCategory() {
                       <button
                         className="text-10 flex"
                         onClick={() => {
-                          // 로그인 여부 확인 조건 추가 필요
-                          setIsLoginModalShow(true);
-                          // router.push('/review/register');
+                          if (session && alcoholId) {
+                            router.push(
+                              `/review/register?alcoholId=${alcoholId}`,
+                            );
+                          } else {
+                            setIsLoginModalShow(true);
+                          }
                         }}
                       >
                         <Image
@@ -203,7 +209,7 @@ function SearchCategory() {
             </p>
             {/* 추후 로직 확인 후 수정 필요 */}
             <div>
-              <StarRating size={40} />
+              <StarRating rate={0} size={40} handleRate={() => {}} />
             </div>
           </article>
           <section className="mx-5 py-5 border-y border-mainGray/30 grid grid-cols-2 gap-2">

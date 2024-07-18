@@ -4,17 +4,20 @@ interface Props {
   defaultState?: boolean;
   offValue?: string;
   onValue?: string;
+  onChange: (value: boolean) => void;
 }
 
 const Toggle = ({
-  defaultState = false,
+  defaultState = true,
   offValue = '리뷰 비공개',
   onValue = '리뷰 공개',
+  onChange,
 }: Props) => {
   const [isToggled, setIsToggled] = useState<boolean>(defaultState);
 
   const handleClick = () => {
     setIsToggled((prev) => !prev);
+    onChange(!isToggled);
   };
 
   return (
