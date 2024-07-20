@@ -16,14 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className} suppressHydrationWarning>
-        <Providers>
-          <div className="bg-white flex flex-col w-full mx-auto max-w-[400px] min-h-screen">
-            <main className="flex-1 overflow-y-auto">{children}</main>
-          </div>
-        </Providers>
-      </body>
-    </html>
+    <div className="bg-white flex flex-col w-full mx-auto max-w-[400px] min-h-screen">
+      <main className="flex-1 overflow-y-auto">{children}</main>
+    </div>
   );
 }
