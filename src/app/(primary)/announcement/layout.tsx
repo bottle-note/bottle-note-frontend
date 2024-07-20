@@ -2,16 +2,19 @@
 
 import Image from 'next/image';
 import { SubHeader } from '../_components/SubHeader';
+import { useRouter } from 'next/navigation';
 
 export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const router = useRouter();
+
   return (
     <main className="bg-white flex flex-col w-full mx-auto max-w-[430px] min-h-screen">
       <SubHeader bgColor="bg-bgGray">
-        <SubHeader.Left onClick={() => {}}>
+        <SubHeader.Left onClick={() => router.back()}>
           <Image
             src="/icon/arrow-left-subCoral.svg"
             alt="arrowIcon"
