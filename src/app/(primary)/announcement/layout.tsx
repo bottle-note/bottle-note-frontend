@@ -21,7 +21,7 @@ export default function Layout({
         </SubHeader.Left>
         <SubHeader.Center textColor="text-subCoral">공지사항</SubHeader.Center>
       </SubHeader>
-      {children}
+      <section className="py-8 px-5">{children}</section>
     </main>
   );
 }
