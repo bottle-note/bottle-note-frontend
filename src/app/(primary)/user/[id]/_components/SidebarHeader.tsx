@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import Logo from 'public/icon/logo-text-subcoral.svg';
@@ -12,6 +12,7 @@ import { SIDEBAR_MENUS } from '../_constants';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useBlockScroll } from '@/hooks/useBlockScroll';
 
 // TODO: block scroll when sidebar is open
 
@@ -42,6 +43,7 @@ const Header = ({
 
 const SidebarHeader = () => {
   const router = useRouter();
+  const { handleScroll } = useBlockScroll();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpen = () => {
@@ -73,6 +75,10 @@ const SidebarHeader = () => {
   const onLogout = () => {
     signOut({ callbackUrl: '/', redirect: true });
   };
+
+  useEffect(() => {
+    handleScroll({ isScroll: !isOpen });
+  }, [isOpen]);
 
   return (
     <>
