@@ -2,7 +2,7 @@
 export const SIDEBAR_MENUS = [
   {
     text: '공지사항',
-    link: '/공지사항',
+    link: '/announcement',
   },
   {
     text: '서비스 문의',
