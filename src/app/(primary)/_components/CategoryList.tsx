@@ -24,7 +24,7 @@ function CategoryList() {
         data={{
           engName: 'ALL',
           korName: '전체',
-          linkSrc: '/search?category=&query=',
+          linkSrc: '/search?category=',
         }}
       />
       <div className="grid grid-cols-2 gap-3">
