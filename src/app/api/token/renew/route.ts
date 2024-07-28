@@ -1,5 +1,6 @@
-import { decode, encode } from 'next-auth/jwt';
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { decode, encode } from 'next-auth/jwt';
 import { AuthApi } from '../../AuthApi';
 
 export async function POST(req: NextRequest, res: NextResponse) {
@@ -12,7 +13,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     token: session?.value,
     secret: process.env.NEXTAUTH_SECRET ?? '',
   });
-  const refreshToken = decoded.refreshToken;
+  const { refreshToken } = decoded;
 
   try {
     const newTokens = await AuthApi.renewAccessToken(refreshToken);
@@ -25,7 +26,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
       maxAge: 30 * 24 * 60 * 60,
     });
 
-    res.cookies.set(sessionCookie, newSessionToken);
+    cookies().set({
+      name: sessionCookie,
+      value: newSessionToken,
+    });
+
     return NextResponse.json(
       { res, data: newTokens.accessToken },
       {
