@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { NextRequest, NextResponse } from 'next/server';
 
 export function updateCookie(

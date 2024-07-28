@@ -143,6 +143,6 @@ export const AlcoholsApi = {
     });
 
     const result: ApiResponse<PickPutApi> = await response.data;
-    return await result;
+    return result;
   },
 };

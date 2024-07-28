@@ -1,6 +1,6 @@
+import { getSession } from 'next-auth/react';
 import { AuthApi } from '@/app/api/AuthApi';
 import { ApiResponse } from '@/types/common';
-import { getSession } from 'next-auth/react';
 
 type FetchWithAuth = (
   url: string,
@@ -41,7 +41,7 @@ export const fetchWithAuth: FetchWithAuth = async (
             throw new Error('갱신된 액세스 토큰이 존재하지 않습니다.');
           }
 
-          return fetchWithAuth(url, options, retryCount + 1);
+          return await fetchWithAuth(url, options, retryCount + 1);
         } catch (e) {
           throw new Error(`HTTP error! ${e}`);
         }
@@ -57,7 +57,7 @@ export const fetchWithAuth: FetchWithAuth = async (
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return response.json();
+    return await response.json();
   } catch (error) {
     // TODO: 적절한 에러처리 필요!
     console.error('Fetch error:', error);

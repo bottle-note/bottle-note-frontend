@@ -1,5 +1,34 @@
 import React from 'react';
 
+interface ButtonProps {
+  btnName: string;
+  type?: 'button' | 'submit';
+  onClick: () => void;
+  btnStyles?: string;
+  btnTextStyles?: string;
+  disabled?: boolean;
+}
+
+export function Button({
+  btnName,
+  type = 'button',
+  onClick,
+  btnStyles = 'bg-subCoral',
+  btnTextStyles = 'text-white font-bold text-15',
+  disabled = false,
+}: ButtonProps) {
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      className={`flex justify-center items-center w-full h-[3.8rem] rounded-xl ${btnStyles}`}
+      disabled={disabled}
+    >
+      <span className={btnTextStyles}>{btnName}</span>
+    </button>
+  );
+}
+
 interface DualButtonProps {
   okayBtnName?: string;
   cancelBtnName?: string;
@@ -36,34 +65,5 @@ export function DualButton({
         btnTextStyles={okayBtnTextStyles}
       />
     </div>
-  );
-}
-
-interface ButtonProps {
-  btnName: string;
-  type?: 'button' | 'submit';
-  onClick: () => void;
-  btnStyles?: string;
-  btnTextStyles?: string;
-  disabled?: boolean;
-}
-
-export function Button({
-  btnName,
-  type = 'button',
-  onClick,
-  btnStyles = 'bg-subCoral',
-  btnTextStyles = 'text-white font-bold text-15',
-  disabled = false,
-}: ButtonProps) {
-  return (
-    <button
-      type={type}
-      onClick={onClick}
-      className={`flex justify-center items-center w-full h-[3.8rem] rounded-xl ${btnStyles}`}
-      disabled={disabled}
-    >
-      <span className={btnTextStyles}>{btnName}</span>
-    </button>
   );
 }

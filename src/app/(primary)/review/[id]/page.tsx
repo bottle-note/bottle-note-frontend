@@ -6,12 +6,9 @@ import { useRouter, useParams } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
-import Comment from './_components/Comment';
 import NavLayout from '@/app/(primary)/_components/NavLayout';
 import Loading from '@/components/Loading';
 import { shareOrCopy } from '@/utils/shareOrCopy';
-import AlcoholInfo from './_components/AlcoholInfo';
-import ReviewDetails from './_components/ReviewDetails';
 import type {
   AlcoholInfo as AlcoholInfoType,
   ReviewDetailsWithoutAlcoholInfo,
@@ -19,8 +16,11 @@ import type {
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import LoginModal from '@/app/(primary)/_components/LoginModal';
-import CommentInput from './_components/CommentInput';
 import { RootReply } from '@/types/Comment';
+import CommentInput from './_components/CommentInput';
+import ReviewDetails from './_components/ReviewDetails';
+import AlcoholInfo from './_components/AlcoholInfoDisplay';
+import Comment from './_components/Comment';
 
 // comment 더미 데이터
 const COMMENT_DATA: RootReply[] = [
@@ -101,8 +101,8 @@ export default function ReviewDetail() {
       if (!reviewId) return;
       try {
         const result = await ReviewApi.getReviewDetails(reviewId);
-        const { alcoholInfo, ...restData } = result;
-        setAlcoholInfo(alcoholInfo);
+        const { alcoholInfo: response, ...restData } = result;
+        setAlcoholInfo(response);
         setReviewDetails(restData);
       } catch (error) {
         console.error('Failed to fetch review details:', error);
@@ -120,7 +120,7 @@ export default function ReviewDetail() {
             <div className="relative pb-5">
               {alcoholInfo.imageUrl && (
                 <div
-                  className={`absolute w-full h-full  bg-cover bg-center`}
+                  className="absolute w-full h-full  bg-cover bg-center"
                   style={{
                     backgroundImage: `url(${alcoholInfo.imageUrl})`,
                   }}

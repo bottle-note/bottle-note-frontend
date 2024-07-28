@@ -14,9 +14,7 @@ function FlavorTag({ tagList }: Props) {
           <div key={tag + index} className="overflow-hidden flex-shrink-0">
             <Label
               name={tag}
-              style={
-                'border-subCoral text-subCoral px-2 py-0.5 rounded-md text-10'
-              }
+              style="border-subCoral text-subCoral px-2 py-0.5 rounded-md text-10"
             />
           </div>
         ))}

@@ -2,14 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import Label from '../../_components/Label';
+import { useFormContext } from 'react-hook-form';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { truncStr } from '@/utils/truncStr';
-import { useFormContext } from 'react-hook-form';
 import PageModal from '@/components/PageModal';
-import SelectFlavor from './SelectFlavor';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
+import SelectFlavor from './SelectFlavor';
+import Label from '../../_components/Label';
 
 interface Props {
   korName: string;
@@ -73,9 +73,7 @@ export default function TagsForm({ korName }: Props) {
             <React.Fragment key={tag}>
               <Label
                 name={tag}
-                style={
-                  'border-subCoral text-subCoral px-2 py-0.5 rounded-md text-13'
-                }
+                style="border-subCoral text-subCoral px-2 py-0.5 rounded-md text-13"
               />
             </React.Fragment>
           ))}

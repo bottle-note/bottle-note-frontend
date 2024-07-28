@@ -1,7 +1,6 @@
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { ApiResponse } from '@/types/common';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 
 interface Props<T> {
   queryKey: [string, any];

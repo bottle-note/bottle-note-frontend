@@ -1,14 +1,14 @@
+import { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import Star from '@/components/Star';
 import { truncStr } from '@/utils/truncStr';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { addNewLine } from '@/utils/addNewLine';
+import { AlcoholAPI } from '@/types/Alcohol';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
-import { AlcoholAPI } from '@/types/Alcohol';
-import Link from 'next/link';
-import { useState } from 'react';
 import RatingCountIcon from 'public/icon/ratingcount-black.svg';
-import Image from 'next/image';
 
 interface Props {
   data: AlcoholAPI;
@@ -55,9 +55,12 @@ const ListItem = ({ data }: Props) => {
             <div className="flex justify-end mt-1.5">
               <PickBtn
                 isPicked={isPicked}
-                setIsPicked={setIsPicked}
                 alcoholId={alcoholId}
                 iconColor="subcoral"
+                // FIXME: 별도 함수로 분리
+                handleUpdatePicked={() => setIsPicked(!isPicked)}
+                handleError={() => alert('에러가 발생했습니다.')}
+                handleNotLogin={() => alert('로그인이 필요한 서비스입니다.')}
               />
             </div>
           </article>

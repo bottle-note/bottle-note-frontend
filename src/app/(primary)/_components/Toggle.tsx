@@ -32,7 +32,7 @@ const Toggle = ({
           className={`toggle-handle w-[0.6rem] h-[0.6rem] rounded-full bg-white transform transition-transform ${
             isToggled ? 'translate-x-full' : 'translate-x-0.5'
           }`}
-        ></div>
+        />
       </div>
       <p className="text-9 text-mainGray">{isToggled ? onValue : offValue}</p>
     </div>

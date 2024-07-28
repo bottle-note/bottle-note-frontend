@@ -9,12 +9,12 @@ import Star from '@/components/Star';
 import Toggle from '@/app/(primary)/_components/Toggle';
 import FlavorTag from '@/app/(primary)/_components/FlavorTag';
 import { numberWithCommas } from '@/utils/formatNum';
-import ProfileDefaultImg from 'public/profile-default.svg';
 import { formatDate } from '@/utils/formatDate';
 import { shareOrCopy } from '@/utils/shareOrCopy';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import OptionModal from '@/app/(primary)/_components/OptionModal';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
+import ProfileDefaultImg from 'public/profile-default.svg';
 
 interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;
@@ -76,7 +76,7 @@ function ReviewDetails({ data, handleShare, handleLogin }: Props) {
             <Star
               rating={data.reviewResponse?.rating ?? 0}
               size={25}
-              style={'text-20 text-subCoral font-semibold'}
+              style="text-20 text-subCoral font-semibold"
             />
           </article>
           <article className="flex space-x-2 items-center">
@@ -140,7 +140,7 @@ function ReviewDetails({ data, handleShare, handleLogin }: Props) {
               }}
             >
               <Image
-                src={'/icon/ellipsis-darkgray.svg'}
+                src="/icon/ellipsis-darkgray.svg"
                 width={10}
                 height={10}
                 alt="report"
@@ -182,22 +182,20 @@ function ReviewDetails({ data, handleShare, handleLogin }: Props) {
           {data.reviewResponse?.address && (
             <div className="flex items-start space-x-1">
               <Image
-                src={'/icon/placepoint-subcoral.svg'}
+                src="/icon/placepoint-subcoral.svg"
                 width={15}
                 height={15}
-                alt={'address'}
+                alt="address"
               />
               <p className="text-mainDarkGray text-10 font-semibold">장소</p>
               <p className="text-mainDarkGray text-10">
-                {
-                  <>
-                    {data.reviewResponse?.zipCode}
-                    <br />
-                    {data.reviewResponse?.address}
-                    <br />
-                    {data.reviewResponse?.detailAddress}
-                  </>
-                }
+                <>
+                  {data.reviewResponse?.zipCode}
+                  <br />
+                  {data.reviewResponse?.address}
+                  <br />
+                  {data.reviewResponse?.detailAddress}
+                </>
               </p>
             </div>
           )}
@@ -209,7 +207,6 @@ function ReviewDetails({ data, handleShare, handleLogin }: Props) {
               onClick={() => {
                 if (!session) {
                   handleLogin();
-                  return;
                 } else {
                   // api 적용 필요
                 }
@@ -237,7 +234,6 @@ function ReviewDetails({ data, handleShare, handleLogin }: Props) {
             onClick={() => {
               if (!session) {
                 handleLogin();
-                return;
               } else {
                 // api 적용 필요
               }
@@ -268,7 +264,7 @@ function ReviewDetails({ data, handleShare, handleLogin }: Props) {
             }}
           >
             <Image
-              src={'/icon/externallink-outlined-gray.svg'}
+              src="/icon/externallink-outlined-gray.svg"
               alt="linkIcon"
               width={16}
               height={16}

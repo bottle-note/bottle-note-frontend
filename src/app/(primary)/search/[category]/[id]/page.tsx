@@ -2,14 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import Star from '@/components/Star';
 import { truncStr } from '@/utils/truncStr';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import Label from '@/app/(primary)/_components/Label';
-import FlavorTag from '../../../_components/FlavorTag';
 import Review from '@/app/(primary)/search/[category]/[id]/_components/Review';
 import { AlcoholDetails } from '@/types/Alcohol';
 import LinkButton from '@/components/LinkButton';
@@ -20,6 +19,7 @@ import LoginModal from '@/app/(primary)/_components/LoginModal';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import useModalStore from '@/store/modalStore';
+import FlavorTag from '../../../_components/FlavorTag';
 
 type Details = {
   title: string;
@@ -64,7 +64,7 @@ function SearchCategory() {
         <div className="relative">
           {data?.alcohols?.alcoholUrlImg && (
             <div
-              className={`absolute w-full h-full  bg-cover bg-center`}
+              className="absolute w-full h-full  bg-cover bg-center"
               style={{ backgroundImage: `url(${data.alcohols.alcoholUrlImg})` }}
             />
           )}
@@ -113,9 +113,7 @@ function SearchCategory() {
                   <div className="space-y-1">
                     <Label
                       name={data.alcohols.korCategory}
-                      style={
-                        'border-white px-2 py-[0.15rem] rounded-md text-10'
-                      }
+                      style="border-white px-2 py-[0.15rem] rounded-md text-10"
                     />
                     <h1 className="text-20 font-semibold whitespace-normal break-words">
                       {data.alcohols.korName &&
@@ -132,7 +130,7 @@ function SearchCategory() {
                         <Star
                           rating={data.alcohols.rating}
                           size={27}
-                          style={'text-white text-27 font-bold'}
+                          style="text-white text-27 font-bold"
                           color="white"
                         />
                       )}
@@ -193,13 +191,13 @@ function SearchCategory() {
             </div>
           </article>
           <section className="mx-5 py-5 border-y border-mainGray/30 grid grid-cols-2 gap-2">
-            {details.map((data) => (
+            {details.map((item) => (
               <div
-                key={data.content}
+                key={item.content}
                 className="flex text-13 text-mainDarkGray items-center"
               >
-                <div className="min-w-14 font-semibold">{data.title}</div>
-                <div className="flex-1 font-light">{data.content}</div>
+                <div className="min-w-14 font-semibold">{item.title}</div>
+                <div className="flex-1 font-light">{item.content}</div>
               </div>
             ))}
           </section>

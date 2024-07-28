@@ -1,8 +1,8 @@
+import Image from 'next/image';
 import KakaoBtn from 'public/login/loginButton_kakao.svg';
 import AppleBtn from 'public/login/loginButton_apple.svg';
 import NaverBtn from 'public/login/loginButton_Naver.svg';
 import GoogleBtn from 'public/login/loginButton_google.svg';
-import Image from 'next/image';
 
 interface Props {
   type: 'KAKAO' | 'APPLE' | 'GOOGLE' | 'NAVER';

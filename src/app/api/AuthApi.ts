@@ -1,5 +1,4 @@
 import { LoginReq } from '@/types/Auth';
-import { getSession } from 'next-auth/react';
 
 export const AuthApi = {
   async login(body: LoginReq): Promise<{

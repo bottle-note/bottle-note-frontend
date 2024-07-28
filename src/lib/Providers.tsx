@@ -2,11 +2,7 @@
 
 import React, { ReactNode, useState } from 'react';
 import { SessionProvider } from 'next-auth/react';
-import {
-  QueryClient,
-  QueryClientProvider,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 interface Props {
   children: ReactNode;

@@ -1,6 +1,6 @@
 import React from 'react';
-import StarRating from '@/components/StarRaiting';
 import { useFormContext } from 'react-hook-form';
+import StarRating from '@/components/StarRaiting';
 
 export default function RatingForm() {
   const { setValue, watch } = useFormContext();

@@ -1,7 +1,7 @@
+import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { CATEGORY_MENUS } from '@/constants/common';
 import { Category } from '@/types/common';
-import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
 
 export const useCategory = () => {
   const categories = Object.values(CATEGORY_MENUS);

@@ -1,6 +1,6 @@
 import React from 'react';
-import Toggle from '@/app/(primary)/_components/Toggle';
 import { useFormContext } from 'react-hook-form';
+import Toggle from '@/app/(primary)/_components/Toggle';
 
 export default function ContentForm() {
   const { register, setValue, watch } = useFormContext();

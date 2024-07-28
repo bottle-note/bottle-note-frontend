@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "test": "jest",
     "test:watch": "jest --watch"
   },
@@ -34,6 +35,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/testing-library__jest-dom": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.17.0",
     "autoprefixer": "^10.0.1",
     "dotenv": "^16.4.5",
     "eslint": "^8",

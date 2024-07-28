@@ -1,10 +1,10 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import ProfileDefaultImg from 'public/profile-default.svg';
-import { useEffect, useState } from 'react';
 
 interface Props {
   profileImgSrc: string | null;
@@ -56,7 +56,7 @@ const UserInfo = ({
         <div className="space-x-1 text-sm">
           {isMatchUser && (
             <button
-              className={`border border-subCoral px-2.5 py-1 rounded-md text-10 bg-white text-subCoral`}
+              className="border border-subCoral px-2.5 py-1 rounded-md text-10 bg-white text-subCoral"
               onClick={() => router.push(`/user/${currentId}/edit`)}
             >
               프로필 수정
@@ -66,7 +66,7 @@ const UserInfo = ({
           {!isMatchUser &&
             (isFollowing ? (
               <button
-                className={`px-2.5 py-1 text-10 label-selected`}
+                className="px-2.5 py-1 text-10 label-selected"
                 onClick={() =>
                   alert('팔로우를 끊고 isFollowing -> false 다옹...')
                 }
@@ -75,7 +75,7 @@ const UserInfo = ({
               </button>
             ) : (
               <button
-                className={`px-2.5 py-1 text-10 label-default`}
+                className="px-2.5 py-1 text-10 label-default"
                 onClick={() =>
                   alert('팔로잉을 하고 isFollowing -> true 다옹...')
                 }

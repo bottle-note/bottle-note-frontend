@@ -1,11 +1,11 @@
 'use client';
 
-import StarRating from '../StarRaiting';
-import ItemImage from './_components/ItemImage';
-import ItemInfo from './_components/ItemInfo';
 import { useState } from 'react';
 import { RateAPI } from '@/types/Rate';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
+import ItemInfo from './_components/ItemInfo';
+import ItemImage from './_components/ItemImage';
+import StarRating from '../StarRaiting';
 
 interface Props {
   data: RateAPI;
@@ -42,9 +42,12 @@ const ListItemRating = ({ data }: Props) => {
           <div className="space-x-1.5 flex items-end">
             <PickBtn
               isPicked={isPicked}
-              setIsPicked={setIsPicked}
               alcoholId={alcoholId}
               iconColor="subcoral"
+              // FIXME: 별도 함수로 분리
+              handleUpdatePicked={() => setIsPicked(!isPicked)}
+              handleError={() => alert('에러가 발생했습니다.')}
+              handleNotLogin={() => alert('로그인이 필요한 서비스입니다.')}
             />
           </div>
         </article>
