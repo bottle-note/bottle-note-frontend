@@ -134,6 +134,7 @@ function Review({ data, handleLogin }: Props) {
                 }}
                 handleNotLogin={handleLogin}
                 size={10}
+                reviewId={''}
               />
               <p>{data.likeCount}</p>
             </div>

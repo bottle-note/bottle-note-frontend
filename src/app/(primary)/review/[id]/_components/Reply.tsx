@@ -7,14 +7,14 @@ import { formatDate } from '@/utils/formatDate';
 import userImg from 'public/user_img.png';
 import Label from '@/app/(primary)/_components/Label';
 import OptionModal from '@/app/(primary)/_components/OptionModal';
-import { RootReply } from '@/types/Comment';
+import { RootReply } from '@/types/Reply';
 
 interface Props {
   data: RootReply;
   children?: React.ReactNode;
 }
 
-function Comment({ data, children }: Props) {
+function Reply({ data, children }: Props) {
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isSubReplyShow, setIsSubReplyShow] = useState(false);
   const handleOptionsShow = () => {
@@ -101,4 +101,4 @@ function Comment({ data, children }: Props) {
   );
 }
 
-export default Comment;
+export default Reply;

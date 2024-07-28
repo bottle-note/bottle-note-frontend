@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 
-export default function CommentInput() {
+export default function ReplyInput() {
   const [comment, setComment] = useState('');
   const textarea = useRef<HTMLTextAreaElement>(null);
 

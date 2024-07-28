@@ -6,7 +6,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
-import Comment from './_components/Comment';
+import Reply from './_components/Reply';
 import NavLayout from '@/app/(primary)/_components/NavLayout';
 import Loading from '@/components/Loading';
 import { shareOrCopy } from '@/utils/shareOrCopy';
@@ -19,8 +19,8 @@ import type {
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import LoginModal from '@/app/(primary)/_components/LoginModal';
-import CommentInput from './_components/CommentInput';
-import { RootReply } from '@/types/Comment';
+import CommentInput from './_components/ReplyInput';
+import { RootReply } from '@/types/Reply';
 
 // comment 더미 데이터
 const COMMENT_DATA: RootReply[] = [
@@ -178,20 +178,19 @@ export default function ReviewDetail() {
                 <section className="mx-5 py-5 space-y-4 pb-40">
                   {COMMENT_DATA.map((comment, index) => (
                     <React.Fragment key={comment.userId + index}>
-                      <Comment data={comment}>
+                      <Reply data={comment}>
                         {comment.subReplyCount > 0 &&
                           COMMENT_DATA.map((subComment, subIndex) => (
-                            <>
+                            <React.Fragment
+                              key={comment.userId + subIndex + index}
+                            >
                               <div className="border-b border-mainCoral/30" />
-                              <div
-                                className="ml-5"
-                                key={comment.userId + subIndex + index}
-                              >
-                                <Comment data={subComment} />
+                              <div className="ml-5">
+                                <Reply data={subComment} />
                               </div>
-                            </>
+                            </React.Fragment>
                           ))}
-                      </Comment>
+                      </Reply>
                       {index !== COMMENT_DATA.length - 1 && (
                         <div className="border-b border-mainGray/30" />
                       )}
