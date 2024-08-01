@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { RateAPI } from '@/types/Rate';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
+import { RateApi } from '@/app/api/RateApi';
 import ItemInfo from './_components/ItemInfo';
 import ItemImage from './_components/ItemImage';
 import StarRating from '../StarRaiting';
@@ -23,9 +24,12 @@ const ListItemRating = ({ data }: Props) => {
   const [rate, setRate] = useState(0);
   const [isPicked, setIsPicked] = useState(initialIsPicked);
 
-  const handleRate = (selectedRate: number) => {
+  const handleRate = async (selectedRate: number) => {
     setRate(selectedRate);
-    // TODO: 서버에 별점 업데이트 요청
+    return RateApi.postRating({
+      alcoholId: String(alcoholId),
+      rating: selectedRate,
+    });
   };
 
   return (
