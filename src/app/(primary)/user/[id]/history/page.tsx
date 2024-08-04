@@ -1,7 +1,9 @@
 'use client';
 
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import List from '@/components/List/List';
 import Tab from '@/components/Tab';
 import { REGIONS } from '@/constants/common';
@@ -9,9 +11,6 @@ import { HISTORY_TYPES } from '@/constants/user';
 import { usePopularList } from '@/hooks/usePopularList';
 import { useTab } from '@/hooks/useTab';
 import { SORT_TYPE } from '@/types/common';
-import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
 
 export default function UserHistory() {
   const router = useRouter();
@@ -20,9 +19,6 @@ export default function UserHistory() {
   // FIXME: 실제 히스토리 API 연동하여 변경
   const { popularList } = usePopularList();
   const [currHistoryType, setCurrHistoryType] = useState('');
-  const [filterOptions, setFilterOptions] = useState<
-    { id: number; value: string }[] | null
-  >(null);
 
   useEffect(() => {
     const selected = tabList.find((item) => item.id === historyType);
@@ -40,13 +36,6 @@ export default function UserHistory() {
     { name: '찜하기순', type: SORT_TYPE.PICK },
     { name: '댓글순', type: SORT_TYPE.REVIEW },
   ];
-
-  useEffect(() => {
-    (async () => {
-      const result = await AlcoholsApi.getRegion();
-      setFilterOptions(result);
-    })();
-  }, []);
 
   // FIXME: 타입 가드 추가
   useEffect(() => {

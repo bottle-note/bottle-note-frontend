@@ -1,6 +1,6 @@
+import { useLayoutEffect, useState } from 'react';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { AlcoholAPI } from '@/types/Alcohol';
-import { useLayoutEffect, useState } from 'react';
 
 export const usePopularList = () => {
   const [isLoading, setIsLoading] = useState(false);

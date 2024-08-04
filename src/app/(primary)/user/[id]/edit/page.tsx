@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import OptionDropdown from '@/components/OptionDropdown';
+import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
-import EditForm from './_components/EditForm';
-import OptionDropdown from '@/components/OptionDropdown';
 
 export default function UserEditPage() {
   const router = useRouter();

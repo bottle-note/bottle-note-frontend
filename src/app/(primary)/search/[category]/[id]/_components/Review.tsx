@@ -3,9 +3,8 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import userImg from 'public/user_img.png';
+import { useSession } from 'next-auth/react';
 import { Review as ReviewType } from '@/types/Review';
 import Label from '@/app/(primary)/_components/Label';
 import { truncStr } from '@/utils/truncStr';
@@ -16,6 +15,7 @@ import Toggle from '@/app/(primary)/_components/Toggle';
 import OptionModal from '@/app/(primary)/_components/OptionModal';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import LikeBtn from '@/app/(primary)/_components/LikeBtn';
+import userImg from 'public/user_img.png';
 
 interface Props {
   data: ReviewType;
@@ -127,6 +127,7 @@ function Review({ data, handleLogin }: Props) {
             {/* API 연결 필요 */}
             <div className="flex items-center space-x-1">
               <LikeBtn
+                reviewId={data.reviewId}
                 isLiked={isLiked}
                 handleUpdateLiked={() => setIsLiked((prev) => !prev)}
                 handleError={() => {
@@ -169,7 +170,7 @@ function Review({ data, handleLogin }: Props) {
               }}
             >
               <Image
-                src={'/icon/ellipsis-darkgray.svg'}
+                src="/icon/ellipsis-darkgray.svg"
                 width={10}
                 height={10}
                 alt="report"

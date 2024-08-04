@@ -1,8 +1,8 @@
 'use client';
 
-import List from '@/components/List/List';
 import Image from 'next/image';
 import Link from 'next/link';
+import List from '@/components/List/List';
 
 function AccnouncementPage() {
   const MOCK_DATA = [

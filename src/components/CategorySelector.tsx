@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import CategoryTitle from './CategoryTitle';
 import { useCategory } from '@/hooks/useCategory';
 import { Category } from '@/types/common';
+import CategoryTitle from './CategoryTitle';
 
 interface Props {
   handleCategoryCallback: (value: Category) => void;

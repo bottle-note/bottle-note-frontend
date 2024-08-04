@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { useSession } from 'next-auth/react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { Review as ReviewType } from '@/types/Review';
@@ -157,7 +157,8 @@ function Reviews() {
                         .map((item: ReviewType, idx) => (
                           <Review
                             data={item}
-                            key={item?.reviewId + idx}
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={item.reviewId + idx}
                             handleLogin={handleModal}
                           />
                         ))}
@@ -195,7 +196,8 @@ function Reviews() {
                         .map((item: ReviewType, idx) => (
                           <Review
                             data={item}
-                            key={item?.reviewId + idx}
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={item.reviewId + idx}
                             handleLogin={handleModal}
                           />
                         ))}

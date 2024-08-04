@@ -35,7 +35,6 @@ export default function SelectFlavor({
       setTags(newTags);
       setValue('');
       setIsAdding(false);
-      return;
     }
   };
 

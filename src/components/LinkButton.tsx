@@ -8,7 +8,15 @@ interface Props {
 }
 
 function LinkButton({
-  data: { listType = 'Full', engName, korName, imgSrc, linkSrc, icon = false },
+  data: {
+    listType = 'Full',
+    engName,
+    korName,
+    imgSrc,
+    linkSrc,
+    imageSize,
+    icon = false,
+  },
 }: Props) {
   return (
     <div
@@ -46,11 +54,12 @@ function LinkButton({
       </Link>
       {imgSrc && (
         <Image
-          className="z-10 absolute bottom-0 right-0"
+          className="z-10 absolute bottom-[0.5px] left-[5.7rem]"
           src={imgSrc}
-          height={100}
-          width={100}
+          height={imageSize?.height}
+          width={imageSize?.width}
           alt="categoryImg"
+          layout="fixed"
         />
       )}
     </div>

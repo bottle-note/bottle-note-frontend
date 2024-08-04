@@ -1,12 +1,13 @@
-import { filterNumbers } from '@/utils/filterNumbers';
-import Image from 'next/image';
-import CloseIconGray from 'public/icon/close-brightgray.svg';
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import { useState } from 'react';
+import Image from 'next/image';
+// import { filterNumbers } from '@/utils/filterNumbers';
+import CloseIconGray from 'public/icon/close-brightgray.svg';
 
 function EditForm() {
   const [nickName, setNickName] = useState('');
-  const [birthDate, setBirthDate] = useState('');
-  const [gender, setGender] = useState<'MALE' | 'FEMALE' | null>(null);
+  // const [birthDate, setBirthDate] = useState('');
+  // const [gender, setGender] = useState<'MALE' | 'FEMALE' | null>(null);
 
   const handleResetNickName = () => {
     setNickName('');
@@ -17,12 +18,12 @@ function EditForm() {
     alert(nickName);
   };
 
-  const handleGender = (selectedGender: 'MALE' | 'FEMALE') => {
-    console.log(gender);
-    if (gender) return setGender(null);
+  // const handleGender = (selectedGender: 'MALE' | 'FEMALE') => {
+  //   console.log(gender);
+  //   if (gender) return setGender(null);
 
-    return setGender(selectedGender);
-  };
+  //   return setGender(selectedGender);
+  // };
 
   return (
     <div className="flex flex-col gap-8">

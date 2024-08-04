@@ -10,8 +10,6 @@ import Reply from './_components/Reply';
 import NavLayout from '@/app/(primary)/_components/NavLayout';
 import Loading from '@/components/Loading';
 import { shareOrCopy } from '@/utils/shareOrCopy';
-import AlcoholInfo from './_components/AlcoholInfo';
-import ReviewDetails from './_components/ReviewDetails';
 import type {
   AlcoholInfo as AlcoholInfoType,
   ReviewDetailsWithoutAlcoholInfo,
@@ -19,8 +17,10 @@ import type {
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import LoginModal from '@/app/(primary)/_components/LoginModal';
-import CommentInput from './_components/ReplyInput';
 import { RootReply } from '@/types/Reply';
+import ReplyInput from './_components/ReplyInput';
+import ReviewDetails from './_components/ReviewDetails';
+import AlcoholInfo from './_components/AlcoholInfoDisplay';
 
 // comment 더미 데이터
 const COMMENT_DATA: RootReply[] = [
@@ -101,8 +101,8 @@ export default function ReviewDetail() {
       if (!reviewId) return;
       try {
         const result = await ReviewApi.getReviewDetails(reviewId);
-        const { alcoholInfo, ...restData } = result;
-        setAlcoholInfo(alcoholInfo);
+        const { alcoholInfo: response, ...restData } = result;
+        setAlcoholInfo(response);
         setReviewDetails(restData);
       } catch (error) {
         console.error('Failed to fetch review details:', error);
@@ -120,7 +120,7 @@ export default function ReviewDetail() {
             <div className="relative pb-5">
               {alcoholInfo.imageUrl && (
                 <div
-                  className={`absolute w-full h-full  bg-cover bg-center`}
+                  className="absolute w-full h-full  bg-cover bg-center"
                   style={{
                     backgroundImage: `url(${alcoholInfo.imageUrl})`,
                   }}
@@ -206,7 +206,7 @@ export default function ReviewDetail() {
                 </section>
               </>
             )}
-            <CommentInput />
+            <ReplyInput />
           </NavLayout>
           {isShowModal && modalType === 'copy' && (
             <Modal

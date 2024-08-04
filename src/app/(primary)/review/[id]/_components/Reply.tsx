@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { truncStr } from '@/utils/truncStr';
 import { formatDate } from '@/utils/formatDate';
-import userImg from 'public/user_img.png';
 import Label from '@/app/(primary)/_components/Label';
 import OptionModal from '@/app/(primary)/_components/OptionModal';
 import { RootReply } from '@/types/Reply';
+import userImg from 'public/user_img.png';
 
 interface Props {
   data: RootReply;
@@ -39,7 +39,7 @@ function Reply({ data, children }: Props) {
               {truncStr(data?.nickName, 12)}
             </p>
             <Label
-              name={'리뷰 작성자'}
+              name="리뷰 작성자"
               style="border-mainCoral text-mainCoral px-1.5 py-0.5 rounded text-9"
             />
           </div>
@@ -55,7 +55,7 @@ function Reply({ data, children }: Props) {
               }}
             >
               <Image
-                src={'/icon/ellipsis-darkgray.svg'}
+                src="/icon/ellipsis-darkgray.svg"
                 width={10}
                 height={10}
                 alt="report"

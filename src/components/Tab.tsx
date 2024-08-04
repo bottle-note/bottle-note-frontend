@@ -8,7 +8,7 @@ interface Props {
 const Tab = ({ currentTab, handleTab }: Props) => {
   return (
     <div className="flex gap-3 relative">
-      {HISTORY_TYPES.map((type, idx) => {
+      {HISTORY_TYPES.map((type) => {
         return (
           <button
             key={type.id}

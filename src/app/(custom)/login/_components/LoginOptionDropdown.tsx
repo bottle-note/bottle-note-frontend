@@ -1,6 +1,6 @@
+import { signIn } from 'next-auth/react';
 import BackDrop from '@/components/BackDrop';
 import SocialLoginBtn from './SocialLoginBtn';
-import { signIn } from 'next-auth/react';
 
 interface Props {
   handleClose: () => void;

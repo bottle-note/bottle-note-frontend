@@ -1,14 +1,13 @@
 'use client';
 
 import React from 'react';
-import { MOCK_LIST_ITEM } from 'mock/alcohol';
 import List from '@/components/List/List';
+import LinkButton from '@/components/LinkButton';
+import { usePopularList } from '@/hooks/usePopularList';
 import UserInfo from './_components/UserInfo';
 import HistoryOverview from './_components/HistoryOverview';
 import SidebarHeader from './_components/SidebarHeader';
 import NavLayout from '../../_components/NavLayout';
-import LinkButton from '@/components/LinkButton';
-import { usePopularList } from '@/hooks/usePopularList';
 
 // TODO:
 // 1. 유저 데이터 가져오는 api 연동
@@ -37,7 +36,7 @@ export default function User({ params: { id } }: { params: { id: string } }) {
           <List emptyViewText={`아직 활동한\n보틀이 없어요!`}>
             <List.Total total={33} />
             {popularList.map((item) => (
-              <List.Item data={item} />
+              <List.Item data={item} key={item.alcoholId} />
             ))}
           </List>
 

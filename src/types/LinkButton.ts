@@ -6,5 +6,6 @@ export interface LinkData {
   korName: string;
   linkSrc: string | { pathname: string; query?: any };
   imgSrc?: StaticImageData;
+  imageSize?: { width: number; height: number };
   icon?: boolean;
 }

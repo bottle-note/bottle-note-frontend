@@ -14,7 +14,7 @@ interface Props {
   handleLogin: () => void;
 }
 
-function AlcoholInfo({ data, handleLogin }: Props) {
+function AlcoholInfoDisplay({ data, handleLogin }: Props) {
   const router = useRouter();
   const { data: session } = useSession();
   const { isPicked: originalIsPicked } = data;
@@ -40,7 +40,7 @@ function AlcoholInfo({ data, handleLogin }: Props) {
           <div className="space-y-1">
             <Label
               name={data.korCategory}
-              style={'border-white px-2 py-[0.15rem] rounded-md text-10'}
+              style="border-white px-2 py-[0.15rem] rounded-md text-10"
             />
             <h1 className="text-15 font-semibold whitespace-normal break-words">
               {data.korName && truncStr(data.korName, 27)}
@@ -70,7 +70,7 @@ function AlcoholInfo({ data, handleLogin }: Props) {
                   width={16}
                   height={16}
                 />
-                {/* 추후 user당 하루 리뷰 count 확인하는 API 연동 필요*/}
+                {/* 추후 user당 하루 리뷰 count 확인하는 API 연동 필요 */}
                 <button>리뷰 작성</button>
               </div>
               <div className="border-[0.5px] border-white my-[0.1rem]" />
@@ -90,4 +90,4 @@ function AlcoholInfo({ data, handleLogin }: Props) {
   );
 }
 
-export default AlcoholInfo;
+export default AlcoholInfoDisplay;

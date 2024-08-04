@@ -1,5 +1,5 @@
+import { useRef } from 'react';
 import Image from 'next/image';
-import { useRef, useState } from 'react';
 
 interface StarProps {
   size: number;
@@ -16,7 +16,7 @@ const Star = ({ size = 30, index, rate, handleRate }: StarProps) => {
     if (imageRef.current) {
       const rect = imageRef.current.getBoundingClientRect();
       const x = event.clientX - rect.left;
-      const width = rect.width;
+      const { width } = rect;
 
       if (x < width / 3) {
         handleRate(index - 1);

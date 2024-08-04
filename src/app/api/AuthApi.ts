@@ -1,5 +1,4 @@
 import { LoginReq } from '@/types/Auth';
-import { getSession } from 'next-auth/react';
 
 export const AuthApi = {
   async login(body: LoginReq): Promise<{
@@ -39,8 +38,7 @@ export const AuthApi = {
         throw new Error(`HTTP error! message: ${body.errors.message}`);
       }
 
-      const newSession = await getSession();
-      const newAccessToken = newSession?.user.accessToken;
+      const newAccessToken = await response.json();
 
       return newAccessToken;
     } catch (e) {

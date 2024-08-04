@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import SearchBar from '@/components/SearchBar';
-import RecentSearch from '../../_components/RecentSearch';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
 import { useBlockScroll } from '@/hooks/useBlockScroll';
+import RecentSearch from '../../_components/RecentSearch';
 
 interface Props {
   handleSearchCallback: (value: string) => void;

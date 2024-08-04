@@ -14,14 +14,13 @@ export default function ImagesForm() {
   const onUploadPreview = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = e.target.files;
 
-    if (!newFiles || newFiles.length === 0) {
-      return;
-    } else {
+    if (newFiles && newFiles.length > 0) {
       // 이미지 미리보기용
       const previewImgCount = previewImages.length ?? 0;
-      const maxOrderId = previewImages
-        ? Math.max(0, ...previewImages.map((img) => img.order))
-        : 0;
+      const maxOrderId =
+        previewImages.length > 0
+          ? Math.max(...previewImages.map((img) => img.order))
+          : 0;
       const imgForPreview = Array.from(newFiles)
         .slice(0, 5 - previewImgCount)
         .map((file, index) => ({

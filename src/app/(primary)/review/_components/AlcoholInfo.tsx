@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useSession } from 'next-auth/react';
 import Label from '@/app/(primary)/_components/Label';
 import { truncStr } from '@/utils/truncStr';
 import { AlcoholInfo as AlcoholDetails } from '@/types/Alcohol';
@@ -11,7 +10,6 @@ interface Props {
 }
 
 function AlcoholInfo({ data }: Props) {
-  const { data: session } = useSession();
   const { korName, engName, korCategory, isPicked: originalIsPicked } = data;
   const [details, setDetails] = useState<any>([]);
   const [isPicked, setIsPicked] = useState<boolean>(originalIsPicked ?? false);
@@ -33,7 +31,7 @@ function AlcoholInfo({ data }: Props) {
         },
         {
           title: '도수',
-          content: data.avg + '%',
+          content: `${data.avg}%`,
         },
       ]);
     }
@@ -60,7 +58,7 @@ function AlcoholInfo({ data }: Props) {
             <div className="space-y-1">
               <Label
                 name={korCategory}
-                style={'border-white px-2 py-[0.15rem] rounded-md text-10'}
+                style="border-white px-2 py-[0.15rem] rounded-md text-10"
               />
               <h1 className="text-15 font-semibold whitespace-normal break-words">
                 {truncStr(korName, 27)}
@@ -70,13 +68,13 @@ function AlcoholInfo({ data }: Props) {
               </p>
             </div>
             <div>
-              {details.map((data: any) => (
+              {details.map((item: any) => (
                 <div
-                  key={data.content}
+                  key={item.content}
                   className="flex text-9 text-white items-start"
                 >
-                  <div className="min-w-14 font-semibold">{data.title}</div>
-                  <div className="flex-1 font-light">{data.content}</div>
+                  <div className="min-w-14 font-semibold">{item.title}</div>
+                  <div className="flex-1 font-light">{item.content}</div>
                 </div>
               ))}
             </div>

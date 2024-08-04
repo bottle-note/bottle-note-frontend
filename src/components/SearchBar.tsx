@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import EnterIcon from 'public/icon/search-subcoral.svg';
 import { useSearchParams } from 'next/navigation';
+import EnterIcon from 'public/icon/search-subcoral.svg';
 
 interface Props {
   type?: 'Link' | 'Search';

@@ -9,6 +9,7 @@ export interface ISearchHistoryService {
 
 export class SearchHistoryService implements ISearchHistoryService {
   #storage;
+
   #key;
 
   constructor(storage = Storage) {

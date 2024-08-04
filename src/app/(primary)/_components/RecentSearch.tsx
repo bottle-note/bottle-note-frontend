@@ -1,9 +1,9 @@
 'use client';
 
-import { SearchHistoryService } from '@/lib/SearchHistoryService';
-import Image from 'next/image';
-import DeleteIcon from 'public/icon/close-subcoral.svg';
 import { useState } from 'react';
+import Image from 'next/image';
+import { SearchHistoryService } from '@/lib/SearchHistoryService';
+import DeleteIcon from 'public/icon/close-subcoral.svg';
 
 interface Props {
   handleSearch: (keyword: string) => void;

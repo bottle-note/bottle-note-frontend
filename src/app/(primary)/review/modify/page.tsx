@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import Image from 'next/image';
-import * as yup from 'yup';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useRouter, useSearchParams } from 'next/navigation';
+import * as yup from 'yup';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import AlcoholInfo from '@/app/(primary)/review/_components/AlcoholInfo';
-import ReviewForm from '../_components/ReviewForm';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { AlcoholInfo as AlcoholDetails } from '@/types/Alcohol';
 import { FormValues } from '@/types/Review';
@@ -18,6 +17,7 @@ import { RateApi } from '@/app/api/RateApi';
 import { Button } from '@/components/Button';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
+import ReviewForm from '../_components/ReviewForm';
 
 function ReviewModify() {
   const router = useRouter();
@@ -50,26 +50,6 @@ function ReviewModify() {
     reset,
     formState: { isDirty, errors }, // 적용 필요
   } = formMethods;
-
-  const onSave = (data: FormValues) => {
-    if (data.images !== null) {
-      onUploadS3(data);
-    } else {
-      onSubmit(data);
-    }
-  };
-
-  const onUploadS3 = async (data: FormValues) => {
-    const images = data?.images?.map((file) => file.image);
-    if (images) {
-      try {
-        const PreSignedDBData = await uploadImages('review', images);
-        onSubmit(data, PreSignedDBData);
-      } catch (error) {
-        console.error('S3 업로드 에러:', error);
-      }
-    }
-  };
 
   const onSubmit = async (
     data: FormValues,
@@ -125,6 +105,26 @@ function ReviewModify() {
     }
   };
 
+  const onUploadS3 = async (data: FormValues) => {
+    const images = data?.images?.map((file) => file.image);
+    if (images) {
+      try {
+        const PreSignedDBData = await uploadImages('review', images);
+        onSubmit(data, PreSignedDBData);
+      } catch (error) {
+        console.error('S3 업로드 에러:', error);
+      }
+    }
+  };
+
+  const onSave = (data: FormValues) => {
+    if (data.images !== null) {
+      onUploadS3(data);
+    } else {
+      onSubmit(data);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       if (reviewId) {
@@ -170,12 +170,12 @@ function ReviewModify() {
   }, [errors]);
 
   return (
-    <>
+    <Suspense>
       <FormProvider {...formMethods}>
         <div className="relative">
           {alcoholData?.alcoholUrlImg && (
             <div
-              className={`absolute w-full h-full  bg-cover bg-center`}
+              className="absolute w-full h-full  bg-cover bg-center"
               style={{ backgroundImage: `url(${alcoholData.alcoholUrlImg})` }}
             />
           )}
@@ -233,7 +233,7 @@ function ReviewModify() {
           mainText={modalContent}
         />
       )}
-    </>
+    </Suspense>
   );
 }
 

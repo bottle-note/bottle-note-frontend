@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CategorySelector from '@/components/CategorySelector';
 import List from '@/components/List/List';
@@ -79,48 +80,55 @@ export default function Rating() {
   ];
 
   return (
-    <main className="mb-24 w-full h-full">
-      <SearchContainer handleSearchCallback={handleSearchCallback} />
-      <section className="flex flex-col gap-7  p-5">
-        <CategorySelector handleCategoryCallback={handleCategoryCallback} />
+    <Suspense>
+      <main className="mb-24 w-full h-full">
+        <SearchContainer handleSearchCallback={handleSearchCallback} />
+        <section className="flex flex-col gap-7  p-5">
+          <CategorySelector handleCategoryCallback={handleCategoryCallback} />
 
-        <List isListFirstLoading={isFirstLoading} isScrollLoading={isFetching}>
-          <List.Total total={ratingList ? ratingList[0].data.totalCount : 0} />
-          <List.SortOrderSwitch
-            type={filterState.sortOrder}
-            handleSortOrder={(value) => handleFilter('sortOrder', value)}
+          <List
+            isListFirstLoading={isFirstLoading}
+            isScrollLoading={isFetching}
+          >
+            <List.Total
+              total={ratingList ? ratingList[0].data.totalCount : 0}
+            />
+            <List.SortOrderSwitch
+              type={filterState.sortOrder}
+              handleSortOrder={(value) => handleFilter('sortOrder', value)}
+            />
+            <List.OptionSelect
+              options={SORT_OPTIONS}
+              handleOptionCallback={(value) => handleFilter('sortType', value)}
+            />
+            <List.OptionSelect
+              options={REGIONS.map((region) => ({
+                type: String(region.regionId),
+                name: region.korName,
+              }))}
+              handleOptionCallback={(value) => handleFilter('regionId', value)}
+            />
+
+            {ratingList &&
+              [...ratingList.map((list) => list.data.ratings)]
+                .flat()
+                .map((item: RateAPI, idx) => (
+                  <List.Rating key={`${item.alcoholId}_${idx}`} data={item} />
+                ))}
+          </List>
+
+          <div ref={targetRef} />
+
+          <LinkButton
+            data={{
+              korName: '혹시 찾는 술이 없으신가요?',
+              engName: 'NO RESULTS',
+              icon: true,
+              linkSrc: '/search',
+            }}
           />
-          <List.OptionSelect
-            options={SORT_OPTIONS}
-            handleOptionCallback={(value) => handleFilter('sortType', value)}
-          />
-          <List.OptionSelect
-            options={REGIONS.map((region) => ({
-              type: String(region.regionId),
-              name: region.korName,
-            }))}
-            handleOptionCallback={(value) => handleFilter('regionId', value)}
-          />
-
-          {ratingList &&
-            [...ratingList.map((list) => list.data.ratings)]
-              .flat()
-              .map((item: RateAPI, idx) => (
-                <List.Rating key={`${item.alcoholId}_${idx}`} data={item} />
-              ))}
-        </List>
-
-        <div ref={targetRef} />
-
-        <LinkButton
-          data={{
-            korName: '혹시 찾는 술이 없으신가요?',
-            engName: 'NO RESULTS',
-            icon: true,
-            linkSrc: '/search',
-          }}
-        />
-      </section>
-    </main>
+        </section>
+      </main>
+    </Suspense>
   );
 }

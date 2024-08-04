@@ -1,14 +1,14 @@
+import { Children } from 'react';
 import { filterChildComponent } from '@/utils/filterChildComponent';
+import EmptyView from '@/app/(primary)/_components/EmptyView';
 import ListItem from './ListItem';
 import ListItemRating from './ListItemRating';
 import Total from './Total';
 import SortOrderSwitch from './SortOrderSwitch';
 import OptionSelect from './OptionSelect';
 import Title from './Title';
-import EmptyView from '@/app/(primary)/_components/EmptyView';
-import Loading from '../Loading';
-import { Children } from 'react';
 import ListSection from './ListSection';
+import Loading from '../Loading';
 
 interface ListMainProps {
   children: React.ReactNode;

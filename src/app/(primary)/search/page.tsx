@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CategorySelector from '@/components/CategorySelector';
 import CategoryTitle from '@/components/CategoryTitle';
@@ -81,68 +82,70 @@ export default function Search() {
   ];
 
   return (
-    <main className="mb-24 w-full h-full">
-      <SearchContainer handleSearchCallback={handleSearchCallback} />
+    <Suspense>
+      <main className="mb-24 w-full h-full">
+        <SearchContainer handleSearchCallback={handleSearchCallback} />
 
-      <section className="flex flex-col gap-7 p-5">
-        <CategorySelector handleCategoryCallback={handleCategoryCallback} />
+        <section className="flex flex-col gap-7 p-5">
+          <CategorySelector handleCategoryCallback={handleCategoryCallback} />
 
-        {currCategory === null && currSearchKeyword === null ? (
-          <section>
-            <CategoryTitle subTitle="위클리 HOT 5" />
+          {currCategory === null && currSearchKeyword === null ? (
+            <section>
+              <CategoryTitle subTitle="위클리 HOT 5" />
 
-            <List>
-              {popularList.map((item: AlcoholAPI) => (
-                <List.Item
-                  key={item.alcoholId}
-                  data={{
-                    ...item,
-                  }}
+              <List>
+                {popularList.map((item: AlcoholAPI) => (
+                  <List.Item
+                    key={item.alcoholId}
+                    data={{
+                      ...item,
+                    }}
+                  />
+                ))}
+              </List>
+            </section>
+          ) : (
+            <>
+              <List
+                isListFirstLoading={isFirstLoading}
+                isScrollLoading={isFetching}
+              >
+                <List.Total
+                  total={alcoholList ? alcoholList[0].data.totalCount : 0}
                 />
-              ))}
-            </List>
-          </section>
-        ) : (
-          <>
-            <List
-              isListFirstLoading={isFirstLoading}
-              isScrollLoading={isFetching}
-            >
-              <List.Total
-                total={alcoholList ? alcoholList[0].data.totalCount : 0}
-              />
-              <List.SortOrderSwitch
-                type={filterState.sortOrder}
-                handleSortOrder={(value) => handleFilter('sortOrder', value)}
-              />
-              <List.OptionSelect
-                options={SORT_OPTIONS}
-                handleOptionCallback={(value) =>
-                  handleFilter('sortType', value)
-                }
-              />
-              <List.OptionSelect
-                options={REGIONS.map((region) => ({
-                  type: String(region.regionId),
-                  name: region.korName,
-                }))}
-                handleOptionCallback={(value) =>
-                  handleFilter('regionId', value)
-                }
-                title="국가"
-              />
+                <List.SortOrderSwitch
+                  type={filterState.sortOrder}
+                  handleSortOrder={(value) => handleFilter('sortOrder', value)}
+                />
+                <List.OptionSelect
+                  options={SORT_OPTIONS}
+                  handleOptionCallback={(value) =>
+                    handleFilter('sortType', value)
+                  }
+                />
+                <List.OptionSelect
+                  options={REGIONS.map((region) => ({
+                    type: String(region.regionId),
+                    name: region.korName,
+                  }))}
+                  handleOptionCallback={(value) =>
+                    handleFilter('regionId', value)
+                  }
+                  title="국가"
+                />
 
-              {alcoholList &&
-                [...alcoholList.map((list) => list.data.alcohols)]
-                  .flat()
-                  .map((item: AlcoholAPI, idx) => (
-                    <List.Item key={`${item.alcoholId}_${idx}`} data={item} />
-                  ))}
-            </List>
-            <div ref={targetRef} />
-          </>
-        )}
-      </section>
-    </main>
+                {alcoholList &&
+                  [...alcoholList.map((list) => list.data.alcohols)]
+                    .flat()
+                    .map((item: AlcoholAPI, idx) => (
+                      <List.Item key={`${item.alcoholId}_${idx}`} data={item} />
+                    ))}
+              </List>
+              <div ref={targetRef} />
+            </>
+          )}
+        </section>
+      </main>
+    </Suspense>
   );
 }
