@@ -8,7 +8,7 @@ export interface UserInfoApi extends User {
   ratingCount: number;
   pickCount: number;
   followerCount: number;
-  follwingCount: number;
+  followingCount: number;
   isFollow: boolean;
   isMyPage: boolean;
 }

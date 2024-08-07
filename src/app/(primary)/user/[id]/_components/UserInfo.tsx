@@ -12,6 +12,7 @@ interface Props {
   following: number;
   currentId: string;
   isFollowing?: boolean;
+  nickName: string;
 }
 
 // 이 아이의 역할
@@ -22,6 +23,7 @@ const UserInfo = ({
   following,
   isFollowing,
   currentId,
+  nickName,
 }: Props) => {
   const { data: session } = useSession();
   const [isMatchUser, setIsMatchUser] = useState(false);
@@ -41,7 +43,7 @@ const UserInfo = ({
       />
 
       <article className="space-y-2.5">
-        <h1 className="text-3xl font-bold text-subCoral">서울시보틀짱</h1>
+        <h1 className="text-3xl font-bold text-subCoral">{nickName}</h1>
         <div className="flex gap-2">
           <p className="text-sm">
             <strong>팔로워 </strong>

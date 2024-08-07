@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import List from '@/components/List/List';
 import LinkButton from '@/components/LinkButton';
 import { usePopularList } from '@/hooks/usePopularList';
+import { UserInfoApi } from '@/types/User';
+import { UserApi } from '@/app/api/UserApi';
 import UserInfo from './_components/UserInfo';
 import HistoryOverview from './_components/HistoryOverview';
 import SidebarHeader from './_components/SidebarHeader';
@@ -16,6 +18,14 @@ import NavLayout from '../../_components/NavLayout';
 export default function User({ params: { id } }: { params: { id: string } }) {
   // FIXME: 활동 내역 가져오기 데이터로 변동
   const { popularList } = usePopularList();
+  const [userData, setUserData] = useState<UserInfoApi | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const res = await UserApi.getUserInfo({ userId: id });
+      setUserData(res.data);
+    })();
+  }, []);
 
   return (
     <NavLayout>
@@ -23,18 +33,24 @@ export default function User({ params: { id } }: { params: { id: string } }) {
         <section className="bg-bgGray p-7.5 pb-7">
           <SidebarHeader />
           <UserInfo
-            profileImgSrc={null}
-            follower={323}
-            following={12}
-            isFollowing={false}
+            profileImgSrc={userData?.imageUrl ?? null}
+            follower={userData?.followerCount ?? 0}
+            following={userData?.followingCount ?? 0}
+            isFollowing={userData?.isFollow}
             currentId={id}
+            nickName={userData?.nickName ?? ''}
           />
-          <HistoryOverview rates={52} reviews={12} likes={14} id={Number(id)} />
+          <HistoryOverview
+            rates={userData?.ratingCount ?? 0}
+            reviews={userData?.reviewCount ?? 0}
+            likes={userData?.pickCount ?? 0}
+            id={Number(id)}
+          />
         </section>
 
         <section className="px-5 pt-9 flex flex-col gap-5">
           <List emptyViewText={`아직 활동한\n보틀이 없어요!`}>
-            <List.Total total={33} />
+            <List.Total total={popularList.length} />
             {popularList.map((item) => (
               <List.Item data={item} key={item.alcoholId} />
             ))}

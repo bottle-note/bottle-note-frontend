@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export interface NavItem {
   name: string;
@@ -13,6 +14,7 @@ export interface NavItem {
 
 function Navbar({ maxWidth }: { maxWidth: string }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const navItems: NavItem[] = [
     { name: '홈', link: '/', icon: '/icon/home-outlined-subcoral.svg' },
     { name: '검색', link: '/search', icon: '/icon/search-subcoral.svg' },
@@ -21,7 +23,11 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
       link: '/rating',
       icon: '/icon/star-filled-subcoral.svg',
     },
-    { name: '마이', link: '/user/1', icon: '/icon/user-outlined-subcoral.svg' }, // 추후 수정 필요 with pathname
+    {
+      name: '마이',
+      link: `/user/${session?.user.userId}`,
+      icon: '/icon/user-outlined-subcoral.svg',
+    }, // 추후 수정 필요 with pathname
   ];
 
   return (
