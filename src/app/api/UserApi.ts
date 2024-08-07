@@ -1,3 +1,5 @@
+import { ApiResponse } from '@/types/common';
+import { UserInfoApi } from '@/types/User';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 export const UserApi = {
@@ -11,5 +13,12 @@ export const UserApi = {
 
     const { data } = await response.json();
     return data.accessToken;
+  },
+
+  async getUserInfo({ userId }: { userId: string }) {
+    const response = await fetchWithAuth(`/bottle-api/users/${userId}`);
+
+    const result: ApiResponse<UserInfoApi> = await response.json();
+    return result;
   },
 };
