@@ -12,7 +12,6 @@ import SidebarHeader from './_components/SidebarHeader';
 import NavLayout from '../../_components/NavLayout';
 
 // TODO:
-// 1. 유저 데이터 가져오는 api 연동
 // 2. 활동 내역 가져오는 api 연동
 // 3. 기타 버튼 액션과 관련된 api 연동
 export default function User({ params: { id } }: { params: { id: string } }) {
@@ -22,8 +21,12 @@ export default function User({ params: { id } }: { params: { id: string } }) {
 
   useEffect(() => {
     (async () => {
-      const res = await UserApi.getUserInfo({ userId: id });
-      setUserData(res.data);
+      try {
+        const res = await UserApi.getUserInfo({ userId: id });
+        setUserData(res);
+      } catch (e) {
+        console.error(e);
+      }
     })();
   }, []);
 

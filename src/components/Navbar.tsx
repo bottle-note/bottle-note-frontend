@@ -15,6 +15,7 @@ export interface NavItem {
 function Navbar({ maxWidth }: { maxWidth: string }) {
   const pathname = usePathname();
   const { data: session } = useSession();
+
   const navItems: NavItem[] = [
     { name: '홈', link: '/', icon: '/icon/home-outlined-subcoral.svg' },
     { name: '검색', link: '/search', icon: '/icon/search-subcoral.svg' },

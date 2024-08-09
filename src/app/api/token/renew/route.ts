@@ -19,6 +19,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const newTokens = await AuthApi.renewAccessToken(refreshToken);
     const newSessionToken = await encode({
       secret: process.env.NEXTAUTH_SECRET as string,
+      ...session,
       token: {
         ...decode,
         ...newTokens,

@@ -16,9 +16,9 @@ export const UserApi = {
   },
 
   async getUserInfo({ userId }: { userId: string }) {
-    const response = await fetchWithAuth(`/bottle-api/users/${userId}`);
+    const response = await fetchWithAuth(`/bottle-api/mypage/${userId}`);
+    const { data }: ApiResponse<UserInfoApi> = response;
 
-    const result: ApiResponse<UserInfoApi> = await response.json();
-    return result;
+    return data;
   },
 };
