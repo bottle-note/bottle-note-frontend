@@ -26,9 +26,9 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
     },
     {
       name: '마이',
-      link: `/user/${session?.user.userId}`,
+      link: session?.user ? `/user/${session?.user.userId}` : '/login',
       icon: '/icon/user-outlined-subcoral.svg',
-    }, // 추후 수정 필요 with pathname
+    },
   ];
 
   return (
