@@ -44,16 +44,18 @@ const UserInfo = ({
 
       <article className="space-y-2.5">
         <h1 className="text-3xl font-bold text-subCoral">{nickName}</h1>
-        <div className="flex gap-2">
-          <p className="text-sm">
-            <strong>팔로워 </strong>
-            <span>{follower}</span>
-          </p>
-          <p className="text-sm">
-            <strong>팔로잉 </strong>
-            <span>{following}</span>
-          </p>
-        </div>
+        <button onClick={() => alert('준비중입니다 ㅎㅎ..')}>
+          <div className="flex gap-2">
+            <p className="text-sm">
+              <strong>팔로워 </strong>
+              <span>{follower}</span>
+            </p>
+            <p className="text-sm">
+              <strong>팔로잉 </strong>
+              <span>{following}</span>
+            </p>
+          </div>
+        </button>
 
         <div className="space-x-1 text-sm">
           {isMatchUser && (

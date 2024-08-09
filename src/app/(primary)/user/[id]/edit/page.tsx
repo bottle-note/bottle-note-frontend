@@ -30,7 +30,7 @@ export default function UserEditPage() {
     name: string;
   }) => {
     setIsOptionShow(false);
-    console.log(type, name);
+    alert(`선택한 옵션: ${name}${type}, 업로드 기능 준비중입니다.`);
     // TODO: type 에 따른 로직 추가
   };
 

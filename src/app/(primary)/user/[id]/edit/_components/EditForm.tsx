@@ -15,7 +15,7 @@ function EditForm() {
 
   const handelRegisterNickName = () => {
     // TODO: api 연동
-    alert(nickName);
+    alert(`변경 api 연동 준비중입니다..ㅎㅎ\n얼른할게요 ㅠㅠ`);
   };
 
   // const handleGender = (selectedGender: 'MALE' | 'FEMALE') => {
