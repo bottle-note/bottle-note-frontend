@@ -10,7 +10,6 @@ import {
   FieldValues,
   SubmitHandler,
 } from 'react-hook-form';
-// import { useSession } from 'next-auth/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FormValues } from '@/types/Reply';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
@@ -33,7 +32,6 @@ import ReplyList from './_components/Reply/ReplyList';
 
 export default function ReviewDetail() {
   const router = useRouter();
-  // const { data: session } = useSession();
   const { id: reviewId } = useParams();
   const { isShowModal, handleModal } = useModalStore();
   const [alcoholInfo, setAlcoholInfo] = useState<AlcoholInfoType | null>(null);

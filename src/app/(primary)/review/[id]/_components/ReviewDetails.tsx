@@ -84,14 +84,14 @@ function ReviewDetails({ data, handleShare, handleLogin }: Props) {
               <Label
                 name="베스트"
                 icon="/icon/thumbup-filled-white.svg"
-                style="bg-mainCoral text-white px-2 py-[0.1rem] border-mainCoral text-9 rounded"
+                styleClass="bg-mainCoral text-white px-2 py-[0.1rem] border-mainCoral text-9 rounded"
               />
             )}
             {data.reviewResponse?.isMyReview && (
               <Label
                 name="나의 코멘트"
                 icon="/icon/user-outlined-subcoral.svg"
-                style="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-9 rounded"
+                styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-9 rounded"
               />
             )}
             {data.reviewResponse?.userId === session?.user?.userId && (

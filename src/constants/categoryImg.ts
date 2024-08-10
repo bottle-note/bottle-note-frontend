@@ -1,10 +1,10 @@
+import { CategoryImage } from '@/types/Image';
 import singleMalt from 'public/categoryImg/singleMalt.png';
 import america from 'public/categoryImg/america.png';
 import blended from 'public/categoryImg/blended.png';
 import blendedMalt from 'public/categoryImg/blendedMalt.png';
 import other from 'public/categoryImg/other.png';
 import rye from 'public/categoryImg/rye.png';
-import { CategoryImage } from '@/types/Image';
 
 export const CATEGORY_IMAGES: {
   [key: string]: CategoryImage;

@@ -8,7 +8,7 @@ import EnterIcon from 'public/icon/search-subcoral.svg';
 
 interface Props {
   type?: 'Link' | 'Search';
-  handleSearch: (value: string) => void;
+  handleSearch?: (value: string) => void;
   handleFocus?: (status: boolean) => void;
 }
 
@@ -21,7 +21,7 @@ export default function SearchBar({
   const [searchText, setSearchText] = useState<string>(currSearchKeyword ?? '');
 
   const handleSubmit = () => {
-    if (searchText) {
+    if (searchText && handleSearch) {
       handleSearch(searchText);
     }
 

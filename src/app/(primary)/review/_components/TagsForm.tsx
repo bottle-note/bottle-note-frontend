@@ -73,7 +73,7 @@ export default function TagsForm({ korName }: Props) {
             <React.Fragment key={tag}>
               <Label
                 name={tag}
-                style="border-subCoral text-subCoral px-2 py-0.5 rounded-md text-13"
+                styleClass="border-subCoral text-subCoral px-2 py-0.5 rounded-md text-13"
               />
             </React.Fragment>
           ))}

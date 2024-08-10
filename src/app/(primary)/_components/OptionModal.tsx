@@ -20,14 +20,15 @@ function OptionModal({ options, type = '신고하기', handleClose }: Props) {
             {type}
           </article>
           {options.map((option) => (
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
             <article
               key={option.name}
               className="py-4 text-center text-subCoral"
               onClick={() => {
                 if (option.path) {
                   router.push(option.path);
-                } else {
-                  option.action && option.action();
+                } else if (option.action) {
+                  option.action();
                 }
                 handleClose();
               }}

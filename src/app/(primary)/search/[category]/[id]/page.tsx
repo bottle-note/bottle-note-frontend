@@ -113,7 +113,7 @@ function SearchCategory() {
                   <div className="space-y-1">
                     <Label
                       name={data.alcohols.korCategory}
-                      style="border-white px-2 py-[0.15rem] rounded-md text-10"
+                      styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
                     />
                     <h1 className="text-20 font-semibold whitespace-normal break-words">
                       {data.alcohols.korName &&

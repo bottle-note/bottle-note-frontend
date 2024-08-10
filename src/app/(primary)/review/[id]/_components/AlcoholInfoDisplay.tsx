@@ -40,7 +40,7 @@ function AlcoholInfoDisplay({ data, handleLogin }: Props) {
           <div className="space-y-1">
             <Label
               name={data.korCategory}
-              style="border-white px-2 py-[0.15rem] rounded-md text-10"
+              styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
             />
             <h1 className="text-15 font-semibold whitespace-normal break-words">
               {data.korName && truncStr(data.korName, 27)}

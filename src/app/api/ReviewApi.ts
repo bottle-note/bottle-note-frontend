@@ -131,7 +131,6 @@ export const ReviewApi = {
     }
 
     const result: ApiResponse<ReviewPatchApi> = await response;
-    console.log('deleteReview', result);
     return result.data;
   },
 
@@ -145,6 +144,6 @@ export const ReviewApi = {
     });
 
     const result: ApiResponse<ReviewLikePutApi> = await response.data;
-    return await result;
+    return result;
   },
 };

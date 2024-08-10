@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 interface Props {
   name: string;
-  style?: string;
+  styleClass?: string;
   icon?: string;
   iconHeight?: number;
   iconWidth?: number;
@@ -14,11 +14,11 @@ function Label({
   icon,
   iconHeight = 10,
   iconWidth = 10,
-  style = 'border-white px-2.5 py-1 rounded-md text-10',
+  styleClass = 'border-white px-2.5 py-1 rounded-md text-10',
 }: Props) {
   return (
     <div>
-      <div className={`border inline-block ${style}`}>
+      <div className={`border inline-block ${styleClass}`}>
         <div className="flex items-center">
           {icon && (
             <Image

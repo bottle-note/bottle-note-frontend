@@ -15,10 +15,6 @@ export default function Header() {
     window.addEventListener('scroll', updateScroll);
   });
 
-  const handleSearch = (value: string) => {
-    console.log('Search', value);
-  };
-
   return (
     <div className="py-[1.3rem] px-5 space-y-4 bg-subCoral">
       <div
@@ -39,7 +35,7 @@ export default function Header() {
           scrollPosition > 0 ? 'pt-5' : ''
         }`}
       >
-        <SearchBar type="Link" handleSearch={handleSearch} />
+        <SearchBar type="Link" />
       </div>
     </div>
   );

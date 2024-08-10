@@ -71,7 +71,7 @@ function Review({ data, handleLogin }: Props) {
               <Label
                 name="베스트"
                 icon="/icon/thumbup-filled-white.svg"
-                style="bg-mainCoral text-white px-2 py-[0.1rem] text-9 border-mainCoral rounded"
+                styleClass="bg-mainCoral text-white px-2 py-[0.1rem] text-9 border-mainCoral rounded"
               />
             )} */}
             {data.isMyReview && (
@@ -79,7 +79,7 @@ function Review({ data, handleLogin }: Props) {
                 name="나의 코멘트"
                 icon="/icon/user-outlined-subcoral.svg"
                 iconHeight={10}
-                style="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-9 rounded"
+                styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-9 rounded"
               />
             )}
           </div>
@@ -135,7 +135,6 @@ function Review({ data, handleLogin }: Props) {
                 }}
                 handleNotLogin={handleLogin}
                 size={10}
-                reviewId={''}
               />
               <p>{data.likeCount}</p>
             </div>

@@ -59,8 +59,7 @@ function Reply({ data, children, getSubReplyList, isReviewUser }: Props) {
               {isReviewUser && (
                 <Label
                   name="리뷰 작성자"
-                  // eslint-disable-next-line react/style-prop-object
-                  style="border-mainCoral text-mainCoral px-1.5 py-0.5 rounded text-9"
+                  styleClass="border-mainCoral text-mainCoral px-1.5 py-0.5 rounded text-9"
                 />
               )}
             </div>
