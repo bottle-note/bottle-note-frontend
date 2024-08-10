@@ -34,6 +34,8 @@ export interface ListQueryParams {
   keyword?: string;
   category?: string;
   alcoholId?: string;
+  reviewId?: string;
+  rootReplyId?: string;
   regionId?: number | '';
   sortType?: SORT_TYPE;
   sortOrder?: SORT_ORDER;
