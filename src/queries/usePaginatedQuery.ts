@@ -13,20 +13,27 @@ export const usePaginatedQuery = <T>({
   queryFn,
   pageSize = 10,
 }: Props<T>) => {
-  const { data, error, isLoading, fetchNextPage, hasNextPage, isFetching } =
-    useInfiniteQuery({
-      queryKey,
-      queryFn,
-      getNextPageParam: (lastPage: ApiResponse<T>) => {
-        if (lastPage.meta.pageable?.hasNext) {
-          return lastPage.meta.pageable.currentCursor + pageSize;
-        }
-        return null;
-      },
-      initialPageParam: 0,
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-    });
+  const {
+    data,
+    error,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey,
+    queryFn,
+    getNextPageParam: (lastPage: ApiResponse<T>) => {
+      if (lastPage.meta.pageable?.hasNext) {
+        return lastPage.meta.pageable.currentCursor + pageSize;
+      }
+      return null;
+    },
+    initialPageParam: 0,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
 
   const { targetRef } = useInfiniteScroll({
     fetchNextPage,
@@ -40,5 +47,6 @@ export const usePaginatedQuery = <T>({
     fetchNextPage,
     hasNextPage,
     targetRef,
+    refetch,
   };
 };
