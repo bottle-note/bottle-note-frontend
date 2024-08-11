@@ -1,11 +1,14 @@
-export interface RootReply {
+export interface Reply {
   userId: number;
   imageUrl: string;
   nickName: string;
   reviewReplyId: number;
   reviewReplyContent: string;
-  subReplyCount: number;
   createAt: string;
+}
+
+export interface RootReply extends Reply {
+  subReplyCount: number;
 }
 
 export interface RootReplyListApi {
@@ -13,16 +16,10 @@ export interface RootReplyListApi {
   totalCount: number;
 }
 
-export interface SubReply {
-  userId: number;
-  imageUrl: string;
-  nickName: string;
+export interface SubReply extends Reply {
   rootReviewId: number;
   parentReviewReplyId: number;
   parentReviewReplyAuthor: string;
-  reviewReplyId: number;
-  reviewReplyContent: string;
-  createAt: string;
 }
 
 export interface SubReplyListApi {
