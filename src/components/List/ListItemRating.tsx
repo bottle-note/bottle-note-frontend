@@ -39,32 +39,30 @@ const ListItemRating = ({ data }: Props) => {
   };
 
   return (
-    <>
-      <article className="flex items-center space-x-2 text-mainBlack border-brightGray border-b h-[90px]">
-        <ItemImage src={imageUrl} alt="위스키 이미지" />
-        <section className="flex-1 space-y-1">
-          <ItemInfo
-            korName={korName}
-            engName={engName}
-            korCategory={korCategory}
-          />
-          <article className="flex justify-between">
-            <StarRating rate={rate} handleRate={handleRate} />
-            <div className="space-x-1.5 flex items-end">
-              <PickBtn
-                isPicked={isPicked}
-                alcoholId={alcoholId}
-                iconColor="subcoral"
-                // FIXME: 별도 함수로 분리
-                handleUpdatePicked={() => setIsPicked(!isPicked)}
-                handleError={() => alert('에러가 발생했습니다.')}
-                handleNotLogin={() => alert('로그인이 필요한 서비스입니다.')}
-              />
-            </div>
-          </article>
-        </section>
-      </article>
-    </>
+    <article className="flex items-center space-x-2 text-mainBlack border-brightGray border-b h-[90px]">
+      <ItemImage src={imageUrl} alt="위스키 이미지" />
+      <section className="flex-1 space-y-1">
+        <ItemInfo
+          korName={korName}
+          engName={engName}
+          korCategory={korCategory}
+        />
+        <article className="flex justify-between">
+          <StarRating rate={rate} handleRate={handleRate} />
+          <div className="space-x-1.5 flex items-end">
+            <PickBtn
+              isPicked={isPicked}
+              alcoholId={alcoholId}
+              iconColor="subcoral"
+              // FIXME: 별도 함수로 분리
+              handleUpdatePicked={() => setIsPicked(!isPicked)}
+              handleError={() => alert('에러가 발생했습니다.')}
+              handleNotLogin={() => alert('로그인이 필요한 서비스입니다.')}
+            />
+          </div>
+        </article>
+      </section>
+    </article>
   );
 };
 
