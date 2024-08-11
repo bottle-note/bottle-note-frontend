@@ -6,7 +6,6 @@ import { RateAPI } from '@/types/Rate';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
-import LoginModal from '@/app/(primary)/_components/LoginModal';
 import ItemInfo from './_components/ItemInfo';
 import ItemImage from './_components/ItemImage';
 import StarRating from '../StarRaiting';
@@ -27,11 +26,10 @@ const ListItemRating = ({ data }: Props) => {
   const { data: session } = useSession();
   const [rate, setRate] = useState(0);
   const [isPicked, setIsPicked] = useState(initialIsPicked);
-  const { isShowModal: isLoginModalShow, handleModal: handleLoginModalShow } =
-    useModalStore();
+  const { handleLoginModal } = useModalStore();
 
   const handleRate = async (selectedRate: number) => {
-    if (!session) return handleLoginModalShow();
+    if (!session) return handleLoginModal();
 
     setRate(selectedRate);
     return RateApi.postRating({
@@ -66,7 +64,6 @@ const ListItemRating = ({ data }: Props) => {
           </article>
         </section>
       </article>
-      {isLoginModalShow && <LoginModal handleClose={handleLoginModalShow} />}
     </>
   );
 };
