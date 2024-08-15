@@ -229,14 +229,15 @@ function ReviewDetails({ data, handleShare, handleLogin }: Props) {
             </div>
           </div>
           <span className="border-[0.01rem] w-px border-mainGray opacity-40 h-4" />
-          <div
+          <button
             className="flex-1 flex text-center justify-center items-center space-x-1"
             onClick={() => {
-              if (!session) {
-                handleLogin();
-              } else {
-                // api 적용 필요
-              }
+              alert('기능 준비중입니다!');
+              // if (!session) {
+              //   handleLogin();
+              // } else {
+              //   // api 적용 필요
+              // }
             }}
           >
             <Image
@@ -252,9 +253,9 @@ function ReviewDetails({ data, handleShare, handleLogin }: Props) {
             <p className="relative w-fit text-mainGray font-bold text-10">
               댓글 작성
             </p>
-          </div>
+          </button>
           <span className="border-[0.01rem] w-px border-mainGray opacity-40 h-4" />
-          <div
+          <button
             className="flex-1 flex text-center justify-center items-center space-x-1"
             onClick={() => {
               shareOrCopy(
@@ -270,7 +271,7 @@ function ReviewDetails({ data, handleShare, handleLogin }: Props) {
               height={16}
             />
             <p className="text-mainGray font-bold text-10">공유</p>
-          </div>
+          </button>
         </section>
       </section>
       {isOptionShow && (
