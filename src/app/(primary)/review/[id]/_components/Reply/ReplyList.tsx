@@ -11,12 +11,16 @@ interface Props {
   reviewId: string | string[];
   isRefetch: boolean;
   setIsRefetch: React.Dispatch<React.SetStateAction<boolean>>;
+  isSubReplyShow: boolean;
+  resetSubReplyToggle: (value?: boolean) => void;
 }
 
 export default function ReplyList({
   reviewId,
   isRefetch,
   setIsRefetch,
+  isSubReplyShow,
+  resetSubReplyToggle,
 }: Props) {
   const { data: session } = useSession();
   const [subReplyList, setSubReplyList] = useState<SubReplyListApi>();
@@ -74,6 +78,8 @@ export default function ReplyList({
                       isReviewUser={comment.userId === session?.user.userId}
                       reviewId={reviewId}
                       setIsRefetch={setIsRefetch}
+                      isSubReplyShow={isSubReplyShow}
+                      resetSubReplyToggle={resetSubReplyToggle}
                     >
                       {(subReplyList?.totalCount ?? 0) > 0 &&
                         subReplyList?.reviewReplies.map((subComment) => (

@@ -22,6 +22,8 @@ interface Props {
   isReviewUser: boolean;
   reviewId: string | string[];
   setIsRefetch: React.Dispatch<React.SetStateAction<boolean>>;
+  isSubReplyShow?: boolean;
+  resetSubReplyToggle?: (value?: boolean) => void;
 }
 
 function Reply({
@@ -31,19 +33,22 @@ function Reply({
   isReviewUser,
   reviewId,
   setIsRefetch,
+  isSubReplyShow = false,
+  resetSubReplyToggle,
 }: Props) {
   const { data: session } = useSession();
   const { setValue } = useFormContext();
   const { isShowModal, handleModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
-  const [isSubReplyShow, setIsSubReplyShow] = useState(false);
 
   const handleOptionsShow = () => {
     setIsOptionShow((prev) => !prev);
   };
 
   const handleUpdateSubReply = () => {
-    setIsSubReplyShow((prev) => !prev);
+    if (resetSubReplyToggle) {
+      resetSubReplyToggle();
+    }
     if (getSubReplyList) getSubReplyList(data?.reviewReplyId);
   };
 
@@ -100,6 +105,7 @@ function Reply({
             <p className="text-mainGray text-10">
               {formatDate(data?.createAt)}
             </p>
+            {/* 삭제된 댓글에 대한 조건 추가 필요 API 수정되면 적용 예정 */}
             <button
               className="cursor-pointer"
               onClick={() => {
@@ -123,6 +129,7 @@ function Reply({
         </div>
         <div className="space-y-1">
           <div className="flex space-x-2">
+            {/* 삭제된 댓글에 대한 조건 추가 필요 API 수정되면 적용 예정 */}
             <button className="text-10 text-subCoral" onClick={updateReplyUser}>
               답글 달기
             </button>
@@ -179,11 +186,11 @@ function Reply({
       {isShowModal && (
         <Modal
           type="alert"
-          handleCancel={() => {
-            handleModal();
-          }}
           handleConfirm={() => {
             handleModal();
+            if (resetSubReplyToggle) {
+              resetSubReplyToggle(false);
+            }
           }}
           mainText="성공적으로 삭제되었습니다."
         />
