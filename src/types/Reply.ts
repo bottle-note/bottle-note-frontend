@@ -44,3 +44,10 @@ export interface FormValues {
   parentReplyId?: string | null;
   replyToReplyUserName?: string | null;
 }
+
+export interface ReplyPatchApi {
+  codeMessage: string;
+  message: string;
+  reviewId: number;
+  responseAt: string;
+}

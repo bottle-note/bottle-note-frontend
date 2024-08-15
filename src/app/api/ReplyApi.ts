@@ -5,6 +5,7 @@ import {
   ReplyQueryParams,
   ReplyPostApi,
   RootReplyListApi,
+  ReplyPatchApi,
 } from '@/types/Reply';
 
 export const ReplyApi = {
@@ -50,6 +51,22 @@ export const ReplyApi = {
     }
 
     const result: ApiResponse<ReplyPostApi> = await response;
+    return result.data;
+  },
+
+  async deleteReply(reviewId: string, replyId: string) {
+    const response = await fetchWithAuth(
+      `/bottle-api/review/reply/${reviewId}/${replyId}`,
+      {
+        method: 'DELETE',
+      },
+    );
+
+    if (response.errors.length !== 0) {
+      throw new Error('Failed to fetch data');
+    }
+
+    const result: ApiResponse<ReplyPatchApi> = await response;
     return result.data;
   },
 };

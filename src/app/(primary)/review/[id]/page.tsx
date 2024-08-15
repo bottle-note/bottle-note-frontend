@@ -169,7 +169,11 @@ export default function ReviewDetail() {
                 handleShare={handleShare}
                 handleLogin={handleLogin}
               />
-              <ReplyList reviewId={reviewId} isRefetch={isRefetch} />
+              <ReplyList
+                reviewId={reviewId}
+                isRefetch={isRefetch}
+                setIsRefetch={setIsRefetch}
+              />
               <ReplyInput handleCreateReply={handleCreateReply} />
             </NavLayout>
             {isShowModal && modalType === 'copy' && (
