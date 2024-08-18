@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Image from 'next/image';
 import BackDrop from '@/components/BackDrop';
 import useModalStore from '@/store/modalStore';
@@ -26,20 +27,36 @@ function Modal({
   mainText,
   subText,
 }: Props) {
-  const { isShowModal, handleModal } = useModalStore();
+  const { handleCloseModal, handleModalState, state } = useModalStore();
 
   const handleOkayClick = () => {
-    if (handleConfirm) handleConfirm();
-    else handleModal();
+    if (state.handleConfirm) state.handleConfirm();
+    else handleCloseModal();
   };
 
   const handleCancelClick = () => {
     if (handleCancel) handleCancel();
-    else handleModal();
+    else handleCloseModal();
   };
 
+  useEffect(() => {
+    return () => {
+      handleModalState({
+        isShowModal: false,
+        type: 'ALERT',
+        mainText: '',
+        subText: '',
+        alertBtnName: '확인',
+        confirmBtnName: '취소',
+        cancelBtnName: '확인',
+        handleCancel: null,
+        handleConfirm: null,
+      });
+    };
+  }, []);
+
   return (
-    <BackDrop isShow={isShowModal}>
+    <BackDrop isShow={state.isShowModal}>
       <div className="w-full h-full flex flex-col justify-center items-center px-4 gap-3">
         <section className="relative w-full min-h-52 pt-16 pb-4 bg-white rounded-xl text-center flex flex-col items-center space-y-4 px-4">
           <article className="absolute top-[-10px]">
