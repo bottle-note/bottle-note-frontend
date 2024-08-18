@@ -16,6 +16,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const { refreshToken } = decoded;
 
   try {
+    console.log('기존 세션', session);
     const newTokens = await AuthApi.renewAccessToken(refreshToken);
     const newSessionToken = await encode({
       secret: process.env.NEXTAUTH_SECRET as string,
@@ -26,6 +27,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
       },
       maxAge: 30 * 24 * 60 * 60,
     });
+
+    console.log('새 세션', newSessionToken);
 
     cookies().set({
       name: sessionCookie,

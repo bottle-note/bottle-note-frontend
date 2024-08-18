@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import ProfileDefaultImg from 'public/profile-default.svg';
+import ProfileImage from './ProfileImage';
 
 interface Props {
   profileImgSrc: string | null;
@@ -15,8 +14,6 @@ interface Props {
   nickName: string;
 }
 
-// 이 아이의 역할
-// 3. 내 프로필일 경우 프로필 수정 페이지로 이동
 const UserInfo = ({
   profileImgSrc = null,
   follower,
@@ -35,12 +32,7 @@ const UserInfo = ({
 
   return (
     <section className="flex space-x-5.25 py-8.75 border-b border-t border-subCoral">
-      <Image
-        src={profileImgSrc ?? ProfileDefaultImg}
-        alt="프로필 이미지"
-        width={104}
-        height={104}
-      />
+      <ProfileImage profileImgSrc={profileImgSrc} />
 
       <article className="space-y-2.5">
         <h1 className="text-3xl font-bold text-subCoral">{nickName}</h1>
