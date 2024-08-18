@@ -4,7 +4,7 @@ export interface ApiResponse<T> {
   success: boolean;
   code: number;
   data: T;
-  errors: any;
+  errors: any; // FIXME: 백엔드 수정 후 에러 타입 추가
   meta: {
     serverEncoding: string;
     serverVersion: string;

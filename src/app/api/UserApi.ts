@@ -3,16 +3,16 @@ import { UserInfoApi } from '@/types/User';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 export const UserApi = {
-  async changeNickname() {
+  async changeNickname(nickName: string) {
     const response = await fetchWithAuth(`/bottle-api/users/nickname`, {
       method: 'PATCH',
       body: JSON.stringify({
-        nickName: '에헤?',
+        nickName,
       }),
     });
 
-    const { data } = await response.json();
-    return data.accessToken;
+    const { data } = response;
+    return data;
   },
 
   async getUserInfo({ userId }: { userId: string }) {
