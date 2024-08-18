@@ -60,8 +60,9 @@ function EditForm() {
         main: `변경 및 저장에 실패했습니다.`,
         sub: '',
       });
-      handleModal();
     }
+
+    handleModal();
   };
 
   // const handleGender = (selectedGender: 'MALE' | 'FEMALE') => {
