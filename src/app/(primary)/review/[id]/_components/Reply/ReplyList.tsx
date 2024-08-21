@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { RootReply, SubReplyListApi } from '@/types/Reply';
+import { RootReply, SubReplyListApi, SubReply } from '@/types/Reply';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ReplyApi } from '@/app/api/ReplyApi';
 import List from '@/components/List/List';
@@ -23,7 +23,7 @@ export default function ReplyList({
   resetSubReplyToggle,
 }: Props) {
   const { data: session } = useSession();
-  const [subReplyList, setSubReplyList] = useState<SubReplyListApi>();
+  const [subReplyList, setSubReplyList] = useState<SubReplyListApi | null>();
 
   const {
     data: rootReplyList,
@@ -42,19 +42,51 @@ export default function ReplyList({
     },
   });
 
+  const sortReplies = (replies: SubReply[], rootReplyId: number) => {
+    const replyMap = new Map();
+
+    replies.sort(
+      (a, b) => new Date(a.createAt).getTime() - new Date(b.createAt).getTime(),
+    );
+
+    replies.forEach((reply) => {
+      const { parentReviewReplyId } = reply;
+      if (!replyMap.has(parentReviewReplyId)) {
+        replyMap.set(parentReviewReplyId, []);
+      }
+      replyMap.get(parentReviewReplyId).push(reply);
+    });
+
+    const sortedReplies: SubReply[] = [];
+    const sortAndPush = (parentId: number) => {
+      if (replyMap.has(parentId)) {
+        replyMap.get(parentId).forEach((reply: SubReply) => {
+          sortedReplies.push(reply);
+          sortAndPush(reply.reviewReplyId);
+        });
+      }
+    };
+
+    sortAndPush(rootReplyId);
+
+    return sortedReplies;
+  };
+
   const getSubReplyList = async (rootReplyId: number) => {
     const result = await ReplyApi.getSubReplyList({
       reviewId: reviewId.toString(),
       rootReplyId: rootReplyId.toString(),
     });
 
-    setSubReplyList(result);
+    if (result && result.totalCount > 0) {
+      const replyFormattedList = sortReplies(result.reviewReplies, rootReplyId);
+      setSubReplyList({ ...result, reviewReplies: replyFormattedList });
+    }
   };
 
   useEffect(() => {
     if (isRefetch) {
-      // 다음 pr에서 대댓글 수정하며 같이 리팩토링 예정
-      refetchRootReply().then(() => setSubReplyList(undefined));
+      refetchRootReply().then(() => setSubReplyList(null));
       setIsRefetch(false);
     }
   }, [isRefetch]);
