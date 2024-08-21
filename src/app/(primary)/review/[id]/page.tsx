@@ -52,7 +52,7 @@ export default function ReviewDetail() {
     resolver: yupResolver(schema),
   });
 
-  const { reset, setValue } = formMethods;
+  const { reset } = formMethods;
 
   const handleLogin = () => {
     setModalType('login');
@@ -83,11 +83,8 @@ export default function ReviewDetail() {
       replyToReplyUserName[1] === data.replyToReplyUserName
     ) {
       saveContent = data.content.replace(/@(\S+?)\s/, '');
-      setValue('content', saveContent);
     } else {
       saveParentReplyId = null;
-      setValue('parentReplyId', null);
-      setValue('replyToReplyUserName', null);
     }
 
     const replyParams = {
