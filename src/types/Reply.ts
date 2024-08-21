@@ -5,6 +5,7 @@ export interface Reply {
   reviewReplyId: number;
   reviewReplyContent: string;
   createAt: string;
+  status: 'NORMAL' | 'DELETED' | 'HIDDEN' | 'BLOCKED';
 }
 
 export interface RootReply extends Reply {

@@ -105,20 +105,21 @@ function Reply({
             <p className="text-mainGray text-10">
               {formatDate(data?.createAt)}
             </p>
-            {/* 삭제된 댓글에 대한 조건 추가 필요 API 수정되면 적용 예정 */}
-            <button
-              className="cursor-pointer"
-              onClick={() => {
-                setIsOptionShow(true);
-              }}
-            >
-              <Image
-                src="/icon/ellipsis-darkgray.svg"
-                width={10}
-                height={10}
-                alt="report"
-              />
-            </button>
+            {data?.status !== 'DELETED' && (
+              <button
+                className="cursor-pointer"
+                onClick={() => {
+                  setIsOptionShow(true);
+                }}
+              >
+                <Image
+                  src="/icon/ellipsis-darkgray.svg"
+                  width={10}
+                  height={10}
+                  alt="report"
+                />
+              </button>
+            )}
           </div>
         </div>
         <div className="text-10 text-mainDarkGray whitespace-pre-wrap break-words flex">
@@ -129,10 +130,14 @@ function Reply({
         </div>
         <div className="space-y-1">
           <div className="flex space-x-2">
-            {/* 삭제된 댓글에 대한 조건 추가 필요 API 수정되면 적용 예정 */}
-            <button className="text-10 text-subCoral" onClick={updateReplyUser}>
-              답글 달기
-            </button>
+            {data?.status !== 'DELETED' && (
+              <button
+                className="text-10 text-subCoral"
+                onClick={updateReplyUser}
+              >
+                답글 달기
+              </button>
+            )}
             {'subReplyCount' in data && data?.subReplyCount !== 0 && (
               <button
                 className="flex items-center space-x-[2px]"
