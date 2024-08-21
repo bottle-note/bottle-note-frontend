@@ -10,9 +10,10 @@ interface Props {
 
 export default function ReplyInput({ handleCreateReply }: Props) {
   const { data: session } = useSession();
-  const { register, watch, handleSubmit } = useFormContext();
+  const { register, watch, handleSubmit, setValue } = useFormContext();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const content = watch('content');
+  const mentionName = watch('replyToReplyUserName');
 
   const handleResizeHeight = () => {
     if (textareaRef.current) {
@@ -25,17 +26,52 @@ export default function ReplyInput({ handleCreateReply }: Props) {
     handleResizeHeight();
   }, [content]);
 
+  const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+    const text = (e.target as HTMLTextAreaElement).value;
+    setValue('content', text);
+  };
+
+  const insertAtCaret = (text: string) => {
+    const el = textareaRef.current;
+    if (el) {
+      el.focus();
+      const { selectionStart, selectionEnd, value } = el;
+      el.value =
+        value.slice(0, selectionStart) + text + value.slice(selectionEnd);
+      el.selectionStart = selectionStart + text.length;
+      el.selectionEnd = selectionStart + text.length;
+      const updatedContent = el.value;
+      setValue('content', updatedContent);
+    }
+  };
+
+  const handleReplyToUser = (userName: string) => {
+    const mention = `@${userName} `;
+    insertAtCaret(mention);
+  };
+
+  useEffect(() => {
+    const el = textareaRef.current;
+
+    if (el) {
+      const updatedHTML = content.replace(/@\w+/g, (match: any) => {
+        // span은 적용이 되는데 style은 적용이 안됨, 추후 수정 필요
+        return `<span style="color:blue">${match}</span>`;
+      });
+      el.innerHTML = updatedHTML;
+    }
+  }, [content]);
+
+  useEffect(() => {
+    if (mentionName) {
+      handleReplyToUser(mentionName);
+    }
+  }, [mentionName]);
+
   return (
     <div className="fixed bottom-[5.5rem] left-0 right-0 mx-auto w-full max-w-2xl px-4 z-10">
       <div className="bg-[#f6f6f6] pt-1 px-3 rounded-lg shadow-md flex items-center">
-        <div
-          className={`flex-grow flex ${watch('replyToReplyUserName') ? 'flex-col' : 'items-center'}`}
-        >
-          {watch('replyToReplyUserName') && (
-            <p className="px-1 text-13 text-mainCoral">
-              @{watch('replyToReplyUserName')}
-            </p>
-          )}
+        <div className="flex-grow flex items-center">
           <textarea
             placeholder={
               session?.user
@@ -44,9 +80,8 @@ export default function ReplyInput({ handleCreateReply }: Props) {
             }
             className="flex-grow p-1 text-mainGray text-13 bg-[#f6f6f6] resize-none max-h-[50px] overflow-hidden focus:outline-none"
             disabled={!session?.user}
-            onInput={handleResizeHeight}
+            onInput={handleInput}
             rows={1}
-            {...register('content')}
             ref={(e) => {
               register('content').ref(e);
               textareaRef.current = e;
