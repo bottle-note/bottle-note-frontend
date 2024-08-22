@@ -270,19 +270,17 @@ function SearchCategory() {
         {data?.reviewList && data.reviewList.totalReviewCount !== 0 ? (
           <>
             <div className="h-4 bg-sectionWhite" />
-            {/* 혜정님 합성 컴포넌트 적용되면 같이 적용하기 */}
             <section className="mx-5 py-5 space-y-3">
               <p className="text-13 text-mainGray font-normal">
                 총 {data?.reviewList?.totalReviewCount}개
               </p>
-              {/* Login 완성되면 isMine 코드 추가하기 */}
               {data?.reviewList?.bestReviewInfos &&
                 data.reviewList.bestReviewInfos.length > 0 && (
                   <>
                     <div className="border-b border-mainGray/30" />
                     <Review
                       data={data.reviewList.bestReviewInfos[0]}
-                      handleLogin={handleModal}
+                      handleLogin={handleLoginModal}
                     />
                   </>
                 )}
@@ -290,7 +288,7 @@ function SearchCategory() {
                 data.reviewList.recentReviewInfos.length > 0 &&
                 data.reviewList.recentReviewInfos.map((review) => (
                   <React.Fragment key={review.userId + review.reviewId}>
-                    <Review data={review} handleLogin={handleModal} />
+                    <Review data={review} handleLogin={handleLoginModal} />
                   </React.Fragment>
                 ))}
             </section>
