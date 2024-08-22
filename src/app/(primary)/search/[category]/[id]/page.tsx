@@ -295,7 +295,6 @@ function SearchCategory() {
                 ))}
             </section>
             <section className="mx-5 mb-24">
-              {/* 쿼리 파람 확인해서 추가하기 */}
               <LinkButton
                 data={{
                   engName: 'MORE COMMENTS',
@@ -306,6 +305,14 @@ function SearchCategory() {
                     query: {
                       name: data?.alcohols?.korName,
                     },
+                  },
+                  handleBeforeRouteChange: (
+                    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+                  ) => {
+                    if (!session) {
+                      e.preventDefault();
+                      handleLoginModal();
+                    }
                   },
                 }}
               />

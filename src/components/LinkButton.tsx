@@ -16,6 +16,7 @@ function LinkButton({
     linkSrc,
     imageSize,
     icon = false,
+    handleBeforeRouteChange,
   },
 }: Props) {
   return (
@@ -34,6 +35,7 @@ function LinkButton({
       )}
       <Link
         href={linkSrc}
+        onClick={handleBeforeRouteChange}
         className={`h-full ${listType === 'Full' ? 'w-full' : 'max-w-[10.0625rem]'} flex flex-col justify-between relative z-10 ${listType === 'Full' ? 'py-[1.0638rem] px-[1.0638rem]' : 'py-[0.813rem] px-[1.13rem]'}`}
       >
         <div className={`${icon && 'flex justify-between'} text-white h-10`}>
