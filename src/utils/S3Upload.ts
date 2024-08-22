@@ -1,4 +1,4 @@
-import { ReviewApi } from '@/app/api/ReviewApi';
+import { CommonApi } from '@/app/api/CommonApi';
 import { S3_URL_PATH } from '@/constants/common';
 
 export async function uploadImages(
@@ -8,7 +8,7 @@ export async function uploadImages(
   const imageArray = Array.isArray(images) ? images : [images];
 
   // GET preSignedURL
-  const preSignedData = await ReviewApi.getPreSignedURL(type, imageArray);
+  const preSignedData = await CommonApi.getUploadUrl(type, imageArray);
 
   // Upload images
   const uploadPromises = imageArray.map((image, index) => {
