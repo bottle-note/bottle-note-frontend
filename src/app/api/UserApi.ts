@@ -3,7 +3,14 @@ import { UserInfoApi } from '@/types/User';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 export const UserApi = {
-  async changeNickname(nickName: string) {
+  async changeNickname(nickName: string): Promise<
+    ApiResponse<{
+      message: string;
+      userId: number;
+      beforeNickname: string;
+      changedNickname: string;
+    }>
+  > {
     const response = await fetchWithAuth(`/bottle-api/users/nickname`, {
       method: 'PATCH',
       body: JSON.stringify({
@@ -11,12 +18,11 @@ export const UserApi = {
       }),
     });
 
-    const { data } = response;
-    return data;
+    return response;
   },
 
   async getUserInfo({ userId }: { userId: string }) {
-    const response = await fetchWithAuth(`/bottle-api/mypage/${userId}`);
+    const response = await fetchWithAuth(`/bottle-api/my-page/${userId}`);
     const { data }: ApiResponse<UserInfoApi> = response;
 
     return data;

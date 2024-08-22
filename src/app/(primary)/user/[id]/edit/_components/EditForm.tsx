@@ -6,6 +6,7 @@ import { UserApi } from '@/app/api/UserApi';
 import { validate } from '@/utils/validate';
 import Modal from '@/components/Modal';
 import useModalStore from '@/store/modalStore';
+import { ApiResponse } from '@/types/common';
 import CloseIconGray from 'public/icon/close-brightgray.svg';
 
 function EditForm() {
@@ -47,15 +48,23 @@ function EditForm() {
     }
 
     try {
-      await UserApi.changeNickname(newNickName);
+      const result = await UserApi.changeNickname(newNickName);
 
-      return handleModalState({
-        isShowModal: true,
-        mainText: `저장되었습니다.`,
-      });
+      if (result.code === 200) {
+        return handleModalState({
+          isShowModal: true,
+          mainText: `저장되었습니다.`,
+        });
+      }
     } catch (e) {
-      // TODO: 에러 상태 코드에 따른 메시지 분기처리
-      // const error = e as ApiResponse<unknown>;
+      const errorRes = e as ApiResponse<any>;
+      if (errorRes.errors[0].code === 'USER_NICKNAME_NOT_VALID') {
+        return handleModalState({
+          isShowModal: true,
+          mainText: `이미 사용중인 닉네임입니다.👀`,
+          subText: `다른 닉네임으로 변경해주세요.`,
+        });
+      }
 
       return handleModalState({
         isShowModal: true,

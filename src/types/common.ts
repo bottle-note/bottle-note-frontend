@@ -4,7 +4,7 @@ export interface ApiResponse<T> {
   success: boolean;
   code: number;
   data: T;
-  errors: any; // FIXME: 백엔드 수정 후 에러 타입 추가
+  errors: ErrorResponse[];
   meta: {
     serverEncoding: string;
     serverVersion: string;
@@ -12,6 +12,12 @@ export interface ApiResponse<T> {
     serverResponseTime: string;
     pageable?: { pageSize: number; hasNext: boolean; currentCursor: number };
   };
+}
+
+export interface ErrorResponse {
+  code: string;
+  message: string;
+  status: string; // NOTE: 정확히 어떤 status가 존재하는지 알면 더 좋겠다.
 }
 
 // TODO: 두 개의 sort type 으로 분리할 것 (리뷰, 위스키 조회 ...)

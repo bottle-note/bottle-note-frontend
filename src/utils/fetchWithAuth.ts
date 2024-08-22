@@ -1,6 +1,6 @@
 import { getSession } from 'next-auth/react';
 import { AuthApi } from '@/app/api/AuthApi';
-import { ApiResponse } from '@/types/common';
+import { ApiError } from './ApiError';
 
 type FetchWithAuth = (
   url: string,
@@ -25,12 +25,13 @@ export const fetchWithAuth: FetchWithAuth = async (
   };
 
   const requestUrl = `${url}`;
+  let res: any = new Error('API 호출 중 에러가 발생했습니다.');
 
   try {
     const response = await fetch(requestUrl, defaultOptions);
 
     if (!response.ok) {
-      const res: ApiResponse<any> = await response.json();
+      res = await response.json();
 
       // case 1: 에러 코드가 403인 경우 -> 기간 만료이므로 리프레시 토큰으로 갱신
       if (res.code === 403 && retryCount < 1) {
@@ -43,7 +44,7 @@ export const fetchWithAuth: FetchWithAuth = async (
 
           return await fetchWithAuth(url, options, retryCount + 1);
         } catch (e) {
-          throw new Error(`HTTP error! ${e}`);
+          throw new ApiError(`HTTP error! ${e}`, response);
         }
       }
 
@@ -54,12 +55,14 @@ export const fetchWithAuth: FetchWithAuth = async (
       }
 
       // case 3: 그 이외의 에러는 throw
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new ApiError(`HTTP error! status: ${response.status}`, response);
     }
 
     return await response.json();
   } catch (error) {
-    // TODO: 적절한 에러처리 필요!
-    console.error('Fetch error:', error);
+    if (error instanceof ApiError) {
+      console.log('API Error Response:', error.response);
+    }
+    throw res;
   }
 };
