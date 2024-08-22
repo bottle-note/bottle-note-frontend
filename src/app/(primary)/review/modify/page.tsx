@@ -129,7 +129,6 @@ function ReviewModify() {
     (async () => {
       if (reviewId) {
         const result = await ReviewApi.getReviewDetails(reviewId);
-        console.log(result);
 
         setAlcoholId(result.alcoholInfo.alcoholId.toString());
         setInitialRating(result.reviewResponse.rating);

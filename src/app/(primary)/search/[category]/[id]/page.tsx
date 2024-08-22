@@ -18,6 +18,7 @@ import EmptyView from '@/app/(primary)/_components/EmptyView';
 import LoginModal from '@/app/(primary)/_components/LoginModal';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import FlavorTag from '../../../_components/FlavorTag';
 
@@ -31,10 +32,11 @@ function SearchCategory() {
   const params = useParams();
   const { data: session } = useSession();
   const alcoholId = params?.id;
-  const { isShowModal, handleModal } = useModalStore();
+  const { isShowModal, handleModal, handleLoginModal } = useModalStore();
   const [data, setData] = useState<AlcoholDetails | null>(null);
   const [details, setDetails] = useState<Details[]>([]);
   const [isPicked, setIsPicked] = useState<boolean>(false);
+  const [rate, setRate] = useState(0);
 
   const fetchAlcoholDetails = async (id: string) => {
     const result = await AlcoholsApi.getAlcoholDetails(id);
@@ -54,9 +56,25 @@ function SearchCategory() {
 
   useEffect(() => {
     if (alcoholId) {
-      fetchAlcoholDetails(alcoholId.toString());
+      const alcoholIdString = alcoholId.toString();
+      fetchAlcoholDetails(alcoholIdString);
+
+      (async () => {
+        const ratingResult = await RateApi.getUserRating(alcoholIdString);
+        setRate(ratingResult.rating);
+      })();
     }
   }, [alcoholId]);
+
+  const handleRate = async (selectedRate: number) => {
+    if (!session) return handleLoginModal();
+
+    setRate(selectedRate);
+    return RateApi.postRating({
+      alcoholId: String(alcoholId),
+      rating: selectedRate,
+    });
+  };
 
   return (
     <>
@@ -185,9 +203,8 @@ function SearchCategory() {
             <p className="text-10 text-mainDarkGray">
               이 술에 대한 평가를 남겨보세요.
             </p>
-            {/* 추후 로직 확인 후 수정 필요 */}
             <div>
-              <StarRating rate={0} size={40} handleRate={() => {}} />
+              <StarRating rate={rate} size={40} handleRate={handleRate} />
             </div>
           </article>
           <section className="mx-5 py-5 border-y border-mainGray/30 grid grid-cols-2 gap-2">
@@ -240,29 +257,29 @@ function SearchCategory() {
           </section>
         </div>
         {/* 없을 때 화면 넣기 */}
-        {data?.reviews && data.reviews.totalReviewCount !== 0 ? (
+        {data?.reviewList && data.reviewList.totalReviewCount !== 0 ? (
           <>
             <div className="h-4 bg-sectionWhite" />
             {/* 혜정님 합성 컴포넌트 적용되면 같이 적용하기 */}
             <section className="mx-5 py-5 space-y-3">
               <p className="text-13 text-mainGray font-normal">
-                총 {data?.reviews?.totalReviewCount}개
+                총 {data?.reviewList?.totalReviewCount}개
               </p>
               {/* Login 완성되면 isMine 코드 추가하기 */}
-              {data?.reviews?.bestReviewInfos &&
-                data.reviews.bestReviewInfos.length > 0 && (
+              {data?.reviewList?.bestReviewInfos &&
+                data.reviewList.bestReviewInfos.length > 0 && (
                   <>
                     <div className="border-b border-mainGray/30" />
                     <Review
-                      data={data.reviews.bestReviewInfos[0]}
+                      data={data.reviewList.bestReviewInfos[0]}
                       handleLogin={handleModal}
                     />
                   </>
                 )}
-              {data?.reviews?.recentReviewInfos &&
-                data.reviews.recentReviewInfos.length > 0 &&
-                data.reviews.recentReviewInfos.map((review, index) => (
-                  <React.Fragment key={review.userId + index}>
+              {data?.reviewList?.recentReviewInfos &&
+                data.reviewList.recentReviewInfos.length > 0 &&
+                data.reviewList.recentReviewInfos.map((review) => (
+                  <React.Fragment key={review.userId + review.reviewId}>
                     <Review data={review} handleLogin={handleModal} />
                   </React.Fragment>
                 ))}
