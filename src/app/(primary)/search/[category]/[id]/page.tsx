@@ -15,12 +15,13 @@ import LinkButton from '@/components/LinkButton';
 import NavLayout from '@/app/(primary)/_components/NavLayout';
 import StarRating from '@/components/StarRaiting';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
-import LoginModal from '@/app/(primary)/_components/LoginModal';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
+import Modal from '@/components/Modal';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import FlavorTag from '../../../_components/FlavorTag';
+import { shareOrCopy } from '@/utils/shareOrCopy';
 
 type Details = {
   title: string;
@@ -31,7 +32,7 @@ function SearchCategory() {
   const router = useRouter();
   const params = useParams();
   const { data: session } = useSession();
-  const alcoholId = params?.id;
+  const { category, id: alcoholId } = params;
   const { isShowModal, handleModal, handleLoginModal } = useModalStore();
   const [data, setData] = useState<AlcoholDetails | null>(null);
   const [details, setDetails] = useState<Details[]>([]);
@@ -59,12 +60,14 @@ function SearchCategory() {
       const alcoholIdString = alcoholId.toString();
       fetchAlcoholDetails(alcoholIdString);
 
-      (async () => {
-        const ratingResult = await RateApi.getUserRating(alcoholIdString);
-        setRate(ratingResult.rating);
-      })();
+      if (session) {
+        (async () => {
+          const ratingResult = await RateApi.getUserRating(alcoholIdString);
+          setRate(ratingResult.rating);
+        })();
+      }
     }
-  }, [alcoholId]);
+  }, [alcoholId, session]);
 
   const handleRate = async (selectedRate: number) => {
     if (!session) return handleLoginModal();
@@ -100,8 +103,16 @@ function SearchCategory() {
                 height={23}
               />
             </SubHeader.Left>
-            <SubHeader.Right onClick={() => {}}>
-              {/* 브라우저는 복사, 핸드폰은 공유하기 */}
+            <SubHeader.Right
+              onClick={() => {
+                shareOrCopy(
+                  `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/category/${category}/${alcoholId}`,
+                  handleModal,
+                  `${data?.alcohols.korName} 정보`,
+                  `${data?.alcohols.korName} 정보 상세보기`,
+                );
+              }}
+            >
               <Image
                 src="/icon/externallink-outlined-white.svg"
                 alt="linkIcon"
@@ -162,7 +173,7 @@ function SearchCategory() {
                         className="text-10 flex"
                         onClick={() => {
                           if (!session || !alcoholId) {
-                            handleModal();
+                            handleLoginModal();
                             return;
                           }
                           router.push(
@@ -186,7 +197,7 @@ function SearchCategory() {
                         handleError={() =>
                           setIsPicked(data?.alcohols?.isPicked)
                         }
-                        handleNotLogin={handleModal}
+                        handleNotLogin={handleLoginModal}
                         pickBtnName="찜하기"
                         alcoholId={Number(alcoholId)}
                         size={16}
@@ -256,7 +267,6 @@ function SearchCategory() {
             )}
           </section>
         </div>
-        {/* 없을 때 화면 넣기 */}
         {data?.reviewList && data.reviewList.totalReviewCount !== 0 ? (
           <>
             <div className="h-4 bg-sectionWhite" />
@@ -310,7 +320,12 @@ function SearchCategory() {
           </>
         )}
       </NavLayout>
-      {isShowModal && <LoginModal handleClose={handleModal} />}
+      {isShowModal && (
+        <Modal
+          mainText="해당 페이지 링크를 복사했습니다."
+          subText="친구에게 공유하러 가볼까요?"
+        />
+      )}
     </>
   );
 }
