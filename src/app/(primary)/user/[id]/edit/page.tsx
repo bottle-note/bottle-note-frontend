@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import OptionDropdown from '@/components/OptionDropdown';
+import { UserApi } from '@/app/api/UserApi';
+import useModalStore from '@/store/modalStore';
+import Modal from '@/components/Modal';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
@@ -13,6 +16,7 @@ import ChangeProfile from 'public/change-profile.svg';
 export default function UserEditPage() {
   const router = useRouter();
   const { data: session } = useSession();
+  const { handleModalState, state } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
 
   const SELECT_OPTIONS = [
@@ -21,17 +25,25 @@ export default function UserEditPage() {
     { type: 'delete', name: '현재 이미지 삭제하기' },
   ];
 
-  // TODO: 타입 가드 추가
-  const handleOptionSelect = ({
-    type,
-    name,
-  }: {
-    type: string;
-    name: string;
-  }) => {
+  const handleOptionSelect = async ({ type }: { type: string }) => {
+    if (type === 'camera') return alert(`카메라 접근 기능 준비중입니다.`);
+    if (type === 'album') return alert(`앨범 접근 기능 준비중입니다.`);
+    if (type === 'delete') {
+      try {
+        await UserApi.changeProfileImage(null);
+        handleModalState({
+          isShowModal: true,
+          mainText: '저장되었습니다.',
+          handleConfirm: () => {
+            router.push(`/user/${session?.user.userId}`);
+          },
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     setIsOptionShow(false);
-    alert(`선택한 옵션: ${name}${type}, 업로드 기능 준비중입니다.`);
-    // TODO: type 에 따른 로직 추가
   };
 
   return (
@@ -84,6 +96,11 @@ export default function UserEditPage() {
           handleClose={() => setIsOptionShow(false)}
         />
       )}
+      <Modal
+        mainText={state.mainText}
+        subText={state.subText}
+        handleConfirm={state.handleConfirm}
+      />
     </main>
   );
 }

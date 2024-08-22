@@ -8,8 +8,8 @@ interface Props {
   type?: 'alert' | 'confirm';
   children?: React.ReactNode;
   alertBtnName?: string;
-  handleCancel?: () => void;
-  handleConfirm?: () => void;
+  handleCancel?: (() => void) | null;
+  handleConfirm?: (() => void) | null;
   confirmBtnName?: string;
   cancelBtnName?: string;
   mainText?: string;
@@ -30,7 +30,7 @@ function Modal({
   const { handleCloseModal, handleModalState, state } = useModalStore();
 
   const handleOkayClick = () => {
-    if (state.handleConfirm) state.handleConfirm();
+    if (handleConfirm) handleConfirm();
     else handleCloseModal();
   };
 

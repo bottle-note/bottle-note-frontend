@@ -21,4 +21,23 @@ export const UserApi = {
 
     return data;
   },
+
+  async changeProfileImage(profileImageSrc: string | null) {
+    const response = await fetchWithAuth(`/bottle-api//users/profile-image`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        viewUrl: profileImageSrc,
+      }),
+    });
+
+    const {
+      data,
+    }: ApiResponse<{
+      userId: string;
+      profileImageUrl: string | null;
+      callback: string;
+    }> = response;
+
+    return data;
+  },
 };

@@ -3,7 +3,7 @@ import BackDrop from './BackDrop';
 interface Props {
   handleClose: () => void;
   options: { type: string; name: string }[];
-  handleOptionSelect: ({ type, name }: { type: string; name: string }) => void;
+  handleOptionSelect: (args: any) => void;
   title?: string;
 }
 

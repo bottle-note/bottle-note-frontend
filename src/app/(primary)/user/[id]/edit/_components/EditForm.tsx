@@ -10,8 +10,7 @@ import CloseIconGray from 'public/icon/close-brightgray.svg';
 
 function EditForm() {
   const [nickName, setNickName] = useState('');
-  const { handleModal } = useModalStore();
-  const [modalMsg, setModalMsg] = useState({ main: '', sub: '' });
+  const { handleModalState, state } = useModalStore();
   // const [birthDate, setBirthDate] = useState('');
   // const [gender, setGender] = useState<'MALE' | 'FEMALE' | null>(null);
 
@@ -41,28 +40,28 @@ function EditForm() {
 
   const handelRegisterNickName = async (newNickName: string) => {
     if (!validateNickName(newNickName)) {
-      setModalMsg({
-        main: `닉네임은 2 ~ 11자의\n한글, 영문, 숫자만 가능합니다.`,
-        sub: '',
+      return handleModalState({
+        isShowModal: true,
+        mainText: `닉네임은 2 ~ 11자의\n한글, 영문, 숫자만 가능합니다.`,
       });
-      return handleModal();
     }
+
     try {
       await UserApi.changeNickname(newNickName);
-      setModalMsg({
-        main: `저장되었습니다.`,
-        sub: '',
+
+      return handleModalState({
+        isShowModal: true,
+        mainText: `저장되었습니다.`,
       });
     } catch (e) {
       // TODO: 에러 상태 코드에 따른 메시지 분기처리
       // const error = e as ApiResponse<unknown>;
-      setModalMsg({
-        main: `변경 및 저장에 실패했습니다.`,
-        sub: '',
+
+      return handleModalState({
+        isShowModal: true,
+        mainText: `변경 및 저장에 실패했습니다..`,
       });
     }
-
-    handleModal();
   };
 
   // const handleGender = (selectedGender: 'MALE' | 'FEMALE') => {
@@ -160,7 +159,7 @@ function EditForm() {
         </article>
       </div> */}
       </div>
-      <Modal mainText={modalMsg.main} subText={modalMsg.sub} />
+      <Modal mainText={state.mainText} subText={state.subText} />
     </>
   );
 }
