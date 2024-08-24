@@ -5,13 +5,13 @@ import { useSession } from 'next-auth/react';
 import { useFormContext, FieldValues, SubmitHandler } from 'react-hook-form';
 
 interface Props {
+  textareaRef: React.MutableRefObject<HTMLTextAreaElement | null>;
   handleCreateReply: SubmitHandler<FieldValues>;
 }
 
-export default function ReplyInput({ handleCreateReply }: Props) {
+export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
   const { data: session } = useSession();
   const { register, watch, handleSubmit, setValue } = useFormContext();
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const content = watch('content');
   const mentionName = watch('replyToReplyUserName');
 

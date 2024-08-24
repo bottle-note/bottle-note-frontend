@@ -21,9 +21,10 @@ interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;
   handleShare: () => void;
   handleLogin: () => void;
+  textareaRef: React.RefObject<HTMLTextAreaElement>;
 }
 
-function ReviewDetails({ data, handleShare, handleLogin }: Props) {
+function ReviewDetails({ data, handleShare, handleLogin, textareaRef }: Props) {
   const router = useRouter();
   const { data: session } = useSession();
   const [isShowStatus, setIsShowStatus] = useState<boolean>(true);
@@ -223,12 +224,11 @@ function ReviewDetails({ data, handleShare, handleLogin }: Props) {
           <button
             className="flex-1 flex text-center justify-center items-center space-x-1"
             onClick={() => {
-              alert('기능 준비중입니다!');
-              // if (!session) {
-              //   handleLogin();
-              // } else {
-              //   // api 적용 필요
-              // }
+              if (!session) {
+                handleLogin();
+              } else {
+                textareaRef.current?.focus();
+              }
             }}
           >
             <Image

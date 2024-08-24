@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import * as yup from 'yup';
@@ -34,6 +34,7 @@ export default function ReviewDetail() {
   const router = useRouter();
   const { id: reviewId } = useParams();
   const { isShowModal, handleModal } = useModalStore();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [alcoholInfo, setAlcoholInfo] = useState<AlcoholInfoType | null>(null);
   const [reviewDetails, setReviewDetails] =
     useState<ReviewDetailsWithoutAlcoholInfo | null>(null);
@@ -190,6 +191,7 @@ export default function ReviewDetail() {
                 data={reviewDetails}
                 handleShare={handleShare}
                 handleLogin={handleLogin}
+                textareaRef={textareaRef}
               />
               <ReplyList
                 reviewId={reviewId}
@@ -198,7 +200,10 @@ export default function ReviewDetail() {
                 isSubReplyShow={isSubReplyShow}
                 resetSubReplyToggle={resetSubReplyToggle}
               />
-              <ReplyInput handleCreateReply={handleCreateReply} />
+              <ReplyInput
+                textareaRef={textareaRef}
+                handleCreateReply={handleCreateReply}
+              />
             </NavLayout>
             {isShowModal && modalType === 'copy' && (
               <Modal
