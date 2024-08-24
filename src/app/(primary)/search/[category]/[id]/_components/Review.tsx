@@ -67,13 +67,13 @@ function Review({ data, handleLogin }: Props) {
                 </p>
               </div>
             </Link>
-            {/* {isBest && (
+            {data.isBestReview && (
               <Label
                 name="베스트"
                 icon="/icon/thumbup-filled-white.svg"
                 styleClass="bg-mainCoral text-white px-2 py-[0.1rem] text-9 border-mainCoral rounded"
               />
-            )} */}
+            )}
             {data.isMyReview && (
               <Label
                 name="나의 코멘트"
@@ -124,7 +124,6 @@ function Review({ data, handleLogin }: Props) {
         </div>
         <div className="flex justify-between text-9 text-mainGray">
           <div className="flex space-x-3">
-            {/* API 연결 필요 */}
             <div className="flex items-center space-x-1">
               <LikeBtn
                 reviewId={data.reviewId}
