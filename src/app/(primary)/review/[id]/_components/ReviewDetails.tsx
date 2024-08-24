@@ -15,6 +15,7 @@ import { ReviewApi } from '@/app/api/ReviewApi';
 import OptionModal from '@/app/(primary)/_components/OptionModal';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import ProfileDefaultImg from 'public/profile-default.svg';
+import LikeBtn from '@/app/(primary)/_components/LikeBtn';
 
 interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;
@@ -27,6 +28,7 @@ function ReviewDetails({ data, handleShare, handleLogin }: Props) {
   const { data: session } = useSession();
   const [isShowStatus, setIsShowStatus] = useState<boolean>(true);
   const [isOptionShow, setIsOptionShow] = useState(false);
+  const [isLiked, setIsLiked] = useState(data?.reviewResponse?.isLikedByMe);
 
   const handleOptionsShow = () => setIsShowStatus((prev) => !prev);
 
@@ -202,28 +204,17 @@ function ReviewDetails({ data, handleShare, handleLogin }: Props) {
         </section>
         <section className="mx-5 py-5 flex items-center space-x-4">
           <div className="flex-1 flex text-center justify-center items-center space-x-1">
-            <button
-              className="flex justify-center items-center space-x-1"
-              onClick={() => {
-                if (!session) {
-                  handleLogin();
-                } else {
-                  // api 적용 필요
-                }
+            <LikeBtn
+              reviewId={data?.reviewResponse?.reviewId}
+              isLiked={isLiked}
+              handleUpdateLiked={() => setIsLiked((prev) => !prev)}
+              handleError={() => {
+                setIsLiked(data?.reviewResponse?.isLikedByMe);
               }}
-            >
-              <Image
-                src={
-                  data.reviewResponse?.isLikedByMe
-                    ? '/icon/thumbup-filled-subcoral.svg'
-                    : '/icon/thumbup-outlined-gray.svg'
-                }
-                width={16}
-                height={16}
-                alt="like"
-              />
-              <div className="text-mainGray font-bold text-10">좋아요</div>
-            </button>
+              handleNotLogin={handleLogin}
+              likeBtnName="좋아요"
+              size={16}
+            />
             <div className=" text-mainGray text-10 font-normal">
               좋아요 {data.reviewResponse?.likeCount}
             </div>
