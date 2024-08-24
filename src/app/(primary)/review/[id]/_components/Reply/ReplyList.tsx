@@ -148,7 +148,7 @@ export default function ReplyList({
       ) : (
         <>
           <div className="h-4 bg-sectionWhite" />
-          <section className="py-5">
+          <section className="py-5 mb-20">
             <EmptyView text="아직 댓글이 없어요!" />
           </section>
         </>

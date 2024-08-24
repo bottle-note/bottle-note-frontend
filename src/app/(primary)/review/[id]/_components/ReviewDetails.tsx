@@ -154,55 +154,58 @@ function ReviewDetails({ data, handleShare, handleLogin, textareaRef }: Props) {
         {data.reviewResponse?.reviewTastingTag.length !== 0 && (
           <FlavorTag tagList={data.reviewResponse.reviewTastingTag} />
         )}
-        <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 ">
-          {data.reviewResponse?.price && data.reviewResponse?.sizeType && (
-            <div className="flex items-center space-x-1">
-              <Image
-                src={
-                  data.reviewResponse.sizeType === 'BOTTLE'
-                    ? '/bottle.svg'
-                    : '/icon/glass-filled-subcoral.svg'
-                }
-                width={15}
-                height={15}
-                alt={
-                  data.reviewResponse.sizeType === 'BOTTLE'
-                    ? 'Bottle Price'
-                    : 'Glass Price'
-                }
-              />
-              <p className="text-mainDarkGray text-10 font-semibold">
-                {data.reviewResponse.sizeType === 'BOTTLE'
-                  ? '병 가격 '
-                  : '잔 가격'}
-              </p>
-              <p className="text-mainDarkGray text-10 font-light">
-                {numberWithCommas(data.reviewResponse.price)}₩
-              </p>
-            </div>
-          )}
-          {/* 주소 형태 변경 예정으로 임시 적용 */}
-          {data.reviewResponse?.address && (
-            <div className="flex items-start space-x-1">
-              <Image
-                src="/icon/placepoint-subcoral.svg"
-                width={15}
-                height={15}
-                alt="address"
-              />
-              <p className="text-mainDarkGray text-10 font-semibold">장소</p>
-              <p className="text-mainDarkGray text-10">
-                <>
-                  {data.reviewResponse?.zipCode}
-                  <br />
-                  {data.reviewResponse?.address}
-                  <br />
-                  {data.reviewResponse?.detailAddress}
-                </>
-              </p>
-            </div>
-          )}
-        </section>
+        {(data.reviewResponse?.address ||
+          (data.reviewResponse?.price && data.reviewResponse?.sizeType)) && (
+          <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 ">
+            {data.reviewResponse?.price && data.reviewResponse?.sizeType && (
+              <div className="flex items-center space-x-1">
+                <Image
+                  src={
+                    data.reviewResponse.sizeType === 'BOTTLE'
+                      ? '/bottle.svg'
+                      : '/icon/glass-filled-subcoral.svg'
+                  }
+                  width={15}
+                  height={15}
+                  alt={
+                    data.reviewResponse.sizeType === 'BOTTLE'
+                      ? 'Bottle Price'
+                      : 'Glass Price'
+                  }
+                />
+                <p className="text-mainDarkGray text-10 font-semibold">
+                  {data.reviewResponse.sizeType === 'BOTTLE'
+                    ? '병 가격 '
+                    : '잔 가격'}
+                </p>
+                <p className="text-mainDarkGray text-10 font-light">
+                  {numberWithCommas(data.reviewResponse.price)}₩
+                </p>
+              </div>
+            )}
+            {/* 주소 형태 변경 예정으로 임시 적용 */}
+            {data.reviewResponse?.address && (
+              <div className="flex items-start space-x-1">
+                <Image
+                  src="/icon/placepoint-subcoral.svg"
+                  width={15}
+                  height={15}
+                  alt="address"
+                />
+                <p className="text-mainDarkGray text-10 font-semibold">장소</p>
+                <p className="text-mainDarkGray text-10">
+                  <>
+                    {data.reviewResponse?.zipCode}
+                    <br />
+                    {data.reviewResponse?.address}
+                    <br />
+                    {data.reviewResponse?.detailAddress}
+                  </>
+                </p>
+              </div>
+            )}
+          </section>
+        )}
         <section className="mx-5 py-5 flex items-center space-x-4">
           <div className="flex-1 flex text-center justify-center items-center space-x-1">
             <LikeBtn
