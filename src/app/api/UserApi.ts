@@ -29,7 +29,7 @@ export const UserApi = {
   },
 
   async changeProfileImage(profileImageSrc: string | null) {
-    const response = await fetchWithAuth(`/bottle-api//users/profile-image`, {
+    const response = await fetchWithAuth(`/bottle-api/users/profile-image`, {
       method: 'PATCH',
       body: JSON.stringify({
         viewUrl: profileImageSrc,
