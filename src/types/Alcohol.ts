@@ -26,7 +26,7 @@ export interface AlcoholDetails {
       rating: number;
     }[];
   };
-  reviews: {
+  reviewList: {
     totalReviewCount: number;
     bestReviewInfos: Review[];
     recentReviewInfos: Review[];

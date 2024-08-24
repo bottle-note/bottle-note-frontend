@@ -1,16 +1,17 @@
 export interface Review {
   userId: number;
-  userProfileImage: null | string;
+  userProfileImage?: null | string;
   nickName: string;
   reviewId: number;
   reviewContent: string;
   rating: number;
-  sizeType: string; // "BOTTLE", "GLASS"
+  sizeType: 'BOTTLE' | 'GLASS';
   price: number;
   likeCount: number;
   isLikedByMe: boolean;
   replyCount: number;
-  isMyReview: boolean;
+  isMyReview?: boolean;
+  isBestReview?: boolean;
   hasReplyByMe: boolean;
   status: 'PUBLIC' | 'PRIVATE';
   reviewImageUrl: null | string;
