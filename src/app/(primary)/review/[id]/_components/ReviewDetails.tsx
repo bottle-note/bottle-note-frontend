@@ -155,7 +155,7 @@ function ReviewDetails({ data, handleShare, handleLogin, textareaRef }: Props) {
           <FlavorTag tagList={data.reviewResponse.reviewTastingTag} />
         )}
         {(data.reviewResponse?.address ||
-          (data.reviewResponse?.price && data.reviewResponse?.sizeType)) && (
+          (!!data.reviewResponse?.price && data.reviewResponse?.sizeType)) && (
           <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 ">
             {data.reviewResponse?.price && data.reviewResponse?.sizeType && (
               <div className="flex items-center space-x-1">
