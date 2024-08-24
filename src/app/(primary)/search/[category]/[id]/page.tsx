@@ -20,8 +20,8 @@ import Modal from '@/components/Modal';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
-import FlavorTag from '../../../_components/FlavorTag';
 import { shareOrCopy } from '@/utils/shareOrCopy';
+import FlavorTag from '../../../_components/FlavorTag';
 
 type Details = {
   title: string;

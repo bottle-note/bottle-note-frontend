@@ -12,10 +12,10 @@ import { numberWithCommas } from '@/utils/formatNum';
 import { formatDate } from '@/utils/formatDate';
 import { shareOrCopy } from '@/utils/shareOrCopy';
 import { ReviewApi } from '@/app/api/ReviewApi';
+import LikeBtn from '@/app/(primary)/_components/LikeBtn';
 import OptionModal from '@/app/(primary)/_components/OptionModal';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import ProfileDefaultImg from 'public/profile-default.svg';
-import LikeBtn from '@/app/(primary)/_components/LikeBtn';
 
 interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;

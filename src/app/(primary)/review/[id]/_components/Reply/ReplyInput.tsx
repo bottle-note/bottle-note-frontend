@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useFormContext, FieldValues, SubmitHandler } from 'react-hook-form';
 
@@ -14,11 +14,12 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
   const { register, watch, handleSubmit, setValue } = useFormContext();
   const content = watch('content');
   const mentionName = watch('replyToReplyUserName');
+  const newTextareaRef = { ...textareaRef };
 
   const handleResizeHeight = () => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    if (newTextareaRef.current) {
+      newTextareaRef.current.style.height = 'auto';
+      newTextareaRef.current.style.height = `${newTextareaRef.current.scrollHeight}px`;
     }
   };
 
@@ -84,7 +85,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
             rows={1}
             ref={(e) => {
               register('content').ref(e);
-              textareaRef.current = e;
+              newTextareaRef.current = e;
             }}
             value={content}
             maxLength={300}
