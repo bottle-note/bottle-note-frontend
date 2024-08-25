@@ -124,7 +124,7 @@ export const ReviewApi = {
       method: 'PUT',
       body: JSON.stringify({
         reviewId,
-        isLiked: isLiked ? 'LIKE' : 'DISLIKE',
+        status: isLiked ? 'LIKE' : 'DISLIKE',
       }),
     });
 
