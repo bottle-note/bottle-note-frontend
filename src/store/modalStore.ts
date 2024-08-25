@@ -12,14 +12,20 @@ interface ModalState {
   handleConfirm: (() => void) | null;
 }
 
+interface LoginModalState {
+  isShowLoginModal: boolean;
+}
+
 type ParcialModalState = {
   [K in keyof ModalState]?: ModalState[K];
 };
 
 interface ModalStore {
   state: ModalState;
+  loginState: LoginModalState;
   handleModalState: (state: ParcialModalState) => void;
   handleCloseModal: () => void;
+  handleLoginModal: () => void;
 }
 
 const useModalStore = create<ModalStore>((set) => ({
@@ -34,6 +40,9 @@ const useModalStore = create<ModalStore>((set) => ({
     handleCancel: null,
     handleConfirm: null,
   },
+  loginState: {
+    isShowLoginModal: false,
+  },
   handleModalState: (newState) =>
     set((state) => ({
       state: {
@@ -44,6 +53,13 @@ const useModalStore = create<ModalStore>((set) => ({
   handleCloseModal: () => {
     set((state) => ({ state: { ...state.state, isShowModal: false } }));
   },
+  handleLoginModal: () =>
+    set((state) => ({
+      loginState: {
+        ...state.loginState,
+        isShowLoginModal: !state.loginState.isShowLoginModal,
+      },
+    })),
 }));
 
 export default useModalStore;
