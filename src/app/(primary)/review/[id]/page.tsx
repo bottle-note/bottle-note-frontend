@@ -125,84 +125,82 @@ export default function ReviewDetail() {
   }, [reviewId]);
 
   return (
-    <>
-      <FormProvider {...formMethods}>
-        {alcoholInfo && reviewDetails ? (
-          <>
-            <NavLayout>
-              <div className="relative pb-5">
-                {alcoholInfo.imageUrl && (
-                  <div
-                    className="absolute w-full h-full  bg-cover bg-center"
-                    style={{
-                      backgroundImage: `url(${alcoholInfo.imageUrl})`,
-                    }}
+    <FormProvider {...formMethods}>
+      {alcoholInfo && reviewDetails ? (
+        <>
+          <NavLayout>
+            <div className="relative pb-5">
+              {alcoholInfo.imageUrl && (
+                <div
+                  className="absolute w-full h-full  bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url(${alcoholInfo.imageUrl})`,
+                  }}
+                />
+              )}
+              <div className="absolute w-full h-full bg-mainCoral bg-opacity-90" />
+              <SubHeader bgColor="bg-mainCoral/10">
+                <SubHeader.Left
+                  onClick={() => {
+                    router.back();
+                  }}
+                >
+                  <Image
+                    src="/icon/arrow-left-white.svg"
+                    alt="arrowIcon"
+                    width={23}
+                    height={23}
                   />
-                )}
-                <div className="absolute w-full h-full bg-mainCoral bg-opacity-90" />
-                <SubHeader bgColor="bg-mainCoral/10">
-                  <SubHeader.Left
-                    onClick={() => {
-                      router.back();
-                    }}
-                  >
-                    <Image
-                      src="/icon/arrow-left-white.svg"
-                      alt="arrowIcon"
-                      width={23}
-                      height={23}
-                    />
-                  </SubHeader.Left>
-                  <SubHeader.Center textColor="text-white">
-                    리뷰 상세보기
-                  </SubHeader.Center>
-                  <SubHeader.Right
-                    onClick={() => {
-                      shareOrCopy(
-                        `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${reviewId}`,
-                        handleModalState,
-                        `${alcoholInfo.korName} 리뷰`,
-                        `${alcoholInfo.korName} 리뷰 상세보기`,
-                      );
-                    }}
-                  >
-                    <Image
-                      src="/icon/externallink-outlined-white.svg"
-                      alt="linkIcon"
-                      width={23}
-                      height={23}
-                    />
-                  </SubHeader.Right>
-                </SubHeader>
-                {alcoholInfo && (
-                  <AlcoholInfo data={alcoholInfo} handleLogin={handleLogin} />
-                )}
-              </div>
-              <ReviewDetails
-                data={reviewDetails}
-                handleLogin={handleLogin}
-                textareaRef={textareaRef}
-              />
-              <ReplyList
-                reviewId={reviewId}
-                isRefetch={isRefetch}
-                setIsRefetch={setIsRefetch}
-                isSubReplyShow={isSubReplyShow}
-                resetSubReplyToggle={resetSubReplyToggle}
-              />
-              <ReplyInput
-                // ReviewDetails에서 클릭이벤트를 주면 textareaRef가 focus되지 않는 문제가 있다 해결해줘
-                //
-                textareaRef={textareaRef}
-                handleCreateReply={handleCreateReply}
-              />
-            </NavLayout>
-            {state.isShowModal && <Modal />}
-          </>
-        ) : (
-          <Loading />
-        )}
-      </FormProvider>
-    </>
+                </SubHeader.Left>
+                <SubHeader.Center textColor="text-white">
+                  리뷰 상세보기
+                </SubHeader.Center>
+                <SubHeader.Right
+                  onClick={() => {
+                    shareOrCopy(
+                      `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${reviewId}`,
+                      handleModalState,
+                      `${alcoholInfo.korName} 리뷰`,
+                      `${alcoholInfo.korName} 리뷰 상세보기`,
+                    );
+                  }}
+                >
+                  <Image
+                    src="/icon/externallink-outlined-white.svg"
+                    alt="linkIcon"
+                    width={23}
+                    height={23}
+                  />
+                </SubHeader.Right>
+              </SubHeader>
+              {alcoholInfo && (
+                <AlcoholInfo data={alcoholInfo} handleLogin={handleLogin} />
+              )}
+            </div>
+            <ReviewDetails
+              data={reviewDetails}
+              handleLogin={handleLogin}
+              textareaRef={textareaRef}
+            />
+            <ReplyList
+              reviewId={reviewId}
+              isRefetch={isRefetch}
+              setIsRefetch={setIsRefetch}
+              isSubReplyShow={isSubReplyShow}
+              resetSubReplyToggle={resetSubReplyToggle}
+            />
+            <ReplyInput
+              // ReviewDetails에서 클릭이벤트를 주면 textareaRef가 focus되지 않는 문제가 있다 해결해줘
+              //
+              textareaRef={textareaRef}
+              handleCreateReply={handleCreateReply}
+            />
+          </NavLayout>
+          {state.isShowModal && <Modal />}
+        </>
+      ) : (
+        <Loading />
+      )}
+    </FormProvider>
   );
 }
