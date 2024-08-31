@@ -33,7 +33,7 @@ function SearchCategory() {
   const params = useParams();
   const { data: session } = useSession();
   const { category, id: alcoholId } = params;
-  const { isShowModal, handleModal, handleLoginModal } = useModalStore();
+  const { state, handleModalState, handleLoginModal } = useModalStore();
   const [data, setData] = useState<AlcoholDetails | null>(null);
   const [details, setDetails] = useState<Details[]>([]);
   const [isPicked, setIsPicked] = useState<boolean>(false);
@@ -107,7 +107,7 @@ function SearchCategory() {
               onClick={() => {
                 shareOrCopy(
                   `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/category/${category}/${alcoholId}`,
-                  handleModal,
+                  handleModalState,
                   `${data?.alcohols.korName} 정보`,
                   `${data?.alcohols.korName} 정보 상세보기`,
                 );
@@ -278,17 +278,14 @@ function SearchCategory() {
                 data.reviewList.bestReviewInfos.length > 0 && (
                   <>
                     <div className="border-b border-mainGray/30" />
-                    <Review
-                      data={data.reviewList.bestReviewInfos[0]}
-                      handleLogin={handleLoginModal}
-                    />
+                    <Review data={data.reviewList.bestReviewInfos[0]} />
                   </>
                 )}
               {data?.reviewList?.recentReviewInfos &&
                 data.reviewList.recentReviewInfos.length > 0 &&
                 data.reviewList.recentReviewInfos.map((review) => (
                   <React.Fragment key={review.userId + review.reviewId}>
-                    <Review data={review} handleLogin={handleLoginModal} />
+                    <Review data={review} />
                   </React.Fragment>
                 ))}
             </section>
@@ -325,12 +322,7 @@ function SearchCategory() {
           </>
         )}
       </NavLayout>
-      {isShowModal && (
-        <Modal
-          mainText="해당 페이지 링크를 복사했습니다."
-          subText="친구에게 공유하러 가볼까요?"
-        />
-      )}
+      {state.isShowModal && <Modal />}
     </>
   );
 }

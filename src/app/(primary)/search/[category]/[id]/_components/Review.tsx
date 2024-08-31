@@ -12,37 +12,63 @@ import Star from '@/components/Star';
 import { numberWithCommas } from '@/utils/formatNum';
 import { formatDate } from '@/utils/formatDate';
 import Toggle from '@/app/(primary)/_components/Toggle';
-import OptionModal from '@/app/(primary)/_components/OptionModal';
-import { ReviewApi } from '@/app/api/ReviewApi';
 import LikeBtn from '@/app/(primary)/_components/LikeBtn';
+import OptionDropdown from '@/components/OptionDropdown';
+import useModalStore from '@/store/modalStore';
+import { deleteReview } from '@/lib/Review';
+import Modal from '@/components/Modal';
 import userImg from 'public/user_img.png';
 
 interface Props {
   data: ReviewType;
-  handleLogin: () => void;
 }
 
-function Review({ data, handleLogin }: Props) {
+function Review({ data }: Props) {
   const router = useRouter();
   const { data: session } = useSession();
   const { isLikedByMe } = data;
+  const { state, handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(isLikedByMe);
 
-  const handleOptionsShow = () => {
-    setIsOptionShow((prev) => !prev);
+  const handleCloseOption = () => {
+    handleModalState({
+      isShowModal: true,
+      type: 'ALERT',
+      mainText: '성공적으로 삭제되었습니다.',
+      handleConfirm: () => {
+        setIsOptionShow(false);
+        handleModalState({
+          isShowModal: false,
+          mainText: '',
+        });
+        // refresh review list
+      },
+    });
   };
 
-  const deleteReview = async () => {
-    if (!data.reviewId) return;
-    try {
-      const result = await ReviewApi.deleteReview(data.reviewId.toString());
-      if (result) {
-        alert('성공적으로 삭제되었습니다.');
-        router.back();
-      }
-    } catch (error) {
-      console.error('Failed to delete review:', error);
+  const handleOptionSelect = (option: { name: string; type: string }) => {
+    if (option.type === 'DELETE') {
+      handleModalState({
+        isShowModal: true,
+        mainText: '정말 삭제하시겠습니까?',
+        type: 'CONFIRM',
+        handleConfirm: () => {
+          deleteReview(data.reviewId, handleCloseOption);
+        },
+      });
+    } else if (option.type === 'MODIFY') {
+      router.push(`/review/modify?reviewId=${data.reviewId}`);
+    } else if (option.type === 'REPORT') {
+      handleModalState({
+        isShowModal: true,
+        mainText: '준비 중인 기능입니다.',
+      });
+    } else if (option.type === 'USER_REPORT') {
+      handleModalState({
+        isShowModal: true,
+        mainText: '준비 중인 기능입니다.',
+      });
     }
   };
 
@@ -132,7 +158,7 @@ function Review({ data, handleLogin }: Props) {
                 handleError={() => {
                   setIsLiked(isLikedByMe);
                 }}
-                handleNotLogin={handleLogin}
+                handleNotLogin={handleLoginModal}
                 size={10}
               />
               <p>{data.likeCount}</p>
@@ -164,7 +190,8 @@ function Review({ data, handleLogin }: Props) {
             <button
               className="cursor-pointer"
               onClick={() => {
-                setIsOptionShow(true);
+                if (session) setIsOptionShow(true);
+                else handleLoginModal();
               }}
             >
               <Image
@@ -178,31 +205,24 @@ function Review({ data, handleLogin }: Props) {
         </div>
       </div>
       {isOptionShow && (
-        <OptionModal
+        <OptionDropdown
+          handleClose={() => setIsOptionShow(false)}
           options={
             session?.user?.userId === data.userId
               ? [
-                  {
-                    name: '수정하기',
-                    path: `/review/modify?reviewId=${data.reviewId}`,
-                  },
-                  {
-                    name: '삭제하기',
-                    action: () => {
-                      const result = confirm('정말 삭제하시겠습니까?');
-                      if (result) deleteReview();
-                    },
-                  },
+                  { name: '수정하기', type: 'MODIFY' },
+                  { name: '삭제하기', type: 'DELETE' },
                 ]
               : [
-                  { name: '리뷰 신고', path: '' },
-                  { name: '유저 신고', path: '' },
+                  { name: '리뷰 신고', type: 'REPORT' },
+                  { name: '유저 신고', type: 'USER_REPORT' },
                 ]
           }
-          type={session?.user?.userId === data.userId ? '리뷰' : '신고하기'}
-          handleClose={handleOptionsShow}
+          handleOptionSelect={handleOptionSelect}
+          title={session?.user?.userId === data.userId ? '내 리뷰' : '신고하기'}
         />
       )}
+      {state.isShowModal && <Modal />}
     </>
   );
 }

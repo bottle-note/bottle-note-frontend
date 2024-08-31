@@ -3,7 +3,7 @@ import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { ApiResponse } from '@/types/common';
 
 interface Props<T> {
-  queryKey: [string, any];
+  queryKey: [string, ...Array<any>];
   queryFn: (params: any) => Promise<ApiResponse<T>>;
   pageSize?: number;
 }

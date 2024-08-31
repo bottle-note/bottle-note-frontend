@@ -25,7 +25,6 @@ export const ReviewApi = {
     }
 
     const result: ApiResponse<ReviewListApi> = await response;
-
     return result;
   },
 

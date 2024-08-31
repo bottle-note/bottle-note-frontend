@@ -2,7 +2,6 @@ import Image from 'next/image';
 import BackDrop from '@/components/BackDrop';
 import useModalStore from '@/store/modalStore';
 import { Button, DualButton } from '@/components/Button';
-import { useEffect } from 'react';
 
 interface Props {
   children?: React.ReactNode;

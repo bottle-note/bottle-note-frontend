@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import useModalStore from '@/store/modalStore';
 
 interface Props {
   tags: string[];
   setTags: React.Dispatch<React.SetStateAction<string[]>>;
   setIsAdding: React.Dispatch<React.SetStateAction<boolean>>;
-  updateAlert: (content: string) => void;
 }
 
 function validateText(text: string) {
@@ -15,21 +15,29 @@ function validateText(text: string) {
   return regex.test(text);
 }
 
-export default function SelectFlavor({
-  tags,
-  setTags,
-  setIsAdding,
-  updateAlert,
-}: Props) {
+export default function SelectFlavor({ tags, setTags, setIsAdding }: Props) {
   const [value, setValue] = useState<string>('');
+  const { handleModalState } = useModalStore();
 
   const handleAddTag = () => {
     if (value.length === 0) {
-      updateAlert('추가하고 싶은 태그를 작성해주세요:)');
+      handleModalState({
+        isShowModal: true,
+        mainText: '추가하고 싶은 태그를 작성해주세요:)',
+        type: 'ALERT',
+      });
     } else if (tags.includes(value)) {
-      updateAlert('이미 동일한 태그가 있습니다.');
+      handleModalState({
+        isShowModal: true,
+        mainText: '이미 동일한 태그가 있습니다.',
+        type: 'ALERT',
+      });
     } else if (!validateText(value)) {
-      updateAlert('태그에 숫자와 특수문자는 추가할 수 없습니다.');
+      handleModalState({
+        isShowModal: true,
+        mainText: '태그에 숫자와 특수문자는 추가할 수 없습니다.',
+        type: 'ALERT',
+      });
     } else {
       const newTags = [...tags, value];
       setTags(newTags);

@@ -21,14 +21,12 @@ import ReviewForm from '../_components/ReviewForm';
 
 function ReviewModify() {
   const router = useRouter();
-  const { isShowModal, handleModal } = useModalStore();
+  const { state, handleModalState } = useModalStore();
   const searchParams = useSearchParams();
   const reviewId = searchParams.get('reviewId');
   const [alcoholId, setAlcoholId] = useState<string>('');
   const [alcoholData, setAlcoholData] = useState<AlcoholDetails>();
   const [initialRating, setInitialRating] = useState<number>(0);
-  const [modalType, setModalType] = useState<'save' | 'cancel' | null>(null);
-  const [modalContent, setModalContent] = useState<string>('');
 
   const schema = yup.object({
     review: yup.string().required('리뷰 내용을 작성해주세요.'),
@@ -96,9 +94,14 @@ function ReviewModify() {
       (initialRating === data.rating && reviewResult) ||
       (initialRating !== data.rating && reviewResult && !ratingResult)
     ) {
-      setModalContent('성공적으로 수정했습니다 👍');
-      setModalType('save');
-      handleModal();
+      handleModalState({
+        isShowModal: true,
+        mainText: '성공적으로 수정했습니다 👍',
+        type: 'ALERT',
+        handleConfirm: () => {
+          router.push(`/review/${reviewId}`);
+        },
+      });
     } else if (initialRating !== data.rating && ratingResult && !reviewResult) {
       // alert('리뷰는 등록되지 않았습니다.');
       router.back();
@@ -162,9 +165,11 @@ function ReviewModify() {
 
   useEffect(() => {
     if (errors.review?.message) {
-      setModalContent(errors.review?.message);
-      handleModal();
-      setModalType('save');
+      handleModalState({
+        isShowModal: true,
+        mainText: errors.review?.message,
+        type: 'ALERT',
+      });
     }
   }, [errors]);
 
@@ -183,11 +188,25 @@ function ReviewModify() {
             <SubHeader.Left
               onClick={() => {
                 if (isDirty) {
-                  setModalType('cancel');
-                  setModalContent(
-                    '수정 중인 내용이 사라집니다.\n정말 뒤로 가시겠습니까?',
-                  );
-                  handleModal();
+                  handleModalState({
+                    isShowModal: true,
+                    mainText:
+                      '작성 중인 내용이 사라집니다.\n정말 뒤로 가시겠습니까?',
+                    type: 'CONFIRM',
+                    cancelBtnName: '예',
+                    confirmBtnName: '아니요',
+                    handleConfirm: () => {
+                      handleModalState({
+                        isShowModal: false,
+                      });
+                    },
+                    handleCancel: () => {
+                      handleModalState({
+                        isShowModal: false,
+                      });
+                      router.back();
+                    },
+                  });
                 } else {
                   router.back();
                 }
@@ -211,27 +230,7 @@ function ReviewModify() {
           <Button onClick={handleSubmit(onSave)} btnName="리뷰 수정" />
         </article>
       </FormProvider>
-      {isShowModal && modalType && ['cancel', 'save'].includes(modalType) && (
-        <Modal
-          type={modalType === 'save' ? 'alert' : 'confirm'}
-          confirmBtnName={modalType === 'cancel' ? '아니요' : ''}
-          cancelBtnName={modalType === 'cancel' ? '예' : ''}
-          handleCancel={() => {
-            handleModal();
-            if (modalType === 'cancel' && isDirty) {
-              router.back();
-            }
-          }}
-          handleConfirm={() => {
-            handleModal();
-            if (modalType === 'save') {
-              !errors.review && router.push(`/review/${reviewId}`);
-            }
-            setModalType(null);
-          }}
-          mainText={modalContent}
-        />
-      )}
+      {state.isShowModal && <Modal />}
     </Suspense>
   );
 }

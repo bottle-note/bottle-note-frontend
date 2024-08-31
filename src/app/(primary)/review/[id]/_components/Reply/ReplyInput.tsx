@@ -85,7 +85,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
             rows={1}
             ref={(e) => {
               register('content').ref(e);
-              newTextareaRef.current = e;
+              textareaRef.current = e;
             }}
             value={content}
             maxLength={300}

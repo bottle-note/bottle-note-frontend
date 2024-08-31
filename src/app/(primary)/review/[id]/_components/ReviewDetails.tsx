@@ -11,40 +11,65 @@ import FlavorTag from '@/app/(primary)/_components/FlavorTag';
 import { numberWithCommas } from '@/utils/formatNum';
 import { formatDate } from '@/utils/formatDate';
 import { shareOrCopy } from '@/utils/shareOrCopy';
-import { ReviewApi } from '@/app/api/ReviewApi';
 import LikeBtn from '@/app/(primary)/_components/LikeBtn';
-import OptionModal from '@/app/(primary)/_components/OptionModal';
+import OptionDropdown from '@/components/OptionDropdown';
+import useModalStore from '@/store/modalStore';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
+import { deleteReview } from '@/lib/Review';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;
-  handleShare: () => void;
   handleLogin: () => void;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
 }
 
-function ReviewDetails({ data, handleShare, handleLogin, textareaRef }: Props) {
+function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
   const router = useRouter();
   const { data: session } = useSession();
+  const { handleModalState } = useModalStore();
   const [isShowStatus, setIsShowStatus] = useState<boolean>(true);
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(data?.reviewResponse?.isLikedByMe);
 
-  const handleOptionsShow = () => setIsShowStatus((prev) => !prev);
-
-  const deleteReview = async () => {
-    if (!data.reviewResponse?.reviewId) return;
-    try {
-      const result = await ReviewApi.deleteReview(
-        data.reviewResponse?.reviewId.toString(),
-      );
-      if (result) {
-        alert('성공적으로 삭제되었습니다.');
+  const handleCloseOption = () => {
+    handleModalState({
+      isShowModal: true,
+      type: 'ALERT',
+      mainText: '성공적으로 삭제되었습니다.',
+      handleConfirm: () => {
+        setIsOptionShow(false);
+        handleModalState({
+          isShowModal: false,
+          mainText: '',
+        });
         router.back();
-      }
-    } catch (error) {
-      console.error('Failed to delete review:', error);
+      },
+    });
+  };
+
+  const handleOptionSelect = (option: { name: string; type: string }) => {
+    if (option.type === 'DELETE') {
+      handleModalState({
+        isShowModal: true,
+        mainText: '정말 삭제하시겠습니까?',
+        type: 'CONFIRM',
+        handleConfirm: () => {
+          deleteReview(data.reviewResponse?.reviewId, handleCloseOption);
+        },
+      });
+    } else if (option.type === 'MODIFY') {
+      router.push(`/review/modify?reviewId=${data.reviewResponse?.reviewId}`);
+    } else if (option.type === 'REPORT') {
+      handleModalState({
+        isShowModal: true,
+        mainText: '준비 중인 기능입니다.',
+      });
+    } else if (option.type === 'USER_REPORT') {
+      handleModalState({
+        isShowModal: true,
+        mainText: '준비 중인 기능입니다.',
+      });
     }
   };
 
@@ -230,6 +255,7 @@ function ReviewDetails({ data, handleShare, handleLogin, textareaRef }: Props) {
               if (!session) {
                 handleLogin();
               } else {
+                console.log('!!!');
                 textareaRef.current?.focus();
               }
             }}
@@ -254,7 +280,7 @@ function ReviewDetails({ data, handleShare, handleLogin, textareaRef }: Props) {
             onClick={() => {
               shareOrCopy(
                 `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${data.reviewResponse?.reviewId}`,
-                handleShare,
+                handleModalState,
               );
             }}
           >
@@ -269,33 +295,25 @@ function ReviewDetails({ data, handleShare, handleLogin, textareaRef }: Props) {
         </section>
       </section>
       {isOptionShow && (
-        <OptionModal
+        <OptionDropdown
+          handleClose={() => setIsOptionShow(false)}
           options={
             session?.user?.userId === data.reviewResponse?.userId
               ? [
-                  {
-                    name: '수정하기',
-                    path: `/review/modify?reviewId=${data.reviewResponse?.reviewId}`,
-                  },
-                  {
-                    name: '삭제하기',
-                    action: () => {
-                      const result = confirm('정말 삭제하시겠습니까?');
-                      if (result) deleteReview();
-                    },
-                  },
+                  { name: '수정하기', type: 'MODIFY' },
+                  { name: '삭제하기', type: 'DELETE' },
                 ]
               : [
-                  { name: '리뷰 신고', path: '' },
-                  { name: '유저 신고', path: '' },
+                  { name: '리뷰 신고', type: 'REPORT' },
+                  { name: '유저 신고', type: 'USER_REPORT' },
                 ]
           }
-          type={
+          handleOptionSelect={handleOptionSelect}
+          title={
             session?.user?.userId === data.reviewResponse?.userId
-              ? '리뷰'
+              ? '내 리뷰'
               : '신고하기'
           }
-          handleClose={handleOptionsShow}
         />
       )}
     </>

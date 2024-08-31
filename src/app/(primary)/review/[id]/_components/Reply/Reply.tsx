@@ -9,7 +9,7 @@ import { ReplyApi } from '@/app/api/ReplyApi';
 import { truncStr } from '@/utils/truncStr';
 import { formatDate } from '@/utils/formatDate';
 import Label from '@/app/(primary)/_components/Label';
-import OptionModal from '@/app/(primary)/_components/OptionModal';
+import OptionDropdown from '@/components/OptionDropdown';
 import { RootReply, SubReply } from '@/types/Reply';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
@@ -38,12 +38,8 @@ function Reply({
 }: Props) {
   const { data: session } = useSession();
   const { setValue } = useFormContext();
-  const { isShowModal, handleModal } = useModalStore();
+  const { state, handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
-
-  const handleOptionsShow = () => {
-    setIsOptionShow((prev) => !prev);
-  };
 
   const handleUpdateSubReply = () => {
     if (resetSubReplyToggle) {
@@ -67,11 +63,49 @@ function Reply({
         data.reviewReplyId.toString(),
       );
       if (result) {
-        handleModal();
-        setIsRefetch(true);
+        handleModalState({
+          isShowModal: true,
+          type: 'ALERT',
+          mainText: '성공적으로 댓글이 삭제되었습니다.',
+          handleConfirm: () => {
+            setIsOptionShow(false);
+            handleModalState({
+              isShowModal: false,
+              mainText: '',
+            });
+            // refresh review list
+            setIsRefetch(true);
+            if (resetSubReplyToggle) {
+              resetSubReplyToggle(false);
+            }
+          },
+        });
       }
     } catch (error) {
       console.error('Failed to delete review:', error);
+    }
+  };
+
+  const handleOptionSelect = (option: { name: string; type: string }) => {
+    if (option.type === 'DELETE') {
+      handleModalState({
+        isShowModal: true,
+        mainText: '정말 삭제하시겠습니까?',
+        type: 'CONFIRM',
+        handleConfirm: () => {
+          deleteReply();
+        },
+      });
+    } else if (option.type === 'REPORT') {
+      handleModalState({
+        isShowModal: true,
+        mainText: '준비 중인 기능입니다.',
+      });
+    } else if (option.type === 'USER_REPORT') {
+      handleModalState({
+        isShowModal: true,
+        mainText: '준비 중인 기능입니다.',
+      });
     }
   };
 
@@ -109,7 +143,8 @@ function Reply({
               <button
                 className="cursor-pointer"
                 onClick={() => {
-                  setIsOptionShow(true);
+                  if (session) setIsOptionShow(true);
+                  else handleLoginModal();
                 }}
               >
                 <Image
@@ -164,42 +199,25 @@ function Reply({
             isSubReplyShow && <div className="space-y-3">{children}</div>}
         </div>
       </div>
-      {/* 댓글, 대댓글 완료 후 일괄 modal 적용하면서 삭제 예정 컴포넌트 입니다. */}
       {isOptionShow && (
-        <OptionModal
+        <OptionDropdown
+          handleClose={() => setIsOptionShow(false)}
           options={
-            session?.user?.userId === data?.userId
+            session?.user?.userId === data.userId
               ? [
-                  {
-                    name: '삭제하기',
-                    action: () => {
-                      // eslint-disable-next-line no-restricted-globals
-                      const result = confirm('정말 댓글을 삭제하시겠습니까?');
-                      if (result) deleteReply();
-                    },
-                  },
+                  // { name: '수정하기', type: 'MODIFY' },
+                  { name: '삭제하기', type: 'DELETE' },
                 ]
               : [
-                  { name: '리뷰 신고', path: '' },
-                  { name: '유저 신고', path: '' },
+                  { name: '리뷰 신고', type: 'REPORT' },
+                  { name: '유저 신고', type: 'USER_REPORT' },
                 ]
           }
-          type={session?.user?.userId === data?.userId ? '댓글' : '신고하기'}
-          handleClose={handleOptionsShow}
+          handleOptionSelect={handleOptionSelect}
+          title={session?.user?.userId === data.userId ? '내 댓글' : '신고하기'}
         />
       )}
-      {isShowModal && (
-        <Modal
-          type="alert"
-          handleConfirm={() => {
-            handleModal();
-            if (resetSubReplyToggle) {
-              resetSubReplyToggle(false);
-            }
-          }}
-          mainText="성공적으로 삭제되었습니다."
-        />
-      )}
+      {state.isShowModal && <Modal />}
     </>
   );
 }

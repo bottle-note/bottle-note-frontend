@@ -15,7 +15,6 @@ import { SORT_TYPE, SORT_ORDER } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
 import useModalStore from '@/store/modalStore';
-import LoginModal from '@/app/(primary)/_components/LoginModal';
 
 const SORT_OPTIONS = [
   { name: '인기도순', type: SORT_TYPE.POPULAR },
@@ -36,7 +35,7 @@ function Reviews() {
   const { data: session } = useSession();
   const alcoholId = params?.id;
   const alcoholKorName = searchParams.get('name');
-  const { isShowModal, handleModal } = useModalStore();
+  const { handleLoginModal } = useModalStore();
   const [activeTab, setActiveTab] = useState('tab1');
 
   const handleTabClick = (tab: string) => {
@@ -59,7 +58,7 @@ function Reviews() {
     reviewList: ReviewType[];
     totalCount: number;
   }>({
-    queryKey: ['review', filterState.sortOrder],
+    queryKey: ['review', filterState, alcoholId],
     queryFn: ({ pageParam }) => {
       return ReviewApi.getReviewList({
         alcoholId: alcoholId as string,
@@ -154,12 +153,10 @@ function Reviews() {
                     {reviewList &&
                       [...reviewList.map((list) => list.data.reviewList)]
                         .flat()
-                        .map((item: ReviewType, idx) => (
+                        .map((item: ReviewType) => (
                           <Review
                             data={item}
-                            // eslint-disable-next-line react/no-array-index-key
-                            key={item.reviewId + idx}
-                            handleLogin={handleModal}
+                            key={item.reviewId + item.userId}
                           />
                         ))}
                   </List.Section>
@@ -193,12 +190,10 @@ function Reviews() {
                     {myReviewList &&
                       [...myReviewList.map((list) => list.data.reviewList)]
                         .flat()
-                        .map((item: ReviewType, idx) => (
+                        .map((item: ReviewType) => (
                           <Review
                             data={item}
-                            // eslint-disable-next-line react/no-array-index-key
-                            key={item.reviewId + idx}
-                            handleLogin={handleModal}
+                            key={item.reviewId + item.userId}
                           />
                         ))}
                   </List.Section>
@@ -212,7 +207,7 @@ function Reviews() {
           <Button
             onClick={() => {
               if (!session || !alcoholId) {
-                handleModal();
+                handleLoginModal();
                 return;
               }
               router.push(`/review/register?alcoholId=${alcoholId}`);
@@ -221,7 +216,6 @@ function Reviews() {
           />
         </section>
       </div>
-      {isShowModal && <LoginModal handleClose={handleModal} />}
     </>
   );
 }

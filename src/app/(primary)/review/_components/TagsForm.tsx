@@ -16,24 +16,16 @@ interface Props {
 }
 
 export default function TagsForm({ korName }: Props) {
-  const { isShowModal, handleModal } = useModalStore();
+  const { state, handleModalState } = useModalStore();
+  const { setValue, watch } = useFormContext();
   const [tagModal, setTagModal] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [isAdding, setIsAdding] = useState(false);
-  const [modalContent, setModalContent] = useState<string>('');
-  const [modalType, setModalType] = useState<'back' | 'notice' | null>(null);
-
-  const { setValue, watch } = useFormContext();
-
-  const updateAlert = (content: string) => {
-    setModalContent(content);
-    setModalType('notice');
-    handleModal();
-  };
 
   useEffect(() => {
     setTags(watch('flavor_tags'));
   }, [watch('flavor_tags')]);
+
   return (
     <>
       <article className={tags.length !== 0 ? 'space-y-2' : ''}>
@@ -85,8 +77,22 @@ export default function TagsForm({ korName }: Props) {
             <SubHeader.Left
               onClick={() => {
                 if (isAdding) {
-                  setModalType('back');
-                  handleModal();
+                  handleModalState({
+                    isShowModal: true,
+                    mainText:
+                      '입력중인 테이스팅 태그가 있습니다.\n정말 나가시겠습니까?',
+                    subText: '태그가 완성되지않으면 없어져요!',
+                    type: 'CONFIRM',
+                    confirmBtnName: '아니요',
+                    cancelBtnName: '예',
+                    handleCancel: () => {
+                      handleModalState({
+                        isShowModal: false,
+                      });
+                      setTagModal(false);
+                      setValue('flavor_tags', tags);
+                    },
+                  });
                 } else {
                   setTagModal(false);
                   setValue('flavor_tags', tags);
@@ -108,27 +114,10 @@ export default function TagsForm({ korName }: Props) {
             tags={tags}
             setTags={setTags}
             setIsAdding={setIsAdding}
-            updateAlert={updateAlert}
           />
         </PageModal>
       )}
-      {isShowModal && modalType === 'back' && (
-        <Modal
-          type="confirm"
-          confirmBtnName="아니요"
-          cancelBtnName="예"
-          handleCancel={() => {
-            handleModal();
-            setTagModal(false);
-            setValue('flavor_tags', tags);
-          }}
-          mainText="입력중인 테이스팅 태그가 있습니다.\n정말 나가시겠습니까?"
-          subText="태그가 완성되지않으면 없어져요!"
-        />
-      )}
-      {isShowModal && modalContent !== '' && modalType === 'notice' && (
-        <Modal mainText={modalContent} />
-      )}
+      {state.isShowModal && <Modal />}
     </>
   );
 }
