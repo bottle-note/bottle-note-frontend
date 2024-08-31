@@ -16,7 +16,7 @@ interface LoginModalState {
   isShowLoginModal: boolean;
 }
 
-type ParcialModalState = {
+export type ParcialModalState = {
   [K in keyof ModalState]?: ModalState[K];
 };
 
@@ -35,8 +35,8 @@ const useModalStore = create<ModalStore>((set) => ({
     mainText: '',
     subText: '',
     alertBtnName: '확인',
-    confirmBtnName: '취소',
-    cancelBtnName: '확인',
+    confirmBtnName: '확인',
+    cancelBtnName: '취소',
     handleCancel: null,
     handleConfirm: null,
   },

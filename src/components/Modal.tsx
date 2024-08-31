@@ -1,59 +1,25 @@
-import { useEffect } from 'react';
 import Image from 'next/image';
 import BackDrop from '@/components/BackDrop';
 import useModalStore from '@/store/modalStore';
 import { Button, DualButton } from '@/components/Button';
+import { useEffect } from 'react';
 
 interface Props {
-  type?: 'alert' | 'confirm';
   children?: React.ReactNode;
-  alertBtnName?: string;
-  handleCancel?: (() => void) | null;
-  handleConfirm?: (() => void) | null;
-  confirmBtnName?: string;
-  cancelBtnName?: string;
-  mainText?: string;
-  subText?: string;
 }
 
-function Modal({
-  type = 'alert',
-  children,
-  handleCancel,
-  handleConfirm,
-  alertBtnName = '확인',
-  confirmBtnName,
-  cancelBtnName,
-  mainText,
-  subText,
-}: Props) {
-  const { handleCloseModal, handleModalState, state } = useModalStore();
+function Modal({ children }: Props) {
+  const { handleCloseModal, state } = useModalStore();
 
   const handleOkayClick = () => {
-    if (handleConfirm) handleConfirm();
+    if (state.handleConfirm) state.handleConfirm();
     else handleCloseModal();
   };
 
   const handleCancelClick = () => {
-    if (handleCancel) handleCancel();
+    if (state.handleCancel) state.handleCancel();
     else handleCloseModal();
   };
-
-  useEffect(() => {
-    return () => {
-      handleModalState({
-        isShowModal: false,
-        type: 'ALERT',
-        mainText: '',
-        subText: '',
-        alertBtnName: '확인',
-        confirmBtnName: '취소',
-        cancelBtnName: '확인',
-        handleCancel: null,
-        handleConfirm: null,
-      });
-    };
-  }, []);
 
   return (
     <BackDrop isShow={state.isShowModal}>
@@ -68,16 +34,16 @@ function Modal({
             />
           </article>
           {children}
-          <p className="modal-mainText">{mainText}</p>
-          <p className="modal-subText">{subText}</p>
-          {type === 'alert' ? (
-            <Button btnName={alertBtnName} onClick={handleOkayClick} />
+          <p className="modal-mainText">{state.mainText}</p>
+          <p className="modal-subText">{state.subText}</p>
+          {state.type === 'ALERT' ? (
+            <Button btnName={state.alertBtnName} onClick={handleOkayClick} />
           ) : (
             <DualButton
               onClickCancel={handleCancelClick}
               onClickOkay={handleOkayClick}
-              okayBtnName={confirmBtnName}
-              cancelBtnName={cancelBtnName}
+              okayBtnName={state.confirmBtnName}
+              cancelBtnName={state.cancelBtnName}
             />
           )}
         </section>
