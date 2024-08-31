@@ -255,7 +255,6 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
               if (!session) {
                 handleLogin();
               } else {
-                console.log('!!!');
                 textareaRef.current?.focus();
               }
             }}
