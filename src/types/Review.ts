@@ -140,3 +140,10 @@ export interface ReviewLikePutApi {
   userNickName: string;
   status: 'LIKE' | 'DISLIKE';
 }
+
+export interface ReviewVisibilityPatchApi {
+  codeMessage: string;
+  message: string;
+  reviewId: number;
+  responseAt: string;
+}

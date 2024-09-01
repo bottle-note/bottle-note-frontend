@@ -7,6 +7,7 @@ import {
   ReviewPatchApi,
   ReviewLikePutApi,
   ReviewListApi,
+  ReviewVisibilityPatchApi
 } from '@/types/Review';
 
 export const ReviewApi = {
@@ -128,6 +129,22 @@ export const ReviewApi = {
     });
 
     const result: ApiResponse<ReviewLikePutApi> = await response.data;
+    return result;
+  },
+
+  async putVisibility(reviewId: string | number, status: 'PUBLIC' | 'PRIVATE') {
+    const response = await fetchWithAuth(
+      `/bottle-api/reviews/${reviewId}/display`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({
+          reviewId,
+          status,
+        }),
+      },
+    );
+
+    const result: ApiResponse<ReviewVisibilityPatchApi> = await response.data;
     return result;
   },
 };
