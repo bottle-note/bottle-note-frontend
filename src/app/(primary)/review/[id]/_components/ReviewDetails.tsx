@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import Label from '@/app/(primary)/_components/Label';
 import { truncStr } from '@/utils/truncStr';
 import Star from '@/components/Star';
-import Toggle from '@/app/(primary)/_components/Toggle';
+import VisibilityToggle from '@/app/(primary)/_components/VisibilityToggle';
 import FlavorTag from '@/app/(primary)/_components/FlavorTag';
 import { numberWithCommas } from '@/utils/formatNum';
 import { formatDate } from '@/utils/formatDate';
@@ -27,8 +27,7 @@ interface Props {
 function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
   const router = useRouter();
   const { data: session } = useSession();
-  const { handleModalState } = useModalStore();
-  const [isShowStatus, setIsShowStatus] = useState<boolean>(true);
+  const { handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(data?.reviewResponse?.isLikedByMe);
 
@@ -72,10 +71,6 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
       });
     }
   };
-
-  useEffect(() => {
-    setIsShowStatus(data.reviewResponse.status !== 'PRIVATE');
-  }, [data]);
 
   return (
     <>
@@ -123,15 +118,10 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
               />
             )}
             {data.reviewResponse?.userId === session?.user?.userId && (
-              <Toggle
-                defaultState={isShowStatus}
-                onChange={(value) => {
-                  setIsShowStatus(value);
-                  // api 적용 필요
-                  // const status = value ? 'PUBLIC' : 'PRIVATE';
-                }}
-                offValue="리뷰 비공개"
-                onValue="리뷰 공개"
+              <VisibilityToggle
+                initialStatus={data.reviewResponse.status === 'PUBLIC'}
+                reviewId={data?.reviewResponse?.reviewId}
+                handleNotLogin={handleLoginModal}
               />
             )}
           </article>

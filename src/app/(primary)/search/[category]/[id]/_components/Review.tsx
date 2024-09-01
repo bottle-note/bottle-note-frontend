@@ -11,7 +11,7 @@ import { truncStr } from '@/utils/truncStr';
 import Star from '@/components/Star';
 import { numberWithCommas } from '@/utils/formatNum';
 import { formatDate } from '@/utils/formatDate';
-import Toggle from '@/app/(primary)/_components/Toggle';
+import VisibilityToggle from '@/app/(primary)/_components/VisibilityToggle';
 import LikeBtn from '@/app/(primary)/_components/LikeBtn';
 import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
@@ -176,12 +176,11 @@ function Review({ data }: Props) {
               />
               <p>{data.replyCount}</p>
             </div>
-            {data.userId && ( // API 완성되면 컴포넌트 만들고 연동하기
-              <Toggle
-                defaultState={data.status === 'PUBLIC'}
-                offValue="리뷰 비공개"
-                onValue="리뷰 공개"
-                onChange={() => {}}
+            {data.userId && (
+              <VisibilityToggle
+                initialStatus={data.status === 'PUBLIC'}
+                reviewId={data.reviewId}
+                handleNotLogin={handleLoginModal}
               />
             )}
           </div>

@@ -1,9 +1,13 @@
-import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import Toggle from '@/app/(primary)/_components/Toggle';
 
 export default function ContentForm() {
   const { register, setValue, watch } = useFormContext();
+
+  const handleToggle = () => {
+    setValue('status', watch('status') === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC');
+  };
+
   return (
     <article>
       <textarea
@@ -14,10 +18,8 @@ export default function ContentForm() {
       />
       <div className="text-10 text-mainGray flex justify-between items-center">
         <Toggle
-          onChange={(value) => {
-            const status = value ? 'PUBLIC' : 'PRIVATE';
-            setValue('status', status);
-          }}
+          isActive={watch('status') === 'PUBLIC'}
+          onToggle={handleToggle}
         />
         <div>({watch('review')?.length}/1000)</div>
       </div>
