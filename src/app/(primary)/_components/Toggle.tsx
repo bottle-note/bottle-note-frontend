@@ -1,40 +1,39 @@
-import React, { useState } from 'react';
-
 interface Props {
-  defaultState?: boolean;
-  offValue?: string;
-  onValue?: string;
-  onChange: (value: boolean) => void;
+  offName?: string;
+  onName?: string;
+  offColor?: string;
+  onColor?: string;
+  isActive: boolean;
+  onToggle: () => void;
+  disabled?: boolean;
 }
 
 const Toggle = ({
-  defaultState = true,
-  offValue = '리뷰 비공개',
-  onValue = '리뷰 공개',
-  onChange,
+  onName = '리뷰 공개',
+  offName = '리뷰 비공개',
+  onColor = 'bg-mainCoral',
+  offColor = 'bg-mainGray',
+  isActive,
+  onToggle,
+  disabled = false,
 }: Props) => {
-  const [isToggled, setIsToggled] = useState<boolean>(defaultState);
-
-  const handleClick = () => {
-    setIsToggled((prev) => !prev);
-    onChange(!isToggled);
-  };
-
   return (
     <div className="flex items-center space-x-1">
-      <div
+      <button
         className={`toggle-container flex items-center w-[1.35rem] h-3 rounded-full ${
-          isToggled ? 'bg-mainCoral' : 'bg-mainGray'
+          isActive ? onColor : offColor
         }`}
-        onClick={handleClick}
+        disabled={disabled}
+        onClick={onToggle}
+        aria-label={isActive ? onName : offName}
       >
         <div
           className={`toggle-handle w-[0.6rem] h-[0.6rem] rounded-full bg-white transform transition-transform ${
-            isToggled ? 'translate-x-full' : 'translate-x-0.5'
+            isActive ? 'translate-x-full' : 'translate-x-0.5'
           }`}
         />
-      </div>
-      <p className="text-9 text-mainGray">{isToggled ? onValue : offValue}</p>
+      </button>
+      <p className="text-9 text-mainGray">{isActive ? onName : offName}</p>
     </div>
   );
 };
