@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import useModalStore from '@/store/modalStore';
 
 interface Props {
   isPicked: boolean;
@@ -26,6 +27,7 @@ const PickBtn = ({
   size = 14,
 }: Props) => {
   const { data: session } = useSession();
+  const { handleModalState } = useModalStore();
 
   const handleClick = async () => {
     if (!session) {
@@ -35,7 +37,11 @@ const PickBtn = ({
       try {
         await AlcoholsApi.putPick(alcoholId, !isPicked);
       } catch (error) {
-        alert('업데이트에 실패했습니다. 다시 시도해주세요.');
+        handleModalState({
+          isShowModal: true,
+          type: 'ALERT',
+          mainText: '찜하기 업데이트에 실패했습니다. 다시 시도해주세요.',
+        });
         console.error('Error updating pick status:', error);
         handleError();
       }

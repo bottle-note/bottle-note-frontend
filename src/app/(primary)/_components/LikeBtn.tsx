@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { ReviewApi } from '@/app/api/ReviewApi';
+import useModalStore from '@/store/modalStore';
 
 interface Props {
   reviewId: string | number;
@@ -28,6 +29,8 @@ const LikeBtn = ({
   size = 14,
 }: Props) => {
   const { data: session } = useSession();
+  const { handleModalState } = useModalStore();
+
   const handleClick = async () => {
     if (!session) {
       handleNotLogin();
@@ -36,7 +39,11 @@ const LikeBtn = ({
       try {
         await ReviewApi.putLike(reviewId, !isLiked);
       } catch (error) {
-        alert('업데이트에 실패했습니다. 다시 시도해주세요.');
+        handleModalState({
+          isShowModal: true,
+          type: 'ALERT',
+          mainText: '좋아요 업데이트에 실패했습니다. 다시 시도해주세요.',
+        });
         console.error('Error updating like status:', error);
         handleError();
       }
