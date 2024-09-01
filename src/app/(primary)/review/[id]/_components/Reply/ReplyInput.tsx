@@ -14,7 +14,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
   const { register, watch, handleSubmit, setValue } = useFormContext();
   const content = watch('content');
   const mentionName = watch('replyToReplyUserName');
-  const newTextareaRef = { ...textareaRef };
+  const newTextareaRef = React.useRef<HTMLTextAreaElement | null>(null);
 
   const handleResizeHeight = () => {
     if (newTextareaRef.current) {
@@ -69,6 +69,12 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
     }
   }, [mentionName]);
 
+  // textareaRef를 newTextareaRef에 복사
+  // 해당 부분 조금 문제가 있어서 다음 PR에서 수정할 예정
+  useEffect(() => {
+    newTextareaRef.current = textareaRef.current;
+  }, [textareaRef]);
+
   return (
     <div className="fixed bottom-[5.5rem] left-0 right-0 mx-auto w-full max-w-2xl px-4 z-10">
       <div className="bg-[#f6f6f6] pt-1 px-3 rounded-lg shadow-md flex items-center">
@@ -85,7 +91,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
             rows={1}
             ref={(e) => {
               register('content').ref(e);
-              textareaRef.current = e;
+              newTextareaRef.current = e;
             }}
             value={content}
             maxLength={300}
