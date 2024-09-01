@@ -176,7 +176,7 @@ function Review({ data }: Props) {
               />
               <p>{data.replyCount}</p>
             </div>
-            {data.userId && (
+            {data?.userId === session?.user?.userId && (
               <VisibilityToggle
                 initialStatus={data.status === 'PUBLIC'}
                 reviewId={data.reviewId}
