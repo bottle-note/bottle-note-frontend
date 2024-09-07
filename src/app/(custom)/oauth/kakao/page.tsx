@@ -14,9 +14,9 @@ export default function OauthKakaoCallbackPage() {
         method: 'POST',
       });
       const result = await res.json();
-      if (result?.data?.id) {
-        router.replace('/');
-      }
+      // if (result?.data?.id) {
+      router.replace('/');
+      // }
 
       console.log('data returned from api: ', result);
     } catch (e) {

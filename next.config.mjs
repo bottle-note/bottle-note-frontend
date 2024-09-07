@@ -4,6 +4,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 const WHITE_LIST = ['*'];
 
 const nextConfig = {
+  reactStrictMode: false,
   experimental: {
     missingSuspenseWithCSRBailout: false,
   },

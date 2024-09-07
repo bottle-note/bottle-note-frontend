@@ -41,10 +41,10 @@ export async function POST(req: NextRequest) {
 
   try {
     // Step 1: Fetch Kakao OAuth token
-    const { access_token } = await fetchKakaoToken(code);
+    const kakaoToken = await fetchKakaoToken(code);
 
     // Step 2: Fetch Kakao user information
-    const userData = await fetchKakaoUserInfo(access_token);
+    const userData = await fetchKakaoUserInfo(kakaoToken.access_token);
 
     // Step 3: Prepare login payload
     const loginPayload = {
