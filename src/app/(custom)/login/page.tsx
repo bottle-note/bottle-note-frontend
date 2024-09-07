@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { signIn, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LoginOptionDropdown from './_components/LoginOptionDropdown';
 
@@ -17,6 +17,33 @@ export default function Login() {
       router.replace('/');
     }
   }, [session]);
+
+  // ----- kakao sdk login
+  useEffect(() => {
+    const kakaoSDK = document.createElement('script');
+    kakaoSDK.async = false;
+    kakaoSDK.src = `https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js`;
+    kakaoSDK.integrity = `sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4`;
+    kakaoSDK.crossOrigin = `anonymous`;
+    document.head.appendChild(kakaoSDK);
+
+    const onLoadKakaoAPI = () => {
+      if (!window.Kakao.isInitialized()) {
+        window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID);
+
+        console.log('after Init: ', window.Kakao.isInitialized());
+      }
+    };
+
+    kakaoSDK.addEventListener('load', onLoadKakaoAPI);
+  }, []);
+
+  const redirectUri = `${process.env.NEXT_PUBLIC_CLIENT_URL}/oauth/kakao`;
+  const kakaoLoginHandler = () => {
+    window.Kakao.Auth.authorize({
+      redirectUri,
+    });
+  };
 
   return (
     <main className="w-full h-[100vh] flex flex-col justify-end items-center bg-bgGray p-5">
@@ -33,7 +60,7 @@ export default function Login() {
         <p className="text-13 text-subCoral font-bold whitespace-pre text-center">{`나의 입맛에 맞는 딱 한 병을\n찾아가는 여정 노트`}</p>
 
         <article className="flex flex-col gap-2">
-          <SocialLoginBtn type="KAKAO" onClick={() => signIn('kakao')} />
+          <SocialLoginBtn type="KAKAO" onClick={kakaoLoginHandler} />
           <SocialLoginBtn type="APPLE" onClick={() => alert('준비중입니다.')} />
         </article>
 
