@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AuthApi } from '../../AuthApi';
+// import { AuthApi } from '../../AuthApi';
 
 const getRedirectUrl = () => `${process.env.CLIENT_URL}/oauth/kakao`;
 
@@ -55,9 +55,9 @@ export async function POST(req: NextRequest) {
     };
 
     // Step 4: Log in with the Auth API
-    const tokens = await AuthApi.login(loginPayload);
+    // const tokens = await AuthApi.login(loginPayload);
 
-    return NextResponse.json({ data: tokens });
+    return NextResponse.json({ data: loginPayload });
   } catch (error) {
     return NextResponse.json({ error });
   }

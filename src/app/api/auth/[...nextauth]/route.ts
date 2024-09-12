@@ -2,7 +2,8 @@
 import KakaoProvider from 'next-auth/providers/kakao';
 import GoogleProvider from 'next-auth/providers/google';
 import NaverProvider from 'next-auth/providers/naver';
-import NextAuth from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
+import NextAuth, { User } from 'next-auth';
 import { AuthApi } from '../../AuthApi';
 
 const jwt = require('jsonwebtoken');
@@ -21,6 +22,31 @@ const handler = NextAuth({
       clientId: `${process.env.NAVER_CLIENT_ID}`,
       clientSecret: `${process.env.NAVER_CLIENT_SECRET}`,
     }),
+    Credentials({
+      credentials: {
+        email: {
+          label: 'email',
+          type: 'text',
+          placehold: 'please fill email',
+        },
+      },
+      async authorize(credentials) {
+        console.log('calling credentials login');
+
+        const body = {
+          email: credentials?.email ?? '',
+          gender: null,
+          age: null,
+          socialType: 'KAKAO',
+        };
+
+        const token = await AuthApi.login(body);
+        const info = jwt.decode(token.accessToken);
+        const user: User = { id: info.userId, email: credentials?.email ?? '' };
+
+        return user;
+      },
+    }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   session: {
@@ -28,6 +54,7 @@ const handler = NextAuth({
   },
   callbacks: {
     async signIn({ user, account }) {
+      console.log('signIn calling');
       try {
         const body = {
           email: user.email as string,
@@ -54,6 +81,7 @@ const handler = NextAuth({
     },
 
     async jwt({ token, account }) {
+      console.log('jwt calling');
       if (account && account.accessToken) {
         token.accessToken = account.accessToken;
         token.refreshToken = account.refreshToken;

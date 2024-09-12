@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 export default function OauthKakaoCallbackPage() {
   const router = useRouter();
@@ -13,12 +14,11 @@ export default function OauthKakaoCallbackPage() {
       const res = await fetch(`/api/oauth/kakao?code=${code}`, {
         method: 'POST',
       });
-      const result = await res.json();
-      // if (result?.data?.id) {
-      router.replace('/');
-      // }
+      const loginPayload = await res.json();
+      const result = await signIn('credentials', loginPayload);
 
-      console.log('data returned from api: ', result);
+      if (result?.ok) router.push('/');
+      router.push('/error');
     } catch (e) {
       console.log(e);
     }
