@@ -190,8 +190,6 @@ export default function ReviewDetail() {
               resetSubReplyToggle={resetSubReplyToggle}
             />
             <ReplyInput
-              // ReviewDetails에서 클릭이벤트를 주면 textareaRef가 focus되지 않는 문제가 있다 해결해줘
-              //
               textareaRef={textareaRef}
               handleCreateReply={handleCreateReply}
             />

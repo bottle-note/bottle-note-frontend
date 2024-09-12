@@ -66,9 +66,12 @@ function ReviewRegister() {
       imageUrlList: imgUrl ?? null,
       tastingTagList: data.flavor_tags,
       locationInfo: {
-        zipCode: data.zipCode,
-        address: data.address,
-        detailAddress: data.detailAddress,
+        locationName: data.locationName,
+        streetAddress: data.streetAddress,
+        category: data.category,
+        mapUrl: data.mapUrl,
+        latitude: data.latitude,
+        longitude: data.longitude,
       },
     };
 
@@ -95,6 +98,10 @@ function ReviewRegister() {
         type: 'ALERT',
         handleConfirm: () => {
           router.push(`/review/${reviewResult.id}`);
+          handleModalState({
+            isShowModal: false,
+            mainText: '',
+          });
         },
       });
     } else if (initialRating !== data.rating && ratingResult && !reviewResult) {
@@ -134,9 +141,12 @@ function ReviewRegister() {
       flavor_tags: [],
       images: [],
       imageUrlList: null,
-      zipCode: null,
-      address: null,
-      detailAddress: null,
+      locationName: null,
+      streetAddress: null,
+      mapUrl: null,
+      category: null,
+      latitude: null,
+      longitude: null,
     });
   }, []);
 

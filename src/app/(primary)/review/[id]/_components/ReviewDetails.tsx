@@ -169,7 +169,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
         {data.reviewResponse?.reviewTastingTag.length !== 0 && (
           <FlavorTag tagList={data.reviewResponse.reviewTastingTag} />
         )}
-        {(data.reviewResponse?.address ||
+        {(data.reviewResponse?.streetAddress ||
           (!!data.reviewResponse?.price && data.reviewResponse?.sizeType)) && (
           <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 ">
             {data.reviewResponse?.price && data.reviewResponse?.sizeType && (
@@ -198,8 +198,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                 </p>
               </div>
             )}
-            {/* 주소 형태 변경 예정으로 임시 적용 */}
-            {data.reviewResponse?.address && (
+            {data.reviewResponse?.streetAddress && (
               <div className="flex items-start space-x-1">
                 <Image
                   src="/icon/placepoint-subcoral.svg"
@@ -210,11 +209,16 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                 <p className="text-mainDarkGray text-10 font-semibold">장소</p>
                 <p className="text-mainDarkGray text-10">
                   <>
-                    {data.reviewResponse?.zipCode}
+                    <p className="font-semibold">
+                      {data.reviewResponse?.locationName}
+                    </p>
+                    {data.reviewResponse?.streetAddress}
                     <br />
-                    {data.reviewResponse?.address}
-                    <br />
-                    {data.reviewResponse?.detailAddress}
+                    {data.reviewResponse?.mapUrl && (
+                      <p className="text-10 text-subCoral m-0 p-0">
+                        <Link href={data.reviewResponse.mapUrl}>지도보기</Link>
+                      </p>
+                    )}
                   </>
                 </p>
               </div>

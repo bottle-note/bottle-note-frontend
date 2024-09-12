@@ -32,9 +32,12 @@ export interface FormValues {
         viewUrl: string;
       }[]
     | null;
-  zipCode?: string | null;
-  address?: string | null;
-  detailAddress?: string | null;
+  locationName?: string | null;
+  streetAddress?: string | null;
+  category?: string | null;
+  mapUrl?: string | null;
+  latitude?: string | null;
+  longitude?: string | null;
 }
 
 export interface ReviewListApi {
@@ -67,9 +70,12 @@ export interface ReviewDetailsApi {
     nickName: string;
     userProfileImage: string;
     rating: number;
-    zipCode: string | null;
-    address: string | null;
-    detailAddress: string | null;
+    locationName?: string | null;
+    streetAddress?: string | null;
+    category?: string | null;
+    mapUrl?: string | null;
+    latitude?: string | null;
+    longitude?: string | null;
     status: 'PUBLIC' | 'PRIVATE';
     isMyReview: boolean;
     isLikedByMe: boolean;
@@ -119,9 +125,12 @@ export interface ReviewQueryParams {
       }[]
     | null;
   locationInfo: {
-    zipCode?: string | null;
-    address?: string | null;
-    detailAddress?: string | null;
+    locationName?: string | null;
+    streetAddress?: string | null;
+    category?: string | null;
+    mapUrl?: string | null;
+    latitude?: string | null;
+    longitude?: string | null;
   };
 }
 
@@ -146,4 +155,19 @@ export interface ReviewVisibilityPatchApi {
   message: string;
   reviewId: number;
   responseAt: string;
+}
+
+export interface KakaoPlace {
+  address_name: string;
+  category_group_code: string;
+  category_group_name: string;
+  category_name: string;
+  distance: string;
+  id: string;
+  phone: string;
+  place_name: string;
+  place_url: string;
+  road_address_name: string;
+  x: string;
+  y: string;
 }

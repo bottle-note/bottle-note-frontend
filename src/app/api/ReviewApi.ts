@@ -7,7 +7,7 @@ import {
   ReviewPatchApi,
   ReviewLikePutApi,
   ReviewListApi,
-  ReviewVisibilityPatchApi
+  ReviewVisibilityPatchApi,
 } from '@/types/Review';
 
 export const ReviewApi = {
