@@ -4,7 +4,7 @@ import useModalStore from '@/store/modalStore';
 import { KakaoPlace } from '@/types/Review';
 
 interface Props {
-  handleSaveData: (place: KakaoPlace) => void;
+  handleSaveData: (place: KakaoPlace, category?: string | null) => void;
 }
 
 export default function KakaoAddressMap({ handleSaveData }: Props) {
@@ -33,12 +33,13 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
           place: KakaoPlace,
           totalCount: number,
         ) {
+          let category = null;
           const el = document.createElement('li');
           let itemStr = `<div><div class="title_row"><div><span class="title">${place.place_name}</span>`;
 
           if (place.category_name) {
             const categoryArr = place.category_name.split(' > ');
-            const category = categoryArr[categoryArr.length - 1];
+            category = categoryArr[categoryArr.length - 1];
             itemStr += `<span class="category">${category}</span></div>`;
           }
 
@@ -130,7 +131,7 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
             htmlElement.style.fontSize = '12px';
           });
 
-          el.addEventListener('click', () => handleSaveData(place));
+          el.addEventListener('click', () => handleSaveData(place, category));
 
           return el;
         }

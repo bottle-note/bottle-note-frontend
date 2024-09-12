@@ -13,10 +13,10 @@ interface Props {
 export default function SearchAddress({ handleCloseModal }: Props) {
   const { setValue } = useFormContext();
 
-  const saveAddress = (place: KakaoPlace) => {
+  const saveAddress = (place: KakaoPlace, category?: string | null) => {
     setValue('locationName', place.place_name || null);
     setValue('streetAddress', place.road_address_name || null);
-    setValue('category', place.category_name || null);
+    setValue('category', category);
     setValue('mapUrl', place.place_url || null);
     setValue('longitude', place.x || null);
     setValue('latitude', place.y || null);
