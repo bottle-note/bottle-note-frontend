@@ -2,13 +2,11 @@
 
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 
 export default function OauthKakaoCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const authCode = searchParams.get('code');
-  const { update } = useSession();
 
   const loginHandler = async (code: string | string[]) => {
     try {
@@ -16,7 +14,7 @@ export default function OauthKakaoCallbackPage() {
         method: 'POST',
       });
       const result = await res.json();
-      await update(result.data);
+      // TODO: 여기서 result 를 로컬스토리지에 저장하도록 수정
       router.push('/');
     } catch (e) {
       console.log(e);

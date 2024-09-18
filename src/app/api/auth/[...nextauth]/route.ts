@@ -28,7 +28,6 @@ const handler = NextAuth({
   },
   callbacks: {
     async signIn({ user, account }) {
-      console.log('signIn calling');
       try {
         const body = {
           email: user.email as string,
@@ -55,7 +54,6 @@ const handler = NextAuth({
     },
 
     async jwt({ token, account }) {
-      console.log('jwt calling');
       if (account && account.accessToken) {
         token.accessToken = account.accessToken;
         token.refreshToken = account.refreshToken;

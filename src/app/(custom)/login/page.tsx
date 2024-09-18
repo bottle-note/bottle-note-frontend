@@ -14,6 +14,7 @@ export default function Login() {
 
   useEffect(() => {
     if (session?.user) {
+      // TODO: 여기서 세션 데이터를 로컬스토리지에 저장하도록 변경
       router.replace('/');
     }
   }, [session]);
