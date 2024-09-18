@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-// import { AuthApi } from '../../AuthApi';
+import { AuthApi } from '../../AuthApi';
+
+const jwt = require('jsonwebtoken');
 
 const getRedirectUrl = () => `${process.env.CLIENT_URL}/oauth/kakao`;
 
@@ -48,16 +50,18 @@ export async function POST(req: NextRequest) {
 
     // Step 3: Prepare login payload
     const loginPayload = {
-      email: userData.kakao_account?.email || 'no-email',
+      email: userData.kakao_account?.email ?? 'no-email',
       gender: null,
       age: null,
       socialType: 'KAKAO',
     };
 
     // Step 4: Log in with the Auth API
-    // const tokens = await AuthApi.login(loginPayload);
+    const tokens = await AuthApi.login(loginPayload);
+    const info = jwt.decode(tokens.accessToken);
 
-    return NextResponse.json({ data: loginPayload });
+    // TODO: 정제된 세션 데이터 만드는 로직 추가 및 유틸함수로 분리
+    return NextResponse.json({ tokens, info });
   } catch (error) {
     return NextResponse.json({ error });
   }

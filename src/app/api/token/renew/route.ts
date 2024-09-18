@@ -22,7 +22,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       secret: process.env.NEXTAUTH_SECRET as string,
       ...session,
       token: {
-        ...decode,
+        ...decoded,
         ...newTokens,
       },
       maxAge: 30 * 24 * 60 * 60,
