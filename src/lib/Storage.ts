@@ -1,13 +1,22 @@
 export class Storage {
   static setItem(key: string, value: any) {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(key, value);
+      localStorage.setItem(key, JSON.stringify(value));
     }
   }
 
-  static getItem(key: string) {
+  static getItem<T>(key: string): T | null {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem(key);
+      const item = localStorage.getItem(key);
+
+      if (item) {
+        try {
+          return JSON.parse(item) as T;
+        } catch (error) {
+          console.error('Error parsing JSON from localStorage', error);
+          return null;
+        }
+      }
     }
 
     return null;

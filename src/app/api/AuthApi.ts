@@ -1,4 +1,4 @@
-import { LoginReq } from '@/types/Auth';
+import { LoginReq, LoginReturn } from '@/types/Auth';
 
 export const AuthApi = {
   async login(body: LoginReq): Promise<{
@@ -84,6 +84,25 @@ export const AuthApi = {
 
       throw new Error(
         `토큰 업데이트 도중 에러가 발생했습니다. 사유: ${error.message}`,
+      );
+    }
+  },
+  async kakaoLogin(code: string | string[]): Promise<LoginReturn> {
+    try {
+      // TODO: 타입 정리
+      const res = await fetch(`/api/oauth/kakao?code=${code}`, {
+        method: 'POST',
+      });
+
+      const result: LoginReturn = await res.json();
+
+      return result;
+    } catch (e) {
+      const error = e as Error;
+      console.error(error.message);
+
+      throw new Error(
+        `카카오 소셜 로그인 도중 에러가 발생했습니다. 사유: ${error.message}`,
       );
     }
   },

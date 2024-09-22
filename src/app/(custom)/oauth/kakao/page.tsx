@@ -2,19 +2,19 @@
 
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { AuthApi } from '@/app/api/AuthApi';
+import { useSession } from '@/utils/useSession';
 
 export default function OauthKakaoCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const authCode = searchParams.get('code');
+  const { login } = useSession();
 
   const loginHandler = async (code: string | string[]) => {
     try {
-      const res = await fetch(`/api/oauth/kakao?code=${code}`, {
-        method: 'POST',
-      });
-      const result = await res.json();
-      // TODO: 여기서 result 를 로컬스토리지에 저장하도록 수정
+      const result = await AuthApi.kakaoLogin(code);
+      login(result.info, result.tokens);
       router.push('/');
     } catch (e) {
       console.log(e);
