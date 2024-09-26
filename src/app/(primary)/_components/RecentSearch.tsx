@@ -7,10 +7,11 @@ import DeleteIcon from 'public/icon/close-subcoral.svg';
 
 interface Props {
   handleSearch: (keyword: string) => void;
+  keyValue?: string;
 }
 
-export default function RecentSearch({ handleSearch }: Props) {
-  const SearchHistory = new SearchHistoryService();
+export default function RecentSearch({ handleSearch, keyValue }: Props) {
+  const SearchHistory = new SearchHistoryService(keyValue);
   const [list, setList] = useState(SearchHistory.get());
 
   const handleDeleteAll = () => {

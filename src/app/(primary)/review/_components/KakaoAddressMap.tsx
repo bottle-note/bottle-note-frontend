@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import useModalStore from '@/store/modalStore';
 import { KakaoPlace } from '@/types/Review';
+import { SearchHistoryService } from '@/lib/SearchHistoryService';
+import RecentSearch from '../../_components/RecentSearch';
 
 interface Props {
   handleSaveData: (place: KakaoPlace, category?: string | null) => void;
@@ -9,16 +11,12 @@ interface Props {
 
 export default function KakaoAddressMap({ handleSaveData }: Props) {
   const { handleModalState } = useModalStore();
+  const searchHistoryKey = 'addressSearchHistory';
+  const SearchHistory = new SearchHistoryService(searchHistoryKey);
   const [searchText, setSearchText] = useState('');
+  const [isOnSearch, setIsOnSearch] = useState(true);
 
   useEffect(() => {
-    // if (window.kakao) {
-    //   const { kakao } = window;
-    //   if (!kakao.isInitialized()) {
-    //     kakao.init(process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID);
-    //   }
-    // }
-
     const script = document.createElement('script');
     script.async = true;
     script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID}&autoload=false&libraries=services`;
@@ -160,6 +158,7 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
         function placesSearchCB(data: any, status: any) {
           if (status === window.kakao.maps.services.Status.OK) {
             displayPlaces(data);
+            setIsOnSearch(false);
           } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
             alert('검색 결과가 존재하지 않습니다.');
           } else if (status === window.kakao.maps.services.Status.ERROR) {
@@ -184,6 +183,7 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
             return false;
           }
           ps.keywordSearch(keyword, placesSearchCB);
+          SearchHistory.save(keyword);
         }
 
         const searchForm = document.getElementById('form');
@@ -195,6 +195,10 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
     };
     script.addEventListener('load', onLoadKakaoMap);
   }, []);
+
+  const onSearch = (keyword: string) => {
+    setSearchText(keyword);
+  };
 
   return (
     <div className="p-5 min-h-screen">
@@ -223,6 +227,11 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
           </button>
         </form>
       </div>
+      {isOnSearch && (
+        <div className="h-full z-10 py-5">
+          <RecentSearch handleSearch={onSearch} keyValue={searchHistoryKey} />
+        </div>
+      )}
       <ul id="placesList" className="my-5 overflow-auto h-dvh" />
     </div>
   );

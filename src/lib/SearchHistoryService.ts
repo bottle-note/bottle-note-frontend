@@ -12,9 +12,9 @@ export class SearchHistoryService implements ISearchHistoryService {
 
   #key;
 
-  constructor(storage = Storage) {
+  constructor(key = 'searchHistory', storage = Storage) {
     this.#storage = storage;
-    this.#key = 'searchHistory';
+    this.#key = key;
   }
 
   get() {
