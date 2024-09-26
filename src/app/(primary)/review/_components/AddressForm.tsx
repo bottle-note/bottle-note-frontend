@@ -38,7 +38,13 @@ export default function AddressForm() {
                 {watch('streetAddress')}
               </p>
               <p className="text-10 text-mainDarkGray m-0 p-0">
-                <Link href={watch('mapUrl')}>지도보기</Link>
+                <Link
+                  href={watch('mapUrl')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  지도보기
+                </Link>
               </p>
             </div>
           )}

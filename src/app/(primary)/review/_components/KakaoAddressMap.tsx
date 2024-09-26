@@ -44,7 +44,7 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
           }
 
           if (place.place_url) {
-            itemStr += `<span class="url" onClick="location.href='${place.place_url}'">지도</span></div>`;
+            itemStr += `<span class="url" onClick="window.open('${place.place_url}', '_blank')">지도</span></div>`;
           }
 
           if (place.road_address_name) {

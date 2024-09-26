@@ -216,7 +216,13 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                     <br />
                     {data.reviewResponse?.mapUrl && (
                       <p className="text-10 text-subCoral m-0 p-0">
-                        <Link href={data.reviewResponse.mapUrl}>지도보기</Link>
+                        <Link
+                          href={data.reviewResponse.mapUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          지도보기
+                        </Link>
                       </p>
                     )}
                   </>
