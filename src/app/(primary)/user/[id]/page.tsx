@@ -11,22 +11,14 @@ import HistoryOverview from './_components/HistoryOverview';
 import SidebarHeader from './_components/SidebarHeader';
 import NavLayout from '../../_components/NavLayout';
 
-// TODO:
-// 2. 활동 내역 가져오는 api 연동
-// 3. 기타 버튼 액션과 관련된 api 연동
 export default function User({ params: { id } }: { params: { id: string } }) {
-  // FIXME: 활동 내역 가져오기 데이터로 변동
   const { popularList } = usePopularList();
   const [userData, setUserData] = useState<UserInfoApi | null>(null);
 
   useEffect(() => {
     (async () => {
-      try {
-        const res = await UserApi.getUserInfo({ userId: id });
-        setUserData(res);
-      } catch (e) {
-        console.error(e);
-      }
+      const res = await UserApi.getUserInfo({ userId: id });
+      setUserData(res);
     })();
   }, []);
 

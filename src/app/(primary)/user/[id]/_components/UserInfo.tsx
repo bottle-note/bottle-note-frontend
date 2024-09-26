@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/utils/useAuth';
 import ProfileImage from './ProfileImage';
 
 interface Props {
@@ -22,13 +22,14 @@ const UserInfo = ({
   currentId,
   nickName,
 }: Props) => {
-  const { data: session } = useSession();
+  const { getUserData } = useAuth();
   const [isMatchUser, setIsMatchUser] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    setIsMatchUser(session?.user.userId === Number(currentId));
-  }, [session]);
+    const userData = getUserData();
+    setIsMatchUser(userData?.userId === Number(currentId));
+  }, []);
 
   return (
     <section className="flex space-x-5.25 py-8.75 border-b border-t border-subCoral">
