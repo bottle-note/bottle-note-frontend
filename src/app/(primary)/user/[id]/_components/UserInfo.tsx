@@ -22,12 +22,11 @@ const UserInfo = ({
   currentId,
   nickName,
 }: Props) => {
-  const { getUserData } = useAuth();
+  const { userData } = useAuth();
   const [isMatchUser, setIsMatchUser] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const userData = getUserData();
     setIsMatchUser(userData?.userId === Number(currentId));
   }, []);
 

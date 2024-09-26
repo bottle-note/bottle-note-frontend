@@ -9,6 +9,8 @@ interface UseAuth {
   setToken: (arg: TokenData) => void;
   login: (userData: UserData, token: TokenData) => void;
   logout: () => void;
+  isLogin: boolean;
+  userData: UserData | null;
 }
 
 export function useAuth(): UseAuth {
@@ -54,5 +56,7 @@ export function useAuth(): UseAuth {
     setToken,
     login,
     logout,
+    isLogin: getIsLogin(),
+    userData: getUserData(),
   };
 }

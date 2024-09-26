@@ -14,9 +14,7 @@ export interface NavItem {
 
 function Navbar({ maxWidth }: { maxWidth: string }) {
   const pathname = usePathname();
-  const { getUserData } = useAuth();
-
-  const userData = getUserData();
+  const { userData } = useAuth();
 
   const navItems: NavItem[] = [
     { name: '홈', link: '/', icon: '/icon/home-outlined-subcoral.svg' },

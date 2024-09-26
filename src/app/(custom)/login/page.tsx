@@ -9,11 +9,11 @@ import LoginOptionDropdown from './_components/LoginOptionDropdown';
 
 export default function Login() {
   const router = useRouter();
-  const { getIsLogin } = useAuth();
+  const { isLogin } = useAuth();
   const [isOptionsShow, setIsOptionsShow] = useState(false);
 
   useEffect(() => {
-    if (getIsLogin()) {
+    if (isLogin) {
       router.replace('/');
     }
   }, []);
