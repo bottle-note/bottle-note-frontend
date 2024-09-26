@@ -15,7 +15,7 @@ export default function OauthKakaoCallbackPage() {
     try {
       const result = await AuthApi.kakaoLogin(code);
       login(result.info, result.tokens);
-      router.push('/');
+      router.push('/login');
     } catch (e) {
       console.log(e);
       router.push('/error');

@@ -3,21 +3,20 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSession } from '@/utils/useSession';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LoginOptionDropdown from './_components/LoginOptionDropdown';
 
 export default function Login() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { getIsLogin } = useSession();
   const [isOptionsShow, setIsOptionsShow] = useState(false);
 
   useEffect(() => {
-    if (session?.user) {
-      // TODO: 여기서 세션 데이터를 로컬스토리지에 저장하도록 변경
+    if (getIsLogin()) {
       router.replace('/');
     }
-  }, [session]);
+  }, []);
 
   // ----- kakao sdk login
   useEffect(() => {
