@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useSession } from '@/utils/useSession';
+import { useAuth } from '@/utils/useAuth';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LoginOptionDropdown from './_components/LoginOptionDropdown';
 
 export default function Login() {
   const router = useRouter();
-  const { getIsLogin } = useSession();
+  const { getIsLogin } = useAuth();
   const [isOptionsShow, setIsOptionsShow] = useState(false);
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { Storage } from '@/lib/Storage';
 import { TokenData, UserData } from '@/types/Auth';
 
-interface UseSession {
+interface UseAuth {
   getIsLogin: () => boolean;
   getUserData: () => UserData | null;
   getToken: () => TokenData | null;
@@ -11,7 +11,7 @@ interface UseSession {
   logout: () => void;
 }
 
-export function useSession(): UseSession {
+export function useAuth(): UseAuth {
   const getIsLogin = () => {
     return Boolean(Storage.getItem('userData'));
   };
