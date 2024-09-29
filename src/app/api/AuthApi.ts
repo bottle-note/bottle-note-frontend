@@ -27,10 +27,11 @@ export const AuthApi = {
       refreshToken,
     };
   },
-  async renewAccessTokenClientSide() {
+  async renewTokenClientSide(refreshToken: string) {
     try {
       const response = await fetch('/api/token/renew', {
         method: 'POST',
+        body: JSON.stringify(refreshToken),
       });
 
       if (!response.ok) {
@@ -38,9 +39,9 @@ export const AuthApi = {
         throw new Error(`HTTP error! message: ${body.errors.message}`);
       }
 
-      const newAccessToken = await response.json();
+      const { data: newTokens } = await response.json();
 
-      return newAccessToken;
+      return newTokens;
     } catch (e) {
       const error = e as Error;
 
@@ -89,7 +90,6 @@ export const AuthApi = {
   },
   async kakaoLogin(code: string | string[]): Promise<LoginReturn> {
     try {
-      // TODO: 타입 정리
       const res = await fetch(`/api/oauth/kakao?code=${code}`, {
         method: 'POST',
       });

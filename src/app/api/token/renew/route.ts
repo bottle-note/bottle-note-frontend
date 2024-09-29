@@ -1,42 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { decode, encode } from 'next-auth/jwt';
 import { AuthApi } from '../../AuthApi';
 
 export async function POST(req: NextRequest, res: NextResponse) {
-  const sessionCookie = process.env.NEXTAUTH_URL?.startsWith('https://')
-    ? '__Secure-next-auth.session-token'
-    : 'next-auth.session-token';
-  const session = req.cookies.get(sessionCookie);
-  // FIXME: JWT 토큰 타입에 access, refresh 토큰 데이터 타입 추가
-  const decoded: any = await decode({
-    token: session?.value,
-    secret: process.env.NEXTAUTH_SECRET ?? '',
-  });
-  const { refreshToken } = decoded;
+  const refreshToken = await req.json();
 
   try {
-    console.log('기존 세션', session);
     const newTokens = await AuthApi.renewAccessToken(refreshToken);
-    const newSessionToken = await encode({
-      secret: process.env.NEXTAUTH_SECRET as string,
-      ...session,
-      token: {
-        ...decoded,
-        ...newTokens,
-      },
-      maxAge: 30 * 24 * 60 * 60,
-    });
-
-    console.log('새 세션', newSessionToken);
-
-    cookies().set({
-      name: sessionCookie,
-      value: newSessionToken,
-    });
 
     return NextResponse.json(
-      { res, data: newTokens.accessToken },
+      { res, data: newTokens },
       {
         status: 200,
       },
