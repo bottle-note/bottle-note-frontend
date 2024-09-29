@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 import ProfileImage from './ProfileImage';
 
 interface Props {
@@ -22,7 +22,7 @@ const UserInfo = ({
   currentId,
   nickName,
 }: Props) => {
-  const { userData } = useAuth();
+  const { userData } = AuthService;
   const [isMatchUser, setIsMatchUser] = useState(false);
   const router = useRouter();
 

@@ -4,7 +4,7 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ReplyApi } from '@/app/api/ReplyApi';
 import List from '@/components/List/List';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 import Reply from './Reply';
 
 interface Props {
@@ -22,7 +22,7 @@ export default function ReplyList({
   isSubReplyShow,
   resetSubReplyToggle,
 }: Props) {
-  const { userData } = useAuth();
+  const { userData } = AuthService;
   const [subReplyList, setSubReplyList] = useState<SubReplyListApi | null>();
 
   const {

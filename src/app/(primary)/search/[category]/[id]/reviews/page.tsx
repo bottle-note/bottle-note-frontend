@@ -14,7 +14,7 @@ import { SORT_TYPE, SORT_ORDER } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
 import useModalStore from '@/store/modalStore';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 
 const SORT_OPTIONS = [
   { name: '인기도순', type: SORT_TYPE.POPULAR },
@@ -32,7 +32,7 @@ function Reviews() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
-  const { isLogin } = useAuth();
+  const { isLogin } = AuthService;
   const alcoholId = params?.id;
   const alcoholKorName = searchParams.get('name');
   const { handleLoginModal } = useModalStore();

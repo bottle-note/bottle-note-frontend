@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import useModalStore from '@/store/modalStore';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 import Toggle from './Toggle';
 
 interface Props {
@@ -17,7 +17,7 @@ const VisibilityToggle = ({
   initialStatus,
   handleNotLogin,
 }: Props) => {
-  const { isLogin } = useAuth();
+  const { isLogin } = AuthService;
   const { handleModalState } = useModalStore();
   const [isActive, setIsActive] = useState(initialStatus);
 

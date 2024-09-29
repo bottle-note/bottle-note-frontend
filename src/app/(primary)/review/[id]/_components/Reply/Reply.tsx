@@ -12,7 +12,7 @@ import OptionDropdown from '@/components/OptionDropdown';
 import { RootReply, SubReply } from '@/types/Reply';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 import userImg from 'public/user_img.png';
 
 interface Props {
@@ -36,7 +36,7 @@ function Reply({
   isSubReplyShow = false,
   resetSubReplyToggle,
 }: Props) {
-  const { isLogin, userData } = useAuth();
+  const { isLogin, userData } = AuthService;
   const { setValue } = useFormContext();
   const { state, handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);

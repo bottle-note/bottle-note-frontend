@@ -20,7 +20,7 @@ import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { shareOrCopy } from '@/utils/shareOrCopy';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 import FlavorTag from '../../../_components/FlavorTag';
 
 type Details = {
@@ -31,7 +31,7 @@ type Details = {
 function SearchCategory() {
   const router = useRouter();
   const params = useParams();
-  const { isLogin } = useAuth();
+  const { isLogin } = AuthService;
   const { category, id: alcoholId } = params;
   const { state, handleModalState, handleLoginModal } = useModalStore();
   const [data, setData] = useState<AlcoholDetails | null>(null);

@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import useModalStore from '@/store/modalStore';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 
 interface Props {
   reviewId: string | number;
@@ -28,7 +28,7 @@ const LikeBtn = ({
   likeIconColor = 'subcoral',
   size = 14,
 }: Props) => {
-  const { isLogin } = useAuth();
+  const { isLogin } = AuthService;
   const { handleModalState } = useModalStore();
 
   const handleClick = async () => {

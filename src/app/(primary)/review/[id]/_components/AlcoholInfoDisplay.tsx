@@ -7,7 +7,7 @@ import PickBtn from '@/app/(primary)/_components/PickBtn';
 import Label from '@/app/(primary)/_components/Label';
 import { truncStr } from '@/utils/truncStr';
 import type { AlcoholInfo } from '@/types/Review';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 
 interface Props {
   data: AlcoholInfo;
@@ -16,7 +16,7 @@ interface Props {
 
 function AlcoholInfoDisplay({ data, handleLogin }: Props) {
   const router = useRouter();
-  const { isLogin } = useAuth();
+  const { isLogin } = AuthService;
   const { isPicked: originalIsPicked } = data;
   const [isPicked, setIsPicked] = useState<boolean>(originalIsPicked);
 

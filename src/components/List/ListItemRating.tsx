@@ -5,7 +5,7 @@ import { RateAPI } from '@/types/Rate';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 import ItemInfo from './_components/ItemInfo';
 import ItemImage from './_components/ItemImage';
 import StarRating from '../StarRaiting';
@@ -23,7 +23,7 @@ const ListItemRating = ({ data }: Props) => {
     isPicked: initialIsPicked,
     alcoholId,
   } = data;
-  const { isLogin } = useAuth();
+  const { isLogin } = AuthService;
   const [rate, setRate] = useState(0);
   const [isPicked, setIsPicked] = useState(initialIsPicked);
   const { handleLoginModal } = useModalStore();

@@ -8,14 +8,14 @@ import OptionDropdown from '@/components/OptionDropdown';
 import { UserApi } from '@/app/api/UserApi';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
 
 export default function UserEditPage() {
   const router = useRouter();
-  const { userData } = useAuth();
+  const { userData } = AuthService;
   const { handleModalState } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
 

@@ -1,6 +1,6 @@
-import { getSession } from 'next-auth/react';
 import { AuthApi } from '@/app/api/AuthApi';
 import { ApiError } from './ApiError';
+import { AuthService } from '../lib/AuthService';
 
 type FetchWithAuth = (
   url: string,
@@ -13,13 +13,15 @@ export const fetchWithAuth: FetchWithAuth = async (
   options,
   retryCount = 0,
 ) => {
-  const session = await getSession();
+  const token = AuthService.getToken();
+
+  if (!token) throw new Error('No token');
 
   const defaultOptions = {
     ...options,
     headers: {
       ...options?.headers,
-      Authorization: `Bearer ${session?.user.accessToken}`,
+      Authorization: `Bearer ${token.accessToken}`,
       'Content-Type': 'application/json',
     },
   };

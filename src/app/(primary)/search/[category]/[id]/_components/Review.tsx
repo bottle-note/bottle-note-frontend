@@ -16,7 +16,7 @@ import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 import { deleteReview } from '@/lib/Review';
 import Modal from '@/components/Modal';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 import userImg from 'public/user_img.png';
 
 interface Props {
@@ -25,7 +25,7 @@ interface Props {
 
 function Review({ data }: Props) {
   const router = useRouter();
-  const { isLogin, userData } = useAuth();
+  const { isLogin, userData } = AuthService;
   const { isLikedByMe } = data;
   const { state, handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useBlockScroll } from '@/hooks/useBlockScroll';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 import Logo from 'public/icon/logo-text-subcoral.svg';
 import LogoWhite from 'public/icon/logo-text-white.svg';
 import Menu from 'public/icon/menu-subcoral.svg';
@@ -43,7 +43,7 @@ const Header = ({
 
 const SidebarHeader = () => {
   const route = useRouter();
-  const { logout } = useAuth();
+  const { logout } = AuthService;
   const { handleScroll } = useBlockScroll();
   const [isOpen, setIsOpen] = useState(false);
 

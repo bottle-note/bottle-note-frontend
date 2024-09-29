@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 
 export interface NavItem {
   name: string;
@@ -14,7 +14,7 @@ export interface NavItem {
 
 function Navbar({ maxWidth }: { maxWidth: string }) {
   const pathname = usePathname();
-  const { userData } = useAuth();
+  const { userData } = AuthService;
 
   const navItems: NavItem[] = [
     { name: '홈', link: '/', icon: '/icon/home-outlined-subcoral.svg' },

@@ -15,7 +15,7 @@ import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { deleteReview } from '@/lib/Review';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 interface Props {
@@ -26,7 +26,7 @@ interface Props {
 
 function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
   const router = useRouter();
-  const { userData, isLogin } = useAuth();
+  const { userData, isLogin } = AuthService;
   const { handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(data?.reviewResponse?.isLikedByMe);

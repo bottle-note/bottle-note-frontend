@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useFormContext, FieldValues, SubmitHandler } from 'react-hook-form';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 
 interface Props {
   textareaRef: React.MutableRefObject<HTMLTextAreaElement | null>;
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
-  const { isLogin } = useAuth();
+  const { isLogin } = AuthService;
   const { register, watch, handleSubmit, setValue } = useFormContext();
   const content = watch('content');
   const mentionName = watch('replyToReplyUserName');

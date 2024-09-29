@@ -3,13 +3,13 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthApi } from '@/app/api/AuthApi';
-import { useAuth } from '@/utils/useAuth';
+import { AuthService } from '@/lib/AuthService';
 
 export default function OauthKakaoCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const authCode = searchParams.get('code');
-  const { login } = useAuth();
+  const { login } = AuthService;
 
   const loginHandler = async (code: string | string[]) => {
     try {
