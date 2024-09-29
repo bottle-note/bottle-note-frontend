@@ -3,11 +3,11 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import Label from '@/app/(primary)/_components/Label';
 import { truncStr } from '@/utils/truncStr';
 import type { AlcoholInfo } from '@/types/Review';
+import { useAuth } from '@/utils/useAuth';
 
 interface Props {
   data: AlcoholInfo;
@@ -16,7 +16,7 @@ interface Props {
 
 function AlcoholInfoDisplay({ data, handleLogin }: Props) {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { isLogin } = useAuth();
   const { isPicked: originalIsPicked } = data;
   const [isPicked, setIsPicked] = useState<boolean>(originalIsPicked);
 
@@ -55,7 +55,7 @@ function AlcoholInfoDisplay({ data, handleLogin }: Props) {
               <div
                 className="text-10 flex"
                 onClick={() => {
-                  if (!session || !data.alcoholId) {
+                  if (!isLogin || !data.alcoholId) {
                     handleLogin();
                     return;
                   }

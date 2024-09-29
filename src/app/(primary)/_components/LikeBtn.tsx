@@ -1,9 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { useSession } from 'next-auth/react';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import useModalStore from '@/store/modalStore';
+import { useAuth } from '@/utils/useAuth';
 
 interface Props {
   reviewId: string | number;
@@ -28,11 +28,11 @@ const LikeBtn = ({
   likeIconColor = 'subcoral',
   size = 14,
 }: Props) => {
-  const { data: session } = useSession();
+  const { isLogin } = useAuth();
   const { handleModalState } = useModalStore();
 
   const handleClick = async () => {
-    if (!session) {
+    if (!isLogin) {
       handleNotLogin();
     } else {
       handleUpdateLiked();

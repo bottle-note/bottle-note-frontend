@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
 import { useFormContext } from 'react-hook-form';
 import { ReplyApi } from '@/app/api/ReplyApi';
 import { truncStr } from '@/utils/truncStr';
@@ -13,6 +12,7 @@ import OptionDropdown from '@/components/OptionDropdown';
 import { RootReply, SubReply } from '@/types/Reply';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
+import { useAuth } from '@/utils/useAuth';
 import userImg from 'public/user_img.png';
 
 interface Props {
@@ -36,7 +36,7 @@ function Reply({
   isSubReplyShow = false,
   resetSubReplyToggle,
 }: Props) {
-  const { data: session } = useSession();
+  const { isLogin, userData } = useAuth();
   const { setValue } = useFormContext();
   const { state, handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
@@ -143,7 +143,7 @@ function Reply({
               <button
                 className="cursor-pointer"
                 onClick={() => {
-                  if (session) setIsOptionShow(true);
+                  if (isLogin) setIsOptionShow(true);
                   else handleLoginModal();
                 }}
               >
@@ -203,7 +203,7 @@ function Reply({
         <OptionDropdown
           handleClose={() => setIsOptionShow(false)}
           options={
-            session?.user?.userId === data.userId
+            userData?.userId === data.userId
               ? [
                   // { name: '수정하기', type: 'MODIFY' },
                   { name: '삭제하기', type: 'DELETE' },
@@ -214,7 +214,7 @@ function Reply({
                 ]
           }
           handleOptionSelect={handleOptionSelect}
-          title={session?.user?.userId === data.userId ? '내 댓글' : '신고하기'}
+          title={userData?.userId === data.userId ? '내 댓글' : '신고하기'}
         />
       )}
       {state.isShowModal && <Modal />}

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { RootReply, SubReplyListApi, SubReply } from '@/types/Reply';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ReplyApi } from '@/app/api/ReplyApi';
 import List from '@/components/List/List';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
+import { useAuth } from '@/utils/useAuth';
 import Reply from './Reply';
 
 interface Props {
@@ -22,7 +22,7 @@ export default function ReplyList({
   isSubReplyShow,
   resetSubReplyToggle,
 }: Props) {
-  const { data: session } = useSession();
+  const { userData } = useAuth();
   const [subReplyList, setSubReplyList] = useState<SubReplyListApi | null>();
 
   const {
@@ -107,7 +107,7 @@ export default function ReplyList({
                     <Reply
                       data={comment}
                       getSubReplyList={getSubReplyList}
-                      isReviewUser={comment.userId === session?.user.userId}
+                      isReviewUser={comment.userId === userData?.userId}
                       reviewId={reviewId}
                       setIsRefetch={setIsRefetch}
                       isSubReplyShow={isSubReplyShow}
@@ -125,7 +125,7 @@ export default function ReplyList({
                               <Reply
                                 data={subComment}
                                 isReviewUser={
-                                  subComment.userId === session?.user.userId
+                                  subComment.userId === userData?.userId
                                 }
                                 reviewId={reviewId}
                                 setIsRefetch={setIsRefetch}

@@ -1,9 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { useSession } from 'next-auth/react';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import useModalStore from '@/store/modalStore';
+import { useAuth } from '@/utils/useAuth';
 
 interface Props {
   isPicked: boolean;
@@ -26,11 +26,11 @@ const PickBtn = ({
   iconColor = 'white',
   size = 14,
 }: Props) => {
-  const { data: session } = useSession();
+  const { isLogin } = useAuth();
   const { handleModalState } = useModalStore();
 
   const handleClick = async () => {
-    if (!session) {
+    if (!isLogin) {
       handleNotLogin();
     } else {
       handleUpdatePicked();

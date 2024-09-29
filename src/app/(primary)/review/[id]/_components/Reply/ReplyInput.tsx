@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { useFormContext, FieldValues, SubmitHandler } from 'react-hook-form';
+import { useAuth } from '@/utils/useAuth';
 
 interface Props {
   textareaRef: React.MutableRefObject<HTMLTextAreaElement | null>;
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
-  const { data: session } = useSession();
+  const { isLogin } = useAuth();
   const { register, watch, handleSubmit, setValue } = useFormContext();
   const content = watch('content');
   const mentionName = watch('replyToReplyUserName');
@@ -81,12 +81,12 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
         <div className="flex-grow flex items-center">
           <textarea
             placeholder={
-              session?.user
+              !isLogin
                 ? '댓글을 입력해 주세요'
                 : '로그인 후 댓글을 작성할 수 있어요:)'
             }
             className="flex-grow p-1 text-mainGray text-13 bg-[#f6f6f6] resize-none max-h-[50px] overflow-hidden focus:outline-none"
-            disabled={!session?.user}
+            disabled={!isLogin}
             onInput={handleInput}
             rows={1}
             ref={(e) => {
@@ -99,7 +99,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
         </div>
         <button
           className={`ml-2 px-4 py-1 ${content.length !== 0 ? 'text-subCoral' : 'text-mainGray'}`}
-          disabled={!session?.user}
+          disabled={!isLogin}
           onClick={handleSubmit(handleCreateReply)}
         >
           등록

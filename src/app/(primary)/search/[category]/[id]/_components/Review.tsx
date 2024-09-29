@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { Review as ReviewType } from '@/types/Review';
 import Label from '@/app/(primary)/_components/Label';
 import { truncStr } from '@/utils/truncStr';
@@ -17,6 +16,7 @@ import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 import { deleteReview } from '@/lib/Review';
 import Modal from '@/components/Modal';
+import { useAuth } from '@/utils/useAuth';
 import userImg from 'public/user_img.png';
 
 interface Props {
@@ -25,7 +25,7 @@ interface Props {
 
 function Review({ data }: Props) {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { isLogin, userData } = useAuth();
   const { isLikedByMe } = data;
   const { state, handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
@@ -176,7 +176,7 @@ function Review({ data }: Props) {
               />
               <p>{data.replyCount}</p>
             </div>
-            {data?.userId === session?.user?.userId && (
+            {data?.userId === userData?.userId && (
               <VisibilityToggle
                 initialStatus={data.status === 'PUBLIC'}
                 reviewId={data.reviewId}
@@ -189,7 +189,7 @@ function Review({ data }: Props) {
             <button
               className="cursor-pointer"
               onClick={() => {
-                if (session) setIsOptionShow(true);
+                if (isLogin) setIsOptionShow(true);
                 else handleLoginModal();
               }}
             >
@@ -207,7 +207,7 @@ function Review({ data }: Props) {
         <OptionDropdown
           handleClose={() => setIsOptionShow(false)}
           options={
-            session?.user?.userId === data.userId
+            userData?.userId === data.userId
               ? [
                   { name: '수정하기', type: 'MODIFY' },
                   { name: '삭제하기', type: 'DELETE' },
@@ -218,7 +218,7 @@ function Review({ data }: Props) {
                 ]
           }
           handleOptionSelect={handleOptionSelect}
-          title={session?.user?.userId === data.userId ? '내 리뷰' : '신고하기'}
+          title={userData?.userId === data.userId ? '내 리뷰' : '신고하기'}
         />
       )}
       {state.isShowModal && <Modal />}

@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { RateAPI } from '@/types/Rate';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
+import { useAuth } from '@/utils/useAuth';
 import ItemInfo from './_components/ItemInfo';
 import ItemImage from './_components/ItemImage';
 import StarRating from '../StarRaiting';
@@ -23,13 +23,13 @@ const ListItemRating = ({ data }: Props) => {
     isPicked: initialIsPicked,
     alcoholId,
   } = data;
-  const { data: session } = useSession();
+  const { isLogin } = useAuth();
   const [rate, setRate] = useState(0);
   const [isPicked, setIsPicked] = useState(initialIsPicked);
   const { handleLoginModal } = useModalStore();
 
   const handleRate = async (selectedRate: number) => {
-    if (!session) return handleLoginModal();
+    if (!isLogin) return handleLoginModal();
 
     setRate(selectedRate);
     return RateApi.postRating({

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import Label from '@/app/(primary)/_components/Label';
 import { truncStr } from '@/utils/truncStr';
 import Star from '@/components/Star';
@@ -16,6 +15,7 @@ import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { deleteReview } from '@/lib/Review';
+import { useAuth } from '@/utils/useAuth';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 interface Props {
@@ -26,7 +26,7 @@ interface Props {
 
 function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { userData, isLogin } = useAuth();
   const { handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(data?.reviewResponse?.isLikedByMe);
@@ -77,7 +77,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
       <section>
         <section className="mx-5 py-5 space-y-4 border-b border-mainGray/30 ">
           <article className="flex items-center justify-between">
-            <Link href={`/user/${session?.user?.userId}`}>
+            <Link href={`/user/${userData?.userId}`}>
               <div className="flex items-center space-x-1 ">
                 <div className="w-[1.9rem] h-[1.9rem] rounded-full overflow-hidden">
                   <Image
@@ -117,7 +117,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                 styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-9 rounded"
               />
             )}
-            {data.reviewResponse?.userId === session?.user?.userId && (
+            {data.reviewResponse?.userId === userData?.userId && (
               <VisibilityToggle
                 initialStatus={data.reviewResponse.status === 'PUBLIC'}
                 reviewId={data?.reviewResponse?.reviewId}
@@ -252,7 +252,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
           <button
             className="flex-1 flex text-center justify-center items-center space-x-1"
             onClick={() => {
-              if (!session) {
+              if (!isLogin) {
                 handleLogin();
               } else {
                 textareaRef.current?.focus();
@@ -297,7 +297,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
         <OptionDropdown
           handleClose={() => setIsOptionShow(false)}
           options={
-            session?.user?.userId === data.reviewResponse?.userId
+            userData?.userId === data.reviewResponse?.userId
               ? [
                   { name: '수정하기', type: 'MODIFY' },
                   { name: '삭제하기', type: 'DELETE' },
@@ -309,7 +309,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
           }
           handleOptionSelect={handleOptionSelect}
           title={
-            session?.user?.userId === data.reviewResponse?.userId
+            userData?.userId === data.reviewResponse?.userId
               ? '내 리뷰'
               : '신고하기'
           }

@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { Review as ReviewType } from '@/types/Review';
@@ -15,6 +14,7 @@ import { SORT_TYPE, SORT_ORDER } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
 import useModalStore from '@/store/modalStore';
+import { useAuth } from '@/utils/useAuth';
 
 const SORT_OPTIONS = [
   { name: '인기도순', type: SORT_TYPE.POPULAR },
@@ -32,7 +32,7 @@ function Reviews() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
-  const { data: session } = useSession();
+  const { isLogin } = useAuth();
   const alcoholId = params?.id;
   const alcoholKorName = searchParams.get('name');
   const { handleLoginModal } = useModalStore();
@@ -197,7 +197,7 @@ function Reviews() {
       <section className="px-5 fixed bottom-2 left-0 right-0">
         <Button
           onClick={() => {
-            if (!session || !alcoholId) {
+            if (!isLogin || !alcoholId) {
               handleLoginModal();
               return;
             }

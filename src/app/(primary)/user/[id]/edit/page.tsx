@@ -3,19 +3,19 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import OptionDropdown from '@/components/OptionDropdown';
 import { UserApi } from '@/app/api/UserApi';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
+import { useAuth } from '@/utils/useAuth';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
 
 export default function UserEditPage() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { userData } = useAuth();
   const { handleModalState } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
 
@@ -35,7 +35,7 @@ export default function UserEditPage() {
           isShowModal: true,
           mainText: '저장되었습니다.',
           handleConfirm: () => {
-            router.push(`/user/${session?.user.userId}`);
+            router.push(`/user/${userData?.userId}`);
           },
         });
       } catch (e) {
@@ -77,7 +77,7 @@ export default function UserEditPage() {
         />
         <div className="w-[104px] h-[104px] bg-white bg-opacity-60 border-subCoral border-2 rounded-full z-10 absolute top-[20%]" />
         <Image
-          src={session?.user.profile ?? ProfileDefaultImg}
+          src={userData?.profile ?? ProfileDefaultImg}
           alt="프로필 이미지"
           width={104}
           height={104}

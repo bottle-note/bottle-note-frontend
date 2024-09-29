@@ -8,6 +8,7 @@ export interface LoginReq {
 export interface UserData {
   sub: string;
   roles: 'ROLE_USER' | 'ROLE_ADMIN';
+  profile: string;
   userId: number;
   iat: number;
   exp: number;

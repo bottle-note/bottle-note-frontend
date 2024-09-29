@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
 import Star from '@/components/Star';
 import { truncStr } from '@/utils/truncStr';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
@@ -21,6 +20,7 @@ import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { shareOrCopy } from '@/utils/shareOrCopy';
+import { useAuth } from '@/utils/useAuth';
 import FlavorTag from '../../../_components/FlavorTag';
 
 type Details = {
@@ -31,7 +31,7 @@ type Details = {
 function SearchCategory() {
   const router = useRouter();
   const params = useParams();
-  const { data: session } = useSession();
+  const { isLogin } = useAuth();
   const { category, id: alcoholId } = params;
   const { state, handleModalState, handleLoginModal } = useModalStore();
   const [data, setData] = useState<AlcoholDetails | null>(null);
@@ -60,17 +60,17 @@ function SearchCategory() {
       const alcoholIdString = alcoholId.toString();
       fetchAlcoholDetails(alcoholIdString);
 
-      if (session) {
+      if (isLogin) {
         (async () => {
           const ratingResult = await RateApi.getUserRating(alcoholIdString);
           setRate(ratingResult.rating);
         })();
       }
     }
-  }, [alcoholId, session]);
+  }, [alcoholId, isLogin]);
 
   const handleRate = async (selectedRate: number) => {
-    if (!session) return handleLoginModal();
+    if (!isLogin) return handleLoginModal();
 
     setRate(selectedRate);
     return RateApi.postRating({
@@ -172,7 +172,7 @@ function SearchCategory() {
                       <button
                         className="text-10 flex"
                         onClick={() => {
-                          if (!session || !alcoholId) {
+                          if (!isLogin || !alcoholId) {
                             handleLoginModal();
                             return;
                           }
@@ -304,7 +304,7 @@ function SearchCategory() {
                   handleBeforeRouteChange: (
                     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
                   ) => {
-                    if (!session) {
+                    if (!isLogin) {
                       e.preventDefault();
                       handleLoginModal();
                     }

@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import useModalStore from '@/store/modalStore';
+import { useAuth } from '@/utils/useAuth';
 import Toggle from './Toggle';
 
 interface Props {
@@ -17,12 +17,12 @@ const VisibilityToggle = ({
   initialStatus,
   handleNotLogin,
 }: Props) => {
-  const { data: session } = useSession();
+  const { isLogin } = useAuth();
   const { handleModalState } = useModalStore();
   const [isActive, setIsActive] = useState(initialStatus);
 
   const handleToggle = async () => {
-    if (!session) {
+    if (!isLogin) {
       handleNotLogin();
     } else {
       const newStatus = !isActive;
