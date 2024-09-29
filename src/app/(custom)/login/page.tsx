@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { AuthService } from '@/lib/AuthService';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LoginOptionDropdown from './_components/LoginOptionDropdown';
 
 export default function Login() {
+  const { data: session } = useSession();
   const router = useRouter();
   const { isLogin } = AuthService;
   const [isOptionsShow, setIsOptionsShow] = useState(false);
@@ -17,6 +19,29 @@ export default function Login() {
       router.replace('/');
     }
   }, []);
+
+  useEffect(() => {
+    if (session) {
+      if (session.user) {
+        const { userId, email, profile, accessToken, refreshToken } =
+          session.user;
+
+        AuthService.login(
+          {
+            userId,
+            sub: email,
+            profile,
+          },
+          {
+            accessToken,
+            refreshToken,
+          },
+        );
+
+        router.replace('/');
+      }
+    }
+  }, [session]);
 
   // ----- kakao sdk login
   useEffect(() => {
