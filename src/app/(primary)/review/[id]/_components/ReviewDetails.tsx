@@ -16,6 +16,7 @@ import useModalStore from '@/store/modalStore';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { deleteReview } from '@/lib/Review';
 import { AuthService } from '@/lib/AuthService';
+import { Storage } from '@/lib/Storage';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 interface Props {
@@ -59,16 +60,18 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
       });
     } else if (option.type === 'MODIFY') {
       router.push(`/review/modify?reviewId=${data.reviewResponse?.reviewId}`);
-    } else if (option.type === 'REPORT') {
+    } else if (option.type === 'REVIEW_REPORT') {
+      // router.push(`/report?type=review`);
+      // API 준비 안됨
       handleModalState({
         isShowModal: true,
         mainText: '준비 중인 기능입니다.',
       });
     } else if (option.type === 'USER_REPORT') {
-      handleModalState({
-        isShowModal: true,
-        mainText: '준비 중인 기능입니다.',
-      });
+      router.push(`/report?type=user`);
+      if (data.reviewResponse?.userId !== undefined) {
+        Storage.setItem('reportUserId', data.reviewResponse?.userId.toString());
+      }
     }
   };
 
@@ -216,13 +219,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                     <br />
                     {data.reviewResponse?.mapUrl && (
                       <p className="text-10 text-subCoral m-0 p-0">
-                        <Link
-                          href={data.reviewResponse.mapUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          지도보기
-                        </Link>
+                        <Link href={data.reviewResponse.mapUrl}>지도보기</Link>
                       </p>
                     )}
                   </>
@@ -303,7 +300,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                   { name: '삭제하기', type: 'DELETE' },
                 ]
               : [
-                  { name: '리뷰 신고', type: 'REPORT' },
+                  { name: '리뷰 신고', type: 'REVIEW_REPORT' },
                   { name: '유저 신고', type: 'USER_REPORT' },
                 ]
           }

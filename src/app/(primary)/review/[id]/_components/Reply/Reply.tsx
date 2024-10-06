@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useFormContext } from 'react-hook-form';
 import { ReplyApi } from '@/app/api/ReplyApi';
 import { truncStr } from '@/utils/truncStr';
@@ -13,6 +14,7 @@ import { RootReply, SubReply } from '@/types/Reply';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
+import { Storage } from '@/lib/Storage';
 import userImg from 'public/user_img.png';
 
 interface Props {
@@ -36,6 +38,7 @@ function Reply({
   isSubReplyShow = false,
   resetSubReplyToggle,
 }: Props) {
+  const router = useRouter();
   const { isLogin, userData } = AuthService;
   const { setValue } = useFormContext();
   const { state, handleModalState, handleLoginModal } = useModalStore();
@@ -96,16 +99,18 @@ function Reply({
           deleteReply();
         },
       });
-    } else if (option.type === 'REPORT') {
+    } else if (option.type === 'REVIEW_REPORT') {
+      // router.push(`/report?type=review`);
+      // API 준비 안됨
       handleModalState({
         isShowModal: true,
         mainText: '준비 중인 기능입니다.',
       });
     } else if (option.type === 'USER_REPORT') {
-      handleModalState({
-        isShowModal: true,
-        mainText: '준비 중인 기능입니다.',
-      });
+      router.push(`/report?type=user`);
+      if (data.userId !== undefined) {
+        Storage.setItem('reportUserId', data.userId.toString());
+      }
     }
   };
 
@@ -209,7 +214,7 @@ function Reply({
                   { name: '삭제하기', type: 'DELETE' },
                 ]
               : [
-                  { name: '리뷰 신고', type: 'REPORT' },
+                  { name: '리뷰 신고', type: 'REVIEW_REPORT' },
                   { name: '유저 신고', type: 'USER_REPORT' },
                 ]
           }
