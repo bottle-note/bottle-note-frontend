@@ -7,14 +7,18 @@ interface SortOptionProps {
   options: { type: string; name: string }[];
   handleOptionCallback?: (type: string) => void;
   title?: string;
+  defaultLabel?: string;
 }
 
 const OptionSelect = ({
   options,
   handleOptionCallback,
   title,
+  defaultLabel,
 }: SortOptionProps) => {
-  const [selectedOption, setSelectedOption] = useState(options[0].name);
+  const [selectedOption, setSelectedOption] = useState(
+    defaultLabel || options[0].name,
+  );
   const [isDropDownShow, setIsDropDownShow] = useState(false);
 
   const handleSortOptionsShow = () => {
