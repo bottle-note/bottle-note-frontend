@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { AuthService } from '@/lib/AuthService';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LoginOptionDropdown from './_components/LoginOptionDropdown';
@@ -86,7 +86,7 @@ export default function Login() {
 
         <article className="flex flex-col gap-2">
           <SocialLoginBtn type="KAKAO" onClick={kakaoLoginHandler} />
-          <SocialLoginBtn type="APPLE" onClick={() => alert('준비중입니다.')} />
+          <SocialLoginBtn type="APPLE" onClick={() => signIn('apple')} />
         </article>
 
         <button
