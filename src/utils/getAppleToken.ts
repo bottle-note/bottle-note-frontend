@@ -4,8 +4,8 @@ import { SignJWT } from 'jose';
 export const getAppleToken = async () => {
   const key = `-----BEGIN PRIVATE KEY-----\n${process.env.APPLE_KEY}\n-----END PRIVATE KEY-----\n`;
 
-  const teamId = process.env.APPLE_TEAM_ID as string;
-  const appleId = process.env.APPLE_ID as string;
+  const teamId = process.env.APPLE_TEAM_ID!;
+  const appleId = process.env.APPLE_ID!;
 
   const appleToken = await new SignJWT({})
     .setAudience('https://appleid.apple.com')
