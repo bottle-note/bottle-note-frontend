@@ -19,7 +19,7 @@ const handler = NextAuth({
       clientSecret: `${process.env.NAVER_CLIENT_SECRET}`,
     }),
     AppleProvider({
-      clientId: process.env.APPLE_ID as string,
+      clientId: process.env.APPLE_CLIENT_ID as string,
       clientSecret: await getAppleToken(),
     }),
   ],
