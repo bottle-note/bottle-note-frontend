@@ -17,7 +17,6 @@ import Modal from '@/components/Modal';
 import useModalStore from '@/store/modalStore';
 import { deleteReview } from '@/lib/Review';
 import { AuthService } from '@/lib/AuthService';
-import { Storage } from '@/lib/Storage';
 import userImg from 'public/user_img.png';
 
 interface Props {
@@ -68,10 +67,7 @@ function Review({ data }: Props) {
         mainText: '준비 중인 기능입니다.',
       });
     } else if (option.type === 'USER_REPORT') {
-      router.push(`/report?type=user`);
-      if (data.userId !== undefined) {
-        Storage.setItem('reportUserId', data.userId.toString());
-      }
+      router.push(`/report?type=user&userId=${data.userId}`);
     }
   };
 

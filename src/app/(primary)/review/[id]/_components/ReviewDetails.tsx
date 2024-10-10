@@ -16,7 +16,6 @@ import useModalStore from '@/store/modalStore';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { deleteReview } from '@/lib/Review';
 import { AuthService } from '@/lib/AuthService';
-import { Storage } from '@/lib/Storage';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 interface Props {
@@ -68,10 +67,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
         mainText: '준비 중인 기능입니다.',
       });
     } else if (option.type === 'USER_REPORT') {
-      router.push(`/report?type=user`);
-      if (data.reviewResponse?.userId !== undefined) {
-        Storage.setItem('reportUserId', data.reviewResponse?.userId.toString());
-      }
+      router.push(`/report?type=user&userId=${data.reviewResponse?.userId}`);
     }
   };
 

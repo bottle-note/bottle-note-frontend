@@ -13,7 +13,6 @@ import { FormValues } from '@/types/Report';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import OptionSelect from '@/components/List/OptionSelect';
-import { Storage } from '@/lib/Storage';
 
 // comment, review는 API 나오면 맞춰서 수정 예정
 const REPORT_TYPE = {
@@ -99,6 +98,7 @@ export default function Report() {
   const searchParams = useSearchParams();
   const { state, handleModalState } = useModalStore();
   const type = searchParams.get('type');
+  const reportUserId = searchParams.get('userId');
   const reportTitle = REPORT_TYPE[type as 'review' | 'comment' | 'user'].title;
 
   const schema = yup.object({
@@ -129,6 +129,7 @@ export default function Report() {
   const onSave = async (data: any) => {
     // console.log('save', data);
 
+    // data type은 추후 report API 나오면 맞춰서 함수로 나누기
     try {
       let result;
       if (type === 'user') {
@@ -147,9 +148,6 @@ export default function Report() {
             });
             reset();
             router.back();
-            if (type === 'user') {
-              Storage.removeItem('reportUserId');
-            }
           },
         });
       }
@@ -163,11 +161,13 @@ export default function Report() {
       content: '',
       type: '',
     });
-
-    if (type === 'user') {
-      setValue('reportUserId', Number(Storage.getItem('reportUserId')));
-    }
   }, []);
+
+  useEffect(() => {
+    if (reportUserId) {
+      setValue('reportUserId', Number(reportUserId));
+    }
+  }, [reportUserId]);
 
   useEffect(() => {
     if (errors.content?.message || errors.type?.message) {
