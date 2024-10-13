@@ -1,18 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import { AuthService } from '@/lib/AuthService';
 import SocialLoginBtn from './_components/SocialLoginBtn';
-import LoginOptionDropdown from './_components/LoginOptionDropdown';
 
 export default function Login() {
   const { data: session } = useSession();
   const router = useRouter();
   const { isLogin } = AuthService;
-  const [isOptionsShow, setIsOptionsShow] = useState(false);
 
   useEffect(() => {
     if (isLogin) {
@@ -88,16 +86,6 @@ export default function Login() {
           <SocialLoginBtn type="KAKAO" onClick={kakaoLoginHandler} />
           <SocialLoginBtn type="APPLE" onClick={() => signIn('apple')} />
         </article>
-
-        <button
-          onClick={() => {
-            setIsOptionsShow(true);
-          }}
-        >
-          <p className="text-xs underline text-mainGray text-center">
-            다른 소셜 계정으로 <span className="font-bold">로그인</span>하기
-          </p>
-        </button>
       </section>
 
       <footer className="border-t border-mainCoral w-full">
@@ -105,10 +93,6 @@ export default function Login() {
           © Copyright 2024. Bottle Note. All rights reserved.
         </p>
       </footer>
-
-      {isOptionsShow && (
-        <LoginOptionDropdown handleClose={() => setIsOptionsShow(false)} />
-      )}
     </main>
   );
 }
