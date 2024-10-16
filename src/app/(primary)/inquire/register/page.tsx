@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import * as yup from 'yup';
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { ReportApi } from '@/app/api/ReportApi';
+import { InquireApi } from '@/app/api/InquireApi';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { Button } from '@/components/Button';
 import { FormValues } from '@/types/Inquire';
@@ -64,13 +64,13 @@ export default function InquireRegister() {
     // console.log('save', data);
 
     try {
-      const result = await ReportApi.registerUserReport(data);
+      const result = await InquireApi.registerInquire(data);
 
       if (result) {
         handleModalState({
           isShowModal: true,
           type: 'ALERT',
-          mainText: '성공적으로 문의되었습니다.',
+          mainText: '성공적으로 문의가 접수되었습니다.',
           handleConfirm: () => {
             handleModalState({
               isShowModal: false,
@@ -90,6 +90,8 @@ export default function InquireRegister() {
     reset({
       content: '',
       type: '',
+      images: null,
+      imageUrlList: null,
     });
   }, []);
 

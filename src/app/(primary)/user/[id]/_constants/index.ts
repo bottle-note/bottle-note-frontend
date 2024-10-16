@@ -6,7 +6,7 @@ export const SIDEBAR_MENUS = [
   },
   {
     text: '서비스 문의',
-    link: '/서비스-문의',
+    link: '/inquire',
   },
   {
     text: '이용약관',
