@@ -11,6 +11,7 @@ import { HISTORY_TYPES } from '@/constants/user';
 import { usePopularList } from '@/hooks/usePopularList';
 import { useTab } from '@/hooks/useTab';
 import { SORT_TYPE } from '@/types/common';
+import SearchBar from '@/components/SearchBar';
 
 export default function UserHistory() {
   const router = useRouter();
@@ -60,12 +61,11 @@ export default function UserHistory() {
             height={23}
           />
         </SubHeader.Left>
-        <SubHeader.Center textColor="text-subCoral">
-          마이페이지
-        </SubHeader.Center>
+        <SubHeader.Center textColor="text-subCoral">마이보틀</SubHeader.Center>
       </SubHeader>
 
-      <section className="pt-10 px-5 space-y-7.5">
+      <section className="pt-5 px-5 space-y-7.5">
+        <SearchBar placeholder="찾으시는 술이 있으신가요?" />
         <Tab currentTab={currentTab} handleTab={handleTab} />
 
         {/* TODO: 실제 데이터로 변동 */}
