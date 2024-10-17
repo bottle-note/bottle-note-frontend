@@ -11,7 +11,7 @@ import { HISTORY_TYPES } from '@/constants/user';
 import { usePopularList } from '@/hooks/usePopularList';
 import { useTab } from '@/hooks/useTab';
 import { SORT_TYPE } from '@/types/common';
-import SearchBar from '@/components/SearchBar';
+import SearchContainer from '@/app/(primary)/search/_components/SearchContainer';
 
 export default function UserHistory() {
   const router = useRouter();
@@ -65,7 +65,11 @@ export default function UserHistory() {
       </SubHeader>
 
       <section className="pt-5 px-5 space-y-7.5">
-        <SearchBar placeholder="찾으시는 술이 있으신가요?" />
+        <SearchContainer
+          handleSearchCallback={() => {}}
+          isWrapper={false}
+          placeholder="찾으시는 술이 있으신가요?"
+        />
         <Tab currentTab={currentTab} handleTab={handleTab} />
 
         {/* TODO: 실제 데이터로 변동 */}
