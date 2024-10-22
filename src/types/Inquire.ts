@@ -18,3 +18,15 @@ export interface InquirePostApi {
   message: string;
   responseAt: string;
 }
+
+export interface InquireList {
+  helpId: number;
+  content: string;
+  createAt: string;
+  helpStatus: 'WAITING' | 'SUCCESS' | 'REJECT' | 'DELETED';
+}
+
+export interface InquireListApi {
+  helpList: InquireList[];
+  totalCount: number;
+}
