@@ -9,6 +9,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { InquireApi } from '@/app/api/InquireApi';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { Button } from '@/components/Button';
+import { uploadImages } from '@/utils/S3Upload';
 import { FormValues } from '@/types/Inquire';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
@@ -60,11 +61,18 @@ export default function InquireRegister() {
     formState: { errors },
   } = formMethods;
 
-  const onSave = async (data: any) => {
-    // console.log('save', data);
+  const onSubmit = async (
+    data: FormValues,
+    imgUrl?: { order: number; viewUrl: string }[],
+  ) => {
+    const params = {
+      content: data.content,
+      type: data.type,
+      imageUrlList: imgUrl ?? null,
+    };
 
     try {
-      const result = await InquireApi.registerInquire(data);
+      const result = await InquireApi.registerInquire(params);
 
       if (result) {
         handleModalState({
@@ -83,6 +91,27 @@ export default function InquireRegister() {
       }
     } catch (error) {
       console.error('Failed to post report:', error);
+    }
+  };
+
+  const onUploadS3 = async (data: FormValues) => {
+    const images = data?.images?.map((file) => file.image);
+
+    if (images) {
+      try {
+        const PreSignedDBData = await uploadImages('review', images);
+        onSubmit(data, PreSignedDBData);
+      } catch (error) {
+        console.error('S3 업로드 에러:', error);
+      }
+    }
+  };
+
+  const onSave = (data: FormValues) => {
+    if (data.images?.length !== 0) {
+      onUploadS3(data);
+    } else {
+      onSubmit(data);
     }
   };
 
