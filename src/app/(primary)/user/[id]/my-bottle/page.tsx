@@ -93,10 +93,10 @@ export default function MyBottle({
 
   // FIXME: 타입 가드 추가
   useEffect(() => {
-    if (currentTab.id === 'all') return setCurrHistoryType('나의 활동');
-    if (currentTab.id === 'rating') return setCurrHistoryType('나의 별점');
-    if (currentTab.id === 'review') return setCurrHistoryType('나의 리뷰');
-    if (currentTab.id === 'pick') return setCurrHistoryType('나의 찜');
+    if (currentTab.id === 'all') return setCurrHistoryType('ALL');
+    if (currentTab.id === 'rating') return setCurrHistoryType('RATING');
+    if (currentTab.id === 'review') return setCurrHistoryType('REVIEW');
+    if (currentTab.id === 'pick') return setCurrHistoryType('PICK');
   }, [currentTab]);
 
   return (
@@ -156,6 +156,7 @@ export default function MyBottle({
                   <List.Item key={item.alcoholId} data={item} />
                 ))}
           </List>
+          <div ref={targetRef} />
         </section>
       </main>
     </Suspense>
