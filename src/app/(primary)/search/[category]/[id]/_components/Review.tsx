@@ -17,7 +17,7 @@ import Modal from '@/components/Modal';
 import useModalStore from '@/store/modalStore';
 import { deleteReview } from '@/lib/Review';
 import { AuthService } from '@/lib/AuthService';
-import userImg from 'public/user_img.png';
+import userImg from 'public/profile-default.svg';
 
 interface Props {
   data: ReviewType;
@@ -137,16 +137,17 @@ function Review({ data }: Props) {
               )}
             </Link>
           </p>
-          {/* 없을 때 이미지 안나오게 수정 */}
-          <div className="flex justify-end items-center">
-            <Image
-              className="w-[3.8rem] h-[3.8rem]"
-              src={data.reviewImageUrl || userImg}
-              alt="content_img"
-              width={60}
-              height={60}
-            />
-          </div>
+          {data.reviewImageUrl && (
+            <div className="flex justify-end items-center">
+              <Image
+                className="w-[3.8rem] h-[3.8rem]"
+                src={data.reviewImageUrl}
+                alt="content_img"
+                width={60}
+                height={60}
+              />
+            </div>
+          )}
         </div>
         <div className="flex justify-between text-9 text-mainGray">
           <div className="flex space-x-3">
