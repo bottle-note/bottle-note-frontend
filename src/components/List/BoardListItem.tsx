@@ -1,21 +1,22 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import Badge from '../Badge';
 import { formatDate } from '@/utils/formatDate';
+import Badge from '../Badge';
 
 interface Props {
   title: string;
   date: string;
   id: number;
+  hrefUrl: string;
   type?: 'WAITING' | 'SUCCESS' | 'REJECT' | 'DELETED';
 }
 
-function BoardListItem({ title, date, id, type }: Props) {
+function BoardListItem({ title, date, id, hrefUrl, type }: Props) {
   return (
     <Link
       className="border-b py-1 flex items-center justify-between"
       key={id}
-      href={`/announcement/${id}`}
+      href={hrefUrl}
     >
       <div>
         {type && <Badge type={type} />}

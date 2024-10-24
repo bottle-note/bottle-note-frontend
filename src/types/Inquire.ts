@@ -19,14 +19,31 @@ export interface InquirePostApi {
   responseAt: string;
 }
 
+type helpStatus = 'WAITING' | 'SUCCESS' | 'REJECT' | 'DELETED';
+
 export interface InquireList {
   helpId: number;
   content: string;
   createAt: string;
-  helpStatus: 'WAITING' | 'SUCCESS' | 'REJECT' | 'DELETED';
+  helpStatus: helpStatus;
 }
 
 export interface InquireListApi {
   helpList: InquireList[];
   totalCount: number;
+}
+
+export interface InquireDetailsApi {
+  helpId: number;
+  content: string;
+  helpType: string;
+  createAt: string;
+  statusType: helpStatus;
+  adminId: number;
+  lastModifyAt: string;
+  responseContent: string;
+  imageUrlList: {
+    order: number;
+    viewUrl: string;
+  }[];
 }

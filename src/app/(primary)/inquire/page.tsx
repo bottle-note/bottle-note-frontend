@@ -74,6 +74,7 @@ export default function Inquire() {
                     title={item.content}
                     date={item.createAt}
                     type={item.helpStatus}
+                    hrefUrl={`/inquire/${item.helpId}`}
                   />
                 ))}
           </List.Section>

@@ -4,6 +4,7 @@ import {
   InquirePostApi,
   InquireQueryParams,
   InquireListApi,
+  InquireDetailsApi,
 } from '@/types/Inquire';
 
 export const InquireApi = {
@@ -30,6 +31,18 @@ export const InquireApi = {
     }
 
     const result: ApiResponse<InquirePostApi> = await response;
+    return result.data;
+  },
+
+  async getInquireDetails(helpId: string | string[]) {
+    const response = await fetchWithAuth(`/bottle-api/help/${helpId}`);
+
+    if (response.errors.length !== 0) {
+      throw new Error('Failed to fetch data');
+    }
+
+    const result: ApiResponse<InquireDetailsApi> = await response;
+
     return result.data;
   },
 };
