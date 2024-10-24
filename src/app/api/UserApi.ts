@@ -1,4 +1,5 @@
-import { ApiResponse } from '@/types/common';
+import { AlcoholAPI } from '@/types/Alcohol';
+import { ApiResponse, MyBottleQueryParams } from '@/types/common';
 import { UserInfoApi } from '@/types/User';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
@@ -45,5 +46,41 @@ export const UserApi = {
     }> = response;
 
     return data;
+  },
+
+  async myBottle({
+    params,
+    userId,
+  }: {
+    params: MyBottleQueryParams;
+    userId: number;
+  }) {
+    const {
+      keyword,
+      regionId,
+      tabType,
+      sortType,
+      sortOrder,
+      cursor,
+      pageSize,
+    } = params;
+    const response = await fetchWithAuth(
+      `/bottle-api/my-page/${userId}/my-bottle?tabType=${tabType}&keyword=${decodeURI(keyword ?? '')}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    const result: ApiResponse<{
+      isMyPage: boolean;
+      totalCount: number;
+      myBottleList: (AlcoholAPI & { hasReviewByMe: boolean })[];
+      userId: number;
+    }> = response;
+
+    return result;
   },
 };
