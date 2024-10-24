@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
 
 interface Props {
@@ -10,41 +10,47 @@ interface Props {
 }
 
 function Badge({ type, icon, iconHeight = 10, iconWidth = 10 }: Props) {
-  const [name, setName] = useState('');
-  const [textColor, setTextColor] = useState('manGray');
-  const [borderColor, setBorderColor] = useState('mainGray');
-  const [bgColor, setBgColor] = useState('white');
-
-  useEffect(() => {
+  const getBadgeStyles = () => {
     switch (type) {
       case 'WAITING':
-        setName('대기중');
-        setTextColor('subCoral');
-        setBorderColor('subCoral');
-        break;
+        return {
+          name: '대기중',
+          textColor: 'subCoral',
+          borderColor: 'subCoral',
+          bgColor: 'white',
+        };
       case 'SUCCESS':
-        setName('처리 완료');
-        setTextColor('white');
-        setBorderColor('subCoral');
-        setBgColor('subCoral');
-        break;
+        return {
+          name: '처리 완료',
+          textColor: 'white',
+          borderColor: 'subCoral',
+          bgColor: 'subCoral',
+        };
       case 'REJECT':
-        setName('반려');
-        setTextColor('mainGray');
-        setBorderColor('mainGray');
-        break;
+        return {
+          name: '반려',
+          textColor: 'mainGray',
+          borderColor: 'mainGray',
+          bgColor: 'white',
+        };
       case 'DELETED':
-        setName('삭제');
-        setTextColor('mainGray');
-        setBorderColor('mainGray');
-        break;
+        return {
+          name: '삭제',
+          textColor: 'mainGray',
+          borderColor: 'mainGray',
+          bgColor: 'white',
+        };
       default:
-        setName('확인중');
-        setTextColor('mainGray');
-        setBorderColor('mainGray');
-        break;
+        return {
+          name: '확인중',
+          textColor: 'mainGray',
+          borderColor: 'mainGray',
+          bgColor: 'white',
+        };
     }
-  }, [type]);
+  };
+
+  const { name, textColor, borderColor, bgColor } = getBadgeStyles();
 
   return (
     <div
