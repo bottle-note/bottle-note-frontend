@@ -43,6 +43,8 @@ export default function MyBottle({
     sortOrder: SORT_ORDER.DESC,
     tabType: currHistoryType,
   };
+
+  // TODO: Implement useFilter
   const { state: filterState, handleFilter } = useFilter(initialState);
 
   const {
@@ -91,7 +93,6 @@ export default function MyBottle({
     { name: '댓글순', type: SORT_TYPE.REVIEW },
   ];
 
-  // FIXME: 타입 가드 추가
   useEffect(() => {
     if (currentTab.id === 'all') return setCurrHistoryType('ALL');
     if (currentTab.id === 'rating') return setCurrHistoryType('RATING');
