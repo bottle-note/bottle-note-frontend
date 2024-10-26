@@ -106,7 +106,7 @@ export default function Report() {
       .string()
       .min(10, '최소 10글자 이상 입력이 필요합니다.')
       .required('내용을 작성해주세요.'),
-    type: yup.string().required('문의사항을 선택해주세요.'),
+    type: yup.string().required('신고사항을 선택해주세요.'),
   });
 
   const userSchema = schema.shape({
@@ -219,7 +219,7 @@ export default function Report() {
           <OptionSelect
             options={REPORT_TYPE[type as 'review' | 'comment' | 'user'].options}
             title="신고하기"
-            defaultLabel="어떤 문의사항인가요?"
+            defaultLabel="어떤 신고사항인가요?"
             handleOptionCallback={(value) => {
               setValue('type', value);
             }}
