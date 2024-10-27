@@ -10,12 +10,14 @@ interface Props {
   type?: 'Link' | 'Search';
   handleSearch?: (value: string) => void;
   handleFocus?: (status: boolean) => void;
+  placeholder?: string;
 }
 
 export default function SearchBar({
   type = 'Search',
   handleSearch,
   handleFocus,
+  placeholder,
 }: Props) {
   const currSearchKeyword = useSearchParams().get('query');
   const [searchText, setSearchText] = useState<string>(currSearchKeyword ?? '');
@@ -46,7 +48,7 @@ export default function SearchBar({
         <Link href="/search" className="relative">
           <div className="w-full flex items-center bg-white rounded-lg h-10 pl-4 pr-12 hover:pointer">
             <p className="absolute t-0 text-mainCoral text-15 font-medium">
-              찾으시는 술이 있으신가요?
+              {placeholder || '찾으시는 술이 있으신가요?'}
             </p>
             <div className="w-6 absolute right-3 hover:pointer">
               <Image
@@ -62,8 +64,8 @@ export default function SearchBar({
         <>
           <input
             type="text"
-            className="w-full bg-white rounded-lg h-10 pl-4 pr-12 outline-none text-mainCoral placeholder-mainCoral text-15"
-            placeholder="어떤 술을 찾고 계신가요?"
+            className="w-full bg-white rounded-lg h-10 pl-4 pr-12 outline-none border border-mainCoral text-mainCoral placeholder-mainCoral text-15"
+            placeholder={placeholder || '어떤 술을 찾고 계신가요?'}
             value={searchText}
             onChange={(e) => {
               setSearchText(e.target.value);

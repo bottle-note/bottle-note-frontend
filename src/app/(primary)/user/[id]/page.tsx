@@ -55,7 +55,7 @@ export default function User({ params: { id } }: { params: { id: string } }) {
             data={{
               engName: 'HISTORY',
               korName: '활동 히스토리',
-              linkSrc: `/user/${id}/history?type=all`,
+              linkSrc: `/user/${id}/my-bottle?type=all`,
               icon: true,
             }}
           />

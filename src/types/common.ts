@@ -29,6 +29,7 @@ export const enum SORT_TYPE {
   RANDOM = 'RANDOM',
   BOTTLE_PRICE = 'BOTTLE_PRICE',
   GLASS_PRICE = 'GLASS_PRICE',
+  LATEST = 'LATEST',
 }
 
 export const enum SORT_ORDER {
@@ -47,6 +48,10 @@ export interface ListQueryParams {
   sortOrder?: SORT_ORDER;
   cursor?: number;
   pageSize?: number;
+}
+
+export interface MyBottleQueryParams extends ListQueryParams {
+  tabType: 'ALL' | 'REVIEW' | 'PICK' | 'RATING';
 }
 
 export type Category =
