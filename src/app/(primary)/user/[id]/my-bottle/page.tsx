@@ -119,9 +119,10 @@ export default function MyBottle({
 
         <SearchContainer
           handleSearchCallback={() => {}}
-          isWrapper={false}
           placeholder="찾으시는 술이 있으신가요?"
+          styleProps="p-5"
         />
+
         <section className="pt-5 px-5 space-y-7.5">
           <Tab currentTab={currentTab} handleTab={handleTab} />
 

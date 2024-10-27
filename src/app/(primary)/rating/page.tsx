@@ -81,9 +81,13 @@ export default function Rating() {
 
   return (
     <Suspense>
-      <main className="mb-24 w-full h-full">
-        <SearchContainer handleSearchCallback={handleSearchCallback} />
-        <section className="flex flex-col gap-7  p-5">
+      <main className="mb-24 w-full h-full relative">
+        <SearchContainer
+          handleSearchCallback={handleSearchCallback}
+          styleProps="px-5 py-10 bg-subCoral"
+        />
+
+        <section className="flex flex-col gap-7 p-5">
           <CategorySelector handleCategoryCallback={handleCategoryCallback} />
 
           <List
