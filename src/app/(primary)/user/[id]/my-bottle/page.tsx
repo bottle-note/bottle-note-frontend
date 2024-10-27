@@ -82,10 +82,6 @@ export default function MyBottle({
     router.replace(`?type=${currentTab.id}`);
   }, [currentTab]);
 
-  useEffect(() => {
-    console.log(alcoholList);
-  }, [alcoholList]);
-
   const SORT_OPTIONS = [
     { name: '인기도순', type: SORT_TYPE.POPULAR },
     { name: '별점순', type: SORT_TYPE.RATING },
@@ -121,12 +117,12 @@ export default function MyBottle({
           </SubHeader.Center>
         </SubHeader>
 
+        <SearchContainer
+          handleSearchCallback={() => {}}
+          isWrapper={false}
+          placeholder="찾으시는 술이 있으신가요?"
+        />
         <section className="pt-5 px-5 space-y-7.5">
-          <SearchContainer
-            handleSearchCallback={() => {}}
-            isWrapper={false}
-            placeholder="찾으시는 술이 있으신가요?"
-          />
           <Tab currentTab={currentTab} handleTab={handleTab} />
 
           <List
