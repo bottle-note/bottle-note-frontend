@@ -79,6 +79,7 @@ export default function MyBottle({
     handleFilter('tabType', selectedCategory);
   };
 
+  // FIXME: handleTab 과 handleCategoryCallback 통합하여 관리하도록 수정
   useEffect(() => {
     const selected = tabList.find((item) => item.id === historyType);
 
