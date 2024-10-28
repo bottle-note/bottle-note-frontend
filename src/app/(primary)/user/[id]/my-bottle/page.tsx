@@ -44,7 +44,6 @@ export default function MyBottle({
     tabType: currHistoryType,
   };
 
-  // TODO: Implement useFilter
   const { state: filterState, handleFilter } = useFilter(initialState);
 
   const {
@@ -72,10 +71,19 @@ export default function MyBottle({
     },
   });
 
+  const handleSearchCallback = (searchedKeyword: string) => {
+    handleFilter('keyword', searchedKeyword);
+  };
+
+  const handleCategoryCallback = (selectedCategory: typeof currHistoryType) => {
+    handleFilter('tabType', selectedCategory);
+  };
+
   useEffect(() => {
     const selected = tabList.find((item) => item.id === historyType);
 
     handleTab(selected?.id ?? 'all');
+    handleCategoryCallback(currHistoryType);
   }, [historyType]);
 
   useEffect(() => {
@@ -118,7 +126,7 @@ export default function MyBottle({
         </SubHeader>
 
         <SearchContainer
-          handleSearchCallback={() => {}}
+          handleSearchCallback={handleSearchCallback}
           placeholder="찾으시는 술이 있으신가요?"
           styleProps="p-5"
         />
@@ -137,14 +145,14 @@ export default function MyBottle({
             />
             <List.OptionSelect
               options={SORT_OPTIONS}
-              handleOptionCallback={(value) => console.log(value)}
+              handleOptionCallback={(value) => handleFilter('sortType', value)}
             />
             <List.OptionSelect
               options={REGIONS.map((region) => ({
                 type: String(region.regionId),
                 name: region.korName,
               }))}
-              handleOptionCallback={(value) => console.log(value)}
+              handleOptionCallback={(value) => handleFilter('regionId', value)}
             />
 
             {alcoholList &&
