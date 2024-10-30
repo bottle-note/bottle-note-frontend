@@ -50,9 +50,11 @@ export const ReviewApi = {
   },
 
   async getReviewDetails(reviewId: string | string[]) {
-    const response = await fetch(`/bottle-api/reviews/detail/${reviewId}`);
+    const response = await fetchWithAuth(
+      `/bottle-api/reviews/detail/${reviewId}`,
+    );
 
-    if (!response.ok) {
+    if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
 
@@ -60,7 +62,7 @@ export const ReviewApi = {
       alcoholInfo: any;
       reviewResponse: any;
       reviewImageList: any[];
-    }> = await response.json();
+    }> = await response;
 
     const formattedResult: ApiResponse<ReviewDetailsApi> = {
       ...result,
@@ -92,7 +94,6 @@ export const ReviewApi = {
   },
 
   async modifyReview(reviewId: string, params: ReviewQueryParams) {
-    // 주소 추가 후 타 적용 예정
     const response = await fetchWithAuth(`/bottle-api/reviews/${reviewId}`, {
       method: 'PATCH',
       body: JSON.stringify(params),
@@ -128,8 +129,12 @@ export const ReviewApi = {
       }),
     });
 
-    const result: ApiResponse<ReviewLikePutApi> = await response.data;
-    return result;
+    if (response.errors.length !== 0) {
+      throw new Error('Failed to fetch data');
+    }
+
+    const result: ApiResponse<ReviewLikePutApi> = await response;
+    return result.data;
   },
 
   async putVisibility(reviewId: string | number, status: 'PUBLIC' | 'PRIVATE') {
@@ -144,7 +149,7 @@ export const ReviewApi = {
       },
     );
 
-    const result: ApiResponse<ReviewVisibilityPatchApi> = await response.data;
-    return result;
+    const result: ApiResponse<ReviewVisibilityPatchApi> = await response;
+    return result.data;
   },
 };

@@ -123,14 +123,14 @@ export const AlcoholsApi = {
   },
 
   async getAlcoholDetails(alcoholId: string) {
-    const response = await fetch(`/bottle-api/alcohols/${alcoholId}`);
-    if (!response.ok) {
+    const response = await fetchWithAuth(`/bottle-api/alcohols/${alcoholId}`);
+
+    if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<AlcoholDetails> = await response.json();
-
-    return result.data;
+    const result: ApiResponse<AlcoholDetails> = await response.data;
+    return result;
   },
 
   async putPick(alcoholId: string | number, isPicked: boolean) {
@@ -141,6 +141,10 @@ export const AlcoholsApi = {
         isPicked: isPicked ? 'PICK' : 'UNPICK',
       }),
     });
+
+    if (response.errors.length !== 0) {
+      throw new Error('Failed to fetch data');
+    }
 
     const result: ApiResponse<PickPutApi> = await response.data;
     return result;

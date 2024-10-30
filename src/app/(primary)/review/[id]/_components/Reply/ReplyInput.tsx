@@ -81,7 +81,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
         <div className="flex-grow flex items-center">
           <textarea
             placeholder={
-              !isLogin
+              isLogin
                 ? '댓글을 입력해 주세요'
                 : '로그인 후 댓글을 작성할 수 있어요:)'
             }
