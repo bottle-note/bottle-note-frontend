@@ -168,7 +168,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
         {data.reviewResponse?.reviewTastingTag.length !== 0 && (
           <FlavorTag tagList={data.reviewResponse.reviewTastingTag} />
         )}
-        {(data.reviewResponse?.streetAddress ||
+        {(data.reviewResponse?.address ||
           (!!data.reviewResponse?.price && data.reviewResponse?.sizeType)) && (
           <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 ">
             {data.reviewResponse?.price && data.reviewResponse?.sizeType && (
@@ -197,7 +197,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                 </p>
               </div>
             )}
-            {data.reviewResponse?.streetAddress && (
+            {data.reviewResponse?.address && (
               <div className="flex items-start space-x-1">
                 <Image
                   src="/icon/placepoint-subcoral.svg"
@@ -211,7 +211,9 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                     <p className="font-semibold">
                       {data.reviewResponse?.locationName}
                     </p>
-                    {data.reviewResponse?.streetAddress}
+                    {data.reviewResponse?.address}
+                    <br />
+                    {data.reviewResponse?.detailAddress}
                     <br />
                     {data.reviewResponse?.mapUrl && (
                       <p className="text-10 text-subCoral m-0 p-0">
