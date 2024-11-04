@@ -4,6 +4,8 @@ import useModalStore from '@/store/modalStore';
 import { KakaoPlace } from '@/types/Review';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
 import RecentSearch from '../../_components/RecentSearch';
+import DeleteIcon from 'public/icon/close-brightgray.svg';
+import SearchIcon from 'public/icon/search-subcoral.svg';
 
 interface Props {
   handleSaveData: (place: KakaoPlace, category?: string | null) => void;
@@ -202,31 +204,35 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
 
   return (
     <div className="p-5 min-h-screen">
-      <div className="relative">
-        <form id="form">
-          <input
-            type="text"
-            id="keyword"
-            className="w-full bg-white rounded-lg h-10 pl-4 pr-12 text-mainDarkGray border-subCoral border outline-none placeholder-mainCoral text-15"
-            placeholder="도로명 주소 혹은 상호명 입력"
-            value={searchText}
-            onChange={(e) => {
-              setSearchText(e.target.value);
-            }}
-          />
+      <form id="form" className="relative flex">
+        <input
+          type="text"
+          id="keyword"
+          className="w-full bg-white rounded-lg h-10 pl-4 pr-12 text-mainDarkGray border-subCoral border outline-none placeholder-mainCoral text-15"
+          placeholder="도로명 주소 혹은 상호명 입력"
+          value={searchText}
+          onChange={(e) => {
+            setSearchText(e.target.value);
+          }}
+        />
+        {searchText.length > 0 && (
           <button
-            className="px-2 w-10 absolute top-0 right-1 h-full"
-            type="submit"
+            type="button"
+            onMouseDown={() => {
+              setSearchText('');
+            }}
+            className="absolute right-11 top-1/2 transform -translate-y-1/2"
           >
-            <Image
-              src="/icon/search-subcoral.svg"
-              alt="search button"
-              width={30}
-              height={10}
-            />
+            <Image src={DeleteIcon} alt="delete" />
           </button>
-        </form>
-      </div>
+        )}
+        <button
+          type="submit"
+          className="absolute right-2 top-1/2 transform -translate-y-1/2"
+        >
+          <Image src={SearchIcon} alt="search" />
+        </button>
+      </form>
       {isOnSearch && (
         <div className="h-full z-10 py-5">
           <RecentSearch handleSearch={onSearch} keyValue={searchHistoryKey} />
