@@ -3,11 +3,12 @@
 @tailwind utilities;
 
 @layer base {
-  input {
+  input,
+  textarea {
     @apply outline-none;
+    touch-action: manipulation;
   }
 }
-
 @layer components {
   .label-default {
     @apply bg-white text-subCoral border border-subCoral rounded-md py-1 px-3;

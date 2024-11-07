@@ -75,7 +75,8 @@ function ReviewModify() {
       tastingTagList: data.flavor_tags,
       locationInfo: {
         locationName: data.locationName,
-        streetAddress: data.streetAddress,
+        address: data.address,
+        detailAddress: data.detailAddress,
         category: data.category,
         mapUrl: data.mapUrl,
         latitude: data.latitude,
@@ -152,7 +153,8 @@ function ReviewModify() {
           imageUrlList: result.reviewImageList ?? [],
           rating: result.reviewResponse.rating,
           locationName: result.reviewResponse.locationName,
-          streetAddress: result.reviewResponse.streetAddress,
+          address: result.reviewResponse.address,
+          detailAddress: result.reviewResponse.detailAddress,
           mapUrl: result.reviewResponse.mapUrl,
         });
       }

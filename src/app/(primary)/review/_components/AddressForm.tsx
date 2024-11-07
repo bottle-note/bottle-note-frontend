@@ -7,7 +7,7 @@ import { useFormContext } from 'react-hook-form';
 import SearchAddress from './SearchAddress';
 
 export default function AddressForm() {
-  const { watch } = useFormContext();
+  const { watch, register } = useFormContext();
   const [searchModal, setSearchModal] = useState(false);
 
   const handleCloseModal = () => {
@@ -24,28 +24,37 @@ export default function AddressForm() {
             width={20}
             height={20}
           />
-          {!watch('streetAddress') ? (
+          {!watch('address') ? (
             <p className="text-10 text-mainDarkGray font-bold">
               이 술을 마셨을 때, 좋았던 장소가 있나요?{' '}
               <span className="text-mainGray font-normal">(선택)</span>
             </p>
           ) : (
             <div className="w-full">
-              <p className="text-10 text-mainDarkGray font-bold">
-                {watch('locationName')}
-              </p>
-              <p className="text-10 text-mainDarkGray">
-                {watch('streetAddress')}
-              </p>
-              <p className="text-10 text-mainDarkGray m-0 p-0">
-                <Link
-                  href={watch('mapUrl')}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  지도보기
-                </Link>
-              </p>
+              <div className="flex items-center space-x-2">
+                <p className="text-10 text-mainDarkGray font-bold">
+                  {watch('locationName')}
+                </p>
+                <p className="text-10 text-mainGray m-0 p-0">
+                  <Link
+                    href={watch('mapUrl')}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    지도보기
+                  </Link>
+                </p>
+              </div>
+              <p className="text-10 text-mainDarkGray">{watch('address')}</p>
+              <div className="border-b border-subCoral py-2 flex items-center">
+                <input
+                  type="text"
+                  placeholder="상세 주소를 입력하세요."
+                  className="text-10 font-[#BFBFBF] w-full text-mainDarkGray"
+                  maxLength={30}
+                  {...register('detailAddress')}
+                />
+              </div>
             </div>
           )}
         </div>
@@ -56,7 +65,7 @@ export default function AddressForm() {
           }}
         >
           <p className="text-mainGray font-normal text-10">
-            {watch('streetAddress') && '변경'}
+            {watch('address') && '변경'}
           </p>
           <Image
             src="/icon/arrow-right-subcoral.svg"

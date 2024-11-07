@@ -15,7 +15,7 @@ export default function SearchAddress({ handleCloseModal }: Props) {
 
   const saveAddress = (place: KakaoPlace, category?: string | null) => {
     setValue('locationName', place.place_name || null);
-    setValue('streetAddress', place.road_address_name || null);
+    setValue('address', place.road_address_name || place.address_name);
     setValue('category', category);
     setValue('mapUrl', place.place_url || null);
     setValue('longitude', place.x || null);

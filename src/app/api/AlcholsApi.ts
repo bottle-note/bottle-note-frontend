@@ -129,8 +129,8 @@ export const AlcoholsApi = {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<AlcoholDetails> = await response.data;
-    return result;
+    const result: ApiResponse<AlcoholDetails> = await response;
+    return result.data;
   },
 
   async putPick(alcoholId: string | number, isPicked: boolean) {

@@ -24,7 +24,7 @@ function ReviewRegister() {
   const searchParams = useSearchParams();
   const { state, handleModalState } = useModalStore();
   const alcoholId = searchParams.get('alcoholId') || '';
-  const [alcoholData, setAlcoholData] = useState<AlcoholDetails>();
+  const [alcoholData, setAlcoholData] = useState<AlcoholDetails | null>();
   const [initialRating, setInitialRating] = useState<number>(0);
 
   const schema = yup.object({
@@ -67,7 +67,9 @@ function ReviewRegister() {
       tastingTagList: data.flavor_tags,
       locationInfo: {
         locationName: data.locationName,
-        streetAddress: data.streetAddress,
+        zipCode: data.zipCode,
+        address: data.address,
+        detailAddress: data.detailAddress,
         category: data.category,
         mapUrl: data.mapUrl,
         latitude: data.latitude,
@@ -142,7 +144,9 @@ function ReviewRegister() {
       images: [],
       imageUrlList: null,
       locationName: null,
-      streetAddress: null,
+      address: null,
+      detailAddress: null,
+      zipCode: null,
       mapUrl: null,
       category: null,
       latitude: null,

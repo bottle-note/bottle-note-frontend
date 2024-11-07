@@ -99,7 +99,7 @@ export default function InquireRegister() {
 
     if (images) {
       try {
-        const PreSignedDBData = await uploadImages('review', images);
+        const PreSignedDBData = await uploadImages('inquire', images);
         onSubmit(data, PreSignedDBData);
       } catch (error) {
         console.error('S3 업로드 에러:', error);

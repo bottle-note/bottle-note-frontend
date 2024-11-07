@@ -31,6 +31,7 @@ export const CATEGORY_MENUS = {
 export const S3_URL_PATH = {
   review: 'review',
   userProfile: 'user/profile',
+  inquire: 'inquire',
 };
 
 export const REGIONS = [

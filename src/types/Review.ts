@@ -33,7 +33,9 @@ export interface FormValues {
       }[]
     | null;
   locationName?: string | null;
-  streetAddress?: string | null;
+  zipCode?: string | null;
+  address?: string | null;
+  detailAddress?: string | null;
   category?: string | null;
   mapUrl?: string | null;
   latitude?: string | null;
@@ -71,7 +73,9 @@ export interface ReviewDetailsApi {
     userProfileImage: string;
     rating: number;
     locationName?: string | null;
-    streetAddress?: string | null;
+    zipCode?: string | null;
+    address?: string | null;
+    detailAddress?: string | null;
     category?: string | null;
     mapUrl?: string | null;
     latitude?: string | null;
@@ -126,7 +130,9 @@ export interface ReviewQueryParams {
     | null;
   locationInfo: {
     locationName?: string | null;
-    streetAddress?: string | null;
+    zipCode?: string | null;
+    address?: string | null;
+    detailAddress?: string | null;
     category?: string | null;
     mapUrl?: string | null;
     latitude?: string | null;
