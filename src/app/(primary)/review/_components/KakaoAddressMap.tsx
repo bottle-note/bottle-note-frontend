@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import useModalStore from '@/store/modalStore';
 import { KakaoPlace } from '@/types/Review';
@@ -15,6 +15,8 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
   const { handleModalState } = useModalStore();
   const searchHistoryKey = 'addressSearchHistory';
   const SearchHistory = new SearchHistoryService(searchHistoryKey);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const keywordRef = useRef<HTMLInputElement | null>(null);
   const [searchText, setSearchText] = useState('');
   const [isOnSearch, setIsOnSearch] = useState(true);
 
@@ -173,10 +175,8 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
         }
 
         function searchPlaces() {
-          const keyword = (
-            document.getElementById('keyword') as HTMLInputElement
-          ).value;
-          if (!keyword.replace(/^\s+|\s+$/g, '')) {
+          const keyword = keywordRef.current?.value || '';
+          if (!keyword.trim()) {
             handleModalState({
               isShowModal: true,
               mainText: '도로명 주소 혹은 상호명을 입력해주세요:)',
@@ -200,44 +200,57 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
 
   const onSearch = (keyword: string) => {
     setSearchText(keyword);
+    if (keywordRef.current) {
+      keywordRef.current.value = keyword;
+    }
+    if (formRef.current) {
+      const event = new Event('submit', { bubbles: false, cancelable: true });
+      formRef.current.dispatchEvent(event);
+    }
   };
 
   return (
     <div className="p-5 min-h-screen">
-      <form id="form" className="relative flex">
-        <input
-          type="text"
-          id="keyword"
-          className="w-full bg-white rounded-lg h-10 pl-4 pr-12 text-mainDarkGray border-subCoral border outline-none placeholder-mainCoral text-15"
-          placeholder="도로명 주소 혹은 상호명 입력"
-          value={searchText}
-          onChange={(e) => {
-            setSearchText(e.target.value);
-          }}
-        />
-        {searchText.length > 0 && (
-          <button
-            type="button"
-            onMouseDown={() => {
-              setSearchText('');
+      <form id="form" ref={formRef} onSubmit={(e) => e.preventDefault()}>
+        <div className="relative flex">
+          <input
+            type="text"
+            id="keyword"
+            ref={keywordRef}
+            className="w-full bg-white rounded-lg h-10 pl-4 pr-12 text-mainDarkGray border-subCoral border outline-none placeholder-mainCoral text-15"
+            placeholder="도로명 주소 혹은 상호명 입력"
+            value={searchText}
+            onChange={(e) => {
+              setSearchText(e.target.value);
             }}
-            className="absolute right-11 top-1/2 transform -translate-y-1/2"
+          />
+          {searchText.length > 0 && (
+            <button
+              type="button"
+              onMouseDown={() => {
+                setSearchText('');
+                if (keywordRef.current) {
+                  keywordRef.current.value = '';
+                }
+              }}
+              className="absolute right-11 top-1/2 transform -translate-y-1/2"
+            >
+              <Image src={DeleteIcon} alt="delete" />
+            </button>
+          )}
+          <button
+            type="submit"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2"
           >
-            <Image src={DeleteIcon} alt="delete" />
+            <Image src={SearchIcon} alt="search" />
           </button>
-        )}
-        <button
-          type="submit"
-          className="absolute right-2 top-1/2 transform -translate-y-1/2"
-        >
-          <Image src={SearchIcon} alt="search" />
-        </button>
-      </form>
-      {isOnSearch && (
-        <div className="h-full z-10 py-5">
-          <RecentSearch handleSearch={onSearch} keyValue={searchHistoryKey} />
         </div>
-      )}
+        {isOnSearch && (
+          <div className="h-full z-10 py-5">
+            <RecentSearch handleSearch={onSearch} keyValue={searchHistoryKey} />
+          </div>
+        )}
+      </form>
       <ul id="placesList" className="my-5 overflow-auto h-dvh" />
     </div>
   );
