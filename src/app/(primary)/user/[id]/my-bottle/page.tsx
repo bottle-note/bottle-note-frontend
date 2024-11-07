@@ -92,10 +92,9 @@ export default function MyBottle({
   }, [currentTab]);
 
   const SORT_OPTIONS = [
-    { name: '인기도순', type: SORT_TYPE.POPULAR },
+    { name: '최신순', type: SORT_TYPE.LATEST },
     { name: '별점순', type: SORT_TYPE.RATING },
-    { name: '찜하기순', type: SORT_TYPE.PICK },
-    { name: '댓글순', type: SORT_TYPE.REVIEW },
+    { name: '리뷰순', type: SORT_TYPE.REVIEW },
   ];
 
   useEffect(() => {
