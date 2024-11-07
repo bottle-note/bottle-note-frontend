@@ -8,14 +8,14 @@ import RecentSearch from '../../_components/RecentSearch';
 
 interface Props {
   handleSearchCallback: (value: string) => void;
-  isWrapper?: boolean;
   placeholder?: string;
+  styleProps?: string;
 }
 
 function SearchContainer({
   handleSearchCallback,
-  isWrapper = true,
   placeholder,
+  styleProps,
 }: Props) {
   const { handleScroll } = useBlockScroll();
   const [isOnSearch, setIsOnSearch] = useState(false);
@@ -45,21 +45,13 @@ function SearchContainer({
 
   return (
     <>
-      {isWrapper ? (
-        <div className="px-5 pt-[76px] pb-6 bg-subCoral relative">
-          <SearchBar
-            handleSearch={onSearch}
-            handleFocus={(status) => setIsOnSearch(status)}
-            placeholder={placeholder}
-          />
-        </div>
-      ) : (
+      <div className={styleProps}>
         <SearchBar
           handleSearch={onSearch}
           handleFocus={(status) => setIsOnSearch(status)}
           placeholder={placeholder}
         />
-      )}
+      </div>
 
       {isOnSearch && (
         <div className="absolute w-full h-full z-10 p-5">

@@ -44,7 +44,6 @@ export default function MyBottle({
     tabType: currHistoryType,
   };
 
-  // TODO: Implement useFilter
   const { state: filterState, handleFilter } = useFilter(initialState);
 
   const {
@@ -72,25 +71,30 @@ export default function MyBottle({
     },
   });
 
+  const handleSearchCallback = (searchedKeyword: string) => {
+    handleFilter('keyword', searchedKeyword);
+  };
+
+  const handleCategoryCallback = (selectedCategory: typeof currHistoryType) => {
+    handleFilter('tabType', selectedCategory);
+  };
+
+  // FIXME: handleTab 과 handleCategoryCallback 통합하여 관리하도록 수정
   useEffect(() => {
     const selected = tabList.find((item) => item.id === historyType);
 
     handleTab(selected?.id ?? 'all');
+    handleCategoryCallback(currHistoryType);
   }, [historyType]);
 
   useEffect(() => {
     router.replace(`?type=${currentTab.id}`);
   }, [currentTab]);
 
-  useEffect(() => {
-    console.log(alcoholList);
-  }, [alcoholList]);
-
   const SORT_OPTIONS = [
-    { name: '인기도순', type: SORT_TYPE.POPULAR },
+    { name: '최신순', type: SORT_TYPE.LATEST },
     { name: '별점순', type: SORT_TYPE.RATING },
-    { name: '찜하기순', type: SORT_TYPE.PICK },
-    { name: '댓글순', type: SORT_TYPE.REVIEW },
+    { name: '리뷰순', type: SORT_TYPE.REVIEW },
   ];
 
   useEffect(() => {
@@ -121,12 +125,13 @@ export default function MyBottle({
           </SubHeader.Center>
         </SubHeader>
 
+        <SearchContainer
+          handleSearchCallback={handleSearchCallback}
+          placeholder="찾으시는 술이 있으신가요?"
+          styleProps="p-5"
+        />
+
         <section className="pt-5 px-5 space-y-7.5">
-          <SearchContainer
-            handleSearchCallback={() => {}}
-            isWrapper={false}
-            placeholder="찾으시는 술이 있으신가요?"
-          />
           <Tab currentTab={currentTab} handleTab={handleTab} />
 
           <List
@@ -140,14 +145,14 @@ export default function MyBottle({
             />
             <List.OptionSelect
               options={SORT_OPTIONS}
-              handleOptionCallback={(value) => console.log(value)}
+              handleOptionCallback={(value) => handleFilter('sortType', value)}
             />
             <List.OptionSelect
               options={REGIONS.map((region) => ({
                 type: String(region.regionId),
                 name: region.korName,
               }))}
-              handleOptionCallback={(value) => console.log(value)}
+              handleOptionCallback={(value) => handleFilter('regionId', value)}
             />
 
             {alcoholList &&

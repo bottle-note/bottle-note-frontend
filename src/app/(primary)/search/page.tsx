@@ -84,7 +84,10 @@ export default function Search() {
   return (
     <Suspense>
       <main className="mb-24 w-full h-full">
-        <SearchContainer handleSearchCallback={handleSearchCallback} />
+        <SearchContainer
+          handleSearchCallback={handleSearchCallback}
+          styleProps="px-5 py-10 bg-subCoral"
+        />
 
         <section className="flex flex-col gap-7 p-5">
           <CategorySelector handleCategoryCallback={handleCategoryCallback} />
