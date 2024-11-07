@@ -3,9 +3,9 @@ import Image from 'next/image';
 import useModalStore from '@/store/modalStore';
 import { KakaoPlace } from '@/types/Review';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
-import RecentSearch from '../../_components/RecentSearch';
 import DeleteIcon from 'public/icon/close-brightgray.svg';
 import SearchIcon from 'public/icon/search-subcoral.svg';
+import RecentSearch from '../../_components/RecentSearch';
 
 interface Props {
   handleSaveData: (place: KakaoPlace, category?: string | null) => void;
