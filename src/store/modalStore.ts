@@ -24,6 +24,7 @@ interface ModalStore {
   state: ModalState;
   loginState: LoginModalState;
   handleModalState: (state: ParcialModalState) => void;
+  handleLoginState: (state: boolean) => void;
   handleCloseModal: () => void;
   handleLoginModal: () => void;
 }
@@ -43,6 +44,8 @@ const useModalStore = create<ModalStore>((set) => ({
   loginState: {
     isShowLoginModal: false,
   },
+  handleLoginState: (newState) =>
+    set({ loginState: { isShowLoginModal: newState } }),
   handleModalState: (newState) =>
     set((state) => ({
       state: {
