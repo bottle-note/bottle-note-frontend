@@ -1,3 +1,5 @@
+import { AuthService } from '@/lib/AuthService';
+import useModalStore from '@/store/modalStore';
 import { LoginReq, LoginReturn } from '@/types/Auth';
 
 export const AuthApi = {
@@ -35,7 +37,16 @@ export const AuthApi = {
       });
 
       if (!response.ok) {
+        const statusCode = response.status;
         const body = await response.json();
+
+        if (statusCode === 400) {
+          AuthService.logout();
+
+          const { handleLoginState } = useModalStore.getState();
+          return handleLoginState(true);
+        }
+
         throw new Error(`HTTP error! message: ${body.errors.message}`);
       }
 
@@ -46,44 +57,6 @@ export const AuthApi = {
       const error = e as Error;
 
       console.error(
-        `토큰 업데이트 도중 에러가 발생했습니다. 사유: ${error.message}`,
-      );
-    }
-  },
-  async renewAccessToken(refreshToken: string) {
-    if (!refreshToken) throw new Error('리프레시 토큰이 존재하지 않습니다.');
-
-    try {
-      const response = await fetch(`${process.env.SERVER_URL}/oauth/reissue`, {
-        method: 'POST',
-        headers: {
-          'refresh-token': refreshToken,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const body = await response.json();
-        throw new Error(`HTTP error! message: ${body.errors.message}`);
-      }
-
-      const cookie: string = response.headers.getSetCookie()[0] ?? '';
-      const newRefreshToken = (
-        cookie
-          .split(';')
-          .find((item) => item.trim().startsWith('refresh-token=')) as string
-      ).split('=')[1];
-      const { data } = await response.json();
-
-      return {
-        accessToken: data.accessToken,
-        refreshToken: newRefreshToken,
-      };
-    } catch (e) {
-      const error = e as Error;
-      console.error(error.message);
-
-      throw new Error(
         `토큰 업데이트 도중 에러가 발생했습니다. 사유: ${error.message}`,
       );
     }

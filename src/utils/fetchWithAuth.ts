@@ -1,4 +1,5 @@
 import { AuthApi } from '@/app/api/AuthApi';
+import useModalStore from '@/store/modalStore';
 import { ApiError } from './ApiError';
 import { AuthService } from '../lib/AuthService';
 
@@ -15,7 +16,11 @@ export const fetchWithAuth: FetchWithAuth = async (
 ) => {
   const token = AuthService.getToken();
 
-  if (!token) throw new Error('No token');
+  if (!token) {
+    AuthService.logout();
+    const { handleLoginState } = useModalStore.getState();
+    return handleLoginState(true);
+  }
 
   const defaultOptions = {
     ...options,
