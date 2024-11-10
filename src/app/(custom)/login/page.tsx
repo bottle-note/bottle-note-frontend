@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import { AuthService } from '@/lib/AuthService';
 import SocialLoginBtn from './_components/SocialLoginBtn';
+import Logo from 'public/icon/logo-white.svg';
+import LogoText from 'public/icon/logo-text-white.svg';
 
 export default function Login() {
   const { data: session } = useSession();
@@ -69,14 +71,12 @@ export default function Login() {
   };
 
   return (
-    <main className="w-full h-[100vh] flex flex-col justify-end items-center bg-bgGray p-5">
+    <main className="w-full h-[100vh] flex flex-col justify-end items-center bg-subCoral p-5">
       <section className="shrink-0 flex-1 flex">
-        <Image
-          src="bottle_note_logo.svg"
-          width={140}
-          height={200}
-          alt="bottle-note-logo"
-        />
+        <div className="flex flex-col items-center justify-center">
+          <Image src={Logo} alt="bottle-note-logo" />
+          <Image src={LogoText} alt="bottle-note-logo" />
+        </div>
       </section>
 
       <section className="flex flex-col gap-5 pb-5">
