@@ -1,0 +1,62 @@
+name: Deploy Workflow
+
+on:
+  push:
+    branches:
+      - dev-deploy-check
+  pull_request:
+    types: [ closed ]
+    branches:
+      - deploy
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      ## 원격 환경에 코드 복사
+      - name: copy project # ssh key를 이용해 현재 푸시된 소스를 서버에 복사한다.
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete # rsync 명령어 옵션
+          remote_path: /home/bottlenote/app/bottle-note-front-server
+          remote_host: ${{ secrets.DEV_SERVER_IP }}
+          remote_port: ${{ secrets.DEV_SERVER_HOST }}
+          remote_user: bottlenote
+          remote_key: ${{ secrets.DEV_SSH_KEY }}
+
+      ## deploy setup
+      - name: deploy setup and gradle build
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEV_SERVER_IP }}
+          port: ${{ secrets.DEV_SERVER_HOST }}
+          username: bottlenote
+          key: ${{ secrets.DEV_SSH_KEY }}
+          script: |
+            cd /home/bottlenote/app/bottle-note-front-server
+            touch  /home/bottlenote/app/bottle-note-front-server/.env
+            echo "${{ secrets.ENV }}" > .env  
+            chmod +x gradlew
+            ./gradlew build
+
+      - name: docker compose up
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEV_SERVER_IP }}
+          port: ${{ secrets.DEV_SERVER_HOST }}
+          username: bottlenote
+          key: ${{ secrets.DEV_SSH_KEY }}
+          script: |
+            cd /home/bottlenote/app/bottle-note-front-server
+            docker stop bottle-note-front-server || true
+            docker rm bottle-note-front-server || true
+            docker compose up -d --no-deps --build bottle-note-front-server
+            docker image prune -f
