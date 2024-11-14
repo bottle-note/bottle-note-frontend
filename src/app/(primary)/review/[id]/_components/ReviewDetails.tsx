@@ -125,7 +125,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
             )}
           </article>
           {data.reviewImageList && (
-            <div className="whitespace-nowrap overflow-x-auto flex space-x-2">
+            <div className="whitespace-nowrap overflow-x-auto flex space-x-2 scrollbar-hide">
               {data.reviewImageList.map((imgData) => (
                 <div
                   className="relative w-[147px] h-[147px]"

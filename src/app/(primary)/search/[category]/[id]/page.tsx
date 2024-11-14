@@ -239,7 +239,7 @@ function SearchCategory() {
                     {data.friendsInfo.followerCount}
                   </div>
                 </div>
-                <div className="whitespace-nowrap overflow-x-auto flex space-x-5">
+                <div className="whitespace-nowrap overflow-x-auto flex space-x-5 scrollbar-hide">
                   {data.friendsInfo.friends?.map((user) => (
                     <div
                       key={user.userId}
