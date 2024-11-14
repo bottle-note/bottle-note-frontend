@@ -3,7 +3,7 @@ name: Deploy Workflow
 on:
   push:
     branches:
-      - dev-deploy-check
+      - dev-depoly-check
   pull_request:
     types: [ closed ]
     branches:
