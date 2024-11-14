@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  input,
+  textarea {
+    @apply outline-none;
+    touch-action: manipulation;
+  }
+}
+@layer components {
+  .label-default {
+    @apply bg-white text-subCoral border border-subCoral rounded-md py-1 px-3;
+  }
+
+  .label-selected {
+    @apply bg-subCoral text-white border border-subCoral rounded-md py-1 px-3;
+  }
+
+  .label-disabled {
+    @apply bg-bgGray text-white border border-bgGray rounded-md py-1 px-3;
+  }
+
+  .tab-default {
+    @apply text-subCoral/50 border-subCoral/50 border-b;
+  }
+
+  .tab-selected {
+    @apply text-subCoral border-subCoral border-b;
+  }
+
+  .line-border {
+    @apply border-t border-mainGray/30 my-3;
+  }
+
+  .modal-mainText {
+    @apply text-15 text-subCoral font-medium whitespace-pre-wrap;
+  }
+
+  .modal-subText {
+    @apply text-13 text-mainDarkGray whitespace-pre-wrap;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

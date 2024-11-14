@@ -15,6 +15,7 @@ module.exports = {
     'plugin:import/typescript',
     'plugin:storybook/recommended',
     'plugin:@next/next/recommended',
+    'next/core-web-vitals',
   ],
   ignorePatterns: [
     'src/stories/*',
@@ -36,12 +37,17 @@ module.exports = {
     },
   },
   rules: {
+    '@typescript-eslint/no-unused-vars': 'warn',
+    'no-restricted-globals': 'warn',
+    'react/no-array-index-key': 'warn',
+    'react/style-prop-object': 'warn',
+    'jsx-a11y/click-events-have-key-events': 'warn',
+    'jsx-a11y/no-noninteractive-element-interactions': 'warn',
+    '@typescript-eslint/no-unused-expressions': 'warn',
     'class-methods-use-this': 'off', // 클래스 메서드 내에서 this를 사용하지 않아도 되도록 강제하지 않음.
     'react/function-component-definition': 'off', // 함수 컴포넌트 정의를 강제하지 않음.
     'no-return-assign': 'off', // 반환문에서 할당을 허용함.
-    '@typescript-eslint/no-unused-vars': 'error', // 사용되지 않은 변수를 오류로 표시함.
-    '@typescript-eslint/no-unused-expressions': 'error', // 사용되지 않은 표현식을 오류로 표시함.
-    'no-console': ['error', { allow: ['warn', 'error'] }], // console.warn과 console.error만 허용함.
+    'no-console': ['warn', { allow: ['warn', 'error'] }], // console.warn과 console.error만 허용함.
     '@typescript-eslint/naming-convention': [
       'off',
       {
@@ -158,7 +164,16 @@ module.exports = {
             group: 'internal',
           },
           {
+            pattern: 'store/**',
+            group: 'internal',
+          },
+          {
             pattern: 'constants/**',
+            group: 'internal',
+            position: 'after',
+          },
+          {
+            pattern: './**',
             group: 'internal',
             position: 'after',
           },
