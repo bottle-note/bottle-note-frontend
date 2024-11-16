@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import { AuthService } from '@/lib/AuthService';
+import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
@@ -71,6 +72,24 @@ export default function Login() {
 
   return (
     <main className="w-full h-[100vh] flex flex-col justify-end items-center bg-subCoral p-5">
+      <section className="w-full">
+        <SubHeader bgColor="bg-subCoral">
+          <SubHeader.Left
+            onClick={() => {
+              router.push('/');
+            }}
+          >
+            <Image
+              src="/icon/arrow-left-white.svg"
+              alt="arrowIcon"
+              width={23}
+              height={23}
+            />
+          </SubHeader.Left>
+          <SubHeader.Center textColor="text-white">로그인</SubHeader.Center>
+        </SubHeader>
+      </section>
+
       <section className="shrink-0 flex-1 flex">
         <div className="flex flex-col items-center justify-center">
           <Image src={LogoWhite} alt="bottle-note-logo" />

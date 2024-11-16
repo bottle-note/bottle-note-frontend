@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import App from 'next/app';
 import KakaoLogo from 'public/icon/kakao-logo.svg';
 import AppleLogo from 'public/icon/apple-logo.svg';
 
