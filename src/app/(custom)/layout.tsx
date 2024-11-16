@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="bg-white flex flex-col w-full mx-auto max-w-[400px] min-h-screen">
+    <div className="bg-white flex flex-col w-full mx-auto min-h-screen">
       <main className="flex-1 overflow-y-auto">{children}</main>
     </div>
   );
