@@ -6,8 +6,7 @@ import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import { AuthService } from '@/lib/AuthService';
 import SocialLoginBtn from './_components/SocialLoginBtn';
-import Logo from 'public/icon/logo-white.svg';
-import LogoText from 'public/icon/logo-text-white.svg';
+import LogoWhite from 'public/bottle_note_logo_white.svg';
 
 export default function Login() {
   const { data: session } = useSession();
@@ -74,22 +73,27 @@ export default function Login() {
     <main className="w-full h-[100vh] flex flex-col justify-end items-center bg-subCoral p-5">
       <section className="shrink-0 flex-1 flex">
         <div className="flex flex-col items-center justify-center">
-          <Image src={Logo} alt="bottle-note-logo" />
-          <Image src={LogoText} alt="bottle-note-logo" />
+          <Image src={LogoWhite} alt="bottle-note-logo" />
         </div>
       </section>
 
-      <section className="flex flex-col gap-5 pb-5">
-        <p className="text-13 text-subCoral font-bold whitespace-pre text-center">{`나의 입맛에 맞는 딱 한 병을\n찾아가는 여정 노트`}</p>
+      <section className="flex flex-col gap-5 pb-5 w-full">
+        <p className="text-13 text-white font-bold whitespace-pre text-center">{`나의 입맛에 맞는 딱 한 병을\n찾아가는 여정 노트`}</p>
 
         <article className="flex flex-col gap-2">
+          <button
+            className="bg-white text-subCoral rounded-md py-2.5"
+            onClick={() => {}}
+          >
+            이메일 로그인
+          </button>
           <SocialLoginBtn type="KAKAO" onClick={kakaoLoginHandler} />
           <SocialLoginBtn type="APPLE" onClick={() => signIn('apple')} />
         </article>
       </section>
 
-      <footer className="border-t border-mainCoral w-full">
-        <p className="text-xxs text-mainCoral text-center">
+      <footer className="border-t border-white w-full pt-2">
+        <p className="text-xxs text-white text-center">
           © Copyright 2024. Bottle Note. All rights reserved.
         </p>
       </footer>
