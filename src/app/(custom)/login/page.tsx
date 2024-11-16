@@ -102,7 +102,7 @@ export default function Login() {
         <article className="flex flex-col gap-2">
           <button
             className="bg-white text-subCoral rounded-md py-2.5"
-            onClick={() => {}}
+            onClick={() => alert('준비중입니당!')}
           >
             이메일 로그인
           </button>
