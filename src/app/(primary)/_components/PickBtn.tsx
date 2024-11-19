@@ -24,7 +24,7 @@ const PickBtn = ({
   alcoholId,
   pickBtnName,
   iconColor = 'white',
-  size = 14,
+  size = 16,
 }: Props) => {
   const { isLogin } = AuthService;
   const { handleModalState } = useModalStore();
@@ -71,7 +71,7 @@ const PickBtn = ({
           alt="unPick"
         />
       )}
-      {pickBtnName && <p className="text-10">{pickBtnName}</p>}
+      {pickBtnName && <p className="text-12">{pickBtnName}</p>}
     </button>
   );
 };

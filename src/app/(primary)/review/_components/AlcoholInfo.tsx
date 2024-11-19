@@ -39,17 +39,20 @@ function AlcoholInfo({ data }: Props) {
 
   return (
     <section className="relative z-10 flex px-5 pb-6 space-x-5">
-      <div className="rounded-lg flex-1 bg-white p-2">
-        <article className="relative h-[180px] w-[135px] flex shrink-0">
-          {data?.alcoholUrlImg && (
-            <Image
-              priority
-              src={data.alcoholUrlImg}
-              alt="img"
-              fill
-              className="object-contain"
-            />
-          )}
+      <div className="rounded-lg bg-white p-2 flex items-center justify-center">
+        <article className="h-[162px] w-[100px] shrink-0 relative flex items-center justify-center">
+          <div className="relative w-[80px] h-[140px]">
+            {data?.alcoholUrlImg && (
+              <Image
+                priority
+                src={data.alcoholUrlImg}
+                alt="img"
+                fill
+                className="object-contain"
+                sizes="100px"
+              />
+            )}
+          </div>
         </article>
       </div>
       <article className="flex-2 py-3 text-white space-y-2 overflow-x-hidden">
@@ -71,10 +74,10 @@ function AlcoholInfo({ data }: Props) {
               {details.map((item: any) => (
                 <div
                   key={item.content}
-                  className="flex text-9 text-white items-start"
+                  className="flex items-start text-11 gap-2 text-white"
                 >
-                  <div className="min-w-14 font-semibold">{item.title}</div>
-                  <div className="flex-1 font-light">{item.content}</div>
+                  <div className="w-12 font-semibold">{item.title}</div>
+                  <div className="flex-1 font-light">{item.content || '-'}</div>
                 </div>
               ))}
             </div>
