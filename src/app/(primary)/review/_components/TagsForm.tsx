@@ -34,10 +34,10 @@ export default function TagsForm({ korName }: Props) {
             <Image
               src="/icon/success-subcoral.svg"
               alt="placeIcon"
-              width={20}
-              height={20}
+              width={24}
+              height={24}
             />
-            <p className="text-10 text-mainDarkGray font-bold">
+            <p className="text-12 text-mainDarkGray font-bold">
               FLAVOR TAG 입력하기{' '}
               <span className="text-mainGray font-normal">(선택)</span>
             </p>

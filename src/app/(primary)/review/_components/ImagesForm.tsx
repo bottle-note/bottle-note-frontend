@@ -93,10 +93,10 @@ export default function ImagesForm() {
           <Image
             src="/icon/photo-subcoral.svg"
             alt="placeIcon"
-            width={20}
-            height={20}
+            width={24}
+            height={24}
           />
-          <p className="text-10 text-mainDarkGray font-bold">
+          <p className="text-12 text-mainDarkGray font-bold">
             이미지 추가{' '}
             <span className="text-mainGray font-normal">(선택·최대 5장)</span>
           </p>

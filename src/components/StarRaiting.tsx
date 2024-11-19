@@ -37,14 +37,17 @@ const Star = ({ size = 30, index, rate, handleRate }: StarProps) => {
 
   // FIXME: 별점 렌더링시 약간의 위치 움직임 있음
   return (
-    <div onClick={handleAction}>
+    <div
+      onClick={handleAction}
+      style={{ width: `${size}px`, height: `${size}px` }}
+    >
       <Image
         src={src}
         width={size}
         height={size}
         alt="star"
         ref={imageRef}
-        style={{ width: '100%', height: 'auto' }}
+        layout="responsive"
       />
     </div>
   );

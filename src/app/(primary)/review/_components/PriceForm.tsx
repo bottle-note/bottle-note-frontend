@@ -20,10 +20,10 @@ export default function PriceForm() {
         <Image
           src="/icon/money-subcoral.svg"
           alt="moneyIcon"
-          width={20}
-          height={20}
+          width={24}
+          height={24}
         />
-        <p className="text-10 text-mainDarkGray font-bold">
+        <p className="text-12 text-mainDarkGray font-bold">
           가격 <span className="text-mainGray font-normal">(선택)</span>
         </p>
       </div>
