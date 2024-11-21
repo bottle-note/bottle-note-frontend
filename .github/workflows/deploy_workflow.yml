@@ -1,10 +1,17 @@
 name: Deploy Workflow
 
 on:
+  push:
+    branches:
+      - deploy
   pull_request:
     types: [ closed ]
     branches:
       - deploy
+
+concurrency:
+  group: "dev-deploy"
+  cancel-in-progress: false
 
 jobs:
   build-and-push:
