@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthApi } from '@/app/api/AuthApi';
 import { AuthService } from '@/lib/AuthService';
+import Loading from '@/components/Loading';
 
 export default function OauthKakaoCallbackPage() {
   const router = useRouter();
@@ -28,5 +29,5 @@ export default function OauthKakaoCallbackPage() {
     }
   }, [authCode]);
 
-  return <div>카카오 로그인 진행중입니다...</div>;
+  return <Loading />;
 }
