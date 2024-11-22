@@ -1,20 +1,34 @@
 export interface Review {
-  userId: number;
-  userProfileImage?: null | string;
-  nickName: string;
   reviewId: number;
   reviewContent: string;
-  rating: number;
-  sizeType: 'BOTTLE' | 'GLASS';
   price: number;
+  sizeType: 'BOTTLE' | 'GLASS';
   likeCount: number;
-  isLikedByMe: boolean;
   replyCount: number;
-  isMyReview?: boolean;
-  isBestReview?: boolean;
-  hasReplyByMe: boolean;
+  reviewImageUrl: string | null;
+  userInfo: {
+    userId: number;
+    nickName: string;
+    userProfileImage?: null | string;
+  };
+  rating: number;
+  viewCount: number;
+  locationInfo: {
+    name?: string;
+    zipCode?: string | null;
+    address?: string;
+    detailAddress?: string;
+    category?: string;
+    mapUrl?: string;
+    latitude?: string;
+    longitude?: string;
+  };
   status: 'PUBLIC' | 'PRIVATE';
-  reviewImageUrl: null | string;
+  isMyReview: boolean;
+  isLikedByMe: boolean;
+  hasReplyByMe: boolean;
+  isBestReview: boolean;
+  tastingTagList?: string[];
   createAt: string;
 }
 
@@ -91,17 +105,6 @@ export interface ReviewDetailsApi {
     order: number;
     viewUrl: string;
   }[];
-  // 최근 변경된 사항으로 댓글 구현 시 수정 예정
-  // reviewReplyList: [
-  //   {
-  //     userId: number;
-  //     imageUrl: string;
-  //     nickName: string;
-  //     reviewReplyId: number;
-  //     reviewReplyContent: string;
-  //     createAt: string;
-  //   },
-  // ];
 }
 
 export type ReviewDetailsWithoutAlcoholInfo = Omit<
