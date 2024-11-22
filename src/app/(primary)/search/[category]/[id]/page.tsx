@@ -198,27 +198,19 @@ function SearchAlcohol() {
             )}
           </section>
         </div>
-        {data?.reviewList && data.reviewList.totalReviewCount !== 0 ? (
+        {data?.reviewInfo?.reviewList && data.reviewInfo.totalCount !== 0 ? (
           <>
             <div className="h-4 bg-sectionWhite" />
             <section className="mx-5 py-5 space-y-3">
               <p className="text-13 text-mainGray font-normal">
-                총 {data?.reviewList?.totalReviewCount}개
+                총 {data.reviewInfo.totalCount}개
               </p>
-              {data?.reviewList?.bestReviewInfos &&
-                data.reviewList.bestReviewInfos.length > 0 && (
-                  <>
-                    <div className="border-b border-mainGray/30" />
-                    <Review data={data.reviewList.bestReviewInfos[0]} />
-                  </>
-                )}
-              {data?.reviewList?.recentReviewInfos &&
-                data.reviewList.recentReviewInfos.length > 0 &&
-                data.reviewList.recentReviewInfos.map((review) => (
-                  <React.Fragment key={review.userId + review.reviewId}>
-                    <Review data={review} />
-                  </React.Fragment>
-                ))}
+              <div className="border-b border-mainGray/30" />
+              {data.reviewInfo.reviewList.map((review) => (
+                <React.Fragment key={review.reviewId}>
+                  <Review data={review} />
+                </React.Fragment>
+              ))}
             </section>
             <section className="mx-5 mb-24">
               <LinkButton

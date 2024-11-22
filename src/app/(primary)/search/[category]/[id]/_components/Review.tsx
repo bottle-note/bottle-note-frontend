@@ -67,28 +67,30 @@ function Review({ data }: Props) {
         mainText: '준비 중인 기능입니다.',
       });
     } else if (option.type === 'USER_REPORT') {
-      router.push(`/report?type=user&userId=${data.userId}`);
+      router.push(`/report?type=user&userId=${data.userInfo.userId}`);
     }
   };
+
+  console.log('data.rating :>> ', data.rating);
 
   return (
     <>
       <div className="space-y-2 border-b border-mainGray/30 pb-3 pt-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1">
-            <Link href={`/user/${data.userId}`}>
+            <Link href={`/user/${data.userInfo.userId}`}>
               <div className="flex items-center space-x-1">
                 <div className="w-7 h-7 rounded-full overflow-hidden">
                   <Image
                     className="object-cover"
-                    src={data.userProfileImage || userImg}
+                    src={data.userInfo.userProfileImage || userImg}
                     alt="user_img"
                     width={28}
                     height={28}
                   />
                 </div>
                 <p className="text-mainGray text-9">
-                  {truncStr(data.nickName, 12)}
+                  {truncStr(data.userInfo.nickName, 12)}
                 </p>
               </div>
             </Link>
@@ -108,7 +110,7 @@ function Review({ data }: Props) {
               />
             )}
           </div>
-          <Star rating={data.rating} size={20} />
+          {data.rating && <Star rating={data.rating} size={20} />}
         </div>
         <div className="flex items-center space-x-1">
           <Image
@@ -177,7 +179,7 @@ function Review({ data }: Props) {
               />
               <p>{data.replyCount}</p>
             </div>
-            {data?.userId === userData?.userId && (
+            {data.userInfo.userId === userData?.userId && (
               <VisibilityToggle
                 initialStatus={data.status === 'PUBLIC'}
                 reviewId={data.reviewId}
@@ -208,7 +210,7 @@ function Review({ data }: Props) {
         <OptionDropdown
           handleClose={() => setIsOptionShow(false)}
           options={
-            userData?.userId === data.userId
+            userData?.userId === data.userInfo.userId
               ? [
                   { name: '수정하기', type: 'MODIFY' },
                   { name: '삭제하기', type: 'DELETE' },
@@ -219,7 +221,9 @@ function Review({ data }: Props) {
                 ]
           }
           handleOptionSelect={handleOptionSelect}
-          title={userData?.userId === data.userId ? '내 리뷰' : '신고하기'}
+          title={
+            userData?.userId === data.userInfo.userId ? '내 리뷰' : '신고하기'
+          }
         />
       )}
       {state.isShowModal && <Modal />}

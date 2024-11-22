@@ -49,7 +49,7 @@ export interface AlcoholDetails {
   alcohols: AlcoholInfo;
   friendsInfo: FriendsInfo;
   reviewInfo: {
-    totalReviewCount: number;
+    totalCount: number;
     reviewList: Review[];
   };
 }
