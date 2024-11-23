@@ -28,14 +28,24 @@ export const fetchWithAuth: FetchWithAuth = async (
     throw new Error('Authentication required');
   }
 
+  const requestUrl = `${url}`;
+  let res: any = new Error('API 호출 중 에러가 발생했습니다.');
+
   if (!token) {
-    const response = await fetch(url, { ...fetchOptions });
+    try {
+      const response = await fetch(requestUrl, { ...fetchOptions });
 
-    if (!response.ok) {
-      throw new ApiError('Failed to fetch data', response);
+      if (!response.ok) {
+        res = await response.json();
+      }
+
+      return await response.json();
+    } catch (error) {
+      if (error instanceof ApiError) {
+        console.log('API Error Response of fetch:', error.response);
+      }
+      throw error;
     }
-
-    return await response.json();
   }
 
   const defaultOptions = {
@@ -46,9 +56,6 @@ export const fetchWithAuth: FetchWithAuth = async (
       'Content-Type': 'application/json',
     },
   };
-
-  const requestUrl = `${url}`;
-  let res: any = new Error('API 호출 중 에러가 발생했습니다.');
 
   try {
     const response = await fetch(requestUrl, defaultOptions);

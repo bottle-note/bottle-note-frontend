@@ -38,12 +38,12 @@ function ReviewModify() {
       .transform((value) => (value === '' ? null : value))
       .when('price', {
         is: (price: number | null) => price !== null && price > 0,
-        then: (schema) =>
-          schema
+        then: (schemaOne) =>
+          schemaOne
             .oneOf(['GLASS', 'BOTTLE'] as const)
             .required('Price type is required when price is provided'),
-        otherwise: (schema) =>
-          schema.oneOf(['GLASS', 'BOTTLE', null] as const).nullable(),
+        otherwise: (schemaTwo) =>
+          schemaTwo.oneOf(['GLASS', 'BOTTLE', null] as const).nullable(),
       }),
   }) as yup.ObjectSchema<FormValues>;
 

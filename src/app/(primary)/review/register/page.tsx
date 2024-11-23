@@ -37,12 +37,12 @@ function ReviewRegister() {
       .transform((value) => (value === '' ? null : value))
       .when('price', {
         is: (price: number | null) => price !== null && price > 0,
-        then: (schema) =>
-          schema
+        then: (schemaOne) =>
+          schemaOne
             .oneOf(['GLASS', 'BOTTLE'] as const)
             .required('가격 타입을 선택해주세요.'),
-        otherwise: (schema) =>
-          schema.oneOf(['GLASS', 'BOTTLE', null] as const).nullable(),
+        otherwise: (schemaTwo) =>
+          schemaTwo.oneOf(['GLASS', 'BOTTLE', null] as const).nullable(),
       }),
   }) as yup.ObjectSchema<FormValues>;
 

@@ -16,6 +16,12 @@ export default function PriceForm() {
   const { register, watch, setValue } = useFormContext();
   const [isOpen, setIsOpen] = useState(false);
 
+  const getPriceTypeLabel = (priceType: 'BOTTLE' | 'GLASS' | null) => {
+    if (priceType === 'BOTTLE') return '1병에';
+    if (priceType === 'GLASS') return '1잔에';
+    return '';
+  };
+
   return (
     <article className="space-y-2">
       <div className="flex items-center justify-between">
@@ -37,7 +43,8 @@ export default function PriceForm() {
           <div
             className="flex items-center cursor-pointer"
             onClick={() => {
-              setValue('price', null), setValue('price_type', null);
+              setValue('price', null);
+              setValue('price_type', null);
             }}
           >
             <p className="text-10 text-mainGray">입력삭제</p>
@@ -73,11 +80,7 @@ export default function PriceForm() {
           </div>
           <div className="border-b border-subCoral py-2 flex items-center">
             <p className="text-subCoral text-10 font-semibold w-8">
-              {watch('price_type') === 'BOTTLE'
-                ? '1병에'
-                : watch('price_type') === 'GLASS'
-                  ? '1잔에'
-                  : ''}
+              {getPriceTypeLabel(watch('price_type'))}
             </p>
             <input
               type="number"
