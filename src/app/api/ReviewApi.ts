@@ -60,7 +60,7 @@ export const ReviewApi = {
 
     const result: ApiResponse<{
       alcoholInfo: any;
-      reviewResponse: any;
+      reviewInfo: any;
       reviewImageList: any[];
     }> = await response;
 

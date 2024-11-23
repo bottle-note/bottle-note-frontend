@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import Label from '@/app/(primary)/_components/Label';
 import { truncStr } from '@/utils/truncStr';
-import { AlcoholInfo as AlcoholDetails } from '@/types/Alcohol';
-import PickBtn from '../../_components/PickBtn';
-import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
+import { AlcoholInfo as AlcoholType } from '@/types/Alcohol';
 import useModalStore from '@/store/modalStore';
+import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
+import Label from '@/app/(primary)/_components/Label';
+import PickBtn from '../../_components/PickBtn';
 
 interface Props {
-  data: AlcoholDetails;
+  data: AlcoholType;
 }
 
 interface DetailItem {

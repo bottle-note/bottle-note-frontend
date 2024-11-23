@@ -142,20 +142,20 @@ function ReviewModify() {
         const result = await ReviewApi.getReviewDetails(reviewId);
 
         setAlcoholId(result.alcoholInfo.alcoholId.toString());
-        setInitialRating(result.reviewResponse.rating);
+        setInitialRating(result.reviewInfo.rating);
         reset({
-          review: result.reviewResponse.reviewContent,
-          status: result.reviewResponse.status,
-          price_type: result.reviewResponse.sizeType ?? 'GLASS',
-          price: result.reviewResponse.price ?? null,
-          flavor_tags: result.reviewResponse.reviewTastingTag ?? [],
+          review: result.reviewInfo.reviewContent,
+          status: result.reviewInfo.status,
+          price_type: result.reviewInfo.sizeType ?? 'GLASS',
+          price: result.reviewInfo.price ?? null,
+          flavor_tags: result.reviewInfo.tastingTagList ?? [],
           images: null,
           imageUrlList: result.reviewImageList ?? [],
-          rating: result.reviewResponse.rating,
-          locationName: result.reviewResponse.locationName,
-          address: result.reviewResponse.address,
-          detailAddress: result.reviewResponse.detailAddress,
-          mapUrl: result.reviewResponse.mapUrl,
+          rating: result.reviewInfo.rating,
+          locationName: result.reviewInfo.locationInfo.name,
+          address: result.reviewInfo.locationInfo.address,
+          detailAddress: result.reviewInfo.locationInfo.detailAddress,
+          mapUrl: result.reviewInfo.locationInfo.mapUrl,
         });
       }
     })();

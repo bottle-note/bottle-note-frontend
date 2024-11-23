@@ -13,7 +13,6 @@ import NavLayout from '@/app/(primary)/_components/NavLayout';
 import StarRating from '@/components/StarRaiting';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
 import Modal from '@/components/Modal';
-import FlavorTag from '../../../_components/FlavorTag';
 import { truncStr } from '@/utils/truncStr';
 import { shareOrCopy } from '@/utils/shareOrCopy';
 import { AuthService } from '@/lib/AuthService';
@@ -22,6 +21,7 @@ import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { AlcoholDetails } from '@/types/Alcohol';
 import AlcoholBox from './_components/AlcoholBox';
+import FlavorTag from '../../../_components/FlavorTag';
 
 interface DetailItem {
   title: string;
@@ -60,9 +60,9 @@ function SearchAlcohol() {
     }
   };
 
-  const fetchUserRating = async (alcoholId: string) => {
+  const fetchUserRating = async (alcohol: string) => {
     try {
-      const ratingResult = await RateApi.getUserRating(alcoholId);
+      const ratingResult = await RateApi.getUserRating(alcohol);
       setRate(ratingResult.rating);
     } catch (error) {
       console.error('Failed to fetch user rating:', error);
@@ -84,7 +84,7 @@ function SearchAlcohol() {
     if (!isLogin) return handleLoginModal();
 
     setRate(selectedRate);
-    return await RateApi.postRating({
+    return RateApi.postRating({
       alcoholId: String(alcoholId),
       rating: selectedRate,
     });

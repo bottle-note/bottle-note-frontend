@@ -7,11 +7,11 @@ import PickBtn from '@/app/(primary)/_components/PickBtn';
 import Label from '@/app/(primary)/_components/Label';
 import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
 import { truncStr } from '@/utils/truncStr';
-import type { AlcoholInfo } from '@/types/Review';
+import type { AlcoholInfo as AlcoholType } from '@/types/Review';
 import { AuthService } from '@/lib/AuthService';
 
 interface Props {
-  data: AlcoholInfo;
+  data: AlcoholType;
   handleLogin: () => void;
 }
 
