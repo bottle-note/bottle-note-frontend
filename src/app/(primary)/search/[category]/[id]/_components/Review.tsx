@@ -71,8 +71,6 @@ function Review({ data }: Props) {
     }
   };
 
-  console.log('data.rating :>> ', data.rating);
-
   return (
     <>
       <div className="space-y-2 border-b border-mainGray/30 pb-3 pt-3">

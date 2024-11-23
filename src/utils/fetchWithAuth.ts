@@ -3,29 +3,45 @@ import useModalStore from '@/store/modalStore';
 import { ApiError } from './ApiError';
 import { AuthService } from '../lib/AuthService';
 
+interface FetchOptions extends RequestInit {
+  requireAuth?: boolean;
+}
+
 type FetchWithAuth = (
   url: string,
-  options?: RequestInit,
+  options?: FetchOptions,
   retryCount?: number,
 ) => Promise<any>;
 
 export const fetchWithAuth: FetchWithAuth = async (
   url,
-  options,
+  options = {},
   retryCount = 0,
 ) => {
+  const { requireAuth = true, ...fetchOptions } = options;
   const token = AuthService.getToken();
 
-  if (!token) {
+  if (requireAuth && !token) {
     AuthService.logout();
     const { handleLoginState } = useModalStore.getState();
-    return handleLoginState(true);
+    handleLoginState(true);
+    throw new Error('Authentication required');
+  }
+
+  if (!token) {
+    const response = await fetch(url, { ...fetchOptions });
+
+    if (!response.ok) {
+      throw new ApiError('Failed to fetch data', response);
+    }
+
+    return await response.json();
   }
 
   const defaultOptions = {
-    ...options,
+    ...fetchOptions,
     headers: {
-      ...options?.headers,
+      ...fetchOptions?.headers,
       Authorization: `Bearer ${token.accessToken}`,
       'Content-Type': 'application/json',
     },
@@ -53,7 +69,7 @@ export const fetchWithAuth: FetchWithAuth = async (
             throw new Error('갱신된 액세스 토큰이 존재하지 않습니다.');
           }
 
-          return await fetchWithAuth(url, options, retryCount + 1);
+          return await fetchWithAuth(url, fetchOptions, retryCount + 1);
         } catch (e) {
           throw new ApiError(`HTTP error! ${e}`, response);
         }

@@ -34,7 +34,9 @@ export const RateApi = {
   },
 
   async getUserRating(alcoholId: string) {
-    const response = await fetchWithAuth(`/bottle-api/rating/${alcoholId}`);
+    const response = await fetchWithAuth(`/bottle-api/rating/${alcoholId}`, {
+      requireAuth: false,
+    });
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');

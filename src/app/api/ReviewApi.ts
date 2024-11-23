@@ -20,6 +20,7 @@ export const ReviewApi = {
   }: ListQueryParams) {
     const response = await fetchWithAuth(
       `/bottle-api/reviews/${alcoholId}?sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
+      { requireAuth: false },
     );
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
@@ -52,6 +53,7 @@ export const ReviewApi = {
   async getReviewDetails(reviewId: string | string[]) {
     const response = await fetchWithAuth(
       `/bottle-api/reviews/detail/${reviewId}`,
+      { requireAuth: false },
     );
 
     if (response.errors.length !== 0) {
