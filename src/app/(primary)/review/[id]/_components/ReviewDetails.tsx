@@ -29,7 +29,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
   const { userData, isLogin } = AuthService;
   const { handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
-  const [isLiked, setIsLiked] = useState(data?.reviewResponse?.isLikedByMe);
+  const [isLiked, setIsLiked] = useState(data?.reviewInfo?.isLikedByMe);
 
   const handleCloseOption = () => {
     handleModalState({
@@ -54,11 +54,11 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
         mainText: '정말 삭제하시겠습니까?',
         type: 'CONFIRM',
         handleConfirm: () => {
-          deleteReview(data.reviewResponse?.reviewId, handleCloseOption);
+          deleteReview(data.reviewInfo?.reviewId, handleCloseOption);
         },
       });
     } else if (option.type === 'MODIFY') {
-      router.push(`/review/modify?reviewId=${data.reviewResponse?.reviewId}`);
+      router.push(`/review/modify?reviewId=${data.reviewInfo?.reviewId}`);
     } else if (option.type === 'REVIEW_REPORT') {
       // router.push(`/report?type=review`);
       // API 준비 안됨
@@ -67,7 +67,9 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
         mainText: '준비 중인 기능입니다.',
       });
     } else if (option.type === 'USER_REPORT') {
-      router.push(`/report?type=user&userId=${data.reviewResponse?.userId}`);
+      router.push(
+        `/report?type=user&userId=${data.reviewInfo?.userInfo?.userId}`,
+      );
     }
   };
 
@@ -82,7 +84,8 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                   <Image
                     className="object-cover"
                     src={
-                      data.reviewResponse?.userProfileImage ?? ProfileDefaultImg
+                      data.reviewInfo?.userInfo?.userProfileImage ??
+                      ProfileDefaultImg
                     }
                     alt="user_img"
                     width={30}
@@ -90,36 +93,36 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                   />
                 </div>
                 <p className="text-mainGray text-13">
-                  {data.reviewResponse?.nickName &&
-                    truncStr(data.reviewResponse.nickName, 12)}
+                  {data.reviewInfo?.userInfo?.nickName &&
+                    truncStr(data.reviewInfo.userInfo.nickName, 12)}
                 </p>
               </div>
             </Link>
             <Star
-              rating={data.reviewResponse?.rating ?? 0}
+              rating={data.reviewInfo?.rating ?? 0}
               size={25}
               style="text-20 text-subCoral font-semibold"
             />
           </article>
           <article className="flex space-x-2 items-center">
-            {data.reviewResponse?.isBestReview && (
+            {data.reviewInfo?.isBestReview && (
               <Label
                 name="베스트"
                 icon="/icon/thumbup-filled-white.svg"
                 styleClass="bg-mainCoral text-white px-2 py-[0.1rem] border-mainCoral text-9 rounded"
               />
             )}
-            {data.reviewResponse?.isMyReview && (
+            {data.reviewInfo?.isMyReview && (
               <Label
                 name="나의 코멘트"
                 icon="/icon/user-outlined-subcoral.svg"
                 styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-9 rounded"
               />
             )}
-            {data.reviewResponse?.userId === userData?.userId && (
+            {data.reviewInfo?.userInfo?.userId === userData?.userId && (
               <VisibilityToggle
-                initialStatus={data.reviewResponse.status === 'PUBLIC'}
-                reviewId={data?.reviewResponse?.reviewId}
+                initialStatus={data.reviewInfo.status === 'PUBLIC'}
+                reviewId={data?.reviewInfo?.reviewId}
                 handleNotLogin={handleLoginModal}
               />
             )}
@@ -142,12 +145,12 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
             </div>
           )}
           <div className="text-10 text-mainDarkGray">
-            {data.reviewResponse?.reviewContent}
+            {data.reviewInfo?.reviewContent}
           </div>
           <article className="flex justify-between">
-            {data.reviewResponse?.createAt && (
+            {data.reviewInfo?.createAt && (
               <p className="text-mainGray text-10">
-                {formatDate(data.reviewResponse.createAt)}
+                {formatDate(data.reviewInfo.createAt)}
               </p>
             )}
             <button
@@ -165,39 +168,40 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
             </button>
           </article>
         </section>
-        {data.reviewResponse?.reviewTastingTag.length !== 0 && (
-          <FlavorTag tagList={data.reviewResponse.reviewTastingTag} />
-        )}
-        {(data.reviewResponse?.address ||
-          (!!data.reviewResponse?.price && data.reviewResponse?.sizeType)) && (
+        {data.reviewInfo?.tastingTagList?.length &&
+          data.reviewInfo.tastingTagList.length !== 0 && (
+            <FlavorTag tagList={data.reviewInfo.tastingTagList} />
+          )}
+        {(data.reviewInfo?.locationInfo?.address ||
+          (!!data.reviewInfo?.price && data.reviewInfo?.sizeType)) && (
           <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 ">
-            {data.reviewResponse?.price && data.reviewResponse?.sizeType && (
+            {data.reviewInfo?.price && data.reviewInfo?.sizeType && (
               <div className="flex items-center space-x-1">
                 <Image
                   src={
-                    data.reviewResponse.sizeType === 'BOTTLE'
+                    data.reviewInfo.sizeType === 'BOTTLE'
                       ? '/bottle.svg'
                       : '/icon/glass-filled-subcoral.svg'
                   }
                   width={15}
                   height={15}
                   alt={
-                    data.reviewResponse.sizeType === 'BOTTLE'
+                    data.reviewInfo.sizeType === 'BOTTLE'
                       ? 'Bottle Price'
                       : 'Glass Price'
                   }
                 />
                 <p className="text-mainDarkGray text-10 font-semibold">
-                  {data.reviewResponse.sizeType === 'BOTTLE'
+                  {data.reviewInfo.sizeType === 'BOTTLE'
                     ? '병 가격 '
                     : '잔 가격'}
                 </p>
                 <p className="text-mainDarkGray text-10 font-light">
-                  {numberWithCommas(data.reviewResponse.price)}₩
+                  {numberWithCommas(data.reviewInfo.price)}₩
                 </p>
               </div>
             )}
-            {data.reviewResponse?.address && (
+            {data.reviewInfo?.locationInfo?.address && (
               <div className="flex items-start space-x-1">
                 <Image
                   src="/icon/placepoint-subcoral.svg"
@@ -209,15 +213,17 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                 <p className="text-mainDarkGray text-10">
                   <>
                     <p className="font-semibold">
-                      {data.reviewResponse?.locationName}
+                      {data.reviewInfo?.locationInfo?.name}
                     </p>
-                    {data.reviewResponse?.address}
+                    {data.reviewInfo?.locationInfo?.address}
                     <br />
-                    {data.reviewResponse?.detailAddress}
+                    {data.reviewInfo?.locationInfo?.detailAddress}
                     <br />
-                    {data.reviewResponse?.mapUrl && (
+                    {data.reviewInfo?.locationInfo?.mapUrl && (
                       <p className="text-10 text-subCoral m-0 p-0">
-                        <Link href={data.reviewResponse.mapUrl}>지도보기</Link>
+                        <Link href={data.reviewInfo.locationInfo.mapUrl}>
+                          지도보기
+                        </Link>
                       </p>
                     )}
                   </>
@@ -229,18 +235,18 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
         <section className="mx-5 py-5 flex items-center space-x-4">
           <div className="flex-1 flex text-center justify-center items-center space-x-1">
             <LikeBtn
-              reviewId={data?.reviewResponse?.reviewId}
+              reviewId={data?.reviewInfo?.reviewId}
               isLiked={isLiked}
               handleUpdateLiked={() => setIsLiked((prev) => !prev)}
               handleError={() => {
-                setIsLiked(data?.reviewResponse?.isLikedByMe);
+                setIsLiked(data?.reviewInfo?.isLikedByMe);
               }}
               handleNotLogin={handleLogin}
               likeBtnName="좋아요"
               size={16}
             />
             <div className=" text-mainGray text-10 font-normal">
-              좋아요 {data.reviewResponse?.likeCount}
+              좋아요 {data.reviewInfo?.likeCount}
             </div>
           </div>
           <span className="border-[0.01rem] w-px border-mainGray opacity-40 h-4" />
@@ -256,7 +262,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
           >
             <Image
               src={
-                data.reviewResponse?.hasReplyByMe
+                data.reviewInfo?.hasReplyByMe
                   ? 'icon/comment-filled-subcoral.svg'
                   : '/icon/comment-outlined-gray.svg'
               }
@@ -273,7 +279,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
             className="flex-1 flex text-center justify-center items-center space-x-1"
             onClick={() => {
               shareOrCopy(
-                `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${data.reviewResponse?.reviewId}`,
+                `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${data.reviewInfo?.reviewId}`,
                 handleModalState,
               );
             }}
@@ -292,7 +298,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
         <OptionDropdown
           handleClose={() => setIsOptionShow(false)}
           options={
-            userData?.userId === data.reviewResponse?.userId
+            userData?.userId === data.reviewInfo?.userInfo?.userId
               ? [
                   { name: '수정하기', type: 'MODIFY' },
                   { name: '삭제하기', type: 'DELETE' },
@@ -304,7 +310,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
           }
           handleOptionSelect={handleOptionSelect}
           title={
-            userData?.userId === data.reviewResponse?.userId
+            userData?.userId === data.reviewInfo?.userInfo?.userId
               ? '내 리뷰'
               : '신고하기'
           }

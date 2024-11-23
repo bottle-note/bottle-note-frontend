@@ -12,3 +12,7 @@ export interface UserInfoApi extends User {
   isFollow: boolean;
   isMyPage: boolean;
 }
+
+export interface ReviewUserInfo extends Omit<User, 'imageUrl'> {
+  userProfileImage?: null | string;
+}

@@ -1,3 +1,26 @@
+import { ReviewUserInfo } from './User';
+
+export interface ReviewLocationInfo {
+  name?: string;
+  zipCode?: string | null;
+  address?: string;
+  detailAddress?: string;
+  category?: string;
+  mapUrl?: string;
+  latitude?: string;
+  longitude?: string;
+}
+
+export interface AlcoholInfo {
+  alcoholId: number;
+  korName: string;
+  engName: string;
+  korCategory: string;
+  engCategory: string;
+  imageUrl: string;
+  isPicked: boolean;
+}
+
 export interface Review {
   reviewId: number;
   reviewContent: string;
@@ -6,23 +29,10 @@ export interface Review {
   likeCount: number;
   replyCount: number;
   reviewImageUrl: string | null;
-  userInfo: {
-    userId: number;
-    nickName: string;
-    userProfileImage?: null | string;
-  };
+  userInfo: ReviewUserInfo;
   rating: number;
   viewCount: number;
-  locationInfo: {
-    name?: string;
-    zipCode?: string | null;
-    address?: string;
-    detailAddress?: string;
-    category?: string;
-    mapUrl?: string;
-    latitude?: string;
-    longitude?: string;
-  };
+  locationInfo: ReviewLocationInfo;
   status: 'PUBLIC' | 'PRIVATE';
   isMyReview: boolean;
   isLikedByMe: boolean;
@@ -61,46 +71,9 @@ export interface ReviewListApi {
   totalCount: number;
 }
 
-export interface AlcoholInfo {
-  alcoholId: number;
-  korName: string;
-  engName: string;
-  korCategory: string;
-  engCategory: string;
-  imageUrl: string;
-  isPicked: boolean;
-}
-
 export interface ReviewDetailsApi {
   alcoholInfo: AlcoholInfo;
-  reviewResponse: {
-    reviewId: number;
-    reviewContent: string;
-    price: number;
-    sizeType: 'GLASS' | 'BOTTLE';
-    likeCount: number;
-    replyCount: number;
-    reviewImageUrl: string;
-    createAt: string;
-    userId: number;
-    nickName: string;
-    userProfileImage: string;
-    rating: number;
-    locationName?: string | null;
-    zipCode?: string | null;
-    address?: string | null;
-    detailAddress?: string | null;
-    category?: string | null;
-    mapUrl?: string | null;
-    latitude?: string | null;
-    longitude?: string | null;
-    status: 'PUBLIC' | 'PRIVATE';
-    isMyReview: boolean;
-    isLikedByMe: boolean;
-    hasReplyByMe: boolean;
-    isBestReview: boolean;
-    reviewTastingTag: string[];
-  };
+  reviewInfo: Review;
   reviewImageList: {
     order: number;
     viewUrl: string;
