@@ -1,0 +1,57 @@
+name: Deploy Workflow
+
+on:
+  push:
+    branches:
+      - deploy
+  pull_request:
+    types: [ closed ]
+    branches:
+      - deploy
+
+concurrency:
+  group: "dev-deploy"
+  cancel-in-progress: false
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+          
+      - name: copy project # ssh key를 이용해 현재 푸시된 소스를 서버에 복사한다.
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete # rsync 명령어 옵션
+          remote_path: /home/bottlenote/app/bottle-note-front-server
+          remote_host: ${{ secrets.DEV_SERVER_IP }}
+          remote_port: ${{ secrets.DEV_SERVER_HOST }}
+          remote_user: bottlenote
+          remote_key: ${{ secrets.DEV_SSH_KEY }}
+
+      - name: deploy setup
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEV_SERVER_IP }}
+          port: ${{ secrets.DEV_SERVER_HOST }}
+          username: bottlenote
+          key: ${{ secrets.DEV_SSH_KEY }}
+          script: |
+            cd /home/bottlenote/app/bottle-note-front-server
+            touch  /home/bottlenote/app/bottle-note-front-server/.env
+            echo "${{ secrets.ENV }}" > .env  
+            
+      - name: docker compose up
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEV_SERVER_IP }}
+          port: ${{ secrets.DEV_SERVER_HOST }}
+          username: bottlenote
+          key: ${{ secrets.DEV_SSH_KEY }}
+          script: |
+            cd /home/bottlenote/app/bottle-note-front-server
+            docker stop bottle-note-front-server || true
+            docker rm bottle-note-front-server || true
+            docker compose up -d --no-deps --build 
+            docker image prune -f
