@@ -45,8 +45,8 @@ export interface Review {
 export interface FormValues {
   review: string;
   status: string;
-  price_type: 'GLASS' | 'BOTTLE';
-  price?: number | null;
+  price_type: 'GLASS' | 'BOTTLE' | null;
+  price: number | null;
   flavor_tags?: string[] | null;
   rating?: number | null;
   images?: { order: number; image: File }[] | null;
