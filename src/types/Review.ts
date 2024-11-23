@@ -98,6 +98,7 @@ export interface ReviewQueryParams {
   sizeType: 'GLASS' | 'BOTTLE' | null;
   price?: number | null;
   tastingTagList?: string[] | null;
+  rating: number;
   imageUrlList?:
     | {
         order: number;

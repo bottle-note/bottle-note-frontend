@@ -82,6 +82,7 @@ function ReviewModify() {
         latitude: data.latitude,
         longitude: data.longitude,
       },
+      rating: data.rating ?? 0,
     };
 
     let ratingResult = null;
