@@ -131,7 +131,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
             <div className="whitespace-nowrap overflow-x-auto flex space-x-2 scrollbar-hide">
               {data.reviewImageList.map((imgData) => (
                 <div
-                  className="relative w-[147px] h-[147px]"
+                  className="relative w-[147px] h-[147px] flex-shrink-0"
                   key={imgData.viewUrl}
                 >
                   <Image
@@ -144,12 +144,12 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
               ))}
             </div>
           )}
-          <div className="text-10 text-mainDarkGray">
+          <div className="text-13 text-mainDarkGray">
             {data.reviewInfo?.reviewContent}
           </div>
           <article className="flex justify-between">
             {data.reviewInfo?.createAt && (
-              <p className="text-mainGray text-10">
+              <p className="text-mainGray text-11">
                 {formatDate(data.reviewInfo.createAt)}
               </p>
             )}
@@ -161,8 +161,8 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
             >
               <Image
                 src="/icon/ellipsis-darkgray.svg"
-                width={10}
-                height={10}
+                width={14}
+                height={14}
                 alt="report"
               />
             </button>
@@ -170,11 +170,14 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
         </section>
         {data.reviewInfo?.tastingTagList?.length &&
           data.reviewInfo.tastingTagList.length !== 0 && (
-            <FlavorTag tagList={data.reviewInfo.tastingTagList} />
+            <FlavorTag
+              tagList={data.reviewInfo.tastingTagList}
+              styleClass="border-subCoral text-subCoral py-[5px] px-[10px] rounded-md text-12"
+            />
           )}
         {(data.reviewInfo?.locationInfo?.address ||
           (!!data.reviewInfo?.price && data.reviewInfo?.sizeType)) && (
-          <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 ">
+          <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 text-12">
             {data.reviewInfo?.price && data.reviewInfo?.sizeType && (
               <div className="flex items-center space-x-1">
                 <Image
@@ -183,20 +186,20 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                       ? '/bottle.svg'
                       : '/icon/glass-filled-subcoral.svg'
                   }
-                  width={15}
-                  height={15}
+                  width={17}
+                  height={17}
                   alt={
                     data.reviewInfo.sizeType === 'BOTTLE'
                       ? 'Bottle Price'
                       : 'Glass Price'
                   }
                 />
-                <p className="text-mainDarkGray text-10 font-semibold">
+                <p className="text-mainDarkGray font-semibold">
                   {data.reviewInfo.sizeType === 'BOTTLE'
                     ? '병 가격 '
                     : '잔 가격'}
                 </p>
-                <p className="text-mainDarkGray text-10 font-light">
+                <p className="text-mainDarkGray font-light">
                   {numberWithCommas(data.reviewInfo.price)}₩
                 </p>
               </div>
@@ -205,12 +208,12 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
               <div className="flex items-start space-x-1">
                 <Image
                   src="/icon/placepoint-subcoral.svg"
-                  width={15}
-                  height={15}
+                  width={17}
+                  height={17}
                   alt="address"
                 />
-                <p className="text-mainDarkGray text-10 font-semibold">장소</p>
-                <p className="text-mainDarkGray text-10">
+                <p className="text-mainDarkGray font-semibold">장소</p>
+                <p className="text-mainDarkGray">
                   <>
                     <p className="font-semibold">
                       {data.reviewInfo?.locationInfo?.name}
@@ -220,7 +223,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                     {data.reviewInfo?.locationInfo?.detailAddress}
                     <br />
                     {data.reviewInfo?.locationInfo?.mapUrl && (
-                      <p className="text-10 text-subCoral m-0 p-0">
+                      <p className="text-subCoral m-0 p-0">
                         <Link href={data.reviewInfo.locationInfo.mapUrl}>
                           지도보기
                         </Link>
@@ -243,7 +246,6 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
               }}
               handleNotLogin={handleLogin}
               likeBtnName="좋아요"
-              size={16}
             />
             <div className=" text-mainGray text-10 font-normal">
               좋아요 {data.reviewInfo?.likeCount}
@@ -266,11 +268,11 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                   ? 'icon/comment-filled-subcoral.svg'
                   : '/icon/comment-outlined-gray.svg'
               }
-              width={16}
-              height={16}
+              width={18}
+              height={18}
               alt="comment"
             />
-            <p className="relative w-fit text-mainGray font-bold text-10">
+            <p className="relative w-fit text-mainGray font-bold text-14">
               댓글 작성
             </p>
           </button>
@@ -287,10 +289,10 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
             <Image
               src="/icon/externallink-outlined-gray.svg"
               alt="linkIcon"
-              width={16}
-              height={16}
+              width={18}
+              height={18}
             />
-            <p className="text-mainGray font-bold text-10">공유</p>
+            <p className="text-mainGray font-bold text-14">공유</p>
           </button>
         </section>
       </section>
