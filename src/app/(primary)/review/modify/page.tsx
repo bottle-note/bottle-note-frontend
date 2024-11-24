@@ -31,11 +31,21 @@ function ReviewModify() {
   const schema = yup.object({
     review: yup.string().required('리뷰 내용을 작성해주세요.'),
     status: yup.string().required(),
+    price: yup.number().nullable(),
     price_type: yup
-      .mixed<'GLASS' | 'BOTTLE'>()
-      .oneOf(['GLASS', 'BOTTLE'])
-      .required(),
-  });
+      .string()
+      .nullable()
+      .transform((value) => (value === '' ? null : value))
+      .when('price', {
+        is: (price: number | null) => price !== null && price > 0,
+        then: (schemaOne) =>
+          schemaOne
+            .oneOf(['GLASS', 'BOTTLE'] as const)
+            .required('Price type is required when price is provided'),
+        otherwise: (schemaTwo) =>
+          schemaTwo.oneOf(['GLASS', 'BOTTLE', null] as const).nullable(),
+      }),
+  }) as yup.ObjectSchema<FormValues>;
 
   const formMethods = useForm<FormValues>({
     mode: 'onChange',
@@ -82,6 +92,7 @@ function ReviewModify() {
         latitude: data.latitude,
         longitude: data.longitude,
       },
+      rating: data.rating ?? 0,
     };
 
     let ratingResult = null;
@@ -142,20 +153,20 @@ function ReviewModify() {
         const result = await ReviewApi.getReviewDetails(reviewId);
 
         setAlcoholId(result.alcoholInfo.alcoholId.toString());
-        setInitialRating(result.reviewResponse.rating);
+        setInitialRating(result.reviewInfo.rating);
         reset({
-          review: result.reviewResponse.reviewContent,
-          status: result.reviewResponse.status,
-          price_type: result.reviewResponse.sizeType ?? 'GLASS',
-          price: result.reviewResponse.price ?? null,
-          flavor_tags: result.reviewResponse.reviewTastingTag ?? [],
+          review: result.reviewInfo.reviewContent,
+          status: result.reviewInfo.status,
+          price_type: result.reviewInfo.sizeType ?? null,
+          price: result.reviewInfo.price ?? null,
+          flavor_tags: result.reviewInfo.tastingTagList ?? [],
           images: null,
           imageUrlList: result.reviewImageList ?? [],
-          rating: result.reviewResponse.rating,
-          locationName: result.reviewResponse.locationName,
-          address: result.reviewResponse.address,
-          detailAddress: result.reviewResponse.detailAddress,
-          mapUrl: result.reviewResponse.mapUrl,
+          rating: result.reviewInfo.rating,
+          locationName: result.reviewInfo.locationInfo.name,
+          address: result.reviewInfo.locationInfo.address,
+          detailAddress: result.reviewInfo.locationInfo.detailAddress,
+          mapUrl: result.reviewInfo.locationInfo.mapUrl,
         });
       }
     })();
@@ -173,10 +184,10 @@ function ReviewModify() {
   }, [alcoholId]);
 
   useEffect(() => {
-    if (errors.review?.message) {
+    if (errors.review?.message || errors.price_type?.message) {
       handleModalState({
         isShowModal: true,
-        mainText: errors.review?.message,
+        mainText: errors.review?.message || errors.price_type?.message,
         type: 'ALERT',
       });
     }

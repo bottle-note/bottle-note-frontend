@@ -5,16 +5,17 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import Label from '@/app/(primary)/_components/Label';
+import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
 import { truncStr } from '@/utils/truncStr';
-import type { AlcoholInfo } from '@/types/Review';
+import type { AlcoholInfo as AlcoholType } from '@/types/Review';
 import { AuthService } from '@/lib/AuthService';
 
 interface Props {
-  data: AlcoholInfo;
+  data: AlcoholType;
   handleLogin: () => void;
 }
 
-function AlcoholInfoDisplay({ data, handleLogin }: Props) {
+function AlcoholInfo({ data, handleLogin }: Props) {
   const router = useRouter();
   const { isLogin } = AuthService;
   const { isPicked: originalIsPicked } = data;
@@ -23,19 +24,15 @@ function AlcoholInfoDisplay({ data, handleLogin }: Props) {
   return (
     <>
       <section className="relative z-10 flex px-5 pb-6 space-x-5">
-        <div className="rounded-lg w-1/3 bg-white p-4">
-          <article className="relative h-[120px]">
-            {data.imageUrl && (
-              <Image
-                priority
-                src={data.imageUrl}
-                alt="img"
-                fill
-                className="object-contain"
-              />
-            )}
-          </article>
-        </div>
+        {data.imageUrl && (
+          <AlcoholImage
+            imageUrl={data.imageUrl}
+            outerWidthClass="w-[80px]"
+            outerHeightClass="h-[120px]"
+            innerWidthClass="w-[70px]"
+            innerHeightClass="h-[110px]"
+          />
+        )}
         <article className="w-2/3 py-3 text-white space-y-2 overflow-x-hidden">
           <div className="space-y-1">
             <Label
@@ -53,7 +50,7 @@ function AlcoholInfoDisplay({ data, handleLogin }: Props) {
             <div className="border-[0.5px] border-white" />
             <div className="flex space-x-3">
               <div
-                className="text-10 flex"
+                className="text-12 font-bold flex"
                 onClick={() => {
                   if (!isLogin || !data.alcoholId) {
                     handleLogin();
@@ -67,8 +64,8 @@ function AlcoholInfoDisplay({ data, handleLogin }: Props) {
                   className="mr-1"
                   src="/icon/edit-outlined-white.svg"
                   alt="write"
-                  width={16}
-                  height={16}
+                  width={18}
+                  height={18}
                 />
                 {/* 추후 user당 하루 리뷰 count 확인하는 API 연동 필요 */}
                 <button>리뷰 작성</button>
@@ -90,4 +87,4 @@ function AlcoholInfoDisplay({ data, handleLogin }: Props) {
   );
 }
 
-export default AlcoholInfoDisplay;
+export default AlcoholInfo;

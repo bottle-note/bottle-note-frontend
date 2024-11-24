@@ -30,7 +30,7 @@ function CategorySelector({ handleCategoryCallback }: Props) {
   return (
     <section className="space-y-4">
       <CategoryTitle subTitle="카테고리" />
-      <article className="whitespace-nowrap overflow-x-auto flex space-x-1.5">
+      <article className="whitespace-nowrap overflow-x-auto flex space-x-1.5 scrollbar-hide">
         {categories.map((category) => {
           return (
             <button

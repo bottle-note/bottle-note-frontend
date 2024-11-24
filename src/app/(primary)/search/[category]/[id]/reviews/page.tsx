@@ -151,7 +151,10 @@ function Reviews() {
                     [...reviewList.map((list) => list.data.reviewList)]
                       .flat()
                       .map((item: ReviewType) => (
-                        <Review data={item} key={item.reviewId + item.userId} />
+                        <Review
+                          data={item}
+                          key={item.reviewId + item.userInfo.userId}
+                        />
                       ))}
                 </List.Section>
               </List>
@@ -185,7 +188,10 @@ function Reviews() {
                     [...myReviewList.map((list) => list.data.reviewList)]
                       .flat()
                       .map((item: ReviewType) => (
-                        <Review data={item} key={item.reviewId + item.userId} />
+                        <Review
+                          data={item}
+                          key={item.reviewId + item.userInfo.userId}
+                        />
                       ))}
                 </List.Section>
               </List>

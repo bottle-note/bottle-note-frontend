@@ -17,15 +17,15 @@ export default function AddressForm() {
   return (
     <>
       <article className="flex items-center justify-between">
-        <div className="flex items-center space-x-1 w-3/4">
+        <div className="flex items-center space-x-1 w-full">
           <Image
             src="/icon/marker-subcoral.svg"
             alt="placeIcon"
-            width={20}
-            height={20}
+            width={24}
+            height={24}
           />
           {!watch('address') ? (
-            <p className="text-10 text-mainDarkGray font-bold">
+            <p className="text-12 text-mainDarkGray font-bold">
               이 술을 마셨을 때, 좋았던 장소가 있나요?{' '}
               <span className="text-mainGray font-normal">(선택)</span>
             </p>

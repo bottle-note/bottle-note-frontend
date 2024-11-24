@@ -11,8 +11,8 @@ import {
 export const ReplyApi = {
   async getRootReplyList({ reviewId, cursor, pageSize }: ListQueryParams) {
     const response = await fetchWithAuth(
-      // `/bottle-api/review/reply/${reviewId}`,
       `/bottle-api/review/reply/${reviewId}?cursor=${cursor}&pageSize=${pageSize}`,
+      { requireAuth: false },
     );
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
@@ -26,6 +26,7 @@ export const ReplyApi = {
   async getSubReplyList({ reviewId, rootReplyId }: ListQueryParams) {
     const response = await fetchWithAuth(
       `/bottle-api/review/reply/${reviewId}/sub/${rootReplyId}`,
+      { requireAuth: false },
     );
 
     if (response.errors.length !== 0) {
