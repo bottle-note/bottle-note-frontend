@@ -87,7 +87,7 @@ function Review({ data }: Props) {
                     height={28}
                   />
                 </div>
-                <p className="text-mainGray text-9">
+                <p className="text-mainGray text-12">
                   {truncStr(data.userInfo.nickName, 12)}
                 </p>
               </div>
@@ -96,7 +96,7 @@ function Review({ data }: Props) {
               <Label
                 name="베스트"
                 icon="/icon/thumbup-filled-white.svg"
-                styleClass="bg-mainCoral text-white px-2 py-[0.1rem] text-9 border-mainCoral rounded"
+                styleClass="bg-mainCoral text-white px-2 py-[0.1rem] text-10 border-mainCoral rounded"
               />
             )}
             {data.isMyReview && (

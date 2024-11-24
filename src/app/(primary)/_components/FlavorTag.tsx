@@ -8,7 +8,7 @@ interface Props {
 
 function FlavorTag({
   tagList,
-  styleClass = 'border-subCoral text-subCoral px-2 py-0.5 rounded-md text-10',
+  styleClass = 'border-subCoral text-subCoral px-2 py-0.5 rounded-md text-12',
 }: Props) {
   return (
     <section className="mx-5 py-5 border-b border-mainGray/30 space-y-1">
