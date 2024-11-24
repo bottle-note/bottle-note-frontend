@@ -26,7 +26,7 @@ import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import ReplyInput from './_components/Reply/ReplyInput';
 import ReviewDetails from './_components/ReviewDetails';
-import AlcoholInfo from './_components/AlcoholInfoDisplay';
+import AlcoholInfo from './_components/AlcoholInfo';
 import ReplyList from './_components/Reply/ReplyList';
 
 export default function ReviewDetail() {

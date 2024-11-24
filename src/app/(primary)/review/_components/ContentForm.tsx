@@ -12,11 +12,11 @@ export default function ContentForm() {
     <article>
       <textarea
         placeholder="이 위스키에 대한 리뷰를 작성해보세요. (최대 1,000자)"
-        className="text-10 w-full h-48"
+        className="text-12 w-full h-48"
         maxLength={1000}
         {...register('review')}
       />
-      <div className="text-10 text-mainGray flex justify-between items-center">
+      <div className="text-12 text-mainGray flex justify-between items-center">
         <Toggle
           isActive={watch('status') === 'PUBLIC'}
           onToggle={handleToggle}

@@ -30,15 +30,43 @@ function ReviewRegister() {
   const schema = yup.object({
     review: yup.string().required('리뷰 내용을 작성해주세요.'),
     status: yup.string().required(),
+    price: yup.number().nullable(),
     price_type: yup
-      .mixed<'GLASS' | 'BOTTLE'>()
-      .oneOf(['GLASS', 'BOTTLE'])
-      .required(),
-  });
+      .string()
+      .nullable()
+      .transform((value) => (value === '' ? null : value))
+      .when('price', {
+        is: (price: number | null) => price !== null && price > 0,
+        then: (schemaOne) =>
+          schemaOne
+            .oneOf(['GLASS', 'BOTTLE'] as const)
+            .required('가격 타입을 선택해주세요.'),
+        otherwise: (schemaTwo) =>
+          schemaTwo.oneOf(['GLASS', 'BOTTLE', null] as const).nullable(),
+      }),
+  }) as yup.ObjectSchema<FormValues>;
 
   const formMethods = useForm<FormValues>({
     mode: 'onChange',
     resolver: yupResolver(schema),
+    defaultValues: {
+      review: '',
+      status: 'PUBLIC',
+      price: null,
+      price_type: null,
+      flavor_tags: [],
+      rating: null,
+      images: [],
+      imageUrlList: null,
+      locationName: null,
+      zipCode: null,
+      address: null,
+      detailAddress: null,
+      category: null,
+      mapUrl: null,
+      latitude: null,
+      longitude: null,
+    },
   });
 
   const {
@@ -75,6 +103,7 @@ function ReviewRegister() {
         latitude: data.latitude,
         longitude: data.longitude,
       },
+      rating: data.rating ?? 0,
     };
 
     let ratingResult = null;
@@ -135,26 +164,6 @@ function ReviewRegister() {
   };
 
   useEffect(() => {
-    reset({
-      review: '',
-      status: 'PUBLIC',
-      price_type: 'GLASS',
-      price: null,
-      flavor_tags: [],
-      images: [],
-      imageUrlList: null,
-      locationName: null,
-      address: null,
-      detailAddress: null,
-      zipCode: null,
-      mapUrl: null,
-      category: null,
-      latitude: null,
-      longitude: null,
-    });
-  }, []);
-
-  useEffect(() => {
     if (alcoholId) {
       (async () => {
         const alcoholResult = await AlcoholsApi.getAlcoholDetails(alcoholId);
@@ -171,10 +180,10 @@ function ReviewRegister() {
   }, [alcoholId]);
 
   useEffect(() => {
-    if (errors.review?.message) {
+    if (errors.review?.message || errors.price_type?.message) {
       handleModalState({
         isShowModal: true,
-        mainText: errors.review?.message,
+        mainText: errors.review?.message || errors.price_type?.message,
         type: 'ALERT',
       });
     }

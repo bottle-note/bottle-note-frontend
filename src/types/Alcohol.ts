@@ -15,24 +15,6 @@ export interface AlcoholAPI {
   isPicked: boolean;
 }
 
-export interface AlcoholDetails {
-  alcohols: AlcoholInfo;
-  friendsInfo: {
-    followerCount: number;
-    friends: {
-      user_image_url: string;
-      userId: number;
-      nickName: string;
-      rating: number;
-    }[];
-  };
-  reviewList: {
-    totalReviewCount: number;
-    bestReviewInfos: Review[];
-    recentReviewInfos: Review[];
-  };
-}
-
 export interface AlcoholInfo {
   alcoholId: number;
   alcoholUrlImg: string;
@@ -43,15 +25,34 @@ export interface AlcoholInfo {
   korRegion: string;
   engRegion: string;
   cask: string;
-  avg: string;
+  abv: string;
   korDistillery: string;
   engDistillery: string;
   rating: number;
-  totalRatingsCount: number;
-  totalRatings: number;
+  myAvgRating: number;
   myRating: number;
+  totalRatingsCount: number;
   isPicked: boolean;
-  tags: string[];
+  alcoholsTastingTags: string[];
+}
+
+export interface FriendsInfo {
+  followerCount: number;
+  friends: {
+    user_image_url: string;
+    userId: number;
+    nickName: string;
+    rating: number;
+  }[];
+}
+
+export interface AlcoholDetails {
+  alcohols: AlcoholInfo;
+  friendsInfo: FriendsInfo;
+  reviewInfo: {
+    totalCount: number;
+    reviewList: Review[];
+  };
 }
 
 export interface RegionApi {

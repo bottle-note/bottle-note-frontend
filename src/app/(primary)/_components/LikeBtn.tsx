@@ -26,7 +26,7 @@ const LikeBtn = ({
   handleNotLogin,
   unLikeIconColor = 'gray',
   likeIconColor = 'subcoral',
-  size = 14,
+  size = 18,
 }: Props) => {
   const { isLogin } = AuthService;
   const { handleModalState } = useModalStore();
@@ -75,7 +75,7 @@ const LikeBtn = ({
         />
       )}
       {likeBtnName && (
-        <p className="text-mainGray font-bold text-10">{likeBtnName}</p>
+        <p className="text-mainGray font-bold text-14">{likeBtnName}</p>
       )}
     </button>
   );

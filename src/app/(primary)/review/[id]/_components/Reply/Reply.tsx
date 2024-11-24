@@ -115,7 +115,7 @@ function Reply({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Link href={`/user/${data?.userId}`}>
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-1 h-8">
               <div className="w-[1.4rem] h-[1.4rem] rounded-full overflow-hidden">
                 <Image
                   className="object-cover"
@@ -125,19 +125,19 @@ function Reply({
                   height={22}
                 />
               </div>
-              <p className="text-mainGray text-10">
+              <p className="text-mainGray text-12">
                 {truncStr(data?.nickName, 12)}
               </p>
               {isReviewUser && (
                 <Label
                   name="리뷰 작성자"
-                  styleClass="border-mainCoral text-mainCoral px-1.5 py-0.5 rounded text-9"
+                  styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] rounded text-9"
                 />
               )}
             </div>
           </Link>
           <div className="flex justify-between">
-            <p className="text-mainGray text-10">
+            <p className="text-mainGray text-11">
               {formatDate(data?.createAt)}
             </p>
             {data?.status !== 'DELETED' && (
@@ -150,15 +150,15 @@ function Reply({
               >
                 <Image
                   src="/icon/ellipsis-darkgray.svg"
-                  width={10}
-                  height={10}
+                  width={14}
+                  height={14}
                   alt="report"
                 />
               </button>
             )}
           </div>
         </div>
-        <div className="text-10 text-mainDarkGray whitespace-pre-wrap break-words flex">
+        <div className="text-12 text-mainDarkGray whitespace-pre-wrap break-words flex">
           <div className="text-mainCoral mr-1">
             {'rootReviewId' in data && `@${data?.nickName}`}
           </div>
