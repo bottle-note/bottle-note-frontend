@@ -123,7 +123,9 @@ export const AlcoholsApi = {
   },
 
   async getAlcoholDetails(alcoholId: string) {
-    const response = await fetchWithAuth(`/bottle-api/alcohols/${alcoholId}`);
+    const response = await fetchWithAuth(`/bottle-api/alcohols/${alcoholId}`, {
+      requireAuth: false,
+    });
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');

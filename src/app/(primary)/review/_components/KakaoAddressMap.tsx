@@ -217,7 +217,7 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
             type="text"
             id="keyword"
             ref={keywordRef}
-            className="w-full bg-white rounded-lg h-10 pl-4 pr-12 text-mainDarkGray border-subCoral border outline-none placeholder-mainCoral text-15"
+            className="w-full bg-white rounded-lg h-10 pl-4 pr-12 text-subCoral border-subCoral border outline-none placeholder-mainCoral text-15"
             placeholder="도로명 주소 혹은 상호명 입력"
             value={searchText}
             onChange={(e) => {

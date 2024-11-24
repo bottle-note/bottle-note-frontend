@@ -4,54 +4,68 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+
 import Star from '@/components/Star';
-import { truncStr } from '@/utils/truncStr';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
-import Label from '@/app/(primary)/_components/Label';
 import Review from '@/app/(primary)/search/[category]/[id]/_components/Review';
-import { AlcoholDetails } from '@/types/Alcohol';
 import LinkButton from '@/components/LinkButton';
 import NavLayout from '@/app/(primary)/_components/NavLayout';
 import StarRating from '@/components/StarRaiting';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
-import PickBtn from '@/app/(primary)/_components/PickBtn';
 import Modal from '@/components/Modal';
+import { truncStr } from '@/utils/truncStr';
+import { shareOrCopy } from '@/utils/shareOrCopy';
+import { AuthService } from '@/lib/AuthService';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
-import { shareOrCopy } from '@/utils/shareOrCopy';
-import { AuthService } from '@/lib/AuthService';
+import { AlcoholDetails } from '@/types/Alcohol';
+import AlcoholBox from './_components/AlcoholBox';
 import FlavorTag from '../../../_components/FlavorTag';
 
-type Details = {
+interface DetailItem {
   title: string;
   content: string;
-};
+}
 
-function SearchCategory() {
+function SearchAlcohol() {
   const router = useRouter();
   const params = useParams();
   const { isLogin } = AuthService;
   const { category, id: alcoholId } = params;
   const { state, handleModalState, handleLoginModal } = useModalStore();
+
   const [data, setData] = useState<AlcoholDetails | null>(null);
-  const [details, setDetails] = useState<Details[]>([]);
+  const [alcoholDetails, setAlcoholDetails] = useState<DetailItem[]>([]);
   const [isPicked, setIsPicked] = useState<boolean>(false);
   const [rate, setRate] = useState(0);
 
   const fetchAlcoholDetails = async (id: string) => {
-    const result = await AlcoholsApi.getAlcoholDetails(id);
-    if (result) {
-      const { alcohols } = result;
-      setData(result);
-      setIsPicked(alcohols.isPicked);
-      setDetails([
-        { title: '카테고리', content: alcohols.engCategory },
-        { title: '국가/지역', content: alcohols.engRegion },
-        { title: '캐스크', content: alcohols.cask },
-        { title: '도수', content: alcohols.avg },
-        { title: '증류소', content: alcohols.engDistillery },
-      ]);
+    try {
+      const result = await AlcoholsApi.getAlcoholDetails(id);
+      if (result) {
+        const { alcohols } = result;
+        setData(result);
+        setIsPicked(alcohols.isPicked);
+        setAlcoholDetails([
+          { title: '카테고리', content: alcohols.engCategory || '-' },
+          { title: '국가/지역', content: alcohols.engRegion || '-' },
+          { title: '캐스크', content: alcohols.cask || '-' },
+          { title: '도수(%)', content: alcohols.abv || '-' },
+          { title: '증류소', content: alcohols.engDistillery || '-' },
+        ]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch alcohol details:', error);
+    }
+  };
+
+  const fetchUserRating = async (alcohol: string) => {
+    try {
+      const ratingResult = await RateApi.getUserRating(alcohol);
+      setRate(ratingResult.rating);
+    } catch (error) {
+      console.error('Failed to fetch user rating:', error);
     }
   };
 
@@ -61,10 +75,7 @@ function SearchCategory() {
       fetchAlcoholDetails(alcoholIdString);
 
       if (isLogin) {
-        (async () => {
-          const ratingResult = await RateApi.getUserRating(alcoholIdString);
-          setRate(ratingResult.rating);
-        })();
+        fetchUserRating(alcoholIdString);
       }
     }
   }, [alcoholId, isLogin]);
@@ -121,115 +132,37 @@ function SearchCategory() {
               />
             </SubHeader.Right>
           </SubHeader>
-          <section className="relative z-10 flex px-5 pb-6 space-x-5">
-            <div className="rounded-lg flex-2 bg-white p-4 h-56">
-              <article className="relative h-48 w-28">
-                {data?.alcohols?.alcoholUrlImg && (
-                  <Image
-                    priority
-                    className="max-w-full max-h-full"
-                    src={data.alcohols.alcoholUrlImg}
-                    alt="img"
-                    width={150}
-                    height={200}
-                  />
-                )}
-              </article>
-            </div>
-            <article className="flex-1 py-3 text-white space-y-2 overflow-x-hidden">
-              {data?.alcohols && (
-                <>
-                  <div className="space-y-1">
-                    <Label
-                      name={data.alcohols.korCategory}
-                      styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
-                    />
-                    <h1 className="text-20 font-semibold whitespace-normal break-words">
-                      {data.alcohols.korName &&
-                        truncStr(data.alcohols.korName, 27)}
-                    </h1>
-                    <p className="text-13 whitespace-normal break-words">
-                      {data.alcohols.engName &&
-                        truncStr(data.alcohols.engName.toUpperCase(), 45)}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-end space-x-1">
-                      {data.alcohols.rating && (
-                        <Star
-                          rating={data.alcohols.rating}
-                          size={27}
-                          style="text-white text-27 font-bold"
-                          color="white"
-                        />
-                      )}
-                      <div className="text-9 mb-1">
-                        (유저평가 {data.alcohols.totalRatingsCount})
-                      </div>
-                    </div>
-                    <div className="border-[0.5px] border-white" />
-                    <div className="flex space-x-3">
-                      <button
-                        className="text-10 flex"
-                        onClick={() => {
-                          if (!isLogin || !alcoholId) {
-                            handleLoginModal();
-                            return;
-                          }
-                          router.push(
-                            `/review/register?alcoholId=${alcoholId}`,
-                          );
-                        }}
-                      >
-                        <Image
-                          className="mr-1"
-                          src="/icon/edit-outlined-white.svg"
-                          alt="write"
-                          width={16}
-                          height={16}
-                        />
-                        리뷰 작성
-                      </button>
-                      <div className="border-[0.5px] border-white my-[0.1rem]" />
-                      <PickBtn
-                        isPicked={isPicked}
-                        handleUpdatePicked={() => setIsPicked(!isPicked)}
-                        handleError={() =>
-                          setIsPicked(data?.alcohols?.isPicked)
-                        }
-                        handleNotLogin={handleLoginModal}
-                        pickBtnName="찜하기"
-                        alcoholId={Number(alcoholId)}
-                        size={16}
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-            </article>
-          </section>
+          <AlcoholBox
+            data={data}
+            alcoholId={alcoholId}
+            isPicked={isPicked}
+            setIsPicked={setIsPicked}
+          />
         </div>
         <div className="mb-5">
           <article className="grid place-items-center space-y-2 py-5">
+            {/* API 확인 후 수정 필요 */}
             <p className="text-10 text-mainDarkGray">
               이 술에 대한 평가를 남겨보세요.
             </p>
             <div>
-              <StarRating rate={rate} size={40} handleRate={handleRate} />
+              <StarRating rate={rate} size={50} handleRate={handleRate} />
             </div>
           </article>
           <section className="mx-5 py-5 border-y border-mainGray/30 grid grid-cols-2 gap-2">
-            {details.map((item) => (
+            {alcoholDetails.map((item: DetailItem) => (
               <div
                 key={item.content}
-                className="flex text-13 text-mainDarkGray items-center"
+                className="flex text-13 text-mainDarkGray items-start gap-2"
               >
                 <div className="min-w-14 font-semibold">{item.title}</div>
                 <div className="flex-1 font-light">{item.content}</div>
               </div>
             ))}
           </section>
-          {data?.alcohols?.tags && <FlavorTag tagList={data.alcohols.tags} />}
+          {data?.alcohols?.alcoholsTastingTags && (
+            <FlavorTag tagList={data.alcohols.alcoholsTastingTags} />
+          )}
           <section className="mx-5 py-5 border-b border-mainGray/30 space-y-2">
             {data?.friendsInfo && (
               <>
@@ -239,7 +172,7 @@ function SearchCategory() {
                     {data.friendsInfo.followerCount}
                   </div>
                 </div>
-                <div className="whitespace-nowrap overflow-x-auto flex space-x-5">
+                <div className="whitespace-nowrap overflow-x-auto flex space-x-5 scrollbar-hide">
                   {data.friendsInfo.friends?.map((user) => (
                     <div
                       key={user.userId}
@@ -267,27 +200,19 @@ function SearchCategory() {
             )}
           </section>
         </div>
-        {data?.reviewList && data.reviewList.totalReviewCount !== 0 ? (
+        {data?.reviewInfo?.reviewList && data.reviewInfo.totalCount !== 0 ? (
           <>
             <div className="h-4 bg-sectionWhite" />
             <section className="mx-5 py-5 space-y-3">
               <p className="text-13 text-mainGray font-normal">
-                총 {data?.reviewList?.totalReviewCount}개
+                총 {data.reviewInfo.totalCount}개
               </p>
-              {data?.reviewList?.bestReviewInfos &&
-                data.reviewList.bestReviewInfos.length > 0 && (
-                  <>
-                    <div className="border-b border-mainGray/30" />
-                    <Review data={data.reviewList.bestReviewInfos[0]} />
-                  </>
-                )}
-              {data?.reviewList?.recentReviewInfos &&
-                data.reviewList.recentReviewInfos.length > 0 &&
-                data.reviewList.recentReviewInfos.map((review) => (
-                  <React.Fragment key={review.userId + review.reviewId}>
-                    <Review data={review} />
-                  </React.Fragment>
-                ))}
+              <div className="border-b border-mainGray/30" />
+              {data.reviewInfo.reviewList.map((review) => (
+                <React.Fragment key={review.reviewId}>
+                  <Review data={review} />
+                </React.Fragment>
+              ))}
             </section>
             <section className="mx-5 mb-24">
               <LinkButton
@@ -327,4 +252,4 @@ function SearchCategory() {
   );
 }
 
-export default SearchCategory;
+export default SearchAlcohol;

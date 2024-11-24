@@ -17,20 +17,18 @@ function Label({
   styleClass = 'border-white px-2.5 py-1 rounded-md text-10',
 }: Props) {
   return (
-    <div>
-      <div className={`border inline-block ${styleClass}`}>
-        <div className="flex items-center">
-          {icon && (
-            <Image
-              className="mr-1"
-              src={icon}
-              width={iconWidth}
-              height={iconHeight}
-              alt={name}
-            />
-          )}
-          {name}
-        </div>
+    <div className={`border inline-block ${styleClass}`}>
+      <div className="flex items-center">
+        {icon && (
+          <Image
+            className="mr-1"
+            src={icon}
+            width={iconWidth}
+            height={iconHeight}
+            alt={name}
+          />
+        )}
+        {name}
       </div>
     </div>
   );

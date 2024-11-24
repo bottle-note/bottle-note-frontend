@@ -11,7 +11,7 @@ interface Props {
 }
 
 function validateText(text: string) {
-  const regex = /^[a-zA-Z가-힣]+$/;
+  const regex = /^[a-zA-Z가-힣\s]+$/;
   return regex.test(text);
 }
 

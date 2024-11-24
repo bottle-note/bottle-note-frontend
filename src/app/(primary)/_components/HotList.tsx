@@ -9,7 +9,7 @@ function HotList() {
   return (
     <>
       {popularList.length !== 0 && (
-        <div className="whitespace-nowrap overflow-x-auto flex space-x-2">
+        <div className="whitespace-nowrap overflow-x-auto flex space-x-2 scrollbar-hide">
           {popularList.map((item) => {
             return (
               <div key={item.alcoholId} className="flex-shrink-0">

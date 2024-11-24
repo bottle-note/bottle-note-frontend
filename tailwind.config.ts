@@ -12,6 +12,8 @@ const config: Config = {
         xxs: ['10px', { lineHeight: '16px' }],
         '9': ['9px', '13px'],
         '10': ['10px', '16px'],
+        '11': ['11px', '17px'],
+        '12': ['12px', '18px'],
         '13': ['13px', '19px'],
         '15': ['15px', '23px'],
         '20': ['20px', '30px'],
@@ -46,6 +48,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwind-scrollbar-hide')],
 };
 export default config;
