@@ -31,7 +31,7 @@ function AlcoholInfo({ data }: Props) {
     { title: '캐스크', content: data.cask },
     { title: '증류소', content: data.engDistillery },
     { title: '국가/지역', content: data.engRegion },
-    { title: '도수', content: `${data.avg}%` },
+    { title: '도수', content: `${data.abv}%` },
   ];
 
   return (

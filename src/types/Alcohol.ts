@@ -25,14 +25,15 @@ export interface AlcoholInfo {
   korRegion: string;
   engRegion: string;
   cask: string;
-  avg: string;
+  abv: string;
   korDistillery: string;
   engDistillery: string;
   rating: number;
-  totalRatingsCount: number;
+  myAvgRating: number;
   myRating: number;
+  totalRatingsCount: number;
   isPicked: boolean;
-  tags: string[];
+  alcoholsTastingTags: string[];
 }
 
 export interface FriendsInfo {

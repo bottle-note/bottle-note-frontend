@@ -51,7 +51,7 @@ function SearchAlcohol() {
           { title: '카테고리', content: alcohols.engCategory || '-' },
           { title: '국가/지역', content: alcohols.engRegion || '-' },
           { title: '캐스크', content: alcohols.cask || '-' },
-          { title: '도수(%)', content: alcohols.avg || '-' },
+          { title: '도수(%)', content: alcohols.abv || '-' },
           { title: '증류소', content: alcohols.engDistillery || '-' },
         ]);
       }
@@ -160,7 +160,9 @@ function SearchAlcohol() {
               </div>
             ))}
           </section>
-          {data?.alcohols?.tags && <FlavorTag tagList={data.alcohols.tags} />}
+          {data?.alcohols?.alcoholsTastingTags && (
+            <FlavorTag tagList={data.alcohols.alcoholsTastingTags} />
+          )}
           <section className="mx-5 py-5 border-b border-mainGray/30 space-y-2">
             {data?.friendsInfo && (
               <>
