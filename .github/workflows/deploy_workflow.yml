@@ -39,9 +39,10 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           script: |
             cd /home/bottlenote/app/bottle-note-front-server
+            rm -f .env
             touch  /home/bottlenote/app/bottle-note-front-server/.env
-            echo "${{ secrets.ENV }}" > .env  
-            
+            echo "${{ secrets.ENV }}" | base64 --decode > .env  
+           
       - name: docker compose up
         uses: appleboy/ssh-action@master
         with:
