@@ -8,189 +8,158 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import AlcoholInfo from '@/app/(primary)/review/_components/AlcoholInfo';
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
-import { AlcoholInfo as AlcoholDetails } from '@/types/Alcohol';
 import { FormValues } from '@/types/Review';
 import { ReviewApi } from '@/app/api/ReviewApi';
-import { uploadImages } from '@/utils/S3Upload';
 import { RateApi } from '@/app/api/RateApi';
+import { uploadImages } from '@/utils/S3Upload';
+import { useSingleCall } from '@/hooks/useCallOnce';
+import { useAlcoholDetails } from '@/hooks/useAlcoholDetails';
+import { useErrorModal } from '@/hooks/useErrorModal';
+import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
 import { Button } from '@/components/Button';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
+import Loading from '@/components/Loading';
 import ReviewForm from '../_components/ReviewForm';
 
 function ReviewModify() {
   const router = useRouter();
   const { state, handleModalState } = useModalStore();
+  const { isProcessing, executeApiCall } = useSingleCall();
   const searchParams = useSearchParams();
   const reviewId = searchParams.get('reviewId');
   const [alcoholId, setAlcoholId] = useState<string>('');
-  const [alcoholData, setAlcoholData] = useState<AlcoholDetails>();
   const [initialRating, setInitialRating] = useState<number>(0);
-
-  const schema = yup.object({
-    review: yup.string().required('리뷰 내용을 작성해주세요.'),
-    status: yup.string().required(),
-    price: yup.number().nullable(),
-    price_type: yup
-      .string()
-      .nullable()
-      .transform((value) => (value === '' ? null : value))
-      .when('price', {
-        is: (price: number | null) => price !== null && price > 0,
-        then: (schemaOne) =>
-          schemaOne
-            .oneOf(['GLASS', 'BOTTLE'] as const)
-            .required('Price type is required when price is provided'),
-        otherwise: (schemaTwo) =>
-          schemaTwo.oneOf(['GLASS', 'BOTTLE', null] as const).nullable(),
-      }),
-  }) as yup.ObjectSchema<FormValues>;
+  const { alcoholData } = useAlcoholDetails(alcoholId, 'modify');
 
   const formMethods = useForm<FormValues>({
     mode: 'onChange',
-    resolver: yupResolver(schema),
+    resolver: yupResolver(reviewSchema as yup.ObjectSchema<FormValues>),
   });
 
   const {
     handleSubmit,
     watch,
     reset,
-    formState: { isDirty, errors }, // 적용 필요
+    formState: { isDirty, errors },
   } = formMethods;
 
-  const onSubmit = async (
-    data: FormValues,
-    imgUrl?: { order: number; viewUrl: string }[],
-  ) => {
-    // 별점 POST api
-    const ratingParams = {
-      alcoholId,
-      rating: data.rating ?? 0,
-    };
-
-    const originImgUrlList = watch('imageUrlList') ?? [];
-    const newImgUrlList = imgUrl ?? [];
-
-    // 리뷰 PATCH api
-    const reviewParams = {
-      status: data.status,
-      content: data.review,
-      sizeType: data.price ? data.price_type : null,
-      price: data.price,
-      imageUrlList:
-        originImgUrlList.length > 0 || newImgUrlList.length > 0
-          ? [...originImgUrlList, ...newImgUrlList]
-          : null,
-      tastingTagList: data.flavor_tags,
-      locationInfo: {
-        locationName: data.locationName,
-        address: data.address,
-        detailAddress: data.detailAddress,
-        category: data.category,
-        mapUrl: data.mapUrl,
-        latitude: data.latitude,
-        longitude: data.longitude,
-      },
-      rating: data.rating ?? 0,
-    };
-
-    let ratingResult = null;
-    let reviewResult = null;
-    if (initialRating !== data.rating) {
-      ratingResult = await RateApi.postRating(ratingParams);
-    }
-    if (reviewId) {
-      reviewResult = await ReviewApi.modifyReview(reviewId, reviewParams);
-    }
-
-    if (
-      (initialRating !== data.rating && ratingResult && reviewResult) ||
-      (initialRating === data.rating && reviewResult) ||
-      (initialRating !== data.rating && reviewResult && !ratingResult)
-    ) {
-      handleModalState({
-        isShowModal: true,
-        mainText: '성공적으로 수정했습니다 👍',
-        type: 'ALERT',
-        handleConfirm: () => {
-          router.push(`/review/${reviewId}`);
-          handleModalState({
-            isShowModal: false,
-            mainText: '',
-          });
-        },
-      });
-    } else if (initialRating !== data.rating && ratingResult && !reviewResult) {
-      // alert('리뷰는 등록되지 않았습니다.');
-      router.back();
-    }
-  };
-
-  const onUploadS3 = async (data: FormValues) => {
-    const images = data?.images?.map((file) => file.image);
-    if (images) {
-      try {
-        const PreSignedDBData = await uploadImages('review', images);
-        onSubmit(data, PreSignedDBData);
-      } catch (error) {
-        console.error('S3 업로드 에러:', error);
+  const onSave = async (data: FormValues) => {
+    const processSubmission = async () => {
+      let newImgUrlList = null;
+      const originImgUrlList = watch('imageUrlList') ?? [];
+      if (data.images?.length !== 0) {
+        const images = data?.images?.map((file) => file.image);
+        if (images) {
+          try {
+            newImgUrlList = await uploadImages('review', images);
+          } catch (error) {
+            console.error('S3 업로드 에러:', error);
+            throw error;
+          }
+        }
       }
-    }
-  };
 
-  const onSave = (data: FormValues) => {
-    if (data.images !== null) {
-      onUploadS3(data);
-    } else {
-      onSubmit(data);
-    }
+      const ratingParams = {
+        alcoholId,
+        rating: data.rating ?? 0,
+      };
+
+      const reviewParams = {
+        alcoholId,
+        status: data.status,
+        content: data.review,
+        sizeType: data.price ? data.price_type : null,
+        price: data.price,
+        imageUrlList:
+          originImgUrlList.length > 0 || (newImgUrlList?.length ?? 0) > 0
+            ? [...originImgUrlList, ...(newImgUrlList ?? [])]
+            : null,
+        tastingTagList: data.flavor_tags,
+        locationInfo: {
+          locationName: data.locationName,
+          zipCode: data.zipCode,
+          address: data.address,
+          detailAddress: data.detailAddress,
+          category: data.category,
+          mapUrl: data.mapUrl,
+          latitude: data.latitude,
+          longitude: data.longitude,
+        },
+        rating: data.rating ?? 0,
+      };
+
+      let ratingResult = null;
+      let reviewResult = null;
+      if (initialRating !== data.rating) {
+        ratingResult = await RateApi.postRating(ratingParams);
+      }
+      if (reviewId) {
+        reviewResult = await ReviewApi.modifyReview(reviewId, reviewParams);
+      }
+
+      // 결과 처리 리팩토링 필수로 해야함..!
+      if (
+        (initialRating !== data.rating && ratingResult && reviewResult) ||
+        (initialRating === data.rating && reviewResult) ||
+        (initialRating !== data.rating && reviewResult && !ratingResult)
+      ) {
+        handleModalState({
+          isShowModal: true,
+          mainText: '성공적으로 수정했습니다 👍',
+          type: 'ALERT',
+          handleConfirm: () => {
+            router.push(`/review/${reviewId}`);
+            handleModalState({
+              isShowModal: false,
+              mainText: '',
+            });
+          },
+        });
+      } else if (
+        initialRating !== data.rating &&
+        ratingResult &&
+        !reviewResult
+      ) {
+        router.back();
+      }
+    };
+
+    await executeApiCall(processSubmission);
   };
 
   useEffect(() => {
     (async () => {
       if (reviewId) {
         const result = await ReviewApi.getReviewDetails(reviewId);
+        const { reviewInfo, reviewImageList } = result;
+        const locationInfo = reviewInfo.locationInfo || {};
 
         setAlcoholId(result.alcoholInfo.alcoholId.toString());
         setInitialRating(result.reviewInfo.rating);
+
         reset({
-          review: result.reviewInfo.reviewContent,
-          status: result.reviewInfo.status,
-          price_type: result.reviewInfo.sizeType ?? null,
-          price: result.reviewInfo.price ?? null,
-          flavor_tags: result.reviewInfo.tastingTagList ?? [],
+          review: reviewInfo.reviewContent,
+          status: reviewInfo.status || 'PUBLIC',
+          price_type: reviewInfo.sizeType || null,
+          price: reviewInfo.price || null,
+          flavor_tags: reviewInfo.tastingTagList || [],
           images: null,
-          imageUrlList: result.reviewImageList ?? [],
-          rating: result.reviewInfo.rating,
-          locationName: result.reviewInfo.locationInfo.name,
-          address: result.reviewInfo.locationInfo.address,
-          detailAddress: result.reviewInfo.locationInfo.detailAddress,
-          mapUrl: result.reviewInfo.locationInfo.mapUrl,
+          imageUrlList: reviewImageList || [],
+          rating: reviewInfo.rating || 0,
+          locationName: locationInfo.name,
+          address: locationInfo.address,
+          detailAddress: locationInfo.detailAddress || null,
+          mapUrl: locationInfo.mapUrl || null,
         });
       }
     })();
   }, [reviewId, reset]);
 
-  useEffect(() => {
-    if (alcoholId) {
-      (async () => {
-        const result = await AlcoholsApi.getAlcoholDetails(
-          alcoholId.toString(),
-        );
-        setAlcoholData(result.alcohols);
-      })();
-    }
-  }, [alcoholId]);
+  const { showErrorModal } = useErrorModal<FormValues>(errors);
 
   useEffect(() => {
-    if (errors.review?.message || errors.price_type?.message) {
-      handleModalState({
-        isShowModal: true,
-        mainText: errors.review?.message || errors.price_type?.message,
-        type: 'ALERT',
-      });
-    }
+    showErrorModal(['review', 'price_type']);
   }, [errors]);
 
   return (
@@ -250,6 +219,7 @@ function ReviewModify() {
           <Button onClick={handleSubmit(onSave)} btnName="리뷰 수정" />
         </article>
       </FormProvider>
+      {(isProcessing || !alcoholData) && <Loading />}
       {state.isShowModal && <Modal />}
     </Suspense>
   );

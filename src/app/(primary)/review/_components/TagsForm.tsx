@@ -22,9 +22,11 @@ export default function TagsForm({ korName }: Props) {
   const [tags, setTags] = useState<string[]>([]);
   const [isAdding, setIsAdding] = useState(false);
 
+  const watchTags = watch('flavor_tags');
+
   useEffect(() => {
-    setTags(watch('flavor_tags'));
-  }, [watch('flavor_tags')]);
+    if (watchTags && watchTags.length !== 0) setTags(watchTags);
+  }, [watchTags]);
 
   return (
     <>

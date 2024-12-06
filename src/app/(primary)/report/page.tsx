@@ -10,93 +10,20 @@ import { ReportApi } from '@/app/api/ReportApi';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { Button } from '@/components/Button';
 import { FormValues } from '@/types/Report';
+import { useSingleCall } from '@/hooks/useCallOnce';
+import { useErrorModal } from '@/hooks/useErrorModal';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import OptionSelect from '@/components/List/OptionSelect';
-
-// comment, review는 API 나오면 맞춰서 수정 예정
-const REPORT_TYPE = {
-  review: {
-    title: '리뷰 신고',
-    options: [
-      {
-        type: 'SPAM',
-        name: '스팸 신고',
-      },
-      {
-        type: 'INAPPROPRIATE_CONTENT',
-        name: '부적절한 콘텐츠 신고',
-      },
-      {
-        type: 'FRAUD',
-        name: '사기 신고',
-      },
-      {
-        type: 'COPYRIGHT_INFRINGEMENT',
-        name: '저작권 침해 신고',
-      },
-      {
-        type: 'OTHER',
-        name: '그 외 기타 신고',
-      },
-    ],
-  },
-  comment: {
-    title: '댓글 신고',
-    options: [
-      {
-        type: 'SPAM',
-        name: '스팸 신고',
-      },
-      {
-        type: 'INAPPROPRIATE_CONTENT',
-        name: '부적절한 콘텐츠 신고',
-      },
-      {
-        type: 'FRAUD',
-        name: '사기 신고',
-      },
-      {
-        type: 'COPYRIGHT_INFRINGEMENT',
-        name: '저작권 침해 신고',
-      },
-      {
-        type: 'OTHER',
-        name: '그 외 기타 신고',
-      },
-    ],
-  },
-  user: {
-    title: '유저 신고',
-    options: [
-      {
-        type: 'SPAM',
-        name: '스팸 신고',
-      },
-      {
-        type: 'INAPPROPRIATE_CONTENT',
-        name: '부적절한 콘텐츠 신고',
-      },
-      {
-        type: 'FRAUD',
-        name: '사기 신고',
-      },
-      {
-        type: 'COPYRIGHT_INFRINGEMENT',
-        name: '저작권 침해 신고',
-      },
-      {
-        type: 'OTHER',
-        name: '그 외 기타 신고',
-      },
-    ],
-  },
-};
+import Loading from '@/components/Loading';
+import { REPORT_TYPE } from '@/app/(primary)/report/_constants/index';
 
 export default function Report() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { state, handleModalState } = useModalStore();
+  const { isProcessing, executeApiCall } = useSingleCall();
+
   const type = searchParams.get('type');
   const reportUserId = searchParams.get('userId');
   const reportTitle = REPORT_TYPE[type as 'review' | 'comment' | 'user'].title;
@@ -130,31 +57,41 @@ export default function Report() {
     // console.log('save', data);
 
     // data type은 추후 report API 나오면 맞춰서 함수로 나누기
-    try {
-      let result;
-      if (type === 'user') {
-        result = await ReportApi.registerUserReport(data);
-      }
+    const submitReport = async () => {
+      try {
+        let result;
+        if (type === 'user') {
+          result = await ReportApi.registerUserReport(data);
+        }
 
-      if (result) {
-        handleModalState({
-          isShowModal: true,
-          type: 'ALERT',
-          mainText: '성공적으로 신고되었습니다.',
-          handleConfirm: () => {
-            handleModalState({
-              isShowModal: false,
-              mainText: '',
-            });
-            reset();
-            router.back();
-          },
-        });
+        if (result) {
+          handleModalState({
+            isShowModal: true,
+            type: 'ALERT',
+            mainText: '성공적으로 신고되었습니다.',
+            handleConfirm: () => {
+              handleModalState({
+                isShowModal: false,
+                mainText: '',
+              });
+              reset();
+              router.back();
+            },
+          });
+        }
+      } catch (error) {
+        console.error('Failed to post report:', error);
       }
-    } catch (error) {
-      console.error('Failed to post report:', error);
-    }
+    };
+
+    await executeApiCall(submitReport);
   };
+
+  const { showErrorModal } = useErrorModal<FormValues>(errors);
+
+  useEffect(() => {
+    showErrorModal(['content', 'type']);
+  }, [errors]);
 
   useEffect(() => {
     reset({
@@ -168,16 +105,6 @@ export default function Report() {
       setValue('reportUserId', Number(reportUserId));
     }
   }, [reportUserId]);
-
-  useEffect(() => {
-    if (errors.content?.message || errors.type?.message) {
-      handleModalState({
-        isShowModal: true,
-        mainText: errors.content?.message || errors.type?.message,
-        type: 'ALERT',
-      });
-    }
-  }, [errors]);
 
   return (
     <>
@@ -238,9 +165,14 @@ export default function Report() {
           </div>
         </article>
         <article className="mx-5 space-y-9">
-          <Button onClick={handleSubmit(onSave)} btnName="전송" />
+          <Button
+            onClick={handleSubmit(onSave)}
+            btnName="전송"
+            disabled={isProcessing}
+          />
         </article>
       </section>
+      {isProcessing && <Loading />}
       {state.isShowModal && <Modal />}
     </>
   );
