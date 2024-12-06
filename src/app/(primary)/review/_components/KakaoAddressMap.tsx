@@ -27,8 +27,8 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
     document.head.appendChild(script);
 
     const onLoadKakaoMap = () => {
-      window.kakao.maps.load(() => {
-        const ps = new window.kakao.maps.services.Places();
+      window.Kakao.maps.load(() => {
+        const ps = new window.Kakao.maps.services.Places();
 
         function getListItem(
           index: number,
@@ -160,12 +160,12 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
         }
 
         function placesSearchCB(data: any, status: any) {
-          if (status === window.kakao.maps.services.Status.OK) {
+          if (status === window.Kakao.maps.services.Status.OK) {
             displayPlaces(data);
             setIsOnSearch(false);
-          } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
+          } else if (status === window.Kakao.maps.services.Status.ZERO_RESULT) {
             alert('검색 결과가 존재하지 않습니다.');
-          } else if (status === window.kakao.maps.services.Status.ERROR) {
+          } else if (status === window.Kakao.maps.services.Status.ERROR) {
             handleModalState({
               isShowModal: true,
               mainText: '검색 결과 중 오류가 발생했습니다.',
