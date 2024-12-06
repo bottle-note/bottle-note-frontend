@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import { AuthService } from '@/lib/AuthService';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import handleWebViewMessage from '@/utils/handleWebViewMessage';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
@@ -19,6 +20,14 @@ export default function Login() {
       router.replace('/');
     }
   }, []);
+
+  useEffect(() => {
+    handleWebViewMessage('key');
+  }, []);
+
+  function getDeviceToken(token: any, deviceType: any) {
+    console.log('DeviceInformation from flutter', token, deviceType);
+  }
 
   useEffect(() => {
     if (session) {
