@@ -26,9 +26,11 @@ export default function Login() {
     handleWebViewMessage('key');
   }, []);
 
-  function getDeviceToken(token: any, deviceType: any) {
-    setFlutterData(`${JSON.stringify(token)}, ${JSON.stringify(deviceType)}`);
-  }
+  useEffect(() => {
+    (window as any).getDeviceToken = (token: string, platform: string) => {
+      setFlutterData(token);
+    };
+  }, []);
 
   useEffect(() => {
     if (session) {
