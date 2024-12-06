@@ -23,7 +23,7 @@ export default function Login() {
   }, []);
 
   useEffect(() => {
-    // handleWebViewMessage('key');
+    handleWebViewMessage('key');
   }, []);
 
   function getDeviceToken(token: any, deviceType: any) {
