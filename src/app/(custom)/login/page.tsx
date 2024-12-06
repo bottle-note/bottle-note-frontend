@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
@@ -14,6 +14,7 @@ export default function Login() {
   const { data: session } = useSession();
   const router = useRouter();
   const { isLogin } = AuthService;
+  const [flutterData, setFlutterData] = useState('initial');
 
   useEffect(() => {
     if (isLogin) {
@@ -26,7 +27,7 @@ export default function Login() {
   }, []);
 
   function getDeviceToken(token: any, deviceType: any) {
-    console.log('DeviceInformation from flutter', token, deviceType);
+    setFlutterData(`${JSON.stringify(token)}, ${JSON.stringify(deviceType)}`);
   }
 
   useEffect(() => {
@@ -97,6 +98,10 @@ export default function Login() {
           </SubHeader.Left>
           <SubHeader.Center textColor="text-white">로그인</SubHeader.Center>
         </SubHeader>
+      </section>
+
+      <section>
+        <span>{flutterData}</span>
       </section>
 
       <section className="shrink-0 flex-1 flex">
