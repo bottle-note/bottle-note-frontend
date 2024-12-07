@@ -22,9 +22,9 @@ export default function Login() {
     }
   }, []);
 
-  useEffect(() => {
-    handleWebViewMessage('key');
-  }, []);
+  // useEffect(() => {
+  //   handleWebViewMessage('key');
+  // }, []);
 
   function getDeviceToken(token: string, platform: string) {
     try {
@@ -33,6 +33,12 @@ export default function Login() {
       setFlutterData('error');
     }
   }
+
+  useEffect(() => {
+    (window as any).getDeviceToken = getDeviceToken;
+
+    console.log('getDeviceToken registered to window');
+  }, []);
 
   useEffect(() => {
     if (session) {
