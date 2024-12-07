@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -8,13 +8,16 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import AlcoholInfo from '@/app/(primary)/review/_components/AlcoholInfo';
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
-import { AlcoholInfo as AlcoholDetails } from '@/types/Alcohol';
 import { FormValues } from '@/types/Review';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import { RateApi } from '@/app/api/RateApi';
+import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
 import { uploadImages } from '@/utils/S3Upload';
 import { Button } from '@/components/Button';
+import Loading from '@/components/Loading';
+import { useCallOnce } from '@/hooks/useCallOnce';
+import { useAlcoholDetails } from '@/hooks/useAlcoholDetails';
+import { useErrorModal } from '@/hooks/useErrorModal';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import ReviewForm from '../_components/ReviewForm';
@@ -23,32 +26,17 @@ function ReviewRegister() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { state, handleModalState } = useModalStore();
+  const { isProcessing, executeApiCall } = useCallOnce();
   const alcoholId = searchParams.get('alcoholId') || '';
-  const [alcoholData, setAlcoholData] = useState<AlcoholDetails | null>();
-  const [initialRating, setInitialRating] = useState<number>(0);
-
-  const schema = yup.object({
-    review: yup.string().required('리뷰 내용을 작성해주세요.'),
-    status: yup.string().required(),
-    price: yup.number().nullable(),
-    price_type: yup
-      .string()
-      .nullable()
-      .transform((value) => (value === '' ? null : value))
-      .when('price', {
-        is: (price: number | null) => price !== null && price > 0,
-        then: (schemaOne) =>
-          schemaOne
-            .oneOf(['GLASS', 'BOTTLE'] as const)
-            .required('가격 타입을 선택해주세요.'),
-        otherwise: (schemaTwo) =>
-          schemaTwo.oneOf(['GLASS', 'BOTTLE', null] as const).nullable(),
-      }),
-  }) as yup.ObjectSchema<FormValues>;
+  const {
+    alcoholData,
+    userRating,
+    isLoading: isAlcoholLoading,
+  } = useAlcoholDetails(alcoholId);
 
   const formMethods = useForm<FormValues>({
     mode: 'onChange',
-    resolver: yupResolver(schema),
+    resolver: yupResolver(reviewSchema as yup.ObjectSchema<FormValues>),
     defaultValues: {
       review: '',
       status: 'PUBLIC',
@@ -75,118 +63,98 @@ function ReviewRegister() {
     formState: { isDirty, errors },
   } = formMethods;
 
-  const onSubmit = async (
-    data: FormValues,
-    imgUrl?: { order: number; viewUrl: string }[],
-  ) => {
-    // 별점 POST api
-    const ratingParams = {
-      alcoholId,
-      rating: data.rating ?? 0,
-    };
-    // 리뷰 POST api
-    const reviewParams = {
-      alcoholId,
-      status: data.status,
-      content: data.review,
-      sizeType: data.price ? data.price_type : null,
-      price: data.price,
-      imageUrlList: imgUrl ?? null,
-      tastingTagList: data.flavor_tags,
-      locationInfo: {
-        locationName: data.locationName,
-        zipCode: data.zipCode,
-        address: data.address,
-        detailAddress: data.detailAddress,
-        category: data.category,
-        mapUrl: data.mapUrl,
-        latitude: data.latitude,
-        longitude: data.longitude,
-      },
-      rating: data.rating ?? 0,
-    };
-
-    let ratingResult = null;
-    if (initialRating !== data.rating) {
-      ratingResult = await RateApi.postRating(ratingParams);
-    }
-    const reviewResult = await ReviewApi.registerReview(reviewParams);
-
-    // error에 대해 추후 보완 예정
-    if (
-      (initialRating !== data.rating && ratingResult && reviewResult) ||
-      (initialRating === data.rating && reviewResult) ||
-      (initialRating !== data.rating && reviewResult && !ratingResult)
-    ) {
-      const text =
-        initialRating !== data.rating && !ratingResult
-          ? '❗️별점 등록에는 실패했습니다. 다시 시도해주세요.'
-          : '여정에 한발 더 가까워지셨어요!';
-      handleModalState({
-        isShowModal: true,
-        mainText: '작성을 완료했습니다 👍',
-        subText: text,
-        type: 'ALERT',
-        handleConfirm: () => {
-          router.push(`/review/${reviewResult.id}`);
-          handleModalState({
-            isShowModal: false,
-            mainText: '',
-          });
-        },
-      });
-    } else if (initialRating !== data.rating && ratingResult && !reviewResult) {
-      // alert('리뷰는 등록되지 않았습니다.');
-      router.back();
-    }
-  };
-
-  const onUploadS3 = async (data: FormValues) => {
-    const images = data?.images?.map((file) => file.image);
-
-    if (images) {
-      try {
-        const PreSignedDBData = await uploadImages('review', images);
-        onSubmit(data, PreSignedDBData);
-      } catch (error) {
-        console.error('S3 업로드 에러:', error);
+  const onSave = async (data: FormValues) => {
+    const processSubmission = async () => {
+      let uploadedImageUrls = null;
+      if (data.images?.length !== 0) {
+        const images = data?.images?.map((file) => file.image);
+        if (images) {
+          try {
+            uploadedImageUrls = await uploadImages('review', images);
+          } catch (error) {
+            console.error('S3 업로드 에러:', error);
+            throw error;
+          }
+        }
       }
-    }
-  };
 
-  const onSave = (data: FormValues) => {
-    // console.log('data1', data);
-    if (data.images?.length !== 0) {
-      onUploadS3(data);
-    } else {
-      onSubmit(data);
-    }
+      const ratingParams = {
+        alcoholId,
+        rating: data.rating ?? 0,
+      };
+
+      const reviewParams = {
+        alcoholId,
+        status: data.status,
+        content: data.review,
+        sizeType: data.price ? data.price_type : null,
+        price: data.price,
+        imageUrlList: uploadedImageUrls ?? null,
+        tastingTagList: data.flavor_tags,
+        locationInfo: {
+          locationName: data.locationName,
+          zipCode: data.zipCode,
+          address: data.address,
+          detailAddress: data.detailAddress,
+          category: data.category,
+          mapUrl: data.mapUrl,
+          latitude: data.latitude,
+          longitude: data.longitude,
+        },
+        rating: data.rating ?? 0,
+      };
+
+      let ratingResult = null;
+      if (userRating !== data.rating) {
+        ratingResult = await RateApi.postRating(ratingParams);
+      }
+
+      const reviewResult = await ReviewApi.registerReview(reviewParams);
+
+      // 결과 처리 리팩토링 필수로 해야함..!
+      if (
+        (userRating !== data.rating && ratingResult && reviewResult) ||
+        (userRating === data.rating && reviewResult) ||
+        (userRating !== data.rating && reviewResult && !ratingResult)
+      ) {
+        const text =
+          userRating !== data.rating && !ratingResult
+            ? '❗️별점 등록에는 실패했습니다. 다시 시도해주세요.'
+            : '여정에 한발 더 가까워지셨어요!';
+        handleModalState({
+          isShowModal: true,
+          mainText: '작성을 완료했습니다 👍',
+          subText: text,
+          type: 'ALERT',
+          handleConfirm: () => {
+            router.push(`/review/${reviewResult.id}`);
+            handleModalState({
+              isShowModal: false,
+              mainText: '',
+            });
+          },
+        });
+      } else if (userRating !== data.rating && ratingResult && !reviewResult) {
+        router.back();
+      }
+    };
+
+    await executeApiCall(processSubmission);
   };
 
   useEffect(() => {
-    if (alcoholId) {
-      (async () => {
-        const alcoholResult = await AlcoholsApi.getAlcoholDetails(alcoholId);
-        setAlcoholData(alcoholResult.alcohols);
-
-        const ratingResult = await RateApi.getUserRating(alcoholId);
-        setInitialRating(ratingResult.rating);
-        reset((prev) => ({
-          ...prev,
-          rating: ratingResult.rating,
-        }));
-      })();
+    if (!isAlcoholLoading && userRating) {
+      reset((prev) => ({
+        ...prev,
+        rating: userRating,
+      }));
     }
-  }, [alcoholId]);
+  }, [userRating, isAlcoholLoading]);
+
+  const { showErrorModal } = useErrorModal<FormValues>(errors);
 
   useEffect(() => {
-    if (errors.review?.message || errors.price_type?.message) {
-      handleModalState({
-        isShowModal: true,
-        mainText: errors.review?.message || errors.price_type?.message,
-        type: 'ALERT',
-      });
-    }
+    showErrorModal(['review', 'price_type']);
   }, [errors]);
 
   return (
@@ -243,9 +211,14 @@ function ReviewRegister() {
         </div>
         {alcoholData && <ReviewForm korName={alcoholData.korName} />}
         <article className="px-5 fixed bottom-2 center left-0 right-0">
-          <Button onClick={handleSubmit(onSave)} btnName="리뷰 등록" />
+          <Button
+            onClick={handleSubmit(onSave)}
+            btnName="리뷰 등록"
+            disabled={isProcessing}
+          />
         </article>
       </FormProvider>
+      {(isProcessing || !alcoholData) && <Loading />}
       {state.isShowModal && <Modal />}
     </>
   );

@@ -11,11 +11,11 @@ export default function Layout({
   const { loginState, handleLoginModal } = useModalStore();
 
   return (
-    <main className="bg-white flex flex-col w-full mx-auto min-h-screen">
-      <section className="flex-1 overflow-y-auto">{children}</section>
+    <div className="bg-white flex flex-col w-full mx-auto min-h-screen pb-12">
+      <main className="flex-1 overflow-y-auto">{children}</main>
       {loginState.isShowLoginModal && (
         <LoginModal handleClose={handleLoginModal} />
       )}
-    </main>
+    </div>
   );
 }
