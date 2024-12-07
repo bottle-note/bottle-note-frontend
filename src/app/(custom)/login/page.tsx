@@ -7,6 +7,7 @@ import { signIn, useSession } from 'next-auth/react';
 import { AuthService } from '@/lib/AuthService';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import handleWebViewMessage from '@/utils/handleWebViewMessage';
+import { UserApi } from '@/app/api/UserApi';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
@@ -27,18 +28,25 @@ export default function Login() {
     handleWebViewMessage('key');
   }, []);
 
-  function getDeviceToken(token: string, platform: string) {
+  async function getDeviceToken(token: string, platform: string) {
     try {
       setFlutterData(JSON.stringify(token));
+
+      if (isLogin) {
+        const deviceTokenSendResult = await UserApi.sendDeviceInfo(
+          token,
+          platform,
+        );
+
+        return setFlutterData(deviceTokenSendResult.data.message);
+      }
     } catch (e) {
-      setFlutterData('error');
+      setFlutterData('Failed to send token data');
     }
   }
 
   useEffect(() => {
     (window as any).getDeviceToken = getDeviceToken;
-
-    console.log('getDeviceToken registered to window');
   }, []);
 
   useEffect(() => {
