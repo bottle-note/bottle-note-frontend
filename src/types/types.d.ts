@@ -4,6 +4,10 @@ declare global {
     FlutterMessageQueue: {
       postMessage: (payload: any) => any;
     };
+    getDeviceToken: (
+      token: string,
+      platform: string,
+    ) => { token: string; platform: string };
   }
 }
 
