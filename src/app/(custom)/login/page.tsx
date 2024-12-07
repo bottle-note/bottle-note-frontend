@@ -29,7 +29,7 @@ export default function Login() {
 
   function getDeviceToken(token: string, platform: string) {
     try {
-      setFlutterData(token);
+      setFlutterData(JSON.stringify(token));
     } catch (e) {
       setFlutterData('error');
     }
