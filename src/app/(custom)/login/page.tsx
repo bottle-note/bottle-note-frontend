@@ -26,11 +26,13 @@ export default function Login() {
     handleWebViewMessage('key');
   }, []);
 
-  useEffect(() => {
-    (window as any).getDeviceToken = (token: string, platform: string) => {
+  function getDeviceToken(token: string, platform: string) {
+    try {
       setFlutterData(token);
-    };
-  }, []);
+    } catch (e) {
+      setFlutterData('error');
+    }
+  }
 
   useEffect(() => {
     if (session) {
