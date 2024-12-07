@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export const useSingleCall = () => {
+export const useCallOnce = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const executeApiCall = async (apiCallFunction: () => Promise<void>) => {

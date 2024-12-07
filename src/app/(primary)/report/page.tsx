@@ -10,7 +10,7 @@ import { ReportApi } from '@/app/api/ReportApi';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { Button } from '@/components/Button';
 import { FormValues } from '@/types/Report';
-import { useSingleCall } from '@/hooks/useCallOnce';
+import { useCallOnce } from '@/hooks/useCallOnce';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
@@ -22,7 +22,7 @@ export default function Report() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { state, handleModalState } = useModalStore();
-  const { isProcessing, executeApiCall } = useSingleCall();
+  const { isProcessing, executeApiCall } = useCallOnce();
 
   const type = searchParams.get('type');
   const reportUserId = searchParams.get('userId');

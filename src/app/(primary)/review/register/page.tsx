@@ -15,7 +15,7 @@ import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
 import { uploadImages } from '@/utils/S3Upload';
 import { Button } from '@/components/Button';
 import Loading from '@/components/Loading';
-import { useSingleCall } from '@/hooks/useCallOnce';
+import { useCallOnce } from '@/hooks/useCallOnce';
 import { useAlcoholDetails } from '@/hooks/useAlcoholDetails';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import useModalStore from '@/store/modalStore';
@@ -26,7 +26,7 @@ function ReviewRegister() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { state, handleModalState } = useModalStore();
-  const { isProcessing, executeApiCall } = useSingleCall();
+  const { isProcessing, executeApiCall } = useCallOnce();
   const alcoholId = searchParams.get('alcoholId') || '';
   const {
     alcoholData,
