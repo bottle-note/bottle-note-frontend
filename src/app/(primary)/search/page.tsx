@@ -86,7 +86,7 @@ export default function Search() {
       <main className="mb-24 w-full h-full">
         <SearchContainer
           handleSearchCallback={handleSearchCallback}
-          styleProps="px-5 py-10 bg-subCoral"
+          styleProps="px-5 pt-[5.5rem] pb-10 bg-subCoral"
         />
 
         <section className="flex flex-col gap-7 p-5">

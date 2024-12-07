@@ -12,8 +12,11 @@ import { Button } from '@/components/Button';
 import { uploadImages } from '@/utils/S3Upload';
 import { FormValues } from '@/types/Inquire';
 import useModalStore from '@/store/modalStore';
+import { useCallOnce } from '@/hooks/useCallOnce';
 import Modal from '@/components/Modal';
+import { useErrorModal } from '@/hooks/useErrorModal';
 import OptionSelect from '@/components/List/OptionSelect';
+import Loading from '@/components/Loading';
 import ImagesForm from '../../review/_components/ImagesForm';
 
 const TYPE_OPTIONS = [
@@ -38,6 +41,7 @@ const TYPE_OPTIONS = [
 export default function InquireRegister() {
   const router = useRouter();
   const { state, handleModalState } = useModalStore();
+  const { isProcessing, executeApiCall } = useCallOnce();
 
   const schema = yup.object({
     content: yup
@@ -50,6 +54,12 @@ export default function InquireRegister() {
   const formMethods = useForm<FormValues>({
     mode: 'onChange',
     resolver: yupResolver(schema),
+    defaultValues: {
+      content: '',
+      type: '',
+      images: null,
+      imageUrlList: null,
+    },
   });
 
   const {
@@ -61,17 +71,27 @@ export default function InquireRegister() {
     formState: { errors },
   } = formMethods;
 
-  const onSubmit = async (
-    data: FormValues,
-    imgUrl?: { order: number; viewUrl: string }[],
-  ) => {
-    const params = {
-      content: data.content,
-      type: data.type,
-      imageUrlList: imgUrl ?? null,
-    };
+  const onSave = async (data: FormValues) => {
+    const processSubmission = async () => {
+      let uploadedImageUrls = null;
+      if (data.images?.length !== 0) {
+        const images = data?.images?.map((file) => file.image);
+        if (images) {
+          try {
+            uploadedImageUrls = await uploadImages('inquire', images);
+          } catch (error) {
+            console.error('S3 업로드 에러:', error);
+            throw error;
+          }
+        }
+      }
 
-    try {
+      const params = {
+        content: data.content,
+        type: data.type,
+        imageUrlList: uploadedImageUrls ?? null,
+      };
+
       const result = await InquireApi.registerInquire(params);
 
       if (result) {
@@ -89,49 +109,15 @@ export default function InquireRegister() {
           },
         });
       }
-    } catch (error) {
-      console.error('Failed to post report:', error);
-    }
+    };
+
+    await executeApiCall(processSubmission);
   };
 
-  const onUploadS3 = async (data: FormValues) => {
-    const images = data?.images?.map((file) => file.image);
-
-    if (images) {
-      try {
-        const PreSignedDBData = await uploadImages('inquire', images);
-        onSubmit(data, PreSignedDBData);
-      } catch (error) {
-        console.error('S3 업로드 에러:', error);
-      }
-    }
-  };
-
-  const onSave = (data: FormValues) => {
-    if (data.images?.length !== 0) {
-      onUploadS3(data);
-    } else {
-      onSubmit(data);
-    }
-  };
+  const { showErrorModal } = useErrorModal<FormValues>(errors);
 
   useEffect(() => {
-    reset({
-      content: '',
-      type: '',
-      images: null,
-      imageUrlList: null,
-    });
-  }, []);
-
-  useEffect(() => {
-    if (errors.content?.message || errors.type?.message) {
-      handleModalState({
-        isShowModal: true,
-        mainText: errors.content?.message || errors.type?.message,
-        type: 'ALERT',
-      });
-    }
+    showErrorModal(['content', 'type']);
   }, [errors]);
 
   return (
@@ -200,6 +186,7 @@ export default function InquireRegister() {
             <Button onClick={handleSubmit(onSave)} btnName="전송" />
           </article>
         </section>
+        {isProcessing && <Loading />}
         {state.isShowModal && <Modal />}
       </FormProvider>
     </>

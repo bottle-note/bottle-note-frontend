@@ -18,10 +18,13 @@ export function Button({
   disabled = false,
 }: ButtonProps) {
   return (
+    // disabled면 bg색을 연하게 해주고 싶어
+
     <button
       type={type}
       onClick={onClick}
-      className={`flex justify-center items-center w-full h-[3.8rem] rounded-xl ${btnStyles}`}
+      className={`flex justify-center items-center w-full h-[3.8rem] rounded-xl 
+        ${disabled ? 'bg-brightGray cursor-not-allowed' : btnStyles}`}
       disabled={disabled}
     >
       <span className={btnTextStyles}>{btnName}</span>
