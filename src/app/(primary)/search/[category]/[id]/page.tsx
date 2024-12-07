@@ -93,7 +93,7 @@ function SearchAlcohol() {
 
   return (
     <>
-      {alcoholDetails && data && rate ? (
+      {alcoholDetails && data ? (
         <>
           <NavLayout>
             <div className="relative">
