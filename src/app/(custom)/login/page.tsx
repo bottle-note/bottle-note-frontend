@@ -22,9 +22,9 @@ export default function Login() {
     }
   }, []);
 
-  // useEffect(() => {
-  //   handleWebViewMessage('key');
-  // }, []);
+  useEffect(() => {
+    handleWebViewMessage('key');
+  }, []);
 
   function getDeviceToken(token: string, platform: string) {
     try {
