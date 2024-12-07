@@ -22,6 +22,7 @@ export default function Login() {
     }
   }, []);
 
+  // NOTE: Flutter 통신을 위한 핸들러. 웹 실행시 주석처리 필요 / 추후 플러터 측에서 웹뷰여부 판단하는 핸들링 채널 추가 예정
   useEffect(() => {
     handleWebViewMessage('key');
   }, []);
