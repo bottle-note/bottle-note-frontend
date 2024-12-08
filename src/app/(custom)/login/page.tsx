@@ -137,9 +137,6 @@ export default function Login() {
         </SubHeader>
       </section>
 
-      <span>is logged in : {JSON.stringify(isLogin)}</span>
-      <span>is in app : {JSON.stringify(isInApp)}</span>
-
       <section className="shrink-0 flex-1 flex">
         <div className="flex flex-col items-center justify-center">
           <Image src={LogoWhite} alt="bottle-note-logo" />
