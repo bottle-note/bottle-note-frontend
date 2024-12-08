@@ -64,7 +64,9 @@ export default function Login() {
             DeviceService.platform || '',
           );
 
-          window.sendLogToFlutter(result.data.message);
+          window.sendLogToFlutter(
+            `${result.data.message} / ${result.data.deviceToken} / ${result.data.platform}`,
+          );
           router.replace('/');
           return;
         }
