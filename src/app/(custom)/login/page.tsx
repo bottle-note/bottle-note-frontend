@@ -67,7 +67,7 @@ export default function Login() {
         router.replace('/');
       }
     })();
-  }, []);
+  }, [isLogin]);
 
   // NOTE: 웹뷰 핸들러 함수 window 전역객체 등록
   useLayoutEffect(() => {
