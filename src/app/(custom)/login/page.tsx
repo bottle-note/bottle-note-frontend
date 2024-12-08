@@ -57,17 +57,21 @@ export default function Login() {
   // NOTE: 인앱 상태일 때, 로그인이 완료된 상태일 때 device 정보를 서버로 전달 및 로그인 처리
   useEffect(() => {
     (async () => {
-      if (isInApp && isLogin) {
-        const { deviceToken, platform } = window.deviceInfo;
-        const result = await UserApi.sendDeviceInfo(deviceToken, platform);
+      try {
+        if (isInApp && isLogin) {
+          const { deviceToken, platform } = window.deviceInfo;
+          const result = await UserApi.sendDeviceInfo(deviceToken, platform);
 
-        window.sendLogToFlutter(result.data.message);
-        router.replace('/');
-        return;
-      }
+          window.sendLogToFlutter(result.data.message);
+          router.replace('/');
+          return;
+        }
 
-      if (!isInApp && isLogin) {
-        router.replace('/');
+        if (!isInApp && isLogin) {
+          router.replace('/');
+        }
+      } catch (e) {
+        window.sendLogToFlutter((e as Error).message);
       }
     })();
   }, [isLogin]);
