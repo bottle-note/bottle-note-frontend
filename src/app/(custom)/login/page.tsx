@@ -49,7 +49,7 @@ export default function Login() {
     if (window.isInApp) {
       handleWebViewMessage('deviceToken');
     }
-  }, [window.isInApp]);
+  }, []);
 
   // NOTE: 인앱 상태일 때, 로그인이 완료된 상태일 때 device 정보를 서버로 전달 및 로그인 처리
   useEffect(() => {
