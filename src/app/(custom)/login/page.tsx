@@ -75,7 +75,7 @@ export default function Login() {
     window.checkIsInApp = checkIsInApp;
     window.sendLogToFlutter = sendLogToFlutter;
 
-    handleWebViewMessage('checkIsWebView');
+    handleWebViewMessage('checkIsInApp');
   }, []);
 
   // ----- kakao sdk login

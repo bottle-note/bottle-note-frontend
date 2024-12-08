@@ -20,6 +20,6 @@ export function sendLogToFlutter(log: string) {
   return log;
 }
 
-export function handleWebViewMessage(message: string) {
+export function handleWebViewMessage(message: 'checkIsInApp' | 'deviceToken') {
   return window.FlutterMessageQueue.postMessage(message);
 }
