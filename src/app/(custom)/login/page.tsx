@@ -126,7 +126,8 @@ export default function Login() {
         </SubHeader>
       </section>
 
-      <span>{JSON.stringify(isLogin)}</span>
+      <span>is logged in : {JSON.stringify(isLogin)}</span>
+      <span>is in app : {JSON.stringify(window.isInApp)}</span>
 
       <section className="shrink-0 flex-1 flex">
         <div className="flex flex-col items-center justify-center">
