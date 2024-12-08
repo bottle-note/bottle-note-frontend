@@ -23,7 +23,3 @@ export function sendLogToFlutter(log: string) {
 export function handleWebViewMessage(message: string) {
   return window.FlutterMessageQueue.postMessage(message);
 }
-
-window.getDeviceToken = getDeviceToken;
-window.checkIsInApp = checkIsInApp;
-window.sendLogToFlutter = sendLogToFlutter;
