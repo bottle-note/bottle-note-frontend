@@ -1,3 +1,5 @@
+import { DeviceService } from '@/lib/DeviceService';
+
 export function checkIsInApp(status: string) {
   const result = status === 'false' ? false : Boolean(status);
   window.isInApp = result;
@@ -5,8 +7,8 @@ export function checkIsInApp(status: string) {
 }
 
 export function getDeviceToken(token: string, platform: string) {
-  window.deviceToken = token;
-  window.platform = platform;
+  DeviceService.setDeviceToken(token);
+  DeviceService.setPlatform(platform);
 
   return { deviceToken: token, platform };
 }
