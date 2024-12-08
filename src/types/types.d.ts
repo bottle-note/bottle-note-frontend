@@ -14,7 +14,8 @@ declare global {
     checkIsInApp: (status: string) => boolean;
     sendLogToFlutter: (log: string) => void;
     isInApp: boolean = false;
-    deviceInfo: { deviceToken: string; platform: string };
+    deviceToken: string;
+    platform: string
   }
 }
 

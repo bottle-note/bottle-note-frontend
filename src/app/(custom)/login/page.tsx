@@ -60,8 +60,8 @@ export default function Login() {
       try {
         if (isInApp && isLogin) {
           const result = await UserApi.sendDeviceInfo(
-            window.deviceInfo.deviceToken,
-            window.deviceInfo.platform,
+            window.deviceToken,
+            window.platform,
           );
 
           window.sendLogToFlutter(result.data.message);

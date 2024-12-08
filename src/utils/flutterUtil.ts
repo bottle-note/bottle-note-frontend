@@ -5,7 +5,9 @@ export function checkIsInApp(status: string) {
 }
 
 export function getDeviceToken(token: string, platform: string) {
-  window.deviceInfo = { deviceToken: token, platform };
+  window.deviceToken = token;
+  window.platform = platform;
+
   return { deviceToken: token, platform };
 }
 
