@@ -75,7 +75,7 @@ export default function Login() {
     window.checkIsInApp = checkIsInApp;
     window.sendLogToFlutter = sendLogToFlutter;
 
-    handleWebViewMessage('checkIsInApp');
+    // handleWebViewMessage('checkIsInApp');
   }, []);
 
   // ----- kakao sdk login
@@ -124,6 +124,8 @@ export default function Login() {
           <SubHeader.Center textColor="text-white">로그인</SubHeader.Center>
         </SubHeader>
       </section>
+
+      <span>{JSON.stringify(isLogin)}</span>
 
       <section className="shrink-0 flex-1 flex">
         <div className="flex flex-col items-center justify-center">
