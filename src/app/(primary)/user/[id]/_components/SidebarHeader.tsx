@@ -31,7 +31,7 @@ const Header = ({
   const padding = isOpen ? 'p-7.5' : 'pb-6';
 
   return (
-    <article className={`flex justify-between ${bgColor} ${padding}`}>
+    <article className={`flex justify-between ${bgColor} ${padding} pt-[48px]`}>
       <button>
         <Image src={logoSrc} alt="보틀노트" />
       </button>
