@@ -7,7 +7,11 @@ declare global {
     getDeviceToken: (
       token: string,
       platform: string,
-    ) => { token: string; platform: string };
+    ) => { deviceToken: string; platform: string };
+    checkIsInApp: (status: string) => boolean;
+    sendLogToFlutter: (log: string) => void;
+    isInApp: boolean = false;
+    deviceInfo: { deviceToken: string; platform: string };
   }
 }
 
