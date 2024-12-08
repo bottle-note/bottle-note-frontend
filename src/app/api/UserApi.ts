@@ -83,4 +83,25 @@ export const UserApi = {
 
     return result;
   },
+
+  async sendDeviceInfo(deviceToken: string, platform: string) {
+    const response = await fetchWithAuth(`/bottle-api/push/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        deviceToken,
+        platform,
+      }),
+    });
+
+    const result: ApiResponse<{
+      deviceToken: string;
+      platform: string;
+      message: string;
+    }> = await response.json();
+
+    return result;
+  },
 };

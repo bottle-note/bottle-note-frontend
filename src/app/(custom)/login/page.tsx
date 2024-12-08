@@ -1,11 +1,18 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import { AuthService } from '@/lib/AuthService';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import { UserApi } from '@/app/api/UserApi';
+import {
+  checkIsInApp,
+  getDeviceToken,
+  handleWebViewMessage,
+  sendLogToFlutter,
+} from '@/utils/flutterUtil';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
@@ -13,12 +20,6 @@ export default function Login() {
   const { data: session } = useSession();
   const router = useRouter();
   const { isLogin } = AuthService;
-
-  useEffect(() => {
-    if (isLogin) {
-      router.replace('/');
-    }
-  }, []);
 
   useEffect(() => {
     if (session) {
@@ -42,6 +43,40 @@ export default function Login() {
       }
     }
   }, [session]);
+
+  // NOTE: 인앱 상태일 때 웹뷰에 device token 발급 요청
+  useEffect(() => {
+    if (window.isInApp) {
+      handleWebViewMessage('deviceToken');
+    }
+  }, []);
+
+  // NOTE: 인앱 상태일 때, 로그인이 완료된 상태일 때 device 정보를 서버로 전달 및 로그인 처리
+  useEffect(() => {
+    (async () => {
+      if (window.isInApp && isLogin) {
+        const { deviceToken, platform } = window.deviceInfo;
+        const result = await UserApi.sendDeviceInfo(deviceToken, platform);
+
+        window.sendLogToFlutter(result.data.message);
+        router.replace('/');
+        return;
+      }
+
+      if (isLogin) {
+        router.replace('/');
+      }
+    })();
+  }, []);
+
+  // NOTE: 웹뷰 핸들러 함수 window 전역객체 등록
+  useLayoutEffect(() => {
+    window.getDeviceToken = getDeviceToken;
+    window.checkIsInApp = checkIsInApp;
+    window.sendLogToFlutter = sendLogToFlutter;
+
+    handleWebViewMessage('checkIsInApp');
+  }, []);
 
   // ----- kakao sdk login
   useEffect(() => {
