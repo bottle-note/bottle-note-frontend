@@ -59,8 +59,10 @@ export default function Login() {
     (async () => {
       try {
         if (isInApp && isLogin) {
-          const { deviceToken, platform } = window.deviceInfo;
-          const result = await UserApi.sendDeviceInfo(deviceToken, platform);
+          const result = await UserApi.sendDeviceInfo(
+            window.deviceInfo.deviceToken,
+            window.deviceInfo.platform,
+          );
 
           window.sendLogToFlutter(result.data.message);
           router.replace('/');
