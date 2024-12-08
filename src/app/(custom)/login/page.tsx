@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
@@ -20,7 +20,7 @@ export default function Login() {
   const { data: session } = useSession();
   const router = useRouter();
   const { isLogin } = AuthService;
-  const [isInApp, setIsInApp] = useState('no');
+  const isInApp = useRef(false);
 
   useEffect(() => {
     if (session) {
@@ -49,14 +49,14 @@ export default function Login() {
   useEffect(() => {
     if (window.isInApp) {
       handleWebViewMessage('deviceToken');
-      setIsInApp('yes');
+      isInApp.current = window.isInApp;
     }
   }, []);
 
   // NOTE: 인앱 상태일 때, 로그인이 완료된 상태일 때 device 정보를 서버로 전달 및 로그인 처리
   useEffect(() => {
     (async () => {
-      if (window.isInApp && isLogin) {
+      if (isInApp.current && isLogin) {
         const { deviceToken, platform } = window.deviceInfo;
         const result = await UserApi.sendDeviceInfo(deviceToken, platform);
 
@@ -65,7 +65,7 @@ export default function Login() {
         return;
       }
 
-      if (!window.isInApp && isLogin) {
+      if (!isInApp.current && isLogin) {
         router.replace('/');
       }
     })();
@@ -129,7 +129,7 @@ export default function Login() {
       </section>
 
       <span>is logged in : {JSON.stringify(isLogin)}</span>
-      <span>is in app : {isInApp}</span>
+      <span>is in app : {isInApp.current}</span>
 
       <section className="shrink-0 flex-1 flex">
         <div className="flex flex-col items-center justify-center">
