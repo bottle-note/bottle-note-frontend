@@ -63,7 +63,7 @@ export default function Login() {
         return;
       }
 
-      if (isLogin) {
+      if (!window.isInApp && isLogin) {
         router.replace('/');
       }
     })();
