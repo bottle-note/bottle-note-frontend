@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
@@ -20,6 +20,7 @@ export default function Login() {
   const { data: session } = useSession();
   const router = useRouter();
   const { isLogin } = AuthService;
+  const [isInApp, setIsInApp] = useState('no');
 
   useEffect(() => {
     if (session) {
@@ -48,6 +49,7 @@ export default function Login() {
   useEffect(() => {
     if (window.isInApp) {
       handleWebViewMessage('deviceToken');
+      setIsInApp('yes');
     }
   }, []);
 
@@ -127,7 +129,7 @@ export default function Login() {
       </section>
 
       <span>is logged in : {JSON.stringify(isLogin)}</span>
-      <span>is in app : {JSON.stringify(window.isInApp)}</span>
+      <span>is in app : {isInApp}</span>
 
       <section className="shrink-0 flex-1 flex">
         <div className="flex flex-col items-center justify-center">
