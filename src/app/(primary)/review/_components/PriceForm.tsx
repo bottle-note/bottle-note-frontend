@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
+import OptionsContainer from './OptionsContainer';
 
 interface OptionProps {
   label: string;
@@ -14,7 +15,6 @@ const options: OptionProps[] = [
 
 export default function PriceForm() {
   const { register, watch, setValue } = useFormContext();
-  const [isOpen, setIsOpen] = useState(false);
 
   const getPriceTypeLabel = (priceType: 'BOTTLE' | 'GLASS' | null) => {
     if (priceType === 'BOTTLE') return '1병에';
@@ -22,82 +22,78 @@ export default function PriceForm() {
     return '';
   };
 
+  const resetPrice = () => {
+    setValue('price', '');
+    setValue('price_type', null);
+  };
+
   return (
-    <article className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div
-          className={`flex items-center space-x-1 ${watch('price') || watch('price_type') ? 'w-[80%]' : 'w-full'}`}
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <Image
-            src="/icon/money-subcoral.svg"
-            alt="moneyIcon"
-            width={24}
-            height={24}
-          />
-          <p className="text-12 text-mainDarkGray font-bold">
-            가격 <span className="text-mainGray font-normal">(선택)</span>
-          </p>
+    <OptionsContainer
+      iconSrc="/icon/money-subcoral.svg"
+      iconAlt="moneyIcon"
+      title="가격"
+      subTitle="(선택)"
+    >
+      <div className="w-full pl-7 space-y-3">
+        <div className="flex items-center space-x-3">
+          {options.map((option) => (
+            <label
+              key={option.value}
+              htmlFor={option.value}
+              className="flex items-center text-mainDarkGray text-10"
+            >
+              <input
+                type="radio"
+                className="mr-1"
+                id={option.value}
+                value={option.value}
+                {...register('price_type')}
+                checked={watch('price_type') === option.value}
+              />
+              {option.label}
+            </label>
+          ))}
         </div>
-        {(watch('price') || watch('price_type')) && (
-          <div
-            className="flex items-center cursor-pointer"
-            onClick={() => {
-              setValue('price', null);
-              setValue('price_type', null);
-            }}
-          >
-            <p className="text-10 text-mainGray">입력삭제</p>
-            <Image
-              src="/icon/close-subcoral.svg"
-              alt="closeIcon"
-              width={18}
-              height={18}
-            />
+        {watch('price_type') && (
+          <div className="flex items-center justify-between">
+            <div className="h-5 w-60 border-b border-subCoral flex items-center">
+              <p className="text-subCoral text-10 font-semibold w-8">
+                {getPriceTypeLabel(watch('price_type'))}
+              </p>
+              <input
+                type="number"
+                placeholder="얼마에 마셨는지 기록해보세요!"
+                className="text-10 font-[#BFBFBF] w-full text-mainDarkGray text-right"
+                maxLength={10}
+                {...register('price')}
+              />
+              <Image
+                src="/icon/won-subcoral.svg"
+                alt="wonIcon"
+                width={15}
+                height={15}
+              />
+            </div>
+            <div
+              className="flex items-center space-x-[2px]"
+              onClick={resetPrice}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  resetPrice();
+                }
+              }}
+            >
+              <p className="text-12 text-mainGray">초기화</p>
+              <Image
+                src="/icon/reset-mainGray.svg"
+                alt="resetIcon"
+                width={13}
+                height={13}
+              />
+            </div>
           </div>
         )}
       </div>
-      {isOpen && (
-        <div className="w-[80%] pl-7">
-          <div className="flex items-center space-x-3">
-            {options.map((option) => (
-              <label
-                key={option.value}
-                htmlFor={option.value}
-                className="flex items-center text-mainDarkGray text-10"
-              >
-                <input
-                  type="radio"
-                  className="mr-1"
-                  id={option.value}
-                  value={option.value}
-                  {...register('price_type')}
-                  checked={watch('price_type') === option.value}
-                />
-                {option.label}
-              </label>
-            ))}
-          </div>
-          <div className="border-b border-subCoral py-2 flex items-center">
-            <p className="text-subCoral text-10 font-semibold w-8">
-              {getPriceTypeLabel(watch('price_type'))}
-            </p>
-            <input
-              type="number"
-              placeholder="얼마에 마셨는지 기록해보세요!"
-              className="text-10 font-[#BFBFBF] w-full text-mainDarkGray text-right"
-              maxLength={10}
-              {...register('price')}
-            />
-            <Image
-              src="/icon/won-subcoral.svg"
-              alt="wonIcon"
-              width={15}
-              height={15}
-            />
-          </div>
-        </div>
-      )}
-    </article>
+    </OptionsContainer>
   );
 }
