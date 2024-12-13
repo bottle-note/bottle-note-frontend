@@ -100,7 +100,7 @@ export const UserApi = {
       deviceToken: string;
       platform: string;
       message: string;
-    }> = await response.json();
+    }> = await response;
 
     return result;
   },

@@ -13,6 +13,7 @@ import {
   handleWebViewMessage,
   sendLogToFlutter,
 } from '@/utils/flutterUtil';
+import { DeviceService } from '@/lib/DeviceService';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
@@ -20,6 +21,7 @@ export default function Login() {
   const { data: session } = useSession();
   const router = useRouter();
   const { isLogin } = AuthService;
+  const { isInApp, setIsInApp } = DeviceService;
 
   useEffect(() => {
     if (session) {
@@ -48,26 +50,35 @@ export default function Login() {
   useEffect(() => {
     if (window.isInApp) {
       handleWebViewMessage('deviceToken');
+      setIsInApp(window.isInApp);
     }
   }, []);
 
   // NOTE: 인앱 상태일 때, 로그인이 완료된 상태일 때 device 정보를 서버로 전달 및 로그인 처리
   useEffect(() => {
     (async () => {
-      if (window.isInApp && isLogin) {
-        const { deviceToken, platform } = window.deviceInfo;
-        const result = await UserApi.sendDeviceInfo(deviceToken, platform);
+      try {
+        if (isInApp && isLogin) {
+          const result = await UserApi.sendDeviceInfo(
+            DeviceService.deviceToken || '',
+            DeviceService.platform || '',
+          );
 
-        window.sendLogToFlutter(result.data.message);
-        router.replace('/');
-        return;
-      }
+          window.sendLogToFlutter(
+            `${result.data.message} / ${result.data.deviceToken} / ${result.data.platform}`,
+          );
+          router.replace('/');
+          return;
+        }
 
-      if (isLogin) {
-        router.replace('/');
+        if (!isInApp && isLogin) {
+          router.replace('/');
+        }
+      } catch (e) {
+        window.sendLogToFlutter((e as Error).message);
       }
     })();
-  }, []);
+  }, [isLogin]);
 
   // NOTE: 웹뷰 핸들러 함수 window 전역객체 등록
   useLayoutEffect(() => {
@@ -75,6 +86,7 @@ export default function Login() {
     window.checkIsInApp = checkIsInApp;
     window.sendLogToFlutter = sendLogToFlutter;
 
+    // NOTE: isInApp 확인하는 함수를 플러터에서 직접 실행하도록 변경 예정, 개발모드 사용시 일단 주석처리하고 개발하세요.
     handleWebViewMessage('checkIsInApp');
   }, []);
 

@@ -4,6 +4,9 @@ declare global {
     FlutterMessageQueue: {
       postMessage: (payload: any) => any;
     };
+     LogToFlutter: {
+      postMessage: (payload: any) => any;
+    };
     getDeviceToken: (
       token: string,
       platform: string,
@@ -11,7 +14,8 @@ declare global {
     checkIsInApp: (status: string) => boolean;
     sendLogToFlutter: (log: string) => void;
     isInApp: boolean = false;
-    deviceInfo: { deviceToken: string; platform: string };
+    deviceToken: string;
+    platform: string
   }
 }
 
