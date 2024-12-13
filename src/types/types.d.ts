@@ -1,5 +1,6 @@
 declare global {
   interface Window {
+    kakao: any;
     Kakao: any;
     FlutterMessageQueue: {
       postMessage: (payload: any) => any;

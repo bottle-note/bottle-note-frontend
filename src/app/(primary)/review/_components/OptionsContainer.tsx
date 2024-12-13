@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 
 interface Props {
@@ -6,7 +6,11 @@ interface Props {
   iconAlt: string;
   title: string;
   subTitle?: string;
+  forceOpen?: boolean;
   children: React.ReactNode;
+  titleSideArea?: {
+    component: React.ReactNode;
+  };
 }
 
 export default function OptionsContainer({
@@ -14,16 +18,26 @@ export default function OptionsContainer({
   iconAlt,
   title,
   subTitle = '',
+  forceOpen = false,
   children,
+  titleSideArea,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleTitleClick = () => {
+    setIsOpen(!isOpen);
+  };
+
+  useEffect(() => {
+    if (forceOpen) setIsOpen(forceOpen);
+  }, [forceOpen]);
 
   return (
     <article className="space-y-2">
       <div className="flex items-center justify-between">
         <div
           className="flex items-center space-x-1 w-full"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={handleTitleClick}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               setIsOpen(!isOpen);
@@ -35,6 +49,18 @@ export default function OptionsContainer({
             {title}{' '}
             <span className="text-mainGray font-normal">{subTitle}</span>
           </p>
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.stopPropagation();
+              }
+            }}
+          >
+            {titleSideArea?.component}
+          </div>
         </div>
         <div className="flex items-center cursor-pointer">
           {isOpen ? (
