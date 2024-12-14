@@ -37,8 +37,8 @@ export default function HoverTouchBox({ children, tooltipContent }: Props) {
     }
   };
 
-  const childrenWithProps = React.isValidElement(children)
-    ? React.cloneElement(children as React.ReactElement<any>, {
+  const childrenWithProps = isValidElement(children)
+    ? cloneElement(children as React.ReactElement<any>, {
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
         onClick: handleTouch,

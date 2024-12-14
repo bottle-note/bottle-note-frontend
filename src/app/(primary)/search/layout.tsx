@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -17,3 +16,5 @@ export default function Layout({
     </NavLayout>
   );
 }
+
+/* eslint-disable jsx-a11y/click-events-have-key-events */

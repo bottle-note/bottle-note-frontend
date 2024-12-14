@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { truncStr } from '@/utils/truncStr';
 import { AlcoholInfo as AlcoholType } from '@/types/Alcohol';
 import useModalStore from '@/store/modalStore';

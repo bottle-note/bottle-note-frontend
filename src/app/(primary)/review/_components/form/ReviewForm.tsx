@@ -22,11 +22,7 @@ const Section = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-interface Props {
-  korName: string;
-}
-
-function ReviewForm({ korName }: Props) {
+function ReviewForm() {
   return (
     <section className="px-5 pt-9 pb-20">
       <Section>
@@ -35,7 +31,7 @@ function ReviewForm({ korName }: Props) {
         <PriceForm />
         <AddressForm />
         <ImagesForm />
-        <TagsForm korName={korName} />
+        <TagsForm />
       </Section>
     </section>
   );

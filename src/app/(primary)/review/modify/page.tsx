@@ -214,7 +214,7 @@ function ReviewModify() {
           </SubHeader>
           {alcoholData && <AlcoholInfo data={alcoholData} />}
         </div>
-        {alcoholData && <ReviewForm korName={alcoholData.korName} />}
+        {alcoholData && <ReviewForm />}
         <article className="px-5 fixed bottom-5 center left-0 right-0">
           <Button onClick={handleSubmit(onSave)} btnName="리뷰 수정" />
         </article>

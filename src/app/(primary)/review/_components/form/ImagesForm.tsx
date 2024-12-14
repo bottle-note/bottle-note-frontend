@@ -91,7 +91,7 @@ export default function ImagesForm() {
   const ExtraButtons = (
     <div className="flex items-center">
       <button
-        onClick={(e) => {
+        onClick={() => {
           imageRefModify.current?.click();
         }}
         className="text-subCoral text-12"
@@ -114,7 +114,7 @@ export default function ImagesForm() {
 
   useEffect(() => {
     forceOpen && setForceOpen(false);
-  }, [previewImages]);
+  }, [previewImages, forceOpen]);
 
   return (
     <OptionsContainer

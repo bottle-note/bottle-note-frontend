@@ -4,19 +4,15 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import useModalStore from '@/store/modalStore';
-import OptionsContainer from '../OptionsContainer';
 import HoverTouchBox from '@/components/HoverTouchBox';
-
-interface Props {
-  korName: string;
-}
+import OptionsContainer from '../OptionsContainer';
 
 function validateText(text: string) {
   const regex = /^[a-zA-Z가-힣\s]+$/;
   return regex.test(text);
 }
 
-export default function TagsForm({ korName }: Props) {
+export default function TagsForm() {
   const { handleModalState } = useModalStore();
   const { setValue, watch } = useFormContext();
   const [tagValue, setTagValue] = useState<string>('');
@@ -114,12 +110,19 @@ export default function TagsForm({ korName }: Props) {
         </div>
         {watchTags.length !== 0 && (
           <div className="flex flex-wrap gap-1 pt-2">
-            {watchTags.map((tag: string, index: number) => (
-              <div key={tag + index} className="overflow-hidden flex-shrink-0">
+            {watchTags.map((tag: string) => (
+              <div key={tag} className="overflow-hidden flex-shrink-0">
                 <div className="inline-block text-13 bg-white text-subCoral border border-subCoral px-2 py-1 rounded-md">
                   <div className="flex items-center justify-center space-x-1">
                     <p>{tag}</p>
-                    <span onClick={() => handleDeleteTag(tag)}>
+                    <span
+                      onClick={() => handleDeleteTag(tag)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleDeleteTag(tag);
+                        }
+                      }}
+                    >
                       <Image
                         className="mr-1"
                         src="/icon/reset-mainGray.svg"

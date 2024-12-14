@@ -24,6 +24,10 @@ export default function OptionsContainer({
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleOpen = () => {
+    setIsOpen(!isOpen);
+  };
+
   useEffect(() => {
     if (forceOpen) setIsOpen(forceOpen);
   }, [forceOpen]);
@@ -41,7 +45,12 @@ export default function OptionsContainer({
         </div>
         <div
           className="flex items-center cursor-pointer"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={handleOpen}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleOpen();
+            }
+          }}
         >
           <Image
             src={

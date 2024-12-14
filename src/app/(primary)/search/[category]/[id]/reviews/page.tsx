@@ -7,7 +7,6 @@ import { ReviewApi } from '@/app/api/ReviewApi';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { Review as ReviewType } from '@/types/Review';
 import Review from '@/app/(primary)/search/[category]/[id]/_components/Review';
-import { truncStr } from '@/utils/truncStr';
 import { Button } from '@/components/Button';
 import List from '@/components/List/List';
 import { SORT_TYPE, SORT_ORDER } from '@/types/common';
