@@ -20,7 +20,7 @@ import { Button } from '@/components/Button';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import Loading from '@/components/Loading';
-import ReviewForm from '../_components/ReviewForm';
+import ReviewForm from '../_components/form/ReviewForm';
 
 function ReviewModify() {
   const router = useRouter();

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import useModalStore from '@/store/modalStore';
-import OptionsContainer from './OptionsContainer';
+import OptionsContainer from '../OptionsContainer';
 import HoverTouchBox from '@/components/HoverTouchBox';
 
 interface Props {

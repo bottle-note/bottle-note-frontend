@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import { SaveImages } from '@/types/Image';
-import OptionsContainer from './OptionsContainer';
+import OptionsContainer from '../OptionsContainer';
 
 export default function ImagesForm() {
   const imageRef = useRef<HTMLInputElement>(null);

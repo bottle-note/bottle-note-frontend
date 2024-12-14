@@ -20,7 +20,7 @@ import { useAlcoholDetails } from '@/hooks/useAlcoholDetails';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
-import ReviewForm from '../_components/ReviewForm';
+import ReviewForm from '../_components/form/ReviewForm';
 
 function ReviewRegister() {
   const router = useRouter();

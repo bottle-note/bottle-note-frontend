@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
-import OptionsContainer from './OptionsContainer';
+import OptionsContainer from '../OptionsContainer';
 
 interface OptionProps {
   label: string;

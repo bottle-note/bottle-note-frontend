@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
-import SearchAddress from './SearchAddress';
-import OptionsContainer from './OptionsContainer';
+import SearchAddress from '../SearchAddress';
+import OptionsContainer from '../OptionsContainer';
 
 export default function AddressForm() {
   const { watch, register, setValue } = useFormContext();
