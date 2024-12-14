@@ -4,12 +4,15 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import { SaveImages } from '@/types/Image';
+import OptionsContainer from './OptionsContainer';
 
 export default function ImagesForm() {
   const imageRef = useRef<HTMLInputElement>(null);
+  const imageRefModify = useRef<HTMLInputElement>(null);
   const { setValue, watch } = useFormContext();
   const [previewImages, setPreviewImages] = useState<SaveImages[]>([]);
   const [savedImages, setSavedImages] = useState<SaveImages[]>([]);
+  const [forceOpen, setForceOpen] = useState(false);
 
   const onUploadPreview = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = e.target.files;
@@ -57,8 +60,7 @@ export default function ImagesForm() {
           viewUrl: file.image,
         }));
       setValue('imageUrlList', DBImages);
-      DBImages &&
-        setSavedImages(savedImages.filter((file) => file.order !== order));
+      setSavedImages(savedImages.filter((file) => file.order !== order));
     } else {
       // 새로 업로드된 이미지 삭제
       const images = watch('images');
@@ -86,69 +88,95 @@ export default function ImagesForm() {
     }
   }, []);
 
+  const ExtraButtons = (
+    <div className="flex items-center">
+      <button
+        onClick={(e) => {
+          imageRefModify.current?.click();
+        }}
+        className="text-subCoral text-12"
+      >
+        이미지 수정
+        <input
+          type="file"
+          accept="image/*"
+          hidden
+          ref={imageRefModify}
+          onChange={(e) => {
+            onUploadPreview(e);
+            setForceOpen(true);
+          }}
+          multiple
+        />
+      </button>
+    </div>
+  );
+
+  useEffect(() => {
+    forceOpen && setForceOpen(false);
+  }, [previewImages]);
+
   return (
-    <section className="space-y-1">
-      <article className="flex items-center justify-between">
-        <div className="flex items-center space-x-1">
-          <Image
-            src="/icon/photo-subcoral.svg"
-            alt="placeIcon"
-            width={24}
-            height={24}
-          />
-          <p className="text-12 text-mainDarkGray font-bold">
-            이미지 추가{' '}
-            <span className="text-mainGray font-normal">(선택·최대 5장)</span>
-          </p>
-        </div>
-        <div className="flex items-center">
-          <p className="text-mainGray font-normal text-10">
-            {previewImages?.length === 0 ? '' : '이미지 수정'}
-          </p>
-          <Image
-            src="/icon/arrow-right-subcoral.svg"
-            alt="rightIcon"
-            width={18}
-            height={18}
-            onClick={() => imageRef.current?.click()}
-          />
-          <input
-            type="file"
-            accept="image/*"
-            hidden
-            ref={imageRef}
-            onChange={onUploadPreview}
-            multiple
-          />
-        </div>
-      </article>
-      {previewImages?.length !== 0 && (
-        <div className="flex justify-start items-center h-[3.8rem] space-x-2">
-          {previewImages?.map((data: SaveImages) => (
-            <figure key={data?.order} className="relative h-full">
+    <OptionsContainer
+      iconSrc="/icon/photo-subcoral.svg"
+      iconAlt="photoIcon"
+      title="사진을 남겨보실래요?"
+      subTitle="(선택·최대 5장)"
+      forceOpen={forceOpen}
+      titleSideArea={{
+        component:
+          previewImages?.length !== 0 &&
+          previewImages?.length !== 5 &&
+          ExtraButtons,
+      }}
+    >
+      <div className="flex justify-start items-center h-[3.8rem] space-x-2">
+        {previewImages?.map((data: SaveImages) => (
+          <figure key={data?.order} className="relative h-full">
+            <Image
+              src={data?.image}
+              alt="이미지"
+              height={60}
+              width={60}
+              quality={75}
+              className="h-full"
+            />
+            <button
+              onClick={() => removeImage(data?.image, data?.order)}
+              className="absolute top-0 right-0 bg-black"
+            >
               <Image
-                src={data?.image}
-                alt="이미지"
-                height={60}
-                width={60}
-                quality={75}
-                className="h-full"
+                src="/icon/close-white.svg"
+                width={18}
+                height={18}
+                alt="close"
               />
-              <button
-                onClick={() => removeImage(data?.image, data?.order)}
-                className="absolute top-0 right-0 bg-black"
-              >
-                <Image
-                  src="/icon/close-white.svg"
-                  width={18}
-                  height={18}
-                  alt="close"
-                />
-              </button>
-            </figure>
-          ))}
-        </div>
-      )}
-    </section>
+            </button>
+          </figure>
+        ))}
+        {previewImages?.length < 5 && (
+          <button
+            onClick={() => imageRef.current?.click()}
+            className="h-[3.8rem] w-[3.8rem] border border-subCoral flex flex-col justify-center items-center"
+          >
+            <Image
+              src="/icon/plus-subcoral.svg"
+              width={20}
+              height={20}
+              alt="plus"
+            />
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              ref={imageRef}
+              onChange={onUploadPreview}
+              multiple
+            />
+          </button>
+        )}
+      </div>
+      {/* )} */}
+    </OptionsContainer>
   );
 }

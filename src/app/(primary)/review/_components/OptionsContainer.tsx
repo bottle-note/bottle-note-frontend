@@ -24,10 +24,6 @@ export default function OptionsContainer({
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleTitleClick = () => {
-    setIsOpen(!isOpen);
-  };
-
   useEffect(() => {
     if (forceOpen) setIsOpen(forceOpen);
   }, [forceOpen]);
@@ -35,49 +31,28 @@ export default function OptionsContainer({
   return (
     <article className="space-y-2">
       <div className="flex items-center justify-between">
-        <div
-          className="flex items-center space-x-1 w-full"
-          onClick={handleTitleClick}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              setIsOpen(!isOpen);
-            }
-          }}
-        >
+        <div className="flex items-center space-x-1">
           <Image src={iconSrc} alt={iconAlt} width={24} height={24} />
           <p className="text-12 text-mainDarkGray font-bold">
             {title}{' '}
             <span className="text-mainGray font-normal">{subTitle}</span>
           </p>
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.stopPropagation();
-              }
-            }}
-          >
-            {titleSideArea?.component}
-          </div>
+          {titleSideArea?.component}
         </div>
-        <div className="flex items-center cursor-pointer">
-          {isOpen ? (
-            <Image
-              src="/icon/arrow-up-subcoral.svg"
-              alt="closeIcon"
-              width={16}
-              height={16}
-            />
-          ) : (
-            <Image
-              src="/icon/arrow-down-subcoral.svg"
-              alt="openIcon"
-              width={16}
-              height={16}
-            />
-          )}
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <Image
+            src={
+              isOpen
+                ? '/icon/arrow-up-subcoral.svg'
+                : '/icon/arrow-down-subcoral.svg'
+            }
+            alt={isOpen ? 'closeIcon' : 'openIcon'}
+            width={16}
+            height={16}
+          />
         </div>
       </div>
       {isOpen && children}
