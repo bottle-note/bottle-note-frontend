@@ -1,125 +1,123 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
-import { truncStr } from '@/utils/truncStr';
-import PageModal from '@/components/PageModal';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
-import SelectFlavor from './SelectFlavor';
-import Label from '../../_components/Label';
+import OptionsContainer from './OptionsContainer';
 
 interface Props {
   korName: string;
 }
 
+function validateText(text: string) {
+  const regex = /^[a-zA-Z가-힣\s]+$/;
+  return regex.test(text);
+}
+
 export default function TagsForm({ korName }: Props) {
-  const { state, handleModalState } = useModalStore();
+  const { handleModalState } = useModalStore();
   const { setValue, watch } = useFormContext();
-  const [tagModal, setTagModal] = useState(false);
-  const [tags, setTags] = useState<string[]>([]);
-  const [isAdding, setIsAdding] = useState(false);
+  const [tagValue, setTagValue] = useState<string>('');
 
   const watchTags = watch('flavor_tags');
 
-  useEffect(() => {
-    if (watchTags && watchTags.length !== 0) setTags(watchTags);
-  }, [watchTags]);
+  const handleAddTag = () => {
+    if (tagValue.length === 0) {
+      handleModalState({
+        isShowModal: true,
+        mainText: '추가하고 싶은 태그를 작성해주세요:)',
+        type: 'ALERT',
+      });
+    } else if (watchTags.includes(tagValue)) {
+      handleModalState({
+        isShowModal: true,
+        mainText: '이미 동일한 태그가 있습니다.',
+        type: 'ALERT',
+      });
+    } else if (!validateText(tagValue)) {
+      handleModalState({
+        isShowModal: true,
+        mainText: '태그에 숫자와 특수문자는 추가할 수 없습니다.',
+        type: 'ALERT',
+      });
+    } else {
+      const newTags = [...watchTags, tagValue];
+      setTagValue('');
+      setValue('flavor_tags', newTags);
+    }
+  };
+
+  const handleDeleteTag = (tag: string) => {
+    const saveTags = watchTags.filter((tagName: string) => tag !== tagName);
+    setValue('flavor_tags', saveTags);
+  };
+
+  const ExtraButtons = (
+    <div className="flex gap-1 text-12 text-mainDarkGray">
+      <Image
+        src="/icon/questionmark-gray.svg"
+        alt="questionMarkIcon"
+        width={15}
+        height={15}
+      />
+      <p>{watchTags.length !== 0 && `총 ${watchTags.length}개 입력`}</p>
+    </div>
+  );
 
   return (
     <>
-      <article className={tags.length !== 0 ? 'space-y-2' : ''}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-1">
-            <Image
-              src="/icon/success-subcoral.svg"
-              alt="placeIcon"
-              width={24}
-              height={24}
-            />
-            <p className="text-12 text-mainDarkGray font-bold">
-              FLAVOR TAG 입력하기{' '}
-              <span className="text-mainGray font-normal">(선택)</span>
-            </p>
-            <p className="text-10 text-mainDarkGray">
-              {tags.length !== 0 && `총 ${tags.length}개 추가`}
-            </p>
-          </div>
-          <div className="flex items-center">
-            <p className="text-mainGray font-normal text-10">
-              {tags.length !== 0 && '수정'}
-            </p>
-            <Image
-              src="/icon/arrow-right-subcoral.svg"
-              alt="rightIcon"
-              width={18}
-              height={18}
-              onClick={() => {
-                setTagModal(true);
-              }}
-            />
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-1">
-          {tags.map((tag: string) => (
-            <React.Fragment key={tag}>
-              <Label
-                name={tag}
-                styleClass="border-subCoral text-subCoral px-2 py-0.5 rounded-md text-13"
-              />
-            </React.Fragment>
-          ))}
-        </div>
-      </article>
-      {tagModal && (
-        <PageModal>
-          <SubHeader bgColor="bg-bgGray">
-            <SubHeader.Left
-              onClick={() => {
-                if (isAdding) {
-                  handleModalState({
-                    isShowModal: true,
-                    mainText:
-                      '입력중인 테이스팅 태그가 있습니다.\n정말 나가시겠습니까?',
-                    subText: '태그가 완성되지않으면 없어져요!',
-                    type: 'CONFIRM',
-                    confirmBtnName: '아니요',
-                    cancelBtnName: '예',
-                    handleCancel: () => {
-                      handleModalState({
-                        isShowModal: false,
-                      });
-                      setTagModal(false);
-                      setValue('flavor_tags', tags);
-                    },
-                  });
-                } else {
-                  setTagModal(false);
-                  setValue('flavor_tags', tags);
-                }
-              }}
-            >
-              <Image
-                src="/icon/arrow-left-subcoral.svg"
-                alt="arrowIcon"
-                width={23}
-                height={23}
-              />
-            </SubHeader.Left>
-            <SubHeader.Center textColor="text-subCoral">
-              {korName && truncStr(korName, 14)}
-            </SubHeader.Center>
-          </SubHeader>
-          <SelectFlavor
-            tags={tags}
-            setTags={setTags}
-            setIsAdding={setIsAdding}
+      <OptionsContainer
+        iconSrc="/icon/success-subcoral.svg"
+        iconAlt="tagIcon"
+        title="플레이버 태그 남기실래요?"
+        subTitle="(선택)"
+        titleSideArea={{
+          component: ExtraButtons,
+        }}
+      >
+        <div className="h-9 flex items-center border-b border-subCoral">
+          <input
+            type="text"
+            className="text-13 text-mainDarkGray w-full"
+            placeholder="예) 반건조 된 건자두"
+            value={tagValue}
+            maxLength={12}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setTagValue(e.target.value);
+            }}
           />
-        </PageModal>
-      )}
-      {state.isShowModal && <Modal />}
+          <button
+            className={`text-10 py-[0.13rem] px-2 rounded border  w-16 ${watchTags.length !== 10 ? 'border-subCoral text-subCoral' : 'border-[#BFBFBF] text-[#BFBFBF]'}`}
+            disabled={watchTags.length === 10}
+            onClick={handleAddTag}
+          >
+            태그 등록
+          </button>
+        </div>
+        {watchTags.length !== 0 && (
+          <div className="flex flex-wrap gap-1 pt-2">
+            {watchTags.map((tag: string, index: number) => (
+              <div key={tag + index} className="overflow-hidden flex-shrink-0">
+                <div className="inline-block text-13 bg-white text-subCoral border border-subCoral px-2 py-1 rounded-md">
+                  <div className="flex items-center justify-center space-x-1">
+                    <p>{tag}</p>
+                    <span onClick={() => handleDeleteTag(tag)}>
+                      <Image
+                        className="mr-1"
+                        src="/icon/reset-mainGray.svg"
+                        alt="deleteIcon"
+                        width={15}
+                        height={15}
+                      />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </OptionsContainer>
     </>
   );
 }
