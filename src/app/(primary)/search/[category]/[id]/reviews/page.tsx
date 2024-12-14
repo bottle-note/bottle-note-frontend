@@ -108,7 +108,7 @@ function Reviews() {
           />
         </SubHeader.Left>
         <SubHeader.Center textColor="text-subCoral">
-          {alcoholKorName && truncStr(alcoholKorName, 12)}
+          {alcoholKorName}
         </SubHeader.Center>
       </SubHeader>
       <section className="p-8 space-y-9">
