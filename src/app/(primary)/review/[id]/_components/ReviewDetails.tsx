@@ -236,7 +236,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
           </section>
         )}
         <section className="mx-5 py-5 flex items-center space-x-4">
-          <div className="flex-1 flex text-center justify-center items-center space-x-1">
+          <div className="w-[48%] flex text-center justify-center items-center space-x-1">
             <LikeBtn
               reviewId={data?.reviewInfo?.reviewId}
               isLiked={isLiked}
@@ -247,13 +247,15 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
               handleNotLogin={handleLogin}
               likeBtnName="좋아요"
             />
-            <div className=" text-mainGray text-10 font-normal">
+            <div className="text-mainGray text-12 font-normal">
               좋아요 {data.reviewInfo?.likeCount}
             </div>
           </div>
+
           <span className="border-[0.01rem] w-px border-mainGray opacity-40 h-4" />
+
           <button
-            className="flex-1 flex text-center justify-center items-center space-x-1"
+            className="w-[32%] flex text-center justify-center items-center space-x-1"
             onClick={() => {
               if (!isLogin) {
                 handleLogin();
@@ -276,9 +278,11 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
               댓글 작성
             </p>
           </button>
+
           <span className="border-[0.01rem] w-px border-mainGray opacity-40 h-4" />
+
           <button
-            className="flex-1 flex text-center justify-center items-center space-x-1"
+            className="w-[20%] flex text-center justify-center items-center space-x-1"
             onClick={() => {
               shareOrCopy(
                 `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${data.reviewInfo?.reviewId}`,
