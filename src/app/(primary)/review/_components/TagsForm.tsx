@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import useModalStore from '@/store/modalStore';
 import OptionsContainer from './OptionsContainer';
+import HoverTouchBox from '@/components/HoverTouchBox';
 
 interface Props {
   korName: string;
@@ -55,12 +56,28 @@ export default function TagsForm({ korName }: Props) {
 
   const ExtraButtons = (
     <div className="flex gap-1 text-12 text-mainDarkGray">
-      <Image
-        src="/icon/questionmark-gray.svg"
-        alt="questionMarkIcon"
-        width={15}
-        height={15}
-      />
+      <HoverTouchBox
+        tooltipContent={
+          <div className="absolute left-5 flex items-center bg-white p-2 border border-subCoral rounded-md">
+            <Image
+              src="/icon/questionmark-subcoral.svg"
+              alt="questionMarkIcon"
+              width={15}
+              height={15}
+            />
+            <p className="text-11 text-subCoral">
+              위스키에서 느껴지는 느낌을 태그로 등록해보세요!
+            </p>
+          </div>
+        }
+      >
+        <Image
+          src="/icon/questionmark-gray.svg"
+          alt="questionMarkIcon"
+          width={15}
+          height={15}
+        />
+      </HoverTouchBox>
       <p>{watchTags.length !== 0 && `총 ${watchTags.length}개 입력`}</p>
     </div>
   );
