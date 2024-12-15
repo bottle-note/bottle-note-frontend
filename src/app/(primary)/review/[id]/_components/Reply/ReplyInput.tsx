@@ -76,7 +76,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
   }, [textareaRef]);
 
   return (
-    <div className="fixed bottom-[5.5rem] left-0 right-0 mx-auto w-full max-w-2xl px-4 z-10">
+    <div className="fixed bottom-[6rem] left-0 right-0 mx-auto w-full max-w-2xl px-4 z-10">
       <div className="bg-[#f6f6f6] pt-1 px-3 rounded-lg shadow-md flex items-center">
         <div className="flex-grow flex items-center">
           <textarea

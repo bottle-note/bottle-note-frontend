@@ -21,6 +21,14 @@ function AlcoholInfo({ data, handleLogin }: Props) {
   const { isPicked: originalIsPicked } = data;
   const [isPicked, setIsPicked] = useState<boolean>(originalIsPicked);
 
+  const handleLoginConfirm = () => {
+    if (!isLogin || !data.alcoholId) {
+      handleLogin();
+      return;
+    }
+    router.push(`/review/register?alcoholId=${data.alcoholId}`);
+  };
+
   return (
     <>
       <section className="relative z-10 flex px-5 pb-6 space-x-5">
@@ -51,13 +59,11 @@ function AlcoholInfo({ data, handleLogin }: Props) {
             <div className="flex space-x-3">
               <div
                 className="text-12 font-bold flex"
-                onClick={() => {
-                  if (!isLogin || !data.alcoholId) {
-                    handleLogin();
-                    return;
+                onClick={handleLoginConfirm}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleLoginConfirm();
                   }
-
-                  router.push(`/review/register?alcoholId=${data.alcoholId}`);
                 }}
               >
                 <Image

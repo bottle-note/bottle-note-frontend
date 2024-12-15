@@ -8,8 +8,8 @@ import { motion } from 'framer-motion';
 import { signOut, useSession } from 'next-auth/react';
 import { useBlockScroll } from '@/hooks/useBlockScroll';
 import { AuthService } from '@/lib/AuthService';
-import Logo from 'public/icon/logo-text-subcoral.svg';
-import LogoWhite from 'public/icon/logo-text-white.svg';
+import Logo from 'public/bottle_note_Icon_logo.svg';
+import LogoWhite from 'public/bottle_note_Icon_logo_white.svg';
 import Menu from 'public/icon/menu-subcoral.svg';
 import MenuWhite from 'public/icon/menu-white.svg';
 import SidebarDeco from 'public/sidebar-deco.png';
@@ -31,7 +31,7 @@ const Header = ({
   const padding = isOpen ? 'p-7.5' : 'pb-6';
 
   return (
-    <article className={`flex justify-between ${bgColor} ${padding} pt-[48px]`}>
+    <article className={`flex justify-between ${bgColor} ${padding} pt-16`}>
       <button>
         <Image src={logoSrc} alt="보틀노트" />
       </button>

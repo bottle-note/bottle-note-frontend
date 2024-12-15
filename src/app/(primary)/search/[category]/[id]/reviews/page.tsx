@@ -7,7 +7,6 @@ import { ReviewApi } from '@/app/api/ReviewApi';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { Review as ReviewType } from '@/types/Review';
 import Review from '@/app/(primary)/search/[category]/[id]/_components/Review';
-import { truncStr } from '@/utils/truncStr';
 import { Button } from '@/components/Button';
 import List from '@/components/List/List';
 import { SORT_TYPE, SORT_ORDER } from '@/types/common';
@@ -108,7 +107,7 @@ function Reviews() {
           />
         </SubHeader.Left>
         <SubHeader.Center textColor="text-subCoral">
-          {alcoholKorName && truncStr(alcoholKorName, 12)}
+          {alcoholKorName}
         </SubHeader.Center>
       </SubHeader>
       <section className="p-8 space-y-9">
@@ -200,7 +199,7 @@ function Reviews() {
           )}
         </div>
       </section>
-      <section className="px-5 fixed bottom-2 left-0 right-0">
+      <section className="px-5 fixed bottom-5 left-0 right-0">
         <Button
           onClick={() => {
             if (!isLogin || !alcoholId) {

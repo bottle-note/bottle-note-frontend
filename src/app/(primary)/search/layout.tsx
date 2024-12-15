@@ -1,5 +1,6 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events */
+'use client';
 
+import { usePathname } from 'next/navigation';
 import NavLayout from '../_components/NavLayout';
 
 export default function Layout({
@@ -7,5 +8,13 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <NavLayout>{children}</NavLayout>;
+  const pathname = usePathname();
+
+  return (
+    <NavLayout showNavbar={!pathname.includes('/reviews')}>
+      {children}
+    </NavLayout>
+  );
 }
+
+/* eslint-disable jsx-a11y/click-events-have-key-events */

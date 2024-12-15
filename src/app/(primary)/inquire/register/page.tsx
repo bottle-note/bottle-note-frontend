@@ -17,7 +17,7 @@ import Modal from '@/components/Modal';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import OptionSelect from '@/components/List/OptionSelect';
 import Loading from '@/components/Loading';
-import ImagesForm from '../../review/_components/ImagesForm';
+import ImagesForm from '../../review/_components/form/ImagesForm';
 
 const TYPE_OPTIONS = [
   {

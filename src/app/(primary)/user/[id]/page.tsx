@@ -25,7 +25,7 @@ export default function User({ params: { id } }: { params: { id: string } }) {
   return (
     <NavLayout>
       <main className="text-mainBlack mb-24">
-        <section className="bg-bgGray p-7.5 pb-7">
+        <section className="bg-bgGray px-7.5 pb-7">
           <SidebarHeader />
           <UserInfo
             profileImgSrc={userData?.imageUrl ?? null}
