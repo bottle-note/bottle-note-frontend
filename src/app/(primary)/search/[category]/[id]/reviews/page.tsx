@@ -199,7 +199,7 @@ function Reviews() {
           )}
         </div>
       </section>
-      <section className="px-5 fixed bottom-5 left-0 right-0">
+      <section className="px-5 fixed bottom-6 left-0 right-0">
         <Button
           onClick={() => {
             if (!isLogin || !alcoholId) {
