@@ -132,7 +132,11 @@ export default function MyBottle({
         />
 
         <section className="pt-5 px-5 space-y-7.5">
-          <Tab currentTab={currentTab} handleTab={handleTab} />
+          <Tab
+            currentTab={currentTab}
+            handleTab={handleTab}
+            tabList={tabList}
+          />
 
           <List
             emptyViewText={`아직 활동한\n보틀이 없어요!`}

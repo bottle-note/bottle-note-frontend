@@ -36,18 +36,30 @@ const UserInfo = ({
 
       <article className="space-y-2.5">
         <h1 className="text-3xl font-bold text-subCoral">{nickName}</h1>
-        <button onClick={() => alert('준비중입니다 ㅎㅎ..')}>
-          <div className="flex gap-2">
+
+        <div className="flex gap-2">
+          <button
+            onClick={() =>
+              router.push(`/user/${currentId}/follow?type=following`)
+            }
+          >
             <p className="text-sm">
               <strong>팔로워 </strong>
               <span>{follower}</span>
             </p>
+          </button>
+
+          <button
+            onClick={() =>
+              router.push(`/user/${currentId}/follow?type=follower`)
+            }
+          >
             <p className="text-sm">
               <strong>팔로잉 </strong>
               <span>{following}</span>
             </p>
-          </div>
-        </button>
+          </button>
+        </div>
 
         <div className="space-x-1 text-sm">
           {isMatchUser && (
