@@ -23,6 +23,7 @@ import type {
   ReviewDetailsWithoutAlcoholInfo,
 } from '@/types/Review';
 import useModalStore from '@/store/modalStore';
+import { useCallOnce } from '@/hooks/useCallOnce';
 import Modal from '@/components/Modal';
 import ReplyInput from './_components/Reply/ReplyInput';
 import ReviewDetails from './_components/ReviewDetails';
@@ -33,6 +34,7 @@ export default function ReviewDetail() {
   const router = useRouter();
   const { id: reviewId } = useParams();
   const { state, handleModalState, handleLoginModal } = useModalStore();
+  const { isProcessing, executeApiCall } = useCallOnce();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [alcoholInfo, setAlcoholInfo] = useState<AlcoholInfoType | null>(null);
   const [reviewDetails, setReviewDetails] =
@@ -66,39 +68,43 @@ export default function ReviewDetail() {
   };
 
   const handleCreateReply: SubmitHandler<FieldValues> = async (data) => {
-    let saveContent = data.content;
-    let saveParentReplyId = data.parentReplyId;
+    const processSubmission = async () => {
+      let saveContent = data.content;
+      let saveParentReplyId = data.parentReplyId;
 
-    const replyToReplyUserName = data.content.match(/@(\S+?)\s/);
+      const replyToReplyUserName = data.content.match(/@(\S+?)\s/);
 
-    if (
-      replyToReplyUserName &&
-      replyToReplyUserName[1] === data.replyToReplyUserName
-    ) {
-      saveContent = data.content.replace(/@(\S+?)\s/, '');
-    } else {
-      saveParentReplyId = null;
-    }
+      if (
+        replyToReplyUserName &&
+        replyToReplyUserName[1] === data.replyToReplyUserName
+      ) {
+        saveContent = data.content.replace(/@(\S+?)\s/, '');
+      } else {
+        saveParentReplyId = null;
+      }
 
-    const replyParams = {
-      content: saveContent,
-      parentReplyId: saveParentReplyId,
+      const replyParams = {
+        content: saveContent,
+        parentReplyId: saveParentReplyId,
+      };
+
+      const response = await ReplyApi.registerReply(
+        reviewId as string,
+        replyParams,
+      );
+
+      if (response) {
+        setIsRefetch(true);
+        setIsSubReplyShow(false);
+        reset({
+          content: '',
+          parentReplyId: null,
+          replyToReplyUserName: null,
+        });
+      }
     };
 
-    const response = await ReplyApi.registerReply(
-      reviewId as string,
-      replyParams,
-    );
-
-    if (response) {
-      setIsRefetch(true);
-      setIsSubReplyShow(false);
-      reset({
-        content: '',
-        parentReplyId: null,
-        replyToReplyUserName: null,
-      });
-    }
+    await executeApiCall(processSubmission);
   };
 
   useEffect(() => {
@@ -126,7 +132,7 @@ export default function ReviewDetail() {
 
   return (
     <FormProvider {...formMethods}>
-      {alcoholInfo && reviewDetails ? (
+      {alcoholInfo && reviewDetails && !isProcessing ? (
         <>
           <NavLayout>
             <div className="relative pb-5">

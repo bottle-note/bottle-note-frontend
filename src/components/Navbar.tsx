@@ -33,7 +33,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
 
   return (
     <nav
-      className={`fixed bottom-3 left-0 right-0 mx-auto w-full max-w-[${maxWidth}] px-4 z-10`}
+      className={`fixed bottom-5 left-0 right-0 mx-auto w-full max-w-[${maxWidth}] px-4 z-10`}
     >
       <section className="h-[4.4rem] flex justify-between bg-[#F6F6F6] py-3 px-9 rounded-[0.8rem] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
         {navItems.map((menu: NavItem, index: number) => (

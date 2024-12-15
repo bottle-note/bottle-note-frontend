@@ -23,7 +23,7 @@ interface HeaderCenterProps {
 const HeaderCenter = ({ children, textColor }: HeaderCenterProps) => {
   return (
     <p
-      className={`${textColor} text-[18px] font-semibold absolute left-1/2 transform -translate-x-1/2`}
+      className={`${textColor} whitespace-nowrap text-[clamp(12px,5vw,18px)] font-semibold absolute left-1/2 -translate-x-1/2`}
     >
       {children}
     </p>
