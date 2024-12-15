@@ -16,3 +16,13 @@ export interface UserInfoApi extends User {
 export interface ReviewUserInfo extends Omit<User, 'imageUrl'> {
   userProfileImage?: null | string;
 }
+
+export interface RelationInfo {
+  userId: number;
+  followUserId: number;
+  nickName: string;
+  userProfileImage: string;
+  status: string;
+  reviewCount: number;
+  ratingCount: number;
+}

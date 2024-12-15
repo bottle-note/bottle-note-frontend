@@ -1,6 +1,7 @@
+import { strict } from 'assert';
 import { AlcoholAPI } from '@/types/Alcohol';
 import { ApiResponse, MyBottleQueryParams } from '@/types/common';
-import { UserInfoApi } from '@/types/User';
+import { RelationInfo, UserInfoApi } from '@/types/User';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 export const UserApi = {
@@ -122,5 +123,19 @@ export const UserApi = {
     }> = await response;
 
     return result;
+  },
+
+  async getRelationList({ userId }: { userId: number }) {
+    const response: ApiResponse<{
+      followingList: RelationInfo[];
+      followerList: RelationInfo[];
+      totalCount: number;
+    }> = await fetchWithAuth(`/bottle-api/follow/${userId}/relation-list`);
+
+    if (!response.data) {
+      throw new Error('Failed to fetch data');
+    }
+
+    return response;
   },
 };
