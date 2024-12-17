@@ -1,4 +1,3 @@
-import { strict } from 'assert';
 import { AlcoholAPI } from '@/types/Alcohol';
 import { ApiResponse, MyBottleQueryParams } from '@/types/common';
 import { RelationInfo, UserInfoApi } from '@/types/User';
@@ -118,5 +117,17 @@ export const UserApi = {
     }
 
     return response;
+  },
+
+  async guestLogin() {
+    const response = await fetch(`/bottle-api/oauth/guest-login`, {
+      body: JSON.stringify({
+        code: process.env.NEXT_PUBLIC_GUEST_LOGIN_CODE,
+      }),
+    });
+
+    const { accessToken } = await response.json();
+
+    return accessToken;
   },
 };
