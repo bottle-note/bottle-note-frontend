@@ -14,14 +14,35 @@ import {
   sendLogToFlutter,
 } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
+import { AuthApi } from '@/app/api/AuthApi';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
 export default function Login() {
   const { data: session } = useSession();
   const router = useRouter();
-  const { isLogin } = AuthService;
+  const { isLogin, login } = AuthService;
   const { isInApp, setIsInApp } = DeviceService;
+
+  const handleGuestLogin = async () => {
+    try {
+      const { accessToken } = await AuthApi.guestLogin();
+      login(
+        {
+          userId: 0,
+          sub: '',
+          profile: '',
+        },
+        {
+          accessToken,
+          refreshToken: 'null',
+        },
+      );
+      router.push('/login');
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   useEffect(() => {
     if (session) {
@@ -149,9 +170,9 @@ export default function Login() {
         <article className="flex flex-col gap-2">
           <button
             className="bg-white text-subCoral rounded-md py-2.5"
-            onClick={() => alert('api 준비중 입니다.')}
+            onClick={handleGuestLogin}
           >
-            이메일 로그인
+            게스트 로그인
           </button>
           <SocialLoginBtn type="KAKAO" onClick={kakaoLoginHandler} />
           <SocialLoginBtn type="APPLE" onClick={() => signIn('apple')} />
