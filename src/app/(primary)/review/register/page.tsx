@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -8,7 +8,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import AlcoholInfo from '@/app/(primary)/review/_components/AlcoholInfo';
-import { FormValues } from '@/types/Review';
+import { FormValues, ReviewTempData } from '@/types/Review';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import { RateApi } from '@/app/api/RateApi';
 import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
@@ -18,9 +18,29 @@ import Loading from '@/components/Loading';
 import { useCallOnce } from '@/hooks/useCallOnce';
 import { useAlcoholDetails } from '@/hooks/useAlcoholDetails';
 import { useErrorModal } from '@/hooks/useErrorModal';
+import { useReviewAutoSave } from '@/hooks/useReviewAutoSave';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import ReviewForm from '../_components/form/ReviewForm';
+
+const defaultFormData: ReviewTempData['content'] = {
+  review: '',
+  status: 'PUBLIC',
+  price: null,
+  price_type: null,
+  flavor_tags: [],
+  rating: null,
+  images: [],
+  imageUrlList: null,
+  locationName: null,
+  zipCode: null,
+  address: null,
+  detailAddress: null,
+  category: null,
+  mapUrl: null,
+  latitude: null,
+  longitude: null,
+};
 
 function ReviewRegister() {
   const router = useRouter();
@@ -37,31 +57,38 @@ function ReviewRegister() {
   const formMethods = useForm<FormValues>({
     mode: 'onChange',
     resolver: yupResolver(reviewSchema as yup.ObjectSchema<FormValues>),
-    defaultValues: {
-      review: '',
-      status: 'PUBLIC',
-      price: null,
-      price_type: null,
-      flavor_tags: [],
-      rating: null,
-      images: [],
-      imageUrlList: null,
-      locationName: null,
-      zipCode: null,
-      address: null,
-      detailAddress: null,
-      category: null,
-      mapUrl: null,
-      latitude: null,
-      longitude: null,
-    },
+    defaultValues: defaultFormData,
   });
 
   const {
     handleSubmit,
     reset,
+    watch,
     formState: { isDirty, errors },
   } = formMethods;
+
+  const formValues = watch();
+
+  const getCurrentData = useCallback(
+    (): ReviewTempData => ({
+      content: formValues,
+      timestamp: Date.now(),
+    }),
+    [formValues],
+  );
+
+  const handleLoad = useCallback(
+    (savedData: ReviewTempData) => {
+      reset(savedData.content);
+    },
+    [reset],
+  );
+
+  const { removeSavedReview } = useReviewAutoSave({
+    alcoholId,
+    onLoad: handleLoad,
+    getCurrentData,
+  });
 
   const onSave = async (data: FormValues) => {
     const processSubmission = async () => {
@@ -131,7 +158,9 @@ function ReviewRegister() {
             handleModalState({
               isShowModal: false,
               mainText: '',
+              subText: '',
             });
+            removeSavedReview();
           },
         });
       } else if (userRating !== data.rating && ratingResult && !reviewResult) {
@@ -175,7 +204,7 @@ function ReviewRegister() {
                   handleModalState({
                     isShowModal: true,
                     mainText:
-                      '작성 중인 내용이 사라집니다.\n정말 뒤로 가시겠습니까?',
+                      '작성 중인 내용이 있습니다.\n정말 뒤로 가시겠습니까?',
                     type: 'CONFIRM',
                     cancelBtnName: '예',
                     confirmBtnName: '아니요',

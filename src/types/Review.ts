@@ -66,6 +66,11 @@ export interface FormValues {
   longitude?: string | null;
 }
 
+export interface ReviewTempData {
+  content: FormValues;
+  timestamp: number;
+}
+
 export interface ReviewListApi {
   reviewList: Review[];
   totalCount: number;
