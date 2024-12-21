@@ -108,7 +108,7 @@ export default function Login() {
     window.sendLogToFlutter = sendLogToFlutter;
 
     // NOTE: isInApp 확인하는 함수를 플러터에서 직접 실행하도록 변경 예정, 개발모드 사용시 일단 주석처리하고 개발하세요.
-    // handleWebViewMessage('checkIsInApp');
+    handleWebViewMessage('checkIsInApp');
   }, []);
 
   // ----- kakao sdk login
