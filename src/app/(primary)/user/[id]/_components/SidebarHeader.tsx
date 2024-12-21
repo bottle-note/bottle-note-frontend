@@ -8,14 +8,15 @@ import { motion } from 'framer-motion';
 import { signOut, useSession } from 'next-auth/react';
 import { useBlockScroll } from '@/hooks/useBlockScroll';
 import { AuthService } from '@/lib/AuthService';
+import useModalStore from '@/store/modalStore';
+import Modal from '@/components/Modal';
+import { UserApi } from '@/app/api/UserApi';
 import Logo from 'public/bottle_note_Icon_logo.svg';
 import LogoWhite from 'public/bottle_note_Icon_logo_white.svg';
 import Menu from 'public/icon/menu-subcoral.svg';
 import MenuWhite from 'public/icon/menu-white.svg';
 import SidebarDeco from 'public/sidebar-deco.png';
 import { SIDEBAR_MENUS } from '../_constants';
-
-// TODO: block scroll when sidebar is open
 
 const Header = ({
   handleOpen,
@@ -47,6 +48,7 @@ const SidebarHeader = () => {
   const { logout } = AuthService;
   const { data: session } = useSession();
   const { handleScroll } = useBlockScroll();
+  const { handleModalState, handleCloseModal } = useModalStore();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpen = () => {
@@ -79,6 +81,30 @@ const SidebarHeader = () => {
     logout();
     if (session) await signOut({ callbackUrl: '/', redirect: true });
     route.push('/');
+  };
+
+  const handleDeleteAccount = async () => {
+    handleModalState({
+      isShowModal: true,
+      cancelBtnName: '예',
+      confirmBtnName: '아니오',
+      type: 'CONFIRM',
+      mainText: `서비스를 탈퇴하시겠습니까?`,
+      handleCancel: async () => {
+        try {
+          await UserApi.deleteAccount();
+          handleModalState({
+            type: 'ALERT',
+            mainText: `탈퇴가 완료되었습니다.`,
+            handleConfirm: onLogout,
+          });
+        } catch (e) {
+          console.log(e);
+          handleCloseModal();
+        }
+      },
+      handleConfirm: handleCloseModal,
+    });
   };
 
   useEffect(() => {
@@ -121,9 +147,7 @@ const SidebarHeader = () => {
                     <button onClick={onLogout}>{'>'}</button>
                   )}
                   {menu.text === '서비스 탈퇴' && (
-                    <button onClick={() => confirm('탈퇴...하시게요...?')}>
-                      {'>'}
-                    </button>
+                    <button onClick={handleDeleteAccount}>{'>'}</button>
                   )}
                 </motion.li>
               ))}
@@ -137,6 +161,7 @@ const SidebarHeader = () => {
           </section>
         </motion.aside>
       )}
+      <Modal />
     </>
   );
 };
