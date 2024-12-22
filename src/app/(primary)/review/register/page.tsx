@@ -21,26 +21,8 @@ import { useErrorModal } from '@/hooks/useErrorModal';
 import { useReviewAutoSave } from '@/hooks/useReviewAutoSave';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
+import Toast from '@/components/Toast';
 import ReviewForm from '../_components/form/ReviewForm';
-
-const defaultFormData: ReviewTempData['content'] = {
-  review: '',
-  status: 'PUBLIC',
-  price: null,
-  price_type: null,
-  flavor_tags: [],
-  rating: null,
-  images: [],
-  imageUrlList: null,
-  locationName: null,
-  zipCode: null,
-  address: null,
-  detailAddress: null,
-  category: null,
-  mapUrl: null,
-  latitude: null,
-  longitude: null,
-};
 
 function ReviewRegister() {
   const router = useRouter();
@@ -53,6 +35,25 @@ function ReviewRegister() {
     userRating,
     isLoading: isAlcoholLoading,
   } = useAlcoholDetails(alcoholId);
+
+  const defaultFormData: ReviewTempData['content'] = {
+    review: '',
+    status: 'PUBLIC',
+    price: 0,
+    price_type: null,
+    flavor_tags: [],
+    rating: userRating ?? null,
+    images: [],
+    imageUrlList: null,
+    locationName: null,
+    zipCode: null,
+    address: null,
+    detailAddress: null,
+    category: null,
+    mapUrl: null,
+    latitude: null,
+    longitude: null,
+  };
 
   const formMethods = useForm<FormValues>({
     mode: 'onChange',
@@ -69,13 +70,25 @@ function ReviewRegister() {
 
   const formValues = watch();
 
-  const getCurrentData = useCallback(
-    (): ReviewTempData => ({
-      content: formValues,
+  const getCurrentData = useCallback((): ReviewTempData | null => {
+    const currentFormData: ReviewTempData['content'] = {
+      ...formValues,
+      images: [],
+      imageUrlList: null,
+    };
+
+    const isDefault =
+      JSON.stringify(defaultFormData) === JSON.stringify(currentFormData);
+
+    if (isDefault) {
+      return null;
+    }
+
+    return {
+      content: currentFormData,
       timestamp: Date.now(),
-    }),
-    [formValues],
-  );
+    };
+  }, [formValues]);
 
   const handleLoad = useCallback(
     (savedData: ReviewTempData) => {
@@ -84,11 +97,14 @@ function ReviewRegister() {
     [reset],
   );
 
-  const { removeSavedReview } = useReviewAutoSave({
-    alcoholId,
-    onLoad: handleLoad,
-    getCurrentData,
-  });
+  const { removeSavedReview, isToastVisible, toastMessage } = useReviewAutoSave(
+    {
+      alcoholId,
+      onLoad: handleLoad,
+      getCurrentData,
+      shouldSave: (data) => data !== null,
+    },
+  );
 
   const onSave = async (data: FormValues) => {
     const processSubmission = async () => {
@@ -246,6 +262,7 @@ function ReviewRegister() {
             disabled={isProcessing}
           />
         </article>
+        {isToastVisible && <Toast message={toastMessage} />}
       </FormProvider>
       {(isProcessing || !alcoholData) && <Loading />}
       {state.isShowModal && <Modal />}
