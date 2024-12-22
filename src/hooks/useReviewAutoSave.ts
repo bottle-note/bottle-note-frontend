@@ -4,22 +4,26 @@ import { useEffect, useCallback, useRef } from 'react';
 import { Storage } from '@/lib/Storage';
 import { ReviewTempData } from '@/types/Review';
 import useModalStore from '@/store/modalStore';
+import { useToast } from './useToast';
 
 interface Props {
   alcoholId: string;
   onLoad?: (data: ReviewTempData) => void;
-  getCurrentData: () => ReviewTempData;
+  getCurrentData: () => ReviewTempData | null;
+  shouldSave?: (data: ReviewTempData | null) => boolean;
 }
 
 export const useReviewAutoSave = ({
   alcoholId,
   onLoad,
   getCurrentData,
+  shouldSave = () => true,
 }: Props) => {
   const STORAGE_KEY_PREFIX = 'review_temp';
   const SAVE_INTERVAL = 60000; // 1분
   const MAX_SAVE_DAYS = 3 * 24 * 60 * 60 * 1000; // 3일
 
+  const { showToast, isVisible, message } = useToast();
   const { handleModalState } = useModalStore();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const getStorageKey = useCallback(
@@ -29,8 +33,13 @@ export const useReviewAutoSave = ({
 
   const saveReview = useCallback(() => {
     const currentData = getCurrentData();
-    Storage.setItem(getStorageKey(alcoholId), currentData);
-  }, [getCurrentData, getStorageKey, alcoholId]);
+    if (!shouldSave(currentData)) return;
+
+    if (currentData) {
+      Storage.setItem(getStorageKey(alcoholId), currentData);
+      showToast('임시 저장되었습니다.');
+    }
+  }, [getCurrentData, getStorageKey, alcoholId, shouldSave, showToast]);
 
   const loadSavedReview = useCallback(() => {
     const savedData = Storage.getItem<ReviewTempData>(getStorageKey(alcoholId));
@@ -123,5 +132,7 @@ export const useReviewAutoSave = ({
     removeSavedReview,
     checkSavedReview,
     promptLoadSavedReview,
+    isToastVisible: isVisible,
+    toastMessage: message,
   };
 };
