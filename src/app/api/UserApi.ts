@@ -22,11 +22,7 @@ export const UserApi = {
     return response;
   },
 
-  async getUserInfo({
-    userId,
-  }: {
-    userId: string;
-  }): Promise<ApiResponse<UserInfoApi>> {
+  async getUserInfo({ userId }: { userId: string }): Promise<UserInfoApi> {
     const response = await fetch(`/bottle-api/my-page/${userId}`);
 
     const { data } = await response.json();
