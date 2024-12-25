@@ -82,22 +82,25 @@ export const AuthApi = {
 
   async guestLogin() {
     try {
-      const res = await fetch(`/api/oauth/oauth/guest-login`, {
+      const res = await fetch(`/bottle-api/oauth/guest-login`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-          code: process.env.NEXT_PUBLIC_GUEST_LOGIN_CODE,
+          code: 'Ym90dGxlbm90ZWd1ZXN0Zm9yYWRucm9pZA==',
         }),
       });
 
-      const result: { accessToken: string } = await res.json();
+      const { data } = await res.json();
 
-      return result;
+      return { accessToken: data.accessToken };
     } catch (e) {
       const error = e as Error;
       console.error(error.message);
 
       throw new Error(
-        `카카오 소셜 로그인 도중 에러가 발생했습니다. 사유: ${error.message}`,
+        `게스트 로그인 도중 에러가 발생했습니다. 사유: ${error.message}`,
       );
     }
   },
