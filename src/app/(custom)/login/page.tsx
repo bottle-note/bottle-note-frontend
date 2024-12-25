@@ -15,8 +15,11 @@ import {
 } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
 import { AuthApi } from '@/app/api/AuthApi';
+import { UserData } from '@/types/Auth';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
+
+const jwt = require('jsonwebtoken');
 
 export default function Login() {
   const { data: session } = useSession();
@@ -27,17 +30,13 @@ export default function Login() {
   const handleGuestLogin = async () => {
     try {
       const { accessToken } = await AuthApi.guestLogin();
-      login(
-        {
-          userId: 0,
-          sub: '',
-          profile: '',
-        },
-        {
-          accessToken,
-          refreshToken: 'null',
-        },
-      );
+      const userData: UserData = jwt.decode(accessToken);
+
+      login(userData, {
+        accessToken,
+        refreshToken: 'null',
+      });
+
       router.push('/login');
     } catch (e) {
       console.log(e);
@@ -108,7 +107,7 @@ export default function Login() {
     window.sendLogToFlutter = sendLogToFlutter;
 
     // NOTE: isInApp 확인하는 함수를 플러터에서 직접 실행하도록 변경 예정, 개발모드 사용시 일단 주석처리하고 개발하세요.
-    handleWebViewMessage('checkIsInApp');
+    // handleWebViewMessage('checkIsInApp');
   }, []);
 
   // ----- kakao sdk login
