@@ -20,12 +20,12 @@ declare global {
   }
 
   declare module '*.svg' {
-    const content: string;
+    const content: string | StaticImageData;
     export default content;
   }
 
   declare module '*.png' {
-    const content: string;
+    const content: string | StaticImageData;
     export default content;
   }
 }
