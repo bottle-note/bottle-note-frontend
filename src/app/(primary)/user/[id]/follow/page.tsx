@@ -10,6 +10,8 @@ import List from '@/components/List/List';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { UserApi } from '@/app/api/UserApi';
 import { RelationInfo } from '@/types/User';
+import ListSection from '@/components/List/ListSection';
+import { FollowerListItem } from '../_components/FollowerListItem';
 
 export default function UserFollowPage({
   params: { id: userId },
@@ -43,10 +45,6 @@ export default function UserFollowPage({
     },
   });
 
-  useEffect(() => {
-    console.log(relationList);
-  }, [relationList]);
-
   return (
     <Suspense>
       <main>
@@ -75,21 +73,53 @@ export default function UserFollowPage({
             tabList={tabList}
           />
 
-          {relationList && (
+          {relationList && currentTab.id === 'following' && (
             <List
-              emptyViewText={`아직 활동한\n보틀이 없어요!`}
+              emptyViewText={`아직 팔로잉중인 사람이 없습니다.\n다른 유저를 팔로우 해보세요!`}
               isListFirstLoading={isFirstLoading}
               isScrollLoading={isFetching}
             >
-              <List.Title title={currentTab.name} />
-              <List.Total total={relationList[0].data.totalCount} />
+              <List.Title title="내가 팔로우 하는 유저" />
+              <List.Total
+                total={relationList[0].data.followingList.length}
+                unit="명"
+              />
 
               {relationList[0].data.followerList
                 .flat()
                 .map((item: RelationInfo) => (
-                  // <List.Item key={item.followUserId} data={item} />
-                  <span key={item.followUserId}>{item.nickName}</span>
+                  <>
+                    <FollowerListItem key={item.followUserId} userInfo={item} />
+                    <span key={item.followUserId}>{item.nickName}</span>
+                  </>
                 ))}
+            </List>
+          )}
+
+          {relationList && currentTab.id === 'follower' && (
+            <List
+              emptyViewText={`아직 팔로워가 없습니다.\n활동을 더욱 열심히 해보세요!`}
+              isListFirstLoading={isFirstLoading}
+              isScrollLoading={isFetching}
+            >
+              <List.Title title="나를 팔로우 하는 유저" />
+              <List.Total
+                total={relationList[0].data.followerList.length}
+                unit="명"
+              />
+
+              <ListSection className="flex flex-col">
+                {relationList[0].data.followerList
+                  .flat()
+                  .map((item: RelationInfo) => (
+                    <>
+                      <FollowerListItem
+                        key={item.followUserId}
+                        userInfo={item}
+                      />
+                    </>
+                  ))}
+              </ListSection>
             </List>
           )}
 
