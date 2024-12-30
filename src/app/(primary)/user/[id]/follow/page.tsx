@@ -73,6 +73,7 @@ export default function UserFollowPage({
             tabList={tabList}
           />
 
+          {/* 현재 tab 이 <팔로잉>인 경우 */}
           {relationList && currentTab.id === 'following' && (
             <List
               emptyViewText={`아직 팔로잉중인 사람이 없습니다.\n다른 유저를 팔로우 해보세요!`}
@@ -89,13 +90,14 @@ export default function UserFollowPage({
                 .flat()
                 .map((item: RelationInfo) => (
                   <>
-                    <FollowerListItem key={item.followUserId} userInfo={item} />
+                    <FollowerListItem key={item.userId} userInfo={item} />
                     <span key={item.followUserId}>{item.nickName}</span>
                   </>
                 ))}
             </List>
           )}
 
+          {/* 현재 tab 이 <팔로워>인 경우 */}
           {relationList && currentTab.id === 'follower' && (
             <List
               emptyViewText={`아직 팔로워가 없습니다.\n활동을 더욱 열심히 해보세요!`}
@@ -112,12 +114,7 @@ export default function UserFollowPage({
                 {relationList[0].data.followerList
                   .flat()
                   .map((item: RelationInfo) => (
-                    <>
-                      <FollowerListItem
-                        key={item.followUserId}
-                        userInfo={item}
-                      />
-                    </>
+                    <FollowerListItem key={item.userId} userInfo={item} />
                   ))}
               </ListSection>
             </List>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthService } from '@/lib/AuthService';
 import ProfileImage from './ProfileImage';
+import { FollowButton } from './FollowButton';
 
 interface Props {
   profileImgSrc: string | null;
@@ -71,26 +72,7 @@ const UserInfo = ({
             </button>
           )}
 
-          {!isMatchUser &&
-            (isFollowing ? (
-              <button
-                className="px-2.5 py-1 text-10 label-selected"
-                onClick={() =>
-                  alert('팔로우를 끊고 isFollowing -> false 다옹...')
-                }
-              >
-                팔로잉
-              </button>
-            ) : (
-              <button
-                className="px-2.5 py-1 text-10 label-default"
-                onClick={() =>
-                  alert('팔로잉을 하고 isFollowing -> true 다옹...')
-                }
-              >
-                팔로우
-              </button>
-            ))}
+          {!isMatchUser && <FollowButton isFollowing={Boolean(isFollowing)} />}
         </div>
       </article>
     </section>
