@@ -86,14 +86,13 @@ export default function UserFollowPage({
                 unit="명"
               />
 
-              {relationList[0].data.followerList
-                .flat()
-                .map((item: RelationInfo) => (
-                  <>
+              <ListSection className="flex flex-col">
+                {relationList[0].data.followingList
+                  .flat()
+                  .map((item: RelationInfo) => (
                     <FollowerListItem key={item.userId} userInfo={item} />
-                    <span key={item.followUserId}>{item.nickName}</span>
-                  </>
-                ))}
+                  ))}
+              </ListSection>
             </List>
           )}
 

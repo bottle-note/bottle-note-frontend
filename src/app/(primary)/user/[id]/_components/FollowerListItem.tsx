@@ -27,17 +27,20 @@ export const FollowerListItem = ({ userInfo }: Props) => {
         <p className="text-10 text-brightGray font-semibold flex gap-2">
           <span className="flex gap-1">
             <Image src={CommentGray} alt="리뷰" width={12} height={12} />
-            리뷰 3개
+            {`리뷰 ${userInfo.reviewCount}개`}
           </span>
           <span>|</span>
           <span className="flex gap-1">
             <Image src={StarGray} alt="평가" width={13} height={13} />
-            평가 12개
+            {`평가 ${userInfo.ratingCount}개`}
           </span>
         </p>
       </div>
       <div className="ml-auto flex items-center">
-        <FollowButton isFollowing={userInfo.status !== 'FOLLOWING'} />
+        <FollowButton
+          isFollowing={userInfo.status === 'FOLLOWING'}
+          followUserId={userInfo.userId}
+        />
       </div>
     </article>
   );

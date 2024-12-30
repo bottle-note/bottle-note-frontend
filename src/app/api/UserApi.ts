@@ -138,4 +138,33 @@ export const UserApi = {
 
     return response;
   },
+
+  async updateFollowingStatus({
+    followUserId,
+    status,
+  }: {
+    followUserId: number;
+    status: RelationInfo['status'];
+  }) {
+    const response = await fetchWithAuth(`/bottle-api/follow`, {
+      method: 'POST',
+      body: JSON.stringify({
+        followUserId,
+        status,
+      }),
+    });
+
+    if (response.errors.length !== 0) {
+      throw new Error('Failed to fetch data');
+    }
+
+    const result: ApiResponse<{
+      followerId: number;
+      nickName: string;
+      imageUrl: string;
+      message: string;
+    }> = await response.data;
+
+    return result;
+  },
 };

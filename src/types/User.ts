@@ -22,7 +22,7 @@ export interface RelationInfo {
   followUserId: number;
   nickName: string;
   userProfileImage: string;
-  status: string;
+  status: 'UNFOLLOW' | 'FOLLOWING';
   reviewCount: number;
   ratingCount: number;
 }
