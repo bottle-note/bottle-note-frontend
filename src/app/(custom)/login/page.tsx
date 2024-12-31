@@ -101,16 +101,16 @@ export default function Login() {
   }, [isLogin]);
 
   // NOTE: 웹뷰 핸들러 함수 window 전역객체 등록
-  // useLayoutEffect(() => {
-  //   window.getDeviceToken = getDeviceToken;
-  //   window.checkIsInApp = checkIsInApp;
-  //   window.sendLogToFlutter = sendLogToFlutter;
+  useLayoutEffect(() => {
+    window.getDeviceToken = getDeviceToken;
+    window.checkIsInApp = checkIsInApp;
+    window.sendLogToFlutter = sendLogToFlutter;
 
-  //   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  //   if (isMobile) {
-  //     handleWebViewMessage('checkIsInApp');
-  //   }
-  // }, []);
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      handleWebViewMessage('checkIsInApp');
+    }
+  }, []);
 
   // ----- kakao sdk login
   useEffect(() => {
