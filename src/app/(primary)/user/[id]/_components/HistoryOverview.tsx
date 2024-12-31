@@ -14,9 +14,9 @@ const HistoryOverview = ({ rates, reviews, likes, id }: Props) => {
   const router = useRouter();
 
   const HISTORY_OVERVIEW = [
-    { name: '별점', value: rates, link: `/user/${id}/history?type=rating` },
-    { name: '리뷰', value: reviews, link: `/user/${id}/history?type=review` },
-    { name: '찜하기', value: likes, link: `/user/${id}/history?type=pick` },
+    { name: '별점', value: rates, link: `/user/${id}/my-bottle?type=rating` },
+    { name: '리뷰', value: reviews, link: `/user/${id}/my-bottle?type=review` },
+    { name: '찜하기', value: likes, link: `/user/${id}/my-bottle?type=pick` },
   ];
 
   return (
