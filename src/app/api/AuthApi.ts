@@ -79,4 +79,29 @@ export const AuthApi = {
       );
     }
   },
+
+  async guestLogin() {
+    try {
+      const res = await fetch(`/bottle-api/oauth/guest-login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: 'Ym90dGxlbm90ZWd1ZXN0Zm9yYWRucm9pZA==',
+        }),
+      });
+
+      const { data } = await res.json();
+
+      return { accessToken: data.accessToken };
+    } catch (e) {
+      const error = e as Error;
+      console.error(error.message);
+
+      throw new Error(
+        `게스트 로그인 도중 에러가 발생했습니다. 사유: ${error.message}`,
+      );
+    }
+  },
 };

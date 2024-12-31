@@ -22,9 +22,10 @@ export const UserApi = {
     return response;
   },
 
-  async getUserInfo({ userId }: { userId: string }) {
-    const response = await fetchWithAuth(`/bottle-api/my-page/${userId}`);
-    const { data }: ApiResponse<UserInfoApi> = response;
+  async getUserInfo({ userId }: { userId: string }): Promise<UserInfoApi> {
+    const response = await fetch(`/bottle-api/my-page/${userId}`);
+
+    const { data } = await response.json();
 
     return data;
   },
@@ -100,6 +101,24 @@ export const UserApi = {
       deviceToken: string;
       platform: string;
       message: string;
+    }> = await response;
+
+    return result;
+  },
+
+  async deleteAccount() {
+    const response = await fetchWithAuth(`/bottle-api/users`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result: ApiResponse<{
+      codeMessage: string;
+      message: string;
+      userId: number;
+      responseAt: string;
     }> = await response;
 
     return result;

@@ -18,6 +18,16 @@ declare global {
     deviceToken: string;
     platform: string
   }
+
+  declare module '*.svg' {
+    const content: string | StaticImageData;
+    export default content;
+  }
+
+  declare module '*.png' {
+    const content: string | StaticImageData;
+    export default content;
+  }
 }
 
 export {};
