@@ -10,14 +10,12 @@ interface Props {
   handleSearchCallback: (value: string) => void;
   placeholder?: string;
   styleProps?: string;
-  useRecentSearch?: boolean;
 }
 
 function SearchContainer({
   handleSearchCallback,
   placeholder,
   styleProps,
-  useRecentSearch = false,
 }: Props) {
   const { handleScroll } = useBlockScroll();
   const [isOnSearch, setIsOnSearch] = useState(false);
@@ -63,7 +61,7 @@ function SearchContainer({
         />
       </div>
 
-      {isOnSearch && useRecentSearch && (
+      {isOnSearch && (
         <div className="absolute w-full h-full z-10 p-5">
           <RecentSearch handleSearch={onSearch} />
         </div>

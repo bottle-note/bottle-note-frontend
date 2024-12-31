@@ -85,7 +85,6 @@ export default function Search() {
     <Suspense>
       <main className="mb-24 w-full h-full">
         <SearchContainer
-          useRecentSearch
           handleSearchCallback={handleSearchCallback}
           styleProps="px-5 pt-16 pb-5 bg-subCoral"
         />
