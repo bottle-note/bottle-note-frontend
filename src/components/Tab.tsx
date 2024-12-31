@@ -1,14 +1,19 @@
 import { HISTORY_TYPES } from '@/constants/user';
 
-interface Props {
-  currentTab: { name: string; id: string };
+interface Props<T> {
+  currentTab: T;
   handleTab: (id: string) => void;
+  tabList: T[];
 }
 
-const Tab = ({ currentTab, handleTab }: Props) => {
+const Tab = <T extends { id: string; name: string }>({
+  currentTab,
+  handleTab,
+  tabList,
+}: Props<T>) => {
   return (
     <div className="flex gap-3 relative">
-      {HISTORY_TYPES.map((type) => {
+      {tabList.map((type) => {
         return (
           <button
             key={type.id}

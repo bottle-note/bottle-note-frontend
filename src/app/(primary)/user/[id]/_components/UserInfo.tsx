@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthService } from '@/lib/AuthService';
 import ProfileImage from './ProfileImage';
+import { FollowButton } from './FollowButton';
 
 interface Props {
   profileImgSrc: string | null;
@@ -30,24 +31,38 @@ const UserInfo = ({
     setIsMatchUser(userData?.userId === Number(currentId));
   }, []);
 
+  if (!userData) throw new Error('유저 데이터 불러오기에 실패하였습니다.');
+
   return (
     <section className="flex space-x-5.25 py-8.75 border-b border-t border-subCoral">
       <ProfileImage profileImgSrc={profileImgSrc} />
 
       <article className="space-y-2.5">
         <h1 className="text-3xl font-bold text-subCoral">{nickName}</h1>
-        <button onClick={() => alert('준비중입니다 ㅎㅎ..')}>
-          <div className="flex gap-2">
+
+        <div className="flex gap-2">
+          <button
+            onClick={() =>
+              router.push(`/user/${currentId}/follow?type=following`)
+            }
+          >
             <p className="text-sm">
               <strong>팔로워 </strong>
               <span>{follower}</span>
             </p>
+          </button>
+
+          <button
+            onClick={() =>
+              router.push(`/user/${currentId}/follow?type=follower`)
+            }
+          >
             <p className="text-sm">
               <strong>팔로잉 </strong>
               <span>{following}</span>
             </p>
-          </div>
-        </button>
+          </button>
+        </div>
 
         <div className="space-x-1 text-sm">
           {isMatchUser && (
@@ -59,26 +74,12 @@ const UserInfo = ({
             </button>
           )}
 
-          {!isMatchUser &&
-            (isFollowing ? (
-              <button
-                className="px-2.5 py-1 text-10 label-selected"
-                onClick={() =>
-                  alert('팔로우를 끊고 isFollowing -> false 다옹...')
-                }
-              >
-                팔로잉
-              </button>
-            ) : (
-              <button
-                className="px-2.5 py-1 text-10 label-default"
-                onClick={() =>
-                  alert('팔로잉을 하고 isFollowing -> true 다옹...')
-                }
-              >
-                팔로우
-              </button>
-            ))}
+          {!isMatchUser && (
+            <FollowButton
+              isFollowing={Boolean(isFollowing)}
+              followUserId={userData?.userId}
+            />
+          )}
         </div>
       </article>
     </section>
