@@ -19,7 +19,7 @@ export default function UserFollowPage({
   params: { id: string };
 }) {
   const router = useRouter();
-  const historyType = useSearchParams().get('type');
+  const historyType = useSearchParams().get('type') ?? 'following';
   const { currentTab, handleTab, tabList } = useTab({
     tabList: [
       { name: '팔로잉', id: 'following' },
@@ -44,6 +44,10 @@ export default function UserFollowPage({
       });
     },
   });
+
+  useEffect(() => {
+    handleTab(historyType);
+  }, [historyType]);
 
   return (
     <Suspense>
