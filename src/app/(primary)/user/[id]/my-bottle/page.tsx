@@ -10,7 +10,7 @@ import { REGIONS } from '@/constants/common';
 import { HISTORY_TYPES } from '@/constants/user';
 import { useTab } from '@/hooks/useTab';
 import { RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
-import SearchContainer from '@/app/(primary)/search/_components/SearchContainer';
+import SearchContainer from '@/components/Search/SearchContainer';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { AlcoholAPI } from '@/types/Alcohol';
 import { UserApi } from '@/app/api/UserApi';

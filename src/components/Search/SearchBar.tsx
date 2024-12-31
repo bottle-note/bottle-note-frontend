@@ -1,16 +1,20 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import EnterIcon from 'public/icon/search-subcoral.svg';
+import DeleteIcon from 'public//icon/reset-mainGray.svg';
 
 interface Props {
   type?: 'Link' | 'Search';
   handleSearch?: (value: string) => void;
   handleFocus?: (status: boolean) => void;
   placeholder?: string;
+  setUpdateSearchText?: Dispatch<
+    SetStateAction<((text: string) => void) | null>
+  >;
 }
 
 export default function SearchBar({
@@ -18,6 +22,7 @@ export default function SearchBar({
   handleSearch,
   handleFocus,
   placeholder,
+  setUpdateSearchText,
 }: Props) {
   const currSearchKeyword = useSearchParams().get('query');
   const [searchText, setSearchText] = useState<string>(currSearchKeyword ?? '');
@@ -26,7 +31,6 @@ export default function SearchBar({
     if (searchText && handleSearch) {
       handleSearch(searchText);
     }
-
     if (handleFocus) handleFocus(false);
   };
 
@@ -38,9 +42,27 @@ export default function SearchBar({
     if (handleFocus) handleFocus(false);
   };
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setSearchText('');
+    if (handleFocus) handleFocus(true);
+  };
+
   useEffect(() => {
     setSearchText(currSearchKeyword ?? '');
   }, [currSearchKeyword]);
+
+  useEffect(() => {
+    if (type === 'Search' && setUpdateSearchText) {
+      setUpdateSearchText(() => (newText: string) => {
+        if (searchText === '') {
+          setSearchText(newText);
+        }
+      });
+
+      return () => setUpdateSearchText(null);
+    }
+  }, [setUpdateSearchText, searchText, type]);
 
   return (
     <div className="relative">
@@ -64,7 +86,7 @@ export default function SearchBar({
         <>
           <input
             type="text"
-            className="w-full bg-white rounded-lg h-10 pl-4 pr-12 outline-none border border-mainCoral text-mainCoral placeholder-mainCoral text-15"
+            className="w-full bg-white rounded-lg h-10 pl-4 pr-12 outline-none text-mainCoral placeholder-mainCoral text-15"
             placeholder={placeholder || '어떤 술을 찾고 계신가요?'}
             value={searchText}
             onChange={(e) => {
@@ -78,6 +100,15 @@ export default function SearchBar({
             onFocus={handleOnFocus}
             onBlur={handleOnBlur}
           />
+          {searchText?.length > 0 && (
+            <button
+              type="button"
+              onMouseDown={handleDelete}
+              className="absolute right-11 top-1/2 transform -translate-y-1/2"
+            >
+              <Image src={DeleteIcon} alt="delete" />
+            </button>
+          )}
           <button
             className="px-2 w-10 absolute top-0 right-1 h-full"
             onMouseDown={handleSubmit}

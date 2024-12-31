@@ -12,7 +12,7 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { AlcoholAPI } from '@/types/Alcohol';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { REGIONS } from '@/constants/common';
-import SearchContainer from '../_components/SearchContainer';
+import SearchContainer from '../../../components/Search/SearchContainer';
 
 interface InitialState {
   keyword: string;
@@ -85,8 +85,9 @@ export default function Search() {
     <Suspense>
       <main className="mb-24 w-full h-full">
         <SearchContainer
+          useRecentSearch
           handleSearchCallback={handleSearchCallback}
-          styleProps="px-5 pt-16 pb-10 bg-subCoral"
+          styleProps="px-5 pt-16 pb-5 bg-subCoral"
         />
 
         <section className="flex flex-col gap-7 p-5">

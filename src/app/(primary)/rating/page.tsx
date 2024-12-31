@@ -11,7 +11,7 @@ import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
 import { useFilter } from '@/hooks/useFilter';
 import { RateAPI } from '@/types/Rate';
 import { REGIONS } from '@/constants/common';
-import SearchContainer from '../_components/SearchContainer';
+import SearchContainer from '../../../components/Search/SearchContainer';
 
 interface InitialState {
   keyword: string;
@@ -84,7 +84,7 @@ export default function Rating() {
       <main className="mb-24 w-full h-full relative">
         <SearchContainer
           handleSearchCallback={handleSearchCallback}
-          styleProps="px-5 pt-16 pb-10 bg-subCoral"
+          styleProps="px-5 pt-16 pb-5 bg-subCoral"
         />
 
         <section className="flex flex-col gap-7 p-5">
