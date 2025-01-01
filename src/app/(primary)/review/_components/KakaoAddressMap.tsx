@@ -3,9 +3,9 @@ import Image from 'next/image';
 import useModalStore from '@/store/modalStore';
 import { KakaoPlace } from '@/types/Review';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
-import DeleteIcon from 'public/icon/close-brightgray.svg';
+import RecentSearch from '@/components/Search/RecentSearch';
+import DeleteIcon from 'public//icon/reset-mainGray.svg';
 import SearchIcon from 'public/icon/search-subcoral.svg';
-import RecentSearch from '../../_components/RecentSearch';
 
 interface Props {
   handleSaveData: (place: KakaoPlace, category?: string | null) => void;
@@ -240,7 +240,7 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
           )}
           <button
             type="submit"
-            className="absolute right-2 top-1/2 transform -translate-y-1/2"
+            className="px-2 w-10 absolute top-0 right-1 h-full"
           >
             <Image src={SearchIcon} alt="search" />
           </button>

@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import SearchBar from '@/components/SearchBar';
+import SearchBar from '@/components/Search/SearchBar';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
 import { useBlockScroll } from '@/hooks/useBlockScroll';
-import RecentSearch from '../../_components/RecentSearch';
+import RecentSearch from './RecentSearch';
 
 interface Props {
   handleSearchCallback: (value: string) => void;
@@ -20,12 +20,19 @@ function SearchContainer({
   const { handleScroll } = useBlockScroll();
   const [isOnSearch, setIsOnSearch] = useState(false);
   const SearchHistory = new SearchHistoryService();
+  const [updateSearchText, setUpdateSearchText] = useState<
+    ((text: string) => void) | null
+  >(null);
 
   const onSearch = (value: string) => {
     SearchHistory.save(value);
 
     if (handleSearchCallback) {
       handleSearchCallback(value);
+    }
+
+    if (updateSearchText) {
+      updateSearchText(value);
     }
 
     setIsOnSearch(false);
@@ -50,6 +57,7 @@ function SearchContainer({
           handleSearch={onSearch}
           handleFocus={(status) => setIsOnSearch(status)}
           placeholder={placeholder}
+          setUpdateSearchText={setUpdateSearchText}
         />
       </div>
 

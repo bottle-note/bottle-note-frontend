@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import SearchBar from '@/components/SearchBar';
+import SearchBar from '@/components/Search/SearchBar';
 import LogoWhite from 'public/bottle_note_Icon_logo_white.svg';
 
 export default function Header() {

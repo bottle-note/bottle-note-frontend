@@ -19,7 +19,8 @@ export default function RecentSearch({ handleSearch, keyValue }: Props) {
     setList(SearchHistory.get());
   };
 
-  const handleDeleteOne = (keyword: string) => {
+  const handleDeleteOne = (e: React.MouseEvent, keyword: string) => {
+    e.preventDefault();
     SearchHistory.removeOne(keyword);
     setList(SearchHistory.get());
   };
@@ -33,8 +34,10 @@ export default function RecentSearch({ handleSearch, keyValue }: Props) {
             className="flex justify-between items-center py-3 text-subCoral border-b border-subCoral"
             key={`${text}_${idx}`}
           >
-            <span onMouseDown={() => handleSearch(text)}>{text}</span>
-            <button onMouseDown={() => handleDeleteOne(text)}>
+            <span className="w-full" onMouseDown={() => handleSearch(text)}>
+              {text}
+            </span>
+            <button onMouseDown={(e) => handleDeleteOne(e, text)}>
               <Image src={DeleteIcon} alt="delete" />
             </button>
           </article>
