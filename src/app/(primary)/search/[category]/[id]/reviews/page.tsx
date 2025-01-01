@@ -110,7 +110,7 @@ function Reviews() {
           {alcoholKorName}
         </SubHeader.Center>
       </SubHeader>
-      <section className="p-8 space-y-9">
+      <section className="pt-5 px-5 pb-7 space-y-9">
         <div className="flex gap-3 relative">
           <button
             className={`py-2 ${activeTab === 'tab1' ? 'tab-selected' : 'tab-default'} w-full font-bold text-15 text-center`}
