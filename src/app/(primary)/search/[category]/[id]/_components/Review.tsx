@@ -60,12 +60,7 @@ function Review({ data }: Props) {
     } else if (option.type === 'MODIFY') {
       router.push(`/review/modify?reviewId=${data.reviewId}`);
     } else if (option.type === 'REVIEW_REPORT') {
-      // router.push(`/report?type=review`);
-      // API 준비 안됨
-      handleModalState({
-        isShowModal: true,
-        mainText: '준비 중인 기능입니다.',
-      });
+      router.push(`/report?type=review&reviewId=${data.reviewId}`);
     } else if (option.type === 'USER_REPORT') {
       router.push(`/report?type=user&userId=${data.userInfo.userId}`);
     }
