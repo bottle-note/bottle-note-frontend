@@ -98,13 +98,6 @@ function Reply({
           deleteReply();
         },
       });
-    } else if (option.type === 'REVIEW_REPORT') {
-      // router.push(`/report?type=review`);
-      // API 준비 안됨
-      handleModalState({
-        isShowModal: true,
-        mainText: '준비 중인 기능입니다.',
-      });
     } else if (option.type === 'USER_REPORT') {
       router.push(`/report?type=user&userId=${data.userId}`);
     }
@@ -209,10 +202,7 @@ function Reply({
                   // { name: '수정하기', type: 'MODIFY' },
                   { name: '삭제하기', type: 'DELETE' },
                 ]
-              : [
-                  { name: '리뷰 신고', type: 'REVIEW_REPORT' },
-                  { name: '유저 신고', type: 'USER_REPORT' },
-                ]
+              : [{ name: '유저 신고', type: 'USER_REPORT' }]
           }
           handleOptionSelect={handleOptionSelect}
           title={userData?.userId === data.userId ? '내 댓글' : '신고하기'}
