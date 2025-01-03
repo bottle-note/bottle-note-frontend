@@ -32,6 +32,12 @@ const VisibilityToggle = ({
           reviewId,
           newStatus ? 'PUBLIC' : 'PRIVATE',
         );
+        handleModalState({
+          isShowModal: true,
+          mainText: '리뷰를 비공개했습니다.',
+          subText: '비공개 된 리뷰는 나만 볼 수 있어요!',
+          type: 'ALERT',
+        });
       } catch (error) {
         handleModalState({
           isShowModal: true,
