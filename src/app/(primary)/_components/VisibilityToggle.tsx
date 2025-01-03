@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import useModalStore from '@/store/modalStore';
 import { AuthService } from '@/lib/AuthService';
@@ -43,6 +43,10 @@ const VisibilityToggle = ({
       }
     }
   };
+
+  useEffect(() => {
+    setIsActive(initialStatus);
+  }, [initialStatus]);
 
   return (
     <>

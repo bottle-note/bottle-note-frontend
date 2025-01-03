@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -30,6 +30,7 @@ function Review({ data }: Props) {
   const { state, handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(isLikedByMe);
+  const [currentStatus, setCurrentStatus] = useState(data.status === 'PUBLIC');
 
   const handleCloseOption = () => {
     handleModalState({
@@ -70,6 +71,10 @@ function Review({ data }: Props) {
       router.push(`/report?type=user&userId=${data.userInfo.userId}`);
     }
   };
+
+  useEffect(() => {
+    setCurrentStatus(data.status === 'PUBLIC');
+  }, [data.status]);
 
   return (
     <>
@@ -179,7 +184,7 @@ function Review({ data }: Props) {
             </div>
             {data.userInfo.userId === userData?.userId && (
               <VisibilityToggle
-                initialStatus={data.status === 'PUBLIC'}
+                initialStatus={currentStatus}
                 reviewId={data.reviewId}
                 handleNotLogin={handleLoginModal}
               />
