@@ -12,7 +12,7 @@ import { FormValues } from '@/types/Review';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import { RateApi } from '@/app/api/RateApi';
 import { uploadImages } from '@/utils/S3Upload';
-import { useCallOnce } from '@/hooks/useCallOnce';
+import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import { useAlcoholDetails } from '@/hooks/useAlcoholDetails';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
@@ -25,7 +25,7 @@ import ReviewForm from '../_components/form/ReviewForm';
 function ReviewModify() {
   const router = useRouter();
   const { state, handleModalState } = useModalStore();
-  const { isProcessing, executeApiCall } = useCallOnce();
+  const { isProcessing, executeApiCall } = useSingleApiCall();
   const searchParams = useSearchParams();
   const reviewId = searchParams.get('reviewId');
   const [alcoholId, setAlcoholId] = useState<string>('');
