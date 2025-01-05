@@ -2,21 +2,21 @@ name: Deploy Workflow
 
 on:
   pull_request:
-    types: [ closed ]
+    types: [closed]
     branches:
       - release
 
 concurrency:
-  group: "dev-deploy"
+  group: 'dev-deploy'
   cancel-in-progress: false
 
 jobs:
   build-and-push:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-          
       - name: copy project # ssh key를 이용해 현재 푸시된 소스를 서버에 복사한다.
         uses: burnett01/rsync-deployments@6.0.0
         with:
@@ -38,8 +38,8 @@ jobs:
             cd /home/bottlenote/app/bottle-note-front-server
             rm -f .env
             touch  /home/bottlenote/app/bottle-note-front-server/.env
-            echo "${{ secrets.ENV }}" | base64 --decode > .env  
-           
+            echo "${{ secrets.ENV }}" | base64 --decode > .env
+
       - name: docker compose up
         uses: appleboy/ssh-action@master
         with:
