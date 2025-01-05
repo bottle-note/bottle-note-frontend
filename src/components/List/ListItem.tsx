@@ -2,7 +2,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Star from '@/components/Star';
-import { truncStr } from '@/utils/truncStr';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { addNewLine } from '@/utils/addNewLine';
 import { AlcoholAPI } from '@/types/Alcohol';
@@ -16,7 +15,7 @@ interface Props {
 
 const ListItem = ({ data }: Props) => {
   const {
-    korCategory,
+    korCategoryName,
     engCategory,
     korName,
     engName,
@@ -29,43 +28,46 @@ const ListItem = ({ data }: Props) => {
   const [isPicked, setIsPicked] = useState(initialIsPicked);
 
   return (
-    <Link href={`/search/${engCategory}/${alcoholId}`}>
-      <article className="flex items-center space-x-1 text-mainBlack border-mainBlack border-b h-[90px]">
+    <section className="grid grid-cols-2 text-mainBlack border-brightGray border-b h-[90px]">
+      <Link
+        href={`/search/${engCategory}/${alcoholId}`}
+        className="grid grid-cols-2"
+      >
         <ItemImage src={imageUrl} alt="위스키 이미지" />
-        <section className="flex w-full justify-between items-center">
+        <article className="flex w-full justify-between items-center">
           <ItemInfo
             korName={addNewLine(korName)}
-            engName={truncStr(engName, 16)}
-            korCategory={korCategory}
+            engName={engName}
+            korCategory={korCategoryName}
           />
+        </article>
+      </Link>
 
-          <article className="flex flex-col">
-            <div className="">
-              <Star rating={rating} />
-            </div>
+      <article className="flex flex-col justify-center">
+        <div className="">
+          <Star rating={rating} />
+        </div>
 
-            <div
-              className={`flex justify-end text-xxs text-right tracking-wider ${!ratingCount && 'hidden'}`}
-            >
-              (
-              <Image src={RatingCountIcon} alt="별점 평가 참여자 수" />
-              <span className="">{`${ratingCount ?? 0}`}</span>)
-            </div>
+        <div
+          className={`flex justify-end text-xxs text-right tracking-wider ${!ratingCount && 'hidden'}`}
+        >
+          (
+          <Image src={RatingCountIcon} alt="별점 평가 참여자 수" />
+          <span className="">{`${ratingCount ?? 0}`}</span>)
+        </div>
 
-            <div className="flex justify-end mt-1.5">
-              <PickBtn
-                isPicked={isPicked}
-                alcoholId={alcoholId}
-                iconColor="subcoral"
-                handleUpdatePicked={() => setIsPicked(!isPicked)}
-                handleError={() => alert('에러가 발생했습니다.')}
-                handleNotLogin={() => alert('로그인이 필요한 서비스입니다.')}
-              />
-            </div>
-          </article>
-        </section>
+        <div className="flex justify-end mt-1.5">
+          <PickBtn
+            isPicked={isPicked}
+            alcoholId={alcoholId}
+            iconColor="subcoral"
+            handleUpdatePicked={() => setIsPicked(!isPicked)}
+            handleError={() => console.error('찜하기 도중 에러 발생')}
+            handleNotLogin={() => {}}
+          />
+        </div>
       </article>
-    </Link>
+    </section>
   );
 };
 
