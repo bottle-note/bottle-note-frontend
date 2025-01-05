@@ -12,7 +12,7 @@ import HasReviewIcon from 'public/icon/edit-filled-subcoral.svg';
 import ReviewIcon from 'public/icon/edit-outlined-subcoral.svg';
 
 interface Props {
-  data: AlcoholAPI & { hasReviewByMe: boolean };
+  data: AlcoholAPI & { hasReviewByMe?: boolean; isMyPage?: boolean };
 }
 
 const ListItem = ({ data }: Props) => {
@@ -27,15 +27,13 @@ const ListItem = ({ data }: Props) => {
     ratingCount,
     alcoholId,
     hasReviewByMe,
+    isMyPage,
   } = data;
   const [isPicked, setIsPicked] = useState(initialIsPicked);
 
   return (
     <section className="grid grid-cols-2 text-mainBlack border-brightGray border-b h-[90px]">
-      <Link
-        href={`/search/${engCategory}/${alcoholId}`}
-        className="grid grid-cols-2"
-      >
+      <Link href={`/search/all/${alcoholId}`} className="grid grid-cols-2">
         <ItemImage src={imageUrl} alt="위스키 이미지" />
         <article className="flex w-full justify-between items-center">
           <ItemInfo
@@ -60,10 +58,16 @@ const ListItem = ({ data }: Props) => {
         </div>
 
         <div className="flex justify-end mt-1.5 gap-1">
-          <button>
+          <Link
+            href={
+              isMyPage
+                ? `/search/all/${alcoholId}/reviews?name=${korName}`
+                : `/search/all/${alcoholId}/reviews?name=${korName}`
+            }
+          >
             {hasReviewByMe === true && <Image src={HasReviewIcon} alt="리뷰" />}
             {hasReviewByMe === false && <Image src={ReviewIcon} alt="리뷰" />}
-          </button>
+          </Link>
           <PickBtn
             isPicked={isPicked}
             alcoholId={alcoholId}
