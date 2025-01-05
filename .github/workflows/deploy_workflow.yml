@@ -1,13 +1,10 @@
 name: Deploy Workflow
 
 on:
-  push:
-    branches:
-      - deploy
   pull_request:
     types: [ closed ]
     branches:
-      - deploy
+      - release
 
 concurrency:
   group: "dev-deploy"
