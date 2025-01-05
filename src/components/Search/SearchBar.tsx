@@ -86,7 +86,7 @@ export default function SearchBar({
         <>
           <input
             type="text"
-            className="w-full bg-white rounded-lg h-10 pl-4 pr-12 outline-none text-mainCoral placeholder-mainCoral text-15"
+            className="w-full bg-white rounded-lg h-10 pl-4 pr-12 outline-none text-mainCoral placeholder-mainCoral text-15 border border-mainCoral"
             placeholder={placeholder || '어떤 술을 찾고 계신가요?'}
             value={searchText}
             onChange={(e) => {
