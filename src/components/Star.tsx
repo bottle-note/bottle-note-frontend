@@ -30,7 +30,9 @@ const Star = ({
           alt="star"
         />
       )}
-      <div className={`${style}`}>{rating.toFixed(1)}</div>
+      <span className={`${style} w-5 whitespace-pre`}>
+        {rating ? rating.toFixed(1) : '  -'}
+      </span>
     </div>
   );
 };

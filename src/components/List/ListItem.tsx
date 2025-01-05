@@ -18,7 +18,6 @@ interface Props {
 const ListItem = ({ data }: Props) => {
   const {
     korCategoryName,
-    engCategory,
     korName,
     engName,
     imageUrl,
