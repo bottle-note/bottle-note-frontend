@@ -69,10 +69,10 @@ module.exports = {
     'react/default-props-match-prop-types': 'off', // defaultProps가 propTypes와 일치하도록 강제하지 않음.
     'react/jsx-props-no-spreading': ['off'], // JSX에서 props spreading을 허용함.
     'react-hooks/exhaustive-deps': ['off'], // useEffect의 종속성 배열에 모든 종속성을 포함하도록 강제하지 않음.
-    'linebreak-style': [
-      'error',
-      process.platform === 'win32' ? 'windows' : 'unix', // 플랫폼에 따른 줄바꿈 스타일을 강제함.
-    ],
+    // 'linebreak-style': [
+    //   'error',
+    //   process.platform === 'win32' ? 'windows' : 'unix', // 플랫폼에 따른 줄바꿈 스타일을 강제함.
+    // ],
     'prettier/prettier': ['error', { endOfLine: 'auto' }], // prettier 규칙에 따라 endOfLine을 auto로 설정함.
     'no-underscore-dangle': 'off', // 밑줄(_)로 시작하는 이름을 허용함.
     'react/jsx-no-useless-fragment': 'off', // 불필요한 Fragment 사용을 허용함.

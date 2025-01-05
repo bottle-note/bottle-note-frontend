@@ -9,8 +9,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { ReportApi } from '@/app/api/ReportApi';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { Button } from '@/components/Button';
-import { FormValues } from '@/types/Report';
-import { useSingleApiCall } from '@/hooks/useSingleApiCall';
+import { FormValues, ReportTypeMap } from '@/types/Report';
+import { useCallOnce } from '@/hooks/useCallOnce';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
@@ -18,17 +18,10 @@ import OptionSelect from '@/components/List/OptionSelect';
 import Loading from '@/components/Loading';
 import { REPORT_TYPE } from '@/app/(primary)/report/_constants/index';
 
-export default function Report() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { state, handleModalState } = useModalStore();
-  const { isProcessing, executeApiCall } = useSingleApiCall();
+type ReportType = 'review' | 'comment' | 'user';
 
-  const type = searchParams.get('type');
-  const reportUserId = searchParams.get('userId');
-  const reportTitle = REPORT_TYPE[type as 'review' | 'comment' | 'user'].title;
-
-  const schema = yup.object({
+const createBaseSchema = () =>
+  yup.object({
     content: yup
       .string()
       .min(10, '최소 10글자 이상 입력이 필요합니다.')
@@ -36,9 +29,33 @@ export default function Report() {
     type: yup.string().required('신고사항을 선택해주세요.'),
   });
 
-  const userSchema = schema.shape({
-    reportUserId: yup.number().required(),
-  });
+const getSchemaByType = (reportType: ReportType) => {
+  const baseSchema = createBaseSchema();
+
+  switch (reportType) {
+    case 'user':
+      return baseSchema.shape({
+        reportUserId: yup.number().required(),
+      });
+    case 'review':
+      return baseSchema.shape({
+        reportReviewId: yup.number().required(),
+      });
+    default:
+      return baseSchema;
+  }
+};
+
+export default function Report() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { state, handleModalState } = useModalStore();
+  const { isProcessing, executeApiCall } = useCallOnce();
+
+  const type = searchParams.get('type') as ReportType;
+  const reportUserId = searchParams.get('userId');
+  const reportReviewId = searchParams.get('reviewId');
+  const reportTitle = REPORT_TYPE[type].title;
 
   const {
     handleSubmit,
@@ -49,37 +66,55 @@ export default function Report() {
     formState: { errors },
   } = useForm<FormValues>({
     mode: 'onChange',
-    resolver: yupResolver(type === 'user' ? userSchema : schema), // comment, review는 API 나오면 맞춰서 수정 예정
+    resolver: yupResolver(
+      getSchemaByType(type as 'review' | 'comment' | 'user'),
+    ),
+    defaultValues: {
+      content: '',
+      type: '',
+    },
   });
 
-  // data type은 추후 report API 나오면 맞춰서 수정 예정
-  const onSave = async (data: any) => {
-    // console.log('save', data);
-
-    // data type은 추후 report API 나오면 맞춰서 함수로 나누기
+  const onSave = async (data: FormValues) => {
     const submitReport = async () => {
       try {
-        let result;
-        if (type === 'user') {
-          result = await ReportApi.registerUserReport(data);
-        }
+        if (!type) return;
 
-        if (result) {
-          handleModalState({
-            isShowModal: true,
-            type: 'ALERT',
-            mainText: '성공적으로 신고되었습니다.',
-            handleConfirm: () => {
-              handleModalState({
-                isShowModal: false,
-                mainText: '',
-              });
-              reset();
-              router.back();
-            },
-          });
+        await ReportApi.registerReport(
+          type,
+          data as ReportTypeMap[typeof type]['params'],
+        );
+
+        handleModalState({
+          isShowModal: true,
+          type: 'ALERT',
+          mainText: '성공적으로 신고되었습니다.',
+          handleConfirm: () => {
+            handleModalState({
+              isShowModal: false,
+              mainText: '',
+            });
+            reset();
+            router.back();
+          },
+        });
+      } catch (error: unknown) {
+        if (error && typeof error === 'object' && 'errors' in error) {
+          const apiError = error as { errors: Array<{ message: string }> };
+          if (apiError.errors?.length > 0) {
+            handleModalState({
+              isShowModal: true,
+              type: 'ALERT',
+              mainText: apiError.errors[0].message,
+              handleConfirm: () => {
+                handleModalState({
+                  isShowModal: false,
+                  mainText: '',
+                });
+              },
+            });
+          }
         }
-      } catch (error) {
         console.error('Failed to post report:', error);
       }
     };
@@ -94,17 +129,16 @@ export default function Report() {
   }, [errors]);
 
   useEffect(() => {
-    reset({
-      content: '',
-      type: '',
-    });
-  }, []);
-
-  useEffect(() => {
     if (reportUserId) {
       setValue('reportUserId', Number(reportUserId));
     }
   }, [reportUserId]);
+
+  useEffect(() => {
+    if (reportReviewId) {
+      setValue('reportReviewId', Number(reportReviewId));
+    }
+  }, [reportReviewId]);
 
   return (
     <>
