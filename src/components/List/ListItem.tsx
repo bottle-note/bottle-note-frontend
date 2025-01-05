@@ -8,9 +8,11 @@ import { AlcoholAPI } from '@/types/Alcohol';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
 import RatingCountIcon from 'public/icon/ratingcount-black.svg';
+import HasReviewIcon from 'public/icon/edit-filled-subcoral.svg';
+import ReviewIcon from 'public/icon/edit-outlined-subcoral.svg';
 
 interface Props {
-  data: AlcoholAPI;
+  data: AlcoholAPI & { hasReviewByMe: boolean };
 }
 
 const ListItem = ({ data }: Props) => {
@@ -24,6 +26,7 @@ const ListItem = ({ data }: Props) => {
     isPicked: initialIsPicked,
     ratingCount,
     alcoholId,
+    hasReviewByMe,
   } = data;
   const [isPicked, setIsPicked] = useState(initialIsPicked);
 
@@ -56,7 +59,11 @@ const ListItem = ({ data }: Props) => {
           <span className="">{`${ratingCount ?? 0}`}</span>)
         </div>
 
-        <div className="flex justify-end mt-1.5">
+        <div className="flex justify-end mt-1.5 gap-1">
+          <button>
+            {hasReviewByMe === true && <Image src={HasReviewIcon} alt="리뷰" />}
+            {hasReviewByMe === false && <Image src={ReviewIcon} alt="리뷰" />}
+          </button>
           <PickBtn
             isPicked={isPicked}
             alcoholId={alcoholId}
