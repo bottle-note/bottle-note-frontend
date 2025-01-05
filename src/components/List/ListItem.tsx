@@ -45,7 +45,7 @@ const ListItem = ({ data }: Props) => {
             </div>
 
             <div
-              className={`flex justify-end text-xxs text-right tracking-wider ${ratingCount === undefined ? 'visible' : 'invisible'}`}
+              className={`flex justify-end text-xxs text-right tracking-wider ${!ratingCount && 'hidden'}`}
             >
               (
               <Image src={RatingCountIcon} alt="별점 평가 참여자 수" />
@@ -57,7 +57,6 @@ const ListItem = ({ data }: Props) => {
                 isPicked={isPicked}
                 alcoholId={alcoholId}
                 iconColor="subcoral"
-                // FIXME: 별도 함수로 분리
                 handleUpdatePicked={() => setIsPicked(!isPicked)}
                 handleError={() => alert('에러가 발생했습니다.')}
                 handleNotLogin={() => alert('로그인이 필요한 서비스입니다.')}
