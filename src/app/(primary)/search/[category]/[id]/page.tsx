@@ -168,42 +168,40 @@ function SearchAlcohol() {
               {data?.alcohols?.alcoholsTastingTags && (
                 <FlavorTag tagList={data.alcohols.alcoholsTastingTags} />
               )}
-              <section className="mx-5 py-5 border-b border-mainGray/30 space-y-2">
-                {data?.friendsInfo && (
-                  <>
-                    <div className="flex items-end space-x-1 text-13 text-mainDarkGray">
-                      <div>마셔본 친구</div>
-                      <div className="font-extralight">
-                        {data.friendsInfo.followerCount}
+              {data?.friendsInfo && data.friendsInfo.followerCount !== 0 && (
+                <section className="mx-5 py-5 border-b border-mainGray/30 space-y-2">
+                  <div className="flex items-end space-x-1 text-13 text-mainDarkGray">
+                    <div>마셔본 친구</div>
+                    <div className="font-extralight">
+                      {data.friendsInfo.followerCount}
+                    </div>
+                  </div>
+                  <div className="whitespace-nowrap overflow-x-auto flex space-x-5 scrollbar-hide">
+                    {data.friendsInfo.friends?.map((user) => (
+                      <div
+                        key={user.userId}
+                        className="flex-shrink-0 flex flex-col items-center space-y-1"
+                      >
+                        <Link href={`/user/${user.userId}`}>
+                          <div className="w-14 h-14 rounded-full overflow-hidden">
+                            <Image
+                              className="object-cover"
+                              src={user.user_image_url}
+                              alt="user_img"
+                              width={56}
+                              height={56}
+                            />
+                          </div>
+                        </Link>
+                        <p className="text-10 text-mainDarkGray">
+                          {truncStr(user.nickName, 4)}
+                        </p>
+                        <Star rating={user.rating} size={12} />
                       </div>
-                    </div>
-                    <div className="whitespace-nowrap overflow-x-auto flex space-x-5 scrollbar-hide">
-                      {data.friendsInfo.friends?.map((user) => (
-                        <div
-                          key={user.userId}
-                          className="flex-shrink-0 flex flex-col items-center space-y-1"
-                        >
-                          <Link href={`/user/${user.userId}`}>
-                            <div className="w-14 h-14 rounded-full overflow-hidden">
-                              <Image
-                                className="object-cover"
-                                src={user.user_image_url}
-                                alt="user_img"
-                                width={56}
-                                height={56}
-                              />
-                            </div>
-                          </Link>
-                          <p className="text-10 text-mainDarkGray">
-                            {truncStr(user.nickName, 4)}
-                          </p>
-                          <Star rating={user.rating} size={12} />
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </section>
+                    ))}
+                  </div>
+                </section>
+              )}
             </div>
             {data?.reviewInfo?.reviewList &&
             data.reviewInfo.totalCount !== 0 ? (

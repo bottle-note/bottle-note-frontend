@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import useModalStore from '@/store/modalStore';
 import { AuthService } from '@/lib/AuthService';
@@ -32,6 +32,12 @@ const VisibilityToggle = ({
           reviewId,
           newStatus ? 'PUBLIC' : 'PRIVATE',
         );
+        handleModalState({
+          isShowModal: true,
+          mainText: '리뷰를 비공개했습니다.',
+          subText: '비공개 된 리뷰는 나만 볼 수 있어요!',
+          type: 'ALERT',
+        });
       } catch (error) {
         handleModalState({
           isShowModal: true,
@@ -43,6 +49,10 @@ const VisibilityToggle = ({
       }
     }
   };
+
+  useEffect(() => {
+    setIsActive(initialStatus);
+  }, [initialStatus]);
 
   return (
     <>

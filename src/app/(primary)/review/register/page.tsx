@@ -9,16 +9,14 @@ import * as yup from 'yup';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import AlcoholInfo from '@/app/(primary)/review/_components/AlcoholInfo';
 import { FormValues, ReviewTempData } from '@/types/Review';
-import { ReviewApi } from '@/app/api/ReviewApi';
-import { RateApi } from '@/app/api/RateApi';
 import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
-import { uploadImages } from '@/utils/S3Upload';
 import { Button } from '@/components/Button';
 import Loading from '@/components/Loading';
-import { useCallOnce } from '@/hooks/useCallOnce';
+import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import { useAlcoholDetails } from '@/hooks/useAlcoholDetails';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import { useReviewAutoSave } from '@/hooks/useReviewAutoSave';
+import { useReviewSubmission } from '@/hooks/useReviewSubmission';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import Toast from '@/components/Toast';
@@ -28,7 +26,7 @@ function ReviewRegister() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { state, handleModalState } = useModalStore();
-  const { isProcessing, executeApiCall } = useCallOnce();
+  const { isProcessing, executeApiCall } = useSingleApiCall();
   const alcoholId = searchParams.get('alcoholId') || '';
   const {
     alcoholData,
@@ -106,85 +104,14 @@ function ReviewRegister() {
     },
   );
 
+  const { submitReview } = useReviewSubmission({
+    alcoholId,
+    initialRating: userRating,
+    removeSavedReview,
+  });
+
   const onSave = async (data: FormValues) => {
-    const processSubmission = async () => {
-      let uploadedImageUrls = null;
-      if (data.images?.length !== 0) {
-        const images = data?.images?.map((file) => file.image);
-        if (images) {
-          try {
-            uploadedImageUrls = await uploadImages('review', images);
-          } catch (error) {
-            console.error('S3 업로드 에러:', error);
-            throw error;
-          }
-        }
-      }
-
-      const ratingParams = {
-        alcoholId,
-        rating: data.rating ?? 0,
-      };
-
-      const reviewParams = {
-        alcoholId,
-        status: data.status,
-        content: data.review,
-        sizeType: data.price ? data.price_type : null,
-        price: data.price,
-        imageUrlList: uploadedImageUrls ?? null,
-        tastingTagList: data.flavor_tags,
-        locationInfo: {
-          locationName: data.locationName,
-          zipCode: data.zipCode,
-          address: data.address,
-          detailAddress: data.detailAddress,
-          category: data.category,
-          mapUrl: data.mapUrl,
-          latitude: data.latitude,
-          longitude: data.longitude,
-        },
-        rating: data.rating ?? 0,
-      };
-
-      let ratingResult = null;
-      if (userRating !== data.rating) {
-        ratingResult = await RateApi.postRating(ratingParams);
-      }
-
-      const reviewResult = await ReviewApi.registerReview(reviewParams);
-
-      // 결과 처리 리팩토링 필수로 해야함..!
-      if (
-        (userRating !== data.rating && ratingResult && reviewResult) ||
-        (userRating === data.rating && reviewResult) ||
-        (userRating !== data.rating && reviewResult && !ratingResult)
-      ) {
-        const text =
-          userRating !== data.rating && !ratingResult
-            ? '❗️별점 등록에는 실패했습니다. 다시 시도해주세요.'
-            : '여정에 한발 더 가까워지셨어요!';
-        handleModalState({
-          isShowModal: true,
-          mainText: '작성을 완료했습니다 👍',
-          subText: text,
-          type: 'ALERT',
-          handleConfirm: () => {
-            router.push(`/review/${reviewResult.id}`);
-            handleModalState({
-              isShowModal: false,
-              mainText: '',
-              subText: '',
-            });
-            removeSavedReview();
-          },
-        });
-      } else if (userRating !== data.rating && ratingResult && !reviewResult) {
-        router.back();
-      }
-    };
-
-    await executeApiCall(processSubmission);
+    await executeApiCall(() => submitReview(data));
   };
 
   useEffect(() => {

@@ -23,7 +23,7 @@ import type {
   ReviewDetailsWithoutAlcoholInfo,
 } from '@/types/Review';
 import useModalStore from '@/store/modalStore';
-import { useCallOnce } from '@/hooks/useCallOnce';
+import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import Modal from '@/components/Modal';
 import ReplyInput from './_components/Reply/ReplyInput';
 import ReviewDetails from './_components/ReviewDetails';
@@ -34,7 +34,7 @@ export default function ReviewDetail() {
   const router = useRouter();
   const { id: reviewId } = useParams();
   const { state, handleModalState, handleLoginModal } = useModalStore();
-  const { isProcessing, executeApiCall } = useCallOnce();
+  const { isProcessing, executeApiCall } = useSingleApiCall();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [alcoholInfo, setAlcoholInfo] = useState<AlcoholInfoType | null>(null);
   const [reviewDetails, setReviewDetails] =

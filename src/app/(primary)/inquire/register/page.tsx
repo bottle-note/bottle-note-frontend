@@ -12,7 +12,7 @@ import { Button } from '@/components/Button';
 import { uploadImages } from '@/utils/S3Upload';
 import { FormValues } from '@/types/Inquire';
 import useModalStore from '@/store/modalStore';
-import { useCallOnce } from '@/hooks/useCallOnce';
+import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import Modal from '@/components/Modal';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import OptionSelect from '@/components/List/OptionSelect';
@@ -41,7 +41,7 @@ const TYPE_OPTIONS = [
 export default function InquireRegister() {
   const router = useRouter();
   const { state, handleModalState } = useModalStore();
-  const { isProcessing, executeApiCall } = useCallOnce();
+  const { isProcessing, executeApiCall } = useSingleApiCall();
 
   const schema = yup.object({
     content: yup
