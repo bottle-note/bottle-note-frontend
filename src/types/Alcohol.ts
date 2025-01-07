@@ -6,7 +6,7 @@ export interface AlcoholAPI {
   imageUrl: string;
   korName: string;
   engName: string;
-  korCategory: string;
+  korCategoryName: string;
   engCategory: string;
   rating: number;
   ratingCount: number;
