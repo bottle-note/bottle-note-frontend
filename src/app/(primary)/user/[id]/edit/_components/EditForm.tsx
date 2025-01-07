@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 // import { filterNumbers } from '@/utils/filterNumbers';
+import { useRouter } from 'next/navigation';
 import { UserApi } from '@/app/api/UserApi';
 import { validate } from '@/utils/validate';
 import Modal from '@/components/Modal';
@@ -10,8 +11,9 @@ import { ApiResponse } from '@/types/common';
 import CloseIconGray from 'public/icon/close-brightgray.svg';
 
 function EditForm() {
+  const router = useRouter();
   const [nickName, setNickName] = useState('');
-  const { handleModalState } = useModalStore();
+  const { handleModalState, handleCloseModal } = useModalStore();
   // const [birthDate, setBirthDate] = useState('');
   // const [gender, setGender] = useState<'MALE' | 'FEMALE' | null>(null);
 
@@ -54,6 +56,11 @@ function EditForm() {
         return handleModalState({
           isShowModal: true,
           mainText: `저장되었습니다.`,
+          subText: '',
+          handleConfirm: () => {
+            handleCloseModal();
+            router.back();
+          },
         });
       }
     } catch (e) {
