@@ -10,6 +10,8 @@ import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
 import { handleWebViewMessage, sendLogToFlutter } from '@/utils/flutterUtil';
+import { base64ToFile } from '@/utils/base64ToFile';
+import { uploadImages } from '@/utils/S3Upload';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
@@ -70,13 +72,18 @@ export default function UserEditPage() {
   }, []);
 
   useEffect(() => {
-    // 이미지 데이터가 추가된 경우
-    if (imageData?.length) {
-      // File 형식으로 변환
-      // api 호출
-      // viewURL을 가져와 프로필 이미지로 지정
-      window.sendLogToFlutter(`이미지 데이터 수신 성공`);
-    }
+    const getImgUrl = async () => {
+      if (imageData?.length) {
+        const imgFile = base64ToFile(imageData);
+        const imgData = await uploadImages('userProfile', [imgFile]);
+
+        // viewURL을 가져와 프로필 이미지로 지정
+        window.sendLogToFlutter(
+          `이미지 데이터 수신 성공 ${JSON.stringify(imgData)}`,
+        );
+      }
+    };
+    getImgUrl();
   }, [imageData]);
 
   return (
