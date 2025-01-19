@@ -9,11 +9,7 @@ import { UserApi } from '@/app/api/UserApi';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
-import {
-  handleWebViewMessage,
-  openAlbum,
-  sendLogToFlutter,
-} from '@/utils/flutterUtil';
+import { handleWebViewMessage, sendLogToFlutter } from '@/utils/flutterUtil';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
@@ -63,6 +59,10 @@ export default function UserEditPage() {
 
   // NOTE: 웹뷰 핸들러 함수 window 전역객체 등록
   useLayoutEffect(() => {
+    if (isMobile) {
+      handleWebViewMessage('checkIsInApp');
+    }
+
     window.openAlbum = (imgDataBase64) => {
       setImageData(imgDataBase64);
     };
