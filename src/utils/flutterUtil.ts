@@ -19,8 +19,8 @@ export function handleWebViewMessage(
   return window.FlutterMessageQueue.postMessage(message);
 }
 
-export function openAlbum(imgDataBase64: string) {
-  console.log(imgDataBase64, 'image from flutter');
+export function openAlbum(imgDataBase64: string): string {
+  return imgDataBase64;
 }
 
 export function sendLogToFlutter(log: string) {
