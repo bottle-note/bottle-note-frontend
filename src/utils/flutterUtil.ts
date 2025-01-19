@@ -14,9 +14,13 @@ export function getDeviceToken(token: string, platform: string) {
 }
 
 export function handleWebViewMessage(
-  message: 'checkIsInApp' | 'deviceToken' | 'logToFlutter',
+  message: 'checkIsInApp' | 'deviceToken' | 'logToFlutter' | 'openAlbum',
 ) {
   return window.FlutterMessageQueue.postMessage(message);
+}
+
+export function openAlbum(imgDataBase64: string) {
+  console.log(imgDataBase64, 'image from flutter');
 }
 
 export function sendLogToFlutter(log: string) {
@@ -30,3 +34,5 @@ export function sendLogToFlutter(log: string) {
   }
   return log;
 }
+
+export const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);

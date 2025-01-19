@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
@@ -9,6 +9,7 @@ import { UserApi } from '@/app/api/UserApi';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
+import { handleWebViewMessage, isMobile, openAlbum } from '@/utils/flutterUtil';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
@@ -16,7 +17,7 @@ import ChangeProfile from 'public/change-profile.svg';
 export default function UserEditPage() {
   const router = useRouter();
   const { userData } = AuthService;
-  const { handleModalState } = useModalStore();
+  const { handleModalState, handleCloseModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
 
   const SELECT_OPTIONS = [
@@ -27,7 +28,13 @@ export default function UserEditPage() {
 
   const handleOptionSelect = async ({ type }: { type: string }) => {
     if (type === 'camera') return alert(`카메라 접근 기능 준비중입니다.`);
-    if (type === 'album') return alert(`앨범 접근 기능 준비중입니다.`);
+    if (type === 'album') {
+      if (isMobile) {
+        return handleWebViewMessage('checkIsInApp');
+      }
+
+      return alert('모바일 환경에서만 실행 가능합니다.');
+    }
     if (type === 'delete') {
       try {
         await UserApi.changeProfileImage(null);
@@ -35,6 +42,7 @@ export default function UserEditPage() {
           isShowModal: true,
           mainText: '저장되었습니다.',
           handleConfirm: () => {
+            handleCloseModal();
             router.push(`/user/${userData?.userId}`);
           },
         });
@@ -45,6 +53,11 @@ export default function UserEditPage() {
 
     setIsOptionShow(false);
   };
+
+  // NOTE: 웹뷰 핸들러 함수 window 전역객체 등록
+  useLayoutEffect(() => {
+    window.openAlbum = openAlbum;
+  }, []);
 
   return (
     <main>
