@@ -9,7 +9,7 @@ import { UserApi } from '@/app/api/UserApi';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
-import { handleWebViewMessage, isMobile, openAlbum } from '@/utils/flutterUtil';
+import { handleWebViewMessage, openAlbum } from '@/utils/flutterUtil';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
@@ -25,6 +25,8 @@ export default function UserEditPage() {
     { type: 'album', name: '앨범에서 선택' },
     { type: 'delete', name: '현재 이미지 삭제하기' },
   ];
+
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   const handleOptionSelect = async ({ type }: { type: string }) => {
     if (type === 'camera') return alert(`카메라 접근 기능 준비중입니다.`);

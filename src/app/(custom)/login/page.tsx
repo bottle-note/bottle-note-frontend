@@ -11,7 +11,6 @@ import {
   checkIsInApp,
   getDeviceToken,
   handleWebViewMessage,
-  isMobile,
   sendLogToFlutter,
 } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
@@ -107,6 +106,7 @@ export default function Login() {
     window.checkIsInApp = checkIsInApp;
     window.sendLogToFlutter = sendLogToFlutter;
 
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     if (isMobile) {
       handleWebViewMessage('checkIsInApp');
     }
