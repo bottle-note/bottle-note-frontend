@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
@@ -9,7 +9,11 @@ import { UserApi } from '@/app/api/UserApi';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
-import { handleWebViewMessage, openAlbum } from '@/utils/flutterUtil';
+import {
+  handleWebViewMessage,
+  openAlbum,
+  sendLogToFlutter,
+} from '@/utils/flutterUtil';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
@@ -19,6 +23,7 @@ export default function UserEditPage() {
   const { userData } = AuthService;
   const { handleModalState, handleCloseModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
+  const [imageData, setImageData] = useState<string | null>(null);
 
   const SELECT_OPTIONS = [
     { type: 'camera', name: '카메라' },
@@ -58,8 +63,21 @@ export default function UserEditPage() {
 
   // NOTE: 웹뷰 핸들러 함수 window 전역객체 등록
   useLayoutEffect(() => {
-    window.openAlbum = openAlbum;
+    window.openAlbum = (imgDataBase64) => {
+      setImageData(imgDataBase64);
+    };
+    window.sendLogToFlutter = sendLogToFlutter;
   }, []);
+
+  useEffect(() => {
+    // 이미지 데이터가 추가된 경우
+    if (imageData?.length) {
+      // File 형식으로 변환
+      // api 호출
+      // viewURL을 가져와 프로필 이미지로 지정
+      window.sendLogToFlutter(`이미지 데이터 수신 성공`);
+    }
+  }, [imageData]);
 
   return (
     <main>
