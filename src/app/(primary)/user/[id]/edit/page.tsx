@@ -32,7 +32,7 @@ export default function UserEditPage() {
     if (type === 'camera') return alert(`카메라 접근 기능 준비중입니다.`);
     if (type === 'album') {
       if (isMobile) {
-        return handleWebViewMessage('checkIsInApp');
+        return handleWebViewMessage('openAlbum');
       }
 
       return alert('모바일 환경에서만 실행 가능합니다.');
