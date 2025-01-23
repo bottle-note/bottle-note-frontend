@@ -2,7 +2,7 @@ name: Deploy Workflow
 
 on:
   pull_request:
-    types: [closed]
+    types: [ closed ]
     branches:
       - release
 
@@ -17,13 +17,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: copy project # ssh key를 이용해 현재 푸시된 소스를 서버에 복사한다.
+      - name: copy project
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -avzr --delete # rsync 명령어 옵션
-          remote_path: /home/bottlenote/app/bottle-note-front-server
+          switches: -avzr --delete
+          remote_path: ${{ secrets.ROOT_PATH }}
           remote_host: ${{ secrets.DEV_SERVER_IP }}
-          remote_port: ${{ secrets.DEV_SERVER_HOST }}
+          remote_port: ${{ secrets.DEV_SERVER_PORT }}
           remote_user: bottlenote
           remote_key: ${{ secrets.DEV_SSH_KEY }}
 
@@ -31,24 +31,24 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DEV_SERVER_IP }}
-          port: ${{ secrets.DEV_SERVER_HOST }}
+          port: ${{ secrets.DEV_SERVER_PORT }}
           username: bottlenote
           key: ${{ secrets.DEV_SSH_KEY }}
           script: |
-            cd /home/bottlenote/app/bottle-note-front-server
+            cd ${{ secrets.ROOT_PATH }}
             rm -f .env
-            touch  /home/bottlenote/app/bottle-note-front-server/.env
+            touch .env
             echo "${{ secrets.ENV }}" | base64 --decode > .env
 
       - name: docker compose up
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DEV_SERVER_IP }}
-          port: ${{ secrets.DEV_SERVER_HOST }}
+          port: ${{ secrets.DEV_SERVER_PORT }}
           username: bottlenote
           key: ${{ secrets.DEV_SSH_KEY }}
           script: |
-            cd /home/bottlenote/app/bottle-note-front-server
+            cd ${{ secrets.ROOT_PATH }}
             docker stop bottle-note-front-server || true
             docker rm bottle-note-front-server || true
             docker compose up -d --no-deps --build 
