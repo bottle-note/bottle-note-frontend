@@ -48,8 +48,10 @@ jobs:
 
       - name: 헬스체크 API 테스트
         run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/health)
-          if [ "$response" = "200" ]; then
+          response_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000)
+          content_type=$(curl -s -I http://localhost:3000 | grep -i content-type)
+          
+          if [ "$response_code" = "200" ] && [[ "$content_type" == *"text/html"* ]]; then
             echo "헬스체크 성공"
           else
             echo "헬스체크 실패" && exit 1
