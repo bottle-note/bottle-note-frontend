@@ -52,7 +52,7 @@ export default function ImagesForm() {
 
     // 기존 이미지 삭제
     if (existingImages.includes(image)) {
-      updatedPreviews = previewImages.filter((file) => file.order !== order);
+      updatedPreviews = previewImages.filter((file) => file.image !== image);
       const DBImages = savedImages
         .filter((file) => file.order !== order)
         .map((file) => ({
@@ -69,6 +69,7 @@ export default function ImagesForm() {
         (file: SaveImages) => file.order !== order,
       );
     }
+
     setValue('images', updatedFiles);
     setPreviewImages(updatedPreviews);
   };

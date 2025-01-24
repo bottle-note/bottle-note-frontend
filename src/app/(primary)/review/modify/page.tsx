@@ -10,11 +10,10 @@ import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import AlcoholInfo from '@/app/(primary)/review/_components/AlcoholInfo';
 import { FormValues } from '@/types/Review';
 import { ReviewApi } from '@/app/api/ReviewApi';
-import { RateApi } from '@/app/api/RateApi';
-import { uploadImages } from '@/utils/S3Upload';
-import { useCallOnce } from '@/hooks/useCallOnce';
+import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import { useAlcoholDetails } from '@/hooks/useAlcoholDetails';
 import { useErrorModal } from '@/hooks/useErrorModal';
+import { useReviewSubmission } from '@/hooks/useReviewSubmission';
 import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
 import { Button } from '@/components/Button';
 import useModalStore from '@/store/modalStore';
@@ -25,7 +24,7 @@ import ReviewForm from '../_components/form/ReviewForm';
 function ReviewModify() {
   const router = useRouter();
   const { state, handleModalState } = useModalStore();
-  const { isProcessing, executeApiCall } = useCallOnce();
+  const { isProcessing, executeApiCall } = useSingleApiCall();
   const searchParams = useSearchParams();
   const reviewId = searchParams.get('reviewId');
   const [alcoholId, setAlcoholId] = useState<string>('');
@@ -44,88 +43,15 @@ function ReviewModify() {
     formState: { isDirty, errors },
   } = formMethods;
 
+  const { submitReview } = useReviewSubmission({
+    alcoholId,
+    reviewId: reviewId ?? undefined,
+    initialRating,
+  });
+
   const onSave = async (data: FormValues) => {
-    const processSubmission = async () => {
-      let newImgUrlList = null;
-      const originImgUrlList = watch('imageUrlList') ?? [];
-      if (data.images?.length !== 0) {
-        const images = data?.images?.map((file) => file.image);
-        if (images) {
-          try {
-            newImgUrlList = await uploadImages('review', images);
-          } catch (error) {
-            console.error('S3 업로드 에러:', error);
-            throw error;
-          }
-        }
-      }
-
-      const ratingParams = {
-        alcoholId,
-        rating: data.rating ?? 0,
-      };
-
-      const reviewParams = {
-        alcoholId,
-        status: data.status,
-        content: data.review,
-        sizeType: data.price ? data.price_type : null,
-        price: data.price,
-        imageUrlList:
-          originImgUrlList.length > 0 || (newImgUrlList?.length ?? 0) > 0
-            ? [...originImgUrlList, ...(newImgUrlList ?? [])]
-            : null,
-        tastingTagList: data.flavor_tags,
-        locationInfo: {
-          locationName: data.locationName,
-          zipCode: data.zipCode,
-          address: data.address,
-          detailAddress: data.detailAddress,
-          category: data.category,
-          mapUrl: data.mapUrl,
-          latitude: data.latitude,
-          longitude: data.longitude,
-        },
-        rating: data.rating ?? 0,
-      };
-
-      let ratingResult = null;
-      let reviewResult = null;
-      if (initialRating !== data.rating) {
-        ratingResult = await RateApi.postRating(ratingParams);
-      }
-      if (reviewId) {
-        reviewResult = await ReviewApi.modifyReview(reviewId, reviewParams);
-      }
-
-      // 결과 처리 리팩토링 필수로 해야함..!
-      if (
-        (initialRating !== data.rating && ratingResult && reviewResult) ||
-        (initialRating === data.rating && reviewResult) ||
-        (initialRating !== data.rating && reviewResult && !ratingResult)
-      ) {
-        handleModalState({
-          isShowModal: true,
-          mainText: '성공적으로 수정했습니다 👍',
-          type: 'ALERT',
-          handleConfirm: () => {
-            router.push(`/review/${reviewId}`);
-            handleModalState({
-              isShowModal: false,
-              mainText: '',
-            });
-          },
-        });
-      } else if (
-        initialRating !== data.rating &&
-        ratingResult &&
-        !reviewResult
-      ) {
-        router.back();
-      }
-    };
-
-    await executeApiCall(processSubmission);
+    const originImgUrlList = watch('imageUrlList') ?? [];
+    await executeApiCall(() => submitReview(data, originImgUrlList));
   };
 
   useEffect(() => {

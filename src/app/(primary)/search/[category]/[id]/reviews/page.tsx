@@ -53,6 +53,7 @@ function Reviews() {
     isLoading: isFirstLoading,
     isFetching,
     targetRef,
+    refetch: refetchReview,
   } = usePaginatedQuery<{
     reviewList: ReviewType[];
     totalCount: number;
@@ -76,6 +77,7 @@ function Reviews() {
     isLoading: isMyReviewFirstLoading,
     isFetching: isMyReviewFetching,
     targetRef: myReviewTargetRef,
+    refetch: refetchMyReview,
   } = usePaginatedQuery<{
     reviewList: ReviewType[];
     totalCount: number;
@@ -110,17 +112,23 @@ function Reviews() {
           {alcoholKorName}
         </SubHeader.Center>
       </SubHeader>
-      <section className="p-8 space-y-9">
+      <section className="pt-5 px-5 pb-7 space-y-9">
         <div className="flex gap-3 relative">
           <button
             className={`py-2 ${activeTab === 'tab1' ? 'tab-selected' : 'tab-default'} w-full font-bold text-15 text-center`}
-            onClick={() => handleTabClick('tab1')}
+            onClick={() => {
+              handleTabClick('tab1');
+              refetchReview();
+            }}
           >
             모든 리뷰
           </button>
           <button
             className={`py-2 ${activeTab === 'tab2' ? 'tab-selected' : 'tab-default'} w-full font-bold text-15 text-center`}
-            onClick={() => handleTabClick('tab2')}
+            onClick={() => {
+              handleTabClick('tab2');
+              refetchMyReview();
+            }}
           >
             내가 작성한 리뷰
           </button>

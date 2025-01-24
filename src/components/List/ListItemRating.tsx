@@ -16,7 +16,7 @@ interface Props {
 
 const ListItemRating = ({ data }: Props) => {
   const {
-    korCategory,
+    korCategoryName,
     korName,
     engName,
     imageUrl,
@@ -45,7 +45,7 @@ const ListItemRating = ({ data }: Props) => {
         <ItemInfo
           korName={korName}
           engName={engName}
-          korCategory={korCategory}
+          korCategory={korCategoryName}
         />
         <article className="flex justify-between">
           <StarRating rate={rate} handleRate={handleRate} />
