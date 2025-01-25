@@ -186,7 +186,7 @@ function Review({ data }: Props) {
             )}
           </div>
           <div className="flex items-center">
-            <p className="text-9">{formatDate(data.createAt)}</p>
+            <p className="text-9">{formatDate(data.createAt) as string}</p>
             <button
               className="cursor-pointer"
               onClick={() => {

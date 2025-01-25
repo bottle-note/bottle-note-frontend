@@ -60,7 +60,7 @@ export default function Inquire() {
         {inquireDetails !== null && (
           <>
             <article className="mt-5 mx-5 text-13 text-mainGray">
-              {formatDate(inquireDetails.createAt)}
+              {formatDate(inquireDetails.createAt) as string}
             </article>
             <article className="mx-5 mt-2 py-3 border-t-[0.01rem] border-b-[0.01rem] border-mainGray/30">
               <div className="flex pb-3 items-center space-x-2">
@@ -101,7 +101,7 @@ export default function Inquire() {
                     <p className="text-mainGray text-10">보틀노트</p>
                   </div>
                   <p className="text-mainGray text-10">
-                    {formatDate(inquireDetails.lastModifyAt)}
+                    {formatDate(inquireDetails.lastModifyAt) as string}
                   </p>
                 </div>
                 <div className="text-10 break-words leading-none text-mainDarkGray">
