@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import LinkButton from '@/components/LinkButton';
 import { UserInfoApi } from '@/types/User';
 import { UserApi } from '@/app/api/UserApi';
@@ -14,6 +15,7 @@ import { AuthService } from '@/lib/AuthService';
 
 export default function User({ params: { id } }: { params: { id: string } }) {
   const [userData, setUserData] = useState<UserInfoApi | null>(null);
+  const router = useRouter();
   const { handleModalState, handleLoginModal } = useModalStore();
   const { userData: loginUserData, isLogin } = AuthService;
 
@@ -36,6 +38,8 @@ export default function User({ params: { id } }: { params: { id: string } }) {
           });
         },
       });
+    } else {
+      router.push('/history');
     }
   };
 
