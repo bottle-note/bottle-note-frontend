@@ -25,6 +25,11 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
       icon: '/icon/star-filled-subcoral.svg',
     },
     {
+      name: '기록',
+      link: '/history',
+      icon: '/icon/document-outlined-subcoral.svg',
+    },
+    {
       name: '마이',
       link: userData ? `/user/${userData.userId}` : '/login',
       icon: '/icon/user-outlined-subcoral.svg',
@@ -35,7 +40,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
     <nav
       className={`fixed bottom-6 left-0 right-0 mx-auto w-full max-w-[${maxWidth}] px-4 z-10`}
     >
-      <section className="h-[4.4rem] flex justify-between bg-[#F6F6F6] py-3 px-9 rounded-[0.8rem] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
+      <section className="h-[4.4rem] flex justify-between bg-[#F6F6F6] py-3 px-5 rounded-[0.8rem] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
         {navItems.map((menu: NavItem, index: number) => (
           <React.Fragment key={menu.link}>
             <Link
@@ -50,7 +55,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
               }`}
               href={menu.link}
             >
-              <div className="flex flex-col items-center space-y-1">
+              <div className="flex flex-col items-center justify-center space-y-[2px]">
                 <Image src={menu.icon} alt={menu.name} width={30} height={30} />
                 <span className="text-9 text-subCoral">{menu.name}</span>
               </div>
