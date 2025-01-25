@@ -29,7 +29,7 @@ export const HISTORY_MOCK_LIST_ITEM: HistoryApi[] = [
   },
   {
     historyId: 3,
-    createdAt: '2025-01-21T14:35:12',
+    createdAt: '2025-01-19T14:35:12',
     eventCategory: 'REVIEW',
     eventType: 'REVIEW_CREATE',
     reviewText: '오크향이 매력적인 위스키 중에 하나에요.',
@@ -42,7 +42,7 @@ export const HISTORY_MOCK_LIST_ITEM: HistoryApi[] = [
   },
   {
     historyId: 4,
-    createdAt: '2025-01-21T14:35:12',
+    createdAt: '2025-01-20T14:35:12',
     eventCategory: 'REVIEW',
     eventType: 'REVIEW_CREATE',
     reviewText: '오크향이 매력적인 위스키 중에 하나에요.',

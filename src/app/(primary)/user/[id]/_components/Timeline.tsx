@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
 import TimeLineItem from '@/app/(primary)/_components/TimeLineItem';
 import Label from '@/app/(primary)/_components/Label';
@@ -68,16 +68,26 @@ function Timeline() {
                   />
                 </div>
                 <div className="z-10 space-y-5">
-                  {items.map((item: HistoryApi) => (
-                    <TimeLineItem
-                      key={item.historyId}
-                      date={item.createdAt}
-                      alcoholName={item.korName}
-                      imageSrc={item.imageUrl}
-                      type={item.eventCategory}
-                      rating={item?.rating}
-                      text={item?.reviewText}
-                    />
+                  {items.map((item: HistoryApi, itemIndex) => (
+                    <React.Fragment key={item.historyId}>
+                      {itemIndex > 0 &&
+                        formatDate(
+                          items[itemIndex - 1].createdAt,
+                          'FULL_DATE',
+                        ) !== formatDate(item.createdAt, 'FULL_DATE') && (
+                          <div className="relative py-1">
+                            <div className="absolute left-0 right-0 h-px bg-bgGray" />
+                          </div>
+                        )}
+                      <TimeLineItem
+                        date={item.createdAt}
+                        alcoholName={item.korName}
+                        imageSrc={item.imageUrl}
+                        type={item.eventCategory}
+                        rating={item?.rating}
+                        text={item?.reviewText}
+                      />
+                    </React.Fragment>
                   ))}
                 </div>
                 {index !== Object.keys(groupedHistory).length - 1 && (
