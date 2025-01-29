@@ -7,8 +7,9 @@ import { TimeFormat } from '@/types/FormatDate';
 
 interface BaseProps {
   date: string;
-  alcoholName: string;
-  imageSrc: string;
+  alcoholName?: string;
+  imageSrc?: string;
+  isStart?: boolean;
 }
 
 interface RatingProps extends BaseProps {
@@ -22,13 +23,13 @@ interface ReviewProps extends BaseProps {
 }
 
 interface OtherProps extends BaseProps {
-  type: 'LIKE' | 'UNLIKE' | 'REPLY'; // 서버 API에 맞춰 수정 필요
+  type: 'LIKE' | 'UNLIKE' | 'REPLY' | 'BOTTLE'; // 서버 API에 맞춰 수정 필요
 }
 
 type Props = RatingProps | ReviewProps | OtherProps;
 
 function TimeLineItem(props: Props) {
-  const { date, alcoholName, imageSrc, type } = props;
+  const { date, alcoholName, imageSrc, type, isStart = false } = props;
   const { icon, iconAlt, renderDescription } = HISTORY_TYPE_INFO[type];
   const dateTime = formatDate(date, 'MONTH_DATE_TIME') as TimeFormat;
 
@@ -39,24 +40,35 @@ function TimeLineItem(props: Props) {
         <p className="text-9 font-extralight">{dateTime.time}</p>
       </div>
       <Image className="mr-1" src={icon} width={20} height={20} alt={iconAlt} />
-      <Link href="">
-        <div className="w-[17rem] h-14 p-3 bg-bgGray rounded-md flex justify-between">
-          <div>
-            <p className="text-12 font-bold text-mainDarkGray">{alcoholName}</p>
-            {renderDescription(
-              type === 'RATING' ? props?.rating : undefined,
-              type === 'REVIEW' ? props?.text : undefined,
+      {isStart ? (
+        <div className="w-[17rem] text-12 font-bold text-white bg-subCoral py-[0.65rem] px-3 rounded-md">
+          보틀노트를 시작하신 날이에요.
+        </div>
+      ) : (
+        <Link href="">
+          <div className="w-[17rem] h-14 p-3 bg-bgGray rounded-md flex justify-between">
+            <div>
+              <p className="text-12 font-bold text-mainDarkGray">
+                {alcoholName}
+              </p>
+              {renderDescription &&
+                renderDescription(
+                  type === 'RATING' ? props?.rating : undefined,
+                  type === 'REVIEW' ? props?.text : undefined,
+                )}
+            </div>
+            {imageSrc && (
+              <Image
+                className="mr-1 rounded"
+                src={imageSrc}
+                width={25}
+                height={34}
+                alt="alcoholImage"
+              />
             )}
           </div>
-          <Image
-            className="mr-1 rounded"
-            src={imageSrc}
-            width={25}
-            height={34}
-            alt="alcoholImage"
-          />
-        </div>
-      </Link>
+        </Link>
+      )}
     </div>
   );
 }
