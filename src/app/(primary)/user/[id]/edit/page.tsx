@@ -76,21 +76,30 @@ export default function UserEditPage() {
   }, []);
 
   useEffect(() => {
-    console.log(imageData);
-  }, [imageData]);
-
-  useEffect(() => {
     const getImgUrl = async () => {
-      if (imageData?.length) {
-        const imgFile = base64ToFile(imageData);
-        const imgData = await uploadImages('userProfile', [imgFile]);
+      try {
+        console.log('getImgUrl called');
 
-        // viewURL을 가져와 프로필 이미지로 지정
+        if (imageData?.length) {
+          const imgFile = base64ToFile(imageData);
+          console.log(imgFile);
+
+          const imgData = await uploadImages('userProfile', [imgFile]);
+          console.log(imgData);
+
+          // viewURL을 가져와 프로필 이미지로 지정
+          window.sendLogToFlutter(
+            `이미지 데이터 수신 성공 ${JSON.stringify(imgData)}`,
+          );
+        }
+      } catch (error) {
+        console.error('Error in getImgUrl:', error);
         window.sendLogToFlutter(
-          `이미지 데이터 수신 성공 ${JSON.stringify(imgData)}`,
+          `이미지 업로드 실패: ${(error as Error).message}`,
         );
       }
     };
+
     getImgUrl();
   }, [imageData]);
 
