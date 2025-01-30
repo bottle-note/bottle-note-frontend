@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
@@ -22,6 +22,7 @@ export default function UserEditPage() {
   const { handleModalState, handleCloseModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [imageData, setImageData] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const SELECT_OPTIONS = [
     { type: 'camera', name: '카메라' },
@@ -38,7 +39,7 @@ export default function UserEditPage() {
         return handleWebViewMessage('openAlbum');
       }
 
-      return alert('모바일 환경에서만 실행 가능합니다.');
+      fileInputRef.current?.click();
     }
     if (type === 'delete') {
       try {
@@ -59,6 +60,8 @@ export default function UserEditPage() {
     setIsOptionShow(false);
   };
 
+  const handleUploadImg = async (data: string | File) => {};
+
   // NOTE: 웹뷰 핸들러 함수 window 전역객체 등록
   useLayoutEffect(() => {
     if (isMobile) {
@@ -68,8 +71,13 @@ export default function UserEditPage() {
     window.openAlbum = (imgDataBase64) => {
       setImageData(imgDataBase64);
     };
+
     window.sendLogToFlutter = sendLogToFlutter;
   }, []);
+
+  useEffect(() => {
+    console.log(imageData);
+  }, [imageData]);
 
   useEffect(() => {
     const getImgUrl = async () => {
@@ -105,6 +113,19 @@ export default function UserEditPage() {
           마이페이지
         </SubHeader.Center>
       </SubHeader>
+
+      <input
+        ref={fileInputRef} // ref 사용
+        type="file"
+        accept="image/*" // 이미지 파일만 선택 가능
+        style={{ display: 'none' }} // 파일 입력 필드를 숨김
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          if (file) {
+            handleUploadImg(file);
+          }
+        }}
+      />
 
       <section className="px-5 flex justify-center h-52 relative">
         <Image
