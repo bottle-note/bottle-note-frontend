@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
@@ -14,7 +14,6 @@ import {
   handleWebViewMessage,
   sendLogToFlutter,
 } from '@/utils/flutterUtil';
-import { base64ToFile } from '@/utils/base64ToFile';
 import { uploadImages } from '@/utils/S3Upload';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
@@ -26,7 +25,6 @@ export default function UserEditPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { handleModalState, handleCloseModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
-  const [imageData, setImageData] = useState<string | null>(null);
   const [profileImg, setProfileImg] = useState(userData?.profile);
 
   const SELECT_OPTIONS = [
@@ -41,12 +39,9 @@ export default function UserEditPage() {
     if (type === 'camera') return alert(`카메라 접근 기능 준비중입니다.`);
 
     if (type === 'album') {
-      if (isMobile) {
-        return handleWebViewMessage('openAlbum');
-      }
-
       return fileInputRef.current?.click();
     }
+
     if (type === 'delete') {
       try {
         await UserApi.changeProfileImage(null);
@@ -68,39 +63,16 @@ export default function UserEditPage() {
 
   const handleUploadImg = async (data: File) => {
     const imgData = await uploadImages('userProfile', [data]);
-    console.log(imgData, 'imgData');
     const { viewUrl } = imgData[0];
+    // TODO: 이미지 변경 api 추가
     setProfileImg(viewUrl);
   };
-
-  useEffect(() => {
-    const getImgUrl = async () => {
-      try {
-        if (imageData?.length) {
-          const imgFile = base64ToFile(imageData);
-          console.log(imgFile, 'imgFile');
-          await handleUploadImg(imgFile);
-        }
-      } catch (error) {
-        console.error('Error in getImgUrl:', JSON.stringify(error));
-        window.sendLogToFlutter(
-          `이미지 업로드 실패: ${(error as Error).message}`,
-        );
-      }
-    };
-
-    getImgUrl();
-  }, [imageData]);
 
   // NOTE: 웹뷰 핸들러 함수 window 전역객체 등록
   useLayoutEffect(() => {
     if (isMobile) {
       handleWebViewMessage('checkIsInApp');
     }
-
-    window.openAlbum = (imgDataBase64) => {
-      setImageData(imgDataBase64);
-    };
 
     window.checkIsInApp = checkIsInApp;
     window.sendLogToFlutter = sendLogToFlutter;
