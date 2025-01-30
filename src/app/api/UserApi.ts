@@ -1,4 +1,3 @@
-import { strict } from 'assert';
 import { AlcoholAPI } from '@/types/Alcohol';
 import { ApiResponse, MyBottleQueryParams } from '@/types/common';
 import { RelationInfo, UserInfoApi } from '@/types/User';
