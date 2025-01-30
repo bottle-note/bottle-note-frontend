@@ -9,7 +9,11 @@ import { UserApi } from '@/app/api/UserApi';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
-import { handleWebViewMessage, sendLogToFlutter } from '@/utils/flutterUtil';
+import {
+  checkIsInApp,
+  handleWebViewMessage,
+  sendLogToFlutter,
+} from '@/utils/flutterUtil';
 import { base64ToFile } from '@/utils/base64ToFile';
 import { uploadImages } from '@/utils/S3Upload';
 import EditForm from './_components/EditForm';
@@ -35,6 +39,7 @@ export default function UserEditPage() {
 
   const handleOptionSelect = async ({ type }: { type: string }) => {
     if (type === 'camera') return alert(`카메라 접근 기능 준비중입니다.`);
+
     if (type === 'album') {
       if (isMobile) {
         return handleWebViewMessage('openAlbum');
@@ -95,6 +100,7 @@ export default function UserEditPage() {
       setImageData(imgDataBase64);
     };
 
+    window.checkIsInApp = checkIsInApp;
     window.sendLogToFlutter = sendLogToFlutter;
   }, []);
 
