@@ -40,7 +40,7 @@ export default function UserEditPage() {
         return handleWebViewMessage('openAlbum');
       }
 
-      fileInputRef.current?.click();
+      return fileInputRef.current?.click();
     }
     if (type === 'delete') {
       try {
@@ -72,13 +72,7 @@ export default function UserEditPage() {
       try {
         if (imageData?.length) {
           const imgFile = base64ToFile(imageData);
-
-          const imgData = await uploadImages('userProfile', [imgFile]);
-
-          // viewURL을 가져와 프로필 이미지로 지정
-          window.sendLogToFlutter(
-            `이미지 데이터 수신 성공 ${JSON.stringify(imgData)}`,
-          );
+          handleUploadImg(imgFile);
         }
       } catch (error) {
         console.error('Error in getImgUrl:', JSON.stringify(error));
