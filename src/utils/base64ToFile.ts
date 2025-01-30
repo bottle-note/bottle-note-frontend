@@ -1,6 +1,8 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export const base64ToFile = (
   base64: string,
-  filename: string = 'image.png',
+  filename: string = `${uuidv4()}image.png`,
   mimeType: string = 'image/png',
 ): File => {
   const byteCharacters = atob(base64.split(',')[1]);

@@ -68,6 +68,7 @@ export default function UserEditPage() {
 
   const handleUploadImg = async (data: File) => {
     const imgData = await uploadImages('userProfile', [data]);
+    console.log(imgData);
     const { viewUrl } = imgData[0];
     setProfileImg(viewUrl);
   };
@@ -77,7 +78,6 @@ export default function UserEditPage() {
       try {
         if (imageData?.length) {
           const imgFile = base64ToFile(imageData);
-          console.log(imgFile);
           await handleUploadImg(imgFile);
         }
       } catch (error) {
