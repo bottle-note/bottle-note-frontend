@@ -97,7 +97,8 @@ export default function UserEditPage() {
     }
 
     window.openAlbum = (imgDataBase64) => {
-      setImageData(imgDataBase64);
+      console.log('데이터~', imgDataBase64);
+      // setImageData(imgDataBase64);
     };
 
     window.checkIsInApp = checkIsInApp;
