@@ -77,7 +77,7 @@ export default function UserEditPage() {
       try {
         if (imageData?.length) {
           const imgFile = base64ToFile(imageData);
-          handleUploadImg(imgFile);
+          await handleUploadImg(imgFile);
         }
       } catch (error) {
         console.error('Error in getImgUrl:', JSON.stringify(error));
