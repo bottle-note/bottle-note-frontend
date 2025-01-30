@@ -62,20 +62,9 @@ export default function UserEditPage() {
 
   const handleUploadImg = async (data: string | File) => {};
 
-  // NOTE: 웹뷰 핸들러 함수 window 전역객체 등록
-  useLayoutEffect(() => {
-    if (isMobile) {
-      handleWebViewMessage('checkIsInApp');
-    }
-
-    window.openAlbum = (imgDataBase64) => {
-      setImageData(imgDataBase64);
-    };
-
-    window.sendLogToFlutter = sendLogToFlutter;
-  }, []);
-
   useEffect(() => {
+    console.log('image data changed');
+
     const getImgUrl = async () => {
       try {
         console.log('getImgUrl called');
@@ -102,6 +91,19 @@ export default function UserEditPage() {
 
     getImgUrl();
   }, [imageData]);
+
+  // NOTE: 웹뷰 핸들러 함수 window 전역객체 등록
+  useLayoutEffect(() => {
+    if (isMobile) {
+      handleWebViewMessage('checkIsInApp');
+    }
+
+    window.openAlbum = (imgDataBase64) => {
+      setImageData(imgDataBase64);
+    };
+
+    window.sendLogToFlutter = sendLogToFlutter;
+  }, []);
 
   return (
     <main>
