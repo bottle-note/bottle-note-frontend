@@ -19,10 +19,11 @@ import ChangeProfile from 'public/change-profile.svg';
 export default function UserEditPage() {
   const router = useRouter();
   const { userData } = AuthService;
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { handleModalState, handleCloseModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [imageData, setImageData] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [profileImg, setProfileImg] = useState(userData?.profile);
 
   const SELECT_OPTIONS = [
     { type: 'camera', name: '카메라' },
@@ -60,21 +61,19 @@ export default function UserEditPage() {
     setIsOptionShow(false);
   };
 
-  const handleUploadImg = async (data: string | File) => {};
+  const handleUploadImg = async (data: File) => {
+    const imgData = await uploadImages('userProfile', [data]);
+    const { viewUrl } = imgData[0];
+    setProfileImg(viewUrl);
+  };
 
   useEffect(() => {
-    console.log('image data changed');
-
     const getImgUrl = async () => {
       try {
-        console.log('getImgUrl called');
-
         if (imageData?.length) {
           const imgFile = base64ToFile(imageData);
-          console.log(imgFile);
 
           const imgData = await uploadImages('userProfile', [imgFile]);
-          console.log(imgData);
 
           // viewURL을 가져와 프로필 이미지로 지정
           window.sendLogToFlutter(
@@ -82,7 +81,7 @@ export default function UserEditPage() {
           );
         }
       } catch (error) {
-        console.error('Error in getImgUrl:', error);
+        console.error('Error in getImgUrl:', JSON.stringify(error));
         window.sendLogToFlutter(
           `이미지 업로드 실패: ${(error as Error).message}`,
         );
@@ -126,14 +125,17 @@ export default function UserEditPage() {
       </SubHeader>
 
       <input
-        ref={fileInputRef} // ref 사용
+        ref={fileInputRef}
         type="file"
-        accept="image/*" // 이미지 파일만 선택 가능
-        style={{ display: 'none' }} // 파일 입력 필드를 숨김
+        accept="image/*"
+        hidden
         onChange={(event) => {
-          const file = event.target.files?.[0];
+          const fileInput = event.target;
+          const file = fileInput.files?.[0];
+
           if (file) {
             handleUploadImg(file);
+            fileInput.value = '';
           }
         }}
       />
@@ -147,14 +149,14 @@ export default function UserEditPage() {
           className="absolute top-[20%] z-20"
           onClick={() => setIsOptionShow(true)}
         />
-        <div className="w-[104px] h-[104px] bg-white bg-opacity-60 border-subCoral border-2 rounded-full z-10 absolute top-[20%]" />
-        <Image
-          src={userData?.profile ?? ProfileDefaultImg}
-          alt="프로필 이미지"
-          width={104}
-          height={104}
-          className="absolute top-[20%]"
-        />
+        <div className="w-[104px] h-[104px] bg-white bg-opacity-60 border-subCoral border-2 rounded-full z-10 absolute top-[20%]">
+          <Image
+            src={profileImg ?? ProfileDefaultImg}
+            alt="프로필 이미지"
+            fill
+            className={`rounded-full object-cover ${!profileImg && 'opacity-50'}`}
+          />
+        </div>
       </section>
 
       <section className="px-5">
