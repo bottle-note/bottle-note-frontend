@@ -39,7 +39,11 @@ export default function UserEditPage() {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   const handleOptionSelect = async ({ type }: { type: string }) => {
-    if (type === 'camera') return alert(`카메라 접근 기능 준비중입니다.`);
+    if (type === 'camera') {
+      if (isMobile) return handleWebViewMessage('openCamera');
+
+      alert('모바일에서만 사용 가능합니다.');
+    }
 
     if (type === 'album') {
       if (isMobile) return handleWebViewMessage('openAlbum');
@@ -67,7 +71,6 @@ export default function UserEditPage() {
   };
 
   const handleUploadImg = async (data: File) => {
-    sendLogToFlutter('이미지 업로드 실시한다옹');
     const imgData = await uploadImages('userProfile', [data]);
     const { viewUrl } = imgData[0];
     await UserApi.changeProfileImage(viewUrl);
@@ -83,7 +86,6 @@ export default function UserEditPage() {
     window.checkIsInApp = checkIsInApp;
     window.sendLogToFlutter = sendLogToFlutter;
     window.openAlbum = (data: string) => {
-      sendLogToFlutter('데이터 받았다옹');
       setImgBase64(data);
     };
   }, []);

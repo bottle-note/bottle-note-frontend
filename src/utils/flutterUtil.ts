@@ -14,7 +14,12 @@ export function getDeviceToken(token: string, platform: string) {
 }
 
 export function handleWebViewMessage(
-  message: 'checkIsInApp' | 'deviceToken' | 'logToFlutter' | 'openAlbum',
+  message:
+    | 'checkIsInApp'
+    | 'deviceToken'
+    | 'logToFlutter'
+    | 'openAlbum'
+    | 'openCamera',
 ) {
   return window.FlutterMessageQueue.postMessage(message);
 }
