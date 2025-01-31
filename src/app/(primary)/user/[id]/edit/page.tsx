@@ -110,6 +110,8 @@ export default function UserEditPage() {
           const fileInput = event.target;
           const file = fileInput.files?.[0];
 
+          console.log(file, 'onChange called');
+
           if (file) {
             handleUploadImg(file);
             fileInput.value = '';
