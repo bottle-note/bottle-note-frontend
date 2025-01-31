@@ -1,4 +1,3 @@
-import { useLayoutEffect } from 'react';
 import {
   checkIsInApp,
   getDeviceToken,
@@ -9,7 +8,7 @@ import {
 export const useWebViewInit = () => {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-  useLayoutEffect(() => {
+  const initWebView = () => {
     if (isMobile) {
       handleWebViewMessage('checkIsInApp');
     }
@@ -17,7 +16,7 @@ export const useWebViewInit = () => {
     window.getDeviceToken = getDeviceToken;
     window.checkIsInApp = checkIsInApp;
     window.sendLogToFlutter = sendLogToFlutter;
-  }, []);
+  };
 
-  return { isMobile };
+  return { isMobile, initWebView };
 };
