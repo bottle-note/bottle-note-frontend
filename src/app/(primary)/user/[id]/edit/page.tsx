@@ -62,8 +62,11 @@ export default function UserEditPage() {
   };
 
   const handleUploadImg = async (data: File) => {
+    console.log('handleUploadImg called', data);
     const imgData = await uploadImages('userProfile', [data]);
+    console.log('imgData called', imgData);
     const { viewUrl } = imgData[0];
+    console.log('viewUrl called', viewUrl);
     await UserApi.changeProfileImage(viewUrl);
     setProfileImg(viewUrl);
   };
