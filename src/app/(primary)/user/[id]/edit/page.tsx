@@ -9,7 +9,6 @@ import { UserApi } from '@/app/api/UserApi';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
-import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { uploadImages } from '@/utils/S3Upload';
 import { useWebviewCamera } from '@/hooks/useWebviewCamera';
 import { useWebViewInit } from '@/hooks/useWebViewInit';
@@ -26,6 +25,17 @@ export default function UserEditPage() {
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [profileImg, setProfileImg] = useState(userData?.profile);
 
+  async function handleUploadImg(data: File) {
+    const imgData = await uploadImages('userProfile', [data]);
+    const { viewUrl } = imgData[0];
+    await UserApi.changeProfileImage(viewUrl);
+    setProfileImg(viewUrl);
+  }
+
+  const { handleOpenAlbum, handleOpenCamera } = useWebviewCamera({
+    handleImg: handleUploadImg,
+  });
+
   const SELECT_OPTIONS = [
     { type: 'camera', name: '카메라' },
     { type: 'album', name: '앨범에서 선택' },
@@ -34,20 +44,18 @@ export default function UserEditPage() {
 
   const handleOptionSelect = async ({ type }: { type: string }) => {
     if (type === 'camera') {
-      if (isMobile) return handleWebViewMessage('openCamera');
-
-      alert('모바일에서만 사용 가능합니다.');
+      return handleOpenCamera();
     }
 
     if (type === 'album') {
-      if (isMobile) return handleWebViewMessage('openAlbum');
-
+      if (isMobile) return handleOpenAlbum();
       return fileInputRef.current?.click();
     }
 
     if (type === 'delete') {
       try {
         await UserApi.changeProfileImage(null);
+
         handleModalState({
           isShowModal: true,
           mainText: '삭제되었습니다.',
@@ -63,15 +71,6 @@ export default function UserEditPage() {
 
     setIsOptionShow(false);
   };
-
-  const handleUploadImg = async (data: File) => {
-    const imgData = await uploadImages('userProfile', [data]);
-    const { viewUrl } = imgData[0];
-    await UserApi.changeProfileImage(viewUrl);
-    setProfileImg(viewUrl);
-  };
-
-  useWebviewCamera({ handleImg: handleUploadImg });
 
   return (
     <main>
