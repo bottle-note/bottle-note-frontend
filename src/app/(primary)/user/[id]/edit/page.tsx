@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
@@ -12,9 +12,11 @@ import { AuthService } from '@/lib/AuthService';
 import {
   checkIsInApp,
   handleWebViewMessage,
+  openAlbum,
   sendLogToFlutter,
 } from '@/utils/flutterUtil';
 import { uploadImages } from '@/utils/S3Upload';
+import { base64ToFile } from '@/utils/base64ToFile';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
@@ -26,6 +28,7 @@ export default function UserEditPage() {
   const { handleModalState, handleCloseModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [profileImg, setProfileImg] = useState(userData?.profile);
+  const [imgBase64, setImgBase64] = useState('');
 
   const SELECT_OPTIONS = [
     { type: 'camera', name: '카메라' },
@@ -39,6 +42,7 @@ export default function UserEditPage() {
     if (type === 'camera') return alert(`카메라 접근 기능 준비중입니다.`);
 
     if (type === 'album') {
+      if (isMobile) return handleWebViewMessage('openAlbum');
       return fileInputRef.current?.click();
     }
 
@@ -62,11 +66,8 @@ export default function UserEditPage() {
   };
 
   const handleUploadImg = async (data: File) => {
-    console.log('handleUploadImg called', data);
     const imgData = await uploadImages('userProfile', [data]);
-    console.log('imgData called', imgData);
     const { viewUrl } = imgData[0];
-    console.log('viewUrl called', viewUrl);
     await UserApi.changeProfileImage(viewUrl);
     setProfileImg(viewUrl);
   };
@@ -79,7 +80,15 @@ export default function UserEditPage() {
 
     window.checkIsInApp = checkIsInApp;
     window.sendLogToFlutter = sendLogToFlutter;
+    window.openAlbum = (data: string) => setImgBase64(data);
   }, []);
+
+  useEffect(() => {
+    if (imgBase64) {
+      const converted = base64ToFile(imgBase64);
+      handleUploadImg(converted);
+    }
+  }, [imgBase64]);
 
   return (
     <main>
@@ -109,8 +118,6 @@ export default function UserEditPage() {
         onChange={(event) => {
           const fileInput = event.target;
           const file = fileInput.files?.[0];
-
-          console.log(file, 'onChange called');
 
           if (file) {
             handleUploadImg(file);
