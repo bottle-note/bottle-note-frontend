@@ -43,6 +43,7 @@ export default function UserEditPage() {
 
     if (type === 'album') {
       if (isMobile) return handleWebViewMessage('openAlbum');
+
       return fileInputRef.current?.click();
     }
 
@@ -66,6 +67,7 @@ export default function UserEditPage() {
   };
 
   const handleUploadImg = async (data: File) => {
+    sendLogToFlutter('이미지 업로드 실시한다옹');
     const imgData = await uploadImages('userProfile', [data]);
     const { viewUrl } = imgData[0];
     await UserApi.changeProfileImage(viewUrl);
@@ -80,7 +82,10 @@ export default function UserEditPage() {
 
     window.checkIsInApp = checkIsInApp;
     window.sendLogToFlutter = sendLogToFlutter;
-    window.openAlbum = (data: string) => setImgBase64(data);
+    window.openAlbum = (data: string) => {
+      sendLogToFlutter('데이터 받았다옹');
+      setImgBase64(data);
+    };
   }, []);
 
   useEffect(() => {
