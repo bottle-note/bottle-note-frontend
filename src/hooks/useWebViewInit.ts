@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   checkIsInApp,
   getDeviceToken,
@@ -6,7 +7,13 @@ import {
 } from '@/utils/flutterUtil';
 
 export const useWebViewInit = () => {
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const { userAgent } = navigator;
+    const mobile = /iPhone|iPad|iPod|Android/i.test(userAgent);
+    setIsMobile(mobile);
+  }, []);
 
   const initWebView = () => {
     if (isMobile) {
