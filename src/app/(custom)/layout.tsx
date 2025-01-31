@@ -1,4 +1,4 @@
-'use clinet';
+'use client';
 
 import { useLayoutEffect } from 'react';
 import { useWebViewInit } from '@/hooks/useWebViewInit';
