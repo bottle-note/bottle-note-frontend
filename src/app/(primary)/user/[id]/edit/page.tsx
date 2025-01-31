@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
@@ -9,34 +9,28 @@ import { UserApi } from '@/app/api/UserApi';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
-import {
-  checkIsInApp,
-  handleWebViewMessage,
-  openAlbum,
-  sendLogToFlutter,
-} from '@/utils/flutterUtil';
+import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { uploadImages } from '@/utils/S3Upload';
-import { base64ToFile } from '@/utils/base64ToFile';
+import { useWebviewCamera } from '@/hooks/useWebviewCamera';
+import { useWebViewInit } from '@/hooks/useWebViewInit';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
 
 export default function UserEditPage() {
-  const router = useRouter();
   const { userData } = AuthService;
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const { isMobile } = useWebViewInit();
   const { handleModalState, handleCloseModal } = useModalStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [profileImg, setProfileImg] = useState(userData?.profile);
-  const [imgBase64, setImgBase64] = useState('');
 
   const SELECT_OPTIONS = [
     { type: 'camera', name: '카메라' },
     { type: 'album', name: '앨범에서 선택' },
     { type: 'delete', name: '현재 이미지 삭제하기' },
   ];
-
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   const handleOptionSelect = async ({ type }: { type: string }) => {
     if (type === 'camera') {
@@ -56,7 +50,7 @@ export default function UserEditPage() {
         await UserApi.changeProfileImage(null);
         handleModalState({
           isShowModal: true,
-          mainText: '저장되었습니다.',
+          mainText: '삭제되었습니다.',
           handleConfirm: () => {
             handleCloseModal();
             router.push(`/user/${userData?.userId}`);
@@ -77,25 +71,7 @@ export default function UserEditPage() {
     setProfileImg(viewUrl);
   };
 
-  // NOTE: 웹뷰 핸들러 함수 window 전역객체 등록
-  useLayoutEffect(() => {
-    if (isMobile) {
-      handleWebViewMessage('checkIsInApp');
-    }
-
-    window.checkIsInApp = checkIsInApp;
-    window.sendLogToFlutter = sendLogToFlutter;
-    window.openAlbum = (data: string) => {
-      setImgBase64(data);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (imgBase64) {
-      const converted = base64ToFile(imgBase64);
-      handleUploadImg(converted);
-    }
-  }, [imgBase64]);
+  useWebviewCamera({ handleImg: handleUploadImg });
 
   return (
     <main>
