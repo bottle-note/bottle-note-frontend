@@ -53,17 +53,17 @@ function LinkButton({
           )}
         </div>
         <div className="border-[0.0313rem] border-white" />
+        {imgSrc && (
+          <Image
+            className="z-10 absolute bottom-[0.5px] left-[5.7rem]"
+            src={imgSrc}
+            height={imageSize?.height}
+            width={imageSize?.width}
+            alt="categoryImg"
+            layout="fixed"
+          />
+        )}
       </Link>
-      {imgSrc && (
-        <Image
-          className="z-10 absolute bottom-[0.5px] left-[5.7rem]"
-          src={imgSrc}
-          height={imageSize?.height}
-          width={imageSize?.width}
-          alt="categoryImg"
-          layout="fixed"
-        />
-      )}
     </div>
   );
 }
