@@ -53,8 +53,9 @@ export default function TagsForm() {
   const ExtraButtons = (
     <div className="flex gap-1 text-12 text-mainDarkGray">
       <HoverTouchBox
+        id="flavor-tooltip"
         tooltipContent={
-          <div className="absolute left-5 flex items-center bg-white p-2 border border-subCoral rounded-md">
+          <div className="absolute z-10 left-5 flex items-center bg-white p-2 border border-subCoral rounded-md space-x-1">
             <Image
               src="/icon/questionmark-subcoral.svg"
               alt="questionMarkIcon"

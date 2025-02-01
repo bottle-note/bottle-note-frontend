@@ -1,8 +1,10 @@
-import React, { useState, cloneElement, isValidElement } from 'react';
+import React, { cloneElement, isValidElement } from 'react';
+import useTooltipStore from '@/store/tooltipStore';
 
 interface Props {
   children: React.ReactNode;
   tooltipContent: React.ReactNode;
+  id: string;
 }
 
 const isTouchDevice = () => {
@@ -14,26 +16,27 @@ const isTouchDevice = () => {
   );
 };
 
-export default function HoverTouchBox({ children, tooltipContent }: Props) {
+export default function HoverTouchBox({ children, tooltipContent, id }: Props) {
   const isTouch = isTouchDevice();
-  const [isTextVisible, setIsTextVisible] = useState(false);
+  const { activeTooltip, setActiveTooltip } = useTooltipStore();
+  const isTextVisible = activeTooltip === id;
 
   const handleMouseEnter = () => {
     if (!isTouch) {
-      setIsTextVisible(true);
+      setActiveTooltip(id);
     }
   };
 
   const handleMouseLeave = () => {
     if (!isTouch) {
-      setIsTextVisible(false);
+      setActiveTooltip(null);
     }
   };
 
-  // 모바일 환경
-  const handleTouch = () => {
+  const handleTouch = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (isTouch) {
-      setIsTextVisible(!isTextVisible);
+      setActiveTooltip(isTextVisible ? null : id);
     }
   };
 
@@ -48,7 +51,18 @@ export default function HoverTouchBox({ children, tooltipContent }: Props) {
   return (
     <div>
       {childrenWithProps}
-      {isTextVisible && <>{tooltipContent}</>}
+      {isTextVisible && (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.stopPropagation();
+            }
+          }}
+        >
+          {tooltipContent}
+        </div>
+      )}
     </div>
   );
 }
