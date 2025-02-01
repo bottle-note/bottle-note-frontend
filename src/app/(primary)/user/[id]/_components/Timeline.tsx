@@ -18,11 +18,12 @@ function Timeline() {
       (acc, item) => {
         const yearMonth = formatDate(item.createdAt, 'YEAR_MONTH') as string;
 
-        if (!acc[yearMonth]) {
-          acc[yearMonth] = [];
+        const newAcc = { ...acc };
+        if (!newAcc[yearMonth]) {
+          newAcc[yearMonth] = [];
         }
-        acc[yearMonth].push(item);
-        return acc;
+        newAcc[yearMonth].push(item);
+        return newAcc;
       },
       {} as Record<string, HistoryApi[]>,
     );

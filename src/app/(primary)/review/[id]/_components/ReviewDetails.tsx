@@ -145,7 +145,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
           <article className="flex justify-between">
             {data.reviewInfo?.createAt && (
               <p className="text-mainGray text-11">
-                {formatDate(data.reviewInfo.createAt)}
+                {formatDate(data.reviewInfo.createAt) as string}
               </p>
             )}
             <button
