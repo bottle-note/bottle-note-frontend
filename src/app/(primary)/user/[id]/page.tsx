@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 import LinkButton from '@/components/LinkButton';
 import { UserInfoApi } from '@/types/User';
 import { UserApi } from '@/app/api/UserApi';
+import useModalStore from '@/store/modalStore';
+import { AuthService } from '@/lib/AuthService';
 import UserInfo from './_components/UserInfo';
 import HistoryOverview from './_components/HistoryOverview';
 import SidebarHeader from './_components/SidebarHeader';
 import Timeline from './_components/Timeline';
 import NavLayout from '../../_components/NavLayout';
-import useModalStore from '@/store/modalStore';
-import { AuthService } from '@/lib/AuthService';
 
 export default function User({ params: { id } }: { params: { id: string } }) {
   const [userData, setUserData] = useState<UserInfoApi | null>(null);
@@ -25,22 +25,34 @@ export default function User({ params: { id } }: { params: { id: string } }) {
       return;
     }
 
-    if (loginUserData?.userId !== Number(id)) {
-      handleModalState({
-        isShowModal: true,
-        type: 'ALERT',
-        mainText: '여기까지 볼 수 있어요!',
-        subText: '더 자세한 히스토리는 다른사람에게\n공유되지않아요~😘',
-        handleConfirm: () => {
-          handleModalState({
-            isShowModal: false,
-            mainText: '',
-          });
-        },
-      });
-    } else {
-      router.push('/history');
-    }
+    handleModalState({
+      isShowModal: true,
+      type: 'ALERT',
+      mainText: '현재 기능 준비중입니다:)',
+      handleConfirm: () => {
+        handleModalState({
+          isShowModal: false,
+          mainText: '',
+        });
+      },
+    });
+
+    // if (loginUserData?.userId !== Number(id)) {
+    //   handleModalState({
+    //     isShowModal: true,
+    //     type: 'ALERT',
+    //     mainText: '여기까지 볼 수 있어요!',
+    //     subText: '더 자세한 히스토리는 다른사람에게\n공유되지않아요~😘',
+    //     handleConfirm: () => {
+    //       handleModalState({
+    //         isShowModal: false,
+    //         mainText: '',
+    //       });
+    //     },
+    //   });
+    // } else {
+    //   router.push('/history');
+    // }
   };
 
   useEffect(() => {

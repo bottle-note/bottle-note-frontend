@@ -7,6 +7,7 @@ import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import NavLayout from '@/app/(primary)/_components/NavLayout';
 import SearchContainer from '@/components/Search/SearchContainer';
 import TimeLineItem from '@/app/(primary)/_components/TimeLineItem';
+import EmptyView from '@/app/(primary)/_components/EmptyView';
 import FilterSideModal from './_components/filter/FilterSideModal';
 import DescendingIcon from 'public/icon/descending-subcoral.svg';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
@@ -44,7 +45,7 @@ export default function History() {
           나의 히스토리
         </SubHeader.Center>
       </SubHeader>
-      <main>
+      {/* <main>
         <SearchContainer
           placeholder="위스키 이름 검색"
           handleSearchCallback={handleSearchCallback}
@@ -74,7 +75,8 @@ export default function History() {
             </div>
           </article>
         </section>
-      </main>
+      </main> */}
+      <EmptyView text="아직 히스토리 기능은 준비중입니다:)" />
       <FilterSideModal isOpen={isOpen} onClose={handleClose} />
     </NavLayout>
   );
