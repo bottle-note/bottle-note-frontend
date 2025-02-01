@@ -25,6 +25,7 @@ export default function User({ params: { id } }: { params: { id: string } }) {
       return;
     }
 
+    // ! 아래 코드 주석처리 후 주석된 코드 주석 제거하면 확인 가능
     handleModalState({
       isShowModal: true,
       type: 'ALERT',

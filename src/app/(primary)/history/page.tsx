@@ -45,6 +45,7 @@ export default function History() {
           나의 히스토리
         </SubHeader.Center>
       </SubHeader>
+      {/* 아래 주석된 코드 주석 제거하면 확인 가능 */}
       {/* <main>
         <SearchContainer
           placeholder="위스키 이름 검색"
