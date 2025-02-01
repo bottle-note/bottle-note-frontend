@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+// import Link from 'next/link';
 import { HISTORY_TYPE_INFO } from '@/constants/historyType';
 import { formatDate } from '@/utils/formatDate';
 import { TimeFormat } from '@/types/FormatDate';
@@ -45,29 +45,27 @@ function TimeLineItem(props: Props) {
           보틀노트를 시작하신 날이에요.
         </div>
       ) : (
-        <Link href="">
-          <div className="w-[17rem] h-14 p-3 bg-bgGray rounded-md flex justify-between">
-            <div>
-              <p className="text-12 font-bold text-mainDarkGray">
-                {alcoholName}
-              </p>
-              {renderDescription &&
-                renderDescription(
-                  type === 'RATING' ? props?.rating : undefined,
-                  type === 'REVIEW' ? props?.text : undefined,
-                )}
-            </div>
-            {imageSrc && (
-              <Image
-                className="mr-1 rounded"
-                src={imageSrc}
-                width={25}
-                height={34}
-                alt="alcoholImage"
-              />
-            )}
+        // <Link href="">
+        <div className="w-[17rem] h-14 p-3 bg-bgGray rounded-md flex justify-between">
+          <div>
+            <p className="text-12 font-bold text-mainDarkGray">{alcoholName}</p>
+            {renderDescription &&
+              renderDescription(
+                type === 'RATING' ? props?.rating : undefined,
+                type === 'REVIEW' ? props?.text : undefined,
+              )}
           </div>
-        </Link>
+          {imageSrc && (
+            <Image
+              className="mr-1 rounded"
+              src={imageSrc}
+              width={25}
+              height={34}
+              alt="alcoholImage"
+            />
+          )}
+        </div>
+        // </Link>
       )}
     </div>
   );
