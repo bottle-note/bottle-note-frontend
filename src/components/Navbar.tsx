@@ -26,7 +26,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
     },
     {
       name: '기록',
-      link: '/history',
+      link: userData ? '/history' : '/login',
       icon: '/icon/document-outlined-subcoral.svg',
     },
     {
@@ -48,6 +48,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
                 (menu.link === '/' && pathname === '/') ||
                 (menu.link === '/search' && pathname === '/search') ||
                 (menu.link === '/rating' && pathname === '/rating') ||
+                (menu.link === '/history' && pathname === '/history') ||
                 (menu.link.startsWith('/user/') &&
                   pathname.startsWith('/user/'))
                   ? ''
