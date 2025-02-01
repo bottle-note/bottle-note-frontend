@@ -1,0 +1,64 @@
+name: 빌드 검증
+
+on:
+  pull_request:
+    branches: [ develop, main, release ]
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  build:
+    name: 빌드 체크
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 소스 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'yarn'
+
+      - name: 환경변수 설정
+        run: |
+          echo "${{ secrets.ENV }}" | base64 --decode > .env
+
+      - name: 의존성 설치
+        run: yarn install --frozen-lockfile
+
+      - name: Next.js 빌드 검증
+        run: yarn build
+
+ ## tsc
+##  lint 조건 추가
+
+      - name: 도커 컴포즈 테스트
+        run: |
+          docker compose up -d --build
+
+      - name: 컨테이너 상태 확인
+        run: |
+          sleep 10  # 애플리케이션 시작 대기
+          if [ "$(docker ps -q -f name=bottle-note-front-server)" ]; then
+            echo "컨테이너가 실행 중입니다"
+          else
+            echo "컨테이너 실행 실패" && exit 1
+          fi
+
+      - name: 헬스체크 API 테스트
+        run: |
+          response_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000)
+          content_type=$(curl -s -I http://localhost:3000 | grep -i content-type)
+          
+          if [ "$response_code" = "200" ] && [[ "$content_type" == *"text/html"* ]]; then
+            echo "헬스체크 성공"
+          else
+            echo "헬스체크 실패" && exit 1
+          fi
+
+      - name: 테스트 컨테이너 정리
+        if: always()
+        run: |
+          docker compose down
+          docker image prune -f
