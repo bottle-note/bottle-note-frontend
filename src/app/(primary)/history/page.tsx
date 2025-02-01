@@ -66,7 +66,7 @@ export default function History() {
             </div>
           </div>
           <div className="border-t border-mainGray/30 my-[0.65rem]" />
-          <article className="relative">
+          <article className="relative w-[339px]">
             <div className="text-10 text-mainGray bg-bgGray rounded-md p-2 ml-3 relative z-10">
               2025년 1월까지 기록된 회원닉네임님의 활동여정이에요!
             </div>

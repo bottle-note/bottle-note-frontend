@@ -57,7 +57,7 @@ function Timeline() {
           </p>
         </div>
         <div className="border-t border-mainGray/30 my-3" />
-        <div className="relative">
+        <div className="relative w-[339px]">
           <div className="absolute left-[2.7rem] top-6 bottom-0 w-px border-l border-dashed border-subCoral z-0" />
           <div className="relative z-10 pb-3">
             {Object.entries(groupedHistory).map(([yearMonth, items], index) => (
