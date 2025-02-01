@@ -14,7 +14,7 @@ function LoginModal({ handleClose }: Props) {
   const router = useRouter();
   return (
     <BackDrop isShow>
-      <div className="w-full h-full flex flex-col justify-end items-center px-4 gap-3 pb-2">
+      <div className="w-full h-full flex flex-col justify-end items-center px-4 gap-3 pb-7">
         <section className="relative w-full pt-20 bg-white rounded-xl text-center flex flex-col items-center space-y-3 px-4">
           <article className="absolute top-[-10px]">
             <Image
@@ -34,7 +34,7 @@ function LoginModal({ handleClose }: Props) {
               router.push('/login');
             }}
           />
-          <button className="text-10 text-mainGray pb-2" onClick={handleClose}>
+          <button className="text-10 text-mainGray pb-3" onClick={handleClose}>
             다음에 할게요
           </button>
         </section>
