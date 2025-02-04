@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
@@ -9,15 +9,32 @@ import { UserApi } from '@/app/api/UserApi';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
+import { uploadImages } from '@/utils/S3Upload';
+import { useWebviewCamera } from '@/hooks/useWebviewCamera';
+import { useWebViewInit } from '@/hooks/useWebViewInit';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
 
 export default function UserEditPage() {
-  const router = useRouter();
   const { userData } = AuthService;
-  const { handleModalState } = useModalStore();
+  const router = useRouter();
+  const { isMobile } = useWebViewInit();
+  const { handleModalState, handleCloseModal } = useModalStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isOptionShow, setIsOptionShow] = useState(false);
+  const [profileImg, setProfileImg] = useState(userData?.profile);
+
+  async function handleUploadImg(data: File) {
+    const imgData = await uploadImages('userProfile', [data]);
+    const { viewUrl } = imgData[0];
+    await UserApi.changeProfileImage(viewUrl);
+    setProfileImg(viewUrl);
+  }
+
+  const { handleOpenAlbum, handleOpenCamera } = useWebviewCamera({
+    handleImg: handleUploadImg,
+  });
 
   const SELECT_OPTIONS = [
     { type: 'camera', name: '카메라' },
@@ -26,15 +43,24 @@ export default function UserEditPage() {
   ];
 
   const handleOptionSelect = async ({ type }: { type: string }) => {
-    if (type === 'camera') return alert(`카메라 접근 기능 준비중입니다.`);
-    if (type === 'album') return alert(`앨범 접근 기능 준비중입니다.`);
+    if (type === 'camera') {
+      return handleOpenCamera();
+    }
+
+    if (type === 'album') {
+      if (isMobile) return handleOpenAlbum();
+      return fileInputRef.current?.click();
+    }
+
     if (type === 'delete') {
       try {
         await UserApi.changeProfileImage(null);
+
         handleModalState({
           isShowModal: true,
-          mainText: '저장되었습니다.',
+          mainText: '삭제되었습니다.',
           handleConfirm: () => {
+            handleCloseModal();
             router.push(`/user/${userData?.userId}`);
           },
         });
@@ -66,6 +92,22 @@ export default function UserEditPage() {
         </SubHeader.Center>
       </SubHeader>
 
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={(event) => {
+          const fileInput = event.target;
+          const file = fileInput.files?.[0];
+
+          if (file) {
+            handleUploadImg(file);
+            fileInput.value = '';
+          }
+        }}
+      />
+
       <section className="px-5 flex justify-center h-52 relative">
         <Image
           src={ChangeProfile}
@@ -75,14 +117,14 @@ export default function UserEditPage() {
           className="absolute top-[20%] z-20"
           onClick={() => setIsOptionShow(true)}
         />
-        <div className="w-[104px] h-[104px] bg-white bg-opacity-60 border-subCoral border-2 rounded-full z-10 absolute top-[20%]" />
-        <Image
-          src={userData?.profile ?? ProfileDefaultImg}
-          alt="프로필 이미지"
-          width={104}
-          height={104}
-          className="absolute top-[20%]"
-        />
+        <div className="w-[104px] h-[104px] bg-white bg-opacity-60 border-subCoral border-2 rounded-full z-10 absolute top-[20%]">
+          <Image
+            src={profileImg ?? ProfileDefaultImg}
+            alt="프로필 이미지"
+            fill
+            className={`rounded-full object-cover ${!profileImg && 'opacity-50'}`}
+          />
+        </div>
       </section>
 
       <section className="px-5">

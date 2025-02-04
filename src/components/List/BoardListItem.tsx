@@ -21,7 +21,9 @@ function BoardListItem({ title, date, id, hrefUrl, type }: Props) {
       <div>
         {type && <Badge type={type} />}
         <p className="text-15 font-semiBold text-mainDarkGray">{title}</p>
-        <p className="text-9 text-mainGray font-light">{formatDate(date)}</p>
+        <p className="text-9 text-mainGray font-light">
+          {formatDate(date) as string}
+        </p>
       </div>
       <button>
         <Image

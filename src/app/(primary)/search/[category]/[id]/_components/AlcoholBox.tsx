@@ -41,7 +41,7 @@ function AlcoholBox({ data, alcoholId, isPicked, setIsPicked }: any) {
               </p>
             </div>
             <div className="space-y-1">
-              <div className="flex items-end space-x-1">
+              <div className="flex items-end gap-7">
                 {data.alcohols.rating && (
                   <Star
                     rating={data.alcohols.rating}
