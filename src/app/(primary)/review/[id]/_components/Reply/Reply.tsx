@@ -131,7 +131,7 @@ function Reply({
           </Link>
           <div className="flex justify-between">
             <p className="text-mainGray text-11">
-              {formatDate(data?.createAt)}
+              {formatDate(data?.createAt) as string}
             </p>
             {data?.status !== 'DELETED' && (
               <button

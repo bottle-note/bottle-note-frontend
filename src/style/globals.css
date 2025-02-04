@@ -48,3 +48,11 @@
     text-wrap: balance;
   }
 }
+
+.react-datepicker__header {
+  @apply !border-none !bg-mainCoral;
+}
+
+.react-datepicker__current-month {
+  @apply !text-white;
+}
