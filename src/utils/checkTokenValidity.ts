@@ -1,15 +1,15 @@
-import { UserApi } from '@/app/api/UserApi';
+import { AuthApi } from '@/app/api/AuthApi';
 import { AuthService } from '@/lib/AuthService';
 
-// TODO: Token verification api 적용
 export const checkTokenValidity = async (): Promise<boolean> => {
-  const { userData } = AuthService;
+  const { userData, getToken } = AuthService;
+  const token = getToken()?.accessToken;
 
-  if (!userData) return false;
+  if (!userData || !token) return false;
 
-  const userInfoResponse = await UserApi.getUserInfoWithAuth({
-    userId: `${userData.userId}`,
-  });
+  const { data: result } = await AuthApi.verifyToken(token);
 
-  return userInfoResponse.isMyPage;
+  if (result.includes('invalid')) return false;
+
+  return true;
 };
