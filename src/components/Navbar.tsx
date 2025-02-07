@@ -14,7 +14,7 @@ export interface NavItem {
 
 function Navbar({ maxWidth }: { maxWidth: string }) {
   const pathname = usePathname();
-  const { userData } = AuthService;
+  const { isLogin, userData } = AuthService;
 
   const navItems: NavItem[] = [
     { name: '홈', link: '/', icon: '/icon/home-outlined-subcoral.svg' },
@@ -26,12 +26,12 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
     },
     {
       name: '기록',
-      link: userData ? '/history' : '/login',
+      link: isLogin ? '/history' : '/login',
       icon: '/icon/document-outlined-subcoral.svg',
     },
     {
       name: '마이',
-      link: userData ? `/user/${userData.userId}` : '/login',
+      link: isLogin && userData ? `/user/${userData.userId}` : '/login',
       icon: '/icon/user-outlined-subcoral.svg',
     },
   ];
@@ -66,7 +66,6 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
             )}
           </React.Fragment>
         ))}
-        {/* 로그인 user가 아니면? 없어지는가? */}
       </section>
     </nav>
   );
