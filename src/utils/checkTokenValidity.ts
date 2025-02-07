@@ -2,14 +2,12 @@ import { AuthApi } from '@/app/api/AuthApi';
 import { AuthService } from '@/lib/AuthService';
 
 export const checkTokenValidity = async (): Promise<boolean> => {
-  const { userData, getToken } = AuthService;
-  const token = getToken()?.accessToken;
+  const token = AuthService.getToken()?.accessToken;
 
-  if (!userData || !token) return false;
+  // 토큰이 없거나 userData 존해하지 않음
+  if (!token || !AuthService.userData) return false;
 
+  // 토큰 검증하여 invalid 라는 문구가 없으면 유효 토큰
   const { data: result } = await AuthApi.verifyToken(token);
-
-  if (result.includes('invalid')) return false;
-
-  return true;
+  return !result.includes('invalid');
 };
