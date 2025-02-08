@@ -30,18 +30,6 @@ export const UserApi = {
     return data;
   },
 
-  async getUserInfoWithAuth({
-    userId,
-  }: {
-    userId: string;
-  }): Promise<UserInfoApi> {
-    const response = await fetchWithAuth(`/bottle-api/my-page/${userId}`);
-
-    const { data }: ApiResponse<UserInfoApi> = response;
-
-    return data;
-  },
-
   async changeProfileImage(profileImageSrc: string | null) {
     const response = await fetchWithAuth(`/bottle-api/users/profile-image`, {
       method: 'PATCH',
