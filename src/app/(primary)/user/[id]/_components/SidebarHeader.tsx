@@ -146,7 +146,7 @@ const SidebarHeader = () => {
 
       {isOpen && (
         <motion.aside
-          className="z-10 bg-[#F0996E] bg-opacity-85 fixed inset-0 backdrop-blur-sm"
+          className="z-20 bg-[#F0996E] bg-opacity-85 fixed inset-0 backdrop-blur-sm"
           initial="closed"
           animate="open"
           exit="closed"
