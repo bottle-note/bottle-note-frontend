@@ -1,13 +1,58 @@
 import React, { useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
 import TimeLineItem from '@/app/(primary)/_components/TimeLineItem';
 import Label from '@/app/(primary)/_components/Label';
+import LinkButton from '@/components/LinkButton';
+import useModalStore from '@/store/modalStore';
+import { AuthService } from '@/lib/AuthService';
 import { HistoryApi } from '@/types/History';
 import { formatDate } from '@/utils/formatDate';
 
 import { HISTORY_MOCK_LIST_ITEM } from '../../../../../../mock/history';
 
 function Timeline() {
+  const router = useRouter();
+  const { handleModalState, handleLoginModal } = useModalStore();
+  const { userData: loginUserData, isLogin } = AuthService;
+
+  const handleConfirmUser = () => {
+    if (!isLogin) {
+      handleLoginModal();
+      return;
+    }
+
+    // ! 아래 코드 주석처리 후 주석된 코드 주석 제거하면 확인 가능
+    handleModalState({
+      isShowModal: true,
+      type: 'ALERT',
+      mainText: '현재 기능 준비중입니다:)',
+      handleConfirm: () => {
+        handleModalState({
+          isShowModal: false,
+          mainText: '',
+        });
+      },
+    });
+
+    // if (loginUserData?.userId !== Number(id)) {
+    //   handleModalState({
+    //     isShowModal: true,
+    //     type: 'ALERT',
+    //     mainText: '여기까지 볼 수 있어요!',
+    //     subText: '더 자세한 히스토리는 다른사람에게\n공유되지않아요~😘',
+    //     handleConfirm: () => {
+    //       handleModalState({
+    //         isShowModal: false,
+    //         mainText: '',
+    //       });
+    //     },
+    //   });
+    // } else {
+    //   router.push('/history');
+    // }
+  };
+
   const groupHistoryByDate = (historyItems: HistoryApi[]) => {
     const sortedItems = [...historyItems].sort(
       (a, b) =>
@@ -31,11 +76,11 @@ function Timeline() {
     return groupedItems;
   };
 
-  const groupedHistory = groupHistoryByDate(HISTORY_MOCK_LIST_ITEM);
-
+  const TEST_DATA: any[] = []; // HISTORY_MOCK_LIST_ITEM로 바꾸면 화면 확인 가능
+  const groupedHistory = groupHistoryByDate(TEST_DATA);
   const gradientHeight = useMemo(() => {
-    return HISTORY_MOCK_LIST_ITEM.length <= 3 ? '150px' : '400px';
-  }, [HISTORY_MOCK_LIST_ITEM]);
+    return TEST_DATA.length <= 3 ? '150px' : '400px';
+  }, [TEST_DATA]);
 
   if (Object.keys(groupedHistory).length === 0) {
     return (
@@ -48,8 +93,8 @@ function Timeline() {
   }
 
   return (
-    <section>
-      <article>
+    <article>
+      <div>
         <div className="font-semibold">
           <p className="text-15 text-subCoral">나의 보틀 여정 히스토리</p>
           <p className="text-10 text-brightGray">
@@ -108,8 +153,22 @@ function Timeline() {
           />
         </div>
         <div className="mb-2" />
-      </article>
-    </section>
+      </div>
+      <LinkButton
+        data={{
+          engName: 'HISTORY',
+          korName: '활동 히스토리',
+          linkSrc: `/history`,
+          icon: true,
+          handleBeforeRouteChange: (
+            e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+          ) => {
+            e.preventDefault();
+            handleConfirmUser();
+          },
+        }}
+      />
+    </article>
   );
 }
 
