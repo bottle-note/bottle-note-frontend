@@ -61,6 +61,7 @@ export const AuthApi = {
       );
     }
   },
+
   async kakaoLogin(code: string | string[]): Promise<LoginReturn> {
     try {
       const res = await fetch(`/api/oauth/kakao?code=${code}`, {
@@ -101,6 +102,31 @@ export const AuthApi = {
 
       throw new Error(
         `게스트 로그인 도중 에러가 발생했습니다. 사유: ${error.message}`,
+      );
+    }
+  },
+
+  async verifyToken(accessToken: string) {
+    try {
+      const res = await fetch(`/bottle-api/oauth/token/verify`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: accessToken,
+        }),
+      });
+
+      const { data } = await res.json();
+
+      return { data };
+    } catch (e) {
+      const error = e as Error;
+      console.error(error.message);
+
+      throw new Error(
+        `토큰 검증 도중 에러가 발생했습니다. 사유: ${error.message}`,
       );
     }
   },
