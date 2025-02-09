@@ -121,7 +121,9 @@ export default function Signup() {
               placeholder="이메일 입력"
               {...register('email', { required: '이메일을 입력하세요' })}
             />
-            <span className="text-xs text-mainGray">
+            <span
+              className={`text-xs text-mainGray ${loginErrors.email && 'text-red-500'}`}
+            >
               {loginErrors.email
                 ? loginErrors.email.message
                 : '사용하시는 이메일을 입력해주세요.'}
@@ -138,7 +140,9 @@ export default function Signup() {
               })}
             />
 
-            <span className="text-xs text-mainGray">
+            <span
+              className={`text-xs text-mainGray ${loginErrors.password && 'text-red-500'}`}
+            >
               {loginErrors.password
                 ? loginErrors.password.message
                 : '최소 8자 이상 최대 35자 이하로 입력해주세요.'}
@@ -148,10 +152,17 @@ export default function Signup() {
               className="border border-subCoral p-2 rounded-md"
               type="number"
               placeholder="만나이 입력"
-              {...register('age', { required: '나이를 입력하세요.' })}
+              {...register('age', {
+                required: '나이를 입력하세요.',
+                valueAsNumber: true,
+                validate: (value) =>
+                  value >= 19 || '19세 이상만 가입 가능합니다.',
+              })}
             />
 
-            <span className="text-xs text-mainGray">
+            <span
+              className={`text-xs text-mainGray ${loginErrors.age && 'text-red-500'}`}
+            >
               {loginErrors.age
                 ? loginErrors.age.message
                 : '19세 이하는 가입할 수 없습니다.'}
