@@ -31,50 +31,54 @@ const ListItem = ({ data }: Props) => {
   const [isPicked, setIsPicked] = useState(initialIsPicked);
 
   return (
-    <section className="grid grid-cols-2 text-mainBlack border-brightGray border-b h-[90px]">
-      <Link href={`/search/all/${alcoholId}`} className="grid grid-cols-2">
-        <ItemImage src={imageUrl} alt="위스키 이미지" />
-        <article className="flex w-full justify-between items-center">
+    <section className="grid grid-cols-5 text-mainBlack border-brightGray border-b h-[90px]">
+      <div className="col-span-4">
+        <Link
+          href={`/search/all/${alcoholId}`}
+          className="flex justify-start items-center h-full"
+        >
+          <ItemImage src={imageUrl} alt="위스키 이미지" />
           <ItemInfo
             korName={addNewLine(korName)}
             engName={engName}
             korCategory={korCategoryName}
           />
-        </article>
-      </Link>
+        </Link>
+      </div>
 
       <article className="flex flex-col justify-center">
-        <div className="">
+        <div className="flex flex-col items-end">
           <Star rating={rating} />
-        </div>
-
-        <div
-          className={`flex justify-end text-xxs text-right tracking-wider ${!ratingCount && 'hidden'}`}
-        >
-          (
-          <Image src={RatingCountIcon} alt="별점 평가 참여자 수" />
-          <span className="">{`${ratingCount ?? 0}`}</span>)
-        </div>
-
-        <div className="flex justify-end mt-1.5 gap-1">
-          <Link
-            href={
-              isMyPage
-                ? `/search/all/${alcoholId}/reviews?name=${korName}`
-                : `/search/all/${alcoholId}/reviews?name=${korName}`
-            }
+          <div
+            className={`flex justify-end text-xxs text-right tracking-wider ${!ratingCount && 'hidden'}`}
           >
-            {hasReviewByMe === true && <Image src={HasReviewIcon} alt="리뷰" />}
-            {hasReviewByMe === false && <Image src={ReviewIcon} alt="리뷰" />}
-          </Link>
-          <PickBtn
-            isPicked={isPicked}
-            alcoholId={alcoholId}
-            iconColor="subcoral"
-            handleUpdatePicked={() => setIsPicked(!isPicked)}
-            handleError={() => console.error('찜하기 도중 에러 발생')}
-            handleNotLogin={() => {}}
-          />
+            (
+            <Image src={RatingCountIcon} alt="별점 평가 참여자 수" />
+            <span>{`${ratingCount ?? 0}`}</span>)
+          </div>
+
+          <div className="flex justify-end mt-1.5 gap-1">
+            <Link
+              href={
+                isMyPage
+                  ? `/search/all/${alcoholId}/reviews?name=${korName}`
+                  : `/search/all/${alcoholId}/reviews?name=${korName}`
+              }
+            >
+              {hasReviewByMe === true && (
+                <Image src={HasReviewIcon} alt="리뷰" />
+              )}
+              {hasReviewByMe === false && <Image src={ReviewIcon} alt="리뷰" />}
+            </Link>
+            <PickBtn
+              isPicked={isPicked}
+              alcoholId={alcoholId}
+              iconColor="subcoral"
+              handleUpdatePicked={() => setIsPicked(!isPicked)}
+              handleError={() => console.error('찜하기 도중 에러 발생')}
+              handleNotLogin={() => {}}
+            />
+          </div>
         </div>
       </article>
     </section>
