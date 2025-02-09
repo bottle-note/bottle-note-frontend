@@ -179,54 +179,51 @@ export default function Login() {
         </section>
 
         <section className="shrink-0 flex-1 flex">
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center w-[92px]">
             <Image src={LogoWhite} alt="bottle-note-logo" />
           </div>
         </section>
 
         <section className="flex flex-col gap-5 pb-5 w-full px-5">
-          <p className="text-13 text-white font-bold whitespace-pre text-center">{`나의 입맛에 맞는 딱 한 병을\n찾아가는 여정 노트`}</p>
-
           <form
             onSubmit={handleSubmit(handleLogin)}
             className="flex flex-col gap-2"
           >
             <input
+              className="border p-2 rounded-md"
               type="email"
-              placeholder="email"
+              placeholder="이메일 입력"
               {...register('email', { required: '이메일을 입력하세요' })}
             />
-            {loginErrors.email && (
-              <span className="text-xs text-white">
-                {loginErrors.email.message}
-              </span>
-            )}
+
             <input
+              className="border p-2 rounded-md"
               type="password"
-              placeholder="password"
+              placeholder="비밀번호 8 ~ 35자 입력"
               {...register('password', {
                 required: '비밀번호를 입력하세요',
                 minLength: { value: 8, message: '8자 이상 입력하세요' },
                 maxLength: { value: 35, message: '35자 이하로 입력하세요' },
               })}
             />
-            {loginErrors.password && (
+
+            <button className="bg-subCoral text-white border border-white rounded-md py-2.5">
+              로그인 하기
+            </button>
+            <button onClick={handleSingup}>
               <span className="text-xs text-white">
-                {loginErrors.password.message}
+                보틀노트 회원이 아니신가요?
               </span>
-            )}
-            <button className="bg-white text-subCoral rounded-md py-2.5">
-              로그인
             </button>
           </form>
 
+          <article className="flex gap-2 items-center py-2">
+            <div className="w-full h-[1px] bg-white" />
+            <span className="text-xs text-white shrink-0">또는</span>
+            <div className="w-full h-[1px] bg-white" />
+          </article>
+
           <article className="flex flex-col gap-2">
-            <button
-              className="bg-white text-subCoral rounded-md py-2.5"
-              onClick={handleSingup}
-            >
-              회원가입
-            </button>
             <SocialLoginBtn type="KAKAO" onClick={kakaoLoginHandler} />
             <SocialLoginBtn type="APPLE" onClick={() => signIn('apple')} />
           </article>
