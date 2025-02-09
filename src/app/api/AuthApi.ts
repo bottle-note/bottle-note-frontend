@@ -108,6 +108,33 @@ export const AuthApi = {
     }
   },
 
+  async basicSignup(userInput: { email: string; password: string }) {
+    try {
+      // TODO: 엔드포인트 / body 변경
+      const res = await fetch(`/bottle-api/oauth/guest-login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: 'Ym90dGxlbm90ZWd1ZXN0Zm9yYWRucm9pZA==',
+        }),
+      });
+
+      // TODO:응답값 수정
+      const { data } = await res.json();
+
+      return { accessToken: data.accessToken };
+    } catch (e) {
+      const error = e as Error;
+      console.error(error.message);
+
+      throw new Error(
+        `Basic 회원가입 도중 에러가 발생했습니다. 사유: ${error.message}`,
+      );
+    }
+  },
+
   /**
    * @deprecated
    * */
