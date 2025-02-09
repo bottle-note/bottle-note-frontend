@@ -69,7 +69,9 @@ export default function Login() {
     }
   };
 
-  const handleSingup = () => {};
+  const handleSingup = () => {
+    router.push('/signup');
+  };
 
   useEffect(() => {
     if (session) {
