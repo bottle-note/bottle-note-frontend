@@ -56,7 +56,6 @@ export default function Signup() {
     gender,
   }: SignupFormValues) => {
     try {
-      // 로그인 시도
       const result = await AuthApi.basicSignup({
         email,
         password,
@@ -64,14 +63,13 @@ export default function Signup() {
         gender: mapGenderToApiFormat(gender),
       });
 
-      const decoded: UserData = jwt(result.accessToken);
+      const decoded: UserData = jwt.decode(result.accessToken);
 
       login(decoded, {
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
       });
 
-      // TODO: 로그인 완료 후 데이터 저장
       handleModalState({
         isShowModal: true,
         mainText: '보틀노트에 오신걸 환영합니다.',
@@ -81,8 +79,6 @@ export default function Signup() {
         },
       });
     } catch (e) {
-      // TODO: 서버 실패 메시지 형식 체크 후 mainText 에 전달
-      // 로그인 실패
       handleModalState({
         isShowModal: true,
         mainText: `${(e as unknown as Error).message}`,

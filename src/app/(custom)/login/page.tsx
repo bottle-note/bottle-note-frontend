@@ -31,37 +31,24 @@ export default function Login() {
   const { isInApp, setIsInApp } = DeviceService;
   const { handleModalState, handleCloseModal } = useModalStore();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors: loginErrors },
-  } = useForm<FormValues>();
+  const { register, handleSubmit } = useForm<FormValues>();
 
-  const handleLogin = (data: FormValues) => {
+  const handleLogin = async (data: FormValues) => {
     try {
-      // 로그인 시도
-      const result = AuthApi.basicLogin(data);
+      const result = await AuthApi.basicLogin(data);
 
-      // TODO: 로그인 완료 후 데이터 저장
-      login(
-        {
-          profile: '',
-          sub: '',
-          userId: -1,
-        },
-        {
-          accessToken: '',
-          refreshToken: '',
-        },
-      );
+      const decoded: UserData = jwt.decode(result.accessToken);
+
+      login(decoded, {
+        accessToken: result.accessToken,
+        refreshToken: '',
+      });
 
       router.push('/');
     } catch (e) {
-      // 로그인 실패
-
       handleModalState({
         isShowModal: true,
-        mainText: '로그인에 실패하였습니다.',
+        mainText: `${(e as unknown as Error).message}`,
         handleConfirm: () => {
           handleCloseModal();
         },
