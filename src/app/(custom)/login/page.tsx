@@ -1,18 +1,13 @@
 'use client';
 
-import { useEffect, useLayoutEffect } from 'react';
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import { AuthService } from '@/lib/AuthService';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { UserApi } from '@/app/api/UserApi';
-import {
-  checkIsInApp,
-  getDeviceToken,
-  handleWebViewMessage,
-  sendLogToFlutter,
-} from '@/utils/flutterUtil';
+import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
 import { AuthApi } from '@/app/api/AuthApi';
 import { UserData } from '@/types/Auth';
@@ -99,18 +94,6 @@ export default function Login() {
       }
     })();
   }, [isLogin]);
-
-  // NOTE: 웹뷰 핸들러 함수 window 전역객체 등록
-  useLayoutEffect(() => {
-    window.getDeviceToken = getDeviceToken;
-    window.checkIsInApp = checkIsInApp;
-    window.sendLogToFlutter = sendLogToFlutter;
-
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (isMobile) {
-      handleWebViewMessage('checkIsInApp');
-    }
-  }, []);
 
   // ----- kakao sdk login
   useEffect(() => {

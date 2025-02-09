@@ -31,8 +31,6 @@ const UserInfo = ({
     setIsMatchUser(userData?.userId === Number(currentId));
   }, []);
 
-  if (!userData) throw new Error('유저 데이터 불러오기에 실패하였습니다.');
-
   return (
     <section className="flex space-x-5.25 py-8.75 border-b border-t border-subCoral">
       <ProfileImage profileImgSrc={profileImgSrc} />
@@ -77,7 +75,7 @@ const UserInfo = ({
           {!isMatchUser && (
             <FollowButton
               isFollowing={Boolean(isFollowing)}
-              followUserId={userData?.userId}
+              followUserId={userData?.userId!}
             />
           )}
         </div>
