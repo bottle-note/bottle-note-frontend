@@ -17,12 +17,8 @@ export default function ImagesForm() {
   const [savedImages, setSavedImages] = useState<SaveImages[]>([]);
   const [forceOpen, setForceOpen] = useState(false);
 
-  async function handleUploadImg(data: File) {
-    console.log(data);
-  }
-
-  const onUploadPreview = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newFiles = e.target.files;
+  const onUploadPreview = (imgData: File) => {
+    const newFiles = [imgData];
 
     if (newFiles && newFiles.length > 0) {
       // 이미지 미리보기용
@@ -82,7 +78,7 @@ export default function ImagesForm() {
   };
 
   const { handleOpenAlbum } = useWebviewCamera({
-    handleImg: handleUploadImg,
+    handleImg: onUploadPreview,
   });
 
   const onClickAddImage = () => {
@@ -123,8 +119,14 @@ export default function ImagesForm() {
           accept="image/*"
           hidden
           ref={imageRefModify}
-          onChange={(e) => {
-            onUploadPreview(e);
+          onChange={(event) => {
+            const fileInput = event.target;
+            const file = fileInput.files?.[0];
+
+            if (file) {
+              onUploadPreview(file);
+              fileInput.value = '';
+            }
             setForceOpen(true);
           }}
           multiple
@@ -171,6 +173,7 @@ export default function ImagesForm() {
             </button>
           </figure>
         ))}
+
         {previewImages?.length < 5 && (
           <button
             onClick={onClickAddImage}
@@ -187,7 +190,16 @@ export default function ImagesForm() {
               accept="image/*"
               hidden
               ref={imageRef}
-              onChange={onUploadPreview}
+              onChange={(event) => {
+                const fileInput = event.target;
+                const file = fileInput.files?.[0];
+
+                if (file) {
+                  onUploadPreview(file);
+                  fileInput.value = '';
+                }
+                setForceOpen(true);
+              }}
               multiple
             />
           </button>
