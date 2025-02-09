@@ -16,8 +16,10 @@ export default function RootLayout({
   }, []);
 
   return (
-    <div className="flex flex-col w-full mx-auto min-h-screen bg-subCoral">
-      <main className="flex-1 overflow-y-auto">{children}</main>
+    <div className="flex flex-col w-full min-h-screen bg-subCoral">
+      <main className="flex flex-col flex-grow overflow-y-auto">
+        {children}
+      </main>
     </div>
   );
 }

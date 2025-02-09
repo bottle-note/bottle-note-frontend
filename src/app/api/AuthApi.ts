@@ -1,6 +1,7 @@
 import { AuthService } from '@/lib/AuthService';
 import useModalStore from '@/store/modalStore';
-import { LoginReq, LoginReturn } from '@/types/Auth';
+import { BasicSignupRes, LoginReq, LoginReturn } from '@/types/Auth';
+import { ApiResponse } from '@/types/common';
 
 export const AuthApi = {
   async login(body: LoginReq): Promise<{
@@ -81,6 +82,92 @@ export const AuthApi = {
     }
   },
 
+  // TODO: 연결
+  async basicLogin({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }): Promise<{
+    accessToken: string;
+  }> {
+    try {
+      const res = await fetch(`/bottle-api/oauth/basic/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      if (!res.ok) {
+        const result: ApiResponse<{
+          accessToken: string;
+        }> = await res.json();
+
+        throw new Error(result.errors[0].message);
+      }
+
+      const { data } = await res.json();
+
+      return data;
+    } catch (e) {
+      const error = e as Error;
+      console.error(error.message);
+
+      throw new Error(error.message);
+    }
+  },
+
+  async basicSignup({
+    email,
+    password,
+    age,
+    gender,
+  }: {
+    email: string;
+    password: string;
+    age: number;
+    gender: 'MALE' | 'FEMALE' | null;
+  }): Promise<BasicSignupRes> {
+    try {
+      const res = await fetch(`/bottle-api/oauth/basic/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          age,
+          gender,
+        }),
+      });
+
+      if (!res.ok) {
+        const result: ApiResponse<BasicSignupRes> = await res.json();
+
+        throw new Error(result.errors[0].message);
+      }
+
+      const { data } = await res.json();
+
+      return data;
+    } catch (e) {
+      const error = e as Error;
+      console.error(error.message);
+
+      throw new Error(error.message);
+    }
+  },
+
+  /**
+   * @deprecated
+   * */
   async guestLogin() {
     try {
       const res = await fetch(`/bottle-api/oauth/guest-login`, {
