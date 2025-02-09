@@ -4,15 +4,22 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import { SaveImages } from '@/types/Image';
+import { useWebViewInit } from '@/hooks/useWebViewInit';
+import { useWebviewCamera } from '@/hooks/useWebviewCamera';
 import OptionsContainer from '../OptionsContainer';
 
 export default function ImagesForm() {
   const imageRef = useRef<HTMLInputElement>(null);
   const imageRefModify = useRef<HTMLInputElement>(null);
   const { setValue, watch } = useFormContext();
+  const { isMobile } = useWebViewInit();
   const [previewImages, setPreviewImages] = useState<SaveImages[]>([]);
   const [savedImages, setSavedImages] = useState<SaveImages[]>([]);
   const [forceOpen, setForceOpen] = useState(false);
+
+  async function handleUploadImg(data: File) {
+    console.log(data);
+  }
 
   const onUploadPreview = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = e.target.files;
@@ -74,6 +81,15 @@ export default function ImagesForm() {
     setPreviewImages(updatedPreviews);
   };
 
+  const { handleOpenAlbum } = useWebviewCamera({
+    handleImg: handleUploadImg,
+  });
+
+  const onClickAddImage = () => {
+    if (isMobile) return handleOpenAlbum();
+    return imageRef.current?.click();
+  };
+
   useEffect(() => {
     if (watch('imageUrlList')) {
       const urlData = watch('imageUrlList').map(
@@ -88,6 +104,10 @@ export default function ImagesForm() {
       setPreviewImages(urlData);
     }
   }, []);
+
+  useEffect(() => {
+    forceOpen && setForceOpen(false);
+  }, [previewImages, forceOpen]);
 
   const ExtraButtons = (
     <div className="flex items-center">
@@ -112,10 +132,6 @@ export default function ImagesForm() {
       </button>
     </div>
   );
-
-  useEffect(() => {
-    forceOpen && setForceOpen(false);
-  }, [previewImages, forceOpen]);
 
   return (
     <OptionsContainer
@@ -157,7 +173,7 @@ export default function ImagesForm() {
         ))}
         {previewImages?.length < 5 && (
           <button
-            onClick={() => imageRef.current?.click()}
+            onClick={onClickAddImage}
             className="h-[3.8rem] w-[3.8rem] border border-subCoral flex flex-col justify-center items-center"
           >
             <Image
@@ -177,7 +193,6 @@ export default function ImagesForm() {
           </button>
         )}
       </div>
-      {/* )} */}
     </OptionsContainer>
   );
 }
