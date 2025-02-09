@@ -23,3 +23,11 @@ export interface LoginReturn {
   tokens: TokenData;
   info: UserData;
 }
+
+export interface BasicSignupRes {
+  message: string;
+  email: string;
+  nickname: string;
+  accessToken: string;
+  refreshToken: string;
+}

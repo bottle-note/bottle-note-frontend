@@ -1,6 +1,7 @@
 import { AuthService } from '@/lib/AuthService';
 import useModalStore from '@/store/modalStore';
-import { LoginReq, LoginReturn } from '@/types/Auth';
+import { BasicSignupRes, LoginReq, LoginReturn } from '@/types/Auth';
+import { ApiResponse } from '@/types/common';
 
 export const AuthApi = {
   async login(body: LoginReq): Promise<{
@@ -81,6 +82,7 @@ export const AuthApi = {
     }
   },
 
+  // TODO: 연결
   async basicLogin(userInput: { email: string; password: string }) {
     try {
       // TODO: 엔드포인트 / body 변경
@@ -108,30 +110,46 @@ export const AuthApi = {
     }
   },
 
-  async basicSignup(userInput: { email: string; password: string }) {
+  // TODO: 연결
+  async basicSignup({
+    email,
+    password,
+    age,
+    gender,
+  }: {
+    email: string;
+    password: string;
+    age: number;
+    gender: 'MALE' | 'FEMALE' | null;
+  }): Promise<BasicSignupRes> {
     try {
-      // TODO: 엔드포인트 / body 변경
-      const res = await fetch(`/bottle-api/oauth/guest-login`, {
+      const res = await fetch(`/bottle-api/oauth/basic/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          code: 'Ym90dGxlbm90ZWd1ZXN0Zm9yYWRucm9pZA==',
+          email,
+          password,
+          age,
+          gender,
         }),
       });
 
-      // TODO:응답값 수정
+      if (!res.ok) {
+        const result: ApiResponse<BasicSignupRes> = await res.json();
+
+        throw new Error(result.errors[0].message);
+      }
+
       const { data } = await res.json();
 
-      return { accessToken: data.accessToken };
+      return data;
     } catch (e) {
       const error = e as Error;
       console.error(error.message);
 
-      throw new Error(
-        `Basic 회원가입 도중 에러가 발생했습니다. 사유: ${error.message}`,
-      );
+      throw new Error(error.message);
     }
   },
 

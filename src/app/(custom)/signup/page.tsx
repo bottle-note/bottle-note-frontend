@@ -8,6 +8,9 @@ import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { AuthApi } from '@/app/api/AuthApi';
 import { AuthService } from '@/lib/AuthService';
+import { UserData } from '@/types/Auth';
+
+const jwt = require('jsonwebtoken');
 
 const GENDER_OPTIONS = ['남', '여', '선택안함'] as const;
 
@@ -38,24 +41,37 @@ export default function Signup() {
   const fieldValues = Object.values(watch());
   const isFormFilled = fieldValues.every((fieldValue) => Boolean(fieldValue));
 
-  const onSubmit = (data: SignupFormValues) => {
+  const mapGenderToApiFormat = (gender: (typeof GENDER_OPTIONS)[number]) => {
+    if (gender === '선택안함') return null;
+    if (gender === '남') return 'MALE';
+    if (gender === '여') return 'FEMALE';
+
+    return null;
+  };
+
+  const onSubmit = async ({
+    email,
+    password,
+    age,
+    gender,
+  }: SignupFormValues) => {
     try {
       // 로그인 시도
-      const result = AuthApi.basicSignup(data);
+      const result = await AuthApi.basicSignup({
+        email,
+        password,
+        age,
+        gender: mapGenderToApiFormat(gender),
+      });
+
+      const decoded: UserData = jwt(result.accessToken);
+
+      login(decoded, {
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+      });
 
       // TODO: 로그인 완료 후 데이터 저장
-      login(
-        {
-          profile: '',
-          sub: '',
-          userId: -1,
-        },
-        {
-          accessToken: '',
-          refreshToken: '',
-        },
-      );
-
       handleModalState({
         isShowModal: true,
         mainText: '보틀노트에 오신걸 환영합니다.',
@@ -69,7 +85,7 @@ export default function Signup() {
       // 로그인 실패
       handleModalState({
         isShowModal: true,
-        mainText: '로그인에 실패하였습니다.',
+        mainText: `${(e as unknown as Error).message}`,
         handleConfirm: () => {
           handleCloseModal();
         },
