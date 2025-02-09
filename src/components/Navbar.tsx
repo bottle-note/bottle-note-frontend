@@ -46,8 +46,12 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
     router.push(menu.link);
   };
 
-  const isActive = (link: string) =>
-    pathname === link || pathname.startsWith(link);
+  const isActive = (link: string) => {
+    if (link === '/') {
+      return pathname === '/';
+    }
+    return pathname === link || pathname.startsWith(link);
+  };
 
   return (
     <nav
