@@ -90,8 +90,6 @@ export default function Signup() {
           handleCloseModal();
         },
       });
-
-      console.log(e);
     }
   };
 
@@ -191,9 +189,21 @@ export default function Signup() {
               checked={watch('termsCheck')}
             />
             <div className="whitespace-pre">
-              <span>이용약관</span>
+              <a
+                className="text-subCoral font-bold"
+                href="https://bottle-note.notion.site/127395d49d9580c8813ec167638892be?pvs=4"
+                target="_blank"
+              >
+                이용약관
+              </a>
               <span> 및 </span>
-              <span>개인정보 처리방침</span>
+              <a
+                className="text-subCoral font-bold"
+                href="https://bottle-note.notion.site/"
+                target="_blank"
+              >
+                개인정보 처리방침
+              </a>
               <span>에 동의합니다.</span>
             </div>
           </div>
