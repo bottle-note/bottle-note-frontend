@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import * as yup from 'yup';
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -17,7 +18,14 @@ import Modal from '@/components/Modal';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import OptionSelect from '@/components/List/OptionSelect';
 import Loading from '@/components/Loading';
-import ImagesForm from '../../review/_components/form/ImagesForm';
+
+// FIXME: 이유를 알 수 없지만 해당 컴포넌트가 SSR 로 import 가 되어, 강제로 CSR import 로 변환
+const ImagesForm = dynamic(
+  () => import('../../review/_components/form/ImagesForm'),
+  {
+    ssr: false,
+  },
+);
 
 const TYPE_OPTIONS = [
   {
@@ -179,9 +187,11 @@ export default function InquireRegister() {
               ({watch('content')?.length} / 1000)
             </div>
           </article>
+
           <article className="m-5 pb-5 border-b-[0.01rem] border-mainGray">
             <ImagesForm />
           </article>
+
           <article className="mx-5 space-y-9">
             <Button onClick={handleSubmit(onSave)} btnName="전송" />
           </article>
