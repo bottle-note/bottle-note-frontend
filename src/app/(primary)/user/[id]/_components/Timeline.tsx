@@ -11,6 +11,42 @@ import { formatDate } from '@/utils/formatDate';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { HistoryApi } from '@/app/api/HistoryApi';
 
+interface GroupHistoryOptions {
+  limit?: number;
+  shouldLimit?: boolean;
+}
+
+const groupHistoryByDate = (
+  historyItems: History[],
+  options: GroupHistoryOptions = {},
+) => {
+  const { limit = 7, shouldLimit = false } = options;
+
+  const itemsToProcess = shouldLimit
+    ? historyItems.slice(0, limit)
+    : historyItems;
+
+  const sortedItems = [...itemsToProcess].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+
+  const groupedItems = sortedItems.reduce(
+    (acc, item) => {
+      const yearMonth = formatDate(item.createdAt, 'YEAR_MONTH') as string;
+
+      const newAcc = { ...acc };
+      if (!newAcc[yearMonth]) {
+        newAcc[yearMonth] = [];
+      }
+      newAcc[yearMonth].push(item);
+      return newAcc;
+    },
+    {} as Record<string, History[]>,
+  );
+
+  return groupedItems;
+};
+
 function Timeline() {
   const router = useRouter();
   const { id: userId } = useParams();
@@ -23,58 +59,22 @@ function Timeline() {
       return;
     }
 
-    // ! 아래 코드 주석처리 후 주석된 코드 주석 제거하면 확인 가능
-    handleModalState({
-      isShowModal: true,
-      type: 'ALERT',
-      mainText: '현재 기능 준비중입니다:)',
-      handleConfirm: () => {
-        handleModalState({
-          isShowModal: false,
-          mainText: '',
-        });
-      },
-    });
-
-    // if (loginUserData?.userId !== Number(id)) {
-    //   handleModalState({
-    //     isShowModal: true,
-    //     type: 'ALERT',
-    //     mainText: '여기까지 볼 수 있어요!',
-    //     subText: '더 자세한 히스토리는 다른사람에게\n공유되지않아요~😘',
-    //     handleConfirm: () => {
-    //       handleModalState({
-    //         isShowModal: false,
-    //         mainText: '',
-    //       });
-    //     },
-    //   });
-    // } else {
-    //   router.push('/history');
-    // }
-  };
-
-  const groupHistoryByDate = (historyItems: History[]) => {
-    const sortedItems = [...historyItems].sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
-
-    const groupedItems = sortedItems.reduce(
-      (acc, item) => {
-        const yearMonth = formatDate(item.createdAt, 'YEAR_MONTH') as string;
-
-        const newAcc = { ...acc };
-        if (!newAcc[yearMonth]) {
-          newAcc[yearMonth] = [];
-        }
-        newAcc[yearMonth].push(item);
-        return newAcc;
-      },
-      {} as Record<string, History[]>,
-    );
-
-    return groupedItems;
+    if (loginUserData?.userId !== Number(userId)) {
+      handleModalState({
+        isShowModal: true,
+        type: 'ALERT',
+        mainText: '여기까지 볼 수 있어요!',
+        subText: '더 자세한 히스토리는 다른사람에게\n공유되지않아요~😘',
+        handleConfirm: () => {
+          handleModalState({
+            isShowModal: false,
+            mainText: '',
+          });
+        },
+      });
+    } else {
+      router.push('/history');
+    }
   };
 
   const {
@@ -98,24 +98,31 @@ function Timeline() {
 
   const historyList: History[] =
     (historyData && historyData[0].data.userHistories) || [];
-  const groupedHistory = groupHistoryByDate(historyList);
+  const groupedHistory = groupHistoryByDate(historyList, {
+    limit: 7,
+    shouldLimit: true,
+  });
   const gradientHeight = useMemo(() => {
     return historyData && historyData[0].data.totalCount <= 3
       ? '150px'
       : '400px';
   }, [historyData]);
 
-  if ((historyData && historyData[0].data.totalCount === 0) || error) {
+  const getEmptyViewText = () => {
+    if (isLoading) return '데이터를 가져오고 있어요:)';
+    if (error) return '데이터를 가져오지 못 했어요..';
+    return '히스토리가 없어요!';
+  };
+
+  if (
+    (historyData && historyData[0].data.totalCount === 0) ||
+    error ||
+    isLoading
+  ) {
     return (
       <section>
         <article className="py-5 border-y border-mainGray/30">
-          <EmptyView
-            text={
-              error
-                ? '히스토리 데이터를 불러오지 못 했습니다!'
-                : '히스토리가 없어요!'
-            }
-          />
+          <EmptyView text={getEmptyViewText()} />
         </article>
       </section>
     );
