@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { HISTORY_TYPE_INFO } from '@/constants/historyType';
 import { formatDate } from '@/utils/formatDate';
 import { TimeFormat } from '@/types/FormatDate';
+import { Rate } from '@/types/History';
 
 interface BaseProps {
   date: string;
@@ -13,24 +14,36 @@ interface BaseProps {
 }
 
 interface RatingProps extends BaseProps {
-  type: 'RATING';
-  rating: number | undefined;
+  type: 'START_RATING' | 'RATING_MODIFY';
+  rate: Rate | null;
 }
 
 interface ReviewProps extends BaseProps {
-  type: 'REVIEW';
+  type:
+    | 'REVIEW_CREATE'
+    | 'REVIEW_LIKES'
+    | 'REVIEW_REPLY_CREATE'
+    | 'BEST_REVIEW_SELECTED';
   text: string | undefined;
 }
 
 interface OtherProps extends BaseProps {
-  type: 'LIKE' | 'UNLIKE' | 'REPLY' | 'BOTTLE'; // 서버 API에 맞춰 수정 필요
+  type: 'BOTTLE' | 'UNPICKED' | 'IS_PICK' | 'RATING_DELETE';
 }
 
 type Props = RatingProps | ReviewProps | OtherProps;
 
 function TimeLineItem(props: Props) {
-  const { date, alcoholName, imageSrc, type, isStart = false } = props;
-  const { icon, iconAlt, renderDescription } = HISTORY_TYPE_INFO[type];
+  const {
+    date,
+    alcoholName,
+    imageSrc,
+    type,
+    isStart = false,
+    rate,
+    text,
+  } = props as RatingProps & ReviewProps;
+  const { getIcon, iconAlt, renderDescription } = HISTORY_TYPE_INFO[type];
   const dateTime = formatDate(date, 'MONTH_DATE_TIME') as TimeFormat;
 
   return (
@@ -39,7 +52,13 @@ function TimeLineItem(props: Props) {
         <p className="text-10 font-medium">{dateTime.date}</p>
         <p className="text-9 font-extralight">{dateTime.time}</p>
       </div>
-      <Image className="mr-1" src={icon} width={20} height={20} alt={iconAlt} />
+      <Image
+        className="mr-1"
+        src={getIcon(rate)}
+        width={20}
+        height={20}
+        alt={iconAlt}
+      />
       {isStart ? (
         <div className="w-[17rem] text-12 font-bold text-white bg-subCoral py-[0.65rem] px-3 rounded-md">
           보틀노트를 시작하신 날이에요.
@@ -51,8 +70,17 @@ function TimeLineItem(props: Props) {
             <p className="text-12 font-bold text-mainDarkGray">{alcoholName}</p>
             {renderDescription &&
               renderDescription(
-                type === 'RATING' ? props?.rating : undefined,
-                type === 'REVIEW' ? props?.text : undefined,
+                ['START_RATING', 'RATING_MODIFY'].includes(type)
+                  ? rate
+                  : undefined,
+                [
+                  'REVIEW_CREATE',
+                  'REVIEW_LIKES',
+                  'REVIEW_REPLY_CREATE',
+                  'BEST_REVIEW_SELECTED',
+                ].includes(type)
+                  ? text
+                  : undefined,
               )}
           </div>
           {imageSrc && (

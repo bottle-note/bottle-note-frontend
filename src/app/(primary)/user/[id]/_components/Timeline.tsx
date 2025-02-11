@@ -1,18 +1,19 @@
 import React, { useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
 import TimeLineItem from '@/app/(primary)/_components/TimeLineItem';
 import Label from '@/app/(primary)/_components/Label';
 import LinkButton from '@/components/LinkButton';
 import useModalStore from '@/store/modalStore';
 import { AuthService } from '@/lib/AuthService';
-import { HistoryApi } from '@/types/History';
+import { History } from '@/types/History';
 import { formatDate } from '@/utils/formatDate';
-
-import { HISTORY_MOCK_LIST_ITEM } from '../../../../../../mock/history';
+import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
+import { HistoryApi } from '@/app/api/HistoryApi';
 
 function Timeline() {
   const router = useRouter();
+  const { id: userId } = useParams();
   const { handleModalState, handleLoginModal } = useModalStore();
   const { userData: loginUserData, isLogin } = AuthService;
 
@@ -53,7 +54,7 @@ function Timeline() {
     // }
   };
 
-  const groupHistoryByDate = (historyItems: HistoryApi[]) => {
+  const groupHistoryByDate = (historyItems: History[]) => {
     const sortedItems = [...historyItems].sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
@@ -70,23 +71,51 @@ function Timeline() {
         newAcc[yearMonth].push(item);
         return newAcc;
       },
-      {} as Record<string, HistoryApi[]>,
+      {} as Record<string, History[]>,
     );
 
     return groupedItems;
   };
 
-  const TEST_DATA: any[] = []; // HISTORY_MOCK_LIST_ITEM로 바꾸면 화면 확인 가능
-  const groupedHistory = groupHistoryByDate(TEST_DATA);
-  const gradientHeight = useMemo(() => {
-    return TEST_DATA.length <= 3 ? '150px' : '400px';
-  }, [TEST_DATA]);
+  const {
+    data: historyData,
+    isLoading,
+    error,
+  } = usePaginatedQuery<{
+    userHistories: History[];
+    subscriptionDate: string;
+    totalCount: number;
+  }>({
+    queryKey: ['history', userId],
+    queryFn: ({ pageParam }) => {
+      return HistoryApi.getHistoryList({
+        userId: String(userId),
+        cursor: pageParam,
+        pageSize: 10,
+      });
+    },
+  });
 
-  if (Object.keys(groupedHistory).length === 0) {
+  const historyList: History[] =
+    (historyData && historyData[0].data.userHistories) || [];
+  const groupedHistory = groupHistoryByDate(historyList);
+  const gradientHeight = useMemo(() => {
+    return historyData && historyData[0].data.totalCount <= 3
+      ? '150px'
+      : '400px';
+  }, [historyData]);
+
+  if ((historyData && historyData[0].data.totalCount === 0) || error) {
     return (
       <section>
         <article className="py-5 border-y border-mainGray/30">
-          <EmptyView text="히스토리가 없어요!" />
+          <EmptyView
+            text={
+              error
+                ? '히스토리 데이터를 불러오지 못 했습니다!'
+                : '히스토리가 없어요!'
+            }
+          />
         </article>
       </section>
     );
@@ -114,7 +143,7 @@ function Timeline() {
                   />
                 </div>
                 <div className="z-10 space-y-5">
-                  {items.map((item: HistoryApi, itemIndex) => (
+                  {items.map((item: History, itemIndex) => (
                     <React.Fragment key={item.historyId}>
                       {itemIndex > 0 &&
                         formatDate(
@@ -127,11 +156,11 @@ function Timeline() {
                         )}
                       <TimeLineItem
                         date={item.createdAt}
-                        alcoholName={item.korName}
+                        alcoholName={item.alcoholName}
                         imageSrc={item.imageUrl}
-                        type={item.eventCategory}
-                        rating={item?.rating}
-                        text={item?.reviewText}
+                        type={item.eventType}
+                        rate={item.dynamicMessage}
+                        text={item.message}
                       />
                     </React.Fragment>
                   ))}
