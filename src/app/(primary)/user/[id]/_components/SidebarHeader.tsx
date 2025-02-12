@@ -118,11 +118,21 @@ const SidebarHeader = () => {
       },
       {
         text: '이용약관',
-        action: () => alert('준비중입니다.'),
+        action: () =>
+          window.open(
+            'https://bottle-note.notion.site/info?pvs=4',
+            '_blank',
+            'noopener,noreferrer',
+          ),
       },
       {
         text: '개인정보 처리 방침',
-        action: () => alert('준비중입니다.'),
+        action: () =>
+          window.open(
+            'http://bottle-note.notion.site/',
+            '_blank',
+            'noopener,noreferrer',
+          ),
       },
       {
         text: '로그아웃',
