@@ -56,7 +56,7 @@ export default function OptionsContainer({
             className={`transition-transform duration-300 ${
               isOpen ? 'rotate-0' : 'rotate-180'
             }`}
-            src={'/icon/arrow-up-subcoral.svg'}
+            src="/icon/arrow-up-subcoral.svg"
             alt={isOpen ? 'closeIcon' : 'openIcon'}
             width={16}
             height={16}
