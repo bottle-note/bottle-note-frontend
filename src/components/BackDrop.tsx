@@ -11,7 +11,7 @@ interface Props {
 
 function BackDrop({ isShow, children }: Props) {
   const ModalContents = isShow ? (
-    <main className="bg-mainBlack bg-opacity-30 w-full h-full fixed inset-0 z-10">
+    <main className="bg-mainBlack bg-opacity-30 w-full h-full fixed inset-0 z-50">
       {children}
     </main>
   ) : null;
