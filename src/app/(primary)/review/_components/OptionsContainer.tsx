@@ -53,14 +53,10 @@ export default function OptionsContainer({
           }}
         >
           <Image
-            className={`transform transition-transform duration-300 ${
-              isOpen ? 'rotate-180' : 'rotate-0'
+            className={`transition-transform duration-300 ${
+              isOpen ? 'rotate-0' : 'rotate-180'
             }`}
-            src={
-              isOpen
-                ? '/icon/arrow-up-subcoral.svg'
-                : '/icon/arrow-down-subcoral.svg'
-            }
+            src="/icon/arrow-up-subcoral.svg"
             alt={isOpen ? 'closeIcon' : 'openIcon'}
             width={16}
             height={16}
