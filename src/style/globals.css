@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  body {
+    overscroll-behavior: contain;
+  }
+
   input,
   textarea {
     @apply outline-none;
