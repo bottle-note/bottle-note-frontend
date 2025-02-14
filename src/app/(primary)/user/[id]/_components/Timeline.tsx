@@ -168,6 +168,7 @@ function Timeline() {
                         type={item.eventType}
                         rate={item.dynamicMessage}
                         text={item.message}
+                        alcoholId={item.alcoholId}
                       />
                     </React.Fragment>
                   ))}

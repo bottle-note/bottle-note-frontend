@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-// import Link from 'next/link';
+import Link from 'next/link';
 import { HISTORY_TYPE_INFO } from '@/constants/historyType';
 import { formatDate } from '@/utils/formatDate';
 import { TimeFormat } from '@/types/FormatDate';
@@ -11,6 +11,7 @@ interface BaseProps {
   alcoholName?: string;
   imageSrc?: string;
   isStart?: boolean;
+  alcoholId?: number;
 }
 
 interface RatingProps extends BaseProps {
@@ -33,6 +34,21 @@ interface OtherProps extends BaseProps {
 
 type Props = RatingProps | ReviewProps | OtherProps;
 
+const AlcoholType = [
+  'UNPICKED',
+  'IS_PICK',
+  'RATING_DELETE',
+  'START_RATING',
+  'RATING_MODIFY',
+];
+
+const ReviewType = [
+  'REVIEW_CREATE',
+  'REVIEW_LIKES',
+  'REVIEW_REPLY_CREATE',
+  'BEST_REVIEW_SELECTED',
+];
+
 function TimeLineItem(props: Props) {
   const {
     date,
@@ -45,6 +61,16 @@ function TimeLineItem(props: Props) {
   } = props as RatingProps & ReviewProps;
   const { getIcon, iconAlt, renderDescription } = HISTORY_TYPE_INFO[type];
   const dateTime = formatDate(date, 'MONTH_DATE_TIME') as TimeFormat;
+
+  const isValidType = (type: string): string | null => {
+    if (AlcoholType.includes(type) && props?.alcoholId) {
+      return `/search/all/${props.alcoholId}`;
+    } else if (ReviewType.includes(type)) {
+      return '#';
+    } else {
+      return '#';
+    }
+  };
 
   return (
     <div className="flex items-start justify-between">
@@ -64,36 +90,38 @@ function TimeLineItem(props: Props) {
           보틀노트를 시작하신 날이에요.
         </div>
       ) : (
-        // <Link href="">
-        <div className="w-[17rem] h-14 p-3 bg-bgGray rounded-md flex justify-between">
-          <div>
-            <p className="text-12 font-bold text-mainDarkGray">{alcoholName}</p>
-            {renderDescription &&
-              renderDescription(
-                ['START_RATING', 'RATING_MODIFY'].includes(type)
-                  ? rate
-                  : undefined,
-                [
-                  'REVIEW_CREATE',
-                  'REVIEW_LIKES',
-                  'REVIEW_REPLY_CREATE',
-                  'BEST_REVIEW_SELECTED',
-                ].includes(type)
-                  ? text
-                  : undefined,
-              )}
+        <Link href={isValidType(type) || '#'}>
+          <div className="w-[17rem] h-14 p-3 bg-bgGray rounded-md flex justify-between">
+            <div>
+              <p className="text-12 font-bold text-mainDarkGray">
+                {alcoholName}
+              </p>
+              {renderDescription &&
+                renderDescription(
+                  ['START_RATING', 'RATING_MODIFY'].includes(type)
+                    ? rate
+                    : undefined,
+                  [
+                    'REVIEW_CREATE',
+                    'REVIEW_LIKES',
+                    'REVIEW_REPLY_CREATE',
+                    'BEST_REVIEW_SELECTED',
+                  ].includes(type)
+                    ? text
+                    : undefined,
+                )}
+            </div>
+            {imageSrc && (
+              <Image
+                className="mr-1 rounded"
+                src={imageSrc}
+                width={25}
+                height={34}
+                alt="alcoholImage"
+              />
+            )}
           </div>
-          {imageSrc && (
-            <Image
-              className="mr-1 rounded"
-              src={imageSrc}
-              width={25}
-              height={34}
-              alt="alcoholImage"
-            />
-          )}
-        </div>
-        // </Link>
+        </Link>
       )}
     </div>
   );
