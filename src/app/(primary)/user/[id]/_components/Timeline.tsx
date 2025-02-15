@@ -6,10 +6,9 @@ import LinkButton from '@/components/LinkButton';
 import useModalStore from '@/store/modalStore';
 import { AuthService } from '@/lib/AuthService';
 import { History } from '@/types/History';
-import { formatDate } from '@/utils/formatDate';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { HistoryApi } from '@/app/api/HistoryApi';
-import { groupHistoryByDate } from '@/app/(primary)/history/_utils/groupHistoryByDate';
+import { groupHistoryByDate, shouldShowDivider } from '@/utils/historyUtils';
 import { HistoryEmptyState } from '@/app/(primary)/history/_components/HistoryEmptyState';
 
 function Timeline() {
@@ -97,28 +96,29 @@ function Timeline() {
                       />
                     </div>
                     <div className="z-10 space-y-5">
-                      {items.map((item: History, itemIndex) => (
-                        <React.Fragment key={item.historyId}>
-                          {itemIndex > 0 &&
-                            formatDate(
-                              items[itemIndex - 1].createdAt,
-                              'FULL_DATE',
-                            ) !== formatDate(item.createdAt, 'FULL_DATE') && (
+                      {items.map((item: History, itemIndex) => {
+                        const prevItem =
+                          itemIndex > 0 ? items[itemIndex - 1] : null;
+                        const showDivider = shouldShowDivider(item, prevItem);
+                        return (
+                          <React.Fragment key={item.historyId}>
+                            {showDivider && (
                               <div className="relative py-1">
                                 <div className="absolute left-0 right-0 h-px bg-bgGray" />
                               </div>
                             )}
-                          <TimeLineItem
-                            date={item.createdAt}
-                            alcoholName={item.alcoholName}
-                            imageSrc={item.imageUrl}
-                            type={item.eventType}
-                            rate={item.dynamicMessage}
-                            text={item.message}
-                            alcoholId={item.alcoholId}
-                          />
-                        </React.Fragment>
-                      ))}
+                            <TimeLineItem
+                              date={item.createdAt}
+                              alcoholName={item.alcoholName}
+                              imageSrc={item.imageUrl}
+                              type={item.eventType}
+                              rate={item.dynamicMessage}
+                              text={item.message}
+                              alcoholId={item.alcoholId}
+                            />
+                          </React.Fragment>
+                        );
+                      })}
                     </div>
                     {index !== Object.keys(groupedHistory).length - 1 && (
                       <div className="my-5" />

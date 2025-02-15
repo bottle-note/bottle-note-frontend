@@ -15,9 +15,8 @@ import FilterIcon from 'public/icon/filter-subcoral.svg';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { HistoryApi } from '@/app/api/HistoryApi';
 import { AuthService } from '@/lib/AuthService';
-import { formatDate } from '@/utils/formatDate';
 import { HistoryListApi, History as HistoryType } from '@/types/History';
-import { groupHistoryByDate } from './_utils/groupHistoryByDate';
+import { groupHistoryByDate, shouldShowDivider } from '@/utils/historyUtils';
 import { HistoryEmptyState } from './_components/HistoryEmptyState';
 
 export default function History() {
@@ -48,11 +47,23 @@ export default function History() {
 
   const historyList: HistoryType[] =
     (historyData && historyData[0].data.userHistories) || [];
-  const groupedHistory = groupHistoryByDate(historyList);
-  console.log('groupedHistory', groupedHistory);
 
-  // !! 가장 최근 년, 월 뽑아오기
-  // !! 가장 최근 년, 월은 날짜 뱃지 안보이게 하기
+  const groupedHistory = groupHistoryByDate(historyList);
+
+  const yearMonths = Object.keys(groupedHistory).sort((a, b) =>
+    b.localeCompare(a),
+  );
+
+  function getLatestYearMonth() {
+    const latestYearMonth = yearMonths?.[0];
+    if (!latestYearMonth) return null;
+
+    const [year, month] = latestYearMonth.split('.').map(Number);
+    return { year, month };
+  }
+
+  // !! 회색 라인 오류 수정하기
+  // !! 보틀노트 시작한 날짜 뽑기
   // !! 무한 스크롤 구현
   // !! 필터 구현
 
@@ -100,49 +111,54 @@ export default function History() {
 
           <article className="relative w-[339px]">
             <div className="absolute left-[2.7rem] top-6 bottom-0 w-px border-l border-dashed border-subCoral z-0" />
-            <div className="text-10 text-mainGray bg-bgGray rounded-md p-2 mb-3 ml-3 relative z-10">
-              2025년 1월까지 기록된 회원닉네임님의 활동여정이에요!
+            <div className="text-10 text-mainGray bg-bgGray rounded-md p-2 mb-5 ml-3 relative z-10">
+              {getLatestYearMonth()?.year}년 {getLatestYearMonth()?.month}월까지
+              기록된 회원닉네임님의 활동여정이에요!
             </div>
             <div className="relative z-10 pb-3">
-              {Object.entries(groupedHistory).map(
-                ([yearMonth, items], index) => (
+              {yearMonths.map((yearMonth, index) => {
+                const items = groupedHistory[yearMonth];
+                return (
                   <div key={yearMonth} className="relative">
-                    <div className="pl-4 mb-5">
-                      <Label
-                        name={yearMonth}
-                        styleClass="border-white px-2.5 py-1 rounded-md text-11 bg-bgGray text-subCoral"
-                      />
-                    </div>
+                    {yearMonth !== yearMonths[0] && (
+                      <div className="pl-4 mb-5">
+                        <Label
+                          name={yearMonth}
+                          styleClass="border-white px-2.5 py-1 rounded-md text-11 bg-bgGray text-subCoral"
+                        />
+                      </div>
+                    )}
                     <div className="z-10 space-y-5">
-                      {items.map((item: HistoryType, itemIndex) => (
-                        <React.Fragment key={item.historyId}>
-                          {itemIndex > 0 &&
-                            formatDate(
-                              items[itemIndex - 1].createdAt,
-                              'FULL_DATE',
-                            ) !== formatDate(item.createdAt, 'FULL_DATE') && (
+                      {items.map((item: HistoryType, itemIndex) => {
+                        const prevItem =
+                          itemIndex > 0 ? items[itemIndex - 1] : null;
+                        const showDivider = shouldShowDivider(item, prevItem);
+                        return (
+                          <React.Fragment key={item.historyId}>
+                            {showDivider && (
                               <div className="relative py-1">
                                 <div className="absolute left-0 right-0 h-px bg-bgGray" />
                               </div>
                             )}
-                          <TimeLineItem
-                            date={item.createdAt}
-                            alcoholName={item.alcoholName}
-                            imageSrc={item.imageUrl}
-                            type={item.eventType}
-                            rate={item.dynamicMessage}
-                            text={item.message}
-                            alcoholId={item.alcoholId}
-                          />
-                        </React.Fragment>
-                      ))}
+                            <TimeLineItem
+                              date={item.createdAt}
+                              alcoholName={item.alcoholName}
+                              imageSrc={item.imageUrl}
+                              type={item.eventType}
+                              rate={item.dynamicMessage}
+                              text={item.message}
+                              alcoholId={item.alcoholId}
+                            />
+                          </React.Fragment>
+                        );
+                      })}
                     </div>
-                    {index !== Object.keys(groupedHistory).length - 1 && (
+                    {index !== yearMonths.length - 1 && (
                       <div className="my-5" />
                     )}
                   </div>
-                ),
-              )}
+                );
+              })}
             </div>
             <div className="relative z-10 pb-3 mt-5">
               <TimeLineItem isStart date="2024-01-19T14:35:12" type="BOTTLE" />
