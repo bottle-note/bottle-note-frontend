@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import EmptyView from '@/app/(primary)/_components/EmptyView';
 import TimeLineItem from '@/app/(primary)/_components/TimeLineItem';
 import Label from '@/app/(primary)/_components/Label';
 import LinkButton from '@/components/LinkButton';

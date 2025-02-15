@@ -8,7 +8,6 @@ import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import NavLayout from '@/app/(primary)/_components/NavLayout';
 import SearchContainer from '@/components/Search/SearchContainer';
 import TimeLineItem from '@/app/(primary)/_components/TimeLineItem';
-import EmptyView from '@/app/(primary)/_components/EmptyView';
 import FilterSideModal from './_components/filter/FilterSideModal';
 import Label from '@/app/(primary)/_components/Label';
 import DescendingIcon from 'public/icon/descending-subcoral.svg';
