@@ -204,7 +204,7 @@ export default function Login() {
             </button>
           </form>
 
-          <article className="flex gap-2 items-center py-2">
+          {/* <article className="flex gap-2 items-center py-2">
             <div className="w-full h-[1px] bg-white" />
             <span className="text-xs text-white shrink-0">또는</span>
             <div className="w-full h-[1px] bg-white" />
@@ -213,7 +213,7 @@ export default function Login() {
           <article className="flex flex-col gap-2">
             <SocialLoginBtn type="KAKAO" onClick={kakaoLoginHandler} />
             <SocialLoginBtn type="APPLE" onClick={() => signIn('apple')} />
-          </article>
+          </article> */}
         </section>
 
         <footer className="border-t border-white w-full pt-2">
