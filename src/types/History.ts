@@ -1,4 +1,3 @@
-import { ReactNode } from 'react';
 import { REVIEW_FILTER_TYPES, PICKS_STATUS } from '@/constants/history';
 
 export interface Rate {
@@ -39,6 +38,13 @@ export interface HistoryListApi {
   userHistories: History[];
 }
 
+export interface HistoryListQueryParams {
+  userId: string;
+  cursor?: number;
+  pageSize?: number;
+}
+
+// 필터 관련 타입
 export type ReviewFilterType = keyof typeof REVIEW_FILTER_TYPES;
 export type PicksStatus = keyof typeof PICKS_STATUS;
 
@@ -51,23 +57,4 @@ export interface FilterState {
     endDate: Date | null;
   };
   keyword: string;
-}
-
-export interface HistoryListQueryParams {
-  userId: string;
-  cursor?: number;
-  pageSize?: number;
-}
-
-export interface DescriptionProps {
-  rate?: Rate | null | undefined;
-  description?: string;
-}
-
-export interface HistoryTypeInfo {
-  getIcon: (rate?: Rate | null) => string;
-  iconAlt: string;
-  renderDescription?: (props: DescriptionProps) => ReactNode;
-  needsRate?: boolean;
-  needsDescription?: boolean;
 }

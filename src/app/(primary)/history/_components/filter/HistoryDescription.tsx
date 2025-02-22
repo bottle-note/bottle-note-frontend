@@ -1,5 +1,19 @@
+import { ReactNode } from 'react';
 import { truncStr } from '@/utils/truncStr';
-import { HistoryTypeInfo } from '@/types/History';
+import { Rate } from '@/types/History';
+
+export interface DescriptionProps {
+  rate?: Rate | null | undefined;
+  description?: string;
+}
+
+interface HistoryTypeInfo {
+  getIcon: (rate?: Rate | null) => string;
+  iconAlt: string;
+  renderDescription?: (props: DescriptionProps) => ReactNode;
+  needsRate?: boolean;
+  needsDescription?: boolean;
+}
 
 export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
   START_RATING: {

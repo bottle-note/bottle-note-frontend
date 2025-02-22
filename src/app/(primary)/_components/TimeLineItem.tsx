@@ -1,10 +1,13 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { HISTORY_TYPE_INFO } from '@/app/(primary)/history/_components/filter/HistoryDescription';
+import {
+  HISTORY_TYPE_INFO,
+  DescriptionProps,
+} from '@/app/(primary)/history/_components/filter/HistoryDescription';
 import { formatDate } from '@/utils/formatDate';
 import { TimeFormat } from '@/types/FormatDate';
-import { Rate, DescriptionProps } from '@/types/History';
+import { Rate } from '@/types/History';
 
 interface BaseProps {
   date: string;
