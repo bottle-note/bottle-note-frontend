@@ -8,10 +8,10 @@ import { Rate } from '@/types/History';
 
 interface BaseProps {
   date: string;
+  redirectUrl?: string;
   alcoholName?: string;
   imageSrc?: string;
   isStart?: boolean;
-  alcoholId?: number;
 }
 
 interface RatingProps extends BaseProps {
@@ -25,29 +25,14 @@ interface ReviewProps extends BaseProps {
     | 'REVIEW_LIKES'
     | 'REVIEW_REPLY_CREATE'
     | 'BEST_REVIEW_SELECTED';
-  text: string | undefined;
+  content?: string | undefined;
 }
 
 interface OtherProps extends BaseProps {
-  type: 'BOTTLE' | 'UNPICKED' | 'IS_PICK' | 'RATING_DELETE';
+  type: 'BOTTLE' | 'UNPICK' | 'IS_PICK' | 'RATING_DELETE';
 }
 
 type Props = RatingProps | ReviewProps | OtherProps;
-
-const AlcoholType = [
-  'UNPICKED',
-  'IS_PICK',
-  'RATING_DELETE',
-  'START_RATING',
-  'RATING_MODIFY',
-];
-
-const ReviewType = [
-  'REVIEW_CREATE',
-  'REVIEW_LIKES',
-  'REVIEW_REPLY_CREATE',
-  'BEST_REVIEW_SELECTED',
-];
 
 function TimeLineItem(props: Props) {
   const {
@@ -57,20 +42,11 @@ function TimeLineItem(props: Props) {
     type,
     isStart = false,
     rate,
-    text,
+    content,
+    redirectUrl,
   } = props as RatingProps & ReviewProps;
   const { getIcon, iconAlt, renderDescription } = HISTORY_TYPE_INFO[type];
   const dateTime = formatDate(date, 'MONTH_DATE_TIME') as TimeFormat;
-
-  const isValidType = (type: string): string | null => {
-    if (AlcoholType.includes(type) && props?.alcoholId) {
-      return `/search/all/${props.alcoholId}`;
-    } else if (ReviewType.includes(type)) {
-      return '#';
-    } else {
-      return '#';
-    }
-  };
 
   return (
     <div className="flex items-start justify-between">
@@ -90,7 +66,7 @@ function TimeLineItem(props: Props) {
           보틀노트를 시작하신 날이에요.
         </div>
       ) : (
-        <Link href={isValidType(type) || '#'}>
+        <Link href={redirectUrl || '#'}>
           <div className="w-[17rem] h-14 p-3 bg-bgGray rounded-md flex justify-between">
             <div>
               <p className="text-12 font-bold text-mainDarkGray">
@@ -107,13 +83,13 @@ function TimeLineItem(props: Props) {
                     'REVIEW_REPLY_CREATE',
                     'BEST_REVIEW_SELECTED',
                   ].includes(type)
-                    ? text
+                    ? content
                     : undefined,
                 )}
             </div>
             {imageSrc && (
               <Image
-                className="mr-1 rounded"
+                className="mr-1 rounded object-cover"
                 src={imageSrc}
                 width={25}
                 height={34}
