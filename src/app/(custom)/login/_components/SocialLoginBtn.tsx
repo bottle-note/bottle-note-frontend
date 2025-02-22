@@ -44,6 +44,16 @@ function SocialLoginBtn({ type, onClick }: Props) {
           <span>Apple로 로그인</span>
         </div>
       )}
+      {type === 'GOOGLE' && (
+        <div className="flex justify-center relative bg-white">
+          <span>구글로 로그인</span>
+        </div>
+      )}
+      {type === 'NAVER' && (
+        <div className="flex justify-center relative bg-white">
+          <span>네이버로 로그인</span>
+        </div>
+      )}
     </button>
   );
 }
