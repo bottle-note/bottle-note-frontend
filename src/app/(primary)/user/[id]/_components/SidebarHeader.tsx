@@ -79,6 +79,7 @@ const SidebarHeader = () => {
   const handleLogout = async () => {
     logout();
     if (session) await signOut({ callbackUrl: '/', redirect: true });
+    handleCloseModal();
     route.push('/');
   };
 
