@@ -113,8 +113,8 @@ function Timeline() {
                               imageSrc={item.imageUrl}
                               type={item.eventType}
                               rate={item.dynamicMessage}
-                              text={item.message}
-                              alcoholId={item.alcoholId}
+                              content={item.content}
+                              redirectUrl={item.redirectUrl}
                             />
                           </React.Fragment>
                         );
