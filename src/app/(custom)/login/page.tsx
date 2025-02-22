@@ -213,8 +213,9 @@ export default function Login() {
           <article className="flex flex-col gap-2">
             <SocialLoginBtn type="KAKAO" onClick={kakaoLoginHandler} />
             <SocialLoginBtn type="APPLE" onClick={() => signIn('apple')} />
-            <SocialLoginBtn type="GOOGLE" onClick={() => signIn('google')} />
-            <SocialLoginBtn type="NAVER" onClick={() => signIn('naver')} />
+            {/* NOTE: 소셜로그인 테스트용 계정 */}
+            {/* <SocialLoginBtn type="GOOGLE" onClick={() => signIn('google')} /> */}
+            {/* <SocialLoginBtn type="NAVER" onClick={() => signIn('naver')} /> */}
           </article>
         </section>
 
