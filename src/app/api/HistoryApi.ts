@@ -1,43 +1,17 @@
-import { ApiResponse, ListQueryParams } from '@/types/common';
+import { ApiResponse } from '@/types/common';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
-import { HistoryListApi } from '@/types/History';
-
-interface HistoryListQueryParams extends ListQueryParams {
-  userId: string;
-  ratingPoint?: number;
-  historyReviewFilterType?:
-    | 'ALL'
-    | 'BEST_REVIEW'
-    | 'REVIEW_LIKE'
-    | 'REVIEW_REPLY';
-  picksStatus?: 'PICK' | 'UNPICK';
-  startDate?: string;
-  endDate?: string;
-}
+import { HistoryListApi, HistoryListQueryParams } from '@/types/History';
 
 export const HistoryApi = {
-  async getHistoryList({
-    userId,
-    ratingPoint,
-    historyReviewFilterType = 'ALL',
-    picksStatus,
-    startDate,
-    endDate,
-    sortOrder,
-    cursor,
-    pageSize,
-  }: HistoryListQueryParams) {
+  async getHistoryList(
+    baseParams: HistoryListQueryParams,
+    filterParams?: string,
+  ) {
+    const { userId, cursor, pageSize } = baseParams;
     const response = await fetchWithAuth(
-      `/bottle-api/history/${userId}?cursor=${cursor}&pageSize=${pageSize}`,
+      `/bottle-api/history/${userId}?cursor=${cursor}&pageSize=${pageSize}${filterParams ? `&${filterParams}` : ''}`,
       { requireAuth: true },
     );
-
-    //   const response = await fetchWithAuth(
-    //     `/bottle-api/history/${userId}?ratingPoint=${ratingPoint}&historyReviewFilterType=${historyReviewFilterType}
-    // &picksStatus=${picksStatus}&startDate=${startDate}&endDate${endDate}
-    // &sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
-    //     { requireAuth: true },
-    //   );
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
