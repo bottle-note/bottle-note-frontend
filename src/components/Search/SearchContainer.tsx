@@ -64,7 +64,7 @@ function SearchContainer({
       </div>
 
       {isOnSearch && showRecentSearch && (
-        <div className="absolute w-full h-full z-10 p-5">
+        <div className="absolute w-full h-full z-40 p-3">
           <RecentSearch handleSearch={onSearch} />
         </div>
       )}
