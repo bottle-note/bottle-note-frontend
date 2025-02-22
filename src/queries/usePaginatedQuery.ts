@@ -6,12 +6,14 @@ interface Props<T> {
   queryKey: [string, ...Array<any>];
   queryFn: (params: any) => Promise<ApiResponse<T>>;
   pageSize?: number;
+  staleTime?: number;
 }
 
 export const usePaginatedQuery = <T>({
   queryKey,
   queryFn,
   pageSize = 10,
+  staleTime = 1000,
 }: Props<T>) => {
   const {
     data,
@@ -33,6 +35,7 @@ export const usePaginatedQuery = <T>({
     initialPageParam: 0,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
+    staleTime,
   });
 
   const { targetRef } = useInfiniteScroll({
