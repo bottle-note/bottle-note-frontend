@@ -27,6 +27,17 @@ function SearchContainer({
   >(null);
 
   const onSearch = (value: string) => {
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) {
+      handleSearchCallback('');
+      if (updateSearchText) {
+        updateSearchText('');
+      }
+      setIsOnSearch(false);
+      return;
+    }
+
     SearchHistory.save(value);
 
     if (handleSearchCallback) {

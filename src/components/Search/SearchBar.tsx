@@ -28,7 +28,7 @@ export default function SearchBar({
   const [searchText, setSearchText] = useState<string>(currSearchKeyword ?? '');
 
   const handleSubmit = () => {
-    if (searchText && handleSearch) {
+    if (handleSearch) {
       handleSearch(searchText);
     }
     if (handleFocus) handleFocus(false);
