@@ -14,6 +14,7 @@ import { AuthApi } from '@/app/api/AuthApi';
 import { UserData } from '@/types/Auth';
 import Modal from '@/components/Modal';
 import useModalStore from '@/store/modalStore';
+import { ApiError } from '@/utils/ApiError';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
@@ -33,6 +34,29 @@ export default function Login() {
 
   const { register, handleSubmit } = useForm<FormValues>();
 
+  const handleRestore = async (data: FormValues) => {
+    try {
+      await AuthApi.restore(data);
+      handleModalState({
+        isShowModal: true,
+        type: 'ALERT',
+        mainText: `재가입에 성공하였습니다.`,
+        handleConfirm: () => {
+          handleCloseModal();
+        },
+      });
+    } catch (error) {
+      handleModalState({
+        isShowModal: true,
+        type: 'ALERT',
+        mainText: `${(error as unknown as ApiError).message}`,
+        handleConfirm: () => {
+          handleCloseModal();
+        },
+      });
+    }
+  };
+
   const handleLogin = async (data: FormValues) => {
     try {
       const result = await AuthApi.basicLogin(data);
@@ -45,10 +69,22 @@ export default function Login() {
       });
 
       router.push('/');
-    } catch (e) {
+    } catch (error) {
+      if (error instanceof ApiError && error.code === 'USER_DELETED') {
+        return handleModalState({
+          isShowModal: true,
+          type: 'CONFIRM',
+          mainText: `${`탈퇴한 유저입니다. 재가입하시겠습니까?`}`,
+          handleConfirm: async () => {
+            handleCloseModal();
+            await handleRestore(data);
+          },
+        });
+      }
+
       handleModalState({
         isShowModal: true,
-        mainText: `${(e as unknown as Error).message}`,
+        mainText: `${(error as unknown as Error).message}`,
         handleConfirm: () => {
           handleCloseModal();
         },
@@ -204,7 +240,7 @@ export default function Login() {
             </button>
           </form>
 
-          {/* <article className="flex gap-2 items-center py-2">
+          <article className="flex gap-2 items-center py-2">
             <div className="w-full h-[1px] bg-white" />
             <span className="text-xs text-white shrink-0">또는</span>
             <div className="w-full h-[1px] bg-white" />
@@ -213,7 +249,10 @@ export default function Login() {
           <article className="flex flex-col gap-2">
             <SocialLoginBtn type="KAKAO" onClick={kakaoLoginHandler} />
             <SocialLoginBtn type="APPLE" onClick={() => signIn('apple')} />
-          </article> */}
+            {/* NOTE: 소셜로그인 테스트용 계정 */}
+            {/* <SocialLoginBtn type="GOOGLE" onClick={() => signIn('google')} /> */}
+            {/* <SocialLoginBtn type="NAVER" onClick={() => signIn('naver')} /> */}
+          </article>
         </section>
 
         <footer className="border-t border-white w-full pt-2">
