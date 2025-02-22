@@ -1,10 +1,10 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { HISTORY_TYPE_INFO } from '@/constants/historyType';
+import { HISTORY_TYPE_INFO } from '@/app/(primary)/history/_components/filter/HistoryDescription';
 import { formatDate } from '@/utils/formatDate';
 import { TimeFormat } from '@/types/FormatDate';
-import { Rate } from '@/types/History';
+import { Rate, DescriptionProps } from '@/types/History';
 
 interface BaseProps {
   date: string;
@@ -45,7 +45,16 @@ function TimeLineItem(props: Props) {
     content,
     redirectUrl,
   } = props as RatingProps & ReviewProps;
-  const { getIcon, iconAlt, renderDescription } = HISTORY_TYPE_INFO[type];
+  const { getIcon, iconAlt, renderDescription, needsRate, needsDescription } =
+    HISTORY_TYPE_INFO[type];
+
+  const getDescriptionProps = () => {
+    const historyProps: DescriptionProps = {};
+    if (needsRate) historyProps.rate = rate;
+    if (needsDescription) historyProps.description = content;
+    return historyProps;
+  };
+
   const dateTime = formatDate(date, 'MONTH_DATE_TIME') as TimeFormat;
 
   return (
@@ -72,20 +81,7 @@ function TimeLineItem(props: Props) {
               <p className="text-12 font-bold text-mainDarkGray">
                 {alcoholName}
               </p>
-              {renderDescription &&
-                renderDescription(
-                  ['START_RATING', 'RATING_MODIFY'].includes(type)
-                    ? rate
-                    : undefined,
-                  [
-                    'REVIEW_CREATE',
-                    'REVIEW_LIKES',
-                    'REVIEW_REPLY_CREATE',
-                    'BEST_REVIEW_SELECTED',
-                  ].includes(type)
-                    ? content
-                    : undefined,
-                )}
+              {renderDescription && renderDescription(getDescriptionProps())}
             </div>
             {imageSrc && (
               <Image

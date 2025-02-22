@@ -1,27 +1,21 @@
-import { ReactNode } from 'react';
 import { truncStr } from '@/utils/truncStr';
-import { Rate } from '@/types/History';
-
-export interface HistoryTypeInfo {
-  getIcon: (rate?: Rate | null) => string;
-  iconAlt: string;
-  renderDescription?: (rate?: Rate | null, description?: string) => ReactNode;
-}
+import { HistoryTypeInfo } from '@/types/History';
 
 export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
   START_RATING: {
     getIcon: () => '/icon/history/pick_filled_subcoral.svg',
     iconAlt: '별점 추가 아이콘',
-    renderDescription: (rate?: Rate | null) => (
+    renderDescription: ({ rate }) => (
       <div className="flex items-center">
         <p className="text-12 text-mainGray">
           <strong>별점 {rate?.currentValue}점</strong>을 주셨어요.
         </p>
       </div>
     ),
+    needsRate: true,
   },
   RATING_MODIFY: {
-    getIcon: (rate?: Rate | null) => {
+    getIcon: (rate) => {
       if (!rate?.ratingDiff) return '/icon/history/pick_filled_subcoral.svg';
 
       const ratingDiffStr = rate.ratingDiff.toString();
@@ -32,7 +26,7 @@ export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
       return '/icon/history/rating_filled_red.svg';
     },
     iconAlt: '별점 수정 아이콘',
-    renderDescription: (rate?: Rate | null) => {
+    renderDescription: ({ rate }) => {
       const ratingDiffStr = rate?.ratingDiff?.toString();
       const isNegative = ratingDiffStr?.startsWith('-');
       const ratingValue = isNegative ? ratingDiffStr?.slice(1) : ratingDiffStr;
@@ -54,6 +48,7 @@ export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
         </div>
       );
     },
+    needsRate: true,
   },
   RATING_DELETE: {
     getIcon: () => '/icon/history/rating_unfilled_subcoral.svg',
@@ -69,17 +64,18 @@ export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
   REVIEW_CREATE: {
     getIcon: () => '/icon/history/review_subcoral.svg',
     iconAlt: '리뷰 작성 아이콘',
-    renderDescription: (rate?: Rate | null, description?: string) => (
+    renderDescription: ({ description }) => (
       <p className="text-12 text-mainGray">
         <strong>[{description && truncStr(description, 7)}]리뷰를</strong>{' '}
         작성했어요!
       </p>
     ),
+    needsDescription: true,
   },
   REVIEW_LIKES: {
     getIcon: () => '/icon/history/like_unfilled_subcoral.svg',
     iconAlt: '리뷰 좋아요 아이콘',
-    renderDescription: (rate?: Rate | null, description?: string) => (
+    renderDescription: ({ description }) => (
       <p className="text-12 text-mainGray">
         <strong>
           [{description && truncStr(description, 7)}]리뷰에 좋아요
@@ -87,29 +83,32 @@ export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
         를 했어요.
       </p>
     ),
+    needsDescription: true,
   },
   BEST_REVIEW_SELECTED: {
     getIcon: () => '/icon/history/review_white.svg',
     iconAlt: '베스트 리뷰 아이콘',
-    renderDescription: (rate?: Rate | null, description?: string) => (
+    renderDescription: ({ description }) => (
       <p className="text-12 text-mainGray">
         <strong>
           [{description && truncStr(description, 7)}]베스트 리뷰가 됐어요!
         </strong>
       </p>
     ),
+    needsDescription: true,
   },
   REVIEW_REPLY_CREATE: {
     getIcon: () => '/icon/history/review_subcoral.svg',
     iconAlt: '리뷰 댓글 작성 아이콘',
-    renderDescription: (rate?: Rate | null, description?: string) => (
+    renderDescription: ({ description }) => (
       <p className="text-12 text-mainGray">
         <strong>[{description && truncStr(description, 7)}]리뷰에 댓글</strong>
         을 작성했어요!
       </p>
     ),
+    needsDescription: true,
   },
-  UNPICKED: {
+  UNPICK: {
     getIcon: () => '/icon/history/pick_unfilled_subcoral.svg',
     iconAlt: '찜해제 아이콘',
     renderDescription: () => (

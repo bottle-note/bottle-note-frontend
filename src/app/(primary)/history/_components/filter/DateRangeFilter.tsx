@@ -1,4 +1,4 @@
-import { format, subMonths, subYears, isAfter, isBefore } from 'date-fns';
+import { subMonths, subYears, isAfter, isBefore } from 'date-fns';
 import DateRangePicker from '@/components/DateRangePicker';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
 
@@ -30,7 +30,7 @@ export default function DateRangeFilter() {
     endDate: Date | null,
   ) => {
     const today = new Date();
-    const { minDate, maxDate } = getDateLimits();
+    const { minDate } = getDateLimits();
     let fixedStartDate = startDate;
     let fixedEndDate = endDate;
 
