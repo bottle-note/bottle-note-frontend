@@ -7,14 +7,29 @@ import { useBlockScroll } from '@/hooks/useBlockScroll';
 interface Props {
   isShow: boolean;
   children: React.ReactNode;
+  onBackdropClick?: () => void;
 }
 
-function BackDrop({ isShow, children }: Props) {
-  const ModalContents = isShow ? (
-    <main className="bg-mainBlack bg-opacity-30 w-full h-full fixed inset-0 z-50">
+function BackDrop({ isShow, children, onBackdropClick }: Props) {
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget && onBackdropClick) {
+      onBackdropClick();
+    }
+  };
+  const ModalContents = (
+    <div
+      className={`fixed inset-0 bg-black/60 z-40 ${isShow ? 'block' : 'hidden'}`}
+      onClick={handleBackdropClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape' && onBackdropClick) {
+          onBackdropClick();
+        }
+      }}
+    >
       {children}
-    </main>
-  ) : null;
+    </div>
+  );
+
   const { handleScroll } = useBlockScroll();
   const [isBrowser, setIsBrowser] = useState<boolean>(false);
 

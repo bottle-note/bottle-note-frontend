@@ -27,6 +27,17 @@ function SearchContainer({
   >(null);
 
   const onSearch = (value: string) => {
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) {
+      handleSearchCallback('');
+      if (updateSearchText) {
+        updateSearchText('');
+      }
+      setIsOnSearch(false);
+      return;
+    }
+
     SearchHistory.save(value);
 
     if (handleSearchCallback) {
@@ -64,7 +75,7 @@ function SearchContainer({
       </div>
 
       {isOnSearch && showRecentSearch && (
-        <div className="absolute w-full h-full z-10 p-5">
+        <div className="absolute w-full h-full z-40 p-3">
           <RecentSearch handleSearch={onSearch} />
         </div>
       )}

@@ -2,7 +2,10 @@ import { createPrivateKey } from 'crypto';
 import { SignJWT } from 'jose';
 
 export const getAppleToken = async () => {
-  const key = `-----BEGIN PRIVATE KEY-----\n${process.env.APPLE_KEY}\n-----END PRIVATE KEY-----\n`;
+  const keyContent = Buffer.from(process.env.APPLE_KEY!, 'base64').toString(
+    'utf-8',
+  );
+  const key = `-----BEGIN PRIVATE KEY-----\n${keyContent}\n-----END PRIVATE KEY-----`;
 
   const teamId = process.env.APPLE_TEAM_ID!;
   const appleId = process.env.APPLE_ID!;
