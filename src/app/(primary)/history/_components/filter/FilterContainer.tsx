@@ -1,5 +1,9 @@
 import React, { FC } from 'react';
-import DateRangePicker from '@/components/DateRangePicker';
+import { REVIEW_FILTER_TYPES, PICKS_STATUS } from '@/constants/history';
+import { ReviewFilterType, PicksStatus } from '@/types/History';
+import { handleFilterValues } from '@/utils/historyFilter';
+import { useHistoryFilterStore } from '@/store/historyFilterStore';
+import DateRangeFilter from './DateRangeFilter';
 import ToggleContainer from './ToggleContainer';
 import FilterOption from './FilterOption';
 import ToggleDarkGrayIcon from 'public/icon/arrow-down-darkgray.svg';
@@ -9,6 +13,7 @@ interface Props {
   title: string;
   data?: {
     name: string;
+    value: string;
     icon?: FC<{ color?: string; className?: string; size?: number }>;
   }[];
   gridCols?: number;
@@ -20,13 +25,63 @@ export default function FilterContainer({
   data,
   gridCols = 2,
 }: Props) {
-  if (data?.length === 0) return null;
-
-  const firstItem = data?.[0] ?? '';
+  const firstItem = (data && data[0]) ?? '';
   const restItems = data?.slice(1) ?? [];
 
-  const handleDate = (startDate: Date, endDate: Date) => {
-    console.log(startDate, endDate);
+  const {
+    state: filterState,
+    setRatingPoint,
+    setHistoryReviewFilterType,
+    setPicksStatus,
+  } = useHistoryFilterStore();
+
+  const handleFilter = (value: string) => {
+    switch (title) {
+      case '별점':
+        handleFilterValues(filterState.ratingPoint, value, setRatingPoint);
+        break;
+
+      case '리뷰':
+        handleFilterValues(
+          filterState.historyReviewFilterType,
+          value,
+          (values) => setHistoryReviewFilterType(values as ReviewFilterType[]),
+        );
+        break;
+
+      case '찜':
+        handleFilterValues(filterState.picksStatus, value, (values) =>
+          setPicksStatus(values as PicksStatus[]),
+        );
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const checkValueExists = (value: string) => {
+    switch (title) {
+      case '별점':
+        return filterState.ratingPoint.includes(value);
+      case '리뷰':
+        return filterState.historyReviewFilterType.includes(
+          value as keyof typeof REVIEW_FILTER_TYPES,
+        );
+      case '찜':
+        return filterState.picksStatus.includes(
+          value as keyof typeof PICKS_STATUS,
+        );
+      case '기간':
+        return (
+          filterState.date.startDate?.toISOString() ===
+            new Date(value).toISOString() ||
+          filterState.date.endDate?.toISOString() ===
+            new Date(value).toISOString()
+        );
+      default:
+        return false;
+    }
   };
 
   return (
@@ -38,8 +93,11 @@ export default function FilterContainer({
               <div className="mb-1">
                 <FilterOption
                   key={0}
-                  name={firstItem.name}
+                  value={firstItem.value}
+                  title={firstItem.name}
                   IconComponent={firstItem?.icon}
+                  onClick={handleFilter}
+                  isSelected={checkValueExists(firstItem.value)}
                 />
               </div>
             )}
@@ -53,21 +111,18 @@ export default function FilterContainer({
                 {restItems.map((item) => (
                   <FilterOption
                     key={item.name}
-                    name={item.name}
+                    value={item.value}
+                    title={item.name}
                     IconComponent={item.icon}
+                    onClick={handleFilter}
+                    isSelected={checkValueExists(item.value)}
                   />
                 ))}
               </div>
             )}
           </div>
         ) : (
-          <div className="px-5 py-3 bg-sectionWhite z-50">
-            <DateRangePicker
-              startDate={new Date('2025-01-25')}
-              endDate={new Date('2025-01-27')}
-              onChange={handleDate}
-            />
-          </div>
+          <DateRangeFilter />
         )}
       </ToggleContainer>
     </article>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import DatePicker from 'react-datepicker';
 import { format } from 'date-fns';
@@ -9,7 +9,9 @@ import 'react-datepicker/dist/react-datepicker.css';
 interface Props {
   startDate: Date;
   endDate: Date;
-  onChange: (start: Date, end: Date) => void;
+  onChange: (start: Date | null, end: Date | null) => void;
+  minDate: Date;
+  maxDate: Date;
   description?: string;
 }
 
@@ -17,33 +19,37 @@ export default function DateRangePicker({
   startDate,
   endDate,
   onChange,
+  minDate,
+  maxDate,
   description = '최대 2년까지 기간 조회가 가능해요.',
 }: Props) {
+  const ref = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const isWithinRange = (date: Date) => {
-    if (!startDate || !date) return false;
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
 
-    const compareDate = new Date(date.toDateString());
-    const compareStart = new Date(startDate.toDateString());
-    const compareEnd = endDate ? new Date(endDate.toDateString()) : null;
-
-    if (!compareEnd) return compareDate.getTime() === compareStart.getTime();
-    return compareDate >= compareStart && compareDate <= compareEnd;
-  };
-
-  const maxDate = new Date();
-  maxDate.setFullYear(maxDate.getFullYear() + 2);
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
-    <div className="relative">
+    <div className="relative" ref={ref}>
       <div className="rounded-lg border border-mainCoral py-2 px-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center">
             <span className="text-mainCoral text-12">
               {format(startDate, 'yy.MM.dd')}
             </span>
-            <button onClick={() => setIsOpen(true)} className="ml-2">
+            <button onClick={() => setIsOpen((prev) => !prev)} className="ml-2">
               <Image src={CalendarSubcoralIcon} alt="calendar" />
             </button>
           </div>
@@ -52,7 +58,7 @@ export default function DateRangePicker({
             <span className="text-mainCoral text-12">
               {format(endDate, 'yy.MM.dd')}
             </span>
-            <button onClick={() => setIsOpen(true)} className="ml-2">
+            <button onClick={() => setIsOpen((prev) => !prev)} className="ml-2">
               <Image src={CalendarSubcoralIcon} alt="calendar" />
             </button>
           </div>
@@ -66,31 +72,40 @@ export default function DateRangePicker({
       {isOpen && (
         <DatePicker
           locale={ko}
-          selected={startDate}
+          monthClassName={() => '!text-white'}
+          weekDayClassName={() => '!text-white'}
           onChange={(dates) => {
             const [start, end] = dates;
-            if (start && end) {
-              onChange(start, end);
-            }
-            setIsOpen(false);
+            onChange(start, end);
           }}
           startDate={startDate}
           endDate={endDate}
           selectsRange
           inline
+          minDate={minDate}
           maxDate={maxDate}
           dateFormat="yy.MM.dd"
           wrapperClassName="w-full"
           calendarClassName="bg-white !border-mainCoral rounded-lg shadow-lg"
           dayClassName={(date) => {
             if (!date) return '';
-            if (isWithinRange(date)) {
-              return '!bg-mainCoral !text-white !rounded-full';
+            if (
+              startDate &&
+              format(startDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
+            ) {
+              return '!bg-mainCoral !text-white !rounded-l-full';
+            }
+            if (
+              endDate &&
+              format(endDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
+            ) {
+              return '!bg-mainCoral !text-white !rounded-r-full';
+            }
+            if (startDate && endDate && date > startDate && date < endDate) {
+              return '!bg-mainCoral !text-white';
             }
             return '!rounded-full';
           }}
-          monthClassName={() => '!text-white'}
-          weekDayClassName={() => '!text-white'}
         />
       )}
     </div>
