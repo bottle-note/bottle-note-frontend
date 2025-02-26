@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import useModalStore from '@/store/modalStore';
@@ -16,6 +16,7 @@ export default function TagsForm() {
   const { handleModalState } = useModalStore();
   const { setValue, watch } = useFormContext();
   const [tagValue, setTagValue] = useState<string>('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const watchTags = watch('flavor_tags');
 
@@ -79,6 +80,28 @@ export default function TagsForm() {
     </div>
   );
 
+  useEffect(() => {
+    const handleFocus = () => {
+      if (inputRef.current) {
+        inputRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
+    };
+
+    const inputElement = inputRef.current;
+    if (inputElement) {
+      inputElement.addEventListener('focus', handleFocus);
+    }
+
+    return () => {
+      if (inputElement) {
+        inputElement.removeEventListener('focus', handleFocus);
+      }
+    };
+  }, []);
+
   return (
     <>
       <OptionsContainer
@@ -95,6 +118,7 @@ export default function TagsForm() {
             type="text"
             className="text-13 text-mainDarkGray w-full"
             placeholder="예) 반건조 된 건자두"
+            ref={inputRef}
             value={tagValue}
             maxLength={12}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
