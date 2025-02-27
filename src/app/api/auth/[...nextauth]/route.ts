@@ -9,6 +9,7 @@ import { AuthApi } from '../../AuthApi';
 const jwt = require('jsonwebtoken');
 
 const handler = NextAuth({
+  debug: true,
   providers: [
     GoogleProvider({
       clientId: `${process.env.GOOGLE_CLIENT_ID}`,
