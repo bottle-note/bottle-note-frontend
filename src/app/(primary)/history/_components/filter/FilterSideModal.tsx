@@ -6,6 +6,7 @@ import {
   REVIEW_FILTERS,
   LIKE_FILTERS,
 } from '@/constants/history';
+import { useHistoryFilterStore } from '@/store/historyFilterStore';
 import FilterContainer from './FilterContainer';
 import CloseGrayIcon from 'public/icon/close-gray.svg';
 
@@ -15,15 +16,17 @@ interface Props {
 }
 
 export default function FilterSideModal({ isOpen, onClose }: Props) {
+  const { resetFilter } = useHistoryFilterStore();
+
   return (
     <>
       {isOpen && (
-        <BackDrop isShow={isOpen}>
+        <BackDrop isShow={isOpen} onBackdropClick={onClose}>
           <section className="z-50 w-72 bg-white fixed right-0 top-0 h-full pt-16">
             <header className="flex items-center justify-center gap-[5.5rem] border-b border-brightGray pb-3">
               <button
                 className="border border-brightGray text-10 px-[10px] py-[2px] rounded"
-                onClick={onClose}
+                onClick={() => resetFilter()}
               >
                 초기화
               </button>
