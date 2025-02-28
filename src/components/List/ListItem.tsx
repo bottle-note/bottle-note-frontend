@@ -50,7 +50,7 @@ const ListItem = ({ data }: Props) => {
         <div className="flex flex-col items-end">
           <Star rating={rating} />
           <div
-            className={`flex justify-end text-xxs text-right tracking-wider ${!ratingCount && 'hidden'}`}
+            className={`flex justify-end text-10 text-right tracking-wider ${!ratingCount && 'hidden'}`}
           >
             (
             <Image src={RatingCountIcon} alt="별점 평가 참여자 수" />

@@ -46,7 +46,7 @@ function AlcoholBox({ data, alcoholId, isPicked, setIsPicked }: any) {
                   <Star
                     rating={data.alcohols.rating}
                     size={27}
-                    style="text-white text-27 font-bold"
+                    styleProps="text-white text-27 leading-[40px] font-bold"
                     color="white"
                   />
                 )}
