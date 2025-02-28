@@ -39,11 +39,11 @@
   }
 
   .modal-mainText {
-    @apply text-20 text-subCoral font-medium whitespace-pre-wrap;
+    @apply text-20 text-subCoral font-medium whitespace-pre-wrap mb-2;
   }
 
   .modal-subText {
-    @apply text-16 text-mainDarkGray whitespace-pre-wrap;
+    @apply text-16 text-mainDarkGray whitespace-pre-wrap mb-3;
   }
 }
 
