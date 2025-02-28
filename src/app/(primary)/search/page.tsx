@@ -26,12 +26,12 @@ export default function Search() {
   const router = useRouter();
   const { popularList } = usePopularList();
 
-  const currCategory = useSearchParams().get('category');
+  const currCategory = useSearchParams().get('category') as Category;
   const currSearchKeyword = useSearchParams().get('query');
 
   const initialState: InitialState = {
-    keyword: '',
-    category: '',
+    category: currCategory || '',
+    keyword: currSearchKeyword || '',
     regionId: '',
     sortType: SORT_TYPE.POPULAR,
     sortOrder: SORT_ORDER.DESC,
@@ -140,8 +140,8 @@ export default function Search() {
                 {alcoholList &&
                   [...alcoholList.map((list) => list.data.alcohols)]
                     .flat()
-                    .map((item: AlcoholAPI, idx) => (
-                      <List.Item key={`${item.alcoholId}_${idx}`} data={item} />
+                    .map((item: AlcoholAPI) => (
+                      <List.Item key={`${item.alcoholId}`} data={item} />
                     ))}
               </List>
               <div ref={targetRef} />
