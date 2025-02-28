@@ -12,6 +12,7 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { AlcoholAPI } from '@/types/Alcohol';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { REGIONS } from '@/constants/common';
+import LinkButton from '@/components/LinkButton';
 import SearchContainer from '../../../components/Search/SearchContainer';
 
 interface InitialState {
@@ -140,13 +141,27 @@ export default function Search() {
                 {alcoholList &&
                   [...alcoholList.map((list) => list.data.alcohols)]
                     .flat()
-                    .map((item: AlcoholAPI) => (
-                      <List.Item key={`${item.alcoholId}`} data={item} />
+                    .map((item: AlcoholAPI, idx) => (
+                      <List.Item key={`${item.alcoholId}_${idx}`} data={item} />
                     ))}
               </List>
+
               <div ref={targetRef} />
             </>
           )}
+
+          <LinkButton
+            data={{
+              engName: 'NO RESULTS',
+              korName: '혹시 찾는 술이 없으신가요?',
+              linkSrc: `/history`,
+              icon: true,
+              handleBeforeRouteChange: (e) => {
+                e.preventDefault();
+                router.push('/inquire/register');
+              },
+            }}
+          />
         </section>
       </main>
     </Suspense>
