@@ -191,13 +191,11 @@ export default function History() {
           handleSearchCallback={handleSearchCallback}
           styleProps="p-5"
         />
-        <section className="p-5 mb-10">
-          <div className="flex items-center justify-between mb-[0.65rem]">
-            {historyData ? (
-              <span className="text-xs text-mainGray shrink-0">{`총 ${historyData[0].data.totalCount}개`}</span>
-            ) : (
-              <span />
-            )}
+        <section className="p-5 mb-10 flex flex-col items-center w-full">
+          <div className="flex items-center justify-between mb-[0.65rem] w-full">
+            <span className="text-xs text-mainGray shrink-0">
+              {historyData ? `총 ${historyData[0].data.totalCount}개` : ''}
+            </span>
             <div className="flex items-center">
               <Image
                 src={FilterIcon}
@@ -208,7 +206,7 @@ export default function History() {
           </div>
           {dataChecking && (
             <>
-              <div className="border-t border-mainGray/30 mb-[0.65rem]" />
+              <div className="border-t border-mainGray/30 mb-[0.65rem] w-full" />
               <List isListFirstLoading={isLoading} isScrollLoading={isFetching}>
                 <List.Section>
                   <article className="relative w-[339px]">
