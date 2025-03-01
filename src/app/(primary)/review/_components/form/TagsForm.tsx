@@ -83,27 +83,6 @@ export default function TagsForm() {
 
   useScrollIntoView(inputRef);
 
-  // useEffect(() => {
-  //   const handleFocus = () => {
-  //     if (inputRef.current) {
-  //       inputRef.current.scrollIntoView({
-  //         behavior: 'smooth',
-  //       });
-  //     }
-  //   };
-
-  //   const inputElement = inputRef.current;
-  //   if (inputElement) {
-  //     inputElement.addEventListener('focus', handleFocus);
-  //   }
-
-  //   return () => {
-  //     if (inputElement) {
-  //       inputElement.removeEventListener('focus', handleFocus);
-  //     }
-  //   };
-  // }, []);
-
   return (
     <>
       <OptionsContainer
