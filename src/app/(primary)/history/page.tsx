@@ -111,8 +111,7 @@ export default function History() {
 
   const dataChecking =
     historyData &&
-    historyData[0].data?.userHistories?.length > 0 &&
-    historyData[0].data.totalCount !== 0 &&
+    !historyData[0].meta?.pageable?.hasNext &&
     !error &&
     !isLoading;
 
@@ -267,7 +266,6 @@ export default function History() {
                         );
                       })}
                     </div>
-                    {/* 데이터가 제일 마지막 일때만 나오게 하는 조건 추가 필요 or 화면이 제일 마지막에 도달했을 때? */}
                     <div className="relative z-10 pb-3 mt-5">
                       <div className="relative pb-5">
                         <div className="absolute left-0 right-0 h-px bg-bgGray" />
