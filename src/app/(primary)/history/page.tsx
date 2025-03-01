@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import NavLayout from '@/app/(primary)/_components/NavLayout';
 import SearchContainer from '@/components/Search/SearchContainer';
@@ -25,6 +26,7 @@ import { HistoryEmptyState } from './_components/HistoryEmptyState';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
 
 export default function History() {
+  const queryClient = useQueryClient();
   const router = useRouter();
   const { userData } = AuthService;
   const userId = userData?.userId;
@@ -38,7 +40,7 @@ export default function History() {
     yearMonths: [],
   });
 
-  const { getQueryParams, setKeyword } = useHistoryFilterStore();
+  const { getQueryParams, setKeyword, resetFilter } = useHistoryFilterStore();
 
   const {
     data: historyData,
@@ -148,6 +150,22 @@ export default function History() {
     setKeyword(keyword);
     await handleFilterChange();
   };
+
+  useEffect(() => {
+    return () => {
+      setIsOpen(false);
+      setCurrentParams('');
+      setProcessedHistory({
+        groupedHistory: {},
+        yearMonths: [],
+      });
+      resetFilter();
+
+      queryClient.removeQueries({
+        queryKey: ['history'],
+      });
+    };
+  }, [resetFilter, queryClient]);
 
   return (
     <NavLayout>
