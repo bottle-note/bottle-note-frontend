@@ -170,7 +170,7 @@ export default function Search() {
             data={{
               engName: 'NO RESULTS',
               korName: '혹시 찾는 술이 없으신가요?',
-              linkSrc: `/history`,
+              linkSrc: `/inquire/register`,
               icon: true,
               handleBeforeRouteChange: (e) => {
                 e.preventDefault();
