@@ -15,6 +15,7 @@ import { REGIONS } from '@/constants/common';
 import LinkButton from '@/components/LinkButton';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
+import { AuthService } from '@/lib/AuthService';
 import SearchContainer from '../../../components/Search/SearchContainer';
 
 interface InitialState {
@@ -28,7 +29,7 @@ interface InitialState {
 export default function Search() {
   const router = useRouter();
   const { popularList } = usePopularList();
-
+  const { isLogin } = AuthService;
   const currCategory = useSearchParams().get('category') as Category;
   const currSearchKeyword = useSearchParams().get('query');
 
@@ -63,7 +64,9 @@ export default function Search() {
     },
   });
 
-  const { handleModalState, handleCloseModal } = useModalStore();
+  const { handleModalState, handleCloseModal, handleLoginModal } =
+    useModalStore();
+
   const handleClickInquire = () => {
     handleModalState({
       isShowModal: true,
@@ -71,6 +74,11 @@ export default function Search() {
       mainText: '위스키 추가 요청을 하겠습니까?',
       subText: '문의글을 작성하여 위스키를 요청할까요?',
       handleConfirm: () => {
+        if (!isLogin) {
+          handleCloseModal();
+          handleLoginModal();
+          return;
+        }
         handleCloseModal();
         router.push('/inquire/register');
       },
