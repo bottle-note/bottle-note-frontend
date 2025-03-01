@@ -63,13 +63,14 @@ function Timeline() {
   const historyList: History[] =
     (historyData && historyData[0].data.userHistories) || [];
   const groupedHistory = groupHistoryByDate(historyList, {
-    limit: 7,
+    limit: 1,
     shouldLimit: true,
   });
   const gradientHeight = useMemo(() => {
-    return historyData && historyData[0].data.totalCount <= 3
-      ? '150px'
-      : '400px';
+    // return historyData && historyData[0].data.totalCount <= 3
+    //   ? '150px'
+    //   : '400px';
+    return '150px';
   }, [historyData]);
 
   return (
@@ -83,7 +84,7 @@ function Timeline() {
             </p>
           </div>
           <div className="border-t border-mainGray/30 my-3" />
-          <div className="relative w-[339px]">
+          <div className="relative w-[339px] mx-auto">
             <div className="absolute left-[2.7rem] top-6 bottom-0 w-px border-l border-dashed border-subCoral z-0" />
             <div className="relative z-10 pb-3">
               {Object.entries(groupedHistory).map(
