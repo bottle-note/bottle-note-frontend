@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import useModalStore from '@/store/modalStore';
+import { useScrollIntoView } from '@/hooks/useScrollIntoView';
 import HoverTouchBox from '@/components/HoverTouchBox';
 import OptionsContainer from '../OptionsContainer';
 
@@ -80,27 +81,28 @@ export default function TagsForm() {
     </div>
   );
 
-  useEffect(() => {
-    const handleFocus = () => {
-      if (inputRef.current) {
-        inputRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      }
-    };
+  useScrollIntoView(inputRef);
 
-    const inputElement = inputRef.current;
-    if (inputElement) {
-      inputElement.addEventListener('focus', handleFocus);
-    }
+  // useEffect(() => {
+  //   const handleFocus = () => {
+  //     if (inputRef.current) {
+  //       inputRef.current.scrollIntoView({
+  //         behavior: 'smooth',
+  //       });
+  //     }
+  //   };
 
-    return () => {
-      if (inputElement) {
-        inputElement.removeEventListener('focus', handleFocus);
-      }
-    };
-  }, []);
+  //   const inputElement = inputRef.current;
+  //   if (inputElement) {
+  //     inputElement.addEventListener('focus', handleFocus);
+  //   }
+
+  //   return () => {
+  //     if (inputElement) {
+  //       inputElement.removeEventListener('focus', handleFocus);
+  //     }
+  //   };
+  // }, []);
 
   return (
     <>
