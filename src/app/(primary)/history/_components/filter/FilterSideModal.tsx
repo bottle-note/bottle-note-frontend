@@ -22,7 +22,7 @@ export default function FilterSideModal({ isOpen, onClose }: Props) {
     <>
       {isOpen && (
         <BackDrop isShow={isOpen} onBackdropClick={onClose}>
-          <section className="z-50 w-72 bg-white fixed right-0 top-0 h-full pt-16">
+          <section className="z-50 w-72 bg-white fixed right-0 top-0 h-full pt-16 flex flex-col">
             <header className="flex items-center justify-center gap-[5.5rem] border-b border-brightGray pb-3">
               <button
                 className="border border-brightGray text-10 px-[10px] py-[2px] rounded"
@@ -35,10 +35,16 @@ export default function FilterSideModal({ isOpen, onClose }: Props) {
                 <Image src={CloseGrayIcon} alt="close" />
               </button>
             </header>
-            <FilterContainer title="별점" data={RATINGS_FILTERS} />
-            <FilterContainer title="리뷰" data={REVIEW_FILTERS} gridCols={3} />
-            <FilterContainer title="찜" data={LIKE_FILTERS} />
-            <FilterContainer title="기간" type="DATE" />
+            <div className="flex-1 overflow-y-auto">
+              <FilterContainer title="별점" data={RATINGS_FILTERS} />
+              <FilterContainer
+                title="리뷰"
+                data={REVIEW_FILTERS}
+                gridCols={3}
+              />
+              <FilterContainer title="찜" data={LIKE_FILTERS} />
+              <FilterContainer title="기간" type="DATE" />
+            </div>
           </section>
         </BackDrop>
       )}
