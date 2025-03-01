@@ -63,14 +63,13 @@ function Timeline() {
   const historyList: History[] =
     (historyData && historyData[0].data.userHistories) || [];
   const groupedHistory = groupHistoryByDate(historyList, {
-    limit: 1,
+    limit: 7,
     shouldLimit: true,
   });
   const gradientHeight = useMemo(() => {
-    // return historyData && historyData[0].data.totalCount <= 3
-    //   ? '150px'
-    //   : '400px';
-    return '150px';
+    return historyData && historyData[0].data.totalCount <= 3
+      ? '150px'
+      : '400px';
   }, [historyData]);
 
   return (
