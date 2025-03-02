@@ -2,11 +2,7 @@ import { LinkData } from '@/types/LinkButton';
 import { CATEGORY_MENUS } from '@/constants/common';
 import { CATEGORY_IMAGES } from '@/constants/categoryImg';
 
-type Category = {
-  eng: string;
-  kor: string;
-  link: string;
-};
+type Category = (typeof CATEGORY_MENUS)[keyof typeof CATEGORY_MENUS];
 
 export function getFilteredCategories() {
   return Object.values(CATEGORY_MENUS).filter(

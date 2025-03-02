@@ -46,6 +46,7 @@ const TYPE_OPTIONS = [
   },
 ];
 
+// TODO: 탭 초기값 props 로 받아오도록 수정
 export default function InquireRegister() {
   const router = useRouter();
   const { state, handleModalState } = useModalStore();
