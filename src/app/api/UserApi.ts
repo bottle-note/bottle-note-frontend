@@ -1,6 +1,6 @@
 import { AlcoholAPI } from '@/types/Alcohol';
 import { ApiResponse, MyBottleQueryParams } from '@/types/common';
-import { RelationInfo, UserInfoApi } from '@/types/User';
+import { RelationInfo, UserInfoApi, CurrentUserInfoApi } from '@/types/User';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 export const UserApi = {
@@ -163,6 +163,14 @@ export const UserApi = {
       imageUrl: string;
       message: string;
     }> = await response.data;
+
+    return result;
+  },
+
+  async getCurUserInfo(): Promise<CurrentUserInfoApi> {
+    const response = await fetchWithAuth(`/bottle-api/users/current`);
+
+    const result = await response.data;
 
     return result;
   },

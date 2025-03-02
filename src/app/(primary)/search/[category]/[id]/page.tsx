@@ -18,6 +18,7 @@ import { truncStr } from '@/utils/truncStr';
 import { shareOrCopy } from '@/utils/shareOrCopy';
 import { AuthService } from '@/lib/AuthService';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import { UserApi } from '@/app/api/UserApi';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { AlcoholDetails } from '@/types/Alcohol';
@@ -32,7 +33,7 @@ interface DetailItem {
 function SearchAlcohol() {
   const router = useRouter();
   const params = useParams();
-  const { isLogin, userData } = AuthService;
+  const { isLogin } = AuthService;
   const { category, id: alcoholId } = params;
   const { state, handleModalState, handleLoginModal } = useModalStore();
 
@@ -40,6 +41,7 @@ function SearchAlcohol() {
   const [alcoholDetails, setAlcoholDetails] = useState<DetailItem[]>([]);
   const [isPicked, setIsPicked] = useState<boolean>(false);
   const [rate, setRate] = useState(0);
+  const [userNickName, setUserNickName] = useState<string>('');
 
   const fetchAlcoholDetails = async (id: string) => {
     try {
@@ -61,6 +63,18 @@ function SearchAlcohol() {
     }
   };
 
+  const getCurrentUserInfo = async () => {
+    try {
+      const result = await UserApi.getCurUserInfo();
+      if (result) {
+        setUserNickName(result.nickname);
+        console.log(result);
+      }
+    } catch (error) {
+      console.error('Failed to fetch current user info:', error);
+    }
+  };
+
   const fetchUserRating = async (alcohol: string) => {
     try {
       const ratingResult = await RateApi.getUserRating(alcohol);
@@ -77,6 +91,7 @@ function SearchAlcohol() {
 
       if (isLogin) {
         fetchUserRating(alcoholIdString);
+        getCurrentUserInfo();
       }
     }
   }, [alcoholId, isLogin]);
@@ -96,7 +111,7 @@ function SearchAlcohol() {
       return (
         <div className="text-center text-12 space-y-2">
           <div>
-            <p>{`${userData?.userId}`}님의</p>
+            <p>{`${userNickName}`}님의</p>
             <p>
               <span className="text-subCoral font-medium">
                 평균 별점은 {`${myAvgRating}`}점
