@@ -3,14 +3,14 @@ import Image from 'next/image';
 interface Props {
   rating: number;
   size?: number;
-  style?: string;
+  styleProps?: string;
   color?: 'main' | 'white';
 }
 
 const Star = ({
   rating,
   size = 18,
-  style = 'text-subCoral font-semibold text-15',
+  styleProps = 'text-subCoral font-semibold text-15',
   color = 'main',
 }: Props) => {
   return (
@@ -30,7 +30,7 @@ const Star = ({
           alt="star"
         />
       )}
-      <span className={`${style} w-5 whitespace-pre`}>
+      <span className={`${styleProps} w-5 whitespace-pre`}>
         {rating ? rating.toFixed(1) : '  -'}
       </span>
     </div>

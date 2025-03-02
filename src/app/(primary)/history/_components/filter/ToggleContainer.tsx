@@ -14,7 +14,7 @@ export default function ToggleContainer({
   title,
   subTitle = '',
   toggleIcon = ToggleIcon,
-  forceOpen = false,
+  forceOpen = true,
   children,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);

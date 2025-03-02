@@ -51,10 +51,7 @@ export default function RecentSearch({ handleSearch, keyValue }: Props) {
       </article>
 
       {list.length > 0 && (
-        <button
-          className="text-xxs text-mainGray"
-          onMouseDown={handleDeleteAll}
-        >
+        <button className="text-10 text-mainGray" onMouseDown={handleDeleteAll}>
           전체기록삭제
         </button>
       )}

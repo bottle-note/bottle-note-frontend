@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import NavLayout from '@/app/(primary)/_components/NavLayout';
 import SearchContainer from '@/components/Search/SearchContainer';
@@ -25,6 +26,7 @@ import { HistoryEmptyState } from './_components/HistoryEmptyState';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
 
 export default function History() {
+  const queryClient = useQueryClient();
   const router = useRouter();
   const { userData } = AuthService;
   const userId = userData?.userId;
@@ -38,7 +40,7 @@ export default function History() {
     yearMonths: [],
   });
 
-  const { getQueryParams, setKeyword } = useHistoryFilterStore();
+  const { getQueryParams, setKeyword, resetFilter } = useHistoryFilterStore();
 
   const {
     data: historyData,
@@ -109,8 +111,7 @@ export default function History() {
 
   const dataChecking =
     historyData &&
-    historyData[0].data?.userHistories?.length > 0 &&
-    historyData[0].data.totalCount !== 0 &&
+    !historyData[0].meta?.pageable?.hasNext &&
     !error &&
     !isLoading;
 
@@ -149,6 +150,22 @@ export default function History() {
     await handleFilterChange();
   };
 
+  useEffect(() => {
+    return () => {
+      setIsOpen(false);
+      setCurrentParams('');
+      setProcessedHistory({
+        groupedHistory: {},
+        yearMonths: [],
+      });
+      resetFilter();
+
+      queryClient.removeQueries({
+        queryKey: ['history'],
+      });
+    };
+  }, [resetFilter, queryClient]);
+
   return (
     <NavLayout>
       <SubHeader bgColor="bg-bgGray">
@@ -174,13 +191,11 @@ export default function History() {
           handleSearchCallback={handleSearchCallback}
           styleProps="p-5"
         />
-        <section className="p-5 mb-10">
-          <div className="flex items-center justify-between mb-[0.65rem]">
-            {historyData ? (
-              <span className="text-xs text-mainGray shrink-0">{`총 ${historyData[0].data.totalCount}개`}</span>
-            ) : (
-              <span />
-            )}
+        <section className="p-5 mb-10 flex flex-col items-center w-full">
+          <div className="flex items-center justify-between mb-[0.65rem] w-full">
+            <span className="text-xs text-mainGray shrink-0">
+              {historyData ? `총 ${historyData[0].data.totalCount}개` : ''}
+            </span>
             <div className="flex items-center">
               <Image
                 src={FilterIcon}
@@ -191,7 +206,7 @@ export default function History() {
           </div>
           {dataChecking && (
             <>
-              <div className="border-t border-mainGray/30 mb-[0.65rem]" />
+              <div className="border-t border-mainGray/30 mb-[0.65rem] w-full" />
               <List isListFirstLoading={isLoading} isScrollLoading={isFetching}>
                 <List.Section>
                   <article className="relative w-[339px]">
@@ -249,7 +264,6 @@ export default function History() {
                         );
                       })}
                     </div>
-                    {/* 데이터가 제일 마지막 일때만 나오게 하는 조건 추가 필요 or 화면이 제일 마지막에 도달했을 때? */}
                     <div className="relative z-10 pb-3 mt-5">
                       <div className="relative pb-5">
                         <div className="absolute left-0 right-0 h-px bg-bgGray" />

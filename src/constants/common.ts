@@ -3,29 +3,29 @@ export const CATEGORY_MENUS = {
   SingleMalt: {
     kor: '싱글몰트',
     eng: 'Single malt',
-    link: 'singleMalt',
+    link: 'SINGLE_MALT',
     categoryGroup: 'SINGLE_MALT',
   },
   BlendedMalt: {
     kor: '블렌디드 몰트',
     eng: 'Blended malt',
-    link: 'blendedMalt',
+    link: 'BLENDED_MALT',
     categoryGroup: 'BLENDED_MALT',
   },
   Blended: {
     kor: '블렌디드',
     eng: 'Blended',
-    link: 'blended',
+    link: 'BLEND',
     categoryGroup: 'BLEND',
   },
   America: {
     kor: '아메리카(버번)',
     eng: 'America(Bourbon)',
-    link: 'america',
+    link: 'BOURBON',
     categoryGroup: 'BOURBON',
   },
-  Rye: { kor: '라이', eng: 'Rye', link: 'rye', categoryGroup: 'RYE' },
-  Other: { kor: '기타', eng: 'Other', link: 'other', categoryGroup: 'OTHER' },
+  Rye: { kor: '라이', eng: 'Rye', link: 'RYE', categoryGroup: 'RYE' },
+  Other: { kor: '기타', eng: 'Other', link: 'OTHER', categoryGroup: 'OTHER' },
 } as const;
 
 export const S3_URL_PATH = {
