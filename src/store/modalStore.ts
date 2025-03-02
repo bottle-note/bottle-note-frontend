@@ -54,7 +54,9 @@ const useModalStore = create<ModalStore>((set) => ({
       },
     })),
   handleCloseModal: () => {
-    set((state) => ({ state: { ...state.state, isShowModal: false } }));
+    set((state) => ({
+      state: { ...state.state, mainText: '', subText: '', isShowModal: false },
+    }));
   },
   handleLoginModal: () =>
     set((state) => ({
