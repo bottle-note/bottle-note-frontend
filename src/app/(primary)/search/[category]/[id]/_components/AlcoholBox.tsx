@@ -7,17 +7,24 @@ import { AuthService } from '@/lib/AuthService';
 import Star from '@/components/Star';
 import { truncStr } from '@/utils/truncStr';
 import useModalStore from '@/store/modalStore';
+import { AlcoholInfo } from '@/types/Alcohol';
 
-function AlcoholBox({ data, alcoholId, isPicked, setIsPicked }: any) {
+interface Props {
+  data: AlcoholInfo;
+  isPicked: boolean;
+  setIsPicked: (isPicked: boolean) => void;
+}
+
+function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
   const router = useRouter();
   const { isLogin } = AuthService;
   const { handleLoginModal } = useModalStore();
 
   return (
     <section className="relative z-10 flex px-5 pb-6 space-x-5">
-      {data?.alcohols?.alcoholUrlImg && (
+      {data?.alcoholUrlImg && (
         <AlcoholImage
-          imageUrl={data?.alcohols?.alcoholUrlImg}
+          imageUrl={data?.alcoholUrlImg}
           outerHeightClass="h-48"
           outerWidthClass="w-28"
           innerHeightClass="h-44"
@@ -25,33 +32,32 @@ function AlcoholBox({ data, alcoholId, isPicked, setIsPicked }: any) {
         />
       )}
       <article className="flex-1 py-3 text-white space-y-2 overflow-x-hidden">
-        {data?.alcohols && (
+        {data && (
           <>
             <div className="space-y-1">
               <Label
-                name={data.alcohols.korCategory}
+                name={data.korCategory}
                 styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
               />
               <h1 className="text-20 font-semibold whitespace-normal break-words">
-                {data.alcohols.korName && truncStr(data.alcohols.korName, 27)}
+                {data.korName && truncStr(data.korName, 27)}
               </h1>
               <p className="text-13 whitespace-normal break-words">
-                {data.alcohols.engName &&
-                  truncStr(data.alcohols.engName.toUpperCase(), 45)}
+                {data.engName && truncStr(data.engName.toUpperCase(), 45)}
               </p>
             </div>
             <div className="space-y-1">
               <div className="flex items-end gap-7">
-                {data.alcohols.rating && (
+                {data.rating && (
                   <Star
-                    rating={data.alcohols.rating}
+                    rating={data.rating}
                     size={27}
                     style="text-white text-27 font-bold"
                     color="white"
                   />
                 )}
                 <div className="text-10 font-bold mb-1">
-                  (유저평가 {data.alcohols.totalRatingsCount})
+                  (유저평가 {data.totalRatingsCount})
                 </div>
               </div>
               <div className="border-[0.5px] border-white" />
@@ -59,11 +65,11 @@ function AlcoholBox({ data, alcoholId, isPicked, setIsPicked }: any) {
                 <button
                   className="text-12 font-bold flex"
                   onClick={() => {
-                    if (!isLogin || !alcoholId) {
+                    if (!isLogin || !data.alcoholId) {
                       handleLoginModal();
                       return;
                     }
-                    router.push(`/review/register?alcoholId=${alcoholId}`);
+                    router.push(`/review/register?alcoholId=${data.alcoholId}`);
                   }}
                 >
                   <Image
@@ -79,10 +85,10 @@ function AlcoholBox({ data, alcoholId, isPicked, setIsPicked }: any) {
                 <PickBtn
                   isPicked={isPicked}
                   handleUpdatePicked={() => setIsPicked(!isPicked)}
-                  handleError={() => setIsPicked(data?.alcohols?.isPicked)}
+                  handleError={() => setIsPicked(data.isPicked)}
                   handleNotLogin={handleLoginModal}
                   pickBtnName="찜하기"
-                  alcoholId={Number(alcoholId)}
+                  alcoholId={Number(data.alcoholId)}
                 />
               </div>
             </div>

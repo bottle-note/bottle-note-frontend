@@ -32,7 +32,7 @@ interface DetailItem {
 function SearchAlcohol() {
   const router = useRouter();
   const params = useParams();
-  const { isLogin } = AuthService;
+  const { isLogin, userData } = AuthService;
   const { category, id: alcoholId } = params;
   const { state, handleModalState, handleLoginModal } = useModalStore();
 
@@ -91,6 +91,39 @@ function SearchAlcohol() {
     });
   };
 
+  const getRatingMessage = (myAvgRating: number, myRating: number) => {
+    if (myAvgRating !== 0 && myRating !== 0)
+      return (
+        <div className="text-center text-12 space-y-2">
+          <div>
+            <p>{`${userData?.userId}`}님의</p>
+            <p>
+              <span className="text-subCoral font-medium">
+                평균 별점은 {`${myAvgRating}`}점
+              </span>
+              이에요.
+            </p>
+          </div>
+          <div>
+            <p>최근 평가한 별점은 {`${myRating}`}점이에요.</p>
+            <p>다른 별점을 주시고 싶으시면 언제든지 변경해보세요!</p>
+          </div>
+        </div>
+      );
+
+    if (myAvgRating !== 0 && myRating === 0)
+      return (
+        <div className="text-center text-12">
+          <p>최근 별점 {`${myAvgRating}`}을 주셨어요.</p>
+          <p>별점이 없어요! 별점 평가를 안하실건가요?</p>
+        </div>
+      );
+
+    return (
+      <div className="text-center text-12">이 술에 대한 평가를 남겨보세요.</div>
+    );
+  };
+
   return (
     <>
       {alcoholDetails && data ? (
@@ -138,18 +171,17 @@ function SearchAlcohol() {
                 </SubHeader.Right>
               </SubHeader>
               <AlcoholBox
-                data={data}
-                alcoholId={alcoholId}
+                data={data?.alcohols}
                 isPicked={isPicked}
                 setIsPicked={setIsPicked}
               />
             </div>
             <div className="mb-5">
-              <article className="grid place-items-center space-y-2 py-5">
-                {/* API 확인 후 수정 필요 */}
-                <p className="text-10 text-mainDarkGray">
-                  이 술에 대한 평가를 남겨보세요.
-                </p>
+              <article className="grid place-items-center space-y-3 py-5">
+                {getRatingMessage(
+                  data?.alcohols?.myAvgRating,
+                  data?.alcohols?.myRating,
+                )}
                 <div>
                   <StarRating rate={rate} size={50} handleRate={handleRate} />
                 </div>

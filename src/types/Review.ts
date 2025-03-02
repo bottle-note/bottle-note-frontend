@@ -19,6 +19,8 @@ export interface AlcoholInfo {
   engCategory: string;
   imageUrl: string;
   isPicked: boolean;
+  rating: number;
+  totalRatingsCount: number;
 }
 
 export interface Review {
@@ -30,7 +32,6 @@ export interface Review {
   replyCount: number;
   reviewImageUrl: string | null;
   userInfo: ReviewUserInfo;
-  rating: number;
   viewCount: number;
   locationInfo: ReviewLocationInfo;
   status: 'PUBLIC' | 'PRIVATE';
@@ -38,8 +39,10 @@ export interface Review {
   isLikedByMe: boolean;
   hasReplyByMe: boolean;
   isBestReview: boolean;
-  tastingTagList?: string[];
+  alcoholsTastingTags?: string[];
   createAt: string;
+  myRating: number;
+  myAvgRating: number;
 }
 
 export interface FormValues {
