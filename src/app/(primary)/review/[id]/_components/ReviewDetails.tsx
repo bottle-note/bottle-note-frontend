@@ -96,7 +96,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
             <Star
               rating={data.reviewInfo?.myRating ?? 0}
               size={25}
-              style="text-20 text-subCoral font-semibold"
+              styleProps="text-20 text-subCoral font-semibold"
             />
           </article>
           <article className="flex space-x-2 items-center">

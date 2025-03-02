@@ -31,6 +31,7 @@ function LoginModal({ handleClose }: Props) {
           <Button
             btnName="로그인"
             onClick={() => {
+              handleClose();
               router.push('/login');
             }}
           />

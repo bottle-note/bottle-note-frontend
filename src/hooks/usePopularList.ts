@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { AlcoholAPI } from '@/types/Alcohol';
 
@@ -8,7 +8,7 @@ export const usePopularList = () => {
     [],
   );
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     (async () => {
       setIsLoading(true);
       const result = await AlcoholsApi.getPopular();
