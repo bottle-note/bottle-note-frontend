@@ -68,7 +68,6 @@ function SearchAlcohol() {
       const result = await UserApi.getCurUserInfo();
       if (result) {
         setUserNickName(result.nickname);
-        console.log(result);
       }
     } catch (error) {
       console.error('Failed to fetch current user info:', error);
