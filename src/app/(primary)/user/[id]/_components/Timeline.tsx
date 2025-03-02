@@ -66,10 +66,13 @@ function Timeline() {
     limit: 7,
     shouldLimit: true,
   });
+
   const gradientHeight = useMemo(() => {
-    return historyData && historyData[0].data.totalCount <= 3
-      ? '150px'
-      : '400px';
+    if (historyData) {
+      if (historyData[0].data.totalCount < 3) return '0px';
+      if (historyData[0].data.totalCount === 3) return '150px';
+      return '400px';
+    }
   }, [historyData]);
 
   return (
@@ -83,7 +86,7 @@ function Timeline() {
             </p>
           </div>
           <div className="border-t border-mainGray/30 my-3" />
-          <div className="relative w-[339px]">
+          <div className="relative w-[339px] mx-auto">
             <div className="absolute left-[2.7rem] top-6 bottom-0 w-px border-l border-dashed border-subCoral z-0" />
             <div className="relative z-10 pb-3">
               {Object.entries(groupedHistory).map(
