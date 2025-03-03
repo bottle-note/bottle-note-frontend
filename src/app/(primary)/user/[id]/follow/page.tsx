@@ -97,7 +97,7 @@ export default function UserFollowPage({
                   .map((item: RelationInfo, idx) => (
                     <FollowerListItem
                       key={`${item.userId}_${idx}`}
-                      userInfo={item}
+                      userInfo={{ ...item, userId: item.followUserId }}
                     />
                   ))}
               </ListSection>
