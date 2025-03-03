@@ -62,17 +62,17 @@ function ReviewModify() {
         const locationInfo = reviewInfo.locationInfo || {};
 
         setAlcoholId(result.alcoholInfo.alcoholId.toString());
-        setInitialRating(result.reviewInfo.rating);
+        setInitialRating(result.reviewInfo.myRating);
 
         reset({
           review: reviewInfo.reviewContent,
           status: reviewInfo.status || 'PUBLIC',
           price_type: reviewInfo.sizeType || null,
           price: reviewInfo.price || null,
-          flavor_tags: reviewInfo.tastingTagList || [],
+          flavor_tags: reviewInfo.alcoholsTastingTags || [],
           images: null,
           imageUrlList: reviewImageList || [],
-          rating: reviewInfo.rating || 0,
+          rating: reviewInfo.myRating || 0,
           locationName: locationInfo.name,
           address: locationInfo.address,
           detailAddress: locationInfo.detailAddress || null,

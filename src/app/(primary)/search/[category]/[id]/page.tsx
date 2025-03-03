@@ -18,6 +18,7 @@ import { truncStr } from '@/utils/truncStr';
 import { shareOrCopy } from '@/utils/shareOrCopy';
 import { AuthService } from '@/lib/AuthService';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import { UserApi } from '@/app/api/UserApi';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { AlcoholDetails } from '@/types/Alcohol';
@@ -40,6 +41,7 @@ function SearchAlcohol() {
   const [alcoholDetails, setAlcoholDetails] = useState<DetailItem[]>([]);
   const [isPicked, setIsPicked] = useState<boolean>(false);
   const [rate, setRate] = useState(0);
+  const [userNickName, setUserNickName] = useState<string>('');
 
   const fetchAlcoholDetails = async (id: string) => {
     try {
@@ -61,6 +63,17 @@ function SearchAlcohol() {
     }
   };
 
+  const getCurrentUserInfo = async () => {
+    try {
+      const result = await UserApi.getCurUserInfo();
+      if (result) {
+        setUserNickName(result.nickname);
+      }
+    } catch (error) {
+      console.error('Failed to fetch current user info:', error);
+    }
+  };
+
   const fetchUserRating = async (alcohol: string) => {
     try {
       const ratingResult = await RateApi.getUserRating(alcohol);
@@ -77,6 +90,7 @@ function SearchAlcohol() {
 
       if (isLogin) {
         fetchUserRating(alcoholIdString);
+        getCurrentUserInfo();
       }
     }
   }, [alcoholId, isLogin]);
@@ -89,6 +103,39 @@ function SearchAlcohol() {
       alcoholId: String(alcoholId),
       rating: selectedRate,
     });
+  };
+
+  const getRatingMessage = (myAvgRating: number, myRating: number) => {
+    if (myAvgRating !== 0 && myRating !== 0)
+      return (
+        <div className="text-center text-12 space-y-2">
+          <div>
+            <p>{`${userNickName}`}님의</p>
+            <p>
+              <span className="text-subCoral font-medium">
+                평균 별점은 {`${myAvgRating}`}점
+              </span>
+              이에요.
+            </p>
+          </div>
+          <div>
+            <p>최근 평가한 별점은 {`${myRating}`}점이에요.</p>
+            <p>다른 별점을 주시고 싶으시면 언제든지 변경해보세요!</p>
+          </div>
+        </div>
+      );
+
+    if (myAvgRating !== 0 && myRating === 0)
+      return (
+        <div className="text-center text-12">
+          <p>최근 별점 {`${myAvgRating}`}을 주셨어요.</p>
+          <p>별점이 없어요! 별점 평가를 안하실건가요?</p>
+        </div>
+      );
+
+    return (
+      <div className="text-center text-12">이 술에 대한 평가를 남겨보세요.</div>
+    );
   };
 
   return (
@@ -138,18 +185,17 @@ function SearchAlcohol() {
                 </SubHeader.Right>
               </SubHeader>
               <AlcoholBox
-                data={data}
-                alcoholId={alcoholId}
+                data={data?.alcohols}
                 isPicked={isPicked}
                 setIsPicked={setIsPicked}
               />
             </div>
             <div className="mb-5">
-              <article className="grid place-items-center space-y-2 py-5">
-                {/* API 확인 후 수정 필요 */}
-                <p className="text-10 text-mainDarkGray">
-                  이 술에 대한 평가를 남겨보세요.
-                </p>
+              <article className="grid place-items-center space-y-3 py-5">
+                {getRatingMessage(
+                  data?.alcohols?.myAvgRating,
+                  data?.alcohols?.myRating,
+                )}
                 <div>
                   <StarRating rate={rate} size={50} handleRate={handleRate} />
                 </div>
