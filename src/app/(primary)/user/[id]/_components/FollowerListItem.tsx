@@ -28,7 +28,7 @@ export const FollowerListItem = ({ userInfo }: Props) => {
           className="rounded-full"
         />
         <div className="flex flex-col gap-1">
-          <p className="text-12 font-bold">{userInfo.nickName}</p>
+          <p className="text-12 font-bold">{userInfo.followUserNickname}</p>
           <p className="text-10 text-brightGray font-semibold flex gap-2">
             <span className="flex gap-1">
               <Image src={CommentGray} alt="리뷰" width={12} height={12} />

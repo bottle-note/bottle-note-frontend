@@ -1,10 +1,12 @@
 import { useState } from 'react';
 
-interface Props {
-  tabList: { name: string; id: string }[];
+interface Props<T> {
+  tabList: T[];
 }
 
-export const useTab = ({ tabList }: Props) => {
+export const useTab = <T extends { name: string; id: string }>({
+  tabList,
+}: Props<T>) => {
   const [currentTab, setCurrentTab] = useState(tabList[0]);
 
   const handleTab = (id: string) => {
