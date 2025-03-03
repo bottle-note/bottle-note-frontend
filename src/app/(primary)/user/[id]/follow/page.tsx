@@ -24,7 +24,7 @@ export default function UserFollowPage({
     tabList: [
       { name: '팔로잉', id: 'following' },
       { name: '팔로워', id: 'follower' },
-    ],
+    ] as const,
   });
 
   const {
@@ -37,10 +37,11 @@ export default function UserFollowPage({
     followerList: RelationInfo[];
     totalCount: number;
   }>({
-    queryKey: ['follow'],
+    queryKey: ['follow', currentTab.id],
     queryFn: () => {
       return UserApi.getRelationList({
         userId: Number(userId),
+        type: currentTab.id,
       });
     },
   });
@@ -93,8 +94,11 @@ export default function UserFollowPage({
               <ListSection className="flex flex-col">
                 {relationList[0].data.followingList
                   .flat()
-                  .map((item: RelationInfo) => (
-                    <FollowerListItem key={item.userId} userInfo={item} />
+                  .map((item: RelationInfo, idx) => (
+                    <FollowerListItem
+                      key={`${item.userId}_${idx}`}
+                      userInfo={item}
+                    />
                   ))}
               </ListSection>
             </List>
@@ -116,8 +120,11 @@ export default function UserFollowPage({
               <ListSection className="flex flex-col">
                 {relationList[0].data.followerList
                   .flat()
-                  .map((item: RelationInfo) => (
-                    <FollowerListItem key={item.userId} userInfo={item} />
+                  .map((item: RelationInfo, idx) => (
+                    <FollowerListItem
+                      key={`${item.userId}_${idx}`}
+                      userInfo={item}
+                    />
                   ))}
               </ListSection>
             </List>
