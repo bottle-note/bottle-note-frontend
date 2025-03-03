@@ -12,6 +12,7 @@ interface Props {
   options?: Options;
 }
 
+// TODO: 감지되는 타이밍이 조금 더 이르게 되도록 threshold 값 수정
 export const useInfiniteScroll = ({ fetchNextPage, options }: Props) => {
   const targetRef = useRef<HTMLDivElement | null>(null);
 

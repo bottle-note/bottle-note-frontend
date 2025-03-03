@@ -19,7 +19,7 @@ export default function UserFollowPage({
   params: { id: string };
 }) {
   const router = useRouter();
-  const historyType = useSearchParams().get('type') ?? 'following';
+  const currTapType = useSearchParams().get('type') ?? 'following';
   const { currentTab, handleTab, tabList } = useTab({
     tabList: [
       { name: '팔로잉', id: 'following' },
@@ -33,8 +33,8 @@ export default function UserFollowPage({
     isFetching,
     targetRef,
   } = usePaginatedQuery<{
-    followingList: RelationInfo[];
-    followerList: RelationInfo[];
+    followingList?: RelationInfo[];
+    followerList?: RelationInfo[];
     totalCount: number;
   }>({
     queryKey: ['follow', currentTab.id],
@@ -47,8 +47,8 @@ export default function UserFollowPage({
   });
 
   useEffect(() => {
-    handleTab(historyType);
-  }, [historyType]);
+    handleTab(currTapType);
+  }, []);
 
   return (
     <Suspense>
@@ -87,13 +87,13 @@ export default function UserFollowPage({
             >
               <List.Title title="내가 팔로우 하는 유저" />
               <List.Total
-                total={relationList[0].data.followingList.length}
+                total={relationList[0].data.followingList?.length ?? 0}
                 unit="명"
               />
 
               <ListSection className="flex flex-col">
                 {relationList[0].data.followingList
-                  .flat()
+                  ?.flat()
                   .map((item: RelationInfo, idx) => (
                     <FollowerListItem
                       key={`${item.userId}_${idx}`}
@@ -101,6 +101,7 @@ export default function UserFollowPage({
                     />
                   ))}
               </ListSection>
+              <div ref={targetRef} />
             </List>
           )}
 
@@ -113,13 +114,13 @@ export default function UserFollowPage({
             >
               <List.Title title="나를 팔로우 하는 유저" />
               <List.Total
-                total={relationList[0].data.followerList.length}
+                total={relationList[0].data.followerList?.length ?? 0}
                 unit="명"
               />
 
               <ListSection className="flex flex-col">
                 {relationList[0].data.followerList
-                  .flat()
+                  ?.flat()
                   .map((item: RelationInfo, idx) => (
                     <FollowerListItem
                       key={`${item.userId}_${idx}`}
@@ -127,10 +128,9 @@ export default function UserFollowPage({
                     />
                   ))}
               </ListSection>
+              <div ref={targetRef} />
             </List>
           )}
-
-          <div ref={targetRef} />
         </section>
       </main>
     </Suspense>
