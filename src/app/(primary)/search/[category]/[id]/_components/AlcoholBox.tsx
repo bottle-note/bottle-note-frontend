@@ -48,14 +48,12 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
             </div>
             <div className="space-y-1">
               <div className="flex items-end gap-7">
-                {data.rating && (
-                  <Star
-                    rating={data.rating}
-                    size={27}
-                    styleProps="text-white text-27 leading-[40px] font-bold"
-                    color="white"
-                  />
-                )}
+                <Star
+                  rating={data?.rating}
+                  size={27}
+                  styleProps="text-white text-27 leading-[40px] font-bold"
+                  color="white"
+                />
                 <div className="text-10 font-bold mb-1">
                   (유저평가 {data.totalRatingsCount})
                 </div>

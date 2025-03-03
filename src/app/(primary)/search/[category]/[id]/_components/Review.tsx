@@ -108,7 +108,7 @@ function Review({ data }: Props) {
               />
             )}
           </div>
-          {data.rating && <Star rating={data.rating} size={20} />}
+          {data.myRating && <Star rating={data.myRating} size={20} />}
         </div>
         <div className="flex items-center space-x-1">
           <Image
