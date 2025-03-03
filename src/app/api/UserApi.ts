@@ -124,12 +124,18 @@ export const UserApi = {
     return result;
   },
 
-  async getRelationList({ userId }: { userId: number }) {
+  async getRelationList({
+    userId,
+    type,
+  }: {
+    userId: number;
+    type: 'follower' | 'following';
+  }) {
     const response: ApiResponse<{
       followingList: RelationInfo[];
       followerList: RelationInfo[];
       totalCount: number;
-    }> = await fetchWithAuth(`/bottle-api/follow/${userId}/relation-list`);
+    }> = await fetchWithAuth(`/bottle-api/follow/${userId}/${type}-list`);
 
     if (!response.data) {
       throw new Error('Failed to fetch data');
