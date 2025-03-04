@@ -94,7 +94,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
               </div>
             </Link>
             <Star
-              rating={data.reviewInfo?.rating ?? 0}
+              rating={data.reviewInfo?.myRating ?? 0}
               size={25}
               styleProps="text-20 text-subCoral font-semibold"
             />
@@ -163,10 +163,10 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
             </button>
           </article>
         </section>
-        {data.reviewInfo?.tastingTagList?.length &&
-          data.reviewInfo.tastingTagList.length !== 0 && (
+        {data.reviewInfo?.alcoholsTastingTags?.length &&
+          data.reviewInfo.alcoholsTastingTags.length !== 0 && (
             <FlavorTag
-              tagList={data.reviewInfo.tastingTagList}
+              tagList={data.reviewInfo.alcoholsTastingTags}
               styleClass="border-subCoral text-subCoral py-[5px] px-[10px] rounded-md text-12"
             />
           )}
