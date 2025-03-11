@@ -13,7 +13,7 @@ import List from '@/components/List/List';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { HistoryApi } from '@/app/api/HistoryApi';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
-import { AuthService } from '@/lib/AuthService';
+import { UserApi } from '@/app/api/UserApi';
 import {
   HistoryListApi,
   History as HistoryType,
@@ -24,12 +24,11 @@ import { groupHistoryByDate, shouldShowDivider } from '@/utils/historyUtils';
 import FilterSideModal from './_components/filter/FilterSideModal';
 import { HistoryEmptyState } from './_components/HistoryEmptyState';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
+import { CurrentUserInfoApi } from '@/types/User';
 
 export default function History() {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { userData } = AuthService;
-  const userId = userData?.userId;
   const [isOpen, setIsOpen] = useState(false);
   const [currentParams, setCurrentParams] = useState(''); // 현재 적용된 파라미터
   const [processedHistory, setProcessedHistory] = useState<{
@@ -39,6 +38,8 @@ export default function History() {
     groupedHistory: {},
     yearMonths: [],
   });
+  const [currentUserInfo, setCurrentUserInfo] =
+    useState<CurrentUserInfoApi | null>(null);
 
   const { getQueryParams, setKeyword, resetFilter } = useHistoryFilterStore();
 
@@ -50,10 +51,10 @@ export default function History() {
     targetRef,
     refetch,
   } = usePaginatedQuery<HistoryListApi>({
-    queryKey: ['history', userId, currentParams],
+    queryKey: ['history', currentUserInfo?.id, currentParams],
     queryFn: async ({ pageParam }) => {
       const queryParams: HistoryListQueryParams = {
-        userId: String(userId),
+        userId: String(currentUserInfo?.id),
         cursor: pageParam,
         pageSize: 10,
       };
@@ -86,6 +87,7 @@ export default function History() {
 
       return HistoryApi.getHistoryList(queryParams, urlParams.toString());
     },
+    enabled: !!currentUserInfo?.id,
   });
 
   const handleFilterChange = async () => {
@@ -151,6 +153,15 @@ export default function History() {
   };
 
   useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userInfo = await UserApi.getCurUserInfo();
+      setCurrentUserInfo(userInfo);
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  useEffect(() => {
     return () => {
       setIsOpen(false);
       setCurrentParams('');
@@ -214,7 +225,8 @@ export default function History() {
                     <div className="text-10 text-mainGray bg-bgGray rounded-md p-2 mb-5 ml-3 relative z-10">
                       {getLatestYearMonth()?.year}년{' '}
                       {getLatestYearMonth()?.month}
-                      월까지 기록된 회원닉네임님의 활동여정이에요!
+                      월까지 기록된 {currentUserInfo?.nickname}님의
+                      활동여정이에요!
                     </div>
                     <div className="relative z-10 pb-3">
                       {yearMonths.map((yearMonth, index) => {
