@@ -46,6 +46,10 @@ export const usePaginatedQuery = <T>({
 
   const { targetRef } = useInfiniteScroll({
     fetchNextPage,
+    options: {
+      rootMargin: '300px',
+      threshold: 0,
+    },
   });
 
   return {
