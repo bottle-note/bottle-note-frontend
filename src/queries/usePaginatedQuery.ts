@@ -6,14 +6,19 @@ interface Props<T> {
   queryKey: [string, ...Array<any>];
   queryFn: (params: any) => Promise<ApiResponse<T>>;
   pageSize?: number;
-  staleTime?: number;
+  // staleTime?: number;
+  enabled?: boolean;
+  refetchOnMount?: boolean;
+  gcTime?: number;
 }
 
 export const usePaginatedQuery = <T>({
   queryKey,
   queryFn,
   pageSize = 10,
-  staleTime = 1000,
+  enabled = true,
+  refetchOnMount = true,
+  gcTime = 0,
 }: Props<T>) => {
   const {
     data,
@@ -33,9 +38,10 @@ export const usePaginatedQuery = <T>({
       return null;
     },
     initialPageParam: 0,
-    refetchOnMount: false,
+    refetchOnMount,
     refetchOnWindowFocus: false,
-    staleTime,
+    gcTime,
+    enabled,
   });
 
   const { targetRef } = useInfiniteScroll({
