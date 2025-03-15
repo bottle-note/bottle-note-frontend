@@ -113,24 +113,9 @@ export default function History() {
 
   const dataChecking =
     historyData &&
-    !historyData[0].meta?.pageable?.hasNext &&
+    historyData[0].data?.userHistories?.length > 0 &&
     !error &&
     !isLoading;
-
-  useEffect(() => {
-    if (!historyData) return;
-
-    const historyList = historyData.flatMap((page) => page.data.userHistories);
-    const groupedHistory = groupHistoryByDate(historyList);
-    const yearMonths = Object.keys(groupedHistory).sort((a, b) =>
-      b.localeCompare(a),
-    );
-
-    setProcessedHistory({
-      groupedHistory,
-      yearMonths,
-    });
-  }, [historyData]);
 
   const { groupedHistory, yearMonths } = processedHistory;
 
@@ -282,7 +267,11 @@ export default function History() {
                       </div>
                       <TimeLineItem
                         isStart
-                        date={historyData[0].data.subscriptionDate}
+                        date={
+                          (historyData &&
+                            historyData[0].data?.subscriptionDate) ||
+                          ''
+                        }
                         type="BOTTLE"
                       />
                     </div>
