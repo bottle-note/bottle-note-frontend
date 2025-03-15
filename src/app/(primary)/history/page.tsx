@@ -21,10 +21,10 @@ import {
 } from '@/types/History';
 import { RATING_NUM_VALUES, PICKS_STATUS } from '@/constants/history';
 import { groupHistoryByDate, shouldShowDivider } from '@/utils/historyUtils';
+import { CurrentUserInfoApi } from '@/types/User';
 import FilterSideModal from './_components/filter/FilterSideModal';
 import { HistoryEmptyState } from './_components/HistoryEmptyState';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
-import { CurrentUserInfoApi } from '@/types/User';
 
 export default function History() {
   const queryClient = useQueryClient();
