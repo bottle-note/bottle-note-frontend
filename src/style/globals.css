@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* app/globals.css */
+@import url('https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css');
+
+:root {
+  --font-suit: 'SUIT Variable', sans-serif;
+}
+
+body {
+  font-family: var(--font-suit);
+}
+
 @layer base {
   input,
   textarea {

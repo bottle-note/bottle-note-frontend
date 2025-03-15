@@ -10,7 +10,6 @@ export const HistoryApi = {
     const { userId, cursor, pageSize } = baseParams;
     const response = await fetchWithAuth(
       `/bottle-api/history/${userId}?cursor=${cursor}&pageSize=${pageSize}${filterParams ? `&${filterParams}` : ''}`,
-      { requireAuth: true },
     );
 
     if (response.errors.length !== 0) {

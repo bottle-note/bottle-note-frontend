@@ -42,7 +42,7 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
               <h1 className="text-20 font-semibold whitespace-normal break-words">
                 {data.korName && truncStr(data.korName, 27)}
               </h1>
-              <p className="text-13 whitespace-normal break-words">
+              <p className="text-12 whitespace-normal break-words">
                 {data.engName && truncStr(data.engName.toUpperCase(), 45)}
               </p>
             </div>

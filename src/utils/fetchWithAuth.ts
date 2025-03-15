@@ -5,6 +5,7 @@ import { AuthService } from '../lib/AuthService';
 
 interface FetchOptions extends RequestInit {
   requireAuth?: boolean;
+  cache?: RequestCache;
 }
 
 type FetchWithAuth = (
@@ -18,7 +19,7 @@ export const fetchWithAuth: FetchWithAuth = async (
   options = {},
   retryCount = 0,
 ) => {
-  const { requireAuth = true, ...fetchOptions } = options;
+  const { requireAuth = true, cache = 'no-store', ...fetchOptions } = options;
 
   const token = AuthService.getToken();
 
@@ -38,7 +39,10 @@ export const fetchWithAuth: FetchWithAuth = async (
   if (!token) {
     try {
       // 인증 없이 API 요청
-      const response = await fetch(requestUrl, { ...fetchOptions });
+      const response = await fetch(requestUrl, {
+        ...fetchOptions,
+        cache,
+      });
 
       // 응답이 실패한 경우 → 에러 응답을 저장
       if (!response.ok) {
@@ -59,6 +63,7 @@ export const fetchWithAuth: FetchWithAuth = async (
   // 인증이 필요한 요청의 기본 옵션 구성
   const defaultOptions = {
     ...fetchOptions,
+    cache,
     headers: {
       ...fetchOptions?.headers,
       Authorization: `Bearer ${token.accessToken}`,

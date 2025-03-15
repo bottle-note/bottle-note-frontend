@@ -4,7 +4,11 @@ export interface User {
   imageUrl: string;
 }
 
-export type CurrentUserInfoApi = Omit<User, 'nickName'> & { nickname: string };
+export interface CurrentUserInfoApi {
+  id: number;
+  nickname: string;
+  imageUrl: string;
+}
 
 export interface UserInfoApi extends User {
   reviewCount: number;

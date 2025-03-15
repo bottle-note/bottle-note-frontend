@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { v4 as uuidv4 } from 'uuid';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { Review as ReviewType } from '@/types/Review';
@@ -158,10 +159,7 @@ function Reviews() {
                     [...reviewList.map((list) => list.data.reviewList)]
                       .flat()
                       .map((item: ReviewType) => (
-                        <Review
-                          data={item}
-                          key={item.reviewId + item.userInfo.userId}
-                        />
+                        <Review data={item} key={uuidv4()} />
                       ))}
                 </List.Section>
               </List>
@@ -195,10 +193,7 @@ function Reviews() {
                     [...myReviewList.map((list) => list.data.reviewList)]
                       .flat()
                       .map((item: ReviewType) => (
-                        <Review
-                          data={item}
-                          key={item.reviewId + item.userInfo.userId}
-                        />
+                        <Review data={item} key={uuidv4()} />
                       ))}
                 </List.Section>
               </List>

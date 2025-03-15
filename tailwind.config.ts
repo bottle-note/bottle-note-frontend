@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['SUIT Variable', 'sans-serif'], // 기본 폰트로 설정
+      },
       fontSize: {
         '9': ['9px', '9px'],
         '10': ['10px', '14px'],

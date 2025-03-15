@@ -204,10 +204,10 @@ function SearchAlcohol() {
                 {alcoholDetails.map((item: DetailItem) => (
                   <div
                     key={item.content}
-                    className="flex text-13 text-mainDarkGray items-start gap-2"
+                    className="flex text-12 text-mainDarkGray items-start gap-2"
                   >
                     <div className="min-w-14 font-semibold">{item.title}</div>
-                    <div className="flex-1 font-light">{item.content}</div>
+                    <div className="flex-1 font-normal">{item.content}</div>
                   </div>
                 ))}
               </section>

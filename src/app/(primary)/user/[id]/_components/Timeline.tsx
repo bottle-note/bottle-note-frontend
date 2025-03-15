@@ -58,6 +58,7 @@ function Timeline() {
         pageSize: 10,
       });
     },
+    enabled: !!userId,
   });
 
   const historyList: History[] =
