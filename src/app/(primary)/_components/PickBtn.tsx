@@ -71,7 +71,7 @@ const PickBtn = ({
           alt="unPick"
         />
       )}
-      {pickBtnName && <p className="text-12 font-bold">{pickBtnName}</p>}
+      {pickBtnName && <p className="text-12 font-normal">{pickBtnName}</p>}
     </button>
   );
 };
