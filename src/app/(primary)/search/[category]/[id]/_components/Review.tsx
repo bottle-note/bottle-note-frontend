@@ -17,7 +17,8 @@ import Modal from '@/components/Modal';
 import useModalStore from '@/store/modalStore';
 import { deleteReview } from '@/lib/Review';
 import { AuthService } from '@/lib/AuthService';
-import userImg from 'public/profile-default.svg';
+
+const DEFAULT_USER_IMAGE = '/profile-default.svg';
 
 interface Props {
   data: ReviewType;
@@ -30,7 +31,7 @@ function Review({ data }: Props) {
   const { state, handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(isLikedByMe);
-  const [currentStatus, setCurrentStatus] = useState(data.status === 'PUBLIC');
+  // const [currentStatus, setCurrentStatus] = useState(data.status === 'PUBLIC');
 
   const handleCloseOption = () => {
     handleModalState({
@@ -67,9 +68,9 @@ function Review({ data }: Props) {
     }
   };
 
-  useEffect(() => {
-    setCurrentStatus(data.status === 'PUBLIC');
-  }, [data.status]);
+  // useEffect(() => {
+  //   setCurrentStatus(data.status === 'PUBLIC');
+  // }, [data.status]);
 
   return (
     <>
@@ -81,7 +82,7 @@ function Review({ data }: Props) {
                 <div className="w-7 h-7 rounded-full overflow-hidden">
                   <Image
                     className="object-cover"
-                    src={data.userInfo.userProfileImage || userImg}
+                    src={data.userInfo.userProfileImage || DEFAULT_USER_IMAGE}
                     alt="user_img"
                     width={28}
                     height={28}
@@ -179,7 +180,7 @@ function Review({ data }: Props) {
             </div>
             {data.userInfo.userId === userData?.userId && (
               <VisibilityToggle
-                initialStatus={currentStatus}
+                initialStatus={data.status === 'PUBLIC'}
                 reviewId={data.reviewId}
                 handleNotLogin={handleLoginModal}
               />
