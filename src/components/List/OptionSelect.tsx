@@ -33,8 +33,9 @@ const OptionSelect = ({
     name: string;
   }) => {
     setSelectedOption(name);
-    handleOptionCallback && handleOptionCallback(type);
-    setIsDropDownShow(false);
+    if (handleOptionCallback) {
+      handleOptionCallback(type);
+    }
   };
 
   return (
