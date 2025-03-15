@@ -104,14 +104,14 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
               <Label
                 name="베스트"
                 icon="/icon/thumbup-filled-white.svg"
-                styleClass="bg-mainCoral text-white px-2 py-[0.1rem] border-mainCoral text-9 rounded"
+                styleClass="bg-mainCoral text-white px-2 py-[0.1rem] border-mainCoral text-10 rounded"
               />
             )}
             {data.reviewInfo?.isMyReview && (
               <Label
                 name="나의 코멘트"
                 icon="/icon/user-outlined-subcoral.svg"
-                styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-9 rounded"
+                styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-10 rounded"
               />
             )}
             {data.reviewInfo?.userInfo?.userId === userData?.userId && (
@@ -139,12 +139,12 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
               ))}
             </div>
           )}
-          <div className="text-13 text-mainDarkGray">
+          <div className="text-12 text-mainDarkGray">
             {data.reviewInfo?.reviewContent}
           </div>
           <article className="flex justify-between">
             {data.reviewInfo?.createAt && (
-              <p className="text-mainGray text-11">
+              <p className="text-mainGray text-10">
                 {formatDate(data.reviewInfo.createAt) as string}
               </p>
             )}
@@ -189,12 +189,12 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                       : 'Glass Price'
                   }
                 />
-                <p className="text-mainDarkGray font-semibold">
+                <p className="text-mainDarkGray font-normal">
                   {data.reviewInfo.sizeType === 'BOTTLE'
                     ? '병 가격 '
                     : '잔 가격'}
                 </p>
-                <p className="text-mainDarkGray font-light">
+                <p className="text-mainDarkGray font-normal">
                   {numberWithCommas(data.reviewInfo.price)}₩
                 </p>
               </div>

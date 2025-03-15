@@ -31,7 +31,7 @@ function Review({ data }: Props) {
   const { state, handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(isLikedByMe);
-  // const [currentStatus, setCurrentStatus] = useState(data.status === 'PUBLIC');
+  const [currentStatus, setCurrentStatus] = useState(data.status === 'PUBLIC');
 
   const handleCloseOption = () => {
     handleModalState({
@@ -68,9 +68,9 @@ function Review({ data }: Props) {
     }
   };
 
-  // useEffect(() => {
-  //   setCurrentStatus(data.status === 'PUBLIC');
-  // }, [data.status]);
+  useEffect(() => {
+    setCurrentStatus(data.status === 'PUBLIC');
+  }, [data.status]);
 
   return (
     <>
@@ -105,7 +105,7 @@ function Review({ data }: Props) {
                 name="나의 코멘트"
                 icon="/icon/user-outlined-subcoral.svg"
                 iconHeight={10}
-                styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-9 rounded"
+                styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-10 rounded"
               />
             )}
           </div>
@@ -122,15 +122,15 @@ function Review({ data }: Props) {
             height={12}
             alt={data.sizeType === 'BOTTLE' ? 'Bottle Price' : 'Glass Price'}
           />
-          <p className="text-mainGray text-10 font-semibold">
+          <p className="text-mainGray text-12 font-semibold">
             {data.sizeType === 'BOTTLE' ? '병 가격 ' : '잔 가격'}
           </p>
-          <p className="text-mainGray text-10 font-light">
+          <p className="text-mainGray text-12 font-normal">
             {data.price ? `${numberWithCommas(data.price)} ₩` : '-'}
           </p>
         </div>
         <div className="grid grid-cols-5 space-x-2">
-          <p className="col-span-4 text-mainDarkGray text-10">
+          <p className="col-span-4 text-mainDarkGray text-12">
             <Link href={`/review/${data.reviewId}`}>
               {truncStr(data.reviewContent, 135)}
               {data.reviewContent.length > 135 && (
@@ -150,7 +150,7 @@ function Review({ data }: Props) {
             </div>
           )}
         </div>
-        <div className="flex justify-between text-9 text-mainGray">
+        <div className="flex justify-between text-11 text-mainGray">
           <div className="flex space-x-3">
             <div className="flex items-center space-x-1">
               <LikeBtn
@@ -180,14 +180,14 @@ function Review({ data }: Props) {
             </div>
             {data.userInfo.userId === userData?.userId && (
               <VisibilityToggle
-                initialStatus={data.status === 'PUBLIC'}
+                initialStatus={currentStatus}
                 reviewId={data.reviewId}
                 handleNotLogin={handleLoginModal}
               />
             )}
           </div>
           <div className="flex items-center">
-            <p className="text-9">{formatDate(data.createAt) as string}</p>
+            <p className="text-10">{formatDate(data.createAt) as string}</p>
             <button
               className="cursor-pointer"
               onClick={() => {
