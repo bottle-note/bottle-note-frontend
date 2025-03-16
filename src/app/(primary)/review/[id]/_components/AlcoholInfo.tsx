@@ -50,7 +50,7 @@ function AlcoholInfo({ data, handleLogin }: Props) {
             <h1 className="text-15 font-semibold whitespace-normal break-words">
               {data.korName && truncStr(data.korName, 27)}
             </h1>
-            <p className="text-13 whitespace-normal break-words">
+            <p className="text-12 whitespace-normal break-words font-normal">
               {data.engName && truncStr(data.engName.toUpperCase(), 45)}
             </p>
           </div>
@@ -58,7 +58,7 @@ function AlcoholInfo({ data, handleLogin }: Props) {
             <div className="border-[0.5px] border-white" />
             <div className="flex space-x-3">
               <div
-                className="text-12 font-bold flex"
+                className="text-12 font-normal flex"
                 onClick={handleLoginConfirm}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
