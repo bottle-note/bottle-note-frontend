@@ -48,6 +48,7 @@ export default function Search() {
     isLoading: isFirstLoading,
     isFetching,
     targetRef,
+    error,
   } = usePaginatedQuery<{
     alcohols: AlcoholAPI[];
     totalCount: number;
@@ -137,6 +138,7 @@ export default function Search() {
               <List
                 isListFirstLoading={isFirstLoading}
                 isScrollLoading={isFetching}
+                isError={!!error}
               >
                 <List.Total
                   total={alcoholList ? alcoholList[0].data.totalCount : 0}

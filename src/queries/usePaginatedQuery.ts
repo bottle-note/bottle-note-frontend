@@ -37,15 +37,21 @@ export const usePaginatedQuery = <T>({
       }
       return null;
     },
+
     initialPageParam: 0,
     refetchOnMount,
     refetchOnWindowFocus: false,
     gcTime,
     enabled,
+    retry: false,
   });
 
   const { targetRef } = useInfiniteScroll({
-    fetchNextPage,
+    fetchNextPage: () => {
+      if (!isFetching && hasNextPage) {
+        fetchNextPage();
+      }
+    },
     options: {
       rootMargin: '300px',
       threshold: 0,
