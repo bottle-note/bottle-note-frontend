@@ -15,12 +15,14 @@ interface ListMainProps {
   emptyViewText?: string;
   isListFirstLoading?: boolean;
   isScrollLoading?: boolean;
+  isError?: boolean;
 }
 
 const ListMain = ({
   children,
   emptyViewText,
   isListFirstLoading,
+  isError,
 }: ListMainProps) => {
   const title = filterChildComponent(children, Title);
   const totalDisplay = filterChildComponent(children, Total);
@@ -62,7 +64,15 @@ const ListMain = ({
       )}
 
       <>
-        {isEmpty ? (
+        {isError && (
+          <EmptyView
+            text={'에러가 발생했습니다.\n잠시 후 다시 시도해주세요.'}
+          />
+        )}
+      </>
+
+      <>
+        {isEmpty && !isError ? (
           <EmptyView text={emptyViewText} />
         ) : (
           <>

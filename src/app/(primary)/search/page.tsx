@@ -32,6 +32,7 @@ export default function Search() {
   const { isLogin } = AuthService;
   const currCategory = useSearchParams().get('category') as Category;
   const currSearchKeyword = useSearchParams().get('query');
+  const isEmptySearch = currCategory === null && currSearchKeyword === null;
 
   const initialState: InitialState = {
     category: currCategory || '',
@@ -48,6 +49,7 @@ export default function Search() {
     isLoading: isFirstLoading,
     isFetching,
     targetRef,
+    error,
   } = usePaginatedQuery<{
     alcohols: AlcoholAPI[];
     totalCount: number;
@@ -117,7 +119,7 @@ export default function Search() {
         <section className="flex flex-col gap-7 p-5">
           <CategorySelector handleCategoryCallback={handleCategoryCallback} />
 
-          {currCategory === null && currSearchKeyword === null ? (
+          {isEmptySearch ? (
             <section>
               <CategoryTitle subTitle="위클리 HOT 5" />
 
@@ -137,6 +139,7 @@ export default function Search() {
               <List
                 isListFirstLoading={isFirstLoading}
                 isScrollLoading={isFetching}
+                isError={!!error}
               >
                 <List.Total
                   total={alcoholList ? alcoholList[0].data.totalCount : 0}
@@ -174,18 +177,20 @@ export default function Search() {
             </>
           )}
 
-          <LinkButton
-            data={{
-              engName: 'NO RESULTS',
-              korName: '혹시 찾는 술이 없으신가요?',
-              linkSrc: `/inquire/register`,
-              icon: true,
-              handleBeforeRouteChange: (e) => {
-                e.preventDefault();
-                handleClickInquire();
-              },
-            }}
-          />
+          {!isEmptySearch && (
+            <LinkButton
+              data={{
+                engName: 'NO RESULTS',
+                korName: '혹시 찾는 술이 없으신가요?',
+                linkSrc: `/inquire/register`,
+                icon: true,
+                handleBeforeRouteChange: (e) => {
+                  e.preventDefault();
+                  handleClickInquire();
+                },
+              }}
+            />
+          )}
         </section>
       </main>
 

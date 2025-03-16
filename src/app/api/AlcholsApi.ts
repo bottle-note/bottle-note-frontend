@@ -8,7 +8,6 @@ import {
 } from '@/types/Alcohol';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
-// TODO: 캐싱, 프리페칭을 적용해 반복적인 데이터 요청 작업에 대한 최적화 진행 필요
 export const AlcoholsApi = {
   async getPopular() {
     const response = await fetch(`/bottle-api/popular/week`, {
@@ -100,7 +99,6 @@ export const AlcoholsApi = {
       throw new Error('Failed to fetch data');
     }
 
-    // TODO: 카테고리 필드 명 변경하여 수정해주기
     const result: ApiResponse<{ alcohols: any[]; totalCount: number }> =
       await response.json();
 
