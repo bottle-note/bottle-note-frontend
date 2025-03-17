@@ -9,7 +9,7 @@ import { CurrentUserInfoApi } from '@/types/User';
 import { HistoryEmptyState } from './HistoryEmptyState';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
 
-interface Props {
+interface TimelineProps {
   data: HistoryListApi;
   isLastPage?: boolean;
   currentUserInfo: CurrentUserInfoApi | null;
@@ -33,7 +33,7 @@ export default function Timeline({
   isLoading,
   isFetching,
   error,
-}: Props) {
+}: TimelineProps) {
   const [processedHistory, setProcessedHistory] = useState<{
     groupedHistory: Record<string, HistoryType[]>;
     yearMonths: string[];
