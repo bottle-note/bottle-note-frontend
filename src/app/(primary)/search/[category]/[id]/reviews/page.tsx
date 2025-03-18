@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,6 +15,7 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
 import useModalStore from '@/store/modalStore';
 import { AuthService } from '@/lib/AuthService';
+import Modal from '@/components/Modal';
 
 const SORT_OPTIONS = [
   { name: '인기도순', type: SORT_TYPE.POPULAR },
@@ -94,6 +95,14 @@ function Reviews() {
     },
   });
 
+  const refreshReviews = useCallback(() => {
+    if (activeTab === 'tab1') {
+      refetchReview();
+    } else {
+      refetchMyReview();
+    }
+  }, [activeTab, refetchReview, refetchMyReview]);
+
   return (
     <div className="pb-8 relative">
       <SubHeader bgColor="bg-bgGray">
@@ -159,7 +168,11 @@ function Reviews() {
                     [...reviewList.map((list) => list.data.reviewList)]
                       .flat()
                       .map((item: ReviewType) => (
-                        <Review data={item} key={uuidv4()} />
+                        <Review
+                          data={item}
+                          key={uuidv4()}
+                          onRefresh={refreshReviews}
+                        />
                       ))}
                 </List.Section>
               </List>
@@ -193,7 +206,11 @@ function Reviews() {
                     [...myReviewList.map((list) => list.data.reviewList)]
                       .flat()
                       .map((item: ReviewType) => (
-                        <Review data={item} key={uuidv4()} />
+                        <Review
+                          data={item}
+                          key={uuidv4()}
+                          onRefresh={refreshReviews}
+                        />
                       ))}
                 </List.Section>
               </List>
@@ -214,6 +231,7 @@ function Reviews() {
           btnName="리뷰 작성"
         />
       </section>
+      <Modal />
     </div>
   );
 }

@@ -22,9 +22,10 @@ const DEFAULT_USER_IMAGE = '/profile-default.svg';
 
 interface Props {
   data: ReviewType;
+  onRefresh: () => void;
 }
 
-function Review({ data }: Props) {
+function Review({ data, onRefresh }: Props) {
   const router = useRouter();
   const { userData, isLogin } = AuthService;
   const { isLikedByMe } = data;
@@ -183,6 +184,7 @@ function Review({ data }: Props) {
                 initialStatus={currentStatus}
                 reviewId={data.reviewId}
                 handleNotLogin={handleLoginModal}
+                onSuccess={onRefresh}
               />
             )}
           </div>
@@ -225,7 +227,7 @@ function Review({ data }: Props) {
           }
         />
       )}
-      {state.isShowModal && <Modal />}
+      {/* {state.isShowModal && <Modal />} */}
     </>
   );
 }
