@@ -9,16 +9,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ['SUIT Variable', 'sans-serif'], // 기본 폰트로 설정
-      },
       fontSize: {
         '9': ['9px', '9px'],
         '10': ['10px', '14px'],
         '11': ['11px', '15px'],
         '12': ['12px', '16px'],
         '13': ['13px', '17px'],
-        '15': ['15px', '29px'],
+        '15': ['15px', '19px'],
         '16': ['16px', '20px'],
         '20': ['20px', '24px'],
         '27': ['27px', '31px'],
