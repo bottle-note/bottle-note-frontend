@@ -22,9 +22,10 @@ interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;
   handleLogin: () => void;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
+  onRefresh: () => void;
 }
 
-function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
+function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
   const router = useRouter();
   const { userData, isLogin } = AuthService;
   const { handleModalState, handleLoginModal } = useModalStore();
@@ -119,6 +120,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                 initialStatus={data.reviewInfo.status === 'PUBLIC'}
                 reviewId={data?.reviewInfo?.reviewId}
                 handleNotLogin={handleLoginModal}
+                onSuccess={onRefresh}
               />
             )}
           </article>

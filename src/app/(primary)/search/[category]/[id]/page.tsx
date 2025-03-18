@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -138,6 +138,10 @@ function SearchAlcohol() {
     );
   };
 
+  const refreshAlcoholDetails = useCallback(() => {
+    fetchAlcoholDetails(alcoholId.toString());
+  }, [alcoholId]);
+
   return (
     <>
       {alcoholDetails && data ? (
@@ -260,7 +264,7 @@ function SearchAlcohol() {
                   <div className="border-b border-mainGray/30" />
                   {data.reviewInfo.reviewList.map((review) => (
                     <React.Fragment key={review.reviewId}>
-                      <Review data={review} />
+                      <Review data={review} onRefresh={refreshAlcoholDetails} />
                     </React.Fragment>
                   ))}
                 </section>

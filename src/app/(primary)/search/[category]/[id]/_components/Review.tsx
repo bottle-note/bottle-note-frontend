@@ -13,7 +13,6 @@ import { formatDate } from '@/utils/formatDate';
 import VisibilityToggle from '@/app/(primary)/_components/VisibilityToggle';
 import LikeBtn from '@/app/(primary)/_components/LikeBtn';
 import OptionDropdown from '@/components/OptionDropdown';
-import Modal from '@/components/Modal';
 import useModalStore from '@/store/modalStore';
 import { deleteReview } from '@/lib/Review';
 import { AuthService } from '@/lib/AuthService';
@@ -29,7 +28,7 @@ function Review({ data, onRefresh }: Props) {
   const router = useRouter();
   const { userData, isLogin } = AuthService;
   const { isLikedByMe } = data;
-  const { state, handleModalState, handleLoginModal } = useModalStore();
+  const { handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(isLikedByMe);
   const [currentStatus, setCurrentStatus] = useState(data.status === 'PUBLIC');
@@ -227,7 +226,6 @@ function Review({ data, onRefresh }: Props) {
           }
         />
       )}
-      {/* {state.isShowModal && <Modal />} */}
     </>
   );
 }

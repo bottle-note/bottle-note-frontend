@@ -48,7 +48,7 @@ const VisibilityToggle = ({
         handleModalState({
           isShowModal: true,
           type: 'ALERT',
-          mainText: `${!isActive ? '공개' : '비공개'} 업데이트에 실패했습니다.`,
+          mainText: `${!isActive ? '공개' : '비공개'}로 변경을 실패했습니다.`,
           subText: '다시 시도해주세요.',
         });
       }

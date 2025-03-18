@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import * as yup from 'yup';
@@ -40,7 +40,6 @@ export default function ReviewDetail() {
   const [reviewDetails, setReviewDetails] =
     useState<ReviewDetailsWithoutAlcoholInfo | null>(null);
   const [isRefetch, setIsRefetch] = useState<boolean>(false);
-  // 대댓글 수정하며 같이 리팩토링 예정
   const [isSubReplyShow, setIsSubReplyShow] = useState(false);
 
   const schema = yup.object({
@@ -107,28 +106,27 @@ export default function ReviewDetail() {
     await executeApiCall(processSubmission);
   };
 
-  useEffect(() => {
-    async function fetchReviewDetails() {
-      // reviewId가 없을 때, 별도 페이지 처리가 필요한가?
-      if (!reviewId) return;
-      try {
-        const result = await ReviewApi.getReviewDetails(reviewId);
-        const { alcoholInfo: response, ...restData } = result;
-        setAlcoholInfo(response);
-        setReviewDetails(restData);
-      } catch (error) {
-        console.error('Failed to fetch review details:', error);
-      }
+  const fetchReviewDetails = useCallback(async () => {
+    if (!reviewId) return;
+    try {
+      const result = await ReviewApi.getReviewDetails(reviewId);
+      const { alcoholInfo: response, ...restData } = result;
+      setAlcoholInfo(response);
+      setReviewDetails(restData);
+    } catch (error) {
+      console.error('Failed to fetch review details:', error);
     }
+  }, [reviewId]);
 
+  // 초기 데이터 로드
+  useEffect(() => {
     fetchReviewDetails();
-
     reset({
       content: '',
       parentReplyId: null,
       replyToReplyUserName: null,
     });
-  }, [reviewId]);
+  }, [reviewId, reset, fetchReviewDetails]);
 
   return (
     <FormProvider {...formMethods}>
@@ -187,6 +185,7 @@ export default function ReviewDetail() {
               data={reviewDetails}
               handleLogin={handleLogin}
               textareaRef={textareaRef}
+              onRefresh={fetchReviewDetails}
             />
             <ReplyList
               reviewId={reviewId}
