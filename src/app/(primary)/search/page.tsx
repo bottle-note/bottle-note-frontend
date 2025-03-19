@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CategorySelector from '@/components/CategorySelector';
-import CategoryTitle from '@/components/CategoryTitle';
+import MenuList from '@/components/MenuList';
 import List from '@/components/List/List';
 import { usePopularList } from '@/hooks/usePopularList';
 import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
@@ -121,7 +121,7 @@ export default function Search() {
 
           {isEmptySearch ? (
             <section>
-              <CategoryTitle subTitle="위클리 HOT 5" />
+              <MenuList name="위클리 HOT 5" />
 
               <List>
                 {popularList.map((item: AlcoholAPI) => (

@@ -1,9 +1,9 @@
 'use client';
 
-import HorizontalItem from '@/components/HorizontalItem';
+import PopularCard from '@/app/(primary)/_components/PopularCard';
 import { usePopularList } from '@/hooks/usePopularList';
 
-function HotList() {
+function PopularList() {
   const { popularList } = usePopularList();
 
   return (
@@ -12,7 +12,7 @@ function HotList() {
         <div className="whitespace-nowrap overflow-x-auto overflow-y-hidden flex space-x-2 scrollbar-hide">
           {popularList.map((item) => (
             <div key={item.alcoholId} className="flex-shrink-0 flex-grow-0">
-              <HorizontalItem data={item} />
+              <PopularCard data={item} />
             </div>
           ))}
         </div>
@@ -21,4 +21,4 @@ function HotList() {
   );
 }
 
-export default HotList;
+export default PopularList;
