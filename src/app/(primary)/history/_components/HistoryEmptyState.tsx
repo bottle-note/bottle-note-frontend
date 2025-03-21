@@ -20,8 +20,8 @@ export const HistoryEmptyState = ({
 
   if (totalCount === 0 || error || isLoading) {
     return (
-      <section>
-        <article className="py-5 border-y border-mainGray/30">
+      <section className="w-full">
+        <article className="py-5 w-full border-y border-mainGray/30">
           <EmptyView text={getEmptyViewText()} />
         </article>
       </section>
