@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import useModalStore from '@/store/modalStore';
@@ -10,12 +8,14 @@ interface Props {
   initialStatus: boolean;
   reviewId: string | number;
   handleNotLogin: () => void;
+  onSuccess: () => void;
 }
 
 const VisibilityToggle = ({
   reviewId,
   initialStatus,
   handleNotLogin,
+  onSuccess,
 }: Props) => {
   const { isLogin } = AuthService;
   const { handleModalState } = useModalStore();
@@ -25,27 +25,32 @@ const VisibilityToggle = ({
     if (!isLogin) {
       handleNotLogin();
     } else {
-      const newStatus = !isActive;
-      setIsActive(newStatus);
       try {
-        await ReviewApi.putVisibility(
+        const response = await ReviewApi.putVisibility(
           reviewId,
-          newStatus ? 'PUBLIC' : 'PRIVATE',
+          !isActive ? 'PUBLIC' : 'PRIVATE',
         );
-        handleModalState({
-          isShowModal: true,
-          mainText: '리뷰를 비공개했습니다.',
-          subText: '비공개 된 리뷰는 나만 볼 수 있어요!',
-          type: 'ALERT',
-        });
+
+        if (response) {
+          handleModalState({
+            isShowModal: true,
+            mainText: !isActive
+              ? '리뷰를 공개했습니다.'
+              : '리뷰를 비공개했습니다.',
+            subText: !isActive
+              ? '공개 된 리뷰는 모두가 볼 수 있어요!'
+              : '비공개 된 리뷰는 나만 볼 수 있어요!',
+            type: 'ALERT',
+          });
+          onSuccess();
+        }
       } catch (error) {
         handleModalState({
           isShowModal: true,
           type: 'ALERT',
-          mainText: '공개, 비공개 업데이트에 실패했습니다. 다시 시도해주세요.',
+          mainText: `${!isActive ? '공개' : '비공개'}로 변경을 실패했습니다.`,
+          subText: '다시 시도해주세요.',
         });
-        console.error('Error updating like status:', error);
-        setIsActive(!newStatus);
       }
     }
   };
@@ -54,11 +59,7 @@ const VisibilityToggle = ({
     setIsActive(initialStatus);
   }, [initialStatus]);
 
-  return (
-    <>
-      <Toggle isActive={isActive} onToggle={handleToggle} />
-    </>
-  );
+  return <Toggle isActive={isActive} onToggle={handleToggle} />;
 };
 
 export default VisibilityToggle;

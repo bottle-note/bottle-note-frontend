@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { RateAPI } from '@/types/Rate';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { RateApi } from '@/app/api/RateApi';
@@ -13,6 +14,14 @@ import StarRating from '../StarRaiting';
 interface Props {
   data: RateAPI;
 }
+
+const ItemLink = ({
+  alcoholId,
+  children,
+}: {
+  alcoholId: number;
+  children: React.ReactNode;
+}) => <Link href={`/search/all/${alcoholId}`}>{children}</Link>;
 
 const ListItemRating = ({ data }: Props) => {
   const {
@@ -30,9 +39,8 @@ const ListItemRating = ({ data }: Props) => {
 
   const handleRate = async (selectedRate: number) => {
     if (!isLogin) return handleLoginModal();
-
     setRate(selectedRate);
-    return RateApi.postRating({
+    await RateApi.postRating({
       alcoholId: String(alcoholId),
       rating: selectedRate,
     });
@@ -40,13 +48,19 @@ const ListItemRating = ({ data }: Props) => {
 
   return (
     <article className="flex items-center space-x-2 text-mainBlack border-brightGray border-b h-[90px]">
-      <ItemImage src={imageUrl} alt="위스키 이미지" />
+      <ItemLink alcoholId={alcoholId}>
+        <ItemImage src={imageUrl} alt="위스키 이미지" />
+      </ItemLink>
+
       <section className="flex-1 space-y-1">
-        <ItemInfo
-          korName={korName}
-          engName={engName}
-          korCategory={korCategoryName}
-        />
+        <ItemLink alcoholId={alcoholId}>
+          <ItemInfo
+            korName={korName}
+            engName={engName}
+            korCategory={korCategoryName}
+          />
+        </ItemLink>
+
         <article className="flex justify-between">
           <StarRating rate={rate} handleRate={handleRate} />
           <div className="space-x-1.5 flex items-end">
@@ -54,7 +68,6 @@ const ListItemRating = ({ data }: Props) => {
               isPicked={isPicked}
               alcoholId={alcoholId}
               iconColor="subcoral"
-              // FIXME: 별도 함수로 분리
               handleUpdatePicked={() => setIsPicked(!isPicked)}
               handleError={() => alert('에러가 발생했습니다.')}
               handleNotLogin={() => alert('로그인이 필요한 서비스입니다.')}
