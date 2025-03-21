@@ -19,19 +19,19 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   const { userData, logout } = AuthService;
 
   const navItems: NavItem[] = [
-    { name: '홈', link: '/', icon: '/icon/home-outlined-subcoral.svg' },
-    { name: '검색', link: '/search', icon: '/icon/search-subcoral.svg' },
-    { name: '별점', link: '/rating', icon: '/icon/star-filled-subcoral.svg' },
+    { name: '홈', link: '/', icon: '/icon/navbar/home.svg' },
+    { name: '검색', link: '/search', icon: '/icon/navbar/search.svg' },
+    { name: '별점', link: '/rating', icon: '/icon/navbar/star.svg' },
     {
       name: '기록',
       link: '/history',
-      icon: '/icon/document-outlined-subcoral.svg',
+      icon: '/icon/navbar/history.svg',
       requiresAuth: true,
     },
     {
       name: '마이',
       link: `/user/${userData?.userId || ''}`,
-      icon: '/icon/user-outlined-subcoral.svg',
+      icon: '/icon/navbar/user.svg',
       requiresAuth: true,
     },
   ];
@@ -57,7 +57,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
     <nav
       className={`fixed bottom-6 left-0 right-0 mx-auto w-full max-w-[${maxWidth}] px-4 z-10`}
     >
-      <section className="h-[4.4rem] flex justify-between bg-[#F6F6F6] py-3 px-5 rounded-[0.8rem] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
+      <section className="h-[4.4rem] flex justify-between bg-[#F6F6F6] py-4 px-[26px] rounded-[0.8rem] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
         {navItems.map((menu, index) => (
           <React.Fragment key={menu.link}>
             <button
@@ -65,8 +65,10 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
               onClick={() => handleNavigation(menu)}
             >
               <div className="flex flex-col items-center justify-center space-y-[2px]">
-                <Image src={menu.icon} alt={menu.name} width={30} height={30} />
-                <span className="text-9 text-subCoral">{menu.name}</span>
+                <Image src={menu.icon} alt={menu.name} width={26} height={26} />
+                <span className="text-10 font-medium text-subCoral">
+                  {menu.name}
+                </span>
               </div>
             </button>
             {index !== navItems.length - 1 && (

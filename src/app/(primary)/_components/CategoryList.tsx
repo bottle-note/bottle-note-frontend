@@ -7,7 +7,7 @@ function CategoryList() {
   const menu: LinkData[] = generateMenu(categories);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-[18px]">
       <LinkButton
         data={{
           engName: 'ALL',
@@ -15,7 +15,7 @@ function CategoryList() {
           linkSrc: '/search?category=',
         }}
       />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-y-[18px] gap-x-[11.7px]">
         {menu.map((data) => (
           <LinkButton key={data.engName} data={data} />
         ))}
