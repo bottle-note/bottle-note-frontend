@@ -175,6 +175,10 @@ export default function Login() {
 
   const redirectUri = `${process.env.NEXT_PUBLIC_CLIENT_URL}/oauth/kakao`;
   const kakaoLoginHandler = () => {
+    if (window.isInApp) {
+      return handleWebViewMessage('loginWithKakao');
+    }
+
     window.Kakao.Auth.authorize({
       redirectUri,
     });
@@ -249,9 +253,6 @@ export default function Login() {
           <article className="flex flex-col gap-2">
             <SocialLoginBtn type="KAKAO" onClick={kakaoLoginHandler} />
             <SocialLoginBtn type="APPLE" onClick={() => signIn('apple')} />
-            {/* NOTE: 소셜로그인 테스트용 계정 */}
-            {/* <SocialLoginBtn type="GOOGLE" onClick={() => signIn('google')} /> */}
-            {/* <SocialLoginBtn type="NAVER" onClick={() => signIn('naver')} /> */}
           </article>
         </section>
 

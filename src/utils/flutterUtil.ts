@@ -19,7 +19,8 @@ export function handleWebViewMessage(
     | 'deviceToken'
     | 'logToFlutter'
     | 'openAlbum'
-    | 'openCamera',
+    | 'openCamera'
+    | 'loginWithKakao',
 ) {
   return window.FlutterMessageQueue.postMessage(message);
 }
@@ -38,4 +39,15 @@ export function sendLogToFlutter(log: string) {
     console.log(`[Message sent to Flutter - Browser] ${log}`);
   }
   return log;
+}
+
+export function onKakaoLoginSuccess(email: string) {
+  console.log(`✅ 카카오 로그인 성공: ${email}`);
+
+  return email;
+}
+
+export function onKakaoLoginError(error: string) {
+  console.error(`❌ 카카오 로그인 실패: ${error}`);
+  // TODO: 오류 메시지 표시 및 처리
 }
