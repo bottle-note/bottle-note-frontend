@@ -3,6 +3,8 @@ import {
   checkIsInApp,
   getDeviceToken,
   handleWebViewMessage,
+  onKakaoLoginError,
+  onKakaoLoginSuccess,
   sendLogToFlutter,
 } from '@/utils/flutterUtil';
 
@@ -23,6 +25,8 @@ export const useWebViewInit = () => {
     window.getDeviceToken = getDeviceToken;
     window.checkIsInApp = checkIsInApp;
     window.sendLogToFlutter = sendLogToFlutter;
+    window.onKakaoLoginSuccess = onKakaoLoginSuccess;
+    window.onKakaoLoginError = onKakaoLoginError;
   };
 
   return { isMobile, initWebView };
