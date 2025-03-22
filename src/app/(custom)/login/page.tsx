@@ -174,6 +174,7 @@ export default function Login() {
   }, []);
 
   const redirectUri = `${process.env.NEXT_PUBLIC_CLIENT_URL}/oauth/kakao`;
+
   const kakaoLoginHandler = () => {
     if (window.isInApp) {
       return handleWebViewMessage('loginWithKakao');
