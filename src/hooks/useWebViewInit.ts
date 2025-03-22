@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import {
   checkIsInApp,
   getDeviceToken,
@@ -11,7 +11,7 @@ import {
 export const useWebViewInit = () => {
   const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const { userAgent } = navigator;
     const mobile = /iPhone|iPad|iPod|Android/i.test(userAgent);
     setIsMobile(mobile);
