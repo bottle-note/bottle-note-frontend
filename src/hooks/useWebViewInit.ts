@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   checkIsInApp,
   getDeviceToken,
@@ -9,24 +9,28 @@ import {
 } from '@/utils/flutterUtil';
 
 export const useWebViewInit = () => {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const { userAgent } = navigator;
     const mobile = /iPhone|iPad|iPod|Android/i.test(userAgent);
     setIsMobile(mobile);
   }, []);
 
   const initWebView = () => {
-    if (isMobile) {
-      handleWebViewMessage('checkIsInApp');
-    }
+    if (typeof window === 'undefined') return;
 
     window.getDeviceToken = getDeviceToken;
     window.checkIsInApp = checkIsInApp;
     window.sendLogToFlutter = sendLogToFlutter;
     window.onKakaoLoginSuccess = onKakaoLoginSuccess;
     window.onKakaoLoginError = onKakaoLoginError;
+
+    if (isMobile) {
+      handleWebViewMessage('checkIsInApp');
+    }
   };
 
   return { isMobile, initWebView };
