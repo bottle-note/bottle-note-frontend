@@ -26,9 +26,6 @@ function MenuList({ items, activeId, onSelect }: Props) {
       transform 
       hover:translate-x-1 hover:-translate-y-1 hover:bg-subCoral/50
       active:translate-x-0.5 active:-translate-y-0.5
-      touch-action-none
-      [&:hover]:translate-x-1 [&:hover]:-translate-y-1 [&:hover]:bg-subCoral/50
-      [&:active]:translate-x-0.5 [&:active]:-translate-y-0.5
     `;
   };
 
@@ -39,6 +36,24 @@ function MenuList({ items, activeId, onSelect }: Props) {
           <button
             key={item.id}
             onClick={() => onSelect?.(item.id)}
+            onTouchStart={(e) => {
+              if (!isSingleMenu && item.id !== activeId) {
+                e.currentTarget.classList.add(
+                  'translate-x-1',
+                  '-translate-y-1',
+                  'bg-subCoral/50',
+                );
+              }
+            }}
+            onTouchEnd={(e) => {
+              if (!isSingleMenu && item.id !== activeId) {
+                e.currentTarget.classList.remove(
+                  'translate-x-1',
+                  '-translate-y-1',
+                  'bg-subCoral/50',
+                );
+              }
+            }}
             className={`
               min-w-[165px] py-[6px] px-4
               text-15 font-extrabold
