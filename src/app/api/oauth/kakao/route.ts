@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { SOCIAL_TYPE } from '@/types/Auth';
 import { AuthApi } from '../../AuthApi';
 
 const jwt = require('jsonwebtoken');
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
       email: userData.kakao_account?.email ?? 'no-email',
       gender: null,
       age: null,
-      socialType: 'KAKAO',
+      socialType: SOCIAL_TYPE.KAKAO,
     };
 
     // Step 4: Log in with the Auth API

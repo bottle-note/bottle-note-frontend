@@ -3,12 +3,12 @@ import {
   checkIsInApp,
   getDeviceToken,
   handleWebViewMessage,
-  onKakaoLoginError,
-  onKakaoLoginSuccess,
   sendLogToFlutter,
 } from '@/utils/flutterUtil';
+import { useAppSocialLogin } from './useAppSocialLogin';
 
 export const useWebViewInit = () => {
+  const { onKakaoLoginSuccess, onKakaoLoginError } = useAppSocialLogin();
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {

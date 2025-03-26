@@ -4,6 +4,7 @@ import NaverProvider from 'next-auth/providers/naver';
 import AppleProvider from 'next-auth/providers/apple';
 import NextAuth from 'next-auth';
 import { getAppleToken } from '@/utils/getAppleToken';
+import { SOCIAL_TYPE } from '@/types/Auth';
 import { AuthApi } from '../../AuthApi';
 
 const jwt = require('jsonwebtoken');
@@ -46,7 +47,7 @@ const handler = NextAuth({
           email: user.email as string,
           gender: null,
           age: null,
-          socialType: account?.provider as string,
+          socialType: account?.provider as SOCIAL_TYPE,
         };
 
         const { accessToken, refreshToken } = await AuthApi.login(body);
