@@ -15,7 +15,7 @@ declare global {
     checkIsInApp: (status: string) => boolean;
     openAlbum:(imageDataBase64: string) => void; 
     sendLogToFlutter: (log: string) => void;
-    onKakaoLoginSuccess:(email: string) => string;
+    onKakaoLoginSuccess:(email: string) => Promise<void>;
     onKakaoLoginError:(error: string) => void;
     isInApp: boolean = false;
     deviceToken: string;

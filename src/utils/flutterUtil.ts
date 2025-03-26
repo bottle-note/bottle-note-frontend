@@ -31,23 +31,10 @@ export function openAlbum(imgDataBase64: string): string {
 
 export function sendLogToFlutter(log: string) {
   if (window.isInApp) {
-    // 웹뷰일 때 로그 출력
     window.LogToFlutter.postMessage(log);
     console.log(`[Message sent to Flutter - WebView] ${log}`);
   } else {
-    // 웹뷰가 아닐 때 로그 출력
     console.log(`[Message sent to Flutter - Browser] ${log}`);
   }
   return log;
-}
-
-export function onKakaoLoginSuccess(email: string) {
-  console.log(`✅ 카카오 로그인 성공: ${email}`);
-
-  return email;
-}
-
-export function onKakaoLoginError(error: string) {
-  console.error(`❌ 카카오 로그인 실패: ${error}`);
-  // TODO: 오류 메시지 표시 및 처리
 }
