@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -42,6 +42,7 @@ function Reply({
   const { setValue } = useFormContext();
   const { state, handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleUpdateSubReply = () => {
     if (resetSubReplyToggle) {
@@ -51,9 +52,14 @@ function Reply({
   };
 
   const updateReplyUser = () => {
-    if (data?.nickName && data?.reviewReplyId) {
+    if (data?.nickName) {
+      setValue('content', `@${data.nickName} `);
       setValue('replyToReplyUserName', data.nickName);
       setValue('parentReplyId', data.reviewReplyId);
+
+      if (textareaRef?.current) {
+        textareaRef.current.focus();
+      }
     }
   };
 
@@ -65,6 +71,12 @@ function Reply({
         data.reviewReplyId.toString(),
       );
       if (result) {
+        await setIsRefetch(true);
+
+        if (resetSubReplyToggle) {
+          resetSubReplyToggle(false);
+        }
+
         handleModalState({
           isShowModal: true,
           type: 'ALERT',
@@ -75,11 +87,6 @@ function Reply({
               isShowModal: false,
               mainText: '',
             });
-            // refresh review list
-            setIsRefetch(true);
-            if (resetSubReplyToggle) {
-              resetSubReplyToggle(false);
-            }
           },
         });
       }
@@ -153,7 +160,7 @@ function Reply({
         </div>
         <div className="text-12 text-mainDarkGray whitespace-pre-wrap break-words flex">
           <div className="text-mainCoral mr-1">
-            {'rootReviewId' in data && `@${data?.nickName}`}
+            {'rootReviewId' in data && data?.parentReviewReplyAuthor}
           </div>
           {data?.reviewReplyContent}
         </div>
@@ -162,7 +169,13 @@ function Reply({
             {data?.status !== 'DELETED' && (
               <button
                 className="text-10 text-subCoral"
-                onClick={updateReplyUser}
+                onClick={() => {
+                  if (isLogin) {
+                    updateReplyUser();
+                  } else {
+                    handleLoginModal();
+                  }
+                }}
               >
                 답글 달기
               </button>
