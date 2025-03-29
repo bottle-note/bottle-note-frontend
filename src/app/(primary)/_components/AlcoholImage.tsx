@@ -15,7 +15,7 @@ const AlcoholImage = ({
   innerHeightClass = 'w-[80px] ',
   innerWidthClass = 'h-[140px]',
 }: Props) => (
-  <div className="rounded-lg bg-white p-2 flex items-center justify-center">
+  <div className="rounded-lg bg-white flex items-center justify-center">
     <article
       className={`${outerHeightClass} ${outerWidthClass} shrink-0 relative flex items-center justify-center`}
     >
