@@ -17,7 +17,7 @@ import { ReviewApi } from '@/app/api/ReviewApi';
 import { ReplyApi } from '@/app/api/ReplyApi';
 import NavLayout from '@/app/(primary)/_components/NavLayout';
 import Loading from '@/components/Loading';
-import { shareOrCopy } from '@/utils/shareOrCopy';
+// import { shareOrCopy } from '@/utils/shareOrCopy';
 import type {
   AlcoholInfo as AlcoholInfoType,
   ReviewDetailsWithoutAlcoholInfo,
@@ -151,12 +151,18 @@ export default function ReviewDetail() {
                 </SubHeader.Center>
                 <SubHeader.Right
                   onClick={() => {
-                    shareOrCopy(
-                      `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${reviewId}`,
-                      handleModalState,
-                      `${alcoholInfo.korName} 리뷰`,
-                      `${alcoholInfo.korName} 리뷰 상세보기`,
-                    );
+                    // shareOrCopy(
+                    //   `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${reviewId}`,
+                    //   handleModalState,
+                    //   `${alcoholInfo.korName} 리뷰`,
+                    //   `${alcoholInfo.korName} 리뷰 상세보기`,
+                    // );
+                    handleModalState({
+                      isShowModal: true,
+                      type: 'ALERT',
+                      mainText:
+                        '아직 준비 중인 기능입니다. 조금만 기다려주세요!',
+                    });
                   }}
                 >
                   <Image
