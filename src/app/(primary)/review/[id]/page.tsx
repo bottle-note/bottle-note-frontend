@@ -40,7 +40,6 @@ export default function ReviewDetail() {
   const [reviewDetails, setReviewDetails] =
     useState<ReviewDetailsWithoutAlcoholInfo | null>(null);
   const [isRefetch, setIsRefetch] = useState<boolean>(false);
-  const [isSubReplyShow, setIsSubReplyShow] = useState(false);
 
   const schema = yup.object({
     content: yup.string().required('댓글 내용을 입력해주세요.'),
@@ -56,14 +55,6 @@ export default function ReviewDetail() {
 
   const handleLogin = () => {
     handleLoginModal();
-  };
-
-  const resetSubReplyToggle = (value?: boolean) => {
-    if (value) {
-      setIsSubReplyShow(value);
-    } else {
-      setIsSubReplyShow((prev) => !prev);
-    }
   };
 
   const handleCreateReply: SubmitHandler<FieldValues> = async (data) => {
@@ -94,7 +85,6 @@ export default function ReviewDetail() {
 
       if (response) {
         setIsRefetch(true);
-        setIsSubReplyShow(false);
         reset({
           content: '',
           parentReplyId: null,
@@ -191,8 +181,6 @@ export default function ReviewDetail() {
               reviewId={reviewId}
               isRefetch={isRefetch}
               setIsRefetch={setIsRefetch}
-              isSubReplyShow={isSubReplyShow}
-              resetSubReplyToggle={resetSubReplyToggle}
             />
             <ReplyInput
               textareaRef={textareaRef}
