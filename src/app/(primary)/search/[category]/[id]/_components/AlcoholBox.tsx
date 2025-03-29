@@ -21,7 +21,7 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
   const { handleLoginModal } = useModalStore();
 
   return (
-    <section className="relative z-10 flex px-5 pb-6 space-x-5">
+    <section className="relative z-20 flex px-5 pb-6 space-x-5">
       {data?.alcoholUrlImg && (
         <AlcoholImage
           imageUrl={data?.alcoholUrlImg}
