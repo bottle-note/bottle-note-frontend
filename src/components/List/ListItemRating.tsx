@@ -62,7 +62,12 @@ const ListItemRating = ({ data }: Props) => {
         </ItemLink>
 
         <article className="flex justify-between">
-          <StarRating rate={rate} handleRate={handleRate} />
+          <StarRating
+            rate={rate}
+            handleRate={handleRate}
+            outerHeightSize={36}
+            outerWidthSize={34}
+          />
           <div className="space-x-1.5 flex items-end">
             <PickBtn
               isPicked={isPicked}

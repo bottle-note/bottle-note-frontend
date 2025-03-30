@@ -118,7 +118,7 @@ function SearchAlcohol() {
               이에요.
             </p>
           </div>
-          <div>
+          <div className="text-10">
             <p>최근 평가한 별점은 {`${myRating}`}점이에요.</p>
             <p>다른 별점을 주시고 싶으시면 언제든지 변경해보세요!</p>
           </div>
@@ -195,13 +195,13 @@ function SearchAlcohol() {
               />
             </div>
             <div className="mb-5">
-              <article className="grid place-items-center space-y-3 py-5">
+              <article className="grid place-items-center space-y-2 py-5">
                 {getRatingMessage(
                   data?.alcohols?.myAvgRating,
                   data?.alcohols?.myRating,
                 )}
                 <div>
-                  <StarRating rate={rate} size={50} handleRate={handleRate} />
+                  <StarRating rate={rate} size={42} handleRate={handleRate} />
                 </div>
               </article>
               <section className="mx-5 py-5 border-y border-mainGray/30 grid grid-cols-2 gap-2">
