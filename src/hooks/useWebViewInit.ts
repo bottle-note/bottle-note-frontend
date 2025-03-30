@@ -8,7 +8,12 @@ import {
 import { useAppSocialLogin } from './useAppSocialLogin';
 
 export const useWebViewInit = () => {
-  const { onKakaoLoginSuccess, onKakaoLoginError } = useAppSocialLogin();
+  const {
+    onKakaoLoginSuccess,
+    onKakaoLoginError,
+    onAppleLoginSuccess,
+    onAppleLoginError,
+  } = useAppSocialLogin();
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -27,6 +32,8 @@ export const useWebViewInit = () => {
     window.sendLogToFlutter = sendLogToFlutter;
     window.onKakaoLoginSuccess = onKakaoLoginSuccess;
     window.onKakaoLoginError = onKakaoLoginError;
+    window.onAppleLoginSuccess = onAppleLoginSuccess;
+    window.onAppleLoginError = onAppleLoginError;
 
     if (isMobile) {
       handleWebViewMessage('checkIsInApp');
