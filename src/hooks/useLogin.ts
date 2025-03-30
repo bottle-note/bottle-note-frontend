@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { AuthService } from '@/lib/AuthService';
 import { DeviceService } from '@/lib/DeviceService';
 import useModalStore from '@/store/modalStore';
@@ -147,15 +147,22 @@ export const useLogin = () => {
   };
 
   const handleKakaoLogin = () => {
-    const redirectUri = `${process.env.NEXT_PUBLIC_CLIENT_URL}/oauth/kakao`;
-
     if (window.isInApp) {
       return handleWebViewMessage('loginWithKakao');
     }
 
+    const redirectUri = `${process.env.NEXT_PUBLIC_CLIENT_URL}/oauth/kakao`;
     window.Kakao.Auth.authorize({
       redirectUri,
     });
+  };
+
+  const handleAppleLogin = () => {
+    if (window.isInApp) {
+      return handleWebViewMessage('loginWithApple');
+    }
+
+    return signIn('apple');
   };
 
   return {
