@@ -20,7 +20,8 @@ export function handleWebViewMessage(
     | 'logToFlutter'
     | 'openAlbum'
     | 'openCamera'
-    | 'loginWithKakao',
+    | 'loginWithKakao'
+    | 'loginWithApple',
 ) {
   return window.FlutterMessageQueue.postMessage(message);
 }
