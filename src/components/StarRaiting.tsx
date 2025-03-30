@@ -1,14 +1,26 @@
 import { useRef } from 'react';
 import Image from 'next/image';
 
-interface StarProps {
-  size: number;
-  index: number;
+interface Star {
+  size?: number;
+  outerHeightSize?: number;
+  outerWidthSize?: number;
   rate: number;
   handleRate: (rate: number) => void;
 }
 
-const Star = ({ size = 30, index, rate, handleRate }: StarProps) => {
+interface StarProps extends Star {
+  index: number;
+}
+
+const Star = ({
+  size = 30,
+  outerHeightSize = 54,
+  outerWidthSize = 52,
+  index,
+  rate,
+  handleRate,
+}: StarProps) => {
   const imageRef = useRef<HTMLImageElement>(null);
 
   // TODO: + 마우스 무브, 터치까지 대응되도록 수정
@@ -38,39 +50,47 @@ const Star = ({ size = 30, index, rate, handleRate }: StarProps) => {
   // FIXME: 별점 렌더링시 약간의 위치 움직임 있음
   return (
     <div
-      onClick={handleAction}
-      style={{ width: `${size}px`, height: `${size}px` }}
+      className="flex items-center justify-center"
+      style={{ width: `${outerWidthSize}px`, height: `${outerHeightSize}px` }}
     >
-      <Image
-        src={src}
-        width={size}
-        height={size}
-        alt="star"
-        ref={imageRef}
-        layout="responsive"
-      />
+      <div
+        className="relative"
+        style={{ width: `${size}px`, height: `${size}px` }}
+        onClick={handleAction}
+      >
+        <Image
+          src={src}
+          fill
+          alt="star"
+          ref={imageRef}
+          className="object-contain"
+          sizes={`${size}px`}
+        />
+      </div>
     </div>
   );
 };
 
-interface StarRatingProps {
-  size?: number;
-  rate: number;
-  handleRate: (rate: number) => void;
-}
-
-const StarRating = ({ size = 30, rate, handleRate }: StarRatingProps) => {
+const StarRating = ({
+  size = 30,
+  rate,
+  outerHeightSize,
+  outerWidthSize,
+  handleRate,
+}: Star) => {
   const maxRating = 10;
 
   return (
     <div className="relative w-full h-full">
-      <div className="flex space-x-1">
+      <div className="flex">
         {Array.from({ length: maxRating / 2 }, (_, i) => (
           <Star
             key={i}
             size={size}
             index={i + 1}
             rate={rate}
+            outerHeightSize={outerHeightSize}
+            outerWidthSize={outerWidthSize}
             handleRate={handleRate}
           />
         ))}
