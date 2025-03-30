@@ -172,5 +172,6 @@ export const useLogin = () => {
     handleSendDeviceInfo,
     handleInitKakaoSdkLogin,
     handleKakaoLogin,
+    handleAppleLogin,
   };
 };

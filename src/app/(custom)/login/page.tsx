@@ -28,6 +28,7 @@ export default function Login() {
     handleSendDeviceInfo,
     handleInitKakaoSdkLogin,
     handleKakaoLogin,
+    handleAppleLogin,
   } = useLogin();
   const { isLogin } = AuthService;
   const { setIsInApp } = DeviceService;
@@ -126,7 +127,7 @@ export default function Login() {
 
           <article className="flex flex-col gap-2">
             <SocialLoginBtn type="KAKAO" onClick={handleKakaoLogin} />
-            <SocialLoginBtn type="APPLE" onClick={() => signIn('apple')} />
+            <SocialLoginBtn type="APPLE" onClick={handleAppleLogin} />
           </article>
         </section>
 
