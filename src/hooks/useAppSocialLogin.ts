@@ -21,8 +21,19 @@ export const useAppSocialLogin = () => {
     // TODO: 오류 메시지 표시 및 처리
   };
 
+  const onAppleLoginSuccess = async (data: string) => {
+    console.log(`애플 로그인 성공: ${data}`);
+  };
+
+  const onAppleLoginError = (error: string) => {
+    console.error(`❌ 애플 로그인 실패: ${error}`);
+    // TODO: 오류 메시지 표시 및 처리
+  };
+
   return {
     onKakaoLoginSuccess,
     onKakaoLoginError,
+    onAppleLoginSuccess,
+    onAppleLoginError,
   };
 };

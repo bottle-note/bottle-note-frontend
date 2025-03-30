@@ -17,6 +17,8 @@ declare global {
     sendLogToFlutter: (log: string) => void;
     onKakaoLoginSuccess:(email: string) => Promise<void>;
     onKakaoLoginError:(error: string) => void;
+    onAppleLoginSuccess:(data: string) => Promise<void>;
+    onAppleLoginError:(error: string) => void;
     isInApp: boolean = false;
     deviceToken: string;
     platform: string
