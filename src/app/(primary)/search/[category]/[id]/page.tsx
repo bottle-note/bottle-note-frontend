@@ -15,7 +15,7 @@ import EmptyView from '@/app/(primary)/_components/EmptyView';
 import Modal from '@/components/Modal';
 import Loading from '@/components/Loading';
 import { truncStr } from '@/utils/truncStr';
-import { shareOrCopy } from '@/utils/shareOrCopy';
+// import { shareOrCopy } from '@/utils/shareOrCopy';
 import { AuthService } from '@/lib/AuthService';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { UserApi } from '@/app/api/UserApi';
@@ -172,12 +172,18 @@ function SearchAlcohol() {
                 </SubHeader.Left>
                 <SubHeader.Right
                   onClick={() => {
-                    shareOrCopy(
-                      `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/category/${category}/${alcoholId}`,
-                      handleModalState,
-                      `${data?.alcohols.korName} 정보`,
-                      `${data?.alcohols.korName} 정보 상세보기`,
-                    );
+                    // shareOrCopy(
+                    //   `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/category/${category}/${alcoholId}`,
+                    //   handleModalState,
+                    //   `${data?.alcohols.korName} 정보`,
+                    //   `${data?.alcohols.korName} 정보 상세보기`,
+                    // );
+                    handleModalState({
+                      isShowModal: true,
+                      type: 'ALERT',
+                      mainText:
+                        '아직 준비 중인 기능입니다. 조금만 기다려주세요!',
+                    });
                   }}
                 >
                   <Image
