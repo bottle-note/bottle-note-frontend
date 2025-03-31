@@ -19,23 +19,21 @@ import userImg from 'public/profile-default.svg';
 interface Props {
   data: RootReply | SubReply;
   children?: React.ReactNode;
-  getSubReplyList?: (rootReplyId: number) => void;
   isReviewUser: boolean;
   reviewId: string | string[];
   setIsRefetch: React.Dispatch<React.SetStateAction<boolean>>;
   isSubReplyShow?: boolean;
-  resetSubReplyToggle?: (value?: boolean) => void;
+  onToggleSubReply?: () => void;
 }
 
 function Reply({
   data,
   children,
-  getSubReplyList,
   isReviewUser,
   reviewId,
   setIsRefetch,
-  isSubReplyShow = false,
-  resetSubReplyToggle,
+  isSubReplyShow,
+  onToggleSubReply,
 }: Props) {
   const router = useRouter();
   const { isLogin, userData } = AuthService;
@@ -45,10 +43,9 @@ function Reply({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleUpdateSubReply = () => {
-    if (resetSubReplyToggle) {
-      resetSubReplyToggle();
+    if (onToggleSubReply) {
+      onToggleSubReply();
     }
-    if (getSubReplyList) getSubReplyList(data?.reviewReplyId);
   };
 
   const updateReplyUser = () => {
@@ -72,10 +69,6 @@ function Reply({
       );
       if (result) {
         await setIsRefetch(true);
-
-        if (resetSubReplyToggle) {
-          resetSubReplyToggle(false);
-        }
 
         handleModalState({
           isShowModal: true,
