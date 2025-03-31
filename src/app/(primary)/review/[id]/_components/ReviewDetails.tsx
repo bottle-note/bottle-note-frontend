@@ -9,7 +9,7 @@ import VisibilityToggle from '@/app/(primary)/_components/VisibilityToggle';
 import FlavorTag from '@/app/(primary)/_components/FlavorTag';
 import { numberWithCommas } from '@/utils/formatNum';
 import { formatDate } from '@/utils/formatDate';
-import { shareOrCopy } from '@/utils/shareOrCopy';
+// import { shareOrCopy } from '@/utils/shareOrCopy';
 import LikeBtn from '@/app/(primary)/_components/LikeBtn';
 import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
@@ -281,10 +281,15 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
           <button
             className="w-[20%] flex text-center justify-center items-center space-x-1"
             onClick={() => {
-              shareOrCopy(
-                `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${data.reviewInfo?.reviewId}`,
-                handleModalState,
-              );
+              // shareOrCopy(
+              //   `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${data.reviewInfo?.reviewId}`,
+              // handleModalState,
+              // );
+              handleModalState({
+                isShowModal: true,
+                type: 'ALERT',
+                mainText: '아직 준비 중인 기능입니다. 조금만 기다려주세요!',
+              });
             }}
           >
             <Image
