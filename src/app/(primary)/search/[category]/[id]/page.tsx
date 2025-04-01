@@ -272,8 +272,8 @@ function SearchAlcohol() {
             data.reviewInfo.totalCount !== 0 ? (
               <>
                 <div className="h-4 bg-sectionWhite" />
-                <section className="mx-5 py-5 space-y-3">
-                  <p className="text-13 text-mainGray font-normal">
+                <section className="mx-5 pt-[34px] pb-[20px]">
+                  <p className="text-11 text-mainGray font-normal mb-[10px]">
                     총 {data.reviewInfo.totalCount}개
                   </p>
                   <div className="border-b border-mainGray/30" />
