@@ -131,27 +131,27 @@ function Review({ data, onRefresh }: Props) {
             {data.price ? `${numberWithCommas(data.price)} ₩` : '-'}
           </p>
         </div>
-        <div className="grid grid-cols-5 space-x-2 mt-[6px]">
-          <p className="col-span-4 text-mainDarkGray text-12">
-            <Link href={`/review/${data.reviewId}`}>
+        <Link href={`/review/${data.reviewId}`}>
+          <div className="grid grid-cols-5 space-x-2 mt-[6px]">
+            <p className="col-span-4 text-mainDarkGray text-12">
               {truncStr(data.reviewContent, 135)}
               {data.reviewContent.length > 135 && (
                 <span className="text-mainGray">더보기</span>
               )}
-            </Link>
-          </p>
-          {data.reviewImageUrl && (
-            <div className="flex justify-end items-center">
-              <Image
-                className="w-[3.8rem] h-[3.8rem]"
-                src={data.reviewImageUrl}
-                alt="content_img"
-                width={60}
-                height={60}
-              />
-            </div>
-          )}
-        </div>
+            </p>
+            {data.reviewImageUrl && (
+              <div className="flex justify-end items-center">
+                <Image
+                  className="w-[3.8rem] h-[3.8rem]"
+                  src={data.reviewImageUrl}
+                  alt="content_img"
+                  width={60}
+                  height={60}
+                />
+              </div>
+            )}
+          </div>
+        </Link>
         <div className="flex justify-between text-11 text-mainGray mt-[10px]">
           <div className="flex space-x-3">
             <div className="flex items-center space-x-[2px]">
