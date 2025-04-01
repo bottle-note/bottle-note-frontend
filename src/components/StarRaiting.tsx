@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import Image from 'next/image';
 
-interface Star {
+interface BaseStar {
   size?: number;
   outerHeightSize?: number;
   outerWidthSize?: number;
@@ -9,7 +9,7 @@ interface Star {
   handleRate: (rate: number) => void;
 }
 
-interface StarProps extends Star {
+interface StarProps extends BaseStar {
   index: number;
 }
 
@@ -77,7 +77,7 @@ const StarRating = ({
   outerHeightSize,
   outerWidthSize,
   handleRate,
-}: Star) => {
+}: BaseStar) => {
   const maxRating = 10;
 
   return (
