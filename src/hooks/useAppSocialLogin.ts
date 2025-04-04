@@ -2,6 +2,7 @@ import { useRouter } from 'next/navigation';
 import { AuthApi } from '@/app/api/AuthApi';
 import { AuthService } from '@/lib/AuthService';
 import { SOCIAL_TYPE } from '@/types/Auth';
+import { sendLogToFlutter } from '@/utils/flutterUtil';
 
 export const useAppSocialLogin = () => {
   const router = useRouter();
@@ -23,6 +24,7 @@ export const useAppSocialLogin = () => {
 
   const onAppleLoginSuccess = async (data: string) => {
     console.log(`애플 로그인 성공: ${data}`);
+    sendLogToFlutter(`애플 로그인 성공: ${data}`);
   };
 
   const onAppleLoginError = (error: string) => {
