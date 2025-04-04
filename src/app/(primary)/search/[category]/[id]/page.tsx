@@ -51,11 +51,12 @@ function SearchAlcohol() {
         setData(result);
         setIsPicked(alcohols.isPicked);
         setAlcoholDetails([
-          { title: '카테고리', content: alcohols.engCategory || '-' },
-          { title: '국가/지역', content: alcohols.engRegion || '-' },
-          { title: '캐스크', content: alcohols.cask || '-' },
-          { title: '도수(%)', content: alcohols.abv || '-' },
-          { title: '증류소', content: alcohols.engDistillery || '-' },
+          { title: '증류소', content: alcohols.engDistillery },
+          {
+            title: '국가/지역',
+            content: alcohols.engRegion?.replace('/', '/\n') || '-',
+          },
+          { title: '도수', content: `${alcohols.abv}%` },
         ]);
       }
     } catch (error) {
@@ -118,7 +119,7 @@ function SearchAlcohol() {
               이에요.
             </p>
           </div>
-          <div>
+          <div className="text-10">
             <p>최근 평가한 별점은 {`${myRating}`}점이에요.</p>
             <p>다른 별점을 주시고 싶으시면 언제든지 변경해보세요!</p>
           </div>
@@ -201,25 +202,39 @@ function SearchAlcohol() {
               />
             </div>
             <div className="mb-5">
-              <article className="grid place-items-center space-y-3 py-5">
+              <article className="grid place-items-center space-y-2 pt-[25px] pb-[21px]">
                 {getRatingMessage(
                   data?.alcohols?.myAvgRating,
                   data?.alcohols?.myRating,
                 )}
                 <div>
-                  <StarRating rate={rate} size={50} handleRate={handleRate} />
+                  <StarRating rate={rate} size={42} handleRate={handleRate} />
                 </div>
               </article>
-              <section className="mx-5 py-5 border-y border-mainGray/30 grid grid-cols-2 gap-2">
-                {alcoholDetails.map((item: DetailItem) => (
-                  <div
-                    key={item.content}
-                    className="flex text-12 text-mainDarkGray items-start gap-2"
-                  >
-                    <div className="min-w-14 font-semibold">{item.title}</div>
-                    <div className="flex-1 font-normal">{item.content}</div>
+              <section className="mx-5 py-[21px] border-y border-mainGray/30">
+                <div className="grid gap-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    {alcoholDetails.map((item: DetailItem) => (
+                      <div
+                        key={item.content}
+                        className="flex text-12 text-mainDarkGray items-start gap-2"
+                      >
+                        <div className="min-w-14 font-semibold">
+                          {item.title}
+                        </div>
+                        <div className="flex-1 font-normal whitespace-pre-line">
+                          {item.content}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                  <div className="flex text-12 text-mainDarkGray items-start gap-2">
+                    <div className="min-w-14 font-semibold">캐스크</div>
+                    <div className="flex-1 font-normal break-words">
+                      {data?.alcohols?.cask || '-'}
+                    </div>
+                  </div>
+                </div>
               </section>
               {data?.alcohols?.alcoholsTastingTags && (
                 <FlavorTag tagList={data.alcohols.alcoholsTastingTags} />
@@ -263,8 +278,8 @@ function SearchAlcohol() {
             data.reviewInfo.totalCount !== 0 ? (
               <>
                 <div className="h-4 bg-sectionWhite" />
-                <section className="mx-5 py-5 space-y-3">
-                  <p className="text-13 text-mainGray font-normal">
+                <section className="mx-5 pt-[34px] pb-[20px]">
+                  <p className="text-11 text-mainGray font-normal mb-[10px]">
                     총 {data.reviewInfo.totalCount}개
                   </p>
                   <div className="border-b border-mainGray/30" />

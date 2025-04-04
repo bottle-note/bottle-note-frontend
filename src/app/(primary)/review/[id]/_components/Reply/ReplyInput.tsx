@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { useFormContext, FieldValues, SubmitHandler } from 'react-hook-form';
 import { AuthService } from '@/lib/AuthService';
+import useModalStore from '@/store/modalStore';
 
 interface Props {
   textareaRef: React.MutableRefObject<HTMLTextAreaElement | null>;
@@ -15,6 +16,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
   const content = watch('content');
   const mentionName = watch('replyToReplyUserName');
   const newTextareaRef = React.useRef<HTMLTextAreaElement | null>(null);
+  const { handleLoginModal } = useModalStore();
 
   const handleResizeHeight = () => {
     if (newTextareaRef.current) {
@@ -75,6 +77,13 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
     newTextareaRef.current = textareaRef.current;
   }, [textareaRef]);
 
+  const handleTextareaClick = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    if (!isLogin) {
+      e.preventDefault();
+      handleLoginModal();
+    }
+  };
+
   return (
     <div className="fixed bottom-[6.7rem] left-0 right-0 mx-auto w-full max-w-2xl px-4 z-10">
       <div className="bg-[#f6f6f6] pt-1 px-3 rounded-lg shadow-md flex items-center">
@@ -86,7 +95,6 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
                 : '로그인 후 댓글을 작성할 수 있어요:)'
             }
             className="flex-grow p-1 text-mainGray text-13 bg-[#f6f6f6] resize-none max-h-[50px] overflow-hidden focus:outline-none"
-            disabled={!isLogin}
             onInput={handleInput}
             rows={1}
             ref={(e) => {
@@ -95,6 +103,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
             }}
             value={content}
             maxLength={300}
+            onClick={handleTextareaClick}
           />
         </div>
         <button
