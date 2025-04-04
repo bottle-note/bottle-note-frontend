@@ -39,15 +39,15 @@ function LinkButton({
         <div className={imgSrc ? 'space-y-[90px]' : 'space-y-[11.7px]'}>
           <div className={`${icon && 'flex justify-between'} text-white`}>
             <div>
-              <p className="font-extrabold text-15">{korName}</p>
+              <p className="font-extrabold text-14">{korName}</p>
               <p className="text-12 font-normal">{engName}</p>
             </div>
             {icon && (
               <Image
                 src="/icon/arrow-right-white.svg"
                 alt="arrowIcon"
-                width={23}
-                height={23}
+                width={25}
+                height={25}
               />
             )}
           </div>
