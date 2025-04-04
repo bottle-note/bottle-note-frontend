@@ -41,11 +41,16 @@ export const AuthApi = {
 
   // NOTE: 클라이언트 사이드에서 서버사이드로 보내는 로그인 요청
   async clientLogin(
-    body: Omit<LoginReq, 'gender' | 'age'>,
+    body: Omit<LoginReq, 'gender' | 'age' | 'socialUniqueId'> & {
+      socialUniqueId?: string;
+    },
   ): Promise<{ tokens: TokenData; info: UserData }> {
     const response = await fetch('/api/login', {
       method: 'POST',
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        ...body,
+        socialUniqueId: body.socialUniqueId ?? '',
+      }),
       headers: {
         'Content-Type': 'application/json',
       },
