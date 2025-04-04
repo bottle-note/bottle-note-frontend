@@ -17,6 +17,12 @@ interface Props {
   >;
 }
 
+const SearchButton = () => (
+  <div className="px-2 w-10 absolute top-0 right-1 h-full flex items-center justify-center">
+    <Image src={EnterIcon} alt="search button" />
+  </div>
+);
+
 export default function SearchBar({
   type = 'Search',
   handleSearch,
@@ -46,13 +52,8 @@ export default function SearchBar({
       type === 'Link' ? ' cursor-pointer' : ''
     }`,
     placeholder,
+    'aria-label': '검색어 입력',
   };
-
-  const SearchButton = () => (
-    <div className="px-2 w-10 absolute top-0 right-1 h-full flex items-center justify-center">
-      <Image src={EnterIcon} alt="search button" />
-    </div>
-  );
 
   useEffect(() => {
     setSearchText(currSearchKeyword ?? '');
@@ -95,6 +96,7 @@ export default function SearchBar({
           type="button"
           onMouseDown={handleDelete}
           className="absolute right-11 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
+          aria-label="검색어 지우기"
         >
           <Image src={DeleteIcon} alt="delete" />
         </button>
@@ -102,6 +104,7 @@ export default function SearchBar({
       <button
         className="px-2 w-10 absolute top-0 right-1 h-full flex items-center justify-center"
         onMouseDown={handleSubmit}
+        aria-label="검색"
       >
         <SearchButton />
       </button>
