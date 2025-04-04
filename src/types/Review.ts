@@ -31,18 +31,18 @@ export interface Review {
   likeCount: number;
   replyCount: number;
   reviewImageUrl: string | null;
+  totalImageCount: number;
   userInfo: ReviewUserInfo;
   viewCount: number;
-  locationInfo: ReviewLocationInfo;
+  locationInfo: ReviewLocationInfo | null;
   status: 'PUBLIC' | 'PRIVATE';
   isMyReview: boolean;
   isLikedByMe: boolean;
   hasReplyByMe: boolean;
   isBestReview: boolean;
-  alcoholsTastingTags?: string[];
+  tastingTagList?: string[];
   createAt: string;
-  myRating: number;
-  myAvgRating: number;
+  rating: number;
 }
 
 export interface FormValues {
