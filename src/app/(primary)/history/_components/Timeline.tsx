@@ -165,11 +165,7 @@ export default function Timeline({
       </List>
       <div ref={targetRef} />
       {(error || isLoading || !(data.userHistories?.length > 0)) && (
-        <HistoryEmptyState
-          isLoading={isLoading}
-          error={error}
-          totalCount={data.userHistories?.length}
-        />
+        <HistoryEmptyState isLoading={isLoading} error={error} />
       )}
     </section>
   );
