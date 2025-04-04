@@ -40,6 +40,7 @@ export default function AddressForm() {
         target="_blank"
         rel="noopener noreferrer"
         className="text-subCoral"
+        prefetch={false}
       >
         지도보기
       </Link>
