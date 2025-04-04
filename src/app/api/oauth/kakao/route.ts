@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
       gender: null,
       age: null,
       socialType: SOCIAL_TYPE.KAKAO,
+      socialUniqueId: '',
     };
 
     // Step 4: Log in with the Auth API
