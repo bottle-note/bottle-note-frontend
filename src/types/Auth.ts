@@ -7,6 +7,7 @@ export const enum SOCIAL_TYPE {
 
 export interface LoginReq {
   email: string;
+  socialUniqueId: string;
   gender: 'MALE' | 'FEMALE' | null;
   age: number | null;
   socialType: SOCIAL_TYPE;
