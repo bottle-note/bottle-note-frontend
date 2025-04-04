@@ -48,6 +48,7 @@ const handler = NextAuth({
           gender: null,
           age: null,
           socialType: account?.provider as SOCIAL_TYPE,
+          socialUniqueId: '',
         };
 
         const { accessToken, refreshToken } = await AuthApi.login(body);

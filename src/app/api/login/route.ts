@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
       gender: null,
       age: null,
       socialType,
+      socialUniqueId: '',
     };
 
     const tokens = await AuthApi.login(loginPayload);
