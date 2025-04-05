@@ -95,7 +95,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
               </div>
             </Link>
             <Star
-              rating={data.reviewInfo?.myRating ?? 0}
+              rating={data.reviewInfo?.rating ?? 0}
               size={25}
               styleProps="text-20 text-subCoral font-semibold"
             />
@@ -125,7 +125,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
             )}
           </article>
           {data.reviewImageList && (
-            <div className="whitespace-nowrap overflow-x-auto flex space-x-2 scrollbar-hide">
+            <div className="whitespace-nowrap overdsdsflow-x-auto flex space-x-2 scrollbar-hide">
               {data.reviewImageList.map((imgData) => (
                 <div
                   className="relative w-[147px] h-[147px] flex-shrink-0"
@@ -165,10 +165,10 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
             </button>
           </article>
         </section>
-        {data.reviewInfo?.alcoholsTastingTags?.length &&
-          data.reviewInfo.alcoholsTastingTags.length !== 0 && (
+        {data.reviewInfo?.tastingTagList?.length &&
+          data.reviewInfo.tastingTagList.length !== 0 && (
             <FlavorTag
-              tagList={data.reviewInfo.alcoholsTastingTags}
+              tagList={data.reviewInfo.tastingTagList}
               styleClass="border-subCoral text-subCoral py-[5px] px-[10px] rounded-md text-12"
             />
           )}
