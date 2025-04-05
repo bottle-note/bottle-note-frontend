@@ -130,24 +130,24 @@ export default function History() {
 
   return (
     <NavLayout>
-      <main className="relative bg-white">
-        <SubHeader bgColor="bg-bgGray">
-          <SubHeader.Left
-            onClick={() => {
-              router.back();
-            }}
-          >
-            <Image
-              src="/icon/arrow-left-subcoral.svg"
-              alt="arrowIcon"
-              width={23}
-              height={23}
-            />
-          </SubHeader.Left>
-          <SubHeader.Center textColor="text-subCoral">
-            나의 히스토리
-          </SubHeader.Center>
-        </SubHeader>
+      <SubHeader bgColor="bg-bgGray">
+        <SubHeader.Left
+          onClick={() => {
+            router.back();
+          }}
+        >
+          <Image
+            src="/icon/arrow-left-subcoral.svg"
+            alt="arrowIcon"
+            width={23}
+            height={23}
+          />
+        </SubHeader.Left>
+        <SubHeader.Center textColor="text-subCoral">
+          나의 히스토리
+        </SubHeader.Center>
+      </SubHeader>
+      <main>
         <SearchContainer
           placeholder="위스키 이름 검색"
           handleSearchCallback={handleSearchCallback}
