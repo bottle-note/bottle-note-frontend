@@ -30,7 +30,7 @@ interface DetailItem {
   content: string;
 }
 
-function SearchAlcohol() {
+export default function SearchAlcohol() {
   const router = useRouter();
   const params = useParams();
   const { isLogin } = AuthService;
@@ -42,6 +42,7 @@ function SearchAlcohol() {
   const [isPicked, setIsPicked] = useState<boolean>(false);
   const [rate, setRate] = useState(0);
   const [userNickName, setUserNickName] = useState<string>('');
+  const [isUnmounting, setIsUnmounting] = useState(false);
 
   const fetchAlcoholDetails = async (id: string) => {
     try {
@@ -95,6 +96,12 @@ function SearchAlcohol() {
       }
     }
   }, [alcoholId, isLogin]);
+
+  useEffect(() => {
+    return () => {
+      setIsUnmounting(true);
+    };
+  }, []);
 
   const handleRate = async (selectedRate: number) => {
     if (!isLogin) return handleLoginModal();
@@ -151,13 +158,17 @@ function SearchAlcohol() {
             <div className="relative">
               {data?.alcohols?.alcoholUrlImg && (
                 <div
-                  className="absolute w-full h-full  bg-cover bg-center"
+                  className="absolute w-full h-full bg-cover bg-center"
                   style={{
                     backgroundImage: `url(${data.alcohols.alcoholUrlImg})`,
                   }}
                 />
               )}
-              <div className="absolute w-full h-full bg-mainCoral bg-opacity-90" />
+              <div
+                className={`absolute w-full h-full bg-mainCoral bg-opacity-90 ${
+                  isUnmounting ? 'hidden' : ''
+                }`}
+              />
               <SubHeader bgColor="bg-mainCoral/10">
                 <SubHeader.Left
                   onClick={() => {
@@ -330,5 +341,3 @@ function SearchAlcohol() {
     </>
   );
 }
-
-export default SearchAlcohol;
