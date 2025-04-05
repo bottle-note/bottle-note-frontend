@@ -2,6 +2,7 @@ import { useRouter } from 'next/navigation';
 import { AuthApi } from '@/app/api/AuthApi';
 import { AuthService } from '@/lib/AuthService';
 import { SOCIAL_TYPE } from '@/types/Auth';
+import { sendLogToFlutter } from '@/utils/flutterUtil';
 
 export const useAppSocialLogin = () => {
   const router = useRouter();
@@ -22,15 +23,21 @@ export const useAppSocialLogin = () => {
   };
 
   const onAppleLoginSuccess = async (data: string) => {
+    // 여기서 정보가 제대로 오지 않았을 경우 실패 처리 필요
     const { email, id } = JSON.parse(data) as {
       email: string | null;
       id: string;
     };
+
+    sendLogToFlutter(`email:${email}, id:${id}`);
+
     const loginResult = await AuthApi.clientLogin({
       email: email ?? '',
       socialUniqueId: id,
       socialType: SOCIAL_TYPE.APPLE,
     });
+
+    sendLogToFlutter(`loginResult:${JSON.stringify(loginResult)}`);
 
     AuthService.login(loginResult.info, loginResult.tokens);
 
