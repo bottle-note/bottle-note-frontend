@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { signIn, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { AuthService } from '@/lib/AuthService';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
