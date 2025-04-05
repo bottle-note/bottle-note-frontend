@@ -69,6 +69,12 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
     }
   };
 
+  const hasValidPrice = data.reviewInfo?.price || data.reviewInfo?.price === 0;
+  const hasValidSizeType = data.reviewInfo?.sizeType;
+  const hasValidLocation = data.reviewInfo?.locationInfo?.address;
+  const shouldShowPriceOrLocation =
+    hasValidLocation || (hasValidPrice && hasValidSizeType);
+
   return (
     <>
       <section>
@@ -172,10 +178,9 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
               styleClass="border-subCoral text-subCoral py-[5px] px-[10px] rounded-md text-12"
             />
           )}
-        {(data.reviewInfo?.locationInfo?.address ||
-          (!!data.reviewInfo?.price && data.reviewInfo?.sizeType)) && (
+        {shouldShowPriceOrLocation && (
           <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 text-12">
-            {data.reviewInfo?.price && data.reviewInfo?.sizeType && (
+            {hasValidPrice && hasValidSizeType && (
               <div className="flex items-center space-x-1">
                 <Image
                   src={
@@ -201,7 +206,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
                 </p>
               </div>
             )}
-            {data.reviewInfo?.locationInfo?.address && (
+            {hasValidLocation && (
               <div className="flex items-start space-x-1">
                 <Image
                   src="/icon/placepoint-subcoral.svg"
