@@ -126,7 +126,7 @@ export default function ReviewDetail() {
             <div className="relative pb-5">
               {alcoholInfo.imageUrl && (
                 <div
-                  className="absolute w-full h-full  bg-cover bg-center"
+                  className="absolute w-full h-full bg-cover bg-center"
                   style={{
                     backgroundImage: `url(${alcoholInfo.imageUrl})`,
                   }}
