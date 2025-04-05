@@ -35,15 +35,17 @@ export default function AddressForm() {
 
   const ExtraButtons = (
     <div className="flex gap-1 text-12">
-      <Link
-        href={watch('mapUrl')}
-        target="_blank"
-        rel="noopener noreferrer"
+      <button
+        onClick={() => {
+          const mapUrl = watch('mapUrl');
+          if (mapUrl) {
+            window.open(mapUrl, '_blank', 'noopener,noreferrer');
+          }
+        }}
         className="text-subCoral"
-        prefetch={false}
       >
         지도보기
-      </Link>
+      </button>
       <div className="text-subCoral">|</div>
       <button
         onClick={() => {

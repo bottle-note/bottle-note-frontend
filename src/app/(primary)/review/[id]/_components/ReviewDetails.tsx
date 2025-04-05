@@ -219,18 +219,17 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
                     <br />
                     {data.reviewInfo?.locationInfo?.detailAddress}
                     <br />
-                    {data.reviewInfo?.locationInfo?.mapUrl && (
-                      <p className="text-subCoral m-0 p-0">
-                        <Link
-                          href={data.reviewInfo.locationInfo.mapUrl}
-                          prefetch={false}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          지도보기
-                        </Link>
-                      </p>
-                    )}
+                    <button
+                      onClick={() => {
+                        const mapUrl = data.reviewInfo?.locationInfo?.mapUrl;
+                        if (mapUrl) {
+                          window.open(mapUrl, '_blank', 'noopener,noreferrer');
+                        }
+                      }}
+                      className="text-subCoral"
+                    >
+                      지도보기
+                    </button>
                   </>
                 </p>
               </div>
