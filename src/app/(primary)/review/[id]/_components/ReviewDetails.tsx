@@ -69,6 +69,12 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
     }
   };
 
+  const hasValidPrice = data.reviewInfo?.price || data.reviewInfo?.price === 0;
+  const hasValidSizeType = data.reviewInfo?.sizeType;
+  const hasValidLocation = data.reviewInfo?.locationInfo?.address;
+  const shouldShowPriceOrLocation =
+    hasValidLocation || (hasValidPrice && hasValidSizeType);
+
   return (
     <>
       <section>
@@ -95,7 +101,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
               </div>
             </Link>
             <Star
-              rating={data.reviewInfo?.myRating ?? 0}
+              rating={data.reviewInfo?.rating ?? 0}
               size={25}
               styleProps="text-20 text-subCoral font-semibold"
             />
@@ -125,7 +131,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
             )}
           </article>
           {data.reviewImageList && (
-            <div className="whitespace-nowrap overflow-x-auto flex space-x-2 scrollbar-hide">
+            <div className="whitespace-nowrap overdsdsflow-x-auto flex space-x-2 scrollbar-hide">
               {data.reviewImageList.map((imgData) => (
                 <div
                   className="relative w-[147px] h-[147px] flex-shrink-0"
@@ -165,17 +171,16 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
             </button>
           </article>
         </section>
-        {data.reviewInfo?.alcoholsTastingTags?.length &&
-          data.reviewInfo.alcoholsTastingTags.length !== 0 && (
+        {data.reviewInfo?.tastingTagList?.length &&
+          data.reviewInfo.tastingTagList.length !== 0 && (
             <FlavorTag
-              tagList={data.reviewInfo.alcoholsTastingTags}
+              tagList={data.reviewInfo.tastingTagList}
               styleClass="border-subCoral text-subCoral py-[5px] px-[10px] rounded-md text-12"
             />
           )}
-        {(data.reviewInfo?.locationInfo?.address ||
-          (!!data.reviewInfo?.price && data.reviewInfo?.sizeType)) && (
+        {shouldShowPriceOrLocation && (
           <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 text-12">
-            {data.reviewInfo?.price && data.reviewInfo?.sizeType && (
+            {hasValidPrice && hasValidSizeType && (
               <div className="flex items-center space-x-1">
                 <Image
                   src={
@@ -201,7 +206,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
                 </p>
               </div>
             )}
-            {data.reviewInfo?.locationInfo?.address && (
+            {hasValidLocation && (
               <div className="flex items-start space-x-1">
                 <Image
                   src="/icon/placepoint-subcoral.svg"
@@ -219,13 +224,19 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
                     <br />
                     {data.reviewInfo?.locationInfo?.detailAddress}
                     <br />
-                    {data.reviewInfo?.locationInfo?.mapUrl && (
-                      <p className="text-subCoral m-0 p-0">
-                        <Link href={data.reviewInfo.locationInfo.mapUrl}>
-                          지도보기
-                        </Link>
-                      </p>
-                    )}
+                    <a
+                      href={data.reviewInfo?.locationInfo?.mapUrl || '#'}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const mapUrl = data.reviewInfo?.locationInfo?.mapUrl;
+                        if (mapUrl) {
+                          window.open(mapUrl, '_blank', 'noopener,noreferrer');
+                        }
+                      }}
+                      className="text-subCoral cursor-pointer"
+                    >
+                      지도보기
+                    </a>
                   </>
                 </p>
               </div>
