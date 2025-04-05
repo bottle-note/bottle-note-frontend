@@ -40,6 +40,7 @@ export default function ReviewDetail() {
   const [reviewDetails, setReviewDetails] =
     useState<ReviewDetailsWithoutAlcoholInfo | null>(null);
   const [isRefetch, setIsRefetch] = useState<boolean>(false);
+  const [isUnmounting, setIsUnmounting] = useState(false);
 
   const schema = yup.object({
     content: yup.string().required('댓글 내용을 입력해주세요.'),
@@ -118,6 +119,12 @@ export default function ReviewDetail() {
     });
   }, [reviewId, reset, fetchReviewDetails]);
 
+  useEffect(() => {
+    return () => {
+      setIsUnmounting(true);
+    };
+  }, []);
+
   return (
     <FormProvider {...formMethods}>
       {alcoholInfo && reviewDetails && !isProcessing ? (
@@ -132,7 +139,9 @@ export default function ReviewDetail() {
                   }}
                 />
               )}
-              <div className="absolute w-full h-full bg-mainCoral bg-opacity-90" />
+              <div
+                className={`absolute w-full h-full bg-mainCoral bg-opacity-90 ${isUnmounting ? 'hidden' : ''}`}
+              />
               <SubHeader bgColor="bg-mainCoral/10">
                 <SubHeader.Left
                   onClick={() => {
