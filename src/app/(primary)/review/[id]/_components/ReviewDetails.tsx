@@ -224,17 +224,19 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
                     <br />
                     {data.reviewInfo?.locationInfo?.detailAddress}
                     <br />
-                    <button
-                      onClick={() => {
+                    <a
+                      href={data.reviewInfo?.locationInfo?.mapUrl || '#'}
+                      onClick={(e) => {
+                        e.preventDefault();
                         const mapUrl = data.reviewInfo?.locationInfo?.mapUrl;
                         if (mapUrl) {
                           window.open(mapUrl, '_blank', 'noopener,noreferrer');
                         }
                       }}
-                      className="text-subCoral"
+                      className="text-subCoral cursor-pointer"
                     >
                       지도보기
-                    </button>
+                    </a>
                   </>
                 </p>
               </div>
