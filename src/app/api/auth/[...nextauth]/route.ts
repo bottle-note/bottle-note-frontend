@@ -43,12 +43,21 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user, account }) {
       try {
+        let socialUniqueId = '';
+
+        if (account?.provider === 'apple' && account.id_token) {
+          const decoded = jwt.decode(account.id_token) as { sub: string };
+          socialUniqueId = decoded?.sub || '';
+        } else {
+          socialUniqueId = account?.providerAccountId || '';
+        }
+
         const body = {
           email: user.email as string,
           gender: null,
           age: null,
           socialType: account?.provider as SOCIAL_TYPE,
-          socialUniqueId: '',
+          socialUniqueId,
         };
 
         const { accessToken, refreshToken } = await AuthApi.login(body);
