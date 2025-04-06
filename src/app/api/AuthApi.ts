@@ -1,10 +1,17 @@
 import { AuthService } from '@/lib/AuthService';
 import useModalStore from '@/store/modalStore';
-import { BasicSignupRes, LoginReq, LoginReturn } from '@/types/Auth';
+import {
+  BasicSignupRes,
+  LoginReq,
+  LoginReturn,
+  TokenData,
+  UserData,
+} from '@/types/Auth';
 import { ApiResponse } from '@/types/common';
 import { ApiError } from '@/utils/ApiError';
 
 export const AuthApi = {
+  // NOTE: 서버사이드에서 활용되는 로그인 메서드
   async login(body: LoginReq): Promise<{
     accessToken: string;
     refreshToken: string;
@@ -31,6 +38,32 @@ export const AuthApi = {
       refreshToken,
     };
   },
+
+  // NOTE: 클라이언트 사이드에서 서버사이드로 보내는 로그인 요청
+  async clientLogin(
+    body: Omit<LoginReq, 'gender' | 'age' | 'socialUniqueId'> & {
+      socialUniqueId?: string;
+    },
+  ): Promise<{ tokens: TokenData; info: UserData }> {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        ...body,
+        socialUniqueId: body.socialUniqueId ?? '',
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to log in');
+    }
+
+    const { tokens, info } = await response.json();
+    return { tokens, info };
+  },
+
   async renewTokenClientSide(refreshToken: string) {
     try {
       const response = await fetch('/api/token/renew', {
@@ -226,34 +259,6 @@ export const AuthApi = {
 
       throw new Error(
         `토큰 검증 도중 에러가 발생했습니다. 사유: ${error.message}`,
-      );
-    }
-  },
-
-  /**
-   * @deprecated
-   * */
-  async guestLogin() {
-    try {
-      const res = await fetch(`/bottle-api/oauth/guest-login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          code: 'Ym90dGxlbm90ZWd1ZXN0Zm9yYWRucm9pZA==',
-        }),
-      });
-
-      const { data } = await res.json();
-
-      return { accessToken: data.accessToken };
-    } catch (e) {
-      const error = e as Error;
-      console.error(error.message);
-
-      throw new Error(
-        `게스트 로그인 도중 에러가 발생했습니다. 사유: ${error.message}`,
       );
     }
   },

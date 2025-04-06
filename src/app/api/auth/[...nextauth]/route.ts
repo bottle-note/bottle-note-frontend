@@ -4,6 +4,7 @@ import NaverProvider from 'next-auth/providers/naver';
 import AppleProvider from 'next-auth/providers/apple';
 import NextAuth from 'next-auth';
 import { getAppleToken } from '@/utils/getAppleToken';
+import { SOCIAL_TYPE } from '@/types/Auth';
 import { AuthApi } from '../../AuthApi';
 
 const jwt = require('jsonwebtoken');
@@ -42,11 +43,21 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user, account }) {
       try {
+        let socialUniqueId = '';
+
+        if (account?.provider === 'apple' && account.id_token) {
+          const decoded = jwt.decode(account.id_token) as { sub: string };
+          socialUniqueId = decoded?.sub || '';
+        } else {
+          socialUniqueId = account?.providerAccountId || '';
+        }
+
         const body = {
           email: user.email as string,
           gender: null,
           age: null,
-          socialType: account?.provider as string,
+          socialType: account?.provider as SOCIAL_TYPE,
+          socialUniqueId,
         };
 
         const { accessToken, refreshToken } = await AuthApi.login(body);
