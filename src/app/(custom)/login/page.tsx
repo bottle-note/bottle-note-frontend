@@ -35,7 +35,7 @@ export default function Login() {
 
   const { register, handleSubmit } = useForm<FormValues>();
 
-  const handleSingup = () => {
+  const handleSignup = () => {
     router.push('/signup');
   };
 
@@ -112,7 +112,7 @@ export default function Login() {
             <button className="bg-subCoral text-white border border-white rounded-md py-2.5">
               로그인 하기
             </button>
-            <button onClick={handleSingup}>
+            <button onClick={handleSignup}>
               <span className="text-xs text-white">
                 보틀노트 회원이 아니신가요?
               </span>
