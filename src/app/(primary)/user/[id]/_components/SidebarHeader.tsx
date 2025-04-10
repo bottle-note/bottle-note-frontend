@@ -119,21 +119,13 @@ const SidebarHeader = () => {
       },
       {
         text: '이용약관',
-        action: () =>
-          window.open(
-            'https://bottle-note.notion.site/info?pvs=4',
-            '_blank',
-            'noopener,noreferrer',
-          ),
+        link: 'https://bottle-note.notion.site/info?pvs=4',
+        action: null,
       },
       {
         text: '개인정보 처리 방침',
-        action: () =>
-          window.open(
-            'http://bottle-note.notion.site/',
-            '_blank',
-            'noopener,noreferrer',
-          ),
+        link: 'http://bottle-note.notion.site/',
+        action: null,
       },
       {
         text: '로그아웃',
@@ -180,13 +172,27 @@ const SidebarHeader = () => {
                   animate="visible"
                   custom={index}
                 >
-                  <button
-                    onClick={menu.action}
-                    className="w-full flex justify-between"
-                  >
-                    <span>{menu.text}</span>
-                    <span>{'>'}</span>
-                  </button>
+                  {menu.action && (
+                    <button
+                      onClick={menu.action}
+                      className="w-full flex justify-between"
+                    >
+                      <span>{menu.text}</span>
+                      <span>{'>'}</span>
+                    </button>
+                  )}
+
+                  {menu.link && (
+                    <Link
+                      href={menu.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full flex justify-between"
+                    >
+                      <span>{menu.text}</span>
+                      <span>{'>'}</span>
+                    </Link>
+                  )}
                 </motion.li>
               ))}
             </ul>
