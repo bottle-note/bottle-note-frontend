@@ -5,6 +5,7 @@ import { AuthService } from '../lib/AuthService';
 
 interface FetchOptions extends RequestInit {
   requireAuth?: boolean;
+  preferAuth?: boolean;
   cache?: RequestCache;
 }
 
@@ -19,11 +20,16 @@ export const fetchWithAuth: FetchWithAuth = async (
   options = {},
   retryCount = 0,
 ) => {
-  const { requireAuth = true, cache = 'no-store', ...fetchOptions } = options;
+  const {
+    requireAuth = true,
+    preferAuth = true,
+    cache = 'no-store',
+    ...fetchOptions
+  } = options;
 
   const token = AuthService.getToken();
 
-  // 인증이 필요하지만 토큰이 없는 경우 → 로그아웃 처리 후 로그인 모달 열기
+  // 1. 인증 필수 + 토큰 X -> 로그인 예외
   if (requireAuth && !token) {
     AuthService.logout();
     const { handleLoginState } = useModalStore.getState();
@@ -35,24 +41,20 @@ export const fetchWithAuth: FetchWithAuth = async (
 
   let res: any = new Error('API 호출 중 에러가 발생했습니다.');
 
-  // 인증이 필요 없지만 토큰이 없는 경우
-  if (!token) {
+  // 2. 인증 필수 X + 토큰 X -> 그냥 요청
+  if ((!requireAuth && !preferAuth) || !token) {
     try {
-      // 인증 없이 API 요청
       const response = await fetch(requestUrl, {
         ...fetchOptions,
         cache,
       });
 
-      // 응답이 실패한 경우 → 에러 응답을 저장
       if (!response.ok) {
         res = await response.json();
       }
 
-      // 정상 응답 반환
       return await response.json();
     } catch (error) {
-      // ApiError인 경우 콘솔에 상세 정보 출력
       if (error instanceof ApiError) {
         console.log('API Error Response of fetch:', error.response);
       }
