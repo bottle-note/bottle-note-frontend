@@ -12,7 +12,6 @@ export const AlcoholsApi = {
   async getPopular() {
     const response = await fetchWithAuth(`/bottle-api/popular/week`, {
       requireAuth: false,
-      preferAuth: true,
       cache: 'force-cache',
     });
 
@@ -95,7 +94,6 @@ export const AlcoholsApi = {
           'Content-Type': 'application/json',
         },
         requireAuth: false,
-        preferAuth: true,
       },
     );
 
