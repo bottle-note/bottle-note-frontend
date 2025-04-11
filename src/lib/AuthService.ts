@@ -6,11 +6,11 @@ export class AuthService {
 
   static userData: UserData | null = AuthService.getUserData();
 
-  private static getIsLogin(): boolean {
+  static getIsLogin(): boolean {
     return Boolean(Storage.getItem('userData'));
   }
 
-  private static getUserData(): UserData | null {
+  static getUserData(): UserData | null {
     if (AuthService.getIsLogin()) {
       return Storage.getItem<UserData>('userData');
     }
