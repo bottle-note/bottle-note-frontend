@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { useWebViewInit } from '@/hooks/useWebViewInit';
 import '@/style/globals.css';
 
@@ -9,11 +9,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { initWebView, isMobile } = useWebViewInit();
+  const { initWebView } = useWebViewInit();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     initWebView();
-  }, [isMobile]);
+  }, []);
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-subCoral">
