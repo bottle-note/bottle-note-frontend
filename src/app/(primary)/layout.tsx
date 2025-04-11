@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import useModalStore from '@/store/modalStore';
 import { useWebViewInit } from '@/hooks/useWebViewInit';
 import LoginModal from './_components/LoginModal';
@@ -11,11 +11,11 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   const { loginState, handleLoginModal } = useModalStore();
-  const { initWebView, isMobile } = useWebViewInit();
+  const { initWebView } = useWebViewInit();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     initWebView();
-  }, [isMobile]);
+  }, []);
 
   return (
     <div className="bg-white flex flex-col w-full mx-auto min-h-screen pb-12">
