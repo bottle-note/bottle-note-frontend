@@ -3,16 +3,22 @@
 import { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { AuthService } from '@/lib/AuthService';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import { UserApi } from '@/app/api/UserApi';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
+import { AuthApi } from '@/app/api/AuthApi';
+import { UserData } from '@/types/Auth';
 import Modal from '@/components/Modal';
-import { useLogin } from '@/hooks/useLogin';
+import useModalStore from '@/store/modalStore';
+import { ApiError } from '@/utils/ApiError';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
+
+const jwt = require('jsonwebtoken');
 
 type FormValues = {
   email: string;
@@ -20,32 +26,98 @@ type FormValues = {
 };
 
 export default function Login() {
-  const router = useRouter();
   const { data: session } = useSession();
-  const {
-    handleBasicLogin,
-    handleRedirectWithSession,
-    handleSendDeviceInfo,
-    handleInitKakaoSdkLogin,
-    handleKakaoLogin,
-    handleAppleLogin,
-  } = useLogin();
-  const { isLogin } = AuthService;
-  const { setIsInApp } = DeviceService;
+  const router = useRouter();
+  const { isLogin, login } = AuthService;
+  const { isInApp, setIsInApp } = DeviceService;
+  const { handleModalState, handleCloseModal } = useModalStore();
 
   const { register, handleSubmit } = useForm<FormValues>();
 
-  const handleSignup = () => {
+  const handleRestore = async (data: FormValues) => {
+    try {
+      await AuthApi.restore(data);
+      handleModalState({
+        isShowModal: true,
+        type: 'ALERT',
+        mainText: `재가입에 성공하였습니다.`,
+        handleConfirm: () => {
+          handleCloseModal();
+        },
+      });
+    } catch (error) {
+      handleModalState({
+        isShowModal: true,
+        type: 'ALERT',
+        mainText: `${(error as unknown as ApiError).message}`,
+        handleConfirm: () => {
+          handleCloseModal();
+        },
+      });
+    }
+  };
+
+  const handleLogin = async (data: FormValues) => {
+    try {
+      const result = await AuthApi.basicLogin(data);
+
+      const decoded: UserData = jwt.decode(result.accessToken);
+
+      login(decoded, {
+        accessToken: result.accessToken,
+        refreshToken: '',
+      });
+
+      router.push('/');
+    } catch (error) {
+      if (error instanceof ApiError && error.code === 'USER_DELETED') {
+        return handleModalState({
+          isShowModal: true,
+          type: 'CONFIRM',
+          mainText: `${`탈퇴한 유저입니다. 재가입하시겠습니까?`}`,
+          handleConfirm: async () => {
+            handleCloseModal();
+            await handleRestore(data);
+          },
+        });
+      }
+
+      handleModalState({
+        isShowModal: true,
+        mainText: `${(error as unknown as Error).message}`,
+        handleConfirm: () => {
+          handleCloseModal();
+        },
+      });
+    }
+  };
+
+  const handleSingup = () => {
     router.push('/signup');
   };
 
   useEffect(() => {
-    handleRedirectWithSession();
-  }, [session]);
+    if (session) {
+      if (session.user) {
+        const { userId, email, profile, accessToken, refreshToken } =
+          session.user;
 
-  useEffect(() => {
-    handleSendDeviceInfo();
-  }, [isLogin]);
+        AuthService.login(
+          {
+            userId,
+            sub: email,
+            profile,
+          },
+          {
+            accessToken,
+            refreshToken,
+          },
+        );
+
+        router.replace('/');
+      }
+    }
+  }, [session]);
 
   // NOTE: 인앱 상태일 때 웹뷰에 device token 발급 요청
   useEffect(() => {
@@ -55,9 +127,58 @@ export default function Login() {
     }
   }, []);
 
+  // NOTE: 인앱 상태일 때, 로그인이 완료된 상태일 때 device 정보를 서버로 전달 및 로그인 처리
   useEffect(() => {
-    handleInitKakaoSdkLogin();
+    (async () => {
+      try {
+        if (isInApp && isLogin) {
+          const result = await UserApi.sendDeviceInfo(
+            DeviceService.deviceToken || '',
+            DeviceService.platform || '',
+          );
+
+          window.sendLogToFlutter(
+            `${result.data.message} / ${result.data.deviceToken} / ${result.data.platform}`,
+          );
+          router.replace('/');
+          return;
+        }
+
+        if (!isInApp && isLogin) {
+          router.replace('/');
+        }
+      } catch (e) {
+        window.sendLogToFlutter((e as Error).message);
+      }
+    })();
+  }, [isLogin]);
+
+  // ----- kakao sdk login
+  useEffect(() => {
+    const kakaoSDK = document.createElement('script');
+    kakaoSDK.async = false;
+    kakaoSDK.src = `https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js`;
+    kakaoSDK.integrity = `sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4`;
+    kakaoSDK.crossOrigin = `anonymous`;
+    document.head.appendChild(kakaoSDK);
+
+    const onLoadKakaoAPI = () => {
+      if (!window.Kakao.isInitialized()) {
+        window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID);
+
+        console.log('after Init: ', window.Kakao.isInitialized());
+      }
+    };
+
+    kakaoSDK.addEventListener('load', onLoadKakaoAPI);
   }, []);
+
+  const redirectUri = `${process.env.NEXT_PUBLIC_CLIENT_URL}/oauth/kakao`;
+  const kakaoLoginHandler = () => {
+    window.Kakao.Auth.authorize({
+      redirectUri,
+    });
+  };
 
   return (
     <>
@@ -88,7 +209,7 @@ export default function Login() {
 
         <section className="flex flex-col gap-5 pb-5 w-full px-5">
           <form
-            onSubmit={handleSubmit(handleBasicLogin)}
+            onSubmit={handleSubmit(handleLogin)}
             className="flex flex-col gap-2"
           >
             <input
@@ -112,7 +233,7 @@ export default function Login() {
             <button className="bg-subCoral text-white border border-white rounded-md py-2.5">
               로그인 하기
             </button>
-            <button onClick={handleSignup}>
+            <button onClick={handleSingup}>
               <span className="text-xs text-white">
                 보틀노트 회원이 아니신가요?
               </span>
@@ -126,8 +247,11 @@ export default function Login() {
           </article>
 
           <article className="flex flex-col gap-2">
-            <SocialLoginBtn type="KAKAO" onClick={handleKakaoLogin} />
-            <SocialLoginBtn type="APPLE" onClick={handleAppleLogin} />
+            <SocialLoginBtn type="KAKAO" onClick={kakaoLoginHandler} />
+            <SocialLoginBtn type="APPLE" onClick={() => signIn('apple')} />
+            {/* NOTE: 소셜로그인 테스트용 계정 */}
+            {/* <SocialLoginBtn type="GOOGLE" onClick={() => signIn('google')} /> */}
+            {/* <SocialLoginBtn type="NAVER" onClick={() => signIn('naver')} /> */}
           </article>
         </section>
 
