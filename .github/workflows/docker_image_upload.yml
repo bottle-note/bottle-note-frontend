@@ -3,14 +3,10 @@ name: Build and Push to ECR
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - chore/393-deploy
   pull_request:
     types: [ closed ]
     branches:
-      - dev
-      - prod
+      - release
 
 concurrency:
   group: "ecr-upload"
