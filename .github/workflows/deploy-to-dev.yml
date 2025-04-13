@@ -91,9 +91,6 @@ jobs:
             # 다운로드 확인
             docker images | grep $ECR_REPOSITORY
 
-            # 환경 변수 파일 설정
-            echo "${{ secrets.DEV_ENV }}" | base64 --decode > .bottlenote.development.ENV
-
             # 기존 컨테이너 중지 및 삭제 (있는 경우)
             docker stop bottle-note-front-server-development || true
             docker rm bottle-note-front-server-development || true
@@ -101,7 +98,6 @@ jobs:
             docker run -d \
               --name bottle-note-front-server \
               -p 3000:3000 \
-              --env-file .bottlenote.development.ENV \
               -e TZ=Asia/Seoul \
               --restart unless-stopped \
               --log-driver json-file \
