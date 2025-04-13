@@ -1,10 +1,11 @@
 name: Deploy Workflow
 
 on:
-  pull_request:
-    types: [closed]
-    branches:
-      - release
+  workflow_dispatch:
+  #pull_request:
+  #  types: [closed]
+  #  branches:
+  #    - release
 
 concurrency:
   group: 'dev-deploy'
