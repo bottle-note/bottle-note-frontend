@@ -10,15 +10,16 @@ import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 export const AlcoholsApi = {
   async getPopular() {
-    const response = await fetch(`/bottle-api/popular/week`, {
+    const response = await fetchWithAuth(`/bottle-api/popular/week`, {
+      requireAuth: false,
       cache: 'force-cache',
     });
-    if (!response.ok) {
+
+    if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<{ alcohols: AlcoholAPI[] }> =
-      await response.json();
+    const result: ApiResponse<{ alcohols: AlcoholAPI[] }> = await response;
 
     const formattedData = result.data.alcohols.map((alcohol: AlcoholAPI) => {
       return {
@@ -85,22 +86,23 @@ export const AlcoholsApi = {
     cursor,
     pageSize,
   }: ListQueryParams) {
-    const response = await fetch(
+    const response = await fetchWithAuth(
       `/bottle-api/alcohols/search?keyword=${decodeURI(keyword ?? '')}&category=${category}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
       {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
+        requireAuth: false,
       },
     );
 
-    if (!response.ok) {
+    if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
 
     const result: ApiResponse<{ alcohols: any[]; totalCount: number }> =
-      await response.json();
+      await response;
 
     const formattedResult: ApiResponse<{
       alcohols: AlcoholAPI[];
