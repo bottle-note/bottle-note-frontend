@@ -1,19 +1,29 @@
 import { useState } from 'react';
 
-interface Props<T> {
-  tabList: T[];
+export interface TabItem {
+  id: string;
+  name: string;
 }
 
-export const useTab = <T extends { name: string; id: string }>({
-  tabList,
-}: Props<T>) => {
-  const [currentTab, setCurrentTab] = useState(tabList[0]);
+interface UseTabProps {
+  initialTabId?: string;
+  items: TabItem[];
+}
 
-  const handleTab = (id: string) => {
-    const selected = tabList.find((item) => item.id === id);
+interface UseTabReturn {
+  activeTab: string;
+  setActiveTab: (id: string) => void;
+  items: TabItem[];
+}
 
-    setCurrentTab((prev) => selected ?? prev);
+export const useTab = ({ initialTabId, items }: UseTabProps): UseTabReturn => {
+  const [activeTab, setActiveTab] = useState(
+    initialTabId || items[0]?.id || '',
+  );
+
+  return {
+    activeTab,
+    setActiveTab,
+    items,
   };
-
-  return { currentTab, handleTab, tabList };
 };

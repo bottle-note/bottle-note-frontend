@@ -1,11 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect, ReactNode } from 'react';
-
-interface TabItem {
-  id: string;
-  name: string;
-}
+import { useRef, useEffect, ReactNode } from 'react';
+import { useTab, TabItem } from '@/hooks/useTab';
 
 interface Props {
   items: TabItem[];
@@ -15,7 +11,7 @@ interface Props {
 }
 
 const TabNavigation = ({ items, activeId, onSelect, children }: Props) => {
-  const [activeTab, setActiveTab] = useState(activeId || items[0]?.id || '');
+  const { activeTab, setActiveTab } = useTab({ items, initialTabId: activeId });
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // 활성 탭으로 스크롤 이동
