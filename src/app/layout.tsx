@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import '@/style/globals.css';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { Providers } from '@/lib/Providers';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -29,6 +30,12 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <Providers>
           <body className="relative">
+            {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID &&
+              process.env.NODE_ENV === 'production' && (
+                <GoogleAnalytics
+                  gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}
+                />
+              )}
             {children}
             <div id="modal" />
           </body>
