@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import '@/style/globals.css';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { Providers } from '@/lib/Providers';
 
 export const metadata: Metadata = {
@@ -26,6 +27,12 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <Providers>
           <body className="relative">
+            {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID &&
+              process.env.NODE_ENV === 'production' && (
+                <GoogleAnalytics
+                  gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}
+                />
+              )}
             {children}
             <div id="modal" />
           </body>
