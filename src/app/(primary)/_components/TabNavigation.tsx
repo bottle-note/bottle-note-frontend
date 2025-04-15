@@ -39,7 +39,7 @@ const TabNavigation = ({ items, activeId, onSelect, children }: Props) => {
         {/* 스크롤 가능한 탭 컨테이너 */}
         <div
           ref={scrollContainerRef}
-          className="relative flex overflow-x-auto scrollbar-hide w-full"
+          className="relative flex overflow-x-auto scrollbar-hide w-full scroll-smooth"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           <div className="flex">
