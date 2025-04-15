@@ -16,14 +16,14 @@ export default function PopularCard({ data }: Props) {
     <Link href={path}>
       <div className="w-[166px]">
         <div className="w-full border-t-[2px] border-subCoral">
-          <div className="w-full h-[166px] bg-white relative flex shrink-0 items-center justify-center">
-            <div className="w-[150px] h-[140px] relative">
+          <div className="w-full h-[166px] bg-sectionWhite relative flex shrink-0 items-center justify-center">
+            <div className="w-[150px] h-[140px] relative bg-sectionWhite">
               <Image
                 src={imageUrl}
                 alt="alcohol image"
                 fill
                 sizes="150px"
-                className="object-contain"
+                className="object-contain mix-blend-multiply"
                 priority
               />
             </div>
