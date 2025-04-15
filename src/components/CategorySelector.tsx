@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useCategory } from '@/hooks/useCategory';
 import { Category } from '@/types/common';
-import CategoryTitle from './CategoryTitle';
+import MenuList from './MenuList';
 
 interface Props {
   handleCategoryCallback: (value: Category) => void;
@@ -29,7 +29,7 @@ function CategorySelector({ handleCategoryCallback }: Props) {
 
   return (
     <section className="space-y-4">
-      <CategoryTitle subTitle="카테고리" />
+      <MenuList name="카테고리" />
       <article className="whitespace-nowrap overflow-x-auto flex space-x-1.5 scrollbar-hide">
         {categories.map((category) => {
           return (

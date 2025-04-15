@@ -14,7 +14,7 @@ export default function RatingForm() {
         이 술에 대한 평가를 남겨보세요.
       </p>
       <div>
-        <StarRating size={50} rate={watch('rating')} handleRate={handleRate} />
+        <StarRating size={42} rate={watch('rating')} handleRate={handleRate} />
       </div>
     </article>
   );

@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
@@ -9,15 +10,15 @@ const config: Config = {
   theme: {
     extend: {
       fontSize: {
-        xxs: ['10px', { lineHeight: '16px' }],
-        '9': ['9px', '13px'],
-        '10': ['10px', '16px'],
-        '11': ['11px', '17px'],
-        '12': ['12px', '18px'],
-        '13': ['13px', '19px'],
-        '15': ['15px', '23px'],
-        '20': ['20px', '30px'],
-        '27': ['27px', '40px'],
+        '9': ['9px', '9px'],
+        '10': ['10px', '14px'],
+        '11': ['11px', '15px'],
+        '12': ['12px', '16px'],
+        '13': ['13px', '17px'],
+        '15': ['15px', '19px'],
+        '16': ['16px', '20px'],
+        '20': ['20px', '24px'],
+        '27': ['27px', '31px'],
       },
       lineHeight: {
         sm: '14px',

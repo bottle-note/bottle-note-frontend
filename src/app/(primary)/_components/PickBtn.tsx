@@ -51,7 +51,7 @@ const PickBtn = ({
     <button
       className={
         pickBtnName
-          ? 'flex items-center space-x-1'
+          ? 'flex items-end space-x-[0.5px]'
           : 'justify-self-end row-start-3'
       }
       onClick={handleClick}
@@ -71,7 +71,7 @@ const PickBtn = ({
           alt="unPick"
         />
       )}
-      {pickBtnName && <p className="text-12 font-bold">{pickBtnName}</p>}
+      {pickBtnName && <p className="text-12 font-normal">{pickBtnName}</p>}
     </button>
   );
 };

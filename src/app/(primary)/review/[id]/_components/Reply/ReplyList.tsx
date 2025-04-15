@@ -11,19 +11,16 @@ interface Props {
   reviewId: string | string[];
   isRefetch: boolean;
   setIsRefetch: React.Dispatch<React.SetStateAction<boolean>>;
-  isSubReplyShow: boolean;
-  resetSubReplyToggle: (value?: boolean) => void;
 }
 
 export default function ReplyList({
   reviewId,
   isRefetch,
   setIsRefetch,
-  isSubReplyShow,
-  resetSubReplyToggle,
 }: Props) {
   const { userData } = AuthService;
   const [subReplyList, setSubReplyList] = useState<SubReplyListApi | null>();
+  const [openReplyIds, setOpenReplyIds] = useState<Set<number>>(new Set());
 
   const {
     data: rootReplyList,
@@ -80,16 +77,41 @@ export default function ReplyList({
 
     if (result && result.totalCount > 0) {
       const replyFormattedList = sortReplies(result.reviewReplies, rootReplyId);
-      setSubReplyList({ ...result, reviewReplies: replyFormattedList });
+      setSubReplyList((prev) => ({
+        ...result,
+        reviewReplies: [...(prev?.reviewReplies || []), ...replyFormattedList],
+      }));
     }
+  };
+
+  const handleToggleSubReply = (rootReplyId: number) => {
+    setOpenReplyIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(rootReplyId)) {
+        newSet.delete(rootReplyId);
+      } else {
+        newSet.add(rootReplyId);
+        if (
+          !subReplyList?.reviewReplies.some(
+            (reply) => reply.rootReviewId === rootReplyId,
+          )
+        ) {
+          getSubReplyList(rootReplyId);
+        }
+      }
+      return newSet;
+    });
   };
 
   useEffect(() => {
     if (isRefetch) {
-      refetchRootReply().then(() => setSubReplyList(null));
+      refetchRootReply().then(() => {
+        setSubReplyList(null);
+        setOpenReplyIds(new Set());
+      });
       setIsRefetch(false);
     }
-  }, [isRefetch]);
+  }, [isRefetch, refetchRootReply, setIsRefetch]);
 
   return (
     <>
@@ -106,33 +128,40 @@ export default function ReplyList({
                   <React.Fragment key={comment.userId + comment.reviewReplyId}>
                     <Reply
                       data={comment}
-                      getSubReplyList={getSubReplyList}
                       isReviewUser={comment.userId === userData?.userId}
                       reviewId={reviewId}
                       setIsRefetch={setIsRefetch}
-                      isSubReplyShow={isSubReplyShow}
-                      resetSubReplyToggle={resetSubReplyToggle}
+                      isSubReplyShow={openReplyIds.has(comment.reviewReplyId)}
+                      onToggleSubReply={() =>
+                        handleToggleSubReply(comment.reviewReplyId)
+                      }
                     >
-                      {(subReplyList?.totalCount ?? 0) > 0 &&
-                        subReplyList?.reviewReplies.map((subComment) => (
-                          <React.Fragment
-                            key={
-                              comment.reviewReplyId + subComment.reviewReplyId
-                            }
-                          >
-                            <div className="border-b border-mainCoral/30" />
-                            <div className="ml-5">
-                              <Reply
-                                data={subComment}
-                                isReviewUser={
-                                  subComment.userId === userData?.userId
-                                }
-                                reviewId={reviewId}
-                                setIsRefetch={setIsRefetch}
-                              />
-                            </div>
-                          </React.Fragment>
-                        ))}
+                      {openReplyIds.has(comment.reviewReplyId) &&
+                        (subReplyList?.totalCount ?? 0) > 0 &&
+                        subReplyList?.reviewReplies
+                          .filter(
+                            (reply) =>
+                              reply.rootReviewId === comment.reviewReplyId,
+                          )
+                          .map((subComment) => (
+                            <React.Fragment
+                              key={
+                                comment.reviewReplyId + subComment.reviewReplyId
+                              }
+                            >
+                              <div className="border-b border-mainCoral/30" />
+                              <div className="ml-5">
+                                <Reply
+                                  data={subComment}
+                                  isReviewUser={
+                                    subComment.userId === userData?.userId
+                                  }
+                                  reviewId={reviewId}
+                                  setIsRefetch={setIsRefetch}
+                                />
+                              </div>
+                            </React.Fragment>
+                          ))}
                     </Reply>
                     {index !==
                       Number(rootReplyList[0]?.data?.totalCount) - 1 && (

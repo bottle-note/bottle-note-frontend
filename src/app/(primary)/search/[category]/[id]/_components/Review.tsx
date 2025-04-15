@@ -13,21 +13,22 @@ import { formatDate } from '@/utils/formatDate';
 import VisibilityToggle from '@/app/(primary)/_components/VisibilityToggle';
 import LikeBtn from '@/app/(primary)/_components/LikeBtn';
 import OptionDropdown from '@/components/OptionDropdown';
-import Modal from '@/components/Modal';
 import useModalStore from '@/store/modalStore';
 import { deleteReview } from '@/lib/Review';
 import { AuthService } from '@/lib/AuthService';
-import userImg from 'public/profile-default.svg';
+
+const DEFAULT_USER_IMAGE = '/profile-default.svg';
 
 interface Props {
   data: ReviewType;
+  onRefresh: () => void;
 }
 
-function Review({ data }: Props) {
+function Review({ data, onRefresh }: Props) {
   const router = useRouter();
   const { userData, isLogin } = AuthService;
   const { isLikedByMe } = data;
-  const { state, handleModalState, handleLoginModal } = useModalStore();
+  const { handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(isLikedByMe);
   const [currentStatus, setCurrentStatus] = useState(data.status === 'PUBLIC');
@@ -73,85 +74,87 @@ function Review({ data }: Props) {
 
   return (
     <>
-      <div className="space-y-2 border-b border-mainGray/30 pb-3 pt-3">
+      <div className="border-b border-mainGray/30 py-[15px]">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center  space-x-2">
             <Link href={`/user/${data.userInfo.userId}`}>
               <div className="flex items-center space-x-1">
-                <div className="w-7 h-7 rounded-full overflow-hidden">
+                <div className="w-[22px] h-[22px] rounded-full overflow-hidden">
                   <Image
                     className="object-cover"
-                    src={data.userInfo.userProfileImage || userImg}
+                    src={data.userInfo.userProfileImage || DEFAULT_USER_IMAGE}
                     alt="user_img"
-                    width={28}
-                    height={28}
+                    width={22}
+                    height={22}
                   />
                 </div>
-                <p className="text-mainGray text-12">
+                <p className="text-mainGray text-11">
                   {truncStr(data.userInfo.nickName, 12)}
                 </p>
               </div>
             </Link>
-            {data.isBestReview && (
-              <Label
-                name="베스트"
-                icon="/icon/thumbup-filled-white.svg"
-                styleClass="bg-mainCoral text-white px-2 py-[0.1rem] text-10 border-mainCoral rounded"
-              />
-            )}
-            {data.isMyReview && (
-              <Label
-                name="나의 코멘트"
-                icon="/icon/user-outlined-subcoral.svg"
-                iconHeight={10}
-                styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-9 rounded"
-              />
-            )}
+            <div className="flex items-center space-x-1">
+              {data.isBestReview && (
+                <Label
+                  name="베스트"
+                  icon="/icon/thumbup-filled-white.svg"
+                  styleClass="bg-mainCoral text-white px-2 py-[0.1rem] text-10 border-mainCoral rounded"
+                />
+              )}
+              {data.isMyReview && (
+                <Label
+                  name="나의 코멘트"
+                  icon="/icon/user-outlined-subcoral.svg"
+                  iconHeight={10}
+                  styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-10 rounded"
+                />
+              )}
+            </div>
           </div>
           {data.rating && <Star rating={data.rating} size={20} />}
         </div>
-        <div className="flex items-center space-x-1">
+        <div className="flex items-center space-x-1 mt-[10px]">
           <Image
             src={
               data.sizeType === 'BOTTLE'
                 ? '/bottle.svg'
                 : '/icon/glass-filled-subcoral.svg'
             }
-            width={12}
-            height={12}
+            width={14}
+            height={14}
             alt={data.sizeType === 'BOTTLE' ? 'Bottle Price' : 'Glass Price'}
           />
-          <p className="text-mainGray text-10 font-semibold">
+          <p className="text-mainGray text-12 font-bold">
             {data.sizeType === 'BOTTLE' ? '병 가격 ' : '잔 가격'}
           </p>
-          <p className="text-mainGray text-10 font-light">
+          <p className="text-mainGray text-12 font-normal">
             {data.price ? `${numberWithCommas(data.price)} ₩` : '-'}
           </p>
         </div>
-        <div className="grid grid-cols-5 space-x-2">
-          <p className="col-span-4 text-mainDarkGray text-10">
-            <Link href={`/review/${data.reviewId}`}>
+        <Link href={`/review/${data.reviewId}`}>
+          <div className="grid grid-cols-5 space-x-2 mt-[6px]">
+            <p className="col-span-4 text-mainDarkGray text-12">
               {truncStr(data.reviewContent, 135)}
               {data.reviewContent.length > 135 && (
                 <span className="text-mainGray">더보기</span>
               )}
-            </Link>
-          </p>
-          {data.reviewImageUrl && (
-            <div className="flex justify-end items-center">
-              <Image
-                className="w-[3.8rem] h-[3.8rem]"
-                src={data.reviewImageUrl}
-                alt="content_img"
-                width={60}
-                height={60}
-              />
-            </div>
-          )}
-        </div>
-        <div className="flex justify-between text-9 text-mainGray">
+            </p>
+            {data.reviewImageUrl && (
+              <div className="flex justify-end items-center">
+                <Image
+                  className="w-[3.8rem] h-[3.8rem]"
+                  src={data.reviewImageUrl}
+                  alt="content_img"
+                  width={60}
+                  height={60}
+                />
+              </div>
+            )}
+          </div>
+        </Link>
+        <div className="flex justify-between text-11 text-mainGray mt-[10px]">
           <div className="flex space-x-3">
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-[2px]">
               <LikeBtn
                 reviewId={data.reviewId}
                 isLiked={isLiked}
@@ -160,19 +163,19 @@ function Review({ data }: Props) {
                   setIsLiked(isLikedByMe);
                 }}
                 handleNotLogin={handleLoginModal}
-                size={10}
+                size={12}
               />
               <p>{data.likeCount}</p>
             </div>
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-[2px]">
               <Image
                 src={
                   data.hasReplyByMe
                     ? '/icon/comment-filled-subcoral.svg'
                     : '/icon/comment-outlined-gray.svg'
                 }
-                width={10}
-                height={10}
+                width={12}
+                height={12}
                 alt="comment"
               />
               <p>{data.replyCount}</p>
@@ -182,11 +185,12 @@ function Review({ data }: Props) {
                 initialStatus={currentStatus}
                 reviewId={data.reviewId}
                 handleNotLogin={handleLoginModal}
+                onSuccess={onRefresh}
               />
             )}
           </div>
           <div className="flex items-center">
-            <p className="text-9">{formatDate(data.createAt) as string}</p>
+            <p className="text-11">{formatDate(data.createAt) as string}</p>
             <button
               className="cursor-pointer"
               onClick={() => {
@@ -224,7 +228,6 @@ function Review({ data }: Props) {
           }
         />
       )}
-      {state.isShowModal && <Modal />}
     </>
   );
 }

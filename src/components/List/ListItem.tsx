@@ -5,6 +5,7 @@ import Star from '@/components/Star';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { addNewLine } from '@/utils/addNewLine';
 import { AlcoholAPI } from '@/types/Alcohol';
+import useModalStore from '@/store/modalStore';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
 import RatingCountIcon from 'public/icon/ratingcount-black.svg';
@@ -28,6 +29,7 @@ const ListItem = ({ data }: Props) => {
     hasReviewByMe,
     isMyPage,
   } = data;
+  const { handleLoginModal } = useModalStore();
   const [isPicked, setIsPicked] = useState(initialIsPicked);
 
   return (
@@ -50,7 +52,7 @@ const ListItem = ({ data }: Props) => {
         <div className="flex flex-col items-end">
           <Star rating={rating} />
           <div
-            className={`flex justify-end text-xxs text-right tracking-wider ${!ratingCount && 'hidden'}`}
+            className={`flex justify-end text-10 text-right tracking-wider ${!ratingCount && 'hidden'}`}
           >
             (
             <Image src={RatingCountIcon} alt="별점 평가 참여자 수" />
@@ -76,7 +78,7 @@ const ListItem = ({ data }: Props) => {
               iconColor="subcoral"
               handleUpdatePicked={() => setIsPicked(!isPicked)}
               handleError={() => console.error('찜하기 도중 에러 발생')}
-              handleNotLogin={() => {}}
+              handleNotLogin={handleLoginModal}
             />
           </div>
         </div>

@@ -9,7 +9,7 @@ import VisibilityToggle from '@/app/(primary)/_components/VisibilityToggle';
 import FlavorTag from '@/app/(primary)/_components/FlavorTag';
 import { numberWithCommas } from '@/utils/formatNum';
 import { formatDate } from '@/utils/formatDate';
-import { shareOrCopy } from '@/utils/shareOrCopy';
+// import { shareOrCopy } from '@/utils/shareOrCopy';
 import LikeBtn from '@/app/(primary)/_components/LikeBtn';
 import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
@@ -22,9 +22,10 @@ interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;
   handleLogin: () => void;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
+  onRefresh: () => void;
 }
 
-function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
+function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
   const router = useRouter();
   const { userData, isLogin } = AuthService;
   const { handleModalState, handleLoginModal } = useModalStore();
@@ -68,6 +69,12 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
     }
   };
 
+  const hasValidPrice = data.reviewInfo?.price || data.reviewInfo?.price === 0;
+  const hasValidSizeType = data.reviewInfo?.sizeType;
+  const hasValidLocation = data.reviewInfo?.locationInfo?.address;
+  const shouldShowPriceOrLocation =
+    hasValidLocation || (hasValidPrice && hasValidSizeType);
+
   return (
     <>
       <section>
@@ -96,7 +103,7 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
             <Star
               rating={data.reviewInfo?.rating ?? 0}
               size={25}
-              style="text-20 text-subCoral font-semibold"
+              styleProps="text-20 text-subCoral font-semibold"
             />
           </article>
           <article className="flex space-x-2 items-center">
@@ -104,14 +111,14 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
               <Label
                 name="베스트"
                 icon="/icon/thumbup-filled-white.svg"
-                styleClass="bg-mainCoral text-white px-2 py-[0.1rem] border-mainCoral text-9 rounded"
+                styleClass="bg-mainCoral text-white px-2 py-[0.1rem] border-mainCoral text-10 rounded"
               />
             )}
             {data.reviewInfo?.isMyReview && (
               <Label
                 name="나의 코멘트"
                 icon="/icon/user-outlined-subcoral.svg"
-                styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-9 rounded"
+                styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-10 rounded"
               />
             )}
             {data.reviewInfo?.userInfo?.userId === userData?.userId && (
@@ -119,11 +126,12 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                 initialStatus={data.reviewInfo.status === 'PUBLIC'}
                 reviewId={data?.reviewInfo?.reviewId}
                 handleNotLogin={handleLoginModal}
+                onSuccess={onRefresh}
               />
             )}
           </article>
           {data.reviewImageList && (
-            <div className="whitespace-nowrap overflow-x-auto flex space-x-2 scrollbar-hide">
+            <div className="whitespace-nowrap overdsdsflow-x-auto flex space-x-2 scrollbar-hide">
               {data.reviewImageList.map((imgData) => (
                 <div
                   className="relative w-[147px] h-[147px] flex-shrink-0"
@@ -139,12 +147,12 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
               ))}
             </div>
           )}
-          <div className="text-13 text-mainDarkGray">
+          <div className="text-12 text-mainDarkGray">
             {data.reviewInfo?.reviewContent}
           </div>
           <article className="flex justify-between">
             {data.reviewInfo?.createAt && (
-              <p className="text-mainGray text-11">
+              <p className="text-mainGray text-10">
                 {formatDate(data.reviewInfo.createAt) as string}
               </p>
             )}
@@ -170,10 +178,9 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
               styleClass="border-subCoral text-subCoral py-[5px] px-[10px] rounded-md text-12"
             />
           )}
-        {(data.reviewInfo?.locationInfo?.address ||
-          (!!data.reviewInfo?.price && data.reviewInfo?.sizeType)) && (
+        {shouldShowPriceOrLocation && (
           <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 text-12">
-            {data.reviewInfo?.price && data.reviewInfo?.sizeType && (
+            {hasValidPrice && hasValidSizeType && (
               <div className="flex items-center space-x-1">
                 <Image
                   src={
@@ -189,17 +196,17 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                       : 'Glass Price'
                   }
                 />
-                <p className="text-mainDarkGray font-semibold">
+                <p className="text-mainDarkGray font-normal">
                   {data.reviewInfo.sizeType === 'BOTTLE'
                     ? '병 가격 '
                     : '잔 가격'}
                 </p>
-                <p className="text-mainDarkGray font-light">
+                <p className="text-mainDarkGray font-normal">
                   {numberWithCommas(data.reviewInfo.price)}₩
                 </p>
               </div>
             )}
-            {data.reviewInfo?.locationInfo?.address && (
+            {hasValidLocation && (
               <div className="flex items-start space-x-1">
                 <Image
                   src="/icon/placepoint-subcoral.svg"
@@ -217,13 +224,19 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
                     <br />
                     {data.reviewInfo?.locationInfo?.detailAddress}
                     <br />
-                    {data.reviewInfo?.locationInfo?.mapUrl && (
-                      <p className="text-subCoral m-0 p-0">
-                        <Link href={data.reviewInfo.locationInfo.mapUrl}>
-                          지도보기
-                        </Link>
-                      </p>
-                    )}
+                    <a
+                      href={data.reviewInfo?.locationInfo?.mapUrl || '#'}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const mapUrl = data.reviewInfo?.locationInfo?.mapUrl;
+                        if (mapUrl) {
+                          window.open(mapUrl, '_blank', 'noopener,noreferrer');
+                        }
+                      }}
+                      className="text-subCoral cursor-pointer"
+                    >
+                      지도보기
+                    </a>
                   </>
                 </p>
               </div>
@@ -279,10 +292,15 @@ function ReviewDetails({ data, handleLogin, textareaRef }: Props) {
           <button
             className="w-[20%] flex text-center justify-center items-center space-x-1"
             onClick={() => {
-              shareOrCopy(
-                `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${data.reviewInfo?.reviewId}`,
-                handleModalState,
-              );
+              // shareOrCopy(
+              //   `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${data.reviewInfo?.reviewId}`,
+              // handleModalState,
+              // );
+              handleModalState({
+                isShowModal: true,
+                type: 'ALERT',
+                mainText: '아직 준비 중인 기능입니다. 조금만 기다려주세요!',
+              });
             }}
           >
             <Image

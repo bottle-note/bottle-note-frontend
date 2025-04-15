@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -6,8 +6,10 @@ import {
   DescriptionProps,
 } from '@/app/(primary)/history/_components/filter/HistoryDescription';
 import { formatDate } from '@/utils/formatDate';
+import { truncStr } from '@/utils/truncStr';
 import { TimeFormat } from '@/types/FormatDate';
 import { Rate } from '@/types/History';
+import Fallback from 'public/bottle.svg';
 
 interface BaseProps {
   date: string;
@@ -48,6 +50,7 @@ function TimeLineItem(props: Props) {
     content,
     redirectUrl,
   } = props as RatingProps & ReviewProps;
+  const [imgSrc, setImgSrc] = useState(imageSrc);
   const { getIcon, iconAlt, renderDescription, needsRate, needsDescription } =
     HISTORY_TYPE_INFO[type];
 
@@ -82,17 +85,18 @@ function TimeLineItem(props: Props) {
           <div className="w-[17rem] h-14 p-3 bg-bgGray rounded-md flex justify-between">
             <div>
               <p className="text-12 font-bold text-mainDarkGray">
-                {alcoholName}
+                {truncStr(alcoholName, 23)}
               </p>
               {renderDescription && renderDescription(getDescriptionProps())}
             </div>
-            {imageSrc && (
+            {imgSrc && (
               <Image
                 className="mr-1 rounded object-cover"
-                src={imageSrc}
+                src={imgSrc}
                 width={25}
                 height={34}
                 alt="alcoholImage"
+                onError={() => setImgSrc(Fallback)}
               />
             )}
           </div>
