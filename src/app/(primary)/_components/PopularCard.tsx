@@ -32,9 +32,11 @@ export default function PopularCard({ data }: Props) {
             <div className="text-15 h-[38px] font-extrabold whitespace-normal break-words text-mainDarkGray">
               {korName && truncStr(korName, 20)}
             </div>
-            <div className="flex items-center justify-between text-subCoral">
+            <div className="flex items-end justify-between text-subCoral">
               <Star rating={rating} size={15} />
-              <p className="text-11 font-bold">{engCategory.toUpperCase()}</p>
+              <p className="text-11 font-bold leading-none">
+                {(engCategory || '').toUpperCase()}
+              </p>
             </div>
           </div>
         </div>
