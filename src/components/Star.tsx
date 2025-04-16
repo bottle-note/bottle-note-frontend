@@ -14,14 +14,15 @@ const Star = ({
   color = 'main',
 }: Props) => {
   return (
-    <div className="inline-flex items-baseline space-x-[2px]">
-      <div className="relative top-[1px]">
+    <div className="inline-flex items-end space-x-[2px]">
+      <div className="relative">
         {color === 'main' ? (
           <Image
             src="/icon/star-filled-subcoral.svg"
             width={size}
             height={size}
             alt="star"
+            className="relative bottom-[1px]"
           />
         ) : (
           <Image
@@ -29,10 +30,11 @@ const Star = ({
             width={size}
             height={size}
             alt="star"
+            className="relative bottom-[1px]"
           />
         )}
       </div>
-      <p className={`${styleProps} w-5`}>
+      <p className={`${styleProps} w-5 leading-none`}>
         {rating ? rating.toFixed(1) : '  -'}
       </p>
     </div>

@@ -36,8 +36,10 @@ function LinkButton({
         onClick={handleBeforeRouteChange}
         className="h-full w-full flex flex-col justify-between relative z-10 py-[16.5px] px-[17.02px]"
       >
-        <div className={imgSrc ? 'space-y-[90px]' : 'space-y-[11.7px]'}>
-          <div className={`${icon && 'flex justify-between'} text-white`}>
+        <div className={`${imgSrc ? 'space-y-[90px]' : 'space-y-[11.7px]'}`}>
+          <div
+            className={`${icon && 'flex justify-between'} text-white relative z-20`}
+          >
             <div>
               <p className="font-extrabold text-14">{korName}</p>
               <p className="text-12 font-normal">{engName}</p>
@@ -51,11 +53,11 @@ function LinkButton({
               />
             )}
           </div>
-          <div className="border-[1px] border-white" />
+          <div className="border-[1px] border-white relative z-0" />
         </div>
         {imgSrc && (
           <Image
-            className="z-10 absolute bottom-[0.5px] left-[5.7rem]"
+            className="absolute bottom-[0.5px] left-[5.7rem] z-10"
             src={imgSrc}
             height={imageSize?.height}
             width={imageSize?.width}
