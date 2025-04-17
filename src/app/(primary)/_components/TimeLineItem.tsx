@@ -94,6 +94,7 @@ function TimeLineItem(props: Props) {
               className="rounded object-cover"
               width={25}
               height={34}
+              fill
             />
           </div>
         </Link>
