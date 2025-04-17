@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import BaseImage from '@/components/BaseImage';
 
 interface Props {
@@ -26,15 +25,12 @@ const AlcoholImage = ({
   rounded = 'rounded-lg',
   priority = true,
 }: Props) => {
-  const [isLoading, setIsLoading] = useState(true);
+  const innerWidth = parseInt(innerWidthClass.match(/\d+/)?.[0] || '0', 10);
 
   return (
     <div
-      className={`${rounded} ${bgColor} flex items-center justify-center ${outerHeightClass} ${outerWidthClass} shrink-0 relative`}
+      className={`${rounded} ${bgColor} flex items-center justify-center ${outerHeightClass} ${outerWidthClass} shrink-0`}
     >
-      {isLoading && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
-      )}
       <div
         className={`relative ${innerHeightClass} ${innerWidthClass} flex items-center justify-center`}
       >
@@ -42,10 +38,10 @@ const AlcoholImage = ({
           src={imageUrl}
           alt="alcohol image"
           priority={priority}
-          fill
           className={`object-contain ${blendMode}`}
-          sizes={`${innerWidthClass.replace('w-[', '').replace(']', '')}px`}
-          onLoad={() => setIsLoading(false)}
+          rounded={rounded}
+          sizes={`${innerWidth}px`}
+          fill
         />
       </div>
     </div>
