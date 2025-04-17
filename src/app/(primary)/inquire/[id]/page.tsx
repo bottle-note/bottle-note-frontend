@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import BaseImage from '@/components/BaseImage';
 import { InquireApi } from '@/app/api/InquireApi';
 import { formatDate } from '@/utils/formatDate';
 import { InquireDetailsApi } from '@/types/Inquire';
@@ -72,10 +73,10 @@ export default function Inquire() {
               <div className="space-y-2">
                 {inquireDetails.imageUrlList.map((imgData) => (
                   <div className="relative w-full h-52" key={imgData.viewUrl}>
-                    <Image
+                    <BaseImage
                       src={imgData.viewUrl}
-                      alt="review_img"
-                      fill
+                      alt="Inquire image"
+                      priority
                       className="cover"
                     />
                   </div>
