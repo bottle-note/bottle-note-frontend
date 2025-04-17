@@ -10,34 +10,47 @@ interface Props {
   outerWidthClass?: string;
   innerHeightClass?: string;
   innerWidthClass?: string;
+  bgColor?: string;
+  blendMode?: string;
+  rounded?: string;
+  priority?: boolean;
 }
 
 const AlcoholImage = ({
   imageUrl,
-  outerHeightClass = 'h-[162px]',
-  outerWidthClass = 'w-[100px]',
-  innerHeightClass = 'w-[80px] ',
-  innerWidthClass = 'h-[140px]',
+  outerHeightClass = 'h-[171px]', // default height for the image of review
+  outerWidthClass = 'w-[99px]',
+  innerWidthClass = 'w-[70px]',
+  innerHeightClass = 'h-[141px]',
+  bgColor = 'bg-white',
+  blendMode = '',
+  rounded = 'rounded-lg',
+  priority = true,
 }: Props) => {
   const [imgSrc, setImgSrc] = useState(imageUrl);
+  const [isLoading, setIsLoading] = useState(true);
 
   return (
-    <div className="rounded-lg bg-white flex items-center justify-center">
-      <article
-        className={`${outerHeightClass} ${outerWidthClass} shrink-0 relative flex items-center justify-center`}
+    <div
+      className={`${rounded} ${bgColor} flex items-center justify-center ${outerHeightClass} ${outerWidthClass} shrink-0 relative`}
+    >
+      {isLoading && (
+        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+      )}
+      <div
+        className={`relative ${innerHeightClass} ${innerWidthClass} flex items-center justify-center`}
       >
-        <div className={`${innerHeightClass} ${innerWidthClass} relative`}>
-          <Image
-            priority
-            src={imgSrc}
-            alt="alcohol image"
-            fill
-            className="object-contain"
-            sizes="100px"
-            onError={() => setImgSrc(Fallback)}
-          />
-        </div>
-      </article>
+        <Image
+          priority={priority}
+          src={imgSrc}
+          alt="alcohol image"
+          fill
+          className={`object-contain ${blendMode} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+          sizes={`${innerWidthClass.replace('w-[', '').replace(']', '')}px`}
+          onError={() => setImgSrc(Fallback)}
+          onLoad={() => setIsLoading(false)}
+        />
+      </div>
     </div>
   );
 };

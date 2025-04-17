@@ -4,11 +4,11 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { RateAPI } from '@/types/Rate';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
+import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { AuthService } from '@/lib/AuthService';
 import ItemInfo from './_components/ItemInfo';
-import ItemImage from './_components/ItemImage';
 import StarRating from '../StarRaiting';
 
 interface Props {
@@ -49,7 +49,14 @@ const ListItemRating = ({ data }: Props) => {
   return (
     <article className="flex items-center space-x-2 text-mainBlack border-brightGray border-b h-[90px]">
       <ItemLink alcoholId={alcoholId}>
-        <ItemImage src={imageUrl} alt="위스키 이미지" />
+        <AlcoholImage
+          imageUrl={imageUrl}
+          outerHeightClass="h-[89px]"
+          outerWidthClass="w-[89px]"
+          innerHeightClass="h-[85px]"
+          innerWidthClass="w-[85px]"
+          rounded="rounded-none"
+        />
       </ItemLink>
 
       <section className="flex-1 space-y-1">

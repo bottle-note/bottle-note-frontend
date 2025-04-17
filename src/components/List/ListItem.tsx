@@ -6,7 +6,7 @@ import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { addNewLine } from '@/utils/addNewLine';
 import { AlcoholAPI } from '@/types/Alcohol';
 import useModalStore from '@/store/modalStore';
-import ItemImage from './_components/ItemImage';
+import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
 import ItemInfo from './_components/ItemInfo';
 import RatingCountIcon from 'public/icon/ratingcount-black.svg';
 import HasReviewIcon from 'public/icon/edit-filled-subcoral.svg';
@@ -39,7 +39,14 @@ const ListItem = ({ data }: Props) => {
           href={`/search/all/${alcoholId}`}
           className="flex justify-start items-center h-full"
         >
-          <ItemImage src={imageUrl} alt="위스키 이미지" />
+          <AlcoholImage
+            imageUrl={imageUrl}
+            outerHeightClass="h-[89px]"
+            outerWidthClass="w-[89px]"
+            innerHeightClass="h-[85px]"
+            innerWidthClass="w-[85px]"
+            rounded="rounded-none"
+          />
           <ItemInfo
             korName={addNewLine(korName)}
             engName={engName}
