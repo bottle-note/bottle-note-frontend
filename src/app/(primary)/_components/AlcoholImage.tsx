@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
-import Fallback from 'public/bottle.svg';
+import BaseImage from '@/components/BaseImage';
 
 interface Props {
   imageUrl: string;
@@ -27,7 +26,6 @@ const AlcoholImage = ({
   rounded = 'rounded-lg',
   priority = true,
 }: Props) => {
-  const [imgSrc, setImgSrc] = useState(imageUrl);
   const [isLoading, setIsLoading] = useState(true);
 
   return (
@@ -40,14 +38,13 @@ const AlcoholImage = ({
       <div
         className={`relative ${innerHeightClass} ${innerWidthClass} flex items-center justify-center`}
       >
-        <Image
-          priority={priority}
-          src={imgSrc}
+        <BaseImage
+          src={imageUrl}
           alt="alcohol image"
+          priority={priority}
           fill
-          className={`object-contain ${blendMode} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+          className={`object-contain ${blendMode}`}
           sizes={`${innerWidthClass.replace('w-[', '').replace(']', '')}px`}
-          onError={() => setImgSrc(Fallback)}
           onLoad={() => setIsLoading(false)}
         />
       </div>
