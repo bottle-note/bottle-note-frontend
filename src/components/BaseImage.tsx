@@ -15,6 +15,7 @@ interface Props {
   onError?: () => void;
   width?: number;
   height?: number;
+  rounded?: string;
 }
 
 const BaseImage = ({
@@ -28,6 +29,7 @@ const BaseImage = ({
   onError,
   width,
   height,
+  rounded = '',
 }: Props) => {
   const [imgSrc, setImgSrc] = useState(src);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,18 +45,30 @@ const BaseImage = ({
   };
 
   return (
-    <Image
-      priority={priority}
-      src={imgSrc}
-      alt={alt}
-      fill={fill}
-      width={width}
-      height={height}
-      className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
-      sizes={sizes}
-      onError={handleError}
-      onLoad={handleLoad}
-    />
+    <div
+      className={`relative ${rounded}`}
+      style={{
+        width: width ? `${width}px` : '100%',
+        height: height ? `${height}px` : '100%',
+        overflow: 'hidden',
+      }}
+    >
+      {isLoading && (
+        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+      )}
+      <Image
+        priority={priority}
+        src={imgSrc}
+        alt={alt}
+        fill={fill}
+        width={fill ? undefined : width}
+        height={fill ? undefined : height}
+        className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+        sizes={sizes}
+        onError={handleError}
+        onLoad={handleLoad}
+      />
+    </div>
   );
 };
 
