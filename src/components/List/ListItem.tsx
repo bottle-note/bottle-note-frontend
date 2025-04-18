@@ -39,7 +39,7 @@ const ListItem = ({ data }: Props) => {
           href={`/search/all/${alcoholId}`}
           className="flex justify-start items-center h-full"
         >
-          <ItemImage src={imageUrl} alt="위스키 이미지" />
+          <ItemImage src={imageUrl} alt="image" />
           <ItemInfo
             korName={addNewLine(korName)}
             engName={engName}

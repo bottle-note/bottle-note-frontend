@@ -7,8 +7,8 @@ import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { AuthService } from '@/lib/AuthService';
-import ItemInfo from './_components/ItemInfo';
 import ItemImage from './_components/ItemImage';
+import ItemInfo from './_components/ItemInfo';
 import StarRating from '../StarRaiting';
 
 interface Props {
@@ -49,7 +49,7 @@ const ListItemRating = ({ data }: Props) => {
   return (
     <article className="flex items-center space-x-2 text-mainBlack border-brightGray border-b h-[90px]">
       <ItemLink alcoholId={alcoholId}>
-        <ItemImage src={imageUrl} alt="위스키 이미지" />
+        <ItemImage src={imageUrl} alt="image" />
       </ItemLink>
 
       <section className="flex-1 space-y-1">

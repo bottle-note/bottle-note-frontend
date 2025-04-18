@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
-import Fallback from 'public/bottle.svg';
+import BaseImage from '@/components/BaseImage';
 
 interface Props {
   src: string;
@@ -10,19 +8,16 @@ interface Props {
 }
 
 const ItemImage = ({ src, alt }: Props) => {
-  const [imgSrc, setImgSrc] = useState(src);
-
   return (
     <div className="w-[89px] h-[89px] flex shrink-0 p-2 justify-center items-center">
       <div className="w-full h-full relative">
-        <Image
-          src={imgSrc}
+        <BaseImage
+          src={src}
           alt={alt}
+          priority
+          className="object-contain w-auto h-auto"
           fill
           sizes="85px"
-          className="object-contain w-auto h-auto"
-          priority
-          onError={() => setImgSrc(Fallback)}
         />
       </div>
     </div>
