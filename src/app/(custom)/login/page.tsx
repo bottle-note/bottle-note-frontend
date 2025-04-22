@@ -127,7 +127,7 @@ export default function Login() {
 
           <article className="flex flex-col gap-2">
             <SocialLoginBtn type="KAKAO" onClick={handleKakaoLogin} />
-            {window.platform === 'ios' && (
+            {window?.platform === 'ios' && (
               <SocialLoginBtn type="APPLE" onClick={handleAppleLogin} />
             )}
           </article>
