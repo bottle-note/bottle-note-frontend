@@ -31,7 +31,7 @@ export default function Login() {
     handleAppleLogin,
   } = useLogin();
   const { isLogin } = AuthService;
-  const { setIsInApp, setPlatform } = DeviceService;
+  const { setIsInApp, setPlatform, platform } = DeviceService;
   const { register, handleSubmit } = useForm<FormValues>();
 
   const handleSignup = () => {
@@ -127,7 +127,7 @@ export default function Login() {
 
           <article className="flex flex-col gap-2">
             <SocialLoginBtn type="KAKAO" onClick={handleKakaoLogin} />
-            {window?.platform === 'ios' && (
+            {platform === 'ios' && (
               <SocialLoginBtn type="APPLE" onClick={handleAppleLogin} />
             )}
           </article>
