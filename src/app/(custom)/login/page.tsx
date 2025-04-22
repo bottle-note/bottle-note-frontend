@@ -53,9 +53,12 @@ export default function Login() {
     if (window.isInApp) {
       handleWebViewMessage('deviceToken');
       setIsInApp(window.isInApp);
+    }
+
+    if (window.platform) {
       setCurPlatform(window.platform);
     }
-  }, []);
+  }, [window.isInApp, window.platform]);
 
   useEffect(() => {
     handleInitKakaoSdkLogin();
