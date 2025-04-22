@@ -13,8 +13,12 @@ declare global {
       platform: string,
     ) => { deviceToken: string; platform: string };
     checkIsInApp: (status: string) => boolean;
-    openAlbum:(imageDataBase64:string) => void; // FIXME: 통신 과정 확인하고 리턴값 수정
+    openAlbum:(imageDataBase64: string) => void; 
     sendLogToFlutter: (log: string) => void;
+    onKakaoLoginSuccess:(email: string) => Promise<void>;
+    onKakaoLoginError:(error: string) => void;
+    onAppleLoginSuccess:(data: string) => Promise<void>;
+    onAppleLoginError:(error: string) => void;
     isInApp: boolean = false;
     deviceToken: string;
     platform: string
