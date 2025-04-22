@@ -31,8 +31,7 @@ export default function Login() {
     handleAppleLogin,
   } = useLogin();
   const { isLogin } = AuthService;
-  const { setIsInApp } = DeviceService;
-
+  const { setIsInApp, setPlatform } = DeviceService;
   const { register, handleSubmit } = useForm<FormValues>();
 
   const handleSignup = () => {
@@ -47,11 +46,12 @@ export default function Login() {
     handleSendDeviceInfo();
   }, [isLogin]);
 
-  // NOTE: 인앱 상태일 때 웹뷰에 device token 발급 요청
+  // 인앱 환경에서 초기화
   useEffect(() => {
     if (window.isInApp) {
       handleWebViewMessage('deviceToken');
       setIsInApp(window.isInApp);
+      setPlatform(window.platform);
     }
   }, []);
 

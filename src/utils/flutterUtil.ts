@@ -6,6 +6,11 @@ export function checkIsInApp(status: string) {
   return result;
 }
 
+export function checkPlatform(platform: string) {
+  window.platform = platform;
+  return platform;
+}
+
 export function getDeviceToken(token: string, platform: string) {
   DeviceService.setDeviceToken(token);
   DeviceService.setPlatform(platform);
@@ -16,6 +21,7 @@ export function getDeviceToken(token: string, platform: string) {
 export function handleWebViewMessage(
   message:
     | 'checkIsInApp'
+    | 'checkPlatform'
     | 'deviceToken'
     | 'logToFlutter'
     | 'openAlbum'
