@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -31,8 +31,10 @@ export default function Login() {
     handleAppleLogin,
   } = useLogin();
   const { isLogin } = AuthService;
-  const { setIsInApp, setPlatform, platform } = DeviceService;
+  const { setIsInApp } = DeviceService;
   const { register, handleSubmit } = useForm<FormValues>();
+
+  const [curPlatform, setCurPlatform] = useState('');
 
   const handleSignup = () => {
     router.push('/signup');
@@ -51,7 +53,7 @@ export default function Login() {
     if (window.isInApp) {
       handleWebViewMessage('deviceToken');
       setIsInApp(window.isInApp);
-      setPlatform(window.platform);
+      setCurPlatform(window.platform);
     }
   }, []);
 
@@ -127,7 +129,7 @@ export default function Login() {
 
           <article className="flex flex-col gap-2">
             <SocialLoginBtn type="KAKAO" onClick={handleKakaoLogin} />
-            {platform === 'ios' && (
+            {curPlatform === 'ios' && (
               <SocialLoginBtn type="APPLE" onClick={handleAppleLogin} />
             )}
           </article>
