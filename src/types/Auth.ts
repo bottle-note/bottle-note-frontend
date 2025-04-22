@@ -1,8 +1,16 @@
+export const enum SOCIAL_TYPE {
+  KAKAO = 'KAKAO',
+  NAVER = 'NAVER',
+  GOOGLE = 'GOOGLE',
+  APPLE = 'APPLE',
+}
+
 export interface LoginReq {
   email: string;
+  socialUniqueId: string;
   gender: 'MALE' | 'FEMALE' | null;
   age: number | null;
-  socialType: 'KAKAO' | 'NAVER' | 'GOOGLE' | 'APPLE' | string;
+  socialType: SOCIAL_TYPE;
 }
 
 export interface UserData {
