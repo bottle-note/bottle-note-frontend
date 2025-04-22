@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -31,8 +31,6 @@ export default function Login() {
     handleAppleLogin,
   } = useLogin();
   const { isLogin } = AuthService;
-  const { setIsInApp } = DeviceService;
-
   const { register, handleSubmit } = useForm<FormValues>();
 
   const handleSignup = () => {
@@ -47,11 +45,11 @@ export default function Login() {
     handleSendDeviceInfo();
   }, [isLogin]);
 
-  // NOTE: 인앱 상태일 때 웹뷰에 device token 발급 요청
+  // 인앱 환경에서 초기화
   useEffect(() => {
     if (window.isInApp) {
       handleWebViewMessage('deviceToken');
-      setIsInApp(window.isInApp);
+      DeviceService.setIsInApp(window.isInApp);
     }
   }, []);
 
@@ -127,7 +125,9 @@ export default function Login() {
 
           <article className="flex flex-col gap-2">
             <SocialLoginBtn type="KAKAO" onClick={handleKakaoLogin} />
-            <SocialLoginBtn type="APPLE" onClick={handleAppleLogin} />
+            {DeviceService.platform === 'ios' && (
+              <SocialLoginBtn type="APPLE" onClick={handleAppleLogin} />
+            )}
           </article>
         </section>
 

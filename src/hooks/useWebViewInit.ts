@@ -4,6 +4,7 @@ import {
   getDeviceToken,
   handleWebViewMessage,
   sendLogToFlutter,
+  checkPlatform,
 } from '@/utils/flutterUtil';
 import { useAppSocialLogin } from './useAppSocialLogin';
 
@@ -29,6 +30,7 @@ export const useWebViewInit = () => {
 
     window.getDeviceToken = getDeviceToken;
     window.checkIsInApp = checkIsInApp;
+    window.checkPlatform = checkPlatform;
     window.sendLogToFlutter = sendLogToFlutter;
     window.onKakaoLoginSuccess = onKakaoLoginSuccess;
     window.onKakaoLoginError = onKakaoLoginError;
@@ -37,6 +39,7 @@ export const useWebViewInit = () => {
 
     if (isMobile) {
       handleWebViewMessage('checkIsInApp');
+      handleWebViewMessage('checkPlatform');
     }
   };
 

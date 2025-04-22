@@ -13,6 +13,7 @@ declare global {
       platform: string,
     ) => { deviceToken: string; platform: string };
     checkIsInApp: (status: string) => boolean;
+    checkPlatform: (platform:string) => string;
     openAlbum:(imageDataBase64: string) => void; 
     sendLogToFlutter: (log: string) => void;
     onKakaoLoginSuccess:(email: string) => Promise<void>;
