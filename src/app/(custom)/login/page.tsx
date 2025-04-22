@@ -54,10 +54,6 @@ export default function Login() {
   }, []);
 
   useEffect(() => {
-    console.log('DeviceService.platform', DeviceService.platform);
-  }, [DeviceService.platform]);
-
-  useEffect(() => {
     handleInitKakaoSdkLogin();
   }, []);
 
