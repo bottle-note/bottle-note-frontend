@@ -15,6 +15,7 @@ export function checkPlatform(platform: string) {
 
 export function getDeviceToken(token: string, platform: string) {
   DeviceService.setDeviceToken(token);
+  DeviceService.setPlatform(platform);
 
   return { deviceToken: token, platform };
 }

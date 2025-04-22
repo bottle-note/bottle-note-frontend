@@ -31,10 +31,7 @@ export default function Login() {
     handleAppleLogin,
   } = useLogin();
   const { isLogin } = AuthService;
-  const { setIsInApp } = DeviceService;
   const { register, handleSubmit } = useForm<FormValues>();
-
-  const [curPlatform, setCurPlatform] = useState('');
 
   const handleSignup = () => {
     router.push('/signup');
@@ -52,13 +49,13 @@ export default function Login() {
   useEffect(() => {
     if (window.isInApp) {
       handleWebViewMessage('deviceToken');
-      setIsInApp(window.isInApp);
+      DeviceService.setIsInApp(window.isInApp);
     }
+  }, []);
 
-    if (window.platform) {
-      setCurPlatform(window.platform);
-    }
-  }, [window.isInApp, window.platform]);
+  useEffect(() => {
+    console.log('DeviceService.platform', DeviceService.platform);
+  }, [DeviceService.platform]);
 
   useEffect(() => {
     handleInitKakaoSdkLogin();
@@ -132,7 +129,7 @@ export default function Login() {
 
           <article className="flex flex-col gap-2">
             <SocialLoginBtn type="KAKAO" onClick={handleKakaoLogin} />
-            {curPlatform === 'ios' && (
+            {DeviceService.platform === 'ios' && (
               <SocialLoginBtn type="APPLE" onClick={handleAppleLogin} />
             )}
           </article>
