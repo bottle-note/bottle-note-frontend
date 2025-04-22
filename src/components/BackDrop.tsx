@@ -6,11 +6,17 @@ import { useBlockScroll } from '@/hooks/useBlockScroll';
 
 interface Props {
   isShow: boolean;
+  isModal?: boolean;
   children: React.ReactNode;
   onBackdropClick?: () => void;
 }
 
-function BackDrop({ isShow, children, onBackdropClick }: Props) {
+function BackDrop({
+  isShow,
+  isModal = true,
+  children,
+  onBackdropClick,
+}: Props) {
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget && onBackdropClick) {
       onBackdropClick();
@@ -18,7 +24,7 @@ function BackDrop({ isShow, children, onBackdropClick }: Props) {
   };
   const ModalContents = (
     <div
-      className={`fixed inset-0 bg-black/60 z-40 ${isShow ? 'block' : 'hidden'}`}
+      className={`fixed inset-0  z-40 ${isModal && 'bg-black/60'} ${isShow ? 'block' : 'hidden'}`}
       onClick={handleBackdropClick}
       onKeyDown={(e) => {
         if (e.key === 'Escape' && onBackdropClick) {
