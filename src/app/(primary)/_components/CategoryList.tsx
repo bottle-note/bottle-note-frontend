@@ -8,6 +8,11 @@ function CategoryList() {
 
   return (
     <div className="space-y-[18px]">
+      <div className="grid grid-cols-2 gap-y-[18px] gap-x-[11.7px]">
+        {menu.map((data) => (
+          <LinkButton key={data.engName} data={data} />
+        ))}
+      </div>
       <LinkButton
         data={{
           engName: 'ALL',
@@ -15,11 +20,6 @@ function CategoryList() {
           linkSrc: '/search?category=',
         }}
       />
-      <div className="grid grid-cols-2 gap-y-[18px] gap-x-[11.7px]">
-        {menu.map((data) => (
-          <LinkButton key={data.engName} data={data} />
-        ))}
-      </div>
     </div>
   );
 }
