@@ -7,7 +7,7 @@ function PopularList() {
   const { popularList } = usePopularList();
 
   return (
-    <div className="pt-[34px]">
+    <div className="pt-[34px] pl-[25px]">
       <p className="pb-[10px] text-13 font-extrabold text-mainCoral">
         WEEKLY HOT 5
       </p>

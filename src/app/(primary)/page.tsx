@@ -66,7 +66,7 @@ export default function Home() {
               {renderTopContent()}
             </TabNavigation>
           </article>
-          <article className="pt-10 space-y-[18px]">
+          <article className="pt-[60px] space-y-[18px]">
             <TabNavigation
               items={categoryItems}
               activeId={activeCategoryMenu}
