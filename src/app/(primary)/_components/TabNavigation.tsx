@@ -144,7 +144,7 @@ const TabNavigation = ({ items, activeId, onSelect, children }: Props) => {
           />
         </div>
       </div>
-      <div className="p-4 bg-white">{children}</div>
+      <div className="bg-white pl-[25px]">{children}</div>
     </div>
   );
 };

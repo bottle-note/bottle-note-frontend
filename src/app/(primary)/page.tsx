@@ -8,16 +8,12 @@ import NavLayout from './_components/NavLayout';
 import TabNavigation from './_components/TabNavigation';
 
 const TOP_MENU_ITEMS = [
-  { id: 'popular', name: '위클리 HOT 5' },
-  { id: 'recommend', name: 'Spring 위스키 추천' },
+  { id: 'popular', name: 'HOT 5' },
+  { id: 'spring_recommend', name: '봄 추천 위스키' },
+  { id: 'recent', name: '최근에 본 위스키' },
 ];
 
-const MENU_CATEGORY = [
-  { id: 'category', name: '카테고리' },
-  { id: 'recent', name: '최근에 본 위스키' },
-  { id: 'recent1', name: '최근에 리쥬 쓴 위스키' },
-  { id: 'recent2', name: '최근에 찜한 위스키' },
-];
+const MENU_CATEGORY = [{ id: 'category', name: '카테고리' }];
 
 export default function Home() {
   const {
@@ -51,12 +47,6 @@ export default function Home() {
     switch (activeCategoryMenu) {
       case 'category':
         return <CategoryList />;
-      case 'recent':
-        return <div>최근에 본 위스키</div>;
-      case 'recent1':
-        return <div>최근에 본 위스키</div>;
-      case 'recent2':
-        return <div>최근에 본 위스키</div>;
       default:
         return null;
     }
@@ -66,7 +56,7 @@ export default function Home() {
     <NavLayout>
       <Header />
       <div className="space-y-1 relative">
-        <section className="px-5 pb-20">
+        <section className="pb-20">
           <article className="pt-10 space-y-[18px]">
             <TabNavigation
               items={topMenuItems}
