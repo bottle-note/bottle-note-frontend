@@ -8,8 +8,8 @@ import NavLayout from './_components/NavLayout';
 import TabNavigation from './_components/TabNavigation';
 
 const TOP_MENU_ITEMS = [
-  { id: 'popular', name: 'HOT 5' },
-  { id: 'spring_recommend', name: '봄 추천 위스키' },
+  { id: 'week', name: 'HOT 5' },
+  { id: 'spring', name: '봄 추천 위스키' },
   { id: 'recent', name: '최근에 본 위스키' },
 ];
 
@@ -34,10 +34,10 @@ export default function Home() {
 
   const renderTopContent = () => {
     switch (activeTopMenu) {
-      case 'popular':
-        return <PopularList />;
-      case 'recommend':
-        return <div>추천 위스키 목록</div>;
+      case 'week':
+      case 'spring':
+      case 'recent':
+        return <PopularList key={activeTopMenu} type={activeTopMenu} />;
       default:
         return null;
     }
