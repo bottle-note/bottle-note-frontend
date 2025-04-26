@@ -10,17 +10,23 @@ interface Props {
   children?: ReactNode;
 }
 
+const TAB_WIDTH = 146;
+const TAB_HEIGHT = 32;
+
+const BORDER_COLOR = '#CFCFCF';
+const BORDER_WIDTH = 1.5;
+const ACTIVE_BOTTOM_COVER = 2;
+
 const TabNavigation = ({ items, activeId, onSelect, children }: Props) => {
   const { activeTab, setActiveTab } = useTab({ items, initialTabId: activeId });
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // 활성 탭으로 스크롤 이동
   useEffect(() => {
     if (scrollContainerRef.current) {
       const activeTabElement = document.getElementById(`tab-${activeTab}`);
       if (activeTabElement) {
         scrollContainerRef.current.scrollLeft =
-          activeTabElement.offsetLeft - 13;
+          activeTabElement.offsetLeft - 16;
       }
     }
   }, [activeTab]);
@@ -31,12 +37,20 @@ const TabNavigation = ({ items, activeId, onSelect, children }: Props) => {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-white">
       <div className="relative">
-        {/* 전체 하단 테두리 */}
-        <div className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-gray-300" />
+        {/* 전체 하단 라인 */}
+        <div
+          className="absolute left-0 right-0"
+          style={{
+            bottom: 0,
+            height: `${BORDER_WIDTH}px`,
+            backgroundColor: BORDER_COLOR,
+            zIndex: 0,
+          }}
+        />
 
-        {/* 스크롤 가능한 탭 컨테이너 */}
+        {/* 탭 컨테이너 */}
         <div
           ref={scrollContainerRef}
           className="relative flex overflow-x-auto scrollbar-hide w-full scroll-smooth"
@@ -47,7 +61,7 @@ const TabNavigation = ({ items, activeId, onSelect, children }: Props) => {
               <div
                 key={tab.id}
                 id={`tab-${tab.id}`}
-                className={`relative ${index === 0 ? 'ml-[13px]' : '-ml-[10px]'}`}
+                className={`relative ${index === 0 ? 'ml-4' : '-ml-3'}`}
                 style={{
                   zIndex:
                     activeTab === tab.id
@@ -57,35 +71,63 @@ const TabNavigation = ({ items, activeId, onSelect, children }: Props) => {
               >
                 <button
                   onClick={() => handleSelect(tab.id)}
-                  className="relative flex items-center justify-center h-[28.5px] w-[146px]"
+                  className="relative flex items-center justify-center"
+                  style={{
+                    width: `${TAB_WIDTH}px`,
+                    height: `${TAB_HEIGHT}px`,
+                    background: 'transparent',
+                  }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="146"
-                    height="28.5"
-                    viewBox="0 0 146 28.5"
+                    width={TAB_WIDTH}
+                    height={TAB_HEIGHT}
+                    viewBox={`0 0 ${TAB_WIDTH} ${TAB_HEIGHT}`}
                     className="absolute inset-0"
+                    preserveAspectRatio="none"
                   >
+                    {/* 테두리 경로 */}
                     <path
-                      d="M0,28.5 L10,8 C11,3.5 14,0 19,0 H127 C132,0 135,3.5 136,8 L146,28.5 Z"
-                      fill={activeTab === tab.id ? '#FFFFFF' : '#F3F3F3'}
-                      stroke={activeTab === tab.id ? '#F4A460' : '#D3D3D3'}
-                      strokeWidth="1.5"
+                      d={`
+                        M0,${TAB_HEIGHT}
+                        L12,8
+                        Q14,2 22,2
+                        H${TAB_WIDTH - 22}
+                        Q${TAB_WIDTH - 14},2 ${TAB_WIDTH - 12},8
+                        L${TAB_WIDTH},${TAB_HEIGHT}
+                      `}
+                      fill={activeTab === tab.id ? '#FFF' : '#F7F7F7'}
+                      stroke={BORDER_COLOR}
+                      strokeWidth={BORDER_WIDTH}
+                      strokeLinejoin="round"
                     />
-                    {/* 활성화된 탭은 하단 테두리 제거 */}
+                    {/* 하단 border: 비활성 탭만 표시 */}
+                    {activeTab !== tab.id && (
+                      <line
+                        x1="0"
+                        y1={TAB_HEIGHT}
+                        x2={TAB_WIDTH}
+                        y2={TAB_HEIGHT}
+                        stroke={BORDER_COLOR}
+                        strokeWidth={BORDER_WIDTH}
+                        strokeLinecap="butt"
+                      />
+                    )}
+                    {/* 활성 탭 하단 흰색 덮개 */}
                     {activeTab === tab.id && (
                       <line
-                        x1="-1"
-                        y1="28.5"
-                        x2="147"
-                        y2="28.5"
-                        stroke="#FFFFFF"
-                        strokeWidth="3"
+                        x1="0"
+                        y1={TAB_HEIGHT}
+                        x2={TAB_WIDTH}
+                        y2={TAB_HEIGHT}
+                        stroke="#FFF"
+                        strokeWidth={ACTIVE_BOTTOM_COVER}
+                        strokeLinecap="butt"
                       />
                     )}
                   </svg>
                   <span
-                    className={`relative z-10 text-sm font-medium ${
+                    className={`relative z-10 text-15 font-extrabold ${
                       activeTab === tab.id ? 'text-orange-500' : 'text-gray-400'
                     }`}
                   >
@@ -95,7 +137,11 @@ const TabNavigation = ({ items, activeId, onSelect, children }: Props) => {
               </div>
             ))}
           </div>
-          <div className="flex-grow" />
+          {/* 오른쪽 여백 하단 라인 */}
+          <div
+            className="flex-grow min-w-[20px]"
+            style={{ borderBottom: `${BORDER_WIDTH}px solid ${BORDER_COLOR}` }}
+          />
         </div>
       </div>
       <div className="p-4 bg-white">{children}</div>
