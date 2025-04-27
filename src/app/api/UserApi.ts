@@ -65,8 +65,23 @@ export const UserApi = {
       cursor,
       pageSize,
     } = params;
+    const getTypebyTabType = (type: MyBottleQueryParams['tabType']) => {
+      switch (type) {
+        case 'ALL':
+          return '';
+        case 'REVIEW':
+          return 'reviews';
+        case 'RATING':
+          return 'ra';
+        case 'PICK':
+          return 'picks';
+        default:
+          return '';
+      }
+    };
+
     const response = await fetchWithAuth(
-      `/bottle-api/my-page/${userId}/my-bottle?tabType=${tabType}&keyword=${decodeURI(keyword ?? '')}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
+      `/bottle-api/my-page/${userId}/my-bottle/${getTypebyTabType(tabType)}&keyword=${decodeURI(keyword ?? '')}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
       {
         method: 'GET',
         headers: {
