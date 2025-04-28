@@ -1,6 +1,15 @@
-import { AlcoholAPI } from './Alcohol';
+export interface RateAlcoholAPI {
+  alcoholId: number;
+  korName: string;
+  engName: string;
+  ratingCount: number;
+  engCategoryName: string;
+  korCategoryName: string;
+  imageUrl: string;
+  isPicked: boolean;
+}
 
-export interface RateAPI extends Omit<AlcoholAPI, 'rating'> {
+export interface RateAPI extends Omit<RateAlcoholAPI, 'rating'> {
   totalCount: number;
 }
 

@@ -18,7 +18,7 @@ interface Props {
 
 const ListItem = ({ data }: Props) => {
   const {
-    korCategoryName,
+    korCategory,
     korName,
     engName,
     imageUrl,
@@ -43,7 +43,7 @@ const ListItem = ({ data }: Props) => {
           <ItemInfo
             korName={addNewLine(korName)}
             engName={engName}
-            korCategory={korCategoryName}
+            korCategory={korCategory}
           />
         </Link>
       </div>
