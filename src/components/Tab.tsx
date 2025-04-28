@@ -1,5 +1,3 @@
-import { HISTORY_TYPES } from '@/constants/user';
-
 interface Props<T> {
   currentTab: T;
   handleTab: (id: string) => void;
