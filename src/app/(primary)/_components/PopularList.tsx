@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import PopularCard from '@/app/(primary)/_components/PopularCard';
 import { usePopularList } from '@/hooks/usePopularList';
+import { AuthService } from '@/lib/AuthService';
 
 type ListType = 'week' | 'spring' | 'recent';
 
@@ -13,10 +14,10 @@ interface Props {
 const EmptyState = ({ type }: { type: ListType }) => {
   const emptyStateContent = {
     week: {
-      text: '이번 주 인기 위스키가 없어요.',
+      text: '데이터 준비 중 입니다.',
     },
     spring: {
-      text: '봄 추천 위스키가 없어요.',
+      text: '데이터 준비 중 입니다.',
     },
     recent: {
       text: '최근에 본 위스키가 없어요.',
@@ -59,12 +60,6 @@ const Description = ({ type }: { type: ListType }) => {
           </div>
         </>
       );
-    // case 'recent':
-    //   return (
-    //     <p className="pb-[10px] text-13 font-extrabold text-mainCoral">
-    //       VIEWED WHISKIES
-    //     </p>
-    //   );
     default:
       return null;
   }
@@ -72,9 +67,29 @@ const Description = ({ type }: { type: ListType }) => {
 
 function PopularList({ type = 'week' }: Props) {
   const { popularList, isLoading } = usePopularList({ type });
+  const { isLogin } = AuthService;
 
   if (isLoading) {
     return <div className="pt-[34px] pl-[25px]">로딩중...</div>;
+  }
+
+  if (type === 'recent' && !isLogin) {
+    return (
+      <div className="pt-[34px] pl-[25px]">
+        <Description type={type} />
+        <div className="flex flex-col items-center justify-center">
+          <Image
+            src="/icon/logo-subcoral.svg"
+            alt="logo"
+            width={30}
+            height={30}
+          />
+          <p className="text-mainGray text-15 mt-5">
+            로그인 후 확인 가능한 서비스 입니다
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
