@@ -23,16 +23,18 @@ export const useTab = <T extends { name: string; id: string }>({
     setCurrentTab((prev) => selected ?? prev);
   };
 
+  const registerTab =
+    (id: string) => (el: HTMLDivElement | HTMLButtonElement | null) => {
+      tabRefs.current[id] = el;
+    };
+
   useEffect(() => {
     if (!scroll) return;
-
     const container = scrollContainerRef.current;
     const activeTab = tabRefs.current[currentTab.id];
-
     if (container && activeTab) {
       const containerRect = container.getBoundingClientRect();
       const tabRect = activeTab.getBoundingClientRect();
-
       const scrollTo =
         container.scrollLeft + (tabRect.left - containerRect.left) - offset;
 
@@ -43,5 +45,14 @@ export const useTab = <T extends { name: string; id: string }>({
     }
   }, [currentTab.id, scroll, offset]);
 
-  return { currentTab, handleTab, tabList, scrollContainerRef, tabRefs };
+  return {
+    currentTab,
+    handleTab,
+    registerTab,
+    tabList,
+    refs: {
+      scrollContainerRef,
+      tabRefs,
+    },
+  };
 };

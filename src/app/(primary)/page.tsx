@@ -21,14 +21,20 @@ export default function Home() {
     currentTab: firstMenuSelectedTab,
     handleTab: handelFirstMenu,
     tabList: firstMenuList,
+    refs: { scrollContainerRef: firstMenuScrollContainerRef },
+    registerTab: firstMenuRegisterTab,
   } = useTab({
     tabList: TOP_MENU_ITEMS,
+    offset: 16,
+    scroll: true,
   });
 
   const {
     currentTab: secondMenuSelectedTab,
     handleTab: handleSecondMenu,
     tabList: secondMenuList,
+    refs: { scrollContainerRef: secondMenuScrollContainerRef },
+    registerTab: secondMenuRegisterTab,
   } = useTab({
     tabList: MENU_CATEGORY,
   });
@@ -64,11 +70,23 @@ export default function Home() {
       <div className="space-y-1 relative">
         <section className="pb-20">
           <article className="pt-10 space-y-[18px]">
-            <TabNavigation list={firstMenuList} onSelect={handelFirstMenu} />
+            <TabNavigation
+              tabList={firstMenuList}
+              handleTab={handelFirstMenu}
+              currentTab={firstMenuSelectedTab}
+              scrollContainerRef={firstMenuScrollContainerRef}
+              registerTab={firstMenuRegisterTab}
+            />
             <TabContent>{renderTopContent()}</TabContent>
           </article>
           <article className="pt-[60px] space-y-[18px]">
-            <TabNavigation list={secondMenuList} onSelect={handleSecondMenu} />
+            <TabNavigation
+              tabList={secondMenuList}
+              handleTab={handleSecondMenu}
+              currentTab={secondMenuSelectedTab}
+              scrollContainerRef={secondMenuScrollContainerRef}
+              registerTab={secondMenuRegisterTab}
+            />
             <TabContent>{renderCategoryContent()}</TabContent>
           </article>
         </section>

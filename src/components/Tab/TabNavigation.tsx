@@ -1,29 +1,32 @@
 'use client';
 
-import { useTab } from '@/hooks/useTab';
+import { RefObject } from 'react';
 
-interface Props {
-  list: { id: string; name: string }[];
-  onSelect?: (id: string) => void;
-}
+type Props<T extends { id: string; name: string }> = {
+  currentTab: T;
+  handleTab: (id: string) => void;
+  registerTab: (
+    id: string,
+  ) => (el: HTMLDivElement | HTMLButtonElement | null) => void;
+  tabList: T[];
+};
 
 const TAB_WIDTH = 146;
 const TAB_HEIGHT = 32;
-const TAB_OFFSET = 16;
 
 const BORDER_COLOR = '#CFCFCF';
 const BORDER_WIDTH = 1.5;
 const ACTIVE_BOTTOM_COVER = 2;
 
-const TabNavigation = ({ list, onSelect }: Props) => {
-  const { currentTab, handleTab, tabList, scrollContainerRef, tabRefs } =
-    useTab({ tabList: list, scroll: true, offset: TAB_OFFSET });
-
-  const handleSelect = (id: string) => {
-    handleTab(id);
-    onSelect?.(id);
-  };
-
+const TabNavigation = <T extends { id: string; name: string }>({
+  currentTab,
+  handleTab,
+  tabList,
+  scrollContainerRef,
+  registerTab,
+}: Props<T> & {
+  scrollContainerRef: RefObject<HTMLDivElement>;
+}) => {
   return (
     <div className="w-full bg-white">
       <div className="relative">
@@ -48,17 +51,17 @@ const TabNavigation = ({ list, onSelect }: Props) => {
             {tabList.map((tab, index) => (
               <div
                 key={tab.id}
-                ref={(el) => (tabRefs.current[tab.id] = el)}
+                ref={registerTab(tab.id)}
                 className={`relative ${index === 0 ? 'ml-4' : '-ml-3'}`}
                 style={{
                   zIndex:
                     currentTab.id === tab.id
-                      ? list.length + 1
-                      : list.length - index,
+                      ? tabList.length + 1
+                      : tabList.length - index,
                 }}
               >
                 <button
-                  onClick={() => handleSelect(tab.id)}
+                  onClick={() => handleTab(tab.id)}
                   className="relative flex items-center justify-center"
                   style={{
                     width: `${TAB_WIDTH}px`,
