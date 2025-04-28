@@ -1,13 +1,11 @@
 'use client';
 
-import { useRef, useEffect, ReactNode } from 'react';
-import { useTab, TabItem } from '@/hooks/useTab';
+import { useRef, useEffect } from 'react';
+import { useTab } from '@/hooks/useTab';
 
 interface Props {
-  items: TabItem[];
-  activeId?: string;
+  list: { id: string; name: string }[];
   onSelect?: (id: string) => void;
-  children?: ReactNode;
 }
 
 const TAB_WIDTH = 146;
@@ -17,22 +15,22 @@ const BORDER_COLOR = '#CFCFCF';
 const BORDER_WIDTH = 1.5;
 const ACTIVE_BOTTOM_COVER = 2;
 
-const TabNavigation = ({ items, activeId, onSelect, children }: Props) => {
-  const { activeTab, setActiveTab } = useTab({ items, initialTabId: activeId });
+const TabNavigation = ({ list, onSelect }: Props) => {
+  const { currentTab, handleTab, tabList } = useTab({ tabList: list });
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (scrollContainerRef.current) {
-      const activeTabElement = document.getElementById(`tab-${activeTab}`);
+      const activeTabElement = document.getElementById(`tab-${currentTab.id}`);
       if (activeTabElement) {
         scrollContainerRef.current.scrollLeft =
           activeTabElement.offsetLeft - 16;
       }
     }
-  }, [activeTab]);
+  }, [currentTab.id]);
 
   const handleSelect = (id: string) => {
-    setActiveTab(id);
+    handleTab(id);
     onSelect?.(id);
   };
 
@@ -57,16 +55,16 @@ const TabNavigation = ({ items, activeId, onSelect, children }: Props) => {
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           <div className="flex">
-            {items.map((tab, index) => (
+            {tabList.map((tab, index) => (
               <div
                 key={tab.id}
                 id={`tab-${tab.id}`}
                 className={`relative ${index === 0 ? 'ml-4' : '-ml-3'}`}
                 style={{
                   zIndex:
-                    activeTab === tab.id
-                      ? items.length + 1
-                      : items.length - index,
+                    currentTab.id === tab.id
+                      ? list.length + 1
+                      : list.length - index,
                 }}
               >
                 <button
@@ -96,13 +94,13 @@ const TabNavigation = ({ items, activeId, onSelect, children }: Props) => {
                         Q${TAB_WIDTH - 14},2 ${TAB_WIDTH - 12},8
                         L${TAB_WIDTH},${TAB_HEIGHT}
                       `}
-                      fill={activeTab === tab.id ? '#FFF' : '#F7F7F7'}
+                      fill={currentTab.id === tab.id ? '#FFF' : '#F7F7F7'}
                       stroke={BORDER_COLOR}
                       strokeWidth={BORDER_WIDTH}
                       strokeLinejoin="round"
                     />
                     {/* 하단 border: 비활성 탭만 표시 */}
-                    {activeTab !== tab.id && (
+                    {currentTab.id !== tab.id && (
                       <line
                         x1="0"
                         y1={TAB_HEIGHT}
@@ -114,7 +112,7 @@ const TabNavigation = ({ items, activeId, onSelect, children }: Props) => {
                       />
                     )}
                     {/* 활성 탭 하단 흰색 덮개 */}
-                    {activeTab === tab.id && (
+                    {currentTab.id === tab.id && (
                       <line
                         x1="0"
                         y1={TAB_HEIGHT}
@@ -128,7 +126,9 @@ const TabNavigation = ({ items, activeId, onSelect, children }: Props) => {
                   </svg>
                   <span
                     className={`relative z-10 text-15 font-extrabold ${
-                      activeTab === tab.id ? 'text-orange-500' : 'text-gray-400'
+                      currentTab.id === tab.id
+                        ? 'text-orange-500'
+                        : 'text-gray-400'
                     }`}
                   >
                     {tab.name}
@@ -144,7 +144,6 @@ const TabNavigation = ({ items, activeId, onSelect, children }: Props) => {
           />
         </div>
       </div>
-      <div className="bg-white">{children}</div>
     </div>
   );
 };

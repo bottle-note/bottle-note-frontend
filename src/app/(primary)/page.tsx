@@ -2,10 +2,11 @@
 
 import Header from '@/app/(primary)/_components/Header';
 import { useTab } from '@/hooks/useTab';
+import TabNavigation from '@/components/Tab/TabNavigation';
+import TabContent from '@/components/Tab/TabContent';
 import CategoryList from './_components/CategoryList';
 import PopularList from './_components/PopularList';
 import NavLayout from './_components/NavLayout';
-import TabNavigation from './_components/TabNavigation';
 
 const TOP_MENU_ITEMS = [
   { id: 'week', name: 'HOT 5' },
@@ -17,34 +18,39 @@ const MENU_CATEGORY = [{ id: 'category', name: '카테고리' }];
 
 export default function Home() {
   const {
-    activeTab: activeTopMenu,
-    setActiveTab: setActiveTopMenu,
-    items: topMenuItems,
+    currentTab: firstMenuSelectedTab,
+    handleTab: handelFirstMenu,
+    tabList: firstMenuList,
   } = useTab({
-    items: TOP_MENU_ITEMS,
+    tabList: TOP_MENU_ITEMS,
   });
 
   const {
-    activeTab: activeCategoryMenu,
-    setActiveTab: setActiveCategoryMenu,
-    items: categoryItems,
+    currentTab: secondMenuSelectedTab,
+    handleTab: handleSecondMenu,
+    tabList: secondMenuList,
   } = useTab({
-    items: MENU_CATEGORY,
+    tabList: MENU_CATEGORY,
   });
 
   const renderTopContent = () => {
-    switch (activeTopMenu) {
+    switch (firstMenuSelectedTab.id) {
       case 'week':
       case 'spring':
       case 'recent':
-        return <PopularList key={activeTopMenu} type={activeTopMenu} />;
+        return (
+          <PopularList
+            key={firstMenuSelectedTab.id}
+            type={firstMenuSelectedTab.id}
+          />
+        );
       default:
         return null;
     }
   };
 
   const renderCategoryContent = () => {
-    switch (activeCategoryMenu) {
+    switch (secondMenuSelectedTab.id) {
       case 'category':
         return <CategoryList />;
       default:
@@ -58,22 +64,12 @@ export default function Home() {
       <div className="space-y-1 relative">
         <section className="pb-20">
           <article className="pt-10 space-y-[18px]">
-            <TabNavigation
-              items={topMenuItems}
-              activeId={activeTopMenu}
-              onSelect={setActiveTopMenu}
-            >
-              {renderTopContent()}
-            </TabNavigation>
+            <TabNavigation list={firstMenuList} onSelect={handelFirstMenu} />
+            <TabContent>{renderTopContent()}</TabContent>
           </article>
           <article className="pt-[60px] space-y-[18px]">
-            <TabNavigation
-              items={categoryItems}
-              activeId={activeCategoryMenu}
-              onSelect={setActiveCategoryMenu}
-            >
-              {renderCategoryContent()}
-            </TabNavigation>
+            <TabNavigation list={secondMenuList} onSelect={handleSecondMenu} />
+            <TabContent>{renderCategoryContent()}</TabContent>
           </article>
         </section>
       </div>
