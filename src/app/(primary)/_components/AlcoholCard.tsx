@@ -9,7 +9,7 @@ interface Props {
   data: AlcoholAPI & { path: string };
 }
 
-export default function PopularCard({ data }: Props) {
+export default function AlcoholCard({ data }: Props) {
   const { korName, rating, engCategory, imageUrl, path } = data;
 
   return (

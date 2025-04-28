@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import PopularCard from '@/app/(primary)/_components/PopularCard';
+import AlcoholCard from '@/app/(primary)/_components/AlcoholCard';
 import { usePopularList } from '@/hooks/usePopularList';
 import { AuthService } from '@/lib/AuthService';
 
@@ -104,7 +104,7 @@ function PopularList({ type = 'week' }: Props) {
                 index === popularList.length - 1 ? 'pr-[25px]' : ''
               }`}
             >
-              <PopularCard data={item} />
+              <AlcoholCard data={item} />
             </div>
           ))}
         </div>
