@@ -1,6 +1,5 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
 import { useTab } from '@/hooks/useTab';
 
 interface Props {
@@ -10,24 +9,15 @@ interface Props {
 
 const TAB_WIDTH = 146;
 const TAB_HEIGHT = 32;
+const TAB_OFFSET = 16;
 
 const BORDER_COLOR = '#CFCFCF';
 const BORDER_WIDTH = 1.5;
 const ACTIVE_BOTTOM_COVER = 2;
 
 const TabNavigation = ({ list, onSelect }: Props) => {
-  const { currentTab, handleTab, tabList } = useTab({ tabList: list });
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      const activeTabElement = document.getElementById(`tab-${currentTab.id}`);
-      if (activeTabElement) {
-        scrollContainerRef.current.scrollLeft =
-          activeTabElement.offsetLeft - 16;
-      }
-    }
-  }, [currentTab.id]);
+  const { currentTab, handleTab, tabList, scrollContainerRef, tabRefs } =
+    useTab({ tabList: list, scroll: true, offset: TAB_OFFSET });
 
   const handleSelect = (id: string) => {
     handleTab(id);
@@ -58,7 +48,7 @@ const TabNavigation = ({ list, onSelect }: Props) => {
             {tabList.map((tab, index) => (
               <div
                 key={tab.id}
-                id={`tab-${tab.id}`}
+                ref={(el) => (tabRefs.current[tab.id] = el)}
                 className={`relative ${index === 0 ? 'ml-4' : '-ml-3'}`}
                 style={{
                   zIndex:
