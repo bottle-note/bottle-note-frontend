@@ -18,14 +18,14 @@ const BORDER_COLOR = '#CFCFCF';
 const BORDER_WIDTH = 1.5;
 const ACTIVE_BOTTOM_COVER = 2;
 
-const TabNavigation = <T extends { id: string; name: string }>({
+const BookmarkTab = <T extends { id: string; name: string }>({
   currentTab,
   handleTab,
   tabList,
   scrollContainerRef,
   registerTab,
 }: Props<T> & {
-  scrollContainerRef: RefObject<HTMLDivElement>;
+  scrollContainerRef?: RefObject<HTMLDivElement>;
 }) => {
   return (
     <div className="w-full bg-white">
@@ -141,4 +141,4 @@ const TabNavigation = <T extends { id: string; name: string }>({
   );
 };
 
-export default TabNavigation;
+export default BookmarkTab;

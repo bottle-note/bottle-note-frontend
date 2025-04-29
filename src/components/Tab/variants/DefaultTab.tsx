@@ -4,7 +4,7 @@ interface Props<T> {
   tabList: T[];
 }
 
-const Tab = <T extends { id: string; name: string }>({
+const DefaultTab = <T extends { id: string; name: string }>({
   currentTab,
   handleTab,
   tabList,
@@ -26,4 +26,4 @@ const Tab = <T extends { id: string; name: string }>({
   );
 };
 
-export default Tab;
+export default DefaultTab;
