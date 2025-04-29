@@ -4,13 +4,13 @@ import React, { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
-import Tab from '@/components/Tab';
 import { useTab } from '@/hooks/useTab';
 import List from '@/components/List/List';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { UserApi } from '@/app/api/UserApi';
 import { RelationInfo } from '@/types/User';
 import ListSection from '@/components/List/ListSection';
+import Tab from '@/components/Tab';
 import { FollowerListItem } from '../_components/FollowerListItem';
 
 export default function UserFollowPage({

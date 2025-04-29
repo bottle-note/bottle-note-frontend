@@ -2,8 +2,7 @@
 
 import Header from '@/app/(primary)/_components/Header';
 import { useTab } from '@/hooks/useTab';
-import TabNavigation from '@/components/Tab/TabNavigation';
-import TabContent from '@/components/Tab/TabContent';
+import Tab from '@/components/Tab';
 import CategoryList from './_components/CategoryList';
 import PopularList from './_components/PopularList';
 import NavLayout from './_components/NavLayout';
@@ -70,24 +69,26 @@ export default function Home() {
       <div className="space-y-1 relative">
         <section className="pb-20">
           <article className="pt-10 space-y-[18px]">
-            <TabNavigation
+            <Tab
+              variant="bookmark"
               tabList={firstMenuList}
               handleTab={handelFirstMenu}
               currentTab={firstMenuSelectedTab}
               scrollContainerRef={firstMenuScrollContainerRef}
               registerTab={firstMenuRegisterTab}
             />
-            <TabContent>{renderTopContent()}</TabContent>
+            {renderTopContent()}
           </article>
           <article className="pt-[60px] space-y-[18px]">
-            <TabNavigation
+            <Tab
+              variant="bookmark"
               tabList={secondMenuList}
               handleTab={handleSecondMenu}
               currentTab={secondMenuSelectedTab}
               scrollContainerRef={secondMenuScrollContainerRef}
               registerTab={secondMenuRegisterTab}
             />
-            <TabContent>{renderCategoryContent()}</TabContent>
+            {renderCategoryContent()}
           </article>
         </section>
       </div>

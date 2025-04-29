@@ -35,8 +35,11 @@ export const useTab = <T extends { name: string; id: string }>({
     if (container && activeTab) {
       const containerRect = container.getBoundingClientRect();
       const tabRect = activeTab.getBoundingClientRect();
-      const scrollTo =
-        container.scrollLeft + (tabRect.left - containerRect.left) - offset;
+
+      const containerCenter = containerRect.left + containerRect.width / 2;
+      const tabCenter = tabRect.left + tabRect.width / 2;
+
+      const scrollTo = container.scrollLeft + (tabCenter - containerCenter);
 
       container.scrollTo({
         left: scrollTo,
