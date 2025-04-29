@@ -9,7 +9,7 @@ import {
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 export const AlcoholsApi = {
-  async getPopular() {
+  async getWeeklyPopular() {
     const response = await fetchWithAuth(`/bottle-api/popular/week`, {
       requireAuth: false,
       cache: 'force-cache',
@@ -25,6 +25,49 @@ export const AlcoholsApi = {
       return {
         ...alcohol,
         path: `/search/${alcohol.engCategory}/${alcohol.alcoholId}`,
+      };
+    });
+
+    return formattedData;
+  },
+
+  async getSpringPopular() {
+    const response = await fetchWithAuth(`/bottle-api/popular/spring`, {
+      requireAuth: false,
+      cache: 'force-cache',
+    });
+
+    if (response.errors.length !== 0) {
+      throw new Error('Failed to fetch data');
+    }
+
+    const result: ApiResponse<AlcoholAPI[]> = await response;
+
+    const formattedData = result.data.map((data) => {
+      return {
+        ...data,
+        path: `/search/${data.engCategory}/${data.alcoholId}`,
+      };
+    });
+
+    return formattedData;
+  },
+
+  async getHistory() {
+    const response = await fetchWithAuth(`/bottle-api/history/view/alcohols`, {
+      cache: 'force-cache',
+    });
+
+    if (response.errors.length !== 0) {
+      throw new Error('Failed to fetch data');
+    }
+
+    const result: ApiResponse<{ items: AlcoholAPI[] }> = await response;
+
+    const formattedData = result.data.items.map((data) => {
+      return {
+        ...data,
+        path: `/search/${data.engCategory}/${data.alcoholId}`,
       };
     });
 

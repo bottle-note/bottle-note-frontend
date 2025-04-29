@@ -4,19 +4,19 @@ import BackDrop from './BackDrop';
 
 export default function Loading() {
   return (
-    <BackDrop isShow>
-      <main className="w-full h-full flex flex-col justify-center items-center backdrop-blur bg-black bg-opacity-50 gap-2">
+    <BackDrop isShow isModal={false}>
+      <main className="w-full h-full flex flex-col justify-center items-center backdrop-blur bg-white bg-opacity-50 gap-2">
         <Image
-          src="/icon/logo-white.svg"
+          src="/bottle_note_logo_gray.svg"
           alt="bottle_logo"
-          width={60}
-          height={102}
+          width={48}
+          height={103}
         />
         <Image
-          src="/icon/logo-text-white.svg"
+          src="/bottle_note_logo_text_gray.svg"
           alt="bottle_logo"
-          width={60}
-          height={102}
+          width={48}
+          height={30}
         />
       </main>
     </BackDrop>

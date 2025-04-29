@@ -3,16 +3,15 @@ import { Category } from './common';
 
 export interface AlcoholAPI {
   alcoholId: number;
-  imageUrl: string;
   korName: string;
   engName: string;
-  korCategoryName: string;
-  engCategory: string;
   rating: number;
   ratingCount: number;
-  reviewCount: number;
-  pickCount: number;
+  korCategory: string;
+  engCategory: string;
+  imageUrl: string;
   isPicked: boolean;
+  popularScore: number;
 }
 
 export interface AlcoholInfo {
