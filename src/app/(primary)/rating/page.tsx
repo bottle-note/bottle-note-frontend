@@ -46,14 +46,25 @@ export default function Rating() {
     totalCount: number;
   }>({
     queryKey: ['rating', filterState],
-    queryFn: ({ pageParam }) => {
-      return RateApi.getList({
+    queryFn: async ({ pageParam }) => {
+      const response = await RateApi.getList({
         ...filterState,
         ...{
           cursor: pageParam,
           pageSize: 10,
         },
       });
+
+      return {
+        ...response,
+        data: {
+          ...response.data,
+          ratings: response.data.ratings.map((rating) => ({
+            ...rating,
+            totalCount: response.data.totalCount,
+          })),
+        },
+      };
     },
   });
 

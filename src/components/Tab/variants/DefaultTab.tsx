@@ -1,12 +1,10 @@
-import { HISTORY_TYPES } from '@/constants/user';
-
 interface Props<T> {
   currentTab: T;
   handleTab: (id: string) => void;
   tabList: T[];
 }
 
-const Tab = <T extends { id: string; name: string }>({
+const DefaultTab = <T extends { id: string; name: string }>({
   currentTab,
   handleTab,
   tabList,
@@ -28,4 +26,4 @@ const Tab = <T extends { id: string; name: string }>({
   );
 };
 
-export default Tab;
+export default DefaultTab;
