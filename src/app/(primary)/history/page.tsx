@@ -151,7 +151,7 @@ export default function History() {
         <SearchContainer
           placeholder="위스키 이름 검색"
           handleSearchCallback={handleSearchCallback}
-          styleProps="p-5"
+          styleProps="px-5 pt-5"
         />
         {historyData && accumulatedHistories ? (
           <Timeline
