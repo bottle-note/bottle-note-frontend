@@ -33,11 +33,7 @@ interface InitialState {
   tabType: MyBottleTabType;
 }
 
-const SORT_OPTIONS = [
-  { name: '최신순', type: SORT_TYPE.LATEST },
-  { name: '별점순', type: SORT_TYPE.RATING },
-  { name: '리뷰순', type: SORT_TYPE.REVIEW },
-];
+const SORT_OPTIONS = [{ name: '최신순', type: SORT_TYPE.LATEST }];
 
 export default function MyBottle({
   params: { id: userId },
