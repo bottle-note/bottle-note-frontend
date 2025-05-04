@@ -41,22 +41,22 @@ const UserInfo = ({
         <div className="flex gap-2">
           <button
             onClick={() =>
-              router.push(`/user/${currentId}/follow?type=following`)
+              router.push(`/user/${currentId}/follow?type=follower`)
             }
           >
-            <p className="text-sm">
-              <strong>팔로워 </strong>
+            <p className="text-sm font-thin">
+              <strong className="font-black">팔로워 </strong>
               <span>{follower}</span>
             </p>
           </button>
 
           <button
             onClick={() =>
-              router.push(`/user/${currentId}/follow?type=follower`)
+              router.push(`/user/${currentId}/follow?type=following`)
             }
           >
             <p className="text-sm">
-              <strong>팔로잉 </strong>
+              <strong className="font-black">팔로잉 </strong>
               <span>{following}</span>
             </p>
           </button>
