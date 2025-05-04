@@ -1,5 +1,6 @@
 import { ApiResponse, ListQueryParams } from '@/types/common';
 import {
+  MyBottleTabType,
   PickMyBottleListResponse,
   RatingMyBottleListResponse,
   ReviewMyBottleListResponse,
@@ -7,6 +8,14 @@ import {
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 export const MyBottleApi = {
+  getMyBottle(type: MyBottleTabType) {
+    if (type === 'ratings') return MyBottleApi.getRatings;
+    if (type === 'reviews') return MyBottleApi.getReviews;
+    if (type === 'picks') return MyBottleApi.getPicks;
+
+    throw new Error('Invalid type');
+  },
+
   async getReviews({
     params,
     userId,

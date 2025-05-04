@@ -11,7 +11,7 @@ const ItemInfo = ({ korName, engName, korCategory }: Props) => (
     <h2 className="text-sm leading-sm font-bold text-mainDarkGray">
       {truncStr(korName, 15)}
     </h2>
-    <p className="text-11 text-mainDarkGray">
+    <p className="text-10 text-mainDarkGray">
       <span>{truncStr(engName.toUpperCase(), 15)}</span>
       <span> · {korCategory}</span>
     </p>

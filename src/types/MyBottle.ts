@@ -21,7 +21,7 @@ export interface RatingMyBottleListResponse extends MyBottleListResponse {
     myRatingPoint: number;
     averageRatingPoint: number;
     averageRatingCount: number;
-    ratingModifiedAt: string;
+    ratingModifyAt: string;
   }[];
 }
 
@@ -30,7 +30,7 @@ export interface ReviewMyBottleListResponse extends MyBottleListResponse {
     baseMyBottleInfo: BaseMyBottleInfo;
     reviewId: number;
     isMyReview: boolean;
-    reviewModifiedAt: string;
+    reviewModifyAt: string;
     reviewContent: string;
     reviewTastingTags: string[];
     isBestReview: boolean;

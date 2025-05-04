@@ -8,8 +8,8 @@ import useModalStore from '@/store/modalStore';
 import { AuthService } from '@/lib/AuthService';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
-import { ItemLink } from './_components/ItemLink';
 import StarRating from '../StarRaiting';
+import Link from 'next/link';
 
 interface Props {
   data: RateAPI;
@@ -40,18 +40,21 @@ const ListItemRating = ({ data }: Props) => {
 
   return (
     <article className="flex items-center space-x-2 text-mainBlack border-brightGray border-b h-[90px]">
-      <ItemLink alcoholId={alcoholId}>
+      <Link href={`/search/all/${alcoholId}`}>
         <ItemImage src={imageUrl} alt="image" />
-      </ItemLink>
+      </Link>
 
       <section className="flex-1 space-y-1">
-        <ItemLink alcoholId={alcoholId}>
+        <Link
+          href={`/search/all/${alcoholId}`}
+          className="flex flex-col items-start justify-center space-y-1.5"
+        >
           <ItemInfo
             korName={korName}
             engName={engName}
             korCategory={korCategoryName}
           />
-        </ItemLink>
+        </Link>
 
         <article className="flex justify-between">
           <StarRating

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
@@ -12,9 +12,15 @@ import { RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
 import SearchContainer from '@/components/Search/SearchContainer';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
-import { MyBottleTabType, RatingMyBottleListResponse } from '@/types/MyBottle';
+import {
+  MyBottleTabType,
+  PickMyBottleListResponse,
+  RatingMyBottleListResponse,
+  ReviewMyBottleListResponse,
+} from '@/types/MyBottle';
 import { MyBottleApi } from '@/app/api/MyBottleApi';
 import { RatingsListItem } from './_components/RatingsListItem';
+import { ReviewListItem } from './_components/ReviewListItem';
 
 interface InitialState {
   keyword: string;
@@ -24,29 +30,36 @@ interface InitialState {
   tabType: MyBottleTabType;
 }
 
+const SORT_OPTIONS = [
+  { name: '최신순', type: SORT_TYPE.LATEST },
+  { name: '별점순', type: SORT_TYPE.RATING },
+  { name: '리뷰순', type: SORT_TYPE.REVIEW },
+];
+
 export default function MyBottle({
   params: { id: userId },
 }: {
   params: { id: string };
 }) {
   const router = useRouter();
-  const historyType = useSearchParams().get('type');
-  const { currentTab, handleTab, tabList } = useTab({
+  const myBottleType = useSearchParams().get('type') as MyBottleTabType;
+  const { currentTab, handleTab, tabList } = useTab<{
+    id: MyBottleTabType;
+    name: string;
+  }>({
     tabList: [
-      { id: 'rating', name: '별점' },
-      { id: 'review', name: '리뷰' },
-      { id: 'pick', name: '찜' },
+      { id: 'ratings', name: '별점' },
+      { id: 'reviews', name: '리뷰' },
+      { id: 'picks', name: '찜' },
     ],
   });
-  const [currHistoryType, setCurrHistoryType] =
-    useState<InitialState['tabType']>('ratings');
 
   const initialState: InitialState = {
     keyword: '',
     regionId: '',
     sortType: SORT_TYPE.LATEST,
     sortOrder: SORT_ORDER.DESC,
-    tabType: currHistoryType,
+    tabType: currentTab.id,
   };
 
   const { state: filterState, handleFilter } = useFilter(initialState);
@@ -56,53 +69,37 @@ export default function MyBottle({
     isLoading: isFirstLoading,
     isFetching,
     targetRef,
-  } = usePaginatedQuery<RatingMyBottleListResponse>({
-    queryKey: ['my-bottle', filterState],
+  } = usePaginatedQuery<
+    | RatingMyBottleListResponse
+    | ReviewMyBottleListResponse
+    | PickMyBottleListResponse
+  >({
+    queryKey: ['my-bottle', filterState, currentTab.id],
     queryFn: ({ pageParam }) => {
-      return MyBottleApi.getRatings({
+      const apiMethod = MyBottleApi.getMyBottle(currentTab.id);
+
+      return apiMethod({
         params: {
           ...filterState,
-          ...{
-            cursor: pageParam,
-            pageSize: 10,
-          },
+          cursor: pageParam,
+          pageSize: 20, // FIXME: api 고쳐지면 다시 10으로 변경
         },
         userId: Number(userId),
       });
     },
   });
 
-  const handleSearchCallback = (searchedKeyword: string) => {
+  const handleSearchCallback = useCallback((searchedKeyword: string) => {
     handleFilter('keyword', searchedKeyword);
-  };
-
-  const handleCategoryCallback = (selectedCategory: typeof currHistoryType) => {
-    handleFilter('tabType', selectedCategory);
-  };
-
-  // FIXME: handleTab 과 handleCategoryCallback 통합하여 관리하도록 수정
-  useEffect(() => {
-    const selected = tabList.find((item) => item.id === historyType);
-
-    handleTab(selected?.id ?? 'all');
-    handleCategoryCallback(currHistoryType);
-  }, [historyType]);
+  }, []);
 
   useEffect(() => {
     router.replace(`?type=${currentTab.id}`);
   }, [currentTab]);
 
-  const SORT_OPTIONS = [
-    { name: '최신순', type: SORT_TYPE.LATEST },
-    { name: '별점순', type: SORT_TYPE.RATING },
-    { name: '리뷰순', type: SORT_TYPE.REVIEW },
-  ];
-
   useEffect(() => {
-    if (currentTab.id === 'rating') return setCurrHistoryType('ratings');
-    if (currentTab.id === 'review') return setCurrHistoryType('reviews');
-    if (currentTab.id === 'pick') return setCurrHistoryType('picks');
-  }, [currentTab]);
+    handleTab(myBottleType);
+  }, []);
 
   return (
     <Suspense>
@@ -167,12 +164,33 @@ export default function MyBottle({
               {alcoholList &&
                 [...alcoholList.map((list) => list.data.myBottleList)]
                   .flat()
-                  .map((item) => (
-                    <RatingsListItem
-                      data={item}
-                      key={item.baseMyBottleInfo.alcoholId}
-                    />
-                  ))}
+                  .map((item) => {
+                    if (currentTab.id === 'ratings') {
+                      return (
+                        <RatingsListItem
+                          data={
+                            item as RatingMyBottleListResponse['myBottleList'][number]
+                          }
+                          key={item.baseMyBottleInfo.alcoholId}
+                        />
+                      );
+                    }
+
+                    if (currentTab.id === 'reviews') {
+                      return (
+                        <ReviewListItem
+                          data={
+                            item as ReviewMyBottleListResponse['myBottleList'][number]
+                          }
+                          key={
+                            (
+                              item as ReviewMyBottleListResponse['myBottleList'][number]
+                            ).reviewId
+                          }
+                        />
+                      );
+                    }
+                  })}
             </List.Section>
           </List>
           <div ref={targetRef} />

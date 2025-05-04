@@ -2,10 +2,10 @@ import ItemImage from '@/components/List/_components/ItemImage';
 import ItemInfo from '@/components/List/_components/ItemInfo';
 import { addNewLine } from '@/utils/addNewLine';
 import { RatingMyBottleListResponse } from '@/types/MyBottle';
-import { ItemLink } from '@/components/List/_components/ItemLink';
 import Label from '@/app/(primary)/_components/Label';
 import Star from '@/components/Star';
 import { ItemStats } from '@/components/List/_components/ItemStats';
+import Link from 'next/link';
 
 interface Props {
   data: RatingMyBottleListResponse['myBottleList'][number];
@@ -29,13 +29,13 @@ export const RatingsListItem = ({ data }: Props) => {
   return (
     <section className="text-mainBlack border-brightGray border-b py-2 flex items-center">
       {/* image */}
-      <ItemLink alcoholId={alcoholId} className="">
+      <Link href={`/search/all/${alcoholId}`}>
         <ItemImage src={imageUrl} alt="image" />
-      </ItemLink>
+      </Link>
 
       {/* info */}
-      <ItemLink
-        alcoholId={alcoholId}
+      <Link
+        href={`/search/all/${alcoholId}`}
         className="flex flex-col items-start justify-center space-y-1.5"
       >
         {isHot && (
@@ -55,7 +55,7 @@ export const RatingsListItem = ({ data }: Props) => {
           pointContent={averageRatingPoint.toFixed(1)}
           countContent={averageRatingCount.toString()}
         />
-      </ItemLink>
+      </Link>
 
       {/* my rating point */}
       <div className="ml-auto pr-1 flex flex-col items-end">
