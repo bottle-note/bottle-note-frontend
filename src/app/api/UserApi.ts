@@ -22,7 +22,9 @@ export const UserApi = {
   },
 
   async getUserInfo({ userId }: { userId: string }): Promise<UserInfoApi> {
-    const response = await fetch(`/bottle-api/my-page/${userId}`);
+    const response = await fetch(`/bottle-api/my-page/${userId}`, {
+      cache: 'force-cache',
+    });
 
     const { data } = await response.json();
 

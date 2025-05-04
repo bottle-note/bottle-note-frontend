@@ -21,6 +21,9 @@ import {
 import { MyBottleApi } from '@/app/api/MyBottleApi';
 import { RatingsListItem } from './_components/RatingsListItem';
 import { ReviewListItem } from './_components/ReviewListItem';
+import { PicksListItem } from './_components/PicksListItem';
+import { UserApi } from '@/app/api/UserApi';
+import { useQuery } from '@tanstack/react-query';
 
 interface InitialState {
   keyword: string;
@@ -89,6 +92,16 @@ export default function MyBottle({
     },
   });
 
+  const { data: userInfo } = useQuery({
+    queryKey: ['user-info', userId],
+    queryFn: async () => {
+      const result = await UserApi.getUserInfo({ userId });
+      return result;
+    },
+    enabled: !!alcoholList && !alcoholList[0]?.data.isMyPage,
+    staleTime: Infinity,
+  });
+
   const handleSearchCallback = useCallback((searchedKeyword: string) => {
     handleFilter('keyword', searchedKeyword);
   }, []);
@@ -140,7 +153,9 @@ export default function MyBottle({
             isListFirstLoading={isFirstLoading}
             isScrollLoading={isFetching}
           >
-            <List.Title title={`나의 ${currentTab.name}`} />
+            <List.Title
+              title={`${userInfo ? `${userInfo.nickName}님` : '나'}의 ${currentTab.name}`}
+            />
             <List.Total
               total={alcoholList ? alcoholList[0].data.totalCount : 0}
             />
@@ -186,6 +201,21 @@ export default function MyBottle({
                             (
                               item as ReviewMyBottleListResponse['myBottleList'][number]
                             ).reviewId
+                          }
+                        />
+                      );
+                    }
+
+                    if (currentTab.id === 'picks') {
+                      return (
+                        <PicksListItem
+                          data={
+                            item as PickMyBottleListResponse['myBottleList'][number]
+                          }
+                          key={
+                            (
+                              item as PickMyBottleListResponse['myBottleList'][number]
+                            ).baseMyBottleInfo.alcoholId
                           }
                         />
                       );
