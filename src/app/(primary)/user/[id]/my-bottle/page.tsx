@@ -7,21 +7,21 @@ import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import List from '@/components/List/List';
 import Tab from '@/components/Tab';
 import { REGIONS } from '@/constants/common';
-import { HISTORY_TYPES } from '@/constants/user';
 import { useTab } from '@/hooks/useTab';
 import { RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
 import SearchContainer from '@/components/Search/SearchContainer';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import { AlcoholAPI } from '@/types/Alcohol';
-import { UserApi } from '@/app/api/UserApi';
 import { useFilter } from '@/hooks/useFilter';
+import { MyBottleTabType, RatingMyBottleListResponse } from '@/types/MyBottle';
+import { MyBottleApi } from '@/app/api/MyBottleApi';
+import { RatingsListItem } from './_components/RatingsListItem';
 
 interface InitialState {
   keyword: string;
   regionId: RegionId;
   sortType: SORT_TYPE.REVIEW | SORT_TYPE.LATEST | SORT_TYPE.RATING;
   sortOrder: SORT_ORDER;
-  tabType: 'ALL' | 'REVIEW' | 'PICK' | 'RATING';
+  tabType: MyBottleTabType;
 }
 
 export default function MyBottle({
@@ -31,10 +31,15 @@ export default function MyBottle({
 }) {
   const router = useRouter();
   const historyType = useSearchParams().get('type');
-  const { currentTab, handleTab, tabList } = useTab({ tabList: HISTORY_TYPES });
-  const [currHistoryType, setCurrHistoryType] = useState<
-    'ALL' | 'REVIEW' | 'PICK' | 'RATING'
-  >('ALL');
+  const { currentTab, handleTab, tabList } = useTab({
+    tabList: [
+      { id: 'rating', name: '별점' },
+      { id: 'review', name: '리뷰' },
+      { id: 'pick', name: '찜' },
+    ],
+  });
+  const [currHistoryType, setCurrHistoryType] =
+    useState<InitialState['tabType']>('ratings');
 
   const initialState: InitialState = {
     keyword: '',
@@ -51,14 +56,10 @@ export default function MyBottle({
     isLoading: isFirstLoading,
     isFetching,
     targetRef,
-  } = usePaginatedQuery<{
-    isMyPage: boolean;
-    totalCount: number;
-    myBottleList: (AlcoholAPI & { hasReviewByMe: boolean })[];
-  }>({
+  } = usePaginatedQuery<RatingMyBottleListResponse>({
     queryKey: ['my-bottle', filterState],
     queryFn: ({ pageParam }) => {
-      return UserApi.myBottle({
+      return MyBottleApi.getRatings({
         params: {
           ...filterState,
           ...{
@@ -98,10 +99,9 @@ export default function MyBottle({
   ];
 
   useEffect(() => {
-    if (currentTab.id === 'all') return setCurrHistoryType('ALL');
-    if (currentTab.id === 'rating') return setCurrHistoryType('RATING');
-    if (currentTab.id === 'review') return setCurrHistoryType('REVIEW');
-    if (currentTab.id === 'pick') return setCurrHistoryType('PICK');
+    if (currentTab.id === 'rating') return setCurrHistoryType('ratings');
+    if (currentTab.id === 'review') return setCurrHistoryType('reviews');
+    if (currentTab.id === 'pick') return setCurrHistoryType('picks');
   }, [currentTab]);
 
   return (
@@ -159,12 +159,17 @@ export default function MyBottle({
               handleOptionCallback={(value) => handleFilter('regionId', value)}
             />
 
-            {alcoholList &&
-              [...alcoholList.map((list) => list.data.myBottleList)]
-                .flat()
-                .map((item: any) => (
-                  <List.Item key={item.alcoholId} data={item} />
-                ))}
+            <List.Section>
+              {alcoholList &&
+                [...alcoholList.map((list) => list.data.myBottleList)]
+                  .flat()
+                  .map((item) => (
+                    <RatingsListItem
+                      data={item}
+                      key={item.baseMyBottleInfo.alcoholId}
+                    />
+                  ))}
+            </List.Section>
           </List>
           <div ref={targetRef} />
         </section>

@@ -8,7 +8,7 @@ import { AlcoholAPI } from '@/types/Alcohol';
 import useModalStore from '@/store/modalStore';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
-import RatingCountIcon from 'public/icon/ratingcount-black.svg';
+import RatingCountIcon from 'public/icon/rating-count-black.svg';
 import HasReviewIcon from 'public/icon/edit-filled-subcoral.svg';
 import ReviewIcon from 'public/icon/edit-outlined-subcoral.svg';
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { RateAPI } from '@/types/Rate';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { RateApi } from '@/app/api/RateApi';
@@ -9,19 +8,12 @@ import useModalStore from '@/store/modalStore';
 import { AuthService } from '@/lib/AuthService';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
+import { ItemLink } from './_components/ItemLink';
 import StarRating from '../StarRaiting';
 
 interface Props {
   data: RateAPI;
 }
-
-const ItemLink = ({
-  alcoholId,
-  children,
-}: {
-  alcoholId: number;
-  children: React.ReactNode;
-}) => <Link href={`/search/all/${alcoholId}`}>{children}</Link>;
 
 const ListItemRating = ({ data }: Props) => {
   const {
