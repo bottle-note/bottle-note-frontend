@@ -40,6 +40,7 @@ export interface ReviewMyBottleListResponse extends MyBottleListResponse {
 export interface PickMyBottleListResponse extends MyBottleListResponse {
   myBottleList: {
     baseMyBottleInfo: BaseMyBottleInfo;
-    isPicPicksCount: number;
+    isPicked: boolean;
+    totalPicksCount: number;
   }[];
 }
