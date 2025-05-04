@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import ItemImage from '@/components/List/_components/ItemImage';
 import ItemInfo from '@/components/List/_components/ItemInfo';
 import { addNewLine } from '@/utils/addNewLine';
@@ -6,8 +5,7 @@ import { RatingMyBottleListResponse } from '@/types/MyBottle';
 import { ItemLink } from '@/components/List/_components/ItemLink';
 import Label from '@/app/(primary)/_components/Label';
 import Star from '@/components/Star';
-import RatingCountIcon from 'public/icon/rating-count-black.svg';
-import StartIcon from 'public/icon/star-filled-black.svg';
+import { ItemStats } from '@/components/List/_components/ItemStats';
 
 interface Props {
   data: RatingMyBottleListResponse['myBottleList'][number];
@@ -52,22 +50,11 @@ export const RatingsListItem = ({ data }: Props) => {
           korCategory={korCategoryName}
         />
 
-        <div className="flex justify-end text-12 font-semibold gap-[1px]">
-          <Image src={StartIcon} alt="평균 별점" className="pb-[3px]" />
-          <span>{`${averageRatingPoint.toFixed(1)}`}</span>
-          <p className="flex">
-            (
-            <>
-              <Image
-                src={RatingCountIcon}
-                alt="별점 평가 참여자 수"
-                className="pb-[2px]"
-              />
-              <span>{`${averageRatingCount}`}</span>
-            </>
-            )
-          </p>
-        </div>
+        <ItemStats
+          iconSrc={'/icon/star-filled-black.svg'}
+          pointContent={averageRatingPoint.toFixed(1)}
+          countContent={averageRatingCount.toString()}
+        />
       </ItemLink>
 
       {/* my rating point */}
@@ -77,7 +64,7 @@ export const RatingsListItem = ({ data }: Props) => {
           rating={myRatingPoint}
           size={20}
           color="main"
-          styleProps="text-16 text-mainCoral font-black"
+          styleProps="text-16 text-mainCoral font-black pr-6"
         />
       </div>
     </section>

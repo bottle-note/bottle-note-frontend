@@ -143,9 +143,13 @@ export default function MyBottle({
             isListFirstLoading={isFirstLoading}
             isScrollLoading={isFetching}
           >
-            <List.Title title={currHistoryType} />
+            <List.Title title={`나의 ${currentTab.name}`} />
             <List.Total
               total={alcoholList ? alcoholList[0].data.totalCount : 0}
+            />
+            <List.SortOrderSwitch
+              type={filterState.sortOrder}
+              handleSortOrder={(value) => handleFilter('sortOrder', value)}
             />
             <List.OptionSelect
               options={SORT_OPTIONS}
