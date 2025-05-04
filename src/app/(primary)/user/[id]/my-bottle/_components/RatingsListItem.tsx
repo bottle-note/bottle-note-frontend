@@ -9,9 +9,10 @@ import Link from 'next/link';
 
 interface Props {
   data: RatingMyBottleListResponse['myBottleList'][number];
+  isMyPage: boolean;
 }
 
-export const RatingsListItem = ({ data }: Props) => {
+export const RatingsListItem = ({ data, isMyPage }: Props) => {
   const {
     baseMyBottleInfo: {
       alcoholId,
@@ -27,7 +28,7 @@ export const RatingsListItem = ({ data }: Props) => {
   } = data;
 
   return (
-    <section className="text-mainBlack border-brightGray border-b py-2 flex items-center">
+    <section className="flex items-center text-mainBlack border-brightGray border-b py-2">
       {/* image */}
       <Link href={`/search/all/${alcoholId}`}>
         <ItemImage src={imageUrl} alt="image" />
@@ -59,7 +60,7 @@ export const RatingsListItem = ({ data }: Props) => {
 
       {/* my rating point */}
       <div className="ml-auto pr-1 flex flex-col items-end">
-        <p className="text-10 text-mainGray font-bold">내 별점</p>
+        {isMyPage && <p className="text-10 text-mainGray font-bold">내 별점</p>}
         <Star
           rating={myRatingPoint}
           size={20}

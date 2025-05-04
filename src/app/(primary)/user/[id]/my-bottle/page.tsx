@@ -182,6 +182,7 @@ export default function MyBottle({
                           data={
                             item as RatingMyBottleListResponse['myBottleList'][number]
                           }
+                          isMyPage={alcoholList[0].data.isMyPage}
                           key={item.baseMyBottleInfo.alcoholId}
                         />
                       );
