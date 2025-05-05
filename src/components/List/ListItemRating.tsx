@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { RateAPI } from '@/types/Rate';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { RateApi } from '@/app/api/RateApi';
@@ -9,7 +10,6 @@ import { AuthService } from '@/lib/AuthService';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
 import StarRating from '../StarRaiting';
-import Link from 'next/link';
 
 interface Props {
   data: RateAPI;

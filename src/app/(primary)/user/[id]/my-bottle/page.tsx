@@ -3,7 +3,10 @@
 import React, { Suspense, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import { UserApi } from '@/app/api/UserApi';
+import { MyBottleApi } from '@/app/api/MyBottleApi';
 import List from '@/components/List/List';
 import Tab from '@/components/Tab';
 import { REGIONS } from '@/constants/common';
@@ -18,12 +21,9 @@ import {
   RatingMyBottleListResponse,
   ReviewMyBottleListResponse,
 } from '@/types/MyBottle';
-import { MyBottleApi } from '@/app/api/MyBottleApi';
 import { RatingsListItem } from './_components/RatingsListItem';
 import { ReviewListItem } from './_components/ReviewListItem';
 import { PicksListItem } from './_components/PicksListItem';
-import { UserApi } from '@/app/api/UserApi';
-import { useQuery } from '@tanstack/react-query';
 
 interface InitialState {
   keyword: string;
@@ -217,6 +217,8 @@ export default function MyBottle({
                         />
                       );
                     }
+
+                    return <></>;
                   })}
             </List.Section>
           </List>

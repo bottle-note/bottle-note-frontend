@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import ItemImage from '@/components/List/_components/ItemImage';
 import ItemInfo from '@/components/List/_components/ItemInfo';
 import { addNewLine } from '@/utils/addNewLine';
@@ -5,7 +6,6 @@ import { RatingMyBottleListResponse } from '@/types/MyBottle';
 import Label from '@/app/(primary)/_components/Label';
 import Star from '@/components/Star';
 import { ItemStats } from '@/components/List/_components/ItemStats';
-import Link from 'next/link';
 
 interface Props {
   data: RatingMyBottleListResponse['myBottleList'][number];
@@ -52,7 +52,7 @@ export const RatingsListItem = ({ data, isMyPage }: Props) => {
         />
 
         <ItemStats
-          iconSrc={'/icon/star-filled-black.svg'}
+          iconSrc="/icon/star-filled-black.svg"
           pointContent={averageRatingPoint.toFixed(1)}
           countContent={averageRatingCount.toString()}
         />

@@ -1,14 +1,13 @@
+import { useState } from 'react';
+import Link from 'next/link';
 import Label from '@/app/(primary)/_components/Label';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import ItemImage from '@/components/List/_components/ItemImage';
 import ItemInfo from '@/components/List/_components/ItemInfo';
 import { ItemStats } from '@/components/List/_components/ItemStats';
-import { AuthService } from '@/lib/AuthService';
 import useModalStore from '@/store/modalStore';
 import { PickMyBottleListResponse } from '@/types/MyBottle';
 import { addNewLine } from '@/utils/addNewLine';
-import Link from 'next/link';
-import { useState } from 'react';
 
 interface Props {
   data: PickMyBottleListResponse['myBottleList'][number];
@@ -56,7 +55,7 @@ export const PicksListItem = ({ data }: Props) => {
         />
 
         <ItemStats
-          iconSrc={'/icon/pick-filled-black.svg'}
+          iconSrc="/icon/pick-filled-black.svg"
           pointContent="찜"
           countContent={totalPicksCount.toString()}
         />
