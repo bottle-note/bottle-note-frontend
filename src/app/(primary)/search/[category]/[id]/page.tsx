@@ -34,7 +34,7 @@ export default function SearchAlcohol() {
   const router = useRouter();
   const params = useParams();
   const { isLogin } = AuthService;
-  const { category, id: alcoholId } = params;
+  const { id: alcoholId } = params;
   const { state, handleModalState, handleLoginModal } = useModalStore();
 
   const [data, setData] = useState<AlcoholDetails | null>(null);
