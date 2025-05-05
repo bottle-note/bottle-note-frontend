@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Category } from '@/types/common';
 import { useTab } from '@/hooks/useTab';
 import { CATEGORY_MENUS } from '@/constants/common';
-import { useSearchParams } from 'next/navigation';
 
 interface Props {
   handleCategoryCallback: (value: Category) => void;
