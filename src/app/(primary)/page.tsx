@@ -24,7 +24,6 @@ export default function Home() {
     registerTab: firstMenuRegisterTab,
   } = useTab({
     tabList: TOP_MENU_ITEMS,
-    offset: 16,
     scroll: true,
   });
 

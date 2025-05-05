@@ -4,7 +4,7 @@ interface Props {
   name: string;
 }
 
-function MenuList({ name }: Props) {
+function SectionTitle({ name }: Props) {
   return (
     <div className="border-b-[1.4px] border-subCoral">
       <div className="w-[165px] text-center bg-bgGray rounded-tl-md rounded-tr-md py-[6px]">
@@ -16,4 +16,4 @@ function MenuList({ name }: Props) {
   );
 }
 
-export default MenuList;
+export default SectionTitle;

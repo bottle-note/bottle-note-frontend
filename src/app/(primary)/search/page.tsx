@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CategorySelector from '@/components/CategorySelector';
-import MenuList from '@/components/MenuList';
+import SectionTitle from '@/components/SectionTitle';
 import List from '@/components/List/List';
 import { usePopularList } from '@/hooks/usePopularList';
 import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
@@ -116,12 +116,21 @@ export default function Search() {
           styleProps="px-5 pt-16 pb-5 bg-subCoral"
         />
 
-        <section className="flex flex-col gap-7 p-5">
-          <CategorySelector handleCategoryCallback={handleCategoryCallback} />
+        <section className="flex flex-col gap-7 py-5">
+          <article className="space-y-4">
+            <div className="px-5">
+              <SectionTitle name="카테고리" />
+            </div>
+            <div className="pl-5">
+              <CategorySelector
+                handleCategoryCallback={handleCategoryCallback}
+              />
+            </div>
+          </article>
 
           {isEmptySearch ? (
-            <section>
-              <MenuList name="위클리 HOT 5" />
+            <section className="px-5">
+              <SectionTitle name="위클리 HOT 5" />
 
               <List>
                 {popularList.map((item: AlcoholAPI) => (
@@ -135,7 +144,7 @@ export default function Search() {
               </List>
             </section>
           ) : (
-            <>
+            <section className="px-5">
               <List
                 isListFirstLoading={isFirstLoading}
                 isScrollLoading={isFetching}
@@ -174,7 +183,7 @@ export default function Search() {
               </List>
 
               <div ref={targetRef} />
-            </>
+            </section>
           )}
 
           {!isEmptySearch && (
