@@ -50,10 +50,6 @@ export interface ListQueryParams {
   pageSize?: number;
 }
 
-export interface MyBottleQueryParams extends ListQueryParams {
-  tabType: 'ALL' | 'REVIEW' | 'PICK' | 'RATING';
-}
-
 export type Category =
   (typeof CATEGORY_MENUS)[keyof typeof CATEGORY_MENUS]['categoryGroup'];
 export type RegionId = (typeof REGIONS)[number]['regionId'];

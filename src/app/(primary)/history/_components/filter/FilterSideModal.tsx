@@ -37,14 +37,14 @@ export default function FilterSideModal({ isOpen, onClose }: Props) {
               exit="exit"
               variants={modalVariants}
             >
-              <header className="flex items-center justify-center gap-[5.5rem] border-b border-brightGray pb-3">
+              <header className="flex items-center justify-between border-b border-brightGray pb-3 px-5">
                 <button
                   className="border border-brightGray text-10 px-[10px] py-[2px] rounded"
                   onClick={() => resetFilter()}
                 >
                   초기화
                 </button>
-                <h3>필터</h3>
+                <h3 className="absolute left-1/2 -translate-x-1/2">필터</h3>
                 <button onClick={onClose}>
                   <Image src={CloseGrayIcon} alt="close" />
                 </button>

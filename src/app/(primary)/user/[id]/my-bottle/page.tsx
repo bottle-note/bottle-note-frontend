@@ -1,28 +1,39 @@
 'use client';
 
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import { UserApi } from '@/app/api/UserApi';
+import { MyBottleApi } from '@/app/api/MyBottleApi';
 import List from '@/components/List/List';
 import Tab from '@/components/Tab';
 import { REGIONS } from '@/constants/common';
-import { HISTORY_TYPES } from '@/constants/user';
 import { useTab } from '@/hooks/useTab';
 import { RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
 import SearchContainer from '@/components/Search/SearchContainer';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import { AlcoholAPI } from '@/types/Alcohol';
-import { UserApi } from '@/app/api/UserApi';
 import { useFilter } from '@/hooks/useFilter';
+import {
+  MyBottleTabType,
+  PickMyBottleListResponse,
+  RatingMyBottleListResponse,
+  ReviewMyBottleListResponse,
+} from '@/types/MyBottle';
+import { RatingsListItem } from './_components/RatingsListItem';
+import { ReviewListItem } from './_components/ReviewListItem';
+import { PicksListItem } from './_components/PicksListItem';
 
 interface InitialState {
   keyword: string;
   regionId: RegionId;
   sortType: SORT_TYPE.REVIEW | SORT_TYPE.LATEST | SORT_TYPE.RATING;
   sortOrder: SORT_ORDER;
-  tabType: 'ALL' | 'REVIEW' | 'PICK' | 'RATING';
+  tabType: MyBottleTabType;
 }
+
+const SORT_OPTIONS = [{ name: '최신순', type: SORT_TYPE.LATEST }];
 
 export default function MyBottle({
   params: { id: userId },
@@ -30,18 +41,24 @@ export default function MyBottle({
   params: { id: string };
 }) {
   const router = useRouter();
-  const historyType = useSearchParams().get('type');
-  const { currentTab, handleTab, tabList } = useTab({ tabList: HISTORY_TYPES });
-  const [currHistoryType, setCurrHistoryType] = useState<
-    'ALL' | 'REVIEW' | 'PICK' | 'RATING'
-  >('ALL');
+  const myBottleType = useSearchParams().get('type') as MyBottleTabType;
+  const { currentTab, handleTab, tabList } = useTab<{
+    id: MyBottleTabType;
+    name: string;
+  }>({
+    tabList: [
+      { id: 'ratings', name: '별점' },
+      { id: 'reviews', name: '리뷰' },
+      { id: 'picks', name: '찜' },
+    ],
+  });
 
   const initialState: InitialState = {
     keyword: '',
     regionId: '',
     sortType: SORT_TYPE.LATEST,
     sortOrder: SORT_ORDER.DESC,
-    tabType: currHistoryType,
+    tabType: currentTab.id,
   };
 
   const { state: filterState, handleFilter } = useFilter(initialState);
@@ -51,58 +68,47 @@ export default function MyBottle({
     isLoading: isFirstLoading,
     isFetching,
     targetRef,
-  } = usePaginatedQuery<{
-    isMyPage: boolean;
-    totalCount: number;
-    myBottleList: (AlcoholAPI & { hasReviewByMe: boolean })[];
-  }>({
-    queryKey: ['my-bottle', filterState],
+  } = usePaginatedQuery<
+    | RatingMyBottleListResponse
+    | ReviewMyBottleListResponse
+    | PickMyBottleListResponse
+  >({
+    queryKey: ['my-bottle', filterState, currentTab.id],
     queryFn: ({ pageParam }) => {
-      return UserApi.myBottle({
+      const apiMethod = MyBottleApi.getMyBottle(currentTab.id);
+
+      return apiMethod({
         params: {
           ...filterState,
-          ...{
-            cursor: pageParam,
-            pageSize: 10,
-          },
+          cursor: pageParam,
+          pageSize: 20, // FIXME: api 고쳐지면 다시 10으로 변경
         },
         userId: Number(userId),
       });
     },
   });
 
-  const handleSearchCallback = (searchedKeyword: string) => {
+  const { data: userInfo } = useQuery({
+    queryKey: ['user-info', userId],
+    queryFn: async () => {
+      const result = await UserApi.getUserInfo({ userId });
+      return result;
+    },
+    enabled: !!alcoholList && !alcoholList[0]?.data.isMyPage,
+    staleTime: Infinity,
+  });
+
+  const handleSearchCallback = useCallback((searchedKeyword: string) => {
     handleFilter('keyword', searchedKeyword);
-  };
-
-  const handleCategoryCallback = (selectedCategory: typeof currHistoryType) => {
-    handleFilter('tabType', selectedCategory);
-  };
-
-  // FIXME: handleTab 과 handleCategoryCallback 통합하여 관리하도록 수정
-  useEffect(() => {
-    const selected = tabList.find((item) => item.id === historyType);
-
-    handleTab(selected?.id ?? 'all');
-    handleCategoryCallback(currHistoryType);
-  }, [historyType]);
+  }, []);
 
   useEffect(() => {
     router.replace(`?type=${currentTab.id}`);
   }, [currentTab]);
 
-  const SORT_OPTIONS = [
-    { name: '최신순', type: SORT_TYPE.LATEST },
-    { name: '별점순', type: SORT_TYPE.RATING },
-    { name: '리뷰순', type: SORT_TYPE.REVIEW },
-  ];
-
   useEffect(() => {
-    if (currentTab.id === 'all') return setCurrHistoryType('ALL');
-    if (currentTab.id === 'rating') return setCurrHistoryType('RATING');
-    if (currentTab.id === 'review') return setCurrHistoryType('REVIEW');
-    if (currentTab.id === 'pick') return setCurrHistoryType('PICK');
-  }, [currentTab]);
+    handleTab(myBottleType);
+  }, []);
 
   return (
     <Suspense>
@@ -143,9 +149,15 @@ export default function MyBottle({
             isListFirstLoading={isFirstLoading}
             isScrollLoading={isFetching}
           >
-            <List.Title title={currHistoryType} />
+            <List.Title
+              title={`${userInfo ? `${userInfo.nickName}님` : '나'}의 ${currentTab.name}`}
+            />
             <List.Total
               total={alcoholList ? alcoholList[0].data.totalCount : 0}
+            />
+            <List.SortOrderSwitch
+              type={filterState.sortOrder}
+              handleSortOrder={(value) => handleFilter('sortOrder', value)}
             />
             <List.OptionSelect
               options={SORT_OPTIONS}
@@ -159,12 +171,56 @@ export default function MyBottle({
               handleOptionCallback={(value) => handleFilter('regionId', value)}
             />
 
-            {alcoholList &&
-              [...alcoholList.map((list) => list.data.myBottleList)]
-                .flat()
-                .map((item: any) => (
-                  <List.Item key={item.alcoholId} data={item} />
-                ))}
+            <List.Section>
+              {alcoholList &&
+                [...alcoholList.map((list) => list.data.myBottleList)]
+                  .flat()
+                  .map((item) => {
+                    if (currentTab.id === 'ratings') {
+                      return (
+                        <RatingsListItem
+                          data={
+                            item as RatingMyBottleListResponse['myBottleList'][number]
+                          }
+                          isMyPage={alcoholList[0].data.isMyPage}
+                          key={item.baseMyBottleInfo.alcoholId}
+                        />
+                      );
+                    }
+
+                    if (currentTab.id === 'reviews') {
+                      return (
+                        <ReviewListItem
+                          data={
+                            item as ReviewMyBottleListResponse['myBottleList'][number]
+                          }
+                          key={
+                            (
+                              item as ReviewMyBottleListResponse['myBottleList'][number]
+                            ).reviewId
+                          }
+                        />
+                      );
+                    }
+
+                    if (currentTab.id === 'picks') {
+                      return (
+                        <PicksListItem
+                          data={
+                            item as PickMyBottleListResponse['myBottleList'][number]
+                          }
+                          key={
+                            (
+                              item as PickMyBottleListResponse['myBottleList'][number]
+                            ).baseMyBottleInfo.alcoholId
+                          }
+                        />
+                      );
+                    }
+
+                    return <></>;
+                  })}
+            </List.Section>
           </List>
           <div ref={targetRef} />
         </section>

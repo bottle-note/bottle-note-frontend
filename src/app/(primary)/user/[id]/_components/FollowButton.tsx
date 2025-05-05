@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { UserApi } from '@/app/api/UserApi';
 import { RelationInfo } from '@/types/User';
+import { FollowApi } from '@/app/api/FollowApi';
 
 interface Props {
   isFollowing: boolean;
@@ -19,7 +19,7 @@ export const FollowButton = ({ isFollowing, followUserId }: Props) => {
   async function handleOnFollow() {
     try {
       const status = followingStatus ? 'FOLLOWING' : 'UNFOLLOW';
-      await UserApi.updateFollowingStatus({
+      await FollowApi.updateFollowingStatus({
         followUserId,
         status: reverseFollowingStatus(status),
       });

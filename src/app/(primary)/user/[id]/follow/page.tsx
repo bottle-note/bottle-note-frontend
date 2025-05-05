@@ -7,10 +7,10 @@ import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { useTab } from '@/hooks/useTab';
 import List from '@/components/List/List';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import { UserApi } from '@/app/api/UserApi';
 import { RelationInfo } from '@/types/User';
 import ListSection from '@/components/List/ListSection';
 import Tab from '@/components/Tab';
+import { FollowApi } from '@/app/api/FollowApi';
 import { FollowerListItem } from '../_components/FollowerListItem';
 
 export default function UserFollowPage({
@@ -39,7 +39,7 @@ export default function UserFollowPage({
   }>({
     queryKey: ['follow', currentTab.id],
     queryFn: () => {
-      return UserApi.getRelationList({
+      return FollowApi.getRelationList({
         userId: Number(userId),
         type: currentTab.id,
       });
