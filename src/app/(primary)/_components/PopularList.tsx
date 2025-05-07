@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import AlcoholCard from '@/app/(primary)/_components/AlcoholCard';
 import { usePopularList } from '@/hooks/usePopularList';
 import { AuthService } from '@/lib/AuthService';
@@ -70,6 +71,7 @@ const CardListContainer = ({ children }: { children: React.ReactNode }) => {
 };
 
 function PopularList({ type = 'week' }: Props) {
+  const router = useRouter();
   const { popularList, isLoading } = usePopularList({ type });
   const { isLogin } = AuthService;
 
@@ -78,16 +80,24 @@ function PopularList({ type = 'week' }: Props) {
       <CardListContainer>
         <div className="flex flex-col h-full">
           <Description type={type} />
-          <div className="flex flex-col items-center justify-center flex-grow">
+          <div className="flex flex-col items-center justify-center flex-grow space-y-[14px]">
             <Image
               src="/icon/logo-subcoral.svg"
               alt="logo"
-              width={30}
-              height={30}
+              width={28}
+              height={48}
             />
-            <p className="text-mainGray text-15 mt-5">
-              {isLoading ? '로딩중...' : '로그인 후 이용 가능한 서비스 입니다'}
+            <p className="text-mainGray text-16">
+              {isLoading ? '로딩중...' : '로그인 후 확인 가능한 서비스 입니다.'}
             </p>
+            {type === 'recent' && !isLogin && (
+              <button
+                className="w-[237px] py-[8.5px] text-16 font-bold text-subCoral border border-subCoral rounded-[18px]"
+                onClick={() => router.push('/login')}
+              >
+                로그인 하러가기
+              </button>
+            )}
           </div>
         </div>
       </CardListContainer>
