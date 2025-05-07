@@ -76,9 +76,11 @@ export default function Home() {
               scrollContainerRef={firstMenuScrollContainerRef}
               registerTab={firstMenuRegisterTab}
             />
-            {renderTopContent()}
+            <div className="pt-[33px] pb-[59px] pl-[25px]">
+              {renderTopContent()}
+            </div>
           </article>
-          <article className="pt-[60px] space-y-[18px]">
+          <article className="space-y-[18px]">
             <Tab
               variant="bookmark"
               tabList={secondMenuList}

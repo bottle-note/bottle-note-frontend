@@ -65,17 +65,21 @@ const Description = ({ type }: { type: ListType }) => {
   }
 };
 
+const CardListContainer = ({ children }: { children: React.ReactNode }) => {
+  return <div className="h-[321px]">{children}</div>;
+};
+
 function PopularList({ type = 'week' }: Props) {
   const { popularList, isLoading } = usePopularList({ type });
   const { isLogin } = AuthService;
 
   if (isLoading) {
-    return <div className="pt-[34px] pl-[25px]">로딩중...</div>;
+    return <CardListContainer>로딩중...</CardListContainer>;
   }
 
   if (type === 'recent' && !isLogin) {
     return (
-      <div className="pt-[34px] pl-[25px]">
+      <CardListContainer>
         <Description type={type} />
         <div className="flex flex-col items-center justify-center">
           <Image
@@ -85,15 +89,15 @@ function PopularList({ type = 'week' }: Props) {
             height={30}
           />
           <p className="text-mainGray text-15 mt-5">
-            로그인 후 확인 가능한 서비스 입니다
+            로그인 후 이용 가능한 서비스 입니다
           </p>
         </div>
-      </div>
+      </CardListContainer>
     );
   }
 
   return (
-    <div className="pt-[34px] pl-[25px]">
+    <CardListContainer>
       <Description type={type} />
       {popularList.length !== 0 ? (
         <div className="whitespace-nowrap overflow-x-auto overflow-y-hidden flex space-x-2 scrollbar-hide">
@@ -111,7 +115,7 @@ function PopularList({ type = 'week' }: Props) {
       ) : (
         <EmptyState type={type} />
       )}
-    </div>
+    </CardListContainer>
   );
 }
 
