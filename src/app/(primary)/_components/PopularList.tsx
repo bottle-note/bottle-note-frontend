@@ -73,24 +73,22 @@ function PopularList({ type = 'week' }: Props) {
   const { popularList, isLoading } = usePopularList({ type });
   const { isLogin } = AuthService;
 
-  if (isLoading) {
-    return <CardListContainer>로딩중...</CardListContainer>;
-  }
-
-  if (type === 'recent' && !isLogin) {
+  if ((type === 'recent' && !isLogin) || isLoading) {
     return (
       <CardListContainer>
-        <Description type={type} />
-        <div className="flex flex-col items-center justify-center">
-          <Image
-            src="/icon/logo-subcoral.svg"
-            alt="logo"
-            width={30}
-            height={30}
-          />
-          <p className="text-mainGray text-15 mt-5">
-            로그인 후 이용 가능한 서비스 입니다
-          </p>
+        <div className="flex flex-col h-full">
+          <Description type={type} />
+          <div className="flex flex-col items-center justify-center flex-grow">
+            <Image
+              src="/icon/logo-subcoral.svg"
+              alt="logo"
+              width={30}
+              height={30}
+            />
+            <p className="text-mainGray text-15 mt-5">
+              {isLoading ? '로딩중...' : '로그인 후 이용 가능한 서비스 입니다'}
+            </p>
+          </div>
         </div>
       </CardListContainer>
     );
