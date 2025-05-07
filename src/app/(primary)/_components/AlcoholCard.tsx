@@ -27,13 +27,13 @@ export default function AlcoholCard({ data }: Props) {
             rounded="rounded-none"
           />
         </div>
-        <div className="px-3 py-[10px] space-y-[6px] bg-bgGray">
+        <div className="px-2 py-[10px] space-y-[6px] bg-bgGray">
           <div className="text-13 h-[38px] font-extrabold whitespace-normal break-words text-mainDarkGray">
             {korName && truncStr(korName, 20)}
           </div>
           <div className="flex items-end justify-between text-subCoral">
             <Star rating={rating} size={15} />
-            <p className="text-11 font-bold leading-none">
+            <p className="text-11 font-bold leading-none tracking-tight">
               {(engCategory || '').toUpperCase()}
             </p>
           </div>
