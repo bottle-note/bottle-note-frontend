@@ -16,7 +16,6 @@ const TAB_HEIGHT = 32;
 
 const BORDER_COLOR = '#CFCFCF';
 const BORDER_WIDTH = 1.5;
-const ACTIVE_BOTTOM_COVER = 2;
 
 const BookmarkTab = <T extends { id: string; name: string }>({
   currentTab,
@@ -30,18 +29,6 @@ const BookmarkTab = <T extends { id: string; name: string }>({
   return (
     <div className="w-full bg-white">
       <div className="relative">
-        {/* 전체 하단 라인 */}
-        <div
-          className="absolute left-0 right-0"
-          style={{
-            bottom: 0,
-            height: `${BORDER_WIDTH}px`,
-            backgroundColor: BORDER_COLOR,
-            zIndex: 0,
-          }}
-        />
-
-        {/* 탭 컨테이너 */}
         <div
           ref={scrollContainerRef}
           className="relative flex overflow-x-auto scrollbar-hide w-full scroll-smooth"
@@ -77,7 +64,32 @@ const BookmarkTab = <T extends { id: string; name: string }>({
                     className="absolute inset-0"
                     preserveAspectRatio="none"
                   >
-                    {/* 테두리 경로 */}
+                    <defs>
+                      <clipPath id={`tab-clip-${tab.id}`}>
+                        <path
+                          d={`
+                            M0,${TAB_HEIGHT}
+                            L12,8
+                            Q14,2 22,2
+                            H${TAB_WIDTH - 22}
+                            Q${TAB_WIDTH - 14},2 ${TAB_WIDTH - 12},8
+                            L${TAB_WIDTH},${TAB_HEIGHT}
+                          `}
+                        />
+                      </clipPath>
+                    </defs>
+
+                    {/* 배경색 적용 */}
+                    <rect
+                      x="0"
+                      y="0"
+                      width={TAB_WIDTH}
+                      height={TAB_HEIGHT}
+                      fill={currentTab.id === tab.id ? '#FFF' : '#F7F7F7'}
+                      clipPath={`url(#tab-clip-${tab.id})`}
+                    />
+
+                    {/* 테두리 외곽선 - 하단 제외 */}
                     <path
                       d={`
                         M0,${TAB_HEIGHT}
@@ -87,33 +99,21 @@ const BookmarkTab = <T extends { id: string; name: string }>({
                         Q${TAB_WIDTH - 14},2 ${TAB_WIDTH - 12},8
                         L${TAB_WIDTH},${TAB_HEIGHT}
                       `}
-                      fill={currentTab.id === tab.id ? '#FFF' : '#F7F7F7'}
+                      fill="none"
                       stroke={BORDER_COLOR}
                       strokeWidth={BORDER_WIDTH}
                       strokeLinejoin="round"
                     />
-                    {/* 하단 border: 비활성 탭만 표시 */}
+
+                    {/* 하단 선 - 비활성 탭만 */}
                     {currentTab.id !== tab.id && (
                       <line
                         x1="0"
-                        y1={TAB_HEIGHT}
+                        y1={TAB_HEIGHT - BORDER_WIDTH / 2}
                         x2={TAB_WIDTH}
-                        y2={TAB_HEIGHT}
+                        y2={TAB_HEIGHT - BORDER_WIDTH / 2}
                         stroke={BORDER_COLOR}
                         strokeWidth={BORDER_WIDTH}
-                        strokeLinecap="butt"
-                      />
-                    )}
-                    {/* 활성 탭 하단 흰색 덮개 */}
-                    {currentTab.id === tab.id && (
-                      <line
-                        x1="0"
-                        y1={TAB_HEIGHT}
-                        x2={TAB_WIDTH}
-                        y2={TAB_HEIGHT}
-                        stroke="#FFF"
-                        strokeWidth={ACTIVE_BOTTOM_COVER}
-                        strokeLinecap="butt"
                       />
                     )}
                   </svg>
@@ -133,9 +133,22 @@ const BookmarkTab = <T extends { id: string; name: string }>({
           {/* 오른쪽 여백 하단 라인 */}
           <div
             className="flex-grow min-w-[20px]"
-            style={{ borderBottom: `${BORDER_WIDTH}px solid ${BORDER_COLOR}` }}
+            style={{
+              borderBottom: `${BORDER_WIDTH}px solid ${BORDER_COLOR}`,
+              marginTop: `${TAB_HEIGHT - BORDER_WIDTH}px`,
+            }}
           />
         </div>
+        {/* 전체 하단 라인 */}
+        <div
+          className="absolute left-0 right-0"
+          style={{
+            bottom: 0,
+            height: `${BORDER_WIDTH}px`,
+            backgroundColor: BORDER_COLOR,
+            zIndex: 0,
+          }}
+        />
       </div>
     </div>
   );

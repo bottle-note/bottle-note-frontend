@@ -55,6 +55,7 @@ export const AlcoholsApi = {
 
   async getHistory() {
     const response = await fetchWithAuth(`/bottle-api/history/view/alcohols`, {
+      requireAuth: false,
       cache: 'force-cache',
     });
 
