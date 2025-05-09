@@ -51,7 +51,7 @@ const ListMain = ({
   return (
     <section>
       {isManageExist && (
-        <article className="flex justify-between items-center text-mainGray text-sm pb-3.25 border-brightGray border-b">
+        <article className="flex justify-between items-center text-mainGray text-sm pb-2 border-brightGray border-b">
           <div className="flex gap-1">
             {title}
             {totalDisplay}

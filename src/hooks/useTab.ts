@@ -4,12 +4,14 @@ interface Props<T> {
   tabList: T[];
   scroll?: boolean;
   offset?: number;
+  align?: 'center' | 'left';
 }
 
 export const useTab = <T extends { name: string; id: string }>({
   tabList,
   scroll = false,
-  offset = 16,
+  offset = 0,
+  align = 'center',
 }: Props<T>) => {
   const [currentTab, setCurrentTab] = useState(tabList[0]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -36,17 +38,24 @@ export const useTab = <T extends { name: string; id: string }>({
       const containerRect = container.getBoundingClientRect();
       const tabRect = activeTab.getBoundingClientRect();
 
-      const containerCenter = containerRect.left + containerRect.width / 2;
-      const tabCenter = tabRect.left + tabRect.width / 2;
+      let scrollTo = 0;
 
-      const scrollTo = container.scrollLeft + (tabCenter - containerCenter);
+      if (align === 'center') {
+        const containerCenter = containerRect.left + containerRect.width / 2;
+        const tabCenter = tabRect.left + tabRect.width / 2;
+        scrollTo =
+          container.scrollLeft + (tabCenter - containerCenter) - offset;
+      } else if (align === 'left') {
+        scrollTo =
+          container.scrollLeft + (tabRect.left - containerRect.left) - offset;
+      }
 
       container.scrollTo({
         left: scrollTo,
         behavior: 'smooth',
       });
     }
-  }, [currentTab.id, scroll, offset]);
+  }, [currentTab.id, scroll, offset, align]);
 
   return {
     currentTab,
