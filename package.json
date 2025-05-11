@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "build:dev": "env-cmd -f .env.development next build",
+    "start:dev": "env-cmd -f .env.development next start",
     "build": "next build",
-    "start:dev": "next start",
-    "start:prod": "next start",
+    "start": "next start",
     "ci:tsc": "tsc",
     "ci:lint": "next lint",
     "lint": "next lint",
