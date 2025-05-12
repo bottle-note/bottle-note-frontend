@@ -1,6 +1,5 @@
-import { AlcoholAPI } from '@/types/Alcohol';
-import { ApiResponse, MyBottleQueryParams } from '@/types/common';
-import { RelationInfo, UserInfoApi } from '@/types/User';
+import { ApiResponse } from '@/types/common';
+import { UserInfoApi, CurrentUserInfoApi } from '@/types/User';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
 export const UserApi = {
@@ -23,7 +22,9 @@ export const UserApi = {
   },
 
   async getUserInfo({ userId }: { userId: string }): Promise<UserInfoApi> {
-    const response = await fetch(`/bottle-api/my-page/${userId}`);
+    const response = await fetch(`/bottle-api/my-page/${userId}`, {
+      cache: 'force-cache',
+    });
 
     const { data } = await response.json();
 
@@ -47,42 +48,6 @@ export const UserApi = {
     }> = response;
 
     return data;
-  },
-
-  async myBottle({
-    params,
-    userId,
-  }: {
-    params: MyBottleQueryParams;
-    userId: number;
-  }) {
-    const {
-      keyword,
-      regionId,
-      tabType,
-      sortType,
-      sortOrder,
-      cursor,
-      pageSize,
-    } = params;
-    const response = await fetchWithAuth(
-      `/bottle-api/my-page/${userId}/my-bottle?tabType=${tabType}&keyword=${decodeURI(keyword ?? '')}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    );
-
-    const result: ApiResponse<{
-      isMyPage: boolean;
-      totalCount: number;
-      myBottleList: (AlcoholAPI & { hasReviewByMe: boolean })[];
-      userId: number;
-    }> = response;
-
-    return result;
   },
 
   async sendDeviceInfo(deviceToken: string, platform: string) {
@@ -124,45 +89,10 @@ export const UserApi = {
     return result;
   },
 
-  async getRelationList({ userId }: { userId: number }) {
-    const response: ApiResponse<{
-      followingList: RelationInfo[];
-      followerList: RelationInfo[];
-      totalCount: number;
-    }> = await fetchWithAuth(`/bottle-api/follow/${userId}/relation-list`);
+  async getCurUserInfo(): Promise<CurrentUserInfoApi> {
+    const response = await fetchWithAuth(`/bottle-api/users/current`);
 
-    if (!response.data) {
-      throw new Error('Failed to fetch data');
-    }
-
-    return response;
-  },
-
-  async updateFollowingStatus({
-    followUserId,
-    status,
-  }: {
-    followUserId: number;
-    status: RelationInfo['status'];
-  }) {
-    const response = await fetchWithAuth(`/bottle-api/follow`, {
-      method: 'POST',
-      body: JSON.stringify({
-        followUserId,
-        status,
-      }),
-    });
-
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
-
-    const result: ApiResponse<{
-      followerId: number;
-      nickName: string;
-      imageUrl: string;
-      message: string;
-    }> = await response.data;
+    const result = await response.data;
 
     return result;
   },

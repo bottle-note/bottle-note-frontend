@@ -24,11 +24,11 @@ const UserInfo = ({
   nickName,
 }: Props) => {
   const { userData } = AuthService;
-  const [isMatchUser, setIsMatchUser] = useState(false);
+  const [isMyProfile, setIsMyProfile] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    setIsMatchUser(userData?.userId === Number(currentId));
+    setIsMyProfile(userData?.userId === Number(currentId));
   }, []);
 
   return (
@@ -41,29 +41,29 @@ const UserInfo = ({
         <div className="flex gap-2">
           <button
             onClick={() =>
-              router.push(`/user/${currentId}/follow?type=following`)
+              router.push(`/user/${currentId}/follow?type=follower`)
             }
           >
-            <p className="text-sm">
-              <strong>팔로워 </strong>
+            <p className="text-sm font-thin">
+              <strong className="font-black">팔로워 </strong>
               <span>{follower}</span>
             </p>
           </button>
 
           <button
             onClick={() =>
-              router.push(`/user/${currentId}/follow?type=follower`)
+              router.push(`/user/${currentId}/follow?type=following`)
             }
           >
             <p className="text-sm">
-              <strong>팔로잉 </strong>
+              <strong className="font-black">팔로잉 </strong>
               <span>{following}</span>
             </p>
           </button>
         </div>
 
         <div className="space-x-1 text-sm">
-          {isMatchUser && (
+          {isMyProfile && (
             <button
               className="border border-subCoral px-2.5 py-1 rounded-md text-10 bg-white text-subCoral"
               onClick={() => router.push(`/user/${currentId}/edit`)}
@@ -72,10 +72,10 @@ const UserInfo = ({
             </button>
           )}
 
-          {!isMatchUser && (
+          {!isMyProfile && (
             <FollowButton
               isFollowing={Boolean(isFollowing)}
-              followUserId={userData?.userId!}
+              followUserId={Number(currentId)}
             />
           )}
         </div>

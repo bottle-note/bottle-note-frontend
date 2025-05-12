@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -15,9 +15,10 @@ import EmptyView from '@/app/(primary)/_components/EmptyView';
 import Modal from '@/components/Modal';
 import Loading from '@/components/Loading';
 import { truncStr } from '@/utils/truncStr';
-import { shareOrCopy } from '@/utils/shareOrCopy';
+// import { shareOrCopy } from '@/utils/shareOrCopy';
 import { AuthService } from '@/lib/AuthService';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import { UserApi } from '@/app/api/UserApi';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { AlcoholDetails } from '@/types/Alcohol';
@@ -29,17 +30,19 @@ interface DetailItem {
   content: string;
 }
 
-function SearchAlcohol() {
+export default function SearchAlcohol() {
   const router = useRouter();
   const params = useParams();
   const { isLogin } = AuthService;
-  const { category, id: alcoholId } = params;
+  const { id: alcoholId } = params;
   const { state, handleModalState, handleLoginModal } = useModalStore();
 
   const [data, setData] = useState<AlcoholDetails | null>(null);
   const [alcoholDetails, setAlcoholDetails] = useState<DetailItem[]>([]);
   const [isPicked, setIsPicked] = useState<boolean>(false);
   const [rate, setRate] = useState(0);
+  const [userNickName, setUserNickName] = useState<string>('');
+  const [isUnmounting, setIsUnmounting] = useState(false);
 
   const fetchAlcoholDetails = async (id: string) => {
     try {
@@ -49,15 +52,27 @@ function SearchAlcohol() {
         setData(result);
         setIsPicked(alcohols.isPicked);
         setAlcoholDetails([
-          { title: '카테고리', content: alcohols.engCategory || '-' },
-          { title: '국가/지역', content: alcohols.engRegion || '-' },
-          { title: '캐스크', content: alcohols.cask || '-' },
-          { title: '도수(%)', content: alcohols.abv || '-' },
-          { title: '증류소', content: alcohols.engDistillery || '-' },
+          { title: '증류소', content: alcohols.engDistillery },
+          {
+            title: '국가/지역',
+            content: alcohols.engRegion?.replace('/', '/\n') || '-',
+          },
+          { title: '도수', content: `${alcohols.abv}%` },
         ]);
       }
     } catch (error) {
       console.error('Failed to fetch alcohol details:', error);
+    }
+  };
+
+  const getCurrentUserInfo = async () => {
+    try {
+      const result = await UserApi.getCurUserInfo();
+      if (result) {
+        setUserNickName(result.nickname);
+      }
+    } catch (error) {
+      console.error('Failed to fetch current user info:', error);
     }
   };
 
@@ -77,9 +92,16 @@ function SearchAlcohol() {
 
       if (isLogin) {
         fetchUserRating(alcoholIdString);
+        getCurrentUserInfo();
       }
     }
   }, [alcoholId, isLogin]);
+
+  useEffect(() => {
+    return () => {
+      setIsUnmounting(true);
+    };
+  }, []);
 
   const handleRate = async (selectedRate: number) => {
     if (!isLogin) return handleLoginModal();
@@ -91,6 +113,43 @@ function SearchAlcohol() {
     });
   };
 
+  const getRatingMessage = (myAvgRating: number, myRating: number) => {
+    if (myAvgRating !== 0 && myRating !== 0)
+      return (
+        <div className="text-center text-12 space-y-2">
+          <div>
+            <p>{`${userNickName}`}님의</p>
+            <p>
+              <span className="text-subCoral font-medium">
+                평균 별점은 {`${myAvgRating}`}점
+              </span>
+              이에요.
+            </p>
+          </div>
+          <div className="text-10">
+            <p>최근 평가한 별점은 {`${myRating}`}점이에요.</p>
+            <p>다른 별점을 주시고 싶으시면 언제든지 변경해보세요!</p>
+          </div>
+        </div>
+      );
+
+    if (myAvgRating !== 0 && myRating === 0)
+      return (
+        <div className="text-center text-12">
+          <p>최근 별점 {`${myAvgRating}`}을 주셨어요.</p>
+          <p>별점이 없어요! 별점 평가를 안하실건가요?</p>
+        </div>
+      );
+
+    return (
+      <div className="text-center text-12">이 술에 대한 평가를 남겨보세요.</div>
+    );
+  };
+
+  const refreshAlcoholDetails = useCallback(() => {
+    fetchAlcoholDetails(alcoholId.toString());
+  }, [alcoholId]);
+
   return (
     <>
       {alcoholDetails && data ? (
@@ -99,13 +158,17 @@ function SearchAlcohol() {
             <div className="relative">
               {data?.alcohols?.alcoholUrlImg && (
                 <div
-                  className="absolute w-full h-full  bg-cover bg-center"
+                  className="absolute w-full h-full bg-cover bg-center"
                   style={{
                     backgroundImage: `url(${data.alcohols.alcoholUrlImg})`,
                   }}
                 />
               )}
-              <div className="absolute w-full h-full bg-mainCoral bg-opacity-90" />
+              <div
+                className={`absolute w-full h-full bg-mainCoral bg-opacity-90 ${
+                  isUnmounting ? 'hidden' : ''
+                }`}
+              />
               <SubHeader bgColor="bg-mainCoral/10">
                 <SubHeader.Left
                   onClick={() => {
@@ -121,12 +184,18 @@ function SearchAlcohol() {
                 </SubHeader.Left>
                 <SubHeader.Right
                   onClick={() => {
-                    shareOrCopy(
-                      `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/category/${category}/${alcoholId}`,
-                      handleModalState,
-                      `${data?.alcohols.korName} 정보`,
-                      `${data?.alcohols.korName} 정보 상세보기`,
-                    );
+                    // shareOrCopy(
+                    //   `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/category/${category}/${alcoholId}`,
+                    //   handleModalState,
+                    //   `${data?.alcohols.korName} 정보`,
+                    //   `${data?.alcohols.korName} 정보 상세보기`,
+                    // );
+                    handleModalState({
+                      isShowModal: true,
+                      type: 'ALERT',
+                      mainText:
+                        '아직 준비 중인 기능입니다. 조금만 기다려주세요!',
+                    });
                   }}
                 >
                   <Image
@@ -138,32 +207,45 @@ function SearchAlcohol() {
                 </SubHeader.Right>
               </SubHeader>
               <AlcoholBox
-                data={data}
-                alcoholId={alcoholId}
+                data={data?.alcohols}
                 isPicked={isPicked}
                 setIsPicked={setIsPicked}
               />
             </div>
             <div className="mb-5">
-              <article className="grid place-items-center space-y-2 py-5">
-                {/* API 확인 후 수정 필요 */}
-                <p className="text-10 text-mainDarkGray">
-                  이 술에 대한 평가를 남겨보세요.
-                </p>
+              <article className="grid place-items-center space-y-2 pt-[25px] pb-[21px]">
+                {getRatingMessage(
+                  data?.alcohols?.myAvgRating,
+                  data?.alcohols?.myRating,
+                )}
                 <div>
-                  <StarRating rate={rate} size={50} handleRate={handleRate} />
+                  <StarRating rate={rate} size={42} handleRate={handleRate} />
                 </div>
               </article>
-              <section className="mx-5 py-5 border-y border-mainGray/30 grid grid-cols-2 gap-2">
-                {alcoholDetails.map((item: DetailItem) => (
-                  <div
-                    key={item.content}
-                    className="flex text-13 text-mainDarkGray items-start gap-2"
-                  >
-                    <div className="min-w-14 font-semibold">{item.title}</div>
-                    <div className="flex-1 font-light">{item.content}</div>
+              <section className="mx-5 py-[21px] border-y border-mainGray/30">
+                <div className="grid gap-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    {alcoholDetails.map((item: DetailItem) => (
+                      <div
+                        key={item.content}
+                        className="flex text-12 text-mainDarkGray items-start gap-2"
+                      >
+                        <div className="min-w-14 font-semibold">
+                          {item.title}
+                        </div>
+                        <div className="flex-1 font-normal whitespace-pre-line">
+                          {item.content}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                  <div className="flex text-12 text-mainDarkGray items-start gap-2">
+                    <div className="min-w-14 font-semibold">캐스크</div>
+                    <div className="flex-1 font-normal break-words">
+                      {data?.alcohols?.cask || '-'}
+                    </div>
+                  </div>
+                </div>
               </section>
               {data?.alcohols?.alcoholsTastingTags && (
                 <FlavorTag tagList={data.alcohols.alcoholsTastingTags} />
@@ -207,14 +289,14 @@ function SearchAlcohol() {
             data.reviewInfo.totalCount !== 0 ? (
               <>
                 <div className="h-4 bg-sectionWhite" />
-                <section className="mx-5 py-5 space-y-3">
-                  <p className="text-13 text-mainGray font-normal">
+                <section className="mx-5 pt-[34px] pb-[20px]">
+                  <p className="text-11 text-mainGray font-normal mb-[10px]">
                     총 {data.reviewInfo.totalCount}개
                   </p>
                   <div className="border-b border-mainGray/30" />
                   {data.reviewInfo.reviewList.map((review) => (
                     <React.Fragment key={review.reviewId}>
-                      <Review data={review} />
+                      <Review data={review} onRefresh={refreshAlcoholDetails} />
                     </React.Fragment>
                   ))}
                 </section>
@@ -259,5 +341,3 @@ function SearchAlcohol() {
     </>
   );
 }
-
-export default SearchAlcohol;

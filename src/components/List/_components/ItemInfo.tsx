@@ -4,16 +4,16 @@ interface Props {
   korName: string;
   engName: string;
   korCategory: string;
-  engCategory?: string;
 }
 
-const ItemInfo = ({ korName, engName, korCategory, engCategory }: Props) => (
-  <article className="flex flex-col space-y-2">
-    <h2 className="text-sm leading-sm font-bold line">{korName}</h2>
-    <p className="text-xxs">
-      <span>{truncStr(engName.toUpperCase(), 20)}</span>
+const ItemInfo = ({ korName, engName, korCategory }: Props) => (
+  <article className="flex flex-col space-y-1">
+    <h2 className="text-sm leading-sm font-bold text-mainDarkGray">
+      {truncStr(korName, 15)}
+    </h2>
+    <p className="text-10 text-mainDarkGray">
+      <span>{truncStr(engName.toUpperCase(), 15)}</span>
       <span> · {korCategory}</span>
-      {engCategory && <span> · {engCategory}</span>}
     </p>
   </article>
 );

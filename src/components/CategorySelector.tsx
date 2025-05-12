@@ -1,52 +1,64 @@
-'use client';
-
-import React, { useEffect, useRef } from 'react';
-import { useCategory } from '@/hooks/useCategory';
+import React, { useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Category } from '@/types/common';
-import CategoryTitle from './CategoryTitle';
+import { useTab } from '@/hooks/useTab';
+import { CATEGORY_MENUS } from '@/constants/common';
 
 interface Props {
   handleCategoryCallback: (value: Category) => void;
 }
 
 function CategorySelector({ handleCategoryCallback }: Props) {
-  const { categories, handleCategory, selectedCategory } = useCategory();
-  const selectedRef = useRef<HTMLButtonElement>(null);
+  const searchParams = useSearchParams();
+  const currCategory = searchParams.get('category') as Category;
 
-  const onSelectCategory = (value: Category) => {
-    handleCategory(value, handleCategoryCallback);
+  const categoryMenuList = Object.values(CATEGORY_MENUS).map((category) => ({
+    id: category.categoryGroup,
+    name: category.kor,
+  }));
+  const {
+    currentTab,
+    handleTab,
+    registerTab,
+    tabList: categoryList,
+    refs: { scrollContainerRef },
+  } = useTab({ tabList: categoryMenuList, scroll: true, align: 'left' });
+
+  const handleCategory = (v: (typeof categoryMenuList)[number]) => {
+    handleCategoryCallback(v.id);
+    handleTab(v.id);
   };
 
   useEffect(() => {
-    if (selectedRef.current) {
-      selectedRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'start',
-      });
+    if (currCategory) {
+      const selectedCategory = categoryMenuList.find(
+        (category) => category.id === currCategory,
+      );
+
+      if (selectedCategory) {
+        handleTab(selectedCategory.id);
+      }
     }
-  }, [selectedCategory]);
+  }, [currCategory]);
 
   return (
-    <section className="space-y-4">
-      <CategoryTitle subTitle="카테고리" />
-      <article className="whitespace-nowrap overflow-x-auto flex space-x-1.5 scrollbar-hide">
-        {categories.map((category) => {
-          return (
-            <button
-              key={category.eng}
-              className={`${selectedCategory === category.categoryGroup ? 'label-selected' : 'label-default'} px-2.5 py-1`}
-              onClick={() => onSelectCategory(category.categoryGroup)}
-              ref={
-                category.categoryGroup === selectedCategory ? selectedRef : null
-              }
-            >
-              <span className="text-sm font-light">{category.kor}</span>
-            </button>
-          );
-        })}
-      </article>
-    </section>
+    <article
+      className="whitespace-nowrap overflow-x-auto flex space-x-1.5 scrollbar-hide pr-5"
+      ref={scrollContainerRef}
+    >
+      {categoryList.map((category) => {
+        return (
+          <button
+            ref={registerTab(category.id)}
+            key={category.id}
+            className={`${category.id === currentTab.id ? 'label-selected' : 'label-default'} px-2.5 py-1`}
+            onClick={() => handleCategory(category)}
+          >
+            <span className="text-sm font-light">{category.name}</span>
+          </button>
+        );
+      })}
+    </article>
   );
 }
 

@@ -1,29 +1,98 @@
-import { Suspense } from 'react';
-import CategoryTitle from '@/components/CategoryTitle';
+'use client';
+
 import Header from '@/app/(primary)/_components/Header';
+import { useTab } from '@/hooks/useTab';
+import Tab from '@/components/Tab';
 import CategoryList from './_components/CategoryList';
-import HotList from './_components/HotList';
+import PopularList from './_components/PopularList';
 import NavLayout from './_components/NavLayout';
 
+const TOP_MENU_ITEMS = [
+  { id: 'week', name: 'HOT 5' },
+  { id: 'spring', name: '봄 추천 위스키' },
+  { id: 'recent', name: '최근에 본 위스키' },
+];
+
+const MENU_CATEGORY = [{ id: 'category', name: '카테고리' }];
+
 export default function Home() {
+  const {
+    currentTab: firstMenuSelectedTab,
+    handleTab: handelFirstMenu,
+    tabList: firstMenuList,
+    refs: { scrollContainerRef: firstMenuScrollContainerRef },
+    registerTab: firstMenuRegisterTab,
+  } = useTab({
+    tabList: TOP_MENU_ITEMS,
+    scroll: true,
+  });
+
+  const {
+    currentTab: secondMenuSelectedTab,
+    handleTab: handleSecondMenu,
+    tabList: secondMenuList,
+    refs: { scrollContainerRef: secondMenuScrollContainerRef },
+    registerTab: secondMenuRegisterTab,
+  } = useTab({
+    tabList: MENU_CATEGORY,
+  });
+
+  const renderTopContent = () => {
+    switch (firstMenuSelectedTab.id) {
+      case 'week':
+      case 'spring':
+      case 'recent':
+        return (
+          <PopularList
+            key={firstMenuSelectedTab.id}
+            type={firstMenuSelectedTab.id}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  const renderCategoryContent = () => {
+    switch (secondMenuSelectedTab.id) {
+      case 'category':
+        return <CategoryList />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <Suspense>
-      <NavLayout>
-        <Header />
-        <div className="space-y-1 relative">
-          <section className="px-5 pb-20">
-            <article className="py-2 pt-5 space-y-3">
-              <CategoryTitle subTitle="위클리 HOT 5" />
-              <HotList />
-              {/* 없을 경우의 화면을 넣어줘야하나? */}
-            </article>
-            <article className="py-2 pt-5 space-y-3">
-              <CategoryTitle subTitle="카테고리" />
-              <CategoryList />
-            </article>
-          </section>
-        </div>
-      </NavLayout>
-    </Suspense>
+    <NavLayout>
+      <Header />
+      <div className="space-y-1 relative">
+        <section className="pb-20">
+          <article className="pt-10 space-y-[18px]">
+            <Tab
+              variant="bookmark"
+              tabList={firstMenuList}
+              handleTab={handelFirstMenu}
+              currentTab={firstMenuSelectedTab}
+              scrollContainerRef={firstMenuScrollContainerRef}
+              registerTab={firstMenuRegisterTab}
+            />
+            <div className="pt-[33px] pb-[59px] pl-[25px]">
+              {renderTopContent()}
+            </div>
+          </article>
+          <article className="space-y-[18px]">
+            <Tab
+              variant="bookmark"
+              tabList={secondMenuList}
+              handleTab={handleSecondMenu}
+              currentTab={secondMenuSelectedTab}
+              scrollContainerRef={secondMenuScrollContainerRef}
+              registerTab={secondMenuRegisterTab}
+            />
+            {renderCategoryContent()}
+          </article>
+        </section>
+      </div>
+    </NavLayout>
   );
 }

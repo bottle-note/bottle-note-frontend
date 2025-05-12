@@ -3,6 +3,13 @@ export interface User {
   nickName: string;
   imageUrl: string;
 }
+
+export interface CurrentUserInfoApi {
+  id: number;
+  nickname: string;
+  imageUrl: string;
+}
+
 export interface UserInfoApi extends User {
   reviewCount: number;
   ratingCount: number;
@@ -20,7 +27,7 @@ export interface ReviewUserInfo extends Omit<User, 'imageUrl'> {
 export interface RelationInfo {
   userId: number;
   followUserId: number;
-  nickName: string;
+  followUserNickname: string;
   userProfileImage: string;
   status: 'UNFOLLOW' | 'FOLLOWING';
   reviewCount: number;

@@ -22,9 +22,7 @@ function LinkButton({
   return (
     <div
       className={`relative w-full hover:pointer ${
-        listType === 'Full'
-          ? 'h-20 flex items-center'
-          : 'rounded-xl bg-mainCoral h-[10.0625rem]'
+        listType === 'Full' ? 'flex items-center' : 'rounded-xl bg-mainCoral'
       }`}
     >
       {listType === 'Full' && (
@@ -36,26 +34,30 @@ function LinkButton({
       <Link
         href={linkSrc}
         onClick={handleBeforeRouteChange}
-        className={`h-full ${listType === 'Full' ? 'w-full' : 'max-w-[10.0625rem]'} flex flex-col justify-between relative z-10 ${listType === 'Full' ? 'py-[1.0638rem] px-[1.0638rem]' : 'py-[0.813rem] px-[1.13rem]'}`}
+        className="h-full w-full flex flex-col justify-between relative z-10 py-[16.5px] px-[17.02px]"
       >
-        <div className={`${icon && 'flex justify-between'} text-white h-10`}>
-          <div>
-            <p className="font-bold text-15">{korName}</p>
-            <p className="text-13 font-light">{engName}</p>
+        <div className={`${imgSrc ? 'space-y-[90px]' : 'space-y-[11.7px]'}`}>
+          <div
+            className={`${icon && 'flex justify-between'} text-white relative z-20`}
+          >
+            <div>
+              <p className="font-extrabold text-14">{korName}</p>
+              <p className="text-12 font-normal">{engName}</p>
+            </div>
+            {icon && (
+              <Image
+                src="/icon/arrow-right-white.svg"
+                alt="arrowIcon"
+                width={25}
+                height={25}
+              />
+            )}
           </div>
-          {icon && (
-            <Image
-              src="/icon/arrow-right-white.svg"
-              alt="arrowIcon"
-              width={23}
-              height={23}
-            />
-          )}
+          <div className="border-[1px] border-white relative z-0" />
         </div>
-        <div className="border-[0.0313rem] border-white" />
         {imgSrc && (
           <Image
-            className="z-10 absolute bottom-[0.5px] left-[5.7rem]"
+            className="absolute bottom-[0.5px] left-[5.7rem] z-10"
             src={imgSrc}
             height={imageSize?.height}
             width={imageSize?.width}

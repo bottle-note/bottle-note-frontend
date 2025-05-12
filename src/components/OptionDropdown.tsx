@@ -21,15 +21,16 @@ export default function OptionDropdown({
             {title}
           </article>
           {options.map((option) => (
-            <article
+            <button
               key={option.type}
-              className="py-4 text-center text-subCoral"
+              className="block w-full py-4 text-center text-subCoral"
               onClick={() => {
                 handleOptionSelect(option);
+                handleClose();
               }}
             >
               {option.name}
-            </article>
+            </button>
           ))}
         </section>
         <button

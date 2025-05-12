@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CategorySelector from '@/components/CategorySelector';
-import CategoryTitle from '@/components/CategoryTitle';
+import SectionTitle from '@/components/SectionTitle';
 import List from '@/components/List/List';
 import { usePopularList } from '@/hooks/usePopularList';
 import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
@@ -12,6 +12,10 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { AlcoholAPI } from '@/types/Alcohol';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { REGIONS } from '@/constants/common';
+import LinkButton from '@/components/LinkButton';
+import useModalStore from '@/store/modalStore';
+import Modal from '@/components/Modal';
+import { AuthService } from '@/lib/AuthService';
 import SearchContainer from '../../../components/Search/SearchContainer';
 
 interface InitialState {
@@ -25,13 +29,14 @@ interface InitialState {
 export default function Search() {
   const router = useRouter();
   const { popularList } = usePopularList();
-
-  const currCategory = useSearchParams().get('category');
+  const { isLogin } = AuthService;
+  const currCategory = useSearchParams().get('category') as Category;
   const currSearchKeyword = useSearchParams().get('query');
+  const isEmptySearch = currCategory === null && currSearchKeyword === null;
 
   const initialState: InitialState = {
-    keyword: '',
-    category: '',
+    category: currCategory || '',
+    keyword: currSearchKeyword || '',
     regionId: '',
     sortType: SORT_TYPE.POPULAR,
     sortOrder: SORT_ORDER.DESC,
@@ -44,6 +49,7 @@ export default function Search() {
     isLoading: isFirstLoading,
     isFetching,
     targetRef,
+    error,
   } = usePaginatedQuery<{
     alcohols: AlcoholAPI[];
     totalCount: number;
@@ -59,6 +65,27 @@ export default function Search() {
       });
     },
   });
+
+  const { handleModalState, handleCloseModal, handleLoginModal } =
+    useModalStore();
+
+  const handleClickInquire = () => {
+    handleModalState({
+      isShowModal: true,
+      type: 'CONFIRM',
+      mainText: '위스키 추가 요청을 하겠습니까?',
+      subText: '문의글을 작성하여 위스키를 요청할까요?',
+      handleConfirm: () => {
+        if (!isLogin) {
+          handleCloseModal();
+          handleLoginModal();
+          return;
+        }
+        handleCloseModal();
+        router.push('/inquire/register');
+      },
+    });
+  };
 
   const handleSearchCallback = (searchedKeyword: string) => {
     handleFilter('keyword', searchedKeyword);
@@ -89,12 +116,21 @@ export default function Search() {
           styleProps="px-5 pt-16 pb-5 bg-subCoral"
         />
 
-        <section className="flex flex-col gap-7 p-5">
-          <CategorySelector handleCategoryCallback={handleCategoryCallback} />
+        <section className="flex flex-col gap-7 py-5">
+          <article className="space-y-4">
+            <div className="px-5">
+              <SectionTitle name="카테고리" />
+            </div>
+            <div className="pl-5">
+              <CategorySelector
+                handleCategoryCallback={handleCategoryCallback}
+              />
+            </div>
+          </article>
 
-          {currCategory === null && currSearchKeyword === null ? (
-            <section>
-              <CategoryTitle subTitle="위클리 HOT 5" />
+          {isEmptySearch ? (
+            <section className="px-5">
+              <SectionTitle name="위클리 HOT 5" />
 
               <List>
                 {popularList.map((item: AlcoholAPI) => (
@@ -108,10 +144,11 @@ export default function Search() {
               </List>
             </section>
           ) : (
-            <>
+            <section className="px-5">
               <List
                 isListFirstLoading={isFirstLoading}
                 isScrollLoading={isFetching}
+                isError={!!error}
               >
                 <List.Total
                   total={alcoholList ? alcoholList[0].data.totalCount : 0}
@@ -144,11 +181,29 @@ export default function Search() {
                       <List.Item key={`${item.alcoholId}_${idx}`} data={item} />
                     ))}
               </List>
+
               <div ref={targetRef} />
-            </>
+            </section>
+          )}
+
+          {!isEmptySearch && (
+            <LinkButton
+              data={{
+                engName: 'NO RESULTS',
+                korName: '혹시 찾는 술이 없으신가요?',
+                linkSrc: `/inquire/register`,
+                icon: true,
+                handleBeforeRouteChange: (e) => {
+                  e.preventDefault();
+                  handleClickInquire();
+                },
+              }}
+            />
           )}
         </section>
       </main>
+
+      <Modal />
     </Suspense>
   );
 }

@@ -33,7 +33,7 @@ export default function OptionsContainer({
   }, [forceOpen]);
 
   return (
-    <article className="space-y-2">
+    <article className={isOpen ? 'space-y-2' : ''}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-1">
           <Image src={iconSrc} alt={iconAlt} width={24} height={24} />

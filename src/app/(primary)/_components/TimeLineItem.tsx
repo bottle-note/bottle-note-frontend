@@ -1,11 +1,12 @@
-import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
   HISTORY_TYPE_INFO,
   DescriptionProps,
 } from '@/app/(primary)/history/_components/filter/HistoryDescription';
+import BaseImage from '@/components/BaseImage';
 import { formatDate } from '@/utils/formatDate';
+import { truncStr } from '@/utils/truncStr';
 import { TimeFormat } from '@/types/FormatDate';
 import { Rate } from '@/types/History';
 
@@ -82,19 +83,19 @@ function TimeLineItem(props: Props) {
           <div className="w-[17rem] h-14 p-3 bg-bgGray rounded-md flex justify-between">
             <div>
               <p className="text-12 font-bold text-mainDarkGray">
-                {alcoholName}
+                {truncStr(alcoholName, 23)}
               </p>
               {renderDescription && renderDescription(getDescriptionProps())}
             </div>
-            {imageSrc && (
-              <Image
-                className="mr-1 rounded object-cover"
-                src={imageSrc}
-                width={25}
-                height={34}
-                alt="alcoholImage"
-              />
-            )}
+            <BaseImage
+              src={imageSrc}
+              alt="alcohol image"
+              priority
+              className="rounded object-cover"
+              width={25}
+              height={34}
+              fill
+            />
           </div>
         </Link>
       )}

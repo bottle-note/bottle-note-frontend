@@ -15,12 +15,14 @@ interface ListMainProps {
   emptyViewText?: string;
   isListFirstLoading?: boolean;
   isScrollLoading?: boolean;
+  isError?: boolean;
 }
 
 const ListMain = ({
   children,
   emptyViewText,
   isListFirstLoading,
+  isError,
 }: ListMainProps) => {
   const title = filterChildComponent(children, Title);
   const totalDisplay = filterChildComponent(children, Total);
@@ -49,7 +51,7 @@ const ListMain = ({
   return (
     <section>
       {isManageExist && (
-        <article className="flex justify-between items-center text-mainGray text-sm pb-3.25 border-brightGray border-b">
+        <article className="flex justify-between items-center text-mainGray text-sm pb-2 border-brightGray border-b">
           <div className="flex gap-1">
             {title}
             {totalDisplay}
@@ -62,7 +64,15 @@ const ListMain = ({
       )}
 
       <>
-        {isEmpty ? (
+        {isError && (
+          <EmptyView
+            text={'에러가 발생했습니다.\n잠시 후 다시 시도해주세요.'}
+          />
+        )}
+      </>
+
+      <>
+        {isEmpty && !isError ? (
           <EmptyView text={emptyViewText} />
         ) : (
           <>

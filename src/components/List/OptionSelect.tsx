@@ -33,14 +33,15 @@ const OptionSelect = ({
     name: string;
   }) => {
     setSelectedOption(name);
-    handleOptionCallback && handleOptionCallback(type);
-    setIsDropDownShow(false);
+    if (handleOptionCallback) {
+      handleOptionCallback(type);
+    }
   };
 
   return (
     <>
       <button
-        className="label-default flex items-center gap-1 px-2.5 py-1 rounded-md text-xxs"
+        className="label-default flex items-center gap-1 px-2.5 py-1 rounded-md text-10"
         onClick={handleSortOptionsShow}
       >
         <span>{selectedOption}</span>

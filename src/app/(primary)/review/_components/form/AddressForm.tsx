@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import SearchAddress from '../SearchAddress';
@@ -35,14 +34,19 @@ export default function AddressForm() {
 
   const ExtraButtons = (
     <div className="flex gap-1 text-12">
-      <Link
-        href={watch('mapUrl')}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-subCoral"
+      <a
+        href={watch('mapUrl') || '#'}
+        onClick={(e) => {
+          e.preventDefault();
+          const mapUrl = watch('mapUrl');
+          if (mapUrl) {
+            window.open(mapUrl, '_blank', 'noopener,noreferrer');
+          }
+        }}
+        className="text-subCoral cursor-pointer"
       >
         지도보기
-      </Link>
+      </a>
       <div className="text-subCoral">|</div>
       <button
         onClick={() => {

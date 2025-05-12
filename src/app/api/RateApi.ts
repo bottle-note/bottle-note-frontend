@@ -1,4 +1,4 @@
-import { RateAPI, UserRatingApi } from '@/types/Rate';
+import { RateAlcoholAPI, RateAPI, UserRatingApi } from '@/types/Rate';
 import { ApiResponse, ListQueryParams } from '@/types/common';
 import { fetchWithAuth } from '@/utils/fetchWithAuth';
 
@@ -30,7 +30,22 @@ export const RateApi = {
     const result: ApiResponse<{ ratings: RateAPI[]; totalCount: number }> =
       await response.json();
 
-    return result;
+    const formattedResult: ApiResponse<{
+      ratings: RateAlcoholAPI[];
+      totalCount: number;
+    }> = {
+      ...result,
+      data: {
+        ...result.data,
+        ratings: result.data.ratings.map((item) => ({
+          ...item,
+          engCategory: item.engCategoryName,
+          korCategory: item.korCategoryName,
+        })),
+      },
+    };
+
+    return formattedResult;
   },
 
   async getUserRating(alcoholId: string) {

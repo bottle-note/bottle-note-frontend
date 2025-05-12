@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import * as yup from 'yup';
@@ -17,7 +17,7 @@ import { ReviewApi } from '@/app/api/ReviewApi';
 import { ReplyApi } from '@/app/api/ReplyApi';
 import NavLayout from '@/app/(primary)/_components/NavLayout';
 import Loading from '@/components/Loading';
-import { shareOrCopy } from '@/utils/shareOrCopy';
+// import { shareOrCopy } from '@/utils/shareOrCopy';
 import type {
   AlcoholInfo as AlcoholInfoType,
   ReviewDetailsWithoutAlcoholInfo,
@@ -40,8 +40,7 @@ export default function ReviewDetail() {
   const [reviewDetails, setReviewDetails] =
     useState<ReviewDetailsWithoutAlcoholInfo | null>(null);
   const [isRefetch, setIsRefetch] = useState<boolean>(false);
-  // 대댓글 수정하며 같이 리팩토링 예정
-  const [isSubReplyShow, setIsSubReplyShow] = useState(false);
+  const [isUnmounting, setIsUnmounting] = useState(false);
 
   const schema = yup.object({
     content: yup.string().required('댓글 내용을 입력해주세요.'),
@@ -57,14 +56,6 @@ export default function ReviewDetail() {
 
   const handleLogin = () => {
     handleLoginModal();
-  };
-
-  const resetSubReplyToggle = (value?: boolean) => {
-    if (value) {
-      setIsSubReplyShow(value);
-    } else {
-      setIsSubReplyShow((prev) => !prev);
-    }
   };
 
   const handleCreateReply: SubmitHandler<FieldValues> = async (data) => {
@@ -95,7 +86,6 @@ export default function ReviewDetail() {
 
       if (response) {
         setIsRefetch(true);
-        setIsSubReplyShow(false);
         reset({
           content: '',
           parentReplyId: null,
@@ -107,28 +97,33 @@ export default function ReviewDetail() {
     await executeApiCall(processSubmission);
   };
 
-  useEffect(() => {
-    async function fetchReviewDetails() {
-      // reviewId가 없을 때, 별도 페이지 처리가 필요한가?
-      if (!reviewId) return;
-      try {
-        const result = await ReviewApi.getReviewDetails(reviewId);
-        const { alcoholInfo: response, ...restData } = result;
-        setAlcoholInfo(response);
-        setReviewDetails(restData);
-      } catch (error) {
-        console.error('Failed to fetch review details:', error);
-      }
+  const fetchReviewDetails = useCallback(async () => {
+    if (!reviewId) return;
+    try {
+      const result = await ReviewApi.getReviewDetails(reviewId);
+      const { alcoholInfo: response, ...restData } = result;
+      setAlcoholInfo(response);
+      setReviewDetails(restData);
+    } catch (error) {
+      console.error('Failed to fetch review details:', error);
     }
+  }, [reviewId]);
 
+  // 초기 데이터 로드
+  useEffect(() => {
     fetchReviewDetails();
-
     reset({
       content: '',
       parentReplyId: null,
       replyToReplyUserName: null,
     });
-  }, [reviewId]);
+  }, [reviewId, reset, fetchReviewDetails]);
+
+  useEffect(() => {
+    return () => {
+      setIsUnmounting(true);
+    };
+  }, []);
 
   return (
     <FormProvider {...formMethods}>
@@ -138,13 +133,15 @@ export default function ReviewDetail() {
             <div className="relative pb-5">
               {alcoholInfo.imageUrl && (
                 <div
-                  className="absolute w-full h-full  bg-cover bg-center"
+                  className="absolute w-full h-full bg-cover bg-center"
                   style={{
                     backgroundImage: `url(${alcoholInfo.imageUrl})`,
                   }}
                 />
               )}
-              <div className="absolute w-full h-full bg-mainCoral bg-opacity-90" />
+              <div
+                className={`absolute w-full h-full bg-mainCoral bg-opacity-90 ${isUnmounting ? 'hidden' : ''}`}
+              />
               <SubHeader bgColor="bg-mainCoral/10">
                 <SubHeader.Left
                   onClick={() => {
@@ -163,12 +160,18 @@ export default function ReviewDetail() {
                 </SubHeader.Center>
                 <SubHeader.Right
                   onClick={() => {
-                    shareOrCopy(
-                      `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${reviewId}`,
-                      handleModalState,
-                      `${alcoholInfo.korName} 리뷰`,
-                      `${alcoholInfo.korName} 리뷰 상세보기`,
-                    );
+                    // shareOrCopy(
+                    //   `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${reviewId}`,
+                    //   handleModalState,
+                    //   `${alcoholInfo.korName} 리뷰`,
+                    //   `${alcoholInfo.korName} 리뷰 상세보기`,
+                    // );
+                    handleModalState({
+                      isShowModal: true,
+                      type: 'ALERT',
+                      mainText:
+                        '아직 준비 중인 기능입니다. 조금만 기다려주세요!',
+                    });
                   }}
                 >
                   <Image
@@ -187,13 +190,12 @@ export default function ReviewDetail() {
               data={reviewDetails}
               handleLogin={handleLogin}
               textareaRef={textareaRef}
+              onRefresh={fetchReviewDetails}
             />
             <ReplyList
               reviewId={reviewId}
               isRefetch={isRefetch}
               setIsRefetch={setIsRefetch}
-              isSubReplyShow={isSubReplyShow}
-              resetSubReplyToggle={resetSubReplyToggle}
             />
             <ReplyInput
               textareaRef={textareaRef}

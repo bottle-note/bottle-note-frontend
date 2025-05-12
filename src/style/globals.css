@@ -2,11 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+/* app/globals.css */
 @layer base {
-  body {
-    overscroll-behavior: contain;
+  @font-face {
+    font-family: 'suit';
+    src: url('/fonts/SUIT-Regular.otf') format('opentype');
+    font-weight: 400; /* Regular */
   }
 
+  @font-face {
+    font-family: 'suit';
+    src: url('/fonts/SUIT-Bold.otf') format('opentype');
+    font-weight: 700; /* Bold */
+  }
+
+  @font-face {
+    font-family: 'suit';
+    src: url('/fonts/SUIT-Black.otf') format('opentype');
+    font-weight: 900; /* Black */
+  }
+
+  body {
+    font-family: 'suit', sans-serif;
+    font-weight: 400; /* Default weight */
+  }
+}
+
+@layer base {
   input,
   textarea {
     @apply outline-none;
@@ -39,11 +61,11 @@
   }
 
   .modal-mainText {
-    @apply text-15 text-subCoral font-medium whitespace-pre-wrap;
+    @apply text-20 text-subCoral font-medium whitespace-pre-wrap mb-2;
   }
 
   .modal-subText {
-    @apply text-13 text-mainDarkGray whitespace-pre-wrap;
+    @apply text-16 text-mainDarkGray whitespace-pre-wrap mb-3;
   }
 }
 

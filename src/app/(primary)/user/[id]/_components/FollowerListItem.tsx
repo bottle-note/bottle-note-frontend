@@ -20,15 +20,17 @@ export const FollowerListItem = ({ userInfo }: Props) => {
         className="grid grid-cols-[0.45fr_1fr]"
         href={`/user/${userInfo.userId}`}
       >
-        <Image
-          src={userInfo.userProfileImage ?? DefaultProfile}
-          width={36}
-          height={36}
-          alt="유저 프로필"
-          className="rounded-full"
-        />
+        <div className="w-9 h-9 rounded-full overflow-hidden">
+          <Image
+            src={userInfo.userProfileImage ?? DefaultProfile}
+            width={36}
+            height={36}
+            alt="유저 프로필"
+            className="object-cover w-full h-full"
+          />
+        </div>
         <div className="flex flex-col gap-1">
-          <p className="text-12 font-bold">{userInfo.nickName}</p>
+          <p className="text-12 font-bold">{userInfo.followUserNickname}</p>
           <p className="text-10 text-brightGray font-semibold flex gap-2">
             <span className="flex gap-1">
               <Image src={CommentGray} alt="리뷰" width={12} height={12} />

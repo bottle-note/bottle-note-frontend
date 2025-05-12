@@ -93,11 +93,15 @@ function EditForm() {
             />
 
             <div className="flex  gap-2 absolute bottom-2 right-0">
-              <Image
-                src={CloseIconGray}
-                alt="닉네임 리셋"
-                onClick={handleResetNickName}
-              />
+              {nickName.length ? (
+                <Image
+                  src={CloseIconGray}
+                  alt="닉네임 리셋"
+                  onClick={handleResetNickName}
+                />
+              ) : (
+                <></>
+              )}
               <button
                 className="label-selected text-10 disabled:label-disabled"
                 onClick={() => handelRegisterNickName(nickName)}
