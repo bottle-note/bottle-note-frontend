@@ -119,12 +119,12 @@ const SidebarHeader = () => {
       },
       {
         text: '이용약관',
-        link: 'https://bottle-note.notion.site/info?pvs=4',
+        link: `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_NOTION_URL}info?pvs=4`,
         action: null,
       },
       {
         text: '개인정보 처리 방침',
-        link: 'http://bottle-note.notion.site/',
+        link: process.env.NEXT_PUBLIC_BOTTLE_NOTE_NOTION_URL,
         action: null,
       },
       {
