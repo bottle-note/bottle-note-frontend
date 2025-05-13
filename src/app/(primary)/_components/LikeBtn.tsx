@@ -54,10 +54,11 @@ const LikeBtn = ({
     <button
       className={
         likeBtnName
-          ? 'flex items-center space-x-1'
+          ? 'inline-flex justify-center'
           : 'justify-self-end row-start-3'
       }
       onClick={handleClick}
+      style={{ alignItems: 'center' }}
     >
       {isLiked ? (
         <Image
@@ -65,6 +66,7 @@ const LikeBtn = ({
           width={size}
           height={size}
           alt="좋아요"
+          style={{ display: 'block' }}
         />
       ) : (
         <Image
@@ -72,10 +74,19 @@ const LikeBtn = ({
           width={size}
           height={size}
           alt="좋아요"
+          style={{ display: 'block' }}
         />
       )}
       {likeBtnName && (
-        <p className="text-mainGray font-bold text-14">{likeBtnName}</p>
+        <span
+          className="text-mainGray font-bold text-13"
+          style={{
+            marginLeft: '4px',
+            transform: 'translateY(1px)',
+          }}
+        >
+          {likeBtnName}
+        </span>
       )}
     </button>
   );
