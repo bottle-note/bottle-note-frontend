@@ -105,10 +105,10 @@ function Reply({
 
   return (
     <>
-      <div className="space-y-2">
+      <div>
         <div className="flex items-center justify-between">
           <Link href={`/user/${data?.userId}`}>
-            <div className="flex items-center space-x-1 h-8">
+            <div className="flex items-center space-x-[5px] h-8 px-">
               <div className="w-[1.4rem] h-[1.4rem] rounded-full overflow-hidden">
                 <Image
                   className="object-cover"
@@ -118,13 +118,13 @@ function Reply({
                   height={22}
                 />
               </div>
-              <p className="text-mainGray text-12">
+              <p className="text-mainGray text-12 font-bold">
                 {truncStr(data?.nickName, 12)}
               </p>
               {isReviewUser && (
                 <Label
                   name="리뷰 작성자"
-                  styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] rounded text-9"
+                  styleClass="border-mainCoral text-mainCoral px-[5.82px] py-[2.91px] rounded text-9"
                 />
               )}
             </div>
@@ -151,10 +151,12 @@ function Reply({
             )}
           </div>
         </div>
-        <div className="text-12 text-mainDarkGray whitespace-pre-wrap break-words flex">
-          <div className="text-mainCoral mr-1">
-            {'rootReviewId' in data && data?.parentReviewReplyAuthor}
-          </div>
+        <div className="text-12 text-mainDarkGray whitespace-pre-wrap break-words flex mt-[12px] mb-2">
+          {'rootReviewId' in data && (
+            <div className="text-mainCoral mr-1">
+              {data?.parentReviewReplyAuthor}
+            </div>
+          )}
           {data?.reviewReplyContent}
         </div>
         <div className="space-y-1">

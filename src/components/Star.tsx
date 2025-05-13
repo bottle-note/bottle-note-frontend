@@ -10,7 +10,7 @@ interface Props {
 const Star = ({
   rating,
   size = 18,
-  styleProps = 'text-subCoral font-semibold text-15',
+  styleProps = 'text-subCoral font-semibold text-15 w-5',
   color = 'main',
 }: Props) => {
   return (
@@ -34,7 +34,7 @@ const Star = ({
           />
         )}
       </div>
-      <p className={`${styleProps} w-5 leading-none`}>
+      <p className={`${styleProps} leading-none`}>
         {rating ? rating.toFixed(1) : '  -'}
       </p>
     </div>
