@@ -5,6 +5,7 @@
   "scripts": {
     "build:dev": "cross-env npx env-cmd -f .env.development next build",
     "start:dev": "cross-env npx env-cmd -f .env.development next start",
+    "dev": "cross-env npx env-cmd -f .env.development next dev",
     "build": "next build",
     "start": "next start",
     "ci:tsc": "tsc",
