@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { AlcoholAPI } from '@/types/Alcohol';
-
-type PopularType = 'week' | 'spring' | 'recent';
+import { PopularType } from '@/types/Popular';
 
 interface Props {
   type?: PopularType;

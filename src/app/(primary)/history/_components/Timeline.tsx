@@ -6,11 +6,12 @@ import List from '@/components/List/List';
 import { groupHistoryByDate, shouldShowDivider } from '@/utils/historyUtils';
 import { HistoryListApi, History as HistoryType } from '@/types/History';
 import { CurrentUserInfoApi } from '@/types/User';
+import { TimelineSkeleton } from '@/components/Skeletons/custom/TimelineSkeleton';
 import { HistoryEmptyState } from './HistoryEmptyState';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
 
 interface TimelineProps {
-  data: HistoryListApi;
+  data?: HistoryListApi;
   isLastPage?: boolean;
   currentUserInfo: CurrentUserInfoApi | null;
   handleOpenFilterModal: () => void;
@@ -30,7 +31,7 @@ export default function Timeline({
   shouldReset,
   onResetComplete,
   targetRef,
-  isLoading,
+  isLoading = true,
   isFetching,
   error,
 }: TimelineProps) {
@@ -53,7 +54,7 @@ export default function Timeline({
   }, [shouldReset, onResetComplete]);
 
   useEffect(() => {
-    if (data.userHistories?.length) {
+    if (data?.userHistories?.length) {
       const groupedHistory = groupHistoryByDate(data.userHistories);
       const yearMonths = Object.keys(groupedHistory).sort((a, b) =>
         b.localeCompare(a),
@@ -75,6 +76,21 @@ export default function Timeline({
     const [year, month] = latestYearMonth.split('.').map(Number);
     return { year, month };
   }
+
+  if (isLoading || !data || !currentUserInfo || yearMonths.length === 0) {
+    return (
+      <section className="p-5 mb-10 flex flex-col items-center w-full">
+        <div className="flex items-center justify-between mb-[0.65rem] w-full">
+          <span className="text-xs text-mainGray shrink-0" />
+          <div className="flex items-center">
+            <Image src={FilterIcon} alt="필터메뉴" />
+          </div>
+        </div>
+        <TimelineSkeleton type="history" />
+      </section>
+    );
+  }
+
   return (
     <section className="p-5 mb-10 flex flex-col items-center w-full">
       <div className="flex items-center justify-between mb-[0.65rem] w-full">
@@ -90,12 +106,12 @@ export default function Timeline({
         </div>
       </div>
       <List
-        isListFirstLoading={isLoading}
+        isListFirstLoading={false}
         isScrollLoading={isFetching}
         isError={!!error}
       >
         <List.Section>
-          {data.userHistories?.length > 0 && !error && !isLoading && (
+          {data?.userHistories.length !== 0 && !error ? (
             <article className="relative w-[339px]">
               <div className="absolute left-[2.75rem] top-6 bottom-0 w-px border-l border-dashed border-subCoral z-0" />
               <div className="text-10 text-mainGray bg-bgGray rounded-md p-2 mb-5 ml-3 relative z-10">
@@ -154,19 +170,18 @@ export default function Timeline({
                   </div>
                   <TimeLineItem
                     isStart
-                    date={data.subscriptionDate || ''}
+                    date={data?.subscriptionDate || ''}
                     type="BOTTLE"
                   />
                 </div>
               )}
             </article>
+          ) : (
+            <HistoryEmptyState error={error} />
           )}
         </List.Section>
       </List>
       <div ref={targetRef} />
-      {(error || isLoading || !(data.userHistories?.length > 0)) && (
-        <HistoryEmptyState isLoading={isLoading} error={error} />
-      )}
     </section>
   );
 }
