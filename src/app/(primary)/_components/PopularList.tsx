@@ -2,20 +2,20 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { v4 as uuidv4 } from 'uuid';
-import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
 import AlcoholCard from '@/app/(primary)/_components/AlcoholCard';
 import { usePopularList } from '@/hooks/usePopularList';
 import { AuthService } from '@/lib/AuthService';
-
-type ListType = 'week' | 'spring' | 'recent';
+import {
+  DescriptionSkeleton,
+  LoadingStateSkeleton,
+} from '@/components/Skeletons/custom/PopularSkeleton';
+import { PopularType } from '@/types/Popular';
 
 interface Props {
-  type?: ListType;
+  type?: PopularType;
 }
 
-const EmptyState = ({ type }: { type: ListType }) => {
+const EmptyState = ({ type }: { type: PopularType }) => {
   const emptyStateContent = {
     week: {
       text: '데이터 준비 중 입니다.',
@@ -42,18 +42,11 @@ const Description = ({
   type,
   isLoading = true,
 }: {
-  type: ListType;
+  type: PopularType;
   isLoading: boolean;
 }) => {
   if (isLoading) {
-    return (
-      <>
-        <Skeleton height={17} width={120} className="pb-[10px]" />
-        <div className="space-y-[2px] pb-5">
-          <Skeleton count={2} height={24} width={270} />
-        </div>
-      </>
-    );
+    return <DescriptionSkeleton />;
   }
 
   switch (type) {
@@ -112,32 +105,6 @@ const LoginRequired = () => {
   );
 };
 
-const LoadingState = ({
-  type,
-  isLoading = true,
-}: {
-  type: ListType;
-  isLoading: boolean;
-}) => {
-  return (
-    <>
-      {type !== 'recent' && <Description type={type} isLoading={isLoading} />}
-      <div className="whitespace-nowrap overflow-x-auto overflow-y-hidden flex space-x-2 scrollbar-hide">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <div
-            key={`skeleton-${uuidv4()}`}
-            className={`flex-shrink-0 flex-grow-0 rounded-lg ${
-              index === 4 ? 'pr-[25px]' : ''
-            }`}
-          >
-            <Skeleton height={225} width={145} />
-          </div>
-        ))}
-      </div>
-    </>
-  );
-};
-
 const CardList = ({ items }: { items: any[] }) => {
   return (
     <div className="whitespace-nowrap overflow-x-auto overflow-y-hidden flex space-x-2 scrollbar-hide">
@@ -169,7 +136,7 @@ function PopularList({ type = 'week' }: Props) {
     }
 
     if (isLoading) {
-      return <LoadingState type={type} isLoading={isLoading} />;
+      return <LoadingStateSkeleton type={type} />;
     }
 
     if (popularList.length !== 0) {

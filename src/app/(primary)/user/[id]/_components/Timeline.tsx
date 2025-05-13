@@ -10,6 +10,7 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { HistoryApi } from '@/app/api/HistoryApi';
 import { groupHistoryByDate, shouldShowDivider } from '@/utils/historyUtils';
 import { HistoryEmptyState } from '@/app/(primary)/history/_components/HistoryEmptyState';
+import { TimelineSkeleton } from '@/components/Skeletons/custom/TimelineSkeleton';
 
 function Timeline() {
   const router = useRouter();
@@ -76,6 +77,74 @@ function Timeline() {
     }
   }, [historyData]);
 
+  const renderTimelineContent = () => {
+    if (isLoading) {
+      return <TimelineSkeleton />;
+    }
+
+    if (historyData?.[0]?.data.totalCount === 0 || error) {
+      return <HistoryEmptyState error={error} />;
+    }
+
+    return (
+      <>
+        <div className="border-t border-mainGray/30 my-3" />
+        <div className="relative w-[339px] mx-auto">
+          <div className="absolute left-[2.7rem] top-6 bottom-0 w-px border-l border-dashed border-subCoral z-0" />
+          <div className="relative z-10 pb-3">
+            {Object.entries(groupedHistory).map(([yearMonth, items], index) => (
+              <div key={yearMonth} className="relative">
+                <div className="pl-4 mb-5">
+                  <Label
+                    name={yearMonth}
+                    styleClass="border-white px-2.5 py-1 rounded-md text-11 bg-bgGray text-subCoral"
+                  />
+                </div>
+                <div className="z-10 space-y-5">
+                  {items.map((item: History, itemIndex) => {
+                    const prevItem =
+                      itemIndex > 0 ? items[itemIndex - 1] : null;
+                    const showDivider = shouldShowDivider(item, prevItem);
+                    return (
+                      <React.Fragment key={item.historyId}>
+                        {showDivider && (
+                          <div className="relative py-1">
+                            <div className="absolute left-0 right-0 h-px bg-bgGray" />
+                          </div>
+                        )}
+                        <TimeLineItem
+                          date={item.createdAt}
+                          alcoholName={item.alcoholName}
+                          imageSrc={item.imageUrl}
+                          type={item.eventType}
+                          rate={item.dynamicMessage}
+                          content={item.content}
+                          redirectUrl={item.redirectUrl}
+                        />
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+                {index !== Object.keys(groupedHistory).length - 1 && (
+                  <div className="my-5" />
+                )}
+              </div>
+            ))}
+          </div>
+          <div
+            className="absolute left-0 right-0 bottom-0 pointer-events-none z-10"
+            style={{
+              height: gradientHeight,
+              background:
+                'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
+            }}
+          />
+        </div>
+        <div className="mb-2" />
+      </>
+    );
+  };
+
   return (
     <>
       <article>
@@ -83,73 +152,11 @@ function Timeline() {
           <div className="font-semibold">
             <p className="text-15 text-subCoral">나의 보틀 여정 히스토리</p>
             <p className="text-10 text-brightGray">
-              별점, 평가,찜하기 활동내역을 살펴볼 수 있어요.
+              별점, 평가, 찜하기 활동내역을 살펴볼 수 있어요.
             </p>
           </div>
-          {historyData?.[0]?.data.totalCount !== 0 && !error && !isLoading ? (
-            <>
-              <div className="border-t border-mainGray/30 my-3" />
-              <div className="relative w-[339px] mx-auto">
-                <div className="absolute left-[2.7rem] top-6 bottom-0 w-px border-l border-dashed border-subCoral z-0" />
-                <div className="relative z-10 pb-3">
-                  {Object.entries(groupedHistory).map(
-                    ([yearMonth, items], index) => (
-                      <div key={yearMonth} className="relative">
-                        <div className="pl-4 mb-5">
-                          <Label
-                            name={yearMonth}
-                            styleClass="border-white px-2.5 py-1 rounded-md text-11 bg-bgGray text-subCoral"
-                          />
-                        </div>
-                        <div className="z-10 space-y-5">
-                          {items.map((item: History, itemIndex) => {
-                            const prevItem =
-                              itemIndex > 0 ? items[itemIndex - 1] : null;
-                            const showDivider = shouldShowDivider(
-                              item,
-                              prevItem,
-                            );
-                            return (
-                              <React.Fragment key={item.historyId}>
-                                {showDivider && (
-                                  <div className="relative py-1">
-                                    <div className="absolute left-0 right-0 h-px bg-bgGray" />
-                                  </div>
-                                )}
-                                <TimeLineItem
-                                  date={item.createdAt}
-                                  alcoholName={item.alcoholName}
-                                  imageSrc={item.imageUrl}
-                                  type={item.eventType}
-                                  rate={item.dynamicMessage}
-                                  content={item.content}
-                                  redirectUrl={item.redirectUrl}
-                                />
-                              </React.Fragment>
-                            );
-                          })}
-                        </div>
-                        {index !== Object.keys(groupedHistory).length - 1 && (
-                          <div className="my-5" />
-                        )}
-                      </div>
-                    ),
-                  )}
-                </div>
-                <div
-                  className="absolute left-0 right-0 bottom-0 pointer-events-none z-10"
-                  style={{
-                    height: gradientHeight,
-                    background:
-                      'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
-                  }}
-                />
-              </div>
-              <div className="mb-2" />
-            </>
-          ) : (
-            <HistoryEmptyState isLoading={isLoading} error={error} />
-          )}
+
+          {renderTimelineContent()}
         </div>
         <LinkButton
           data={{
