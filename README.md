@@ -8,4 +8,6 @@ yarn dev
 pnpm dev
 ```
 
+- todo ReadMe 꾸미기
+
 ![boton](https://github.com/user-attachments/assets/3c244ee2-f4b9-4675-a397-cf68a69df9ef)
