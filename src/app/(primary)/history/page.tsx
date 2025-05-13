@@ -153,22 +153,21 @@ export default function History() {
           handleSearchCallback={handleSearchCallback}
           styleProps="px-5 pt-5"
         />
-        {historyData && accumulatedHistories ? (
-          <Timeline
-            data={accumulatedHistories}
-            isLastPage={
-              !historyData[historyData.length - 1].meta.pageable?.hasNext
-            }
-            currentUserInfo={currentUserInfo}
-            handleOpenFilterModal={() => setIsOpen(true)}
-            shouldReset={shouldReset}
-            onResetComplete={() => setShouldReset(false)}
-            targetRef={targetRef}
-            isLoading={isLoading}
-            isFetching={isFetching}
-            error={error}
-          />
-        ) : null}
+        <Timeline
+          data={accumulatedHistories}
+          isLastPage={
+            historyData &&
+            !historyData[historyData.length - 1].meta.pageable?.hasNext
+          }
+          currentUserInfo={currentUserInfo}
+          handleOpenFilterModal={() => setIsOpen(true)}
+          shouldReset={shouldReset}
+          onResetComplete={() => setShouldReset(false)}
+          targetRef={targetRef}
+          isLoading={isLoading}
+          isFetching={isFetching}
+          error={error}
+        />
       </main>
       <FilterSideModal isOpen={isOpen} onClose={handleClose} />
     </NavLayout>

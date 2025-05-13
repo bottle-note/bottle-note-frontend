@@ -2,7 +2,7 @@ import React from 'react';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
 
 interface HistoryEmptyStateProps {
-  isLoading: boolean;
+  isLoading?: boolean;
   error: unknown;
 }
 

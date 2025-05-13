@@ -11,14 +11,14 @@ interface SkeletonBaseProps {
   borderRadius?: string;
 }
 
-export default function SkeletonBase({
+const SkeletonBase = ({
   width,
   height,
   count = 1,
   className = '',
   circle = false,
   borderRadius,
-}: SkeletonBaseProps) {
+}: SkeletonBaseProps) => {
   return (
     <Skeleton
       width={width}
@@ -29,4 +29,6 @@ export default function SkeletonBase({
       borderRadius={borderRadius}
     />
   );
-}
+};
+
+export default SkeletonBase;
