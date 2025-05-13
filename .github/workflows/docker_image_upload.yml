@@ -3,10 +3,10 @@ name: Build and Push to ECR
 
 on:
   workflow_dispatch:
-  pull_request:
-    types: [ closed ]
-    branches:
-      - release
+  #pull_request:
+  #  types: [ closed ]
+  #  branches:
+  #    - release
 
 concurrency:
   group: "ecr-upload"
@@ -16,7 +16,7 @@ jobs:
   docker-image-upload:
     runs-on: ubuntu-latest
     outputs:
-      image_tag: ${{ steps.build-image.outputs.image_tag }}
+      IMAGE_TAG: ${{ steps.build-image.outputs.image_tag }}
     steps:
       - name: Checkout code with submodules
         uses: actions/checkout@v4

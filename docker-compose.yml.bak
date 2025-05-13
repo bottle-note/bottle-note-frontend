@@ -2,7 +2,7 @@ services:
   dev-bottle-note:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.bak
     container_name: bottle-note-front-server
     restart: always
     ports:
