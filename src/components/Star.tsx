@@ -34,7 +34,7 @@ const Star = ({
           />
         )}
       </div>
-      <p className={`${styleProps} leading-none`}>
+      <p className={`${styleProps} ${rating ? 'leading-none' : 'pl-1'}`}>
         {rating ? rating.toFixed(1) : '  -'}
       </p>
     </div>
