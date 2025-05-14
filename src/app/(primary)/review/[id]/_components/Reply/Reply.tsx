@@ -159,8 +159,8 @@ function Reply({
           )}
           {data?.reviewReplyContent}
         </div>
-        <div className="space-y-1">
-          <div className="flex space-x-2">
+        <div className="space-y-[14px]">
+          <div className="flex space-x-[6px]">
             {data?.status !== 'DELETED' && (
               <button
                 className="text-10 text-subCoral"
@@ -176,29 +176,32 @@ function Reply({
               </button>
             )}
             {'subReplyCount' in data && data?.subReplyCount !== 0 && (
-              <button
-                className="flex items-center space-x-[2px]"
-                onClick={handleUpdateSubReply}
-              >
-                <div className="text-10 text-subCoral">
-                  답글 {data?.subReplyCount}개
-                </div>
-                <Image
-                  src={
-                    isSubReplyShow
-                      ? '/icon/arrow-up-subcoral.svg'
-                      : '/icon/arrow-down-subcoral.svg'
-                  }
-                  alt="arrowUpIcon"
-                  width={10}
-                  height={8}
-                />
-              </button>
+              <>
+                <p className="text-10 text-subCoral">·</p>
+                <button
+                  className="flex items-center space-x-[2px]"
+                  onClick={handleUpdateSubReply}
+                >
+                  <div className="text-10 text-subCoral pr-[1px]">
+                    답글 {data?.subReplyCount}개
+                  </div>
+                  <Image
+                    src={
+                      isSubReplyShow
+                        ? '/icon/arrow-up-subcoral.svg'
+                        : '/icon/arrow-down-subcoral.svg'
+                    }
+                    alt="arrowUpIcon"
+                    width={10}
+                    height={8}
+                  />
+                </button>
+              </>
             )}
           </div>
           {'subReplyCount' in data &&
             data?.subReplyCount !== 0 &&
-            isSubReplyShow && <div className="space-y-3">{children}</div>}
+            isSubReplyShow && <div className="space-y-[14px]">{children}</div>}
         </div>
       </div>
       {isOptionShow && (
