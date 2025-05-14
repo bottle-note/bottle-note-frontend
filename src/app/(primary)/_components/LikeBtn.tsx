@@ -35,9 +35,9 @@ const LikeBtn = ({
     if (!isLogin) {
       handleNotLogin();
     } else {
-      handleUpdateLiked();
       try {
         await ReviewApi.putLike(reviewId, !isLiked);
+        handleUpdateLiked();
       } catch (error) {
         handleModalState({
           isShowModal: true,

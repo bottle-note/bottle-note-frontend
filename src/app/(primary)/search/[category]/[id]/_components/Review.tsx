@@ -160,7 +160,10 @@ function Review({ data, onRefresh }: Props) {
               <LikeBtn
                 reviewId={data.reviewId}
                 isLiked={isLiked}
-                handleUpdateLiked={() => setIsLiked((prev) => !prev)}
+                handleUpdateLiked={() => {
+                  setIsLiked((prev) => !prev);
+                  onRefresh();
+                }}
                 handleError={() => {
                   setIsLiked(isLikedByMe);
                 }}
