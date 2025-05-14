@@ -2,14 +2,14 @@
 name: Deploy to Dev
 on:
   workflow_dispatch:
-  workflow_call:
-    inputs:
-      IMAGE_TAG:
-        required: true
-        type: string
-    secrets:
-      GIT_ACCESS_TOKEN:
-        required: true
+  #workflow_call:
+  #  inputs:
+  #    IMAGE_TAG:
+  #      required: true
+  #      type: string
+  #  secrets:
+  #    GIT_ACCESS_TOKEN:
+  #      required: true
 
 jobs:
   dev_deploy_workflow_job:
