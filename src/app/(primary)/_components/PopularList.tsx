@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import AlcoholCard from '@/app/(primary)/_components/AlcoholCard';
@@ -10,6 +11,7 @@ import {
   LoadingStateSkeleton,
 } from '@/components/Skeletons/custom/PopularSkeleton';
 import { PopularType } from '@/types/Popular';
+import { UserApi } from '@/app/api/UserApi';
 
 interface Props {
   type?: PopularType;
@@ -45,6 +47,14 @@ const Description = ({
   type: PopularType;
   isLoading: boolean;
 }) => {
+  const [userInfo, setUserInfo] = useState<{ nickname?: string }>({});
+
+  useEffect(() => {
+    if (type === 'recent' && !isLoading) {
+      UserApi.getCurUserInfo().then(setUserInfo);
+    }
+  }, [type, isLoading]);
+
   if (isLoading) {
     return <DescriptionSkeleton />;
   }
@@ -71,6 +81,18 @@ const Description = ({
           <div className="text-20 font-bold space-y-[2px] pb-5">
             <p>봄에 어울리는 술</p>
             <p>봄바람처럼 부드러운 한 잔🌸</p>
+          </div>
+        </>
+      );
+    case 'recent':
+      return (
+        <>
+          <p className="pb-[10px] text-13 font-extrabold text-mainCoral">
+            VIEW HISTORY
+          </p>
+          <div className="text-20 font-bold space-y-[2px] pb-5">
+            <p>{userInfo.nickname} 님이</p>
+            <p>최근 본 위스키에요🥃</p>
           </div>
         </>
       );
@@ -136,7 +158,7 @@ function PopularList({ type = 'week' }: Props) {
     }
 
     if (isLoading) {
-      return <LoadingStateSkeleton type={type} />;
+      return <LoadingStateSkeleton />;
     }
 
     if (popularList.length !== 0) {
