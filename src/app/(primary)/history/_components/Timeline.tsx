@@ -77,7 +77,7 @@ export default function Timeline({
     return { year, month };
   }
 
-  if (isLoading || !data || !currentUserInfo || yearMonths.length === 0) {
+  if (isLoading || !data) {
     return (
       <section className="p-5 mb-10 flex flex-col items-center w-full">
         <div className="flex items-center justify-between mb-[0.65rem] w-full">
@@ -105,13 +105,13 @@ export default function Timeline({
           />
         </div>
       </div>
-      <List
-        isListFirstLoading={false}
-        isScrollLoading={isFetching}
-        isError={!!error}
-      >
-        <List.Section>
-          {data?.userHistories.length !== 0 && !error ? (
+      {data.userHistories.length !== 0 && !error ? (
+        <List
+          isListFirstLoading={false}
+          isScrollLoading={isFetching}
+          isError={!!error}
+        >
+          <List.Section>
             <article className="relative w-[339px]">
               <div className="absolute left-[2.75rem] top-6 bottom-0 w-px border-l border-dashed border-subCoral z-0" />
               <div className="text-10 text-mainGray bg-bgGray rounded-md p-2 mb-5 ml-3 relative z-10">
@@ -176,11 +176,11 @@ export default function Timeline({
                 </div>
               )}
             </article>
-          ) : (
-            <HistoryEmptyState error={error} />
-          )}
-        </List.Section>
-      </List>
+          </List.Section>
+        </List>
+      ) : (
+        <HistoryEmptyState isLoading={isLoading} error={error} />
+      )}
       <div ref={targetRef} />
     </section>
   );

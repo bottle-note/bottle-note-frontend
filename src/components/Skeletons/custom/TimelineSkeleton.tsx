@@ -14,7 +14,7 @@ export const TimelineSkeleton = ({
       {type === 'mypage' && (
         <div className="border-t border-mainGray/30 my-3" />
       )}
-      <div className="absolute left-[3.1rem] top-6 bottom-0 w-px border-l border-dashed border-gray-200 z-0" />
+      <div className="absolute left-[3.1rem] top-6 bottom-0 w-px border-l border-dashed border-mainGray/50 z-0" />
 
       <div className="relative z-10 pb-3">
         <div className="pl-2 mb-5">

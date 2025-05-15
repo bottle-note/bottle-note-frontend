@@ -33,7 +33,7 @@ import ReplyList from './_components/Reply/ReplyList';
 export default function ReviewDetail() {
   const router = useRouter();
   const { id: reviewId } = useParams();
-  const { state, handleModalState, handleLoginModal } = useModalStore();
+  const { state, handleLoginModal } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [alcoholInfo, setAlcoholInfo] = useState<AlcoholInfoType | null>(null);
@@ -130,7 +130,7 @@ export default function ReviewDetail() {
       {alcoholInfo && reviewDetails && !isProcessing ? (
         <>
           <NavLayout>
-            <div className="relative pb-5">
+            <div className="relative">
               {alcoholInfo.imageUrl && (
                 <div
                   className="absolute w-full h-full bg-cover bg-center"
@@ -158,14 +158,14 @@ export default function ReviewDetail() {
                 <SubHeader.Center textColor="text-white">
                   리뷰 상세보기
                 </SubHeader.Center>
-                <SubHeader.Right
+                {/* <SubHeader.Right
                   onClick={() => {
-                    // shareOrCopy(
-                    //   `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${reviewId}`,
-                    //   handleModalState,
-                    //   `${alcoholInfo.korName} 리뷰`,
-                    //   `${alcoholInfo.korName} 리뷰 상세보기`,
-                    // );
+                    shareOrCopy(
+                      `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${reviewId}`,
+                      handleModalState,
+                      `${alcoholInfo.korName} 리뷰`,
+                      `${alcoholInfo.korName} 리뷰 상세보기`,
+                    );
                     handleModalState({
                       isShowModal: true,
                       type: 'ALERT',
@@ -180,7 +180,7 @@ export default function ReviewDetail() {
                     width={23}
                     height={23}
                   />
-                </SubHeader.Right>
+                </SubHeader.Right> */}
               </SubHeader>
               {alcoholInfo && (
                 <AlcoholInfo data={alcoholInfo} handleLogin={handleLogin} />

@@ -12,14 +12,26 @@
 
   @font-face {
     font-family: 'suit';
-    src: url('/fonts/SUIT-Bold.otf') format('opentype');
-    font-weight: 700; /* Bold */
+    src: url('/fonts/SUIT-Medium.otf') format('opentype');
+    font-weight: 500;
   }
 
   @font-face {
     font-family: 'suit';
-    src: url('/fonts/SUIT-Black.otf') format('opentype');
-    font-weight: 900; /* Black */
+    src: url('/fonts/SUIT-SemiBold.otf') format('opentype');
+    font-weight: 600;
+  }
+
+  @font-face {
+    font-family: 'suit';
+    src: url('/fonts/SUIT-Bold.otf') format('opentype');
+    font-weight: 700;
+  }
+
+  @font-face {
+    font-family: 'suit';
+    src: url('/fonts/SUIT-ExtraBold.otf') format('opentype');
+    font-weight: 800;
   }
 
   body {

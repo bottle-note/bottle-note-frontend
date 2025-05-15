@@ -18,7 +18,7 @@ const Toggle = ({
   disabled = false,
 }: Props) => {
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center space-x-[3px]">
       <button
         className={`toggle-container flex items-center justify-center w-8 h-4 rounded-full ${
           isActive ? onColor : offColor
@@ -33,7 +33,7 @@ const Toggle = ({
           }`}
         />
       </button>
-      <p className="text-13 text-mainGray">{isActive ? onName : offName}</p>
+      <p className="text-10 text-mainGray">{isActive ? onName : offName}</p>
     </div>
   );
 };
