@@ -91,7 +91,7 @@ const Description = ({
             VIEW HISTORY
           </p>
           <div className="text-20 font-bold space-y-[2px] pb-5">
-            <p>{userInfo.nickname} 님이</p>
+            <p>{userInfo.nickname ?? ''} 님이</p>
             <p>최근 본 위스키에요🥃</p>
           </div>
         </>
