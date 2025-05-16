@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { AuthService } from '@/lib/AuthService';
 import { checkTokenValidity } from '@/utils/checkTokenValidity';
+import useModalStore from '@/store/modalStore';
 
 export interface NavItem {
   name: string;
@@ -17,6 +18,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const { userData, logout } = AuthService;
+  const { handleLoginModal } = useModalStore();
 
   const navItems: NavItem[] = [
     { name: '홈', link: '/', icon: '/icon/navbar/home.svg' },
@@ -38,11 +40,17 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
 
   const handleNavigation = async (menu: NavItem) => {
     if (menu.requiresAuth) {
-      if (!userData || !(await checkTokenValidity())) {
+      const isAuthenticated = userData && (await checkTokenValidity());
+
+      if (!isAuthenticated) {
+        if (menu.link === '/history') {
+          return handleLoginModal();
+        }
         logout();
         return router.push('/login');
       }
     }
+
     router.push(menu.link);
   };
 

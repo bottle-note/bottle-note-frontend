@@ -77,11 +77,11 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
 
   return (
     <>
-      <section>
-        <section className="mx-5 py-5 space-y-4 border-b border-mainGray/30 ">
+      <section className="pt-[38px]">
+        <section className="mx-5 pb-5 border-b border-mainGray/30 ">
           <article className="flex items-center justify-between">
             <Link href={`/user/${userData?.userId}`}>
-              <div className="flex items-center space-x-1 ">
+              <div className="flex items-center space-x-[7px] ">
                 <div className="w-[1.9rem] h-[1.9rem] rounded-full overflow-hidden">
                   <Image
                     className="object-cover"
@@ -102,11 +102,11 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
             </Link>
             <Star
               rating={data.reviewInfo?.rating ?? 0}
-              size={25}
-              styleProps="text-20 text-subCoral font-semibold"
+              size={21}
+              styleProps="text-20 text-subCoral font-semibold w-7"
             />
           </article>
-          <article className="flex space-x-2 items-center">
+          <article className="flex items-center mt-[10px] space-x-2">
             {data.reviewInfo?.isBestReview && (
               <Label
                 name="베스트"
@@ -131,7 +131,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
             )}
           </article>
           {data.reviewImageList && (
-            <div className="whitespace-nowrap overflow-x-auto flex space-x-2 scrollbar-hide">
+            <div className="my-[22px] whitespace-nowrap overflow-x-auto flex space-x-2 scrollbar-hide">
               {data.reviewImageList.map((imgData) => (
                 <div
                   className="relative w-[147px] h-[147px] flex-shrink-0"
@@ -150,7 +150,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
           <div className="text-12 text-mainDarkGray">
             {data.reviewInfo?.reviewContent}
           </div>
-          <article className="flex justify-between">
+          <article className="flex justify-between mt-[10px]">
             {data.reviewInfo?.createAt && (
               <p className="text-mainGray text-10">
                 {formatDate(data.reviewInfo.createAt) as string}
@@ -181,7 +181,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
         {shouldShowPriceOrLocation && (
           <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 text-12">
             {hasValidPrice && hasValidSizeType && (
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-[6px]">
                 <Image
                   src={
                     data.reviewInfo.sizeType === 'BOTTLE'
@@ -196,7 +196,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
                       : 'Glass Price'
                   }
                 />
-                <p className="text-mainDarkGray font-normal">
+                <p className="text-mainDarkGray font-bold">
                   {data.reviewInfo.sizeType === 'BOTTLE'
                     ? '병 가격 '
                     : '잔 가격'}
@@ -207,23 +207,19 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
               </div>
             )}
             {hasValidLocation && (
-              <div className="flex items-start space-x-1">
+              <div className="flex items-start space-x-[6px]">
                 <Image
                   src="/icon/placepoint-subcoral.svg"
                   width={17}
                   height={17}
                   alt="address"
                 />
-                <p className="text-mainDarkGray font-semibold">장소</p>
+                <p className="text-mainDarkGray font-bold">장소</p>
                 <p className="text-mainDarkGray">
                   <>
-                    <p className="font-semibold">
-                      {data.reviewInfo?.locationInfo?.name}
-                    </p>
-                    {data.reviewInfo?.locationInfo?.address}
-                    <br />
-                    {data.reviewInfo?.locationInfo?.detailAddress}
-                    <br />
+                    <p>{data.reviewInfo?.locationInfo?.name}</p>
+                    {data.reviewInfo?.locationInfo?.address}{' '}
+                    {data.reviewInfo?.locationInfo?.detailAddress}{' '}
                     <a
                       href={data.reviewInfo?.locationInfo?.mapUrl || '#'}
                       onClick={(e) => {
@@ -244,8 +240,9 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
           </section>
         )}
         <section className="mx-5 py-5 flex items-center space-x-4">
-          <div className="w-[48%] flex text-center justify-center items-center space-x-1">
+          <div className="flex-1 flex text-center justify-center items-center space-x-1">
             <LikeBtn
+              size={16}
               reviewId={data?.reviewInfo?.reviewId}
               isLiked={isLiked}
               handleUpdateLiked={() => setIsLiked((prev) => !prev)}
@@ -255,15 +252,15 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
               handleNotLogin={handleLogin}
               likeBtnName="좋아요"
             />
-            <div className="text-mainGray text-12 font-normal">
-              좋아요 {data.reviewInfo?.likeCount}
+            <div className="text-mainGray text-10">
+              {data.reviewInfo?.likeCount}개
             </div>
           </div>
 
           <span className="border-[0.01rem] w-px border-mainGray opacity-40 h-4" />
 
           <button
-            className="w-[32%] flex text-center justify-center items-center space-x-1"
+            className="flex-1 flex text-center justify-center items-center space-x-1"
             onClick={() => {
               if (!isLogin) {
                 handleLogin();
@@ -278,11 +275,11 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
                   ? 'icon/comment-filled-subcoral.svg'
                   : '/icon/comment-outlined-gray.svg'
               }
-              width={18}
-              height={18}
+              width={16}
+              height={16}
               alt="comment"
             />
-            <p className="relative w-fit text-mainGray font-bold text-14">
+            <p className="relative w-fit text-mainGray font-bold text-13">
               댓글 작성
             </p>
           </button>
@@ -290,7 +287,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
           <span className="border-[0.01rem] w-px border-mainGray opacity-40 h-4" />
 
           <button
-            className="w-[20%] flex text-center justify-center items-center space-x-1"
+            className="flex-1 flex text-center justify-center items-center space-x-1"
             onClick={() => {
               // shareOrCopy(
               //   `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${data.reviewInfo?.reviewId}`,
@@ -306,10 +303,10 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
             <Image
               src="/icon/externallink-outlined-gray.svg"
               alt="linkIcon"
-              width={18}
-              height={18}
+              width={16}
+              height={16}
             />
-            <p className="text-mainGray font-bold text-14">공유</p>
+            <p className="text-mainGray font-bold text-13">공유</p>
           </button>
         </section>
       </section>

@@ -1,7 +1,6 @@
 import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import SkeletonBase from '@/components/Skeletons/SkeletonBase';
-import { PopularType } from '@/types/Popular';
 
 export const DescriptionSkeleton = () => {
   return (
@@ -14,10 +13,10 @@ export const DescriptionSkeleton = () => {
   );
 };
 
-export const LoadingStateSkeleton = ({ type }: { type: PopularType }) => {
+export const LoadingStateSkeleton = () => {
   return (
     <>
-      {type !== 'recent' && <DescriptionSkeleton />}
+      <DescriptionSkeleton />
       <div className="whitespace-nowrap overflow-x-auto overflow-y-hidden flex space-x-2 scrollbar-hide">
         {Array.from({ length: 5 }).map((_, index) => (
           <div

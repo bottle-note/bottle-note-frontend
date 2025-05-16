@@ -72,15 +72,15 @@ const ListMain = ({
       </>
 
       <>
-        {isEmpty && !isError ? (
+        {/* {isEmpty && !isError ? (
           <EmptyView text={emptyViewText} />
         ) : (
-          <>
-            {items}
-            {ratingItems}
-            {listSection}
-          </>
-        )}
+          <> */}
+        {items}
+        {ratingItems}
+        {listSection}
+        {/* </>
+        )} */}
 
         {isListFirstLoading && <Loading />}
       </>

@@ -2,8 +2,8 @@
 
 import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { v4 as uuid } from 'uuid';
 import CategorySelector from '@/components/CategorySelector';
-import SectionTitle from '@/components/SectionTitle';
 import List from '@/components/List/List';
 import { usePopularList } from '@/hooks/usePopularList';
 import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
@@ -16,6 +16,8 @@ import LinkButton from '@/components/LinkButton';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
+import { useTab } from '@/hooks/useTab';
+import Tab from '@/components/Tab';
 import SearchContainer from '../../../components/Search/SearchContainer';
 
 interface InitialState {
@@ -108,6 +110,24 @@ export default function Search() {
     { name: '댓글순', type: SORT_TYPE.REVIEW },
   ];
 
+  const {
+    currentTab: categorySelectedTab,
+    handleTab: handelCategory,
+    tabList: categoryList,
+  } = useTab({
+    tabList: [{ id: 'category', name: '카테고리' }],
+    scroll: true,
+  });
+
+  const {
+    currentTab: popularSelectedTab,
+    handleTab: handelPopular,
+    tabList: PopularList,
+  } = useTab({
+    tabList: [{ id: 'week', name: 'HOT 5' }],
+    scroll: true,
+  });
+
   return (
     <Suspense>
       <main className="mb-24 w-full h-full">
@@ -119,7 +139,12 @@ export default function Search() {
         <section className="flex flex-col gap-7 py-5">
           <article className="space-y-4">
             <div className="px-5">
-              <SectionTitle name="카테고리" />
+              <Tab
+                variant="bookmark"
+                tabList={categoryList}
+                handleTab={handelCategory}
+                currentTab={categorySelectedTab}
+              />
             </div>
             <div className="pl-5">
               <CategorySelector
@@ -130,8 +155,12 @@ export default function Search() {
 
           {isEmptySearch ? (
             <section className="px-5">
-              <SectionTitle name="위클리 HOT 5" />
-
+              <Tab
+                variant="bookmark"
+                tabList={PopularList}
+                handleTab={handelPopular}
+                currentTab={popularSelectedTab}
+              />
               <List>
                 {popularList.map((item: AlcoholAPI) => (
                   <List.Item
@@ -177,8 +206,8 @@ export default function Search() {
                 {alcoholList &&
                   [...alcoholList.map((list) => list.data.alcohols)]
                     .flat()
-                    .map((item: AlcoholAPI, idx) => (
-                      <List.Item key={`${item.alcoholId}_${idx}`} data={item} />
+                    .map((item: AlcoholAPI) => (
+                      <List.Item key={uuid()} data={item} />
                     ))}
               </List>
 
@@ -187,18 +216,20 @@ export default function Search() {
           )}
 
           {!isEmptySearch && (
-            <LinkButton
-              data={{
-                engName: 'NO RESULTS',
-                korName: '혹시 찾는 술이 없으신가요?',
-                linkSrc: `/inquire/register`,
-                icon: true,
-                handleBeforeRouteChange: (e) => {
-                  e.preventDefault();
-                  handleClickInquire();
-                },
-              }}
-            />
+            <div className="px-5">
+              <LinkButton
+                data={{
+                  engName: 'NO RESULTS',
+                  korName: '혹시 찾는 술이 없으신가요?',
+                  linkSrc: `/inquire/register`,
+                  icon: true,
+                  handleBeforeRouteChange: (e) => {
+                    e.preventDefault();
+                    handleClickInquire();
+                  },
+                }}
+              />
+            </div>
           )}
         </section>
       </main>

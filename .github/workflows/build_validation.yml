@@ -29,25 +29,29 @@ jobs:
           echo "${{ secrets.DEV_ENV }}" | base64 --decode > .env
 
       - name: 의존성 설치
-        run: yarn install --frozen-lockfile
+        run: |
+          yarn install --frozen-lockfile
 
       - name: Next.js 빌드 검증
-        run: yarn build
-
- ## tsc
-##  lint 조건 추가
-
-      - name: 도커 컴포즈 테스트
         run: |
-          docker compose up -d --build
+          yarn build
 
-      - name: 컨테이너 상태 확인
+      # - name: 도커 컴포즈 테스트
+      #   run: |
+      #     docker compose up -d --build
+
+      - name: Next.js 서버 실행
+        run: |
+          yarn start > server.log 2>&1 &
+          echo $! > server.pid  # 프로세스 ID 저장
+
+      - name: 애플리케이션 상태 확인
         run: |
           sleep 10  # 애플리케이션 시작 대기
-          if [ "$(docker ps -q -f name=bottle-note-front-server)" ]; then
-            echo "컨테이너가 실행 중입니다"
+          if ps -p $(cat server.pid) > /dev/null; then
+            echo "애플리케이션이 실행 중입니다"
           else
-            echo "컨테이너 실행 실패" && exit 1
+            echo "애플리케이션 실행 실패" && exit 1
           fi
 
       - name: 헬스체크 API 테스트
@@ -61,8 +65,10 @@ jobs:
             echo "헬스체크 실패" && exit 1
           fi
 
-      - name: 테스트 컨테이너 정리
+      - name: 애플리케이션 프로세스 종료
         if: always()
         run: |
-          docker compose down
-          docker image prune -f
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+            rm server.pid
+          fi

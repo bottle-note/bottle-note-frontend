@@ -77,11 +77,25 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
     newTextareaRef.current = textareaRef.current;
   }, [textareaRef]);
 
-  const handleTextareaClick = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+  const handleLoginOrAction = (
+    action: () => void,
+    e?: React.MouseEvent<HTMLTextAreaElement | HTMLButtonElement>,
+  ) => {
     if (!isLogin) {
-      e.preventDefault();
+      e?.preventDefault();
+      e?.stopPropagation();
       handleLoginModal();
+    } else {
+      action();
     }
+  };
+
+  const handleTextareaClick = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    handleLoginOrAction(() => {}, e);
+  };
+
+  const handleButtonClick = () => {
+    handleLoginOrAction(() => handleSubmit(handleCreateReply)());
   };
 
   return (
@@ -101,6 +115,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
               register('content').ref(e);
               newTextareaRef.current = e;
             }}
+            readOnly={!isLogin}
             value={content}
             maxLength={300}
             onClick={handleTextareaClick}
@@ -108,8 +123,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
         </div>
         <button
           className={`ml-2 px-4 py-1 ${content.length !== 0 ? 'text-subCoral' : 'text-mainGray'}`}
-          disabled={!isLogin}
-          onClick={handleSubmit(handleCreateReply)}
+          onClick={handleButtonClick}
         >
           등록
         </button>
