@@ -32,7 +32,7 @@ export default function AlcoholCard({ data }: Props) {
             {korName && truncStr(korName, 20)}
           </div>
           <div className="flex items-end justify-between text-subCoral">
-            <Star rating={rating} size={15} />
+            <Star rating={rating} size={15} textTop={3} />
             <p className="text-11 font-bold leading-none tracking-tight">
               {(engCategory || '').toUpperCase()}
             </p>
