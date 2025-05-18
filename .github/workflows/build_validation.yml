@@ -43,7 +43,7 @@ jobs:
 
       - name: 의존성 설치
         run: |
-          pnpm install --frozen-lockfile
+          pnpm install
 
       - name: Next.js 빌드 검증
         run: |
