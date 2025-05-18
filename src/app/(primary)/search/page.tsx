@@ -138,14 +138,12 @@ export default function Search() {
 
         <section className="flex flex-col gap-7 py-5">
           <article className="space-y-4">
-            <div className="px-5">
-              <Tab
-                variant="bookmark"
-                tabList={categoryList}
-                handleTab={handelCategory}
-                currentTab={categorySelectedTab}
-              />
-            </div>
+            <Tab
+              variant="bookmark"
+              tabList={categoryList}
+              handleTab={handelCategory}
+              currentTab={categorySelectedTab}
+            />
             <div className="pl-5">
               <CategorySelector
                 handleCategoryCallback={handleCategoryCallback}
@@ -154,24 +152,26 @@ export default function Search() {
           </article>
 
           {isEmptySearch ? (
-            <section className="px-5">
+            <>
               <Tab
                 variant="bookmark"
                 tabList={PopularList}
                 handleTab={handelPopular}
                 currentTab={popularSelectedTab}
               />
-              <List>
-                {popularList.map((item: AlcoholAPI) => (
-                  <List.Item
-                    key={item.alcoholId}
-                    data={{
-                      ...item,
-                    }}
-                  />
-                ))}
-              </List>
-            </section>
+              <section className="px-5">
+                <List>
+                  {popularList.map((item: AlcoholAPI) => (
+                    <List.Item
+                      key={item.alcoholId}
+                      data={{
+                        ...item,
+                      }}
+                    />
+                  ))}
+                </List>
+              </section>
+            </>
           ) : (
             <section className="px-5">
               <List
