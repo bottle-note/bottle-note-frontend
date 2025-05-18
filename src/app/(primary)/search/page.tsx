@@ -56,7 +56,14 @@ export default function Search() {
     alcohols: AlcoholAPI[];
     totalCount: number;
   }>({
-    queryKey: ['search', filterState],
+    queryKey: [
+      'search',
+      filterState.category,
+      filterState.regionId,
+      filterState.sortType,
+      filterState.sortOrder,
+      filterState.keyword,
+    ],
     queryFn: ({ pageParam }) => {
       return AlcoholsApi.getList({
         ...filterState,
@@ -66,6 +73,7 @@ export default function Search() {
         },
       });
     },
+    staleTime: 1000 * 60 * 5,
   });
 
   const { handleModalState, handleCloseModal, handleLoginModal } =
