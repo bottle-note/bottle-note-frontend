@@ -13,6 +13,7 @@ import Modal from '@/components/Modal';
 import { useLogin } from '@/hooks/useLogin';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
+import { ROUTES } from '@/constants/routes';
 
 type FormValues = {
   email: string;
@@ -34,7 +35,7 @@ export default function Login() {
   const { register, handleSubmit } = useForm<FormValues>();
 
   const handleSignup = () => {
-    router.push('/signup');
+    router.push(ROUTES.SIGNUP);
   };
 
   useEffect(() => {
@@ -64,7 +65,7 @@ export default function Login() {
           <SubHeader bgColor="bg-subCoral">
             <SubHeader.Left
               onClick={() => {
-                router.push('/');
+                router.push(ROUTES.HOME);
               }}
             >
               <Image

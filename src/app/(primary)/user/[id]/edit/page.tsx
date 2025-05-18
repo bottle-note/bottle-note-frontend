@@ -15,6 +15,7 @@ import { useWebViewInit } from '@/hooks/useWebViewInit';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
+import { ROUTES } from '@/constants/routes';
 
 export default function UserEditPage() {
   const { userData } = AuthService;
@@ -61,7 +62,7 @@ export default function UserEditPage() {
           mainText: '삭제되었습니다.',
           handleConfirm: () => {
             handleCloseModal();
-            router.push(`/user/${userData?.userId}`);
+            router.push(ROUTES.USER.BASE(userData?.userId!));
           },
         });
       } catch (e) {

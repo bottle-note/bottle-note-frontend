@@ -8,6 +8,7 @@ import { ReviewMyBottleListResponse } from '@/types/MyBottle';
 import { addNewLine } from '@/utils/addNewLine';
 import { truncStr } from '@/utils/truncStr';
 import Ellipsis from 'public/icon/ellipsis-vertical-subcoral.svg';
+import { ROUTES } from '@/constants/routes';
 
 interface Props {
   data: ReviewMyBottleListResponse['myBottleList'][number];
@@ -33,13 +34,13 @@ export const ReviewListItem = ({ data }: Props) => {
   return (
     <section className="text-mainBlack border-brightGray border-b py-4 flex items-center">
       {/* image */}
-      <Link href={`/review/${reviewId}`}>
+      <Link href={ROUTES.REVIEW.DETAIL(reviewId)}>
         <ItemImage src={imageUrl} alt="image" />
       </Link>
 
       {/* info */}
       <Link
-        href={`/review/${reviewId}`}
+        href={ROUTES.REVIEW.DETAIL(reviewId)}
         className="flex flex-col items-start justify-center space-y-1.5"
       >
         {/* labels */}

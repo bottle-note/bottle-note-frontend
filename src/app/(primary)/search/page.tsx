@@ -19,6 +19,7 @@ import { AuthService } from '@/lib/AuthService';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
 import SearchContainer from '../../../components/Search/SearchContainer';
+import { ROUTES } from '@/constants/routes';
 
 interface InitialState {
   keyword: string;
@@ -92,7 +93,7 @@ export default function Search() {
           return;
         }
         handleCloseModal();
-        router.push('/inquire/register');
+        router.push(ROUTES.INQUIRE.REGISTER);
       },
     });
   };

@@ -5,6 +5,7 @@ import { FollowButton } from './FollowButton';
 import DefaultProfile from 'public/profile-default.svg';
 import CommentGray from 'public/icon/comment-filled-gray.svg';
 import StarGray from 'public/icon/star-filled-gray.svg';
+import { ROUTES } from '@/constants/routes';
 
 interface Props {
   userInfo: RelationInfo;
@@ -18,7 +19,7 @@ export const FollowerListItem = ({ userInfo }: Props) => {
     >
       <Link
         className="grid grid-cols-[0.45fr_1fr]"
-        href={`/user/${userInfo.userId}`}
+        href={ROUTES.USER.BASE(userInfo.userId)}
       >
         <div className="w-9 h-9 rounded-full overflow-hidden">
           <Image

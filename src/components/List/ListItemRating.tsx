@@ -10,6 +10,7 @@ import { AuthService } from '@/lib/AuthService';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
 import StarRating from '../StarRaiting';
+import { ROUTES } from '@/constants/routes';
 
 interface Props {
   data: RateAPI;
@@ -40,13 +41,13 @@ const ListItemRating = ({ data }: Props) => {
 
   return (
     <article className="flex items-center space-x-2 text-mainBlack border-brightGray border-b h-[90px]">
-      <Link href={`/search/all/${alcoholId}`}>
+      <Link href={ROUTES.SEARCH.ALL(alcoholId)}>
         <ItemImage src={imageUrl} alt="image" />
       </Link>
 
       <section className="flex-1 space-y-1">
         <Link
-          href={`/search/all/${alcoholId}`}
+          href={ROUTES.SEARCH.ALL(alcoholId)}
           className="flex flex-col items-start justify-center space-y-1.5"
         >
           <ItemInfo

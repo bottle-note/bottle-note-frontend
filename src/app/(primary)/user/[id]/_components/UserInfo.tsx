@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AuthService } from '@/lib/AuthService';
 import ProfileImage from './ProfileImage';
 import { FollowButton } from './FollowButton';
+import { ROUTES } from '@/constants/routes';
 
 interface Props {
   profileImgSrc: string | null;
@@ -41,7 +42,7 @@ const UserInfo = ({
         <div className="flex gap-2">
           <button
             onClick={() =>
-              router.push(`/user/${currentId}/follow?type=follower`)
+              router.push(ROUTES.USER.FOLLOW(currentId, 'follower'))
             }
           >
             <p className="text-sm font-thin">
@@ -52,7 +53,7 @@ const UserInfo = ({
 
           <button
             onClick={() =>
-              router.push(`/user/${currentId}/follow?type=following`)
+              router.push(ROUTES.USER.FOLLOW(currentId, 'following'))
             }
           >
             <p className="text-sm">
@@ -66,7 +67,7 @@ const UserInfo = ({
           {isMyProfile && (
             <button
               className="border border-subCoral px-2.5 py-1 rounded-md text-10 bg-white text-subCoral"
-              onClick={() => router.push(`/user/${currentId}/edit`)}
+              onClick={() => router.push(ROUTES.USER.EDIT(currentId))}
             >
               프로필 수정
             </button>

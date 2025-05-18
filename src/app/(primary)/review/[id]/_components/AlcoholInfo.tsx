@@ -9,6 +9,7 @@ import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
 import { truncStr } from '@/utils/truncStr';
 import type { AlcoholInfo as AlcoholType } from '@/types/Review';
 import { AuthService } from '@/lib/AuthService';
+import { ROUTES } from '@/constants/routes';
 
 interface Props {
   data: AlcoholType;
@@ -26,7 +27,7 @@ function AlcoholInfo({ data, handleLogin }: Props) {
       handleLogin();
       return;
     }
-    router.push(`/review/register?alcoholId=${data.alcoholId}`);
+    router.push(ROUTES.REVIEW.REGISTER(data.alcoholId));
   };
 
   return (

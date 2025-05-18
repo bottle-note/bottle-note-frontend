@@ -16,6 +16,7 @@ import { useFilter } from '@/hooks/useFilter';
 import useModalStore from '@/store/modalStore';
 import { AuthService } from '@/lib/AuthService';
 import Modal from '@/components/Modal';
+import { ROUTES } from '@/constants/routes';
 
 const SORT_OPTIONS = [
   { name: '인기도순', type: SORT_TYPE.POPULAR },
@@ -34,7 +35,7 @@ function Reviews() {
   const params = useParams();
   const searchParams = useSearchParams();
   const { isLogin } = AuthService;
-  const alcoholId = params?.id;
+  const alcoholId = params?.id as string;
   const alcoholKorName = searchParams.get('name');
   const { handleLoginModal } = useModalStore();
   const [activeTab, setActiveTab] = useState('tab1');
@@ -226,7 +227,7 @@ function Reviews() {
               handleLoginModal();
               return;
             }
-            router.push(`/review/register?alcoholId=${alcoholId}`);
+            router.push(ROUTES.REVIEW.REGISTER(alcoholId));
           }}
           btnName="리뷰 작성"
         />

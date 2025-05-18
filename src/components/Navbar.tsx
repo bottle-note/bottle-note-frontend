@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { AuthService } from '@/lib/AuthService';
 import { checkTokenValidity } from '@/utils/checkTokenValidity';
 import useModalStore from '@/store/modalStore';
+import { ROUTES } from '@/constants/routes';
 
 export interface NavItem {
   name: string;
@@ -21,8 +22,8 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   const { handleLoginModal } = useModalStore();
 
   const navItems: NavItem[] = [
-    { name: '홈', link: '/', icon: '/icon/navbar/home.svg' },
-    { name: '검색', link: '/search', icon: '/icon/navbar/search.svg' },
+    { name: '홈', link: ROUTES.HOME, icon: '/icon/navbar/home.svg' },
+    { name: '검색', link: ROUTES.SEARCH.BASE, icon: '/icon/navbar/search.svg' },
     { name: '둘러보기', link: '/explorer', icon: '/icon/navbar/explorer.svg' },
     {
       name: '기록',
@@ -32,7 +33,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
     },
     {
       name: '마이',
-      link: `/user/${userData?.userId || ''}`,
+      link: userData?.userId ? ROUTES.USER.BASE(userData.userId) : '',
       icon: '/icon/navbar/user.svg',
       requiresAuth: true,
     },
@@ -47,7 +48,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
           return handleLoginModal();
         }
         logout();
-        return router.push('/login');
+        return router.push(ROUTES.LOGIN);
       }
     }
 
