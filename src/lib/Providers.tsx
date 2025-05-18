@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 interface Props {
   children: ReactNode;
 }
+
 export const Providers = ({ children }: Props) => {
   const [queryClient] = useState(
     () =>
