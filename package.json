@@ -9,10 +9,8 @@
     "dev": "cross-env npx env-cmd -f .env.development next dev",
     "build": "next build",
     "start": "next start",
-
     "build:standalone": "next build && mkdir -p .next/standalone/.next/static && cp -R .next/static .next/standalone/.next/ && cp -R public .next/standalone/",
     "start:standalone": "node .next/standalone/server.js",
-
     "ci:tsc": "tsc",
     "ci:lint": "next lint",
     "lint": "next lint",
@@ -38,6 +36,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.52.0",
     "react-loading-skeleton": "^3.5.0",
+    "sharp": "^0.34.1",
     "tailwind-scrollbar-hide": "^1.1.7",
     "ts-jest": "^29.1.2",
     "uuid": "^11.0.5",
