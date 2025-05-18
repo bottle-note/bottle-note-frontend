@@ -56,7 +56,7 @@ export default function Search() {
     alcohols: AlcoholAPI[];
     totalCount: number;
   }>({
-    queryKey: ['rating', filterState],
+    queryKey: ['search', filterState],
     queryFn: ({ pageParam }) => {
       return AlcoholsApi.getList({
         ...filterState,
