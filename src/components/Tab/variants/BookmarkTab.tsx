@@ -5,7 +5,7 @@ import { RefObject } from 'react';
 type Props<T extends { id: string; name: string }> = {
   currentTab: T;
   handleTab: (id: string) => void;
-  registerTab: (
+  registerTab?: (
     id: string,
   ) => (el: HTMLDivElement | HTMLButtonElement | null) => void;
   tabList: T[];
@@ -38,7 +38,7 @@ const BookmarkTab = <T extends { id: string; name: string }>({
             {tabList.map((tab, index) => (
               <div
                 key={tab.id}
-                ref={registerTab(tab.id)}
+                ref={registerTab?.(tab.id)}
                 className={`relative ${index === 0 ? 'ml-4' : '-ml-3'}`}
                 style={{
                   zIndex:

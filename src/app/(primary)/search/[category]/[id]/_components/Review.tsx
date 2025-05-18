@@ -111,7 +111,9 @@ function Review({ data, onRefresh }: Props) {
               )}
             </div>
           </div>
-          {data.rating && <Star rating={data.rating} size={20} />}
+          {data.rating !== undefined && data.rating !== null && (
+            <Star rating={data.rating} size={20} />
+          )}
         </div>
         <div className="flex items-center space-x-1 mt-[10px]">
           <Image
@@ -158,7 +160,10 @@ function Review({ data, onRefresh }: Props) {
               <LikeBtn
                 reviewId={data.reviewId}
                 isLiked={isLiked}
-                handleUpdateLiked={() => setIsLiked((prev) => !prev)}
+                handleUpdateLiked={() => {
+                  setIsLiked((prev) => !prev);
+                  onRefresh();
+                }}
                 handleError={() => {
                   setIsLiked(isLikedByMe);
                 }}

@@ -51,7 +51,7 @@ const PickBtn = ({
     <button
       className={
         pickBtnName
-          ? 'flex items-end space-x-[0.5px]'
+          ? 'flex items-end space-x-[1px]'
           : 'justify-self-end row-start-3'
       }
       onClick={handleClick}

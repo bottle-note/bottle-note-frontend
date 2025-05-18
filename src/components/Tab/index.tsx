@@ -14,8 +14,8 @@ interface BaseTabProps<T extends TabItem> {
 
 interface BookmarkTabProps<T extends TabItem> extends BaseTabProps<T> {
   variant: 'bookmark';
-  scrollContainerRef: React.RefObject<HTMLDivElement>;
-  registerTab: (
+  scrollContainerRef?: React.RefObject<HTMLDivElement>;
+  registerTab?: (
     id: string,
   ) => (el: HTMLDivElement | HTMLButtonElement | null) => void;
 }
@@ -28,11 +28,7 @@ type TabProps<T extends TabItem> = BookmarkTabProps<T> | DefaultTabProps<T>;
 
 function Tab<T extends TabItem>({ ...props }: TabProps<T>) {
   const renderTabList = () => {
-    if (
-      props.variant === 'bookmark' &&
-      props.scrollContainerRef !== null &&
-      typeof props.registerTab === 'function'
-    ) {
+    if (props.variant === 'bookmark') {
       return (
         <BookmarkTab
           currentTab={props.currentTab}
