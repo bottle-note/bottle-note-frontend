@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "setenv:local": "cp git.environment-variables/application/nextjs/.env.local .env.local",
     "setenv:dev": "cp git.environment-variables/application/nextjs/.env.dev .env.development",
     "setenv:prod": "cp git.environment-variables/application/nextjs/.env.prod .env.production",
     "dev": "pnpm run setenv:dev && cross-env npx env-cmd -f .env.development next dev",
+    "dev:local": "pnpm run setenv:local && cross-env npx env-cmd -f .env.local next dev",
     "dev:prod": "pnpm run setenv:prod && cross-env npx env-cmd -f .env.production next dev",
     "build:dev": "pnpm run setenv:dev && cross-env npx env-cmd -f .env.development next build",
     "build:prod": "pnpm run setenv:prod && cross-env npx env-cmd -f .env.production next build",
