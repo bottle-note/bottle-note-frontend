@@ -9,7 +9,10 @@
     "dev": "cross-env npx env-cmd -f .env.development next dev",
     "build": "next build",
     "start": "next start",
+
+    "build:standalone": "next build && mkdir -p .next/standalone/.next/static && cp -R .next/static .next/standalone/.next/ && cp -R public .next/standalone/",
     "start:standalone": "node .next/standalone/server.js",
+
     "ci:tsc": "tsc",
     "ci:lint": "next lint",
     "lint": "next lint",
