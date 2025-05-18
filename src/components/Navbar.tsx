@@ -23,7 +23,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   const navItems: NavItem[] = [
     { name: '홈', link: '/', icon: '/icon/navbar/home.svg' },
     { name: '검색', link: '/search', icon: '/icon/navbar/search.svg' },
-    { name: '별점', link: '/rating', icon: '/icon/navbar/star.svg' },
+    { name: '둘러보기', link: '/explorer', icon: '/icon/navbar/explorer.svg' },
     {
       name: '기록',
       link: '/history',
