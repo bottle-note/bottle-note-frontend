@@ -42,6 +42,7 @@ const config: Config = {
         subCoral: '#E58257',
         bgGray: '#E6E6DD',
         brightGray: '#BFBFBF',
+        gray: '#2B2B2B',
         mainBlack: '#101010',
         mainDarkGray: '#252525',
         mainGray: '#666666',

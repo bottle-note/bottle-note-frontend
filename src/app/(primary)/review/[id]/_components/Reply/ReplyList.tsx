@@ -149,16 +149,18 @@ export default function ReplyList({
                                 comment.reviewReplyId + subComment.reviewReplyId
                               }
                             >
-                              <div className="border-b border-mainCoral/30" />
-                              <div className="ml-5">
-                                <Reply
-                                  data={subComment}
-                                  isReviewUser={
-                                    subComment.userId === userData?.userId
-                                  }
-                                  reviewId={reviewId}
-                                  setIsRefetch={setIsRefetch}
-                                />
+                              <div className="relative ml-[6px]">
+                                <div className="absolute top-0 w-px h-full bg-gray/30" />
+                                <div className="ml-4">
+                                  <Reply
+                                    data={subComment}
+                                    isReviewUser={
+                                      subComment.userId === userData?.userId
+                                    }
+                                    reviewId={reviewId}
+                                    setIsRefetch={setIsRefetch}
+                                  />
+                                </div>
                               </div>
                             </React.Fragment>
                           ))}

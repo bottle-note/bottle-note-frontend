@@ -5,13 +5,15 @@ interface Props {
   size?: number;
   styleProps?: string;
   color?: 'main' | 'white';
+  textTop?: number;
 }
 
 const Star = ({
   rating,
   size = 18,
-  styleProps = 'text-subCoral font-semibold text-15',
+  styleProps = 'text-subCoral font-semibold text-15 w-5',
   color = 'main',
+  textTop = 1,
 }: Props) => {
   return (
     <div className="inline-flex items-end space-x-[2px]">
@@ -22,7 +24,6 @@ const Star = ({
             width={size}
             height={size}
             alt="star"
-            className="relative bottom-[1px]"
           />
         ) : (
           <Image
@@ -30,11 +31,12 @@ const Star = ({
             width={size}
             height={size}
             alt="star"
-            className="relative bottom-[1px]"
           />
         )}
       </div>
-      <p className={`${styleProps} w-5 leading-none`}>
+      <p
+        className={`${styleProps} ${rating ? 'leading-none' : `pl-1 relative top-[${textTop}px]`} `}
+      >
         {rating ? rating.toFixed(1) : '  -'}
       </p>
     </div>
