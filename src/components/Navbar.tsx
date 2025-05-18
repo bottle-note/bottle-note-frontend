@@ -7,6 +7,7 @@ import { AuthService } from '@/lib/AuthService';
 import { checkTokenValidity } from '@/utils/checkTokenValidity';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
+import Modal from './Modal';
 
 export interface NavItem {
   name: string;
@@ -19,15 +20,19 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const { userData, logout } = AuthService;
-  const { handleLoginModal } = useModalStore();
+  const { handleLoginModal, handleModalState } = useModalStore();
 
   const navItems: NavItem[] = [
     { name: '홈', link: ROUTES.HOME, icon: '/icon/navbar/home.svg' },
     { name: '검색', link: ROUTES.SEARCH.BASE, icon: '/icon/navbar/search.svg' },
-    { name: '둘러보기', link: '/explorer', icon: '/icon/navbar/explorer.svg' },
+    {
+      name: '둘러보기',
+      link: ROUTES.EXPLORER.BASE,
+      icon: '/icon/navbar/explorer.svg',
+    },
     {
       name: '기록',
-      link: '/history',
+      link: ROUTES.HISTORY.BASE,
       icon: '/icon/navbar/history.svg',
       requiresAuth: true,
     },
@@ -40,6 +45,13 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   ];
 
   const handleNavigation = async (menu: NavItem) => {
+    if (menu.link === ROUTES.EXPLORER.BASE) {
+      return handleModalState({
+        mainText: '준비중인 기능입니다.',
+        type: 'ALERT',
+        isShowModal: true,
+      });
+    }
     if (menu.requiresAuth) {
       const isAuthenticated = userData && (await checkTokenValidity());
 
@@ -92,6 +104,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
           </React.Fragment>
         ))}
       </section>
+      <Modal />
     </nav>
   );
 }
