@@ -73,6 +73,7 @@ function TimeLineItem(props: Props) {
         width={20}
         height={20}
         alt={iconAlt}
+        style={{ width: 20, height: 20 }}
       />
       {isStart ? (
         <div className="w-[17rem] text-12 font-bold text-white bg-subCoral py-[0.65rem] px-3 rounded-md">
@@ -91,10 +92,11 @@ function TimeLineItem(props: Props) {
               src={imageSrc}
               alt="alcohol image"
               priority
-              className="rounded object-cover"
+              className="rounded object-contain"
               width={25}
               height={34}
               fill
+              sizes="25px"
             />
           </div>
         </Link>

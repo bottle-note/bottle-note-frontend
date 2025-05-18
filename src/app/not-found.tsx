@@ -31,6 +31,8 @@ export default function NotFound() {
           alt="bottle_logo"
           width={73}
           height={125}
+          style={{ width: 73, height: 125 }}
+          priority
         />
         <div className="text-center space-y-2">
           <p className="text-mainGray text-20">어이쿠!</p>

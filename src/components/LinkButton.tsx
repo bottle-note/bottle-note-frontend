@@ -50,6 +50,7 @@ function LinkButton({
                 alt="arrowIcon"
                 width={25}
                 height={25}
+                style={{ width: 25, height: 25 }}
               />
             )}
           </div>
@@ -62,7 +63,7 @@ function LinkButton({
             height={imageSize?.height}
             width={imageSize?.width}
             alt="categoryImg"
-            layout="fixed"
+            style={{ width: imageSize?.width, height: imageSize?.height }}
           />
         )}
       </Link>

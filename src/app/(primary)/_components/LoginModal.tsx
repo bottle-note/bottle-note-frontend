@@ -22,6 +22,8 @@ function LoginModal({ handleClose }: Props) {
               alt="bottle_logo"
               width={50}
               height={60}
+              style={{ width: 50, height: 60 }}
+              priority
             />
           </article>
           <article>
