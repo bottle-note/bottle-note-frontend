@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { AuthService } from '@/lib/AuthService';
@@ -21,6 +21,11 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   const pathname = usePathname();
   const { userData, logout } = AuthService;
   const { handleLoginModal, handleModalState } = useModalStore();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const navItems: NavItem[] = [
     { name: '홈', link: ROUTES.HOME, icon: '/icon/navbar/home.svg' },
@@ -82,7 +87,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
         {navItems.map((menu, index) => (
           <React.Fragment key={menu.link}>
             <button
-              className={`flex flex-col items-center space-y-1 ${isActive(menu.link) ? '' : 'opacity-40'}`}
+              className={`flex flex-col items-center space-y-1 ${isMounted && !isActive(menu.link) ? 'opacity-40' : ''}`}
               onClick={() => handleNavigation(menu)}
             >
               <div className="flex flex-col items-center justify-center space-y-[2px]">
