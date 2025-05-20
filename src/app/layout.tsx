@@ -26,7 +26,7 @@ export default function RootLayout({
     <html lang="en" className="touch-manipulation">
       <body suppressHydrationWarning>
         <Providers>
-          <body className="relative">
+          <div className="relative">
             {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID &&
               process.env.NODE_ENV === 'production' && (
                 <GoogleAnalytics
@@ -35,7 +35,7 @@ export default function RootLayout({
               )}
             {children}
             <div id="modal" />
-          </body>
+          </div>
         </Providers>
       </body>
     </html>

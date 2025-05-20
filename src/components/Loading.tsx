@@ -11,12 +11,14 @@ export default function Loading() {
           alt="bottle_logo"
           width={48}
           height={103}
+          style={{ width: 48, height: 103 }}
         />
         <Image
           src="/bottle_note_logo_text_gray.svg"
           alt="bottle_logo"
           width={48}
           height={30}
+          style={{ width: 48, height: 30 }}
         />
       </main>
     </BackDrop>

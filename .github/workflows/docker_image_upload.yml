@@ -9,7 +9,7 @@ on:
   #    - release
 
 concurrency:
-  group: "ecr-upload"
+  group: 'ecr-upload'
   cancel-in-progress: true
 
 jobs:
@@ -35,9 +35,9 @@ jobs:
         with:
           export-env: true
         env:
-          AWS_ACCESS_KEY_ID: "op://vault/ecr iam authentication/access key id"
-          AWS_SECRET_ACCESS_KEY: "op://vault/ecr iam authentication/secret access key"
-          AWS_REGION: "op://vault/ecr iam authentication/region"
+          AWS_ACCESS_KEY_ID: 'op://vault/ecr iam authentication/access key id'
+          AWS_SECRET_ACCESS_KEY: 'op://vault/ecr iam authentication/secret access key'
+          AWS_REGION: 'op://vault/ecr iam authentication/region'
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -62,7 +62,7 @@ jobs:
 
           # 환경 변수 파일 설정
           echo "${{ secrets.DEV_ENV }}" | base64 --decode > .env
-          
+
           # 이미지 빌드 및 푸시
           docker buildx build --platform linux/amd64,linux/arm64 \
             --provenance false \
@@ -78,5 +78,7 @@ jobs:
     needs: docker-image-upload
     uses: ./.github/workflows/deploy-to-dev.yml
     with:
-      IMAGE_TAG: ${{ needs.docker-image-upload.outputs.image_tag }}
-    secrets: inherit
+      IMAGE_TAG: ${{ needs.docker-image-upload.outputs.IMAGE_TAG }}
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      GIT_ACCESS_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}

@@ -34,7 +34,14 @@ const EmptyState = ({ type }: { type: PopularType }) => {
 
   return (
     <div className="h-[225px] flex flex-col items-center justify-center">
-      <Image src="/icon/logo-subcoral.svg" alt="logo" width={30} height={30} />
+      <Image
+        src="/icon/logo-subcoral.svg"
+        alt="logo"
+        width={30}
+        height={30}
+        style={{ width: 30, height: 30 }}
+        priority
+      />
       <p className="text-mainGray text-15 mt-5">{content.text}</p>
     </div>
   );
@@ -112,6 +119,8 @@ const LoginRequired = () => {
           alt="logo"
           width={28}
           height={48}
+          style={{ width: 28, height: 48 }}
+          priority
         />
         <p className="text-mainGray text-16">
           로그인 후 확인 가능한 서비스 입니다.

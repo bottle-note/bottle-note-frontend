@@ -73,7 +73,13 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
               onClick={() => handleNavigation(menu)}
             >
               <div className="flex flex-col items-center justify-center space-y-[2px]">
-                <Image src={menu.icon} alt={menu.name} width={26} height={26} />
+                <Image
+                  src={menu.icon}
+                  alt={menu.name}
+                  width={26}
+                  height={26}
+                  style={{ width: 26, height: 26 }}
+                />
                 <span className="text-10 font-medium text-subCoral">
                   {menu.name}
                 </span>

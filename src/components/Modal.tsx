@@ -30,6 +30,8 @@ function Modal({ children }: Props) {
               alt="bottle_logo"
               width={40}
               height={55}
+              style={{ width: 40, height: 55 }}
+              priority
             />
           </article>
           {children}

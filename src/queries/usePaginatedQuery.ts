@@ -6,7 +6,7 @@ interface Props<T> {
   queryKey: [string, ...Array<any>];
   queryFn: (params: any) => Promise<ApiResponse<T>>;
   pageSize?: number;
-  // staleTime?: number;
+  staleTime?: number;
   enabled?: boolean;
   refetchOnMount?: boolean;
   gcTime?: number;
@@ -18,7 +18,8 @@ export const usePaginatedQuery = <T>({
   pageSize = 10,
   enabled = true,
   refetchOnMount = true,
-  gcTime = 0,
+  staleTime = 0,
+  gcTime = 1000 * 60 * 10,
 }: Props<T>) => {
   const {
     data,
@@ -37,11 +38,11 @@ export const usePaginatedQuery = <T>({
       }
       return null;
     },
-
     initialPageParam: 0,
     refetchOnMount,
     refetchOnWindowFocus: false,
     gcTime,
+    staleTime,
     enabled,
     retry: false,
   });

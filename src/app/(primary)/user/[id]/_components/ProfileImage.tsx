@@ -13,6 +13,7 @@ function ProfileImage({ profileImgSrc }: Props) {
         alt="프로필 이미지"
         fill
         className="rounded-full border-2 border-subCoral object-cover"
+        priority
       />
     </div>
   );

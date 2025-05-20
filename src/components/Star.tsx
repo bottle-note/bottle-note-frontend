@@ -24,6 +24,7 @@ const Star = ({
             width={size}
             height={size}
             alt="star"
+            style={{ width: size, height: size }}
           />
         ) : (
           <Image
@@ -31,6 +32,7 @@ const Star = ({
             width={size}
             height={size}
             alt="star"
+            style={{ width: size, height: size }}
           />
         )}
       </div>
