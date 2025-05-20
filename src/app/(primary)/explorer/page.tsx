@@ -4,9 +4,14 @@ import { Suspense } from 'react';
 import { Header } from './_components/Header';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
-import ReviewCard from './_components/ReviewCard';
 import { ReviewExplorerList } from './_components/ReviewExplorerList';
 import { WhiskeyExplorerList } from './_components/WhiskeyExplorerList';
+
+// TODO:
+// 1. 도메인별 interface 정리
+// 2. api 추가
+// 3. 리스트 ui 추가
+// 4. 검색 ui 추가
 
 export default function ExplorerPage() {
   const { currentTab, handleTab, tabList, refs, registerTab } = useTab({
