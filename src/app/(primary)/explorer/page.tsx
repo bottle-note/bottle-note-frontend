@@ -10,8 +10,9 @@ import { WhiskeyExplorerList } from './_components/WhiskeyExplorerList';
 // TODO:
 // 1. 도메인별 interface 정리
 // 2. api 추가
-// 3. 리스트 ui 추가
+// 3. 리뷰 리스트 ui 추가
 // 4. 검색 ui 추가
+// 5. 위스티 리스트 ui 추가
 
 export default function ExplorerPage() {
   const { currentTab, handleTab, tabList, refs, registerTab } = useTab({
