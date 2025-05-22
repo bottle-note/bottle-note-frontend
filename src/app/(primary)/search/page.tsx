@@ -19,7 +19,7 @@ import { AuthService } from '@/lib/AuthService';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
 import SearchContainer from '../../../components/Search/SearchContainer';
-import ListItemSkeleton from '@/components/Skeletons/custom/ListItemSkeleton';
+import ListItemSkeleton from '@/components/Skeletons/ListItemSkeleton';
 
 interface InitialState {
   keyword: string;

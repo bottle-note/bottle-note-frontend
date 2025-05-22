@@ -8,7 +8,7 @@ import SortOrderSwitch from './SortOrderSwitch';
 import OptionSelect from './OptionSelect';
 import Title from './Title';
 import ListSection from './ListSection';
-import ListItemSkeleton from '@/components/Skeletons/custom/ListItemSkeleton';
+import ListItemSkeleton from '@/components/Skeletons/ListItemSkeleton';
 
 interface ListMainProps {
   children: React.ReactNode;
