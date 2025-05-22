@@ -8,7 +8,7 @@ import SortOrderSwitch from './SortOrderSwitch';
 import OptionSelect from './OptionSelect';
 import Title from './Title';
 import ListSection from './ListSection';
-import Loading from '../Loading';
+import ListItemSkeleton from '@/components/Skeletons/custom/ListItemSkeleton';
 
 interface ListMainProps {
   children: React.ReactNode;
@@ -82,7 +82,13 @@ const ListMain = ({
         {/* </>
         )} */}
 
-        {isListFirstLoading && <Loading />}
+        {isListFirstLoading && (
+          <section className="px-5">
+            {Array.from({ length: 5 }).map((_, idx) => (
+              <ListItemSkeleton key={idx} />
+            ))}
+          </section>
+        )}
       </>
     </section>
   );
