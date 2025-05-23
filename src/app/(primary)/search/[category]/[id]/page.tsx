@@ -23,6 +23,7 @@ import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { AlcoholDetails } from '@/types/Alcohol';
 import AlcoholBox from './_components/AlcoholBox';
+import AlcoholDetailsSkeleton from '@/components/Skeletons/custom/AlcoholDetailsSkeleton';
 import FlavorTag from '../../../_components/FlavorTag';
 
 interface DetailItem {
@@ -152,10 +153,12 @@ export default function SearchAlcohol() {
 
   return (
     <>
-      {alcoholDetails && data ? (
-        <>
-          <NavLayout>
-            <div className="relative">
+      <NavLayout>
+        {!data || !data.alcohols ? (
+          <AlcoholDetailsSkeleton />
+        ) : (
+          <>
+            <div className="relative ">
               {data?.alcohols?.alcoholUrlImg && (
                 <div
                   className="absolute w-full h-full bg-cover bg-center"
@@ -184,12 +187,6 @@ export default function SearchAlcohol() {
                 </SubHeader.Left>
                 <SubHeader.Right
                   onClick={() => {
-                    // shareOrCopy(
-                    //   `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/category/${category}/${alcoholId}`,
-                    //   handleModalState,
-                    //   `${data?.alcohols.korName} 정보`,
-                    //   `${data?.alcohols.korName} 정보 상세보기`,
-                    // );
                     handleModalState({
                       isShowModal: true,
                       type: 'ALERT',
@@ -285,59 +282,62 @@ export default function SearchAlcohol() {
                 </section>
               )}
             </div>
-            {data?.reviewInfo?.reviewList &&
-            data.reviewInfo.totalCount !== 0 ? (
-              <>
-                <div className="h-4 bg-sectionWhite" />
-                <section className="mx-5 pt-[34px] pb-[20px]">
-                  <p className="text-11 text-mainGray font-normal mb-[10px]">
-                    총 {data.reviewInfo.totalCount}개
-                  </p>
-                  <div className="border-b border-mainGray/30" />
-                  {data.reviewInfo.reviewList.map((review) => (
-                    <React.Fragment key={review.reviewId}>
-                      <Review data={review} onRefresh={refreshAlcoholDetails} />
-                    </React.Fragment>
-                  ))}
-                </section>
-                <section className="mx-5 mb-24">
-                  <LinkButton
-                    data={{
-                      engName: 'MORE COMMENTS',
-                      korName: '리뷰 더 보기',
-                      icon: true,
-                      linkSrc: {
-                        pathname: `/search/${data?.alcohols?.engCategory}/${data?.alcohols?.alcoholId}/reviews`,
-                        query: {
-                          name: data?.alcohols?.korName,
+            <>
+              {data?.reviewInfo?.reviewList &&
+              data.reviewInfo.totalCount !== 0 ? (
+                <>
+                  <div className="h-4 bg-sectionWhite" />
+                  <section className="mx-5 pt-[34px] pb-[20px]">
+                    <p className="text-11 text-mainGray font-normal mb-[10px]">
+                      총 {data.reviewInfo.totalCount}개
+                    </p>
+                    <div className="border-b border-mainGray/30" />
+                    {data.reviewInfo.reviewList.map((review) => (
+                      <React.Fragment key={review.reviewId}>
+                        <Review
+                          data={review}
+                          onRefresh={refreshAlcoholDetails}
+                        />
+                      </React.Fragment>
+                    ))}
+                  </section>
+                  <section className="mx-5 mb-24">
+                    <LinkButton
+                      data={{
+                        engName: 'MORE COMMENTS',
+                        korName: '리뷰 더 보기',
+                        icon: true,
+                        linkSrc: {
+                          pathname: `/search/${data?.alcohols?.engCategory}/${data?.alcohols?.alcoholId}/reviews`,
+                          query: {
+                            name: data?.alcohols?.korName,
+                          },
                         },
-                      },
-                      handleBeforeRouteChange: (
-                        e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-                      ) => {
-                        if (!isLogin) {
-                          e.preventDefault();
-                          handleLoginModal();
-                        }
-                      },
-                    }}
-                  />
-                </section>
-              </>
-            ) : (
-              <>
-                <div className="h-4 bg-sectionWhite" />
-                <section className="py-5">
-                  <EmptyView text="아직 리뷰가 없어요!" />
-                </section>
-              </>
-            )}
-          </NavLayout>
-          {state.isShowModal && <Modal />}
-        </>
-      ) : (
-        <Loading />
-      )}
+                        handleBeforeRouteChange: (
+                          e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+                        ) => {
+                          if (!isLogin) {
+                            e.preventDefault();
+                            handleLoginModal();
+                          }
+                        },
+                      }}
+                    />
+                  </section>
+                </>
+              ) : (
+                <>
+                  <div className="h-4 bg-sectionWhite" />
+                  <section className="py-5">
+                    <EmptyView text="아직 리뷰가 없어요!" />
+                  </section>
+                </>
+              )}
+            </>
+          </>
+        )}
+      </NavLayout>
+      {state.isShowModal && <Modal />}
     </>
   );
 }
