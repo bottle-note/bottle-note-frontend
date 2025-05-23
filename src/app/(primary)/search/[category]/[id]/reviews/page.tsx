@@ -16,6 +16,7 @@ import { useFilter } from '@/hooks/useFilter';
 import useModalStore from '@/store/modalStore';
 import { AuthService } from '@/lib/AuthService';
 import Modal from '@/components/Modal';
+import ReviewItemSkeleton from '@/components/Skeletons/ReviewItemSkeleton';
 
 const SORT_OPTIONS = [
   { name: '인기도순', type: SORT_TYPE.POPULAR },
@@ -164,7 +165,7 @@ function Reviews() {
                   }
                 />
                 <List.Section>
-                  {reviewList &&
+                  {reviewList ? (
                     [...reviewList.map((list) => list.data.reviewList)]
                       .flat()
                       .map((item: ReviewType) => (
@@ -173,7 +174,14 @@ function Reviews() {
                           key={uuidv4()}
                           onRefresh={refreshReviews}
                         />
+                      ))
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      {Array.from({ length: 3 }).map((_, idx) => (
+                        <ReviewItemSkeleton key={idx} />
                       ))}
+                    </div>
+                  )}
                 </List.Section>
               </List>
               <div ref={targetRef} />
@@ -202,7 +210,7 @@ function Reviews() {
                   }
                 />
                 <List.Section>
-                  {myReviewList &&
+                  {myReviewList ? (
                     [...myReviewList.map((list) => list.data.reviewList)]
                       .flat()
                       .map((item: ReviewType) => (
@@ -211,7 +219,14 @@ function Reviews() {
                           key={uuidv4()}
                           onRefresh={refreshReviews}
                         />
+                      ))
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      {Array.from({ length: 3 }).map((_, idx) => (
+                        <ReviewItemSkeleton key={idx} />
                       ))}
+                    </div>
+                  )}
                 </List.Section>
               </List>
               <div ref={myReviewTargetRef} />

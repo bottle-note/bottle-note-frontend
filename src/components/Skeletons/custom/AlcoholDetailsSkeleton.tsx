@@ -1,4 +1,5 @@
 import SkeletonBase from '../SkeletonBase';
+import ReviewItemSkeleton from '../ReviewItemSkeleton';
 
 function AlcoholBoxSkeleton() {
   return (
@@ -61,8 +62,8 @@ function AlcoholBoxSkeleton() {
         <div className="h-4 bg-sectionWhite" />
         <section className="pt-[34px] pb-[20px]">
           <SkeletonBase width={50} height={18} className="mb-[10px]" />
-          <div className="border-y border-mainGray/30 py-3">
-            <SkeletonBase height={150} className="w-full" />
+          <div className="border-t border-mainGray/30">
+            <ReviewItemSkeleton />
           </div>
         </section>
         <section className="mb-24">
