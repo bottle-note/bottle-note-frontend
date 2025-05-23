@@ -22,8 +22,8 @@ import { UserApi } from '@/app/api/UserApi';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { AlcoholDetails } from '@/types/Alcohol';
-import AlcoholBox from './_components/AlcoholBox';
 import AlcoholDetailsSkeleton from '@/components/Skeletons/custom/AlcoholDetailsSkeleton';
+import AlcoholBox from './_components/AlcoholBox';
 import FlavorTag from '../../../_components/FlavorTag';
 
 interface DetailItem {
