@@ -13,6 +13,7 @@ import { AuthService } from '@/lib/AuthService';
 import OptionDropdown from '@/components/OptionDropdown';
 import { deleteReview } from '@/lib/Review';
 import { ROUTES } from '@/constants/routes';
+import Link from 'next/link';
 
 const convertImageUrlsToProductImageArray = (
   imageUrls: string[] | undefined | null,
@@ -85,6 +86,7 @@ const ReviewCard = ({ content }: Props) => {
         <div className="flex flex-col gap-[9px] mb-5">
           <div className="flex justify-between items-center w-full">
             <UserInfoDisplay
+              userId={content.userInfo.userId}
               nickName={content.userInfo.nickName}
               userImageProps={{
                 imgSrc: content.userInfo.userProfileImage,
@@ -103,7 +105,10 @@ const ReviewCard = ({ content }: Props) => {
             />
           </div>
           <div className="flex justify-between items-center w-full">
-            <p className="text-12 text-mainDarkGray">{`${content.alcoholName}  >`}</p>
+            <Link href={ROUTES.SEARCH.ALL(content.alcoholId)}>
+              <p className="text-12 text-mainDarkGray">{`${content.alcoholName}  >`}</p>
+            </Link>
+
             <div className="flex gap-1">
               {content.isBestReview && (
                 <Label
@@ -122,18 +127,22 @@ const ReviewCard = ({ content }: Props) => {
             </div>
           </div>
         </div>
+
         {/* 리뷰 본문 */}
-        <div className="flex flex-col gap-[14px]">
-          <ReviewImageCarousel images={productImages} />
-          <p className="text-12 text-mainDarkGray">{content.reviewContent}</p>
-          <div className="flex gap-[6px]">
-            {content.reviewTags.map((tag) => (
-              <div key={tag} className="overflow-hidden flex-shrink-0">
-                <Label name={tag} styleClass="label-default text-11" />
-              </div>
-            ))}
+        <Link href={ROUTES.REVIEW.DETAIL(content.reviewId)}>
+          <div className="flex flex-col gap-[14px]">
+            <ReviewImageCarousel images={productImages} />
+            <p className="text-12 text-mainDarkGray">{content.reviewContent}</p>
+            <div className="flex gap-[6px]">
+              {content.reviewTags.map((tag) => (
+                <div key={tag} className="overflow-hidden flex-shrink-0">
+                  <Label name={tag} styleClass="label-default text-11" />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </Link>
+
         {/* 리뷰 좋아요, 댓글 */}
         <div className="flex items-center justify-between mt-[14px]">
           <div className="flex items-center gap-4">

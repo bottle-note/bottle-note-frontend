@@ -1,5 +1,7 @@
+import { ROUTES } from '@/constants/routes';
 import { ThemeColor } from '@/style/theme';
 import Image from 'next/image';
+import Link from 'next/link';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import { number } from 'yup';
 
@@ -56,6 +58,7 @@ export interface UserInfoDisplayProps {
   userImageProps: UserImageProps;
   userNickNameProps: Omit<UserNickNameProps, 'nickName'>;
   nickName: string;
+  userId: string | number;
   className?: string;
 }
 
@@ -63,12 +66,15 @@ export const UserInfoDisplay = ({
   userImageProps,
   userNickNameProps,
   nickName,
+  userId,
   className = 'flex items-center space-x-[7px]',
 }: UserInfoDisplayProps) => {
   return (
-    <div className={className}>
-      <UserImage {...userImageProps} />
-      <UserNickName {...userNickNameProps} nickName={nickName} />
-    </div>
+    <Link href={ROUTES.USER.BASE(userId)}>
+      <div className={className}>
+        <UserImage {...userImageProps} />
+        <UserNickName {...userNickNameProps} nickName={nickName} />
+      </div>
+    </Link>
   );
 };
