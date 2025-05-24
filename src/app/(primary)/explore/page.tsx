@@ -9,11 +9,9 @@ import { WhiskeyExplorerList } from './_components/WhiskeyExploreList';
 import { MOCK_REVIEW } from './mock';
 
 // TODO:
-// 1. 도메인별 interface 정리
 // 2. api 추가
-// 3. 리뷰 리스트 ui 추가
 // 4. 검색 ui 추가
-// 5. 위스티 리스트 ui 추가
+// 5. 위스키 리스트 ui 추가
 
 export default function ExplorePage() {
   const { currentTab, handleTab, tabList, refs, registerTab } = useTab({
@@ -26,26 +24,24 @@ export default function ExplorePage() {
 
   return (
     <Suspense>
-      <main className="mb-24 w-full min-h-screen relative bg-gray-50">
-        <div className="fixed top-0 left-0 right-0 bg-white z-10 shadow-sm">
-          <Header />
-          <Tab
-            variant="bookmark"
-            tabList={tabList}
-            handleTab={handleTab}
-            currentTab={currentTab}
-            scrollContainerRef={refs.scrollContainerRef}
-            registerTab={registerTab}
-          />
-        </div>
-        <section className="w-full h-full mt-[100px] p-4 md:p-6">
-          {currentTab.id === 'EXPLORER_WISKEY' && <WhiskeyExplorerList />}
+      <div className="fixed top-0 left-0 right-0 bg-white z-10 shadow-sm">
+        <Header />
+        <Tab
+          variant="bookmark"
+          tabList={tabList}
+          handleTab={handleTab}
+          currentTab={currentTab}
+          scrollContainerRef={refs.scrollContainerRef}
+          registerTab={registerTab}
+        />
+      </div>
+      <section className="w-full h-full mt-[100px] p-4 md:p-6">
+        {currentTab.id === 'EXPLORER_WISKEY' && <WhiskeyExplorerList />}
 
-          {currentTab.id === 'REVIEW_WISKEY' && (
-            <ReviewExplorerList list={MOCK_REVIEW} />
-          )}
-        </section>
-      </main>
+        {currentTab.id === 'REVIEW_WISKEY' && (
+          <ReviewExplorerList list={MOCK_REVIEW} />
+        )}
+      </section>
     </Suspense>
   );
 }

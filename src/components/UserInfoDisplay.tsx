@@ -16,12 +16,10 @@ export const UserImage = ({
   height = 30,
   alt = 'user_img',
 }: UserImageProps) => {
-  const widthClass = `w-[${width}px]`;
-  const heightClass = `h-[${height}px]`;
-
   return (
     <div
-      className={`${widthClass} ${heightClass} rounded-full overflow-hidden shrink-0`}
+      style={{ width: `${width}px`, height: `${height}px` }}
+      className="rounded-full overflow-hidden shrink-0"
     >
       <Image
         className="object-cover w-full h-full"
@@ -45,10 +43,13 @@ export const UserNickName = ({
   size = 13,
   color = 'mainGray',
 }: UserNickNameProps) => {
-  const textSizeClass = `text-[${size}px]`;
   const textColorClass = `text-${color}`;
 
-  return <p className={`${textColorClass} ${textSizeClass}`}>{nickName}</p>;
+  return (
+    <p style={{ fontSize: `${size}px` }} className={`${textColorClass}`}>
+      {nickName}
+    </p>
+  );
 };
 
 export interface UserInfoDisplayProps {
