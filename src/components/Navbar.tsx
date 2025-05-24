@@ -32,7 +32,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
     { name: '검색', link: ROUTES.SEARCH.BASE, icon: '/icon/navbar/search.svg' },
     {
       name: '둘러보기',
-      link: ROUTES.EXPLORER.BASE,
+      link: ROUTES.EXPLORE.BASE,
       icon: '/icon/navbar/explorer.svg',
     },
     {
@@ -50,7 +50,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   ];
 
   const handleNavigation = async (menu: NavItem) => {
-    if (menu.link === ROUTES.EXPLORER.BASE) {
+    if (menu.link === ROUTES.EXPLORE.BASE) {
       return handleModalState({
         mainText: '준비중인 기능입니다.',
         type: 'ALERT',

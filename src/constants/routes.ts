@@ -19,8 +19,8 @@ export const ROUTES = {
     BASE: (id: string | number) => `/detail/${id}`,
     COMMENTS: (id: string | number) => `/detail/${id}/comments`,
   },
-  EXPLORER: {
-    BASE: '/explorer',
+  EXPLORE: {
+    BASE: '/explore',
   },
   HISTORY: {
     BASE: '/history',
