@@ -6,7 +6,6 @@ import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
 import { ReviewExplorerList } from './_components/ReviewExploreList';
 import { WhiskeyExplorerList } from './_components/WhiskeyExploreList';
-import { MOCK_REVIEW } from './mock';
 
 // TODO:
 // 2. api 추가
@@ -38,9 +37,7 @@ export default function ExplorePage() {
       <section className="w-full h-full mt-[100px] p-4 md:p-6">
         {currentTab.id === 'EXPLORER_WISKEY' && <WhiskeyExplorerList />}
 
-        {currentTab.id === 'REVIEW_WISKEY' && (
-          <ReviewExplorerList list={MOCK_REVIEW} />
-        )}
+        {currentTab.id === 'REVIEW_WISKEY' && <ReviewExplorerList />}
       </section>
     </Suspense>
   );
