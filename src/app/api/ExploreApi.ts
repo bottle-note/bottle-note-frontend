@@ -10,6 +10,7 @@ export const ExploreApi = {
   }: ListQueryParams & { keywords: string[] }) {
     const response = await fetchWithAuth(
       `/bottle-api/reviews/explore/standard?keywords=${keywords.join('&')}`,
+      { requireAuth: false },
     );
 
     if (response.errors.length !== 0) {
