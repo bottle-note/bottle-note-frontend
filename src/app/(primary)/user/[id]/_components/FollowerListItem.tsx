@@ -1,11 +1,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { RelationInfo } from '@/types/User';
+import { ROUTES } from '@/constants/routes';
 import { FollowButton } from './FollowButton';
 import DefaultProfile from 'public/profile-default.svg';
 import CommentGray from 'public/icon/comment-filled-gray.svg';
 import StarGray from 'public/icon/star-filled-gray.svg';
-import { ROUTES } from '@/constants/routes';
 
 interface Props {
   userInfo: RelationInfo;

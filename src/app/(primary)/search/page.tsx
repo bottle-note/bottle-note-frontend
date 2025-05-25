@@ -18,8 +18,8 @@ import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
-import SearchContainer from '../../../components/Search/SearchContainer';
 import { ROUTES } from '@/constants/routes';
+import SearchContainer from '../../../components/Search/SearchContainer';
 
 interface InitialState {
   keyword: string;

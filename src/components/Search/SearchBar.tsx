@@ -4,9 +4,9 @@ import React, { useEffect, useState, Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { ROUTES } from '@/constants/routes';
 import EnterIcon from 'public/icon/search-subcoral.svg';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
-import { ROUTES } from '@/constants/routes';
 
 interface Props {
   type?: 'Link' | 'Search';

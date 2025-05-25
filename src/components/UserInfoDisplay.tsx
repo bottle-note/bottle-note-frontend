@@ -1,9 +1,9 @@
-import { ROUTES } from '@/constants/routes';
-import { ThemeColor } from '@/style/theme';
 import Image from 'next/image';
 import Link from 'next/link';
-import ProfileDefaultImg from 'public/profile-default.svg';
 import { number } from 'yup';
+import { ROUTES } from '@/constants/routes';
+import { ThemeColor } from '@/style/theme';
+import ProfileDefaultImg from 'public/profile-default.svg';
 
 export interface UserImageProps {
   imgSrc: string | null;

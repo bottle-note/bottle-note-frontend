@@ -2,12 +2,12 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { v4 as uuid } from 'uuid';
 import { ExploreReview } from '@/types/Explore';
-import ReviewCard from './ReviewCard';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ExploreApi } from '@/app/api/ExploreApi';
+import ReviewCard from './ReviewCard';
 import { SearchBar } from './SearchBar';
-import Label from '../../_components/Label';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
+import Label from '../../_components/Label';
 
 export const ReviewExplorerList = () => {
   const [keywords, setKeywords] = useState<string[]>([]);

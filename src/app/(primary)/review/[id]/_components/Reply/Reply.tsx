@@ -14,8 +14,8 @@ import { RootReply, SubReply } from '@/types/Reply';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
-import userImg from 'public/profile-default.svg';
 import { ROUTES } from '@/constants/routes';
+import userImg from 'public/profile-default.svg';
 
 interface Props {
   data: RootReply | SubReply;

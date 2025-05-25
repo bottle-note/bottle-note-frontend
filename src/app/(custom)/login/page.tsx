@@ -11,9 +11,9 @@ import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
 import Modal from '@/components/Modal';
 import { useLogin } from '@/hooks/useLogin';
+import { ROUTES } from '@/constants/routes';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
-import { ROUTES } from '@/constants/routes';
 
 type FormValues = {
   email: string;

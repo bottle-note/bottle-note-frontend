@@ -16,8 +16,8 @@ import useModalStore from '@/store/modalStore';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { deleteReview } from '@/lib/Review';
 import { AuthService } from '@/lib/AuthService';
-import ProfileDefaultImg from 'public/profile-default.svg';
 import { ROUTES } from '@/constants/routes';
+import ProfileDefaultImg from 'public/profile-default.svg';
 
 interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;

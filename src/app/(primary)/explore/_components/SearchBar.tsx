@@ -1,5 +1,5 @@
-import { LucideSearch } from 'lucide-react';
 import Image from 'next/image';
+import { LucideSearch } from 'lucide-react';
 import HelpIcon from 'public/icon/help-filled-subcoral.svg';
 
 export const SearchBar = () => {

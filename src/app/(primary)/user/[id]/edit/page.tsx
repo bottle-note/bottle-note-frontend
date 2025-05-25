@@ -12,10 +12,10 @@ import { AuthService } from '@/lib/AuthService';
 import { uploadImages } from '@/utils/S3Upload';
 import { useWebviewCamera } from '@/hooks/useWebviewCamera';
 import { useWebViewInit } from '@/hooks/useWebViewInit';
+import { ROUTES } from '@/constants/routes';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
-import { ROUTES } from '@/constants/routes';
 
 export default function UserEditPage() {
   const { userData } = AuthService;

@@ -1,6 +1,6 @@
-import { ROUTES } from '@/constants/routes';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ROUTES } from '@/constants/routes';
 
 import Logo from 'public/bottle_note_Icon_logo.svg';
 

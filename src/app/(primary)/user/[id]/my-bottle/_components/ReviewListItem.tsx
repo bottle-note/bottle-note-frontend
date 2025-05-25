@@ -7,8 +7,8 @@ import ItemInfo from '@/components/List/_components/ItemInfo';
 import { ReviewMyBottleListResponse } from '@/types/MyBottle';
 import { addNewLine } from '@/utils/addNewLine';
 import { truncStr } from '@/utils/truncStr';
-import Ellipsis from 'public/icon/ellipsis-vertical-subcoral.svg';
 import { ROUTES } from '@/constants/routes';
+import Ellipsis from 'public/icon/ellipsis-vertical-subcoral.svg';
 
 interface Props {
   data: ReviewMyBottleListResponse['myBottleList'][number];

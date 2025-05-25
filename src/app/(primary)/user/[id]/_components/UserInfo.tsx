@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthService } from '@/lib/AuthService';
+import { ROUTES } from '@/constants/routes';
 import ProfileImage from './ProfileImage';
 import { FollowButton } from './FollowButton';
-import { ROUTES } from '@/constants/routes';
 
 interface Props {
   profileImgSrc: string | null;

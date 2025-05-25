@@ -7,10 +7,10 @@ import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { AuthService } from '@/lib/AuthService';
+import { ROUTES } from '@/constants/routes';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
 import StarRating from '../StarRaiting';
-import { ROUTES } from '@/constants/routes';
 
 interface Props {
   data: RateAPI;

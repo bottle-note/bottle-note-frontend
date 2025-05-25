@@ -1,9 +1,9 @@
 'use client';
 
 import { Suspense } from 'react';
-import { Header } from './_components/Header';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
+import { Header } from './_components/Header';
 import { ReviewExplorerList } from './_components/ReviewExploreList';
 import { WhiskeyExplorerList } from './_components/WhiskeyExploreList';
 

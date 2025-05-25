@@ -22,9 +22,9 @@ import { UserApi } from '@/app/api/UserApi';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { AlcoholDetails } from '@/types/Alcohol';
+import { ROUTES } from '@/constants/routes';
 import AlcoholBox from './_components/AlcoholBox';
 import FlavorTag from '../../../_components/FlavorTag';
-import { ROUTES } from '@/constants/routes';
 
 interface DetailItem {
   title: string;
