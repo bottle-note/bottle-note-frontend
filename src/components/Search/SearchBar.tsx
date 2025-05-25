@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import EnterIcon from 'public/icon/search-subcoral.svg';
-import DeleteIcon from 'public//icon/reset-mainGray.svg';
+import DeleteIcon from 'public/icon/reset-mainGray.svg';
 import { ROUTES } from '@/constants/routes';
 
 interface Props {
