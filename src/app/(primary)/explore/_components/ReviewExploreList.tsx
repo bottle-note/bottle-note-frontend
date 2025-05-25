@@ -1,9 +1,10 @@
 import { ExploreReview } from '@/types/Explore';
 import ReviewCard from './ReviewCard';
 import { v4 as uuid } from 'uuid';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ExploreApi } from '@/app/api/ExploreApi';
+import { SearchBar } from './SearchBar';
 
 export const ReviewExplorerList = () => {
   const [keywords, setKeywords] = useState<string[]>([]);
@@ -31,12 +32,15 @@ export const ReviewExplorerList = () => {
   });
 
   return (
-    <div className="space-y-[30px] divide-y-[1px]">
-      {reviewList &&
-        reviewList[0].data.items.map((review) => (
-          <>{<ReviewCard key={uuid()} content={review} />}</>
-        ))}
-      <div ref={targetRef} />
-    </div>
+    <section>
+      <SearchBar />
+      <article className="space-y-[30px] divide-y-[1px]">
+        {reviewList &&
+          reviewList[0].data.items.map((review) => (
+            <>{<ReviewCard key={uuid()} content={review} />}</>
+          ))}
+        <div ref={targetRef} />
+      </article>
+    </section>
   );
 };
