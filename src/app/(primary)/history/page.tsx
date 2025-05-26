@@ -88,8 +88,10 @@ export default function History() {
 
   const handleFilterChange = async () => {
     const newParams = getQueryParams().toString();
-    setCurrentParams(newParams);
-    await refetch();
+    if (newParams !== currentParams) {
+      setCurrentParams(newParams);
+      await refetch();
+    }
   };
 
   const handleClose = async () => {
