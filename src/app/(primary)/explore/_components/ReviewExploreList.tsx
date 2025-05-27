@@ -4,13 +4,14 @@ import { v4 as uuid } from 'uuid';
 import { ExploreReview } from '@/types/Explore';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ExploreApi } from '@/app/api/ExploreApi';
+import List from '@/components/List/List';
 import ReviewCard from './ReviewCard';
 import { SearchBar } from './SearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
 import Label from '../../_components/Label';
 
 export const ReviewExplorerList = () => {
-  const [keywords, setKeywords] = useState<string[]>([]);
+  const [keywords, setKeywords] = useState<Set<string>>(new Set());
 
   const {
     data: reviewList,
@@ -18,13 +19,14 @@ export const ReviewExplorerList = () => {
     isFetching,
     targetRef,
     error,
+    refetch,
   } = usePaginatedQuery<{
     items: ExploreReview[];
   }>({
-    queryKey: ['explore.reviews'],
+    queryKey: ['explore.reviews', keywords],
     queryFn: ({ pageParam }) => {
       return ExploreApi.getReviews({
-        keywords,
+        keywords: Array.from(keywords),
         ...{
           cursor: pageParam,
           pageSize: 10,
@@ -34,11 +36,30 @@ export const ReviewExplorerList = () => {
     staleTime: 1000 * 60 * 5,
   });
 
+  const handleSearch = () => {
+    refetch();
+  };
+
+  const handleAddKeyword = (newKeyword: string) => {
+    setKeywords((prev) => new Set(prev).add(newKeyword));
+  };
+
+  const handleRemoveKeyword = (keywordToRemove: string) => {
+    setKeywords((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(keywordToRemove);
+      return newSet;
+    });
+  };
+
   return (
     <section>
-      <SearchBar />
-      <article>
-        {keywords.map((keyword) => (
+      <SearchBar
+        handleSearch={handleSearch}
+        handleAddKeyword={handleAddKeyword}
+      />
+      <article className="flex gap-x-1 gap-y-1.5 flex-wrap">
+        {Array.from(keywords).map((keyword) => (
           <div key={keyword} className="overflow-hidden flex-shrink-0">
             <Label
               name={keyword}
@@ -47,7 +68,7 @@ export const ReviewExplorerList = () => {
               icon={
                 <button
                   type="button"
-                  onMouseDown={() => {}}
+                  onMouseDown={() => handleRemoveKeyword(keyword)}
                   className=""
                   aria-label="검색어 지우기"
                 >
@@ -58,13 +79,23 @@ export const ReviewExplorerList = () => {
           </div>
         ))}
       </article>
-      <article className="space-y-[30px] divide-y-[1px]">
-        {reviewList &&
-          reviewList[0].data.items.map((review) => (
-            <ReviewCard key={uuid()} content={review} />
-          ))}
+      <List
+        isListFirstLoading={isFirstLoading}
+        isError={!!error}
+        isScrollLoading={isFetching}
+        isEmpty={
+          !isFirstLoading &&
+          (!reviewList || reviewList[0]?.data.items.length === 0)
+        }
+      >
+        <List.Section className="space-y-[30px] divide-y-[1px]">
+          {reviewList &&
+            reviewList[0].data.items.map((review) => (
+              <ReviewCard key={uuid()} content={review} />
+            ))}
+        </List.Section>
         <div ref={targetRef} />
-      </article>
+      </List>
     </section>
   );
 };

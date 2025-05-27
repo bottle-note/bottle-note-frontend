@@ -8,8 +8,6 @@ import { ReviewExplorerList } from './_components/ReviewExploreList';
 import { WhiskeyExplorerList } from './_components/WhiskeyExploreList';
 
 // TODO:
-// 2. api 추가
-// 4. 검색 ui 추가
 // 5. 위스키 리스트 ui 추가
 
 export default function ExplorePage() {
