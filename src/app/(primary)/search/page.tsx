@@ -19,6 +19,7 @@ import { AuthService } from '@/lib/AuthService';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
 import { ROUTES } from '@/constants/routes';
+import ListItemSkeleton from '@/components/Skeletons/ListItemSkeleton';
 import SearchContainer from '../../../components/Search/SearchContainer';
 
 interface InitialState {
@@ -31,7 +32,7 @@ interface InitialState {
 
 export default function Search() {
   const router = useRouter();
-  const { popularList } = usePopularList();
+  const { popularList, isLoading: isPopularLoading } = usePopularList();
   const { isLogin } = AuthService;
   const currCategory = useSearchParams().get('category') as Category;
   const currSearchKeyword = useSearchParams().get('query');
@@ -169,16 +170,24 @@ export default function Search() {
                 currentTab={popularSelectedTab}
               />
               <section className="px-5">
-                <List>
-                  {popularList.map((item: AlcoholAPI) => (
-                    <List.Item
-                      key={item.alcoholId}
-                      data={{
-                        ...item,
-                      }}
-                    />
-                  ))}
-                </List>
+                {isPopularLoading ? (
+                  <div className="flex flex-col gap-2">
+                    {Array.from({ length: 5 }).map((_, idx) => (
+                      <ListItemSkeleton key={idx} />
+                    ))}
+                  </div>
+                ) : (
+                  <List>
+                    {popularList.map((item: AlcoholAPI) => (
+                      <List.Item
+                        key={item.alcoholId}
+                        data={{
+                          ...item,
+                        }}
+                      />
+                    ))}
+                  </List>
+                )}
               </section>
             </>
           ) : (

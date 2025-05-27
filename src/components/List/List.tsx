@@ -1,5 +1,6 @@
 import { filterChildComponent } from '@/utils/filterChildComponent';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
+import ListItemSkeleton from '@/components/Skeletons/ListItemSkeleton';
 import ListItem from './ListItem';
 import ListItemRating from './ListItemRating';
 import Total from './Total';
@@ -7,7 +8,6 @@ import SortOrderSwitch from './SortOrderSwitch';
 import OptionSelect from './OptionSelect';
 import Title from './Title';
 import ListSection from './ListSection';
-import Loading from '../Loading';
 
 interface ListMainProps {
   children: React.ReactNode;
@@ -77,7 +77,13 @@ const ListMain = ({
           </>
         )}
 
-        {isListFirstLoading && <Loading />}
+        {isListFirstLoading && (
+          <section className="px-5">
+            {Array.from({ length: 5 }).map((_, idx) => (
+              <ListItemSkeleton key={idx} />
+            ))}
+          </section>
+        )}
       </>
     </section>
   );
