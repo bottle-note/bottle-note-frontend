@@ -22,6 +22,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   const { userData, logout } = AuthService;
   const { handleLoginModal } = useModalStore();
   const [isMounted, setIsMounted] = useState(false);
+  const { handleModalState } = useModalStore();
 
   useEffect(() => {
     setIsMounted(true);
@@ -50,6 +51,14 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   ];
 
   const handleNavigation = async (menu: NavItem) => {
+    if (menu.link === ROUTES.EXPLORE.BASE) {
+      handleModalState({
+        mainText: '준비중인 기능입니다!',
+        type: 'ALERT',
+        isShowModal: true,
+      });
+      return;
+    }
     if (menu.requiresAuth) {
       const isAuthenticated = userData && (await checkTokenValidity());
 
