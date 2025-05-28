@@ -63,13 +63,11 @@ export default function SearchBar({
   useEffect(() => {
     if (type === 'Search' && setUpdateSearchText) {
       setUpdateSearchText(() => (newText: string) => {
-        if (searchText === '') {
-          setSearchText(newText);
-        }
+        setSearchText(newText);
       });
       return () => setUpdateSearchText(null);
     }
-  }, [setUpdateSearchText, searchText, type]);
+  }, [setUpdateSearchText, type]);
 
   if (type === 'Link') {
     return (

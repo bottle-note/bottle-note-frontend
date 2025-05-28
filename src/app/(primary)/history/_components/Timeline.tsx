@@ -179,7 +179,11 @@ export default function Timeline({
           </List.Section>
         </List>
       ) : (
-        <HistoryEmptyState isLoading={isLoading} error={error} />
+        <HistoryEmptyState
+          isLoading={isLoading}
+          error={error}
+          isFiltering={data.totalCount !== 0 && data.userHistories.length === 0}
+        />
       )}
       <div ref={targetRef} />
     </section>
