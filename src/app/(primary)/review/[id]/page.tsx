@@ -16,7 +16,6 @@ import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import { ReplyApi } from '@/app/api/ReplyApi';
 import NavLayout from '@/app/(primary)/_components/NavLayout';
-import Loading from '@/components/Loading';
 // import { shareOrCopy } from '@/utils/shareOrCopy';
 import type {
   AlcoholInfo as AlcoholInfoType,
@@ -25,6 +24,7 @@ import type {
 import useModalStore from '@/store/modalStore';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import Modal from '@/components/Modal';
+import ReviewDetailsSkeleton from '@/components/Skeletons/custom/ReviewDetailsSkeleton';
 import ReplyInput from './_components/Reply/ReplyInput';
 import ReviewDetails from './_components/ReviewDetails';
 import AlcoholInfo from './_components/AlcoholInfo';
@@ -205,7 +205,7 @@ export default function ReviewDetail() {
           {state.isShowModal && <Modal />}
         </>
       ) : (
-        <Loading />
+        <ReviewDetailsSkeleton />
       )}
     </FormProvider>
   );
