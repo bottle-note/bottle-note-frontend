@@ -1,7 +1,7 @@
 import SkeletonBase from '../SkeletonBase';
 import ReviewItemSkeleton from '../ReviewItemSkeleton';
 
-function AlcoholBoxSkeleton() {
+function AlcoholDetailsSkeleton() {
   return (
     <div className="w-full">
       <SkeletonBase height={250} className="w-full" />
@@ -74,4 +74,4 @@ function AlcoholBoxSkeleton() {
   );
 }
 
-export default AlcoholBoxSkeleton;
+export default AlcoholDetailsSkeleton;
