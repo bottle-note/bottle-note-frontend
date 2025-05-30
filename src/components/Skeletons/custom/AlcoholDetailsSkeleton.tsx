@@ -1,5 +1,7 @@
+import { v4 as uuid } from 'uuid';
 import SkeletonBase from '../SkeletonBase';
 import ReviewItemSkeleton from '../ReviewItemSkeleton';
+import TagSkeleton from '../TagSkeleton';
 
 function AlcoholDetailsSkeleton() {
   return (
@@ -15,9 +17,9 @@ function AlcoholDetailsSkeleton() {
         <section className="mx-5 py-[21px] border-y border-mainGray/30">
           <div className="grid gap-2">
             <div className="grid grid-cols-2 gap-2">
-              {Array.from({ length: 3 }).map((_, idx) => (
+              {Array.from({ length: 3 }).map(() => (
                 <div
-                  key={idx}
+                  key={uuid()}
                   className="flex text-12 text-mainDarkGray items-start gap-2"
                 >
                   <SkeletonBase width={50} height={16} />
@@ -33,20 +35,15 @@ function AlcoholDetailsSkeleton() {
         </section>
         {/* 태그 영역 */}
         <section className="mx-5 py-[21px] space-y-2 border-b border-mainGray/30">
-          <SkeletonBase width={70} height={18} />
-          <div className="flex gap-2">
-            {Array.from({ length: 6 }).map((_, idx) => (
-              <SkeletonBase key={idx} width={60} height={25} />
-            ))}
-          </div>
+          <TagSkeleton />
         </section>
         {/* 친구 목록 영역 */}
         <section className="mx-5 py-5 border-b border-mainGray/30 space-y-2">
           <SkeletonBase width={70} height={18} />
           <div className="whitespace-nowrap overflow-x-auto flex space-x-5 scrollbar-hide">
-            {Array.from({ length: 4 }).map((_, idx) => (
+            {Array.from({ length: 4 }).map(() => (
               <div
-                key={idx}
+                key={uuid()}
                 className="flex-shrink-0 flex flex-col items-center"
               >
                 <SkeletonBase width={59} height={59} borderRadius="50%" />
