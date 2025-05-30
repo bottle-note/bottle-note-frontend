@@ -26,7 +26,7 @@ export default function TagsForm() {
         mainText: '추가하고 싶은 태그를 작성해주세요:)',
         type: 'ALERT',
       });
-    } else if (watchTags.includes(tagValue)) {
+    } else if (watchTags && watchTags.includes(tagValue)) {
       handleModalState({
         isShowModal: true,
         mainText: '이미 동일한 태그가 있습니다.',
@@ -75,7 +75,9 @@ export default function TagsForm() {
           height={15}
         />
       </HoverTouchBox>
-      <p>{watchTags.length !== 0 && `총 ${watchTags.length}개 입력`}</p>
+      <p>
+        {watchTags && watchTags.length !== 0 && `총 ${watchTags.length}개 입력`}
+      </p>
     </div>
   );
 
@@ -102,14 +104,14 @@ export default function TagsForm() {
             }}
           />
           <button
-            className={`text-10 py-[0.13rem] px-2 rounded border  w-16 ${watchTags.length !== 10 ? 'border-subCoral text-subCoral' : 'border-[#BFBFBF] text-[#BFBFBF]'}`}
-            disabled={watchTags.length === 10}
+            className={`text-10 py-[0.13rem] px-2 rounded border  w-16 ${watchTags?.length !== 10 ? 'border-subCoral text-subCoral' : 'border-[#BFBFBF] text-[#BFBFBF]'}`}
+            disabled={watchTags?.length === 10}
             onClick={handleAddTag}
           >
             태그 등록
           </button>
         </div>
-        {watchTags.length !== 0 && (
+        {watchTags && watchTags.length !== 0 && (
           <div className="flex flex-wrap gap-1 pt-2">
             {watchTags.map((tag: string) => (
               <div key={tag} className="overflow-hidden flex-shrink-0">
