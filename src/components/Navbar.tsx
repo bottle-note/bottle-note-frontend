@@ -75,9 +75,14 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   };
 
   const isActive = (link: string) => {
+    if (link === '') {
+      return false;
+    }
+
     if (link === '/') {
       return pathname === '/';
     }
+
     return pathname === link || pathname.startsWith(link);
   };
 
