@@ -16,6 +16,7 @@ import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 import { deleteReview } from '@/lib/Review';
 import { AuthService } from '@/lib/AuthService';
+import { ROUTES } from '@/constants/routes';
 
 const DEFAULT_USER_IMAGE = '/profile-default.svg';
 
@@ -60,11 +61,11 @@ function Review({ data, onRefresh }: Props) {
         },
       });
     } else if (option.type === 'MODIFY') {
-      router.push(`/review/modify?reviewId=${data.reviewId}`);
+      router.push(ROUTES.REVIEW.MODIFY(data.reviewId));
     } else if (option.type === 'REVIEW_REPORT') {
-      router.push(`/report?type=review&reviewId=${data.reviewId}`);
+      router.push(ROUTES.REPORT.REVIEW(data.reviewId));
     } else if (option.type === 'USER_REPORT') {
-      router.push(`/report?type=user&userId=${data.userInfo.userId}`);
+      router.push(ROUTES.REPORT.USER(data.userInfo.userId));
     }
   };
 
@@ -77,7 +78,7 @@ function Review({ data, onRefresh }: Props) {
       <div className="border-b border-mainGray/30 py-[15px]">
         <div className="flex items-center justify-between">
           <div className="flex items-center  space-x-2">
-            <Link href={`/user/${data.userInfo.userId}`}>
+            <Link href={ROUTES.USER.BASE(data.userInfo.userId)}>
               <div className="flex items-center space-x-1">
                 <div className="w-[22px] h-[22px] rounded-full overflow-hidden">
                   <Image
@@ -133,7 +134,7 @@ function Review({ data, onRefresh }: Props) {
             {data.price ? `${numberWithCommas(data.price)} ₩` : '-'}
           </p>
         </div>
-        <Link href={`/review/${data.reviewId}`}>
+        <Link href={ROUTES.REVIEW.DETAIL(data.reviewId)}>
           <div className="grid grid-cols-5 space-x-2 mt-[6px]">
             <p className="col-span-4 text-mainDarkGray text-12">
               {truncStr(data.reviewContent, 135)}

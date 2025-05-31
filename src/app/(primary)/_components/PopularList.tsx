@@ -12,6 +12,7 @@ import {
 } from '@/components/Skeletons/custom/PopularSkeleton';
 import { PopularType } from '@/types/Popular';
 import { UserApi } from '@/app/api/UserApi';
+import { ROUTES } from '@/constants/routes';
 
 interface Props {
   type?: PopularType;
@@ -127,7 +128,7 @@ const LoginRequired = () => {
         </p>
         <button
           className="w-[237px] py-[8.5px] text-16 font-bold text-subCoral border border-subCoral rounded-[18px]"
-          onClick={() => router.push('/login')}
+          onClick={() => router.push(ROUTES.LOGIN)}
         >
           로그인 하러가기
         </button>

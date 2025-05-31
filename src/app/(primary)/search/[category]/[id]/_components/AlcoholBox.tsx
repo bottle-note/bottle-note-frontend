@@ -8,6 +8,7 @@ import Star from '@/components/Star';
 import { truncStr } from '@/utils/truncStr';
 import useModalStore from '@/store/modalStore';
 import { AlcoholInfo } from '@/types/Alcohol';
+import { ROUTES } from '@/constants/routes';
 
 interface Props {
   data: AlcoholInfo;
@@ -67,7 +68,7 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
                       handleLoginModal();
                       return;
                     }
-                    router.push(`/review/register?alcoholId=${data.alcoholId}`);
+                    router.push(ROUTES.REVIEW.REGISTER(data.alcoholId));
                   }}
                 >
                   <Image

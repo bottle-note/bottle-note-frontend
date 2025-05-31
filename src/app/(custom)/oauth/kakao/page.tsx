@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthApi } from '@/app/api/AuthApi';
 import { AuthService } from '@/lib/AuthService';
 import Loading from '@/components/Loading';
+import { ROUTES } from '@/constants/routes';
 
 export default function OauthKakaoCallbackPage() {
   const router = useRouter();
@@ -16,10 +17,10 @@ export default function OauthKakaoCallbackPage() {
     try {
       const result = await AuthApi.kakaoLogin(code);
       login(result.info, result.tokens);
-      router.push('/login');
+      router.push(ROUTES.LOGIN);
     } catch (e) {
       console.log(e);
-      router.push('/error');
+      router.push(ROUTES.ERROR);
     }
   };
 

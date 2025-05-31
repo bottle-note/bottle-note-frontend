@@ -16,6 +16,7 @@ import useModalStore from '@/store/modalStore';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { deleteReview } from '@/lib/Review';
 import { AuthService } from '@/lib/AuthService';
+import { ROUTES } from '@/constants/routes';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 interface Props {
@@ -59,13 +60,11 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
         },
       });
     } else if (option.type === 'MODIFY') {
-      router.push(`/review/modify?reviewId=${data.reviewInfo?.reviewId}`);
+      router.push(ROUTES.REVIEW.MODIFY(data.reviewInfo?.reviewId));
     } else if (option.type === 'REVIEW_REPORT') {
-      router.push(`/report?type=review&reviewId=${data.reviewInfo?.reviewId}`);
+      router.push(ROUTES.REPORT.REVIEW(data.reviewInfo?.reviewId));
     } else if (option.type === 'USER_REPORT') {
-      router.push(
-        `/report?type=user&userId=${data.reviewInfo?.userInfo?.userId}`,
-      );
+      router.push(ROUTES.REPORT.USER(data.reviewInfo?.userInfo?.userId));
     }
   };
 
@@ -80,7 +79,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
       <section className="pt-[38px]">
         <section className="mx-5 pb-5 border-b border-mainGray/30 ">
           <article className="flex items-center justify-between">
-            <Link href={`/user/${userData?.userId}`}>
+            <Link href={ROUTES.USER.BASE(userData?.userId!)}>
               <div className="flex items-center space-x-[7px] ">
                 <div className="w-[1.9rem] h-[1.9rem] rounded-full overflow-hidden">
                   <Image

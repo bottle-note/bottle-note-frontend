@@ -6,6 +6,7 @@ import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { addNewLine } from '@/utils/addNewLine';
 import { AlcoholAPI } from '@/types/Alcohol';
 import useModalStore from '@/store/modalStore';
+import { ROUTES } from '@/constants/routes';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
 import RatingCountIcon from 'public/icon/rating-count-black.svg';
@@ -35,13 +36,13 @@ const ListItem = ({ data }: Props) => {
   return (
     <section className="flex items-center text-mainBlack border-brightGray border-b py-1">
       {/* image */}
-      <Link href={`/search/all/${alcoholId}`}>
+      <Link href={ROUTES.SEARCH.ALL(alcoholId)}>
         <ItemImage src={imageUrl} alt="image" />
       </Link>
 
       {/* info */}
       <Link
-        href={`/search/all/${alcoholId}`}
+        href={ROUTES.SEARCH.ALL(alcoholId)}
         className="flex flex-col items-start justify-center space-y-1.5"
       >
         <ItemInfo
@@ -55,7 +56,7 @@ const ListItem = ({ data }: Props) => {
         {/* rating */}
         <Star rating={rating} />
         {/* count */}
-        <p className="flex text-10 gap-[1px]">
+        <p className="flex text-10 mt-1.5">
           (
           <>
             <Image
@@ -69,16 +70,6 @@ const ListItem = ({ data }: Props) => {
         </p>
 
         <div className="flex justify-end mt-3">
-          <Link
-            href={
-              isMyPage
-                ? `/search/all/${alcoholId}/reviews?name=${korName}`
-                : `/search/all/${alcoholId}/reviews?name=${korName}`
-            }
-          >
-            {hasReviewByMe === true && <Image src={HasReviewIcon} alt="리뷰" />}
-            {hasReviewByMe === false && <Image src={ReviewIcon} alt="리뷰" />}
-          </Link>
           <PickBtn
             isPicked={isPicked}
             alcoholId={alcoholId}

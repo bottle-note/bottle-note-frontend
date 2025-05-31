@@ -1,6 +1,3 @@
-'use client';
-
-import { usePathname } from 'next/navigation';
 import NavLayout from '../_components/NavLayout';
 
 export default function Layout({
@@ -8,11 +5,11 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-
   return (
-    <NavLayout showNavbar={!pathname.includes('/reviews')}>
-      {children}
+    <NavLayout showNavbar>
+      <main className="mb-24 w-full h-full min-h-screen relative bg-gray-50">
+        {children}
+      </main>
     </NavLayout>
   );
 }
