@@ -1,4 +1,3 @@
-import { Children } from 'react';
 import { filterChildComponent } from '@/utils/filterChildComponent';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
 import ListItemSkeleton from '@/components/Skeletons/ListItemSkeleton';
@@ -16,6 +15,7 @@ interface ListMainProps {
   isListFirstLoading?: boolean;
   isScrollLoading?: boolean;
   isError?: boolean;
+  isEmpty?: boolean;
 }
 
 const ListMain = ({
@@ -23,6 +23,7 @@ const ListMain = ({
   emptyViewText,
   isListFirstLoading,
   isError,
+  isEmpty,
 }: ListMainProps) => {
   const title = filterChildComponent(children, Title);
   const totalDisplay = filterChildComponent(children, Total);
@@ -34,12 +35,6 @@ const ListMain = ({
     children,
     ListSection,
   );
-
-  const isEmpty =
-    !items.length &&
-    !ratingItems.length &&
-    listSection &&
-    !Children.count((listSection[0] as React.ReactElement)?.props?.children);
 
   const isManageExist = Boolean(
     title.length ||
@@ -72,15 +67,15 @@ const ListMain = ({
       </>
 
       <>
-        {/* {isEmpty && !isError ? (
+        {isEmpty && !isError ? (
           <EmptyView text={emptyViewText} />
         ) : (
-          <> */}
-        {items}
-        {ratingItems}
-        {listSection}
-        {/* </>
-        )} */}
+          <>
+            {items}
+            {ratingItems}
+            {listSection}
+          </>
+        )}
 
         {isListFirstLoading && (
           <section className="px-5">

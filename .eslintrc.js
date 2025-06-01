@@ -7,14 +7,9 @@ module.exports = {
   plugins: ['@typescript-eslint/eslint-plugin', 'prettier', 'import'],
   parserOptions: { project: './tsconfig.json' },
   extends: [
-    'airbnb',
-    'airbnb-typescript',
     'plugin:prettier/recommended',
-    'plugin:cypress/recommended',
     'plugin:import/recommended',
     'plugin:import/typescript',
-    'plugin:storybook/recommended',
-    'plugin:@next/next/recommended',
     'next/core-web-vitals',
   ],
   ignorePatterns: [

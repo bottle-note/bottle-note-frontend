@@ -11,6 +11,7 @@ import BoardListItem from '@/components/List/BoardListItem';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { InquireApi } from '@/app/api/InquireApi';
 import { InquireList } from '@/types/Inquire';
+import { ROUTES } from '@/constants/routes';
 
 export default function Inquire() {
   const router = useRouter();
@@ -89,7 +90,7 @@ export default function Inquire() {
                 handleLoginModal();
                 return;
               }
-              router.push(`/inquire/register`);
+              router.push(ROUTES.INQUIRE.REGISTER);
             }}
             btnName="문의하기"
           />

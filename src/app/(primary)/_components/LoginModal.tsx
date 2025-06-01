@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import BackDrop from '@/components/BackDrop';
 import { Button } from '@/components/Button';
+import { ROUTES } from '@/constants/routes';
 
 interface Props {
   handleClose: () => void;
@@ -34,7 +35,7 @@ function LoginModal({ handleClose }: Props) {
             btnName="로그인"
             onClick={() => {
               handleClose();
-              router.push('/login');
+              router.push(ROUTES.LOGIN);
             }}
           />
           <button className="text-10 text-mainGray pb-3" onClick={handleClose}>

@@ -121,7 +121,7 @@ const BookmarkTab = <T extends { id: string; name: string }>({
                     className={`relative z-10 text-15 font-extrabold ${
                       currentTab.id === tab.id
                         ? 'text-orange-500'
-                        : 'text-gray-400'
+                        : 'text-brightGray'
                     }`}
                   >
                     {tab.name}

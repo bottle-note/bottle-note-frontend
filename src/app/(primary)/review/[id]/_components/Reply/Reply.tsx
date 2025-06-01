@@ -14,6 +14,7 @@ import { RootReply, SubReply } from '@/types/Reply';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
+import { ROUTES } from '@/constants/routes';
 import userImg from 'public/profile-default.svg';
 
 interface Props {
@@ -99,7 +100,7 @@ function Reply({
         },
       });
     } else if (option.type === 'USER_REPORT') {
-      router.push(`/report?type=user&userId=${data.userId}`);
+      router.push(ROUTES.REPORT.USER(data.userId));
     }
   };
 
@@ -107,7 +108,7 @@ function Reply({
     <>
       <div>
         <div className="flex items-center justify-between">
-          <Link href={`/user/${data?.userId}`}>
+          <Link href={ROUTES.USER.BASE(data?.userId!)}>
             <div className="flex items-center space-x-[5px] h-8 px-">
               <div className="w-[1.4rem] h-[1.4rem] rounded-full overflow-hidden">
                 <Image

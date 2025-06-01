@@ -11,6 +11,7 @@ import { HistoryApi } from '@/app/api/HistoryApi';
 import { groupHistoryByDate, shouldShowDivider } from '@/utils/historyUtils';
 import { HistoryEmptyState } from '@/app/(primary)/history/_components/HistoryEmptyState';
 import { TimelineSkeleton } from '@/components/Skeletons/custom/TimelineSkeleton';
+import { ROUTES } from '@/constants/routes';
 
 function Timeline() {
   const router = useRouter();
@@ -38,7 +39,7 @@ function Timeline() {
         },
       });
     } else {
-      router.push('/history');
+      router.push(ROUTES.HISTORY.BASE);
     }
   };
 

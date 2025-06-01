@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { RelationInfo } from '@/types/User';
+import { ROUTES } from '@/constants/routes';
 import { FollowButton } from './FollowButton';
 import DefaultProfile from 'public/profile-default.svg';
 import CommentGray from 'public/icon/comment-filled-gray.svg';
@@ -18,7 +19,7 @@ export const FollowerListItem = ({ userInfo }: Props) => {
     >
       <Link
         className="grid grid-cols-[0.45fr_1fr]"
-        href={`/user/${userInfo.userId}`}
+        href={ROUTES.USER.BASE(userInfo.userId)}
       >
         <div className="w-9 h-9 rounded-full overflow-hidden">
           <Image

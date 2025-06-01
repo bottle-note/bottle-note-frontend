@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import List from '@/components/List/List';
+import { ROUTES } from '@/constants/routes';
 
 function AccnouncementPage() {
   const MOCK_DATA = [
@@ -19,7 +20,7 @@ function AccnouncementPage() {
           <Link
             className="border-b py-3 flex items-center justify-between"
             key={item.id}
-            href={`/announcement/${item.id}`}
+            href={ROUTES.ANNOUNCEMENT.DETAIL(item.id)}
           >
             <div>
               <p className="text-15 font-bold text-mainDarkGray">
