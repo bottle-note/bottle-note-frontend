@@ -101,7 +101,7 @@ const ReviewCard = ({ content }: Props) => {
             <Star
               rating={content.reviewRating ?? 0}
               size={21}
-              styleProps="text-20 text-subCoral font-semibold w-7"
+              textStyle="text-20 text-subCoral font-semibold w-7"
             />
           </div>
           <div className="flex justify-between items-center w-full">
