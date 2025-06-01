@@ -3,21 +3,25 @@ import Image from 'next/image';
 interface Props {
   rating: number;
   size?: number;
-  styleProps?: string;
+  textStyle?: string;
   color?: 'main' | 'white';
-  textTop?: number;
+  align?: 'center' | 'end';
 }
 
 const Star = ({
   rating,
   size = 18,
-  styleProps = 'text-subCoral font-semibold text-15 w-5',
+  textStyle = 'text-subCoral font-semibold text-15 w-5',
   color = 'main',
-  textTop = 1,
+  align = 'center',
 }: Props) => {
+  const hasRating = rating && rating > 0;
+
   return (
-    <div className="inline-flex items-end space-x-[2px]">
-      <div className="relative">
+    <div
+      className={`inline-flex items-${hasRating && align === 'end' ? 'end' : 'center'}`}
+    >
+      <div className="relative flex-shrink-0">
         {color === 'main' ? (
           <Image
             src="/icon/star-filled-subcoral.svg"
@@ -36,11 +40,14 @@ const Star = ({
           />
         )}
       </div>
-      <p
-        className={`${styleProps} ${rating ? 'leading-none' : `pl-1 relative top-[${textTop}px]`} `}
+      <span
+        className={`ml-1 ${textStyle}`}
+        style={{
+          lineHeight: '1',
+        }}
       >
-        {rating ? rating.toFixed(1) : '  -'}
-      </p>
+        {hasRating ? rating.toFixed(1) : '-'}
+      </span>
     </div>
   );
 };
