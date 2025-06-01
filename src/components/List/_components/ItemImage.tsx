@@ -5,11 +5,14 @@ import BaseImage from '@/components/BaseImage';
 interface Props {
   src: string;
   alt: string;
+  className?: string;
 }
 
-const ItemImage = ({ src, alt }: Props) => {
+const ItemImage = ({ src, alt, className }: Props) => {
   return (
-    <div className="w-[89px] h-[89px] flex shrink-0 p-2 justify-center items-center">
+    <div
+      className={`w-[89px] h-[89px] flex shrink-0 p-2 justify-center items-center ${className}`}
+    >
       <div className="w-full h-full relative">
         <BaseImage
           src={src}

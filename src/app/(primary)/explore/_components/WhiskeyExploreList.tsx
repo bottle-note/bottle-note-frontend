@@ -43,7 +43,7 @@ export const WhiskeyExplorerList = () => {
           (!alcoholList || alcoholList[0]?.data.items.length === 0)
         }
       >
-        <List.Section className="space-y-[30px] divide-y-[1px]">
+        <List.Section className="divide-y-[1px]">
           {alcoholList &&
             alcoholList[0].data.items.map((data) => (
               <WhiskeyListItem key={uuid()} content={data} />

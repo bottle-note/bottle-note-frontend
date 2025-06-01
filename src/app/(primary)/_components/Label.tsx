@@ -8,6 +8,7 @@ interface Props {
   iconHeight?: number;
   iconWidth?: number;
   position?: 'before' | 'after';
+  iconClass?: string;
 }
 
 function Label({
@@ -17,6 +18,7 @@ function Label({
   iconWidth = 10,
   styleClass = 'border-white px-2.5 py-1 rounded-md text-10',
   position = 'before',
+  iconClass = '',
 }: Props) {
   const renderIcon = () => {
     if (!icon) return null;
@@ -33,11 +35,11 @@ function Label({
     <div className={`border inline-block ${styleClass}`}>
       <div className="flex items-center">
         {position === 'before' && icon && (
-          <span className="mr-1">{renderIcon()}</span>
+          <span className={`mr-1 ${iconClass}`}>{renderIcon()}</span>
         )}
         {name}
         {position === 'after' && icon && (
-          <span className="ml-1">{renderIcon()}</span>
+          <span className={`ml-1 ${iconClass}`}>{renderIcon()}</span>
         )}
       </div>
     </div>
