@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { v4 as uuid } from 'uuid';
 import { ExploreReview } from '@/types/Explore';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ExploreApi } from '@/app/api/ExploreApi';
 import List from '@/components/List/List';
-import ReviewCard from './ReviewCard';
+import ReviewCard from './ReviewListItem';
 import { SearchBar } from './SearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
 import Label from '../../_components/Label';
@@ -51,6 +51,10 @@ export const ReviewExplorerList = () => {
       return newSet;
     });
   };
+
+  useEffect(() => {
+    console.log(reviewList);
+  }, [reviewList]);
 
   return (
     <section>
