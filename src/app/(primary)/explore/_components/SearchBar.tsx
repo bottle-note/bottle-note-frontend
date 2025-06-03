@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { LucideSearch } from 'lucide-react';
 import SideFilterDrawer from '@/components/SideFilterDrawer';
+import AccrodionHeader from '@/components/SideFilterDrawer/AccrodionHeader';
 import HelpIcon from 'public/icon/help-filled-subcoral.svg';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
 interface Props {
@@ -64,7 +65,10 @@ export const SearchBar = ({
         isOpen={isOpenSideFilter}
         onClose={() => setIsOpenSideFilter(false)}
         resetFilter={() => {}}
-      />
+      >
+        <AccrodionHeader title="카테고리">냠냠</AccrodionHeader>
+        <AccrodionHeader title="지역">쨥쨥</AccrodionHeader>
+      </SideFilterDrawer>
     </>
   );
 };

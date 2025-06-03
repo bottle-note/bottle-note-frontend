@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import ArrowIcon from 'public/icon/arrow-down-subcoral.svg';
+import ArrowIcon from 'public/icon/arrow-down-darkgray.svg';
 
 interface Props {
   title: string;
