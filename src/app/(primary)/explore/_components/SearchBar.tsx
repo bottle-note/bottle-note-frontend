@@ -6,9 +6,14 @@ import HelpIcon from 'public/icon/help-filled-subcoral.svg';
 interface Props {
   handleSearch: () => void;
   handleAddKeyword: (keyword: string) => void;
+  description: string;
 }
 
-export const SearchBar = ({ handleSearch, handleAddKeyword }: Props) => {
+export const SearchBar = ({
+  handleSearch,
+  handleAddKeyword,
+  description,
+}: Props) => {
   const [searchText, setSearchText] = useState('');
 
   const onAddKeyword = (v: string) => {
@@ -45,7 +50,7 @@ export const SearchBar = ({ handleSearch, handleAddKeyword }: Props) => {
       <div className="flex items-start gap-[2px] py-[10px]">
         <Image src={HelpIcon} alt="help" className="pt-[1px]" />
         <p className="text-12 text-mainGray whitespace-pre-line">
-          {`보고싶은 리뷰의 내용, 플레이버태그, 작성자, 위스키이름을\n 추가하여 검색해보세요.`}
+          {description}
         </p>
       </div>
     </article>
