@@ -146,9 +146,12 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
               ))}
             </div>
           )}
-          <div className="text-12 text-mainDarkGray">
-            {data.reviewInfo?.reviewContent}
-          </div>
+          <div
+            className="text-12 text-mainDarkGray whitespace-pre-line"
+            dangerouslySetInnerHTML={{
+              __html: data.reviewInfo?.reviewContent?.replace(/\n/g, '<br />'),
+            }}
+          />
           <article className="flex justify-between mt-[10px]">
             {data.reviewInfo?.createAt && (
               <p className="text-mainGray text-10">
