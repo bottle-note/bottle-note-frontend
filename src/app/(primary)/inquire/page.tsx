@@ -60,6 +60,7 @@ export default function Inquire() {
           isListFirstLoading={isLoading}
           isScrollLoading={isFetching}
           emptyViewText="문의사항이 없습니다."
+          isEmpty={!inquireList || inquireList[0].data.totalCount === 0}
         >
           <List.Total
             total={inquireList ? inquireList[0].data.totalCount : 0}

@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { filterChildComponent } from '@/utils/filterChildComponent';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
 import ListItemSkeleton from '@/components/Skeletons/ListItemSkeleton';
@@ -67,7 +68,7 @@ const ListMain = ({
       </>
 
       <>
-        {isEmpty && !isError ? (
+        {isEmpty && !isError && !isListFirstLoading ? (
           <EmptyView text={emptyViewText} />
         ) : (
           <>
@@ -79,8 +80,8 @@ const ListMain = ({
 
         {isListFirstLoading && (
           <section className="px-5">
-            {Array.from({ length: 5 }).map((_, idx) => (
-              <ListItemSkeleton key={idx} />
+            {Array.from({ length: 5 }).map(() => (
+              <ListItemSkeleton key={uuid()} />
             ))}
           </section>
         )}
