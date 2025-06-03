@@ -6,7 +6,7 @@ import TagSkeleton from '../TagSkeleton';
 function AlcoholDetailsSkeleton() {
   return (
     <div className="w-full">
-      <SkeletonBase height={250} className="w-full" />
+      <SkeletonBase height={250} className="w-full" borderRadius="0" />
       <div className="mb-5">
         {/* 별점 영역 */}
         <article className="grid place-items-center space-y-2 py-[25px]">
