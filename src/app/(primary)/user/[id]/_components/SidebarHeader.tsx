@@ -111,7 +111,8 @@ const SidebarHeader = () => {
     () => [
       {
         text: '공지사항',
-        action: () => route.push('/announcement'),
+        link: `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_NOTION_URL}board?pvs=4`,
+        action: null,
       },
       {
         text: '서비스 문의',
