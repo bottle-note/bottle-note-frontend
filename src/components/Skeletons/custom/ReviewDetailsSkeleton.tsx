@@ -5,7 +5,7 @@ import TagSkeleton from '../TagSkeleton';
 function ReviewDetailsSkeleton() {
   return (
     <div className="w-full">
-      <SkeletonBase height={260} className="w-full" />
+      <SkeletonBase height={260} className="w-full" borderRadius="0" />
       <div className="mb-5">
         <section className="pt-[38px]">
           <section className="mx-5 pb-5 border-b border-mainGray/30">

@@ -82,9 +82,12 @@ export default function Inquire() {
                   </div>
                 ))}
               </div>
-              <p className="pt-3 text-13 break-words leading-none text-mainDarkGray ">
-                {inquireDetails.content}
-              </p>
+              <p
+                className="pt-3 text-13 break-words leading-none text-mainDarkGray "
+                dangerouslySetInnerHTML={{
+                  __html: inquireDetails.content?.replace(/\n/g, '<br />'),
+                }}
+              />
             </article>
             {inquireDetails.adminId && (
               <article className="mx-5 py-3 space-y-4 border-b-[0.01rem] border-mainGray/30">
