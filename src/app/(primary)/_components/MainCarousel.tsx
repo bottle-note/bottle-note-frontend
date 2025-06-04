@@ -13,12 +13,14 @@ export interface ProductImage {
   alt: string;
 }
 
-// ! 주예님 확인 후 링크 수정 필요
 function textOverlay(id: string | number) {
   switch (id) {
     case 'bottleNote':
       return (
-        <div className="absolute left-0 top-11 w-full h-full flex flex-col pl-7 z-10">
+        <Link
+          href="/explore"
+          className="absolute left-0 top-11 w-full h-full flex flex-col pl-7 z-10"
+        >
           <div>
             <span className="block text-white text-24 font-semiBold leading-tight drop-shadow-md">
               기억에 남는 첫 향,
@@ -26,24 +28,17 @@ function textOverlay(id: string | number) {
               보틀노트에서
             </span>
           </div>
-          <Link
-            href="/explore"
-            className="inline-flex items-center gap-1 text-textGray mt-2"
-          >
+          <div className="inline-flex items-center gap-1 text-textGray mt-2">
             둘러보기
-            <Image
-              src="/icon/arrow-left-white.svg"
-              alt="arrowIcon"
-              width={18}
-              height={18}
-              className="rotate-180"
-            />
-          </Link>
-        </div>
+          </div>
+        </Link>
       );
     case 'summerRecommend':
       return (
-        <div className="absolute left-0 top-10 w-full h-full flex flex-col pl-[35px] z-10">
+        <Link
+          href="/search"
+          className="absolute left-0 top-10 w-full h-full flex flex-col pl-[35px] z-10"
+        >
           <div>
             <span className="block text-white text-24 font-semiBold leading-tight drop-shadow-md">
               올여름을 완성해 줄
@@ -51,31 +46,28 @@ function textOverlay(id: string | number) {
               위스키 한 잔
             </span>
           </div>
-          <Link
-            href="/search"
-            className="inline-flex items-center gap-1 text-[#165E59] font-extrabold mt-2"
-          >
+          <div className="inline-flex items-center gap-1 text-[#165E59] font-extrabold mt-2">
             여름 추천 위스키 보기
-          </Link>
-        </div>
+          </div>
+        </Link>
       );
     case 'rainDayRecommend':
       return (
-        <div className="absolute left-0 top-[121px] w-full h-full flex flex-col pl-6 z-10">
+        <Link
+          href="/search"
+          className="absolute left-0 top-[121px] w-full h-full flex flex-col pl-6 z-10"
+        >
           <div>
-            <Link
-              href="/search"
-              className="inline-flex items-center gap-1 text-white font-extrabold mt-2"
-            >
+            <div className="inline-flex items-center gap-1 text-white font-extrabold mt-2">
               비오는 날은 피트!
-            </Link>
+            </div>
             <span className="block text-white text-24 font-semiBold leading-tight drop-shadow-md">
               보틀노트가 추천하는
               <br />
               장마철 피트 위스키
             </span>
           </div>
-        </div>
+        </Link>
       );
     default:
       return null;
