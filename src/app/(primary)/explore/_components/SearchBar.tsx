@@ -2,9 +2,10 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { LucideSearch } from 'lucide-react';
 import SideFilterDrawer from '@/components/SideFilterDrawer';
-import AccrodionHeader from '@/components/SideFilterDrawer/AccrodionHeader';
+import { Accordion } from '@/components/SideFilterDrawer/Accordion';
 import HelpIcon from 'public/icon/help-filled-subcoral.svg';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
+
 interface Props {
   handleSearch: () => void;
   handleAddKeyword: (keyword: string) => void;
@@ -61,13 +62,33 @@ export const SearchBar = ({
           </p>
         </div>
       </article>
+
       <SideFilterDrawer
         isOpen={isOpenSideFilter}
         onClose={() => setIsOpenSideFilter(false)}
         resetFilter={() => {}}
       >
-        <AccrodionHeader title="카테고리">냠냠</AccrodionHeader>
-        <AccrodionHeader title="지역">쨥쨥</AccrodionHeader>
+        <Accordion title="카테고리">
+          <Accordion.Single>
+            <Accordion.Content
+              title="전체"
+              value="all"
+              isSelected={true}
+              onClick={onAddKeyword}
+            />
+          </Accordion.Single>
+        </Accordion>
+
+        <Accordion title="지역">
+          <Accordion.Single>
+            <Accordion.Content
+              title="전체"
+              value="all"
+              isSelected={true}
+              onClick={onAddKeyword}
+            />
+          </Accordion.Single>
+        </Accordion>
       </SideFilterDrawer>
     </>
   );
