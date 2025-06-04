@@ -3,7 +3,7 @@
 import Header from '@/app/(primary)/_components/Header';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
-import BannerCarousel from '@/app/(primary)/_components/BannerCarousel';
+import MainCarousel from '@/app/(primary)/_components/MainCarousel';
 import { BANNER_IMAGES, TOP_MENU_ITEMS, MENU_CATEGORY } from '@/constants/home';
 import CategoryList from './_components/CategoryList';
 import PopularList from './_components/PopularList';
@@ -59,7 +59,7 @@ export default function Home() {
   return (
     <NavLayout>
       <Header />
-      <BannerCarousel images={BANNER_IMAGES} />
+      <MainCarousel images={BANNER_IMAGES} />
       <div className="pt-[9px] space-y-1 relative">
         <section className="pb-20">
           <article className="space-y-[18px]">

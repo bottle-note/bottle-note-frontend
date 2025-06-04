@@ -82,7 +82,7 @@ function textOverlay(id: string | number) {
   }
 }
 
-export default function BannerCarousel({ images }: { images: ProductImage[] }) {
+export default function MainCarousel({ images }: { images: ProductImage[] }) {
   const [api, setApi] = useState<any>(null);
 
   if (!images || images.length === 0) {

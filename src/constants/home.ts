@@ -1,4 +1,4 @@
-import { ProductImage } from '@/app/(primary)/_components/BannerCarousel';
+import { ProductImage } from '@/app/(primary)/_components/MainCarousel';
 
 export const BANNER_IMAGES: ProductImage[] = [
   {
