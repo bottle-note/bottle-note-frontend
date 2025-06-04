@@ -3,17 +3,11 @@
 import Header from '@/app/(primary)/_components/Header';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
+import BannerCarousel from '@/app/(primary)/_components/BannerCarousel';
+import { BANNER_IMAGES, TOP_MENU_ITEMS, MENU_CATEGORY } from '@/constants/home';
 import CategoryList from './_components/CategoryList';
 import PopularList from './_components/PopularList';
 import NavLayout from './_components/NavLayout';
-
-const TOP_MENU_ITEMS = [
-  { id: 'week', name: 'HOT 5' },
-  { id: 'spring', name: '봄 추천 위스키' },
-  { id: 'recent', name: '최근에 본 위스키' },
-];
-
-const MENU_CATEGORY = [{ id: 'category', name: '카테고리' }];
 
 export default function Home() {
   const {
@@ -65,9 +59,10 @@ export default function Home() {
   return (
     <NavLayout>
       <Header />
-      <div className="space-y-1 relative">
+      <BannerCarousel images={BANNER_IMAGES} />
+      <div className="pt-[9px] space-y-1 relative">
         <section className="pb-20">
-          <article className="pt-10 space-y-[18px]">
+          <article className="space-y-[18px]">
             <Tab
               variant="bookmark"
               tabList={firstMenuList}
