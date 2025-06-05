@@ -12,6 +12,7 @@ interface Props {
   handleAddKeyword: (keyword: string) => void;
   handleRemoveKeyword: (keyword: string) => void;
   description: string;
+  isFilter?: boolean;
 }
 
 export const SearchBar = ({
@@ -19,6 +20,7 @@ export const SearchBar = ({
   handleAddKeyword,
   handleRemoveKeyword,
   description,
+  isFilter = false,
 }: Props) => {
   const [searchText, setSearchText] = useState('');
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
@@ -96,9 +98,11 @@ export const SearchBar = ({
             <LucideSearch className="w-3.5 h-3.5" />
             검색
           </button>
-          <button onClick={() => setIsOpenSideFilter(true)}>
-            <Image src={FilterIcon} alt="필터메뉴" />
-          </button>
+          {isFilter && (
+            <button onClick={() => setIsOpenSideFilter(true)}>
+              <Image src={FilterIcon} alt="필터메뉴" />
+            </button>
+          )}
         </div>
 
         <div className="flex items-start gap-[2px] py-[10px]">
@@ -109,59 +113,61 @@ export const SearchBar = ({
         </div>
       </article>
 
-      <SideFilterDrawer
-        isOpen={isOpenSideFilter}
-        onClose={() => setIsOpenSideFilter(false)}
-        resetFilter={handleResetFilter}
-      >
-        <Accordion title="카테고리">
-          <Accordion.Single>
-            <Accordion.Content
-              title="전체"
-              value={CATEGORY_MENUS_LIST[0].id}
-              isSelected={selectedCategory.size === 0}
-              onClick={() => setSelectedCategory(new Set())}
-            />
-          </Accordion.Single>
-          <Accordion.Grid cols={2}>
-            {CATEGORY_MENUS_LIST.slice(1, CATEGORY_MENUS_LIST.length).map(
-              (v) => (
-                <Accordion.Content
-                  title={v.name}
-                  value={v.id}
-                  isSelected={selectedCategory.has(v.name)}
-                  onClick={() => handleToggleOption.category(v.name)}
-                  key={v.id}
-                />
-              ),
-            )}
-          </Accordion.Grid>
-        </Accordion>
-
-        <Accordion title="지역">
-          <Accordion.Single>
-            <Accordion.Content
-              title="전체"
-              value={REGIONS[0].regionId}
-              isSelected={selectedRegion.size === 0}
-              onClick={() => setSelectedRegion(new Set())}
-            />
-          </Accordion.Single>
-          <Accordion.Grid cols={2}>
-            {REGIONS.slice(1, REGIONS.length).map((v) => (
+      {isFilter && (
+        <SideFilterDrawer
+          isOpen={isOpenSideFilter}
+          onClose={() => setIsOpenSideFilter(false)}
+          resetFilter={handleResetFilter}
+        >
+          <Accordion title="카테고리">
+            <Accordion.Single>
               <Accordion.Content
-                title={v.korName}
-                value={v.korName}
-                isSelected={selectedRegion.has(v.korName)}
-                onClick={() => {
-                  handleToggleOption.region(v.korName);
-                }}
-                key={v.regionId}
+                title="전체"
+                value={CATEGORY_MENUS_LIST[0].id}
+                isSelected={selectedCategory.size === 0}
+                onClick={() => setSelectedCategory(new Set())}
               />
-            ))}
-          </Accordion.Grid>
-        </Accordion>
-      </SideFilterDrawer>
+            </Accordion.Single>
+            <Accordion.Grid cols={2}>
+              {CATEGORY_MENUS_LIST.slice(1, CATEGORY_MENUS_LIST.length).map(
+                (v) => (
+                  <Accordion.Content
+                    title={v.name}
+                    value={v.id}
+                    isSelected={selectedCategory.has(v.name)}
+                    onClick={() => handleToggleOption.category(v.name)}
+                    key={v.id}
+                  />
+                ),
+              )}
+            </Accordion.Grid>
+          </Accordion>
+
+          <Accordion title="지역">
+            <Accordion.Single>
+              <Accordion.Content
+                title="전체"
+                value={REGIONS[0].regionId}
+                isSelected={selectedRegion.size === 0}
+                onClick={() => setSelectedRegion(new Set())}
+              />
+            </Accordion.Single>
+            <Accordion.Grid cols={2}>
+              {REGIONS.slice(1, REGIONS.length).map((v) => (
+                <Accordion.Content
+                  title={v.korName}
+                  value={v.korName}
+                  isSelected={selectedRegion.has(v.korName)}
+                  onClick={() => {
+                    handleToggleOption.region(v.korName);
+                  }}
+                  key={v.regionId}
+                />
+              ))}
+            </Accordion.Grid>
+          </Accordion>
+        </SideFilterDrawer>
+      )}
     </>
   );
 };
