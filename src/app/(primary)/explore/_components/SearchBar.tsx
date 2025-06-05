@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { LucideSearch } from 'lucide-react';
 import SideFilterDrawer from '@/components/SideFilterDrawer';
 import { Accordion } from '@/components/SideFilterDrawer/Accordion';
+import { CATEGORY_MENUS_LIST, REGIONS } from '@/constants/common';
 import HelpIcon from 'public/icon/help-filled-subcoral.svg';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
 
@@ -24,6 +25,10 @@ export const SearchBar = ({
     handleAddKeyword(v);
     setSearchText('');
   };
+
+  useEffect(() => {
+    console.log(CATEGORY_MENUS_LIST);
+  }, []);
 
   return (
     <>
@@ -71,23 +76,47 @@ export const SearchBar = ({
         <Accordion title="카테고리">
           <Accordion.Single>
             <Accordion.Content
-              title="전체"
-              value="all"
+              title={CATEGORY_MENUS_LIST[0].name}
+              value={CATEGORY_MENUS_LIST[0].id}
               isSelected={true}
               onClick={onAddKeyword}
             />
           </Accordion.Single>
+          <Accordion.Grid cols={2}>
+            {CATEGORY_MENUS_LIST.slice(1, CATEGORY_MENUS_LIST.length).map(
+              (v) => (
+                <Accordion.Content
+                  title={v.name}
+                  value={v.id}
+                  isSelected={false}
+                  onClick={onAddKeyword}
+                  key={v.id}
+                />
+              ),
+            )}
+          </Accordion.Grid>
         </Accordion>
 
         <Accordion title="지역">
           <Accordion.Single>
             <Accordion.Content
               title="전체"
-              value="all"
+              value={REGIONS[0].regionId}
               isSelected={true}
               onClick={onAddKeyword}
             />
           </Accordion.Single>
+          <Accordion.Grid cols={2}>
+            {REGIONS.slice(1, REGIONS.length).map((v) => (
+              <Accordion.Content
+                title={v.korName}
+                value={v.korName}
+                isSelected={false}
+                onClick={onAddKeyword}
+                key={v.regionId}
+              />
+            ))}
+          </Accordion.Grid>
         </Accordion>
       </SideFilterDrawer>
     </>

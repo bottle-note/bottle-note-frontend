@@ -28,6 +28,13 @@ export const CATEGORY_MENUS = {
   Other: { kor: '기타', eng: 'Other', link: 'OTHER', categoryGroup: 'OTHER' },
 } as const;
 
+export const CATEGORY_MENUS_LIST = Object.values(CATEGORY_MENUS).map(
+  (category) => ({
+    id: category.categoryGroup,
+    name: category.kor,
+  }),
+);
+
 export const S3_URL_PATH = {
   review: 'review',
   userProfile: 'user/profile',

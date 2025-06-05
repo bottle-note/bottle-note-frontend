@@ -29,10 +29,11 @@ const AccordionItemWrapper = ({
 
   return (
     <>
+      {/* 토글 헤더 */}
       <div className="px-5 py-3 flex items-center justify-between border-b border-bgGray">
         <div className="flex items-center space-x-1">
           <p className="text-12 text-mainDarkGray font-bold">
-            {title}{' '}
+            {title}
             <span className="text-mainGray font-normal">{subTitle}</span>
           </p>
         </div>
@@ -57,9 +58,10 @@ const AccordionItemWrapper = ({
         </div>
       </div>
 
+      {/* 컨텐츠 */}
       <div
         className={`overflow-hidden transition-all duration-300 ease-out ${
-          isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          isOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
         <div
@@ -67,7 +69,7 @@ const AccordionItemWrapper = ({
             isOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
           }`}
         >
-          {children}
+          <div className="py-3 px-5 bg-sectionWhite">{children}</div>
         </div>
       </div>
     </>
