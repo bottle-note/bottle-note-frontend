@@ -81,7 +81,7 @@ export default function MyBottle({
         params: {
           ...filterState,
           cursor: pageParam,
-          pageSize: 20, // FIXME: api 고쳐지면 다시 10으로 변경
+          pageSize: 10,
         },
         userId: Number(userId),
       });
@@ -149,8 +149,8 @@ export default function MyBottle({
             isListFirstLoading={isFirstLoading}
             isScrollLoading={isFetching}
             isEmpty={
-              !alcoholList ||
-              alcoholList.every((list) => list.data.myBottleList.length === 0)
+              !isFirstLoading &&
+              (!alcoholList || alcoholList[0]?.data.myBottleList.length === 0)
             }
           >
             <List.Title

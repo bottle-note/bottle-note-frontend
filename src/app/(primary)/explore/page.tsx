@@ -7,9 +7,6 @@ import { Header } from './_components/Header';
 import { ReviewExplorerList } from './_components/ReviewExploreList';
 import { WhiskeyExplorerList } from './_components/WhiskeyExploreList';
 
-// TODO:
-// 5. 위스키 리스트 ui 추가
-
 export default function ExplorePage() {
   const { currentTab, handleTab, tabList, refs, registerTab } = useTab({
     tabList: [

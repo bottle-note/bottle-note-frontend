@@ -51,14 +51,6 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   ];
 
   const handleNavigation = async (menu: NavItem) => {
-    if (menu.link === ROUTES.EXPLORE.BASE) {
-      handleModalState({
-        mainText: '준비중인 기능입니다!',
-        type: 'ALERT',
-        isShowModal: true,
-      });
-      return;
-    }
     if (menu.requiresAuth) {
       const isAuthenticated = userData && (await checkTokenValidity());
 
@@ -75,9 +67,14 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   };
 
   const isActive = (link: string) => {
+    if (link === '') {
+      return false;
+    }
+
     if (link === '/') {
       return pathname === '/';
     }
+
     return pathname === link || pathname.startsWith(link);
   };
 

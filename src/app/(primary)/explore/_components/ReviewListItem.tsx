@@ -34,7 +34,7 @@ interface Props {
   content: ExploreReview;
 }
 
-const ReviewCard = ({ content }: Props) => {
+const ReviewListItem = ({ content }: Props) => {
   const router = useRouter();
   const { handleLoginModal, handleModalState } = useModalStore();
   const { isLogin, userData } = AuthService;
@@ -222,4 +222,4 @@ const ReviewCard = ({ content }: Props) => {
   );
 };
 
-export default ReviewCard;
+export default ReviewListItem;
