@@ -79,7 +79,7 @@ export const SearchBar = ({
         <input
           type="text"
           placeholder="입력..."
-          className="w-full py-2.5 px-2 border-b-2 border-gray-200 focus:border-amber-500 outline-none bg-transparent text-base placeholder-mainGray placeholder:text-13 transition-colors"
+          className="w-full py-2.5 px-2 border-b-2 border-gray-200 focus:border-amber-500 outline-none bg-transparent text-base placeholder-mainGray placeholder:text-13 transition-colors appearance-none rounded-none"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />

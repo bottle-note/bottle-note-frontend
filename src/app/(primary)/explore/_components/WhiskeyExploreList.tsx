@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { v4 as uuid } from 'uuid';
 import { ExploreApi } from '@/app/api/ExploreApi';
@@ -97,9 +97,7 @@ export const WhiskeyExplorerList = () => {
             [...alcoholList].map((listdata) =>
               listdata.data.items
                 .flat()
-                .map((data) => (
-                  <WhiskeyListItem key={data.alcoholId} content={data} />
-                )),
+                .map((data) => <WhiskeyListItem key={uuid()} content={data} />),
             )}
         </List.Section>
       </List>
