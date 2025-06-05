@@ -23,7 +23,7 @@ export const ReviewExplorerList = () => {
   } = usePaginatedQuery<{
     items: ExploreReview[];
   }>({
-    queryKey: ['explore.reviews', keywords],
+    queryKey: ['explore.reviews', ...keywords],
     queryFn: ({ pageParam }) => {
       return ExploreApi.getReviews({
         keywords: Array.from(keywords),
@@ -88,9 +88,11 @@ export const ReviewExplorerList = () => {
       >
         <List.Section className="space-y-[30px] divide-y-[1px]">
           {reviewList &&
-            reviewList[0].data.items.map((review) => (
-              <ReviewCard key={uuid()} content={review} />
-            ))}
+            [...reviewList].map((listData) =>
+              listData.data.items
+                .flat()
+                .map((review) => <ReviewCard key={uuid()} content={review} />),
+            )}
         </List.Section>
         <div ref={targetRef} />
       </List>
