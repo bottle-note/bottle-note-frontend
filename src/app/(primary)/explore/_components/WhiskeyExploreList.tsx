@@ -57,6 +57,7 @@ export const WhiskeyExplorerList = () => {
       <SearchBar
         handleSearch={handleSearch}
         handleAddKeyword={handleAddKeyword}
+        handleRemoveKeyword={handleRemoveKeyword}
         description={`이름이나 플레이버 태그를 추가하여 검색해보세요.`}
       />
       <article className="flex gap-x-1 gap-y-1.5 flex-wrap border-b border-borderGray pb-6">

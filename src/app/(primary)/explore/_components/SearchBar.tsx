@@ -10,21 +10,23 @@ import FilterIcon from 'public/icon/filter-subcoral.svg';
 interface Props {
   handleSearch: () => void;
   handleAddKeyword: (keyword: string) => void;
+  handleRemoveKeyword: (keyword: string) => void;
   description: string;
 }
 
 export const SearchBar = ({
   handleSearch,
   handleAddKeyword,
+  handleRemoveKeyword,
   description,
 }: Props) => {
   const [searchText, setSearchText] = useState('');
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<
-    Set<(typeof CATEGORY_MENUS_LIST)[number]['id']>
+    Set<(typeof CATEGORY_MENUS_LIST)[number]['name']>
   >(new Set());
   const [selectedRegion, setSelectedRegion] = useState<
-    Set<(typeof REGIONS)[number]['engName']>
+    Set<(typeof REGIONS)[number]['korName']>
   >(new Set());
 
   const onAddKeyword = (v: string) => {
@@ -34,24 +36,28 @@ export const SearchBar = ({
 
   const handleToggleOption = useMemo(
     () => ({
-      category: (value: (typeof CATEGORY_MENUS_LIST)[number]['id']) => {
+      category: (value: (typeof CATEGORY_MENUS_LIST)[number]['name']) => {
         setSelectedCategory((prev) => {
           const newSet = new Set(prev);
           if (newSet.has(value)) {
             newSet.delete(value);
+            handleRemoveKeyword(value);
           } else {
             newSet.add(value);
+            handleAddKeyword(value);
           }
           return newSet;
         });
       },
-      region: (value: (typeof REGIONS)[number]['engName']) => {
+      region: (value: (typeof REGIONS)[number]['korName']) => {
         setSelectedRegion((prev) => {
           const newSet = new Set(prev);
           if (newSet.has(value)) {
             newSet.delete(value);
+            handleRemoveKeyword(value);
           } else {
             newSet.add(value);
+            handleAddKeyword(value);
           }
           return newSet;
         });
@@ -123,8 +129,8 @@ export const SearchBar = ({
                 <Accordion.Content
                   title={v.name}
                   value={v.id}
-                  isSelected={selectedCategory.has(v.id)}
-                  onClick={() => handleToggleOption.category(v.id)}
+                  isSelected={selectedCategory.has(v.name)}
+                  onClick={() => handleToggleOption.category(v.name)}
                   key={v.id}
                 />
               ),
@@ -146,9 +152,9 @@ export const SearchBar = ({
               <Accordion.Content
                 title={v.korName}
                 value={v.korName}
-                isSelected={selectedRegion.has(v.engName)}
+                isSelected={selectedRegion.has(v.korName)}
                 onClick={() => {
-                  handleToggleOption.region(v.engName);
+                  handleToggleOption.region(v.korName);
                 }}
                 key={v.regionId}
               />
