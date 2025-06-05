@@ -9,6 +9,7 @@ import Modal from '@/components/Modal';
 import { AuthApi } from '@/app/api/AuthApi';
 import { AuthService } from '@/lib/AuthService';
 import { UserData } from '@/types/Auth';
+import { ROUTES } from '@/constants/routes';
 
 const jwt = require('jsonwebtoken');
 
@@ -75,7 +76,7 @@ export default function Signup() {
         mainText: '보틀노트에 오신걸 환영합니다.',
         handleConfirm: () => {
           handleCloseModal();
-          router.push('/login');
+          router.push(ROUTES.LOGIN);
         },
       });
     } catch (e) {

@@ -40,11 +40,15 @@ function BackDrop({
   const [isBrowser, setIsBrowser] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsBrowser(true);
-    handleScroll({ isScroll: false });
+    if (isShow) {
+      setIsBrowser(true);
+      handleScroll({ isScroll: false });
+    }
 
-    return () => handleScroll({ isScroll: true });
-  }, []);
+    return () => {
+      handleScroll({ isScroll: true });
+    };
+  }, [isShow]);
 
   if (isBrowser) {
     return ReactDOM.createPortal(

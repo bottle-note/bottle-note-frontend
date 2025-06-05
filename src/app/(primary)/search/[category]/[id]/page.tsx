@@ -22,6 +22,7 @@ import { UserApi } from '@/app/api/UserApi';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { AlcoholDetails } from '@/types/Alcohol';
+import { ROUTES } from '@/constants/routes';
 import AlcoholDetailsSkeleton from '@/components/Skeletons/custom/AlcoholDetailsSkeleton';
 import AlcoholBox from './_components/AlcoholBox';
 import FlavorTag from '../../../_components/FlavorTag';
@@ -261,7 +262,7 @@ export default function SearchAlcohol() {
                         key={user.userId}
                         className="flex-shrink-0 flex flex-col items-center space-y-1"
                       >
-                        <Link href={`/user/${user.userId}`}>
+                        <Link href={ROUTES.USER.BASE(user.userId)}>
                           <div className="w-14 h-14 rounded-full overflow-hidden">
                             <Image
                               className="object-cover"

@@ -6,6 +6,7 @@ import { RatingMyBottleListResponse } from '@/types/MyBottle';
 import Label from '@/app/(primary)/_components/Label';
 import Star from '@/components/Star';
 import { ItemStats } from '@/components/List/_components/ItemStats';
+import { ROUTES } from '@/constants/routes';
 
 interface Props {
   data: RatingMyBottleListResponse['myBottleList'][number];
@@ -30,13 +31,13 @@ export const RatingsListItem = ({ data, isMyPage }: Props) => {
   return (
     <section className="flex items-center text-mainBlack border-brightGray border-b py-2">
       {/* image */}
-      <Link href={`/search/all/${alcoholId}`}>
+      <Link href={ROUTES.SEARCH.ALL(alcoholId)}>
         <ItemImage src={imageUrl} alt="image" />
       </Link>
 
       {/* info */}
       <Link
-        href={`/search/all/${alcoholId}`}
+        href={ROUTES.SEARCH.ALL(alcoholId)}
         className="flex flex-col items-start justify-center space-y-1.5"
       >
         {isHot && (
@@ -65,7 +66,7 @@ export const RatingsListItem = ({ data, isMyPage }: Props) => {
           rating={myRatingPoint}
           size={20}
           color="main"
-          styleProps="text-16 text-mainCoral font-black pr-6"
+          textStyle="text-16 text-mainCoral font-black pr-6"
         />
       </div>
     </section>

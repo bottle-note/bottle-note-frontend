@@ -18,6 +18,7 @@ import Modal from '@/components/Modal';
 import { AuthService } from '@/lib/AuthService';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
+import { ROUTES } from '@/constants/routes';
 import ListItemSkeleton from '@/components/Skeletons/ListItemSkeleton';
 import SearchContainer from '../../../components/Search/SearchContainer';
 
@@ -93,7 +94,7 @@ export default function Search() {
           return;
         }
         handleCloseModal();
-        router.push('/inquire/register');
+        router.push(ROUTES.INQUIRE.REGISTER);
       },
     });
   };

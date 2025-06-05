@@ -11,8 +11,8 @@ const ListItemSkeleton = () => {
       />
 
       <div className="flex flex-col flex-1 space-y-2">
-        <SkeletonBase width={200} height={20} />
-        <SkeletonBase width={250} height={15} />
+        <SkeletonBase width={130} height={20} />
+        <SkeletonBase width={180} height={15} />
       </div>
 
       <div className="ml-auto pr-1 flex flex-col items-end space-y-2">

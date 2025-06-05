@@ -1,11 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { AuthService } from '@/lib/AuthService';
 import { checkTokenValidity } from '@/utils/checkTokenValidity';
 import useModalStore from '@/store/modalStore';
+import { ROUTES } from '@/constants/routes';
+import Modal from './Modal';
 
 export interface NavItem {
   name: string;
@@ -19,26 +21,44 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   const pathname = usePathname();
   const { userData, logout } = AuthService;
   const { handleLoginModal } = useModalStore();
+  const [isMounted, setIsMounted] = useState(false);
+  const { handleModalState } = useModalStore();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const navItems: NavItem[] = [
-    { name: '홈', link: '/', icon: '/icon/navbar/home.svg' },
-    { name: '검색', link: '/search', icon: '/icon/navbar/search.svg' },
-    { name: '별점', link: '/rating', icon: '/icon/navbar/star.svg' },
+    { name: '홈', link: ROUTES.HOME, icon: '/icon/navbar/home.svg' },
+    { name: '검색', link: ROUTES.SEARCH.BASE, icon: '/icon/navbar/search.svg' },
+    {
+      name: '둘러보기',
+      link: ROUTES.EXPLORE.BASE,
+      icon: '/icon/navbar/explorer.svg',
+    },
     {
       name: '기록',
-      link: '/history',
+      link: ROUTES.HISTORY.BASE,
       icon: '/icon/navbar/history.svg',
       requiresAuth: true,
     },
     {
       name: '마이',
-      link: `/user/${userData?.userId || ''}`,
+      link: userData?.userId ? ROUTES.USER.BASE(userData.userId) : '',
       icon: '/icon/navbar/user.svg',
       requiresAuth: true,
     },
   ];
 
   const handleNavigation = async (menu: NavItem) => {
+    if (menu.link === ROUTES.EXPLORE.BASE) {
+      handleModalState({
+        mainText: '준비중인 기능입니다!',
+        type: 'ALERT',
+        isShowModal: true,
+      });
+      return;
+    }
     if (menu.requiresAuth) {
       const isAuthenticated = userData && (await checkTokenValidity());
 
@@ -47,7 +67,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
           return handleLoginModal();
         }
         logout();
-        return router.push('/login');
+        return router.push(ROUTES.LOGIN);
       }
     }
 
@@ -69,7 +89,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
         {navItems.map((menu, index) => (
           <React.Fragment key={menu.link}>
             <button
-              className={`flex flex-col items-center space-y-1 ${isActive(menu.link) ? '' : 'opacity-40'}`}
+              className={`flex flex-col items-center space-y-1 ${isMounted && !isActive(menu.link) ? 'opacity-40' : ''}`}
               onClick={() => handleNavigation(menu)}
             >
               <div className="flex flex-col items-center justify-center space-y-[2px]">
@@ -91,6 +111,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
           </React.Fragment>
         ))}
       </section>
+      <Modal />
     </nav>
   );
 }

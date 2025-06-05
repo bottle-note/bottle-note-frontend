@@ -8,6 +8,7 @@ import Star from '@/components/Star';
 import { truncStr } from '@/utils/truncStr';
 import useModalStore from '@/store/modalStore';
 import { AlcoholInfo } from '@/types/Alcohol';
+import { ROUTES } from '@/constants/routes';
 
 interface Props {
   data: AlcoholInfo;
@@ -47,14 +48,15 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
               </p>
             </div>
             <div className="space-y-[10px] pt-5">
-              <div className="flex items-baseline gap-7">
+              <div className="flex items-end gap-2">
                 <Star
                   rating={data?.rating}
                   size={27}
-                  styleProps="text-white text-27 font-extrabold leading-[27px]"
+                  textStyle="text-white text-27 font-extrabold leading-[27px]"
                   color="white"
+                  align="end"
                 />
-                <div className="text-10 translate-y-[1px]">
+                <div className="text-10">
                   (유저평가 {data.totalRatingsCount})
                 </div>
               </div>
@@ -67,7 +69,7 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
                       handleLoginModal();
                       return;
                     }
-                    router.push(`/review/register?alcoholId=${data.alcoholId}`);
+                    router.push(ROUTES.REVIEW.REGISTER(data.alcoholId));
                   }}
                 >
                   <Image

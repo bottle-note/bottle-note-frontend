@@ -37,8 +37,13 @@ export const enum SORT_ORDER {
   ASC = 'ASC',
 }
 
-export interface ListQueryParams {
+export interface BaseListQueryParams {
   keyword?: string;
+  cursor?: number;
+  pageSize?: number;
+}
+
+export interface ListQueryParams extends BaseListQueryParams {
   category?: string;
   alcoholId?: string;
   reviewId?: string;
@@ -46,8 +51,6 @@ export interface ListQueryParams {
   regionId?: number | '';
   sortType?: SORT_TYPE;
   sortOrder?: SORT_ORDER;
-  cursor?: number;
-  pageSize?: number;
 }
 
 export type Category =

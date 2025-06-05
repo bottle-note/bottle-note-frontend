@@ -4,6 +4,7 @@ import { RateApi } from '@/app/api/RateApi';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import useModalStore from '@/store/modalStore';
 import { FormValues } from '@/types/Review';
+import { ROUTES } from '@/constants/routes';
 
 interface UseReviewSubmissionProps {
   alcoholId: string;
@@ -89,7 +90,7 @@ export const useReviewSubmission = ({
       subText,
       type: 'ALERT',
       handleConfirm: () => {
-        router.push(`/review/${successReviewId}`);
+        router.push(ROUTES.REVIEW.DETAIL(successReviewId));
         handleModalState({
           isShowModal: false,
           mainText: '',

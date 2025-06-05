@@ -12,6 +12,7 @@ import { AuthService } from '@/lib/AuthService';
 import { uploadImages } from '@/utils/S3Upload';
 import { useWebviewCamera } from '@/hooks/useWebviewCamera';
 import { useWebViewInit } from '@/hooks/useWebViewInit';
+import { ROUTES } from '@/constants/routes';
 import EditForm from './_components/EditForm';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
@@ -61,7 +62,7 @@ export default function UserEditPage() {
           mainText: '삭제되었습니다.',
           handleConfirm: () => {
             handleCloseModal();
-            router.push(`/user/${userData?.userId}`);
+            router.push(ROUTES.USER.BASE(userData?.userId!));
           },
         });
       } catch (e) {

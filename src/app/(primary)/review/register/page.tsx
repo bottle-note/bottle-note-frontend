@@ -20,6 +20,7 @@ import { useReviewSubmission } from '@/hooks/useReviewSubmission';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import Toast from '@/components/Toast';
+import SkeletonBase from '@/components/Skeletons/SkeletonBase';
 import ReviewForm from '../_components/form/ReviewForm';
 
 function ReviewRegister() {
@@ -134,74 +135,74 @@ function ReviewRegister() {
       <FormProvider {...formMethods}>
         <div className="relative min-h-screen">
           <div className="fixed inset-0 overflow-y-auto">
-            <div className="relative">
-              {alcoholData?.alcoholUrlImg && (
-                <div
-                  className="absolute w-full h-full  bg-cover bg-center"
-                  style={{
-                    backgroundImage: `url(${alcoholData.alcoholUrlImg})`,
-                  }}
-                />
-              )}
-              <div className="absolute w-full h-full bg-mainCoral bg-opacity-90" />
-              <SubHeader bgColor="bg-mainCoral/10">
-                <SubHeader.Left
-                  onClick={() => {
-                    if (isDirty) {
-                      handleModalState({
-                        isShowModal: true,
-                        mainText:
-                          '작성 중인 내용이 있습니다.\n정말 뒤로 가시겠습니까?',
-                        type: 'CONFIRM',
-                        cancelBtnName: '예',
-                        confirmBtnName: '아니요',
-                        handleConfirm: () => {
-                          handleModalState({
-                            isShowModal: false,
-                          });
-                        },
-                        handleCancel: () => {
-                          handleModalState({
-                            isShowModal: false,
-                          });
-                          router.back();
-                        },
-                      });
-                    } else {
-                      router.back();
-                    }
-                  }}
-                >
-                  <Image
-                    src="/icon/arrow-left-white.svg"
-                    alt="arrowIcon"
-                    width={23}
-                    height={23}
+            {alcoholData ? (
+              <div className="relative">
+                {alcoholData?.alcoholUrlImg && (
+                  <div
+                    className="absolute w-full h-full  bg-cover bg-center"
+                    style={{
+                      backgroundImage: `url(${alcoholData.alcoholUrlImg})`,
+                    }}
                   />
-                </SubHeader.Left>
-                <SubHeader.Center textColor="text-white">
-                  리뷰 작성
-                </SubHeader.Center>
-              </SubHeader>
-              {alcoholData && <AlcoholInfo data={alcoholData} />}
-            </div>
-            {alcoholData && (
-              <>
-                <ReviewForm />
-                <article className="sticky bottom-3 px-5 z-10">
-                  <Button
-                    onClick={handleSubmit(onSave)}
-                    btnName="리뷰 등록"
-                    disabled={isProcessing}
-                  />
-                </article>
-              </>
+                )}
+                <div className="absolute w-full h-full bg-mainCoral bg-opacity-90" />
+                <SubHeader bgColor="bg-mainCoral/10">
+                  <SubHeader.Left
+                    onClick={() => {
+                      if (isDirty) {
+                        handleModalState({
+                          isShowModal: true,
+                          mainText:
+                            '작성 중인 내용이 있습니다.\n정말 뒤로 가시겠습니까?',
+                          type: 'CONFIRM',
+                          cancelBtnName: '예',
+                          confirmBtnName: '아니요',
+                          handleConfirm: () => {
+                            handleModalState({
+                              isShowModal: false,
+                            });
+                          },
+                          handleCancel: () => {
+                            handleModalState({
+                              isShowModal: false,
+                            });
+                            router.back();
+                          },
+                        });
+                      } else {
+                        router.back();
+                      }
+                    }}
+                  >
+                    <Image
+                      src="/icon/arrow-left-white.svg"
+                      alt="arrowIcon"
+                      width={23}
+                      height={23}
+                    />
+                  </SubHeader.Left>
+                  <SubHeader.Center textColor="text-white">
+                    리뷰 작성
+                  </SubHeader.Center>
+                </SubHeader>
+                {alcoholData && <AlcoholInfo data={alcoholData} />}
+              </div>
+            ) : (
+              <SkeletonBase height={330} className="w-full" />
             )}
+            <ReviewForm />
+            <article className="sticky bottom-3 px-5 z-10">
+              <Button
+                onClick={handleSubmit(onSave)}
+                btnName="리뷰 등록"
+                disabled={isProcessing}
+              />
+            </article>
           </div>
         </div>
         {isToastVisible && <Toast message={toastMessage} />}
       </FormProvider>
-      {(isProcessing || !alcoholData) && <Loading />}
+      {isProcessing && <Loading />}
       <Modal />
     </>
   );

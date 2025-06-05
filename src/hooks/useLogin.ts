@@ -10,6 +10,7 @@ import { ApiError } from '@/utils/ApiError';
 import { UserData } from '@/types/Auth';
 import { UserApi } from '@/app/api/UserApi';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
+import { ROUTES } from '@/constants/routes';
 
 const jwt = require('jsonwebtoken');
 
@@ -59,7 +60,7 @@ export const useLogin = () => {
         refreshToken: '',
       });
 
-      router.push('/');
+      router.push(ROUTES.HOME);
     } catch (error) {
       if (error instanceof ApiError && error.code === 'USER_DELETED') {
         return handleModalState({

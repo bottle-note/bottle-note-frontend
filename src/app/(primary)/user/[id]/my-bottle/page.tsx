@@ -148,6 +148,10 @@ export default function MyBottle({
             emptyViewText={`아직 활동한\n보틀이 없어요!`}
             isListFirstLoading={isFirstLoading}
             isScrollLoading={isFetching}
+            isEmpty={
+              !alcoholList ||
+              alcoholList.every((list) => list.data.myBottleList.length === 0)
+            }
           >
             <List.Title
               title={`${userInfo ? `${userInfo.nickName}님` : '나'}의 ${currentTab.name}`}
