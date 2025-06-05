@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { LucideSearch } from 'lucide-react';
 import SideFilterDrawer from '@/components/SideFilterDrawer';
@@ -20,14 +20,49 @@ export const SearchBar = ({
 }: Props) => {
   const [searchText, setSearchText] = useState('');
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<
+    Set<(typeof CATEGORY_MENUS_LIST)[number]['id']>
+  >(new Set());
+  const [selectedRegion, setSelectedRegion] = useState<
+    Set<(typeof REGIONS)[number]['engName']>
+  >(new Set());
 
   const onAddKeyword = (v: string) => {
     handleAddKeyword(v);
     setSearchText('');
   };
 
-  useEffect(() => {
-    console.log(CATEGORY_MENUS_LIST);
+  const handleToggleOption = useMemo(
+    () => ({
+      category: (value: (typeof CATEGORY_MENUS_LIST)[number]['id']) => {
+        setSelectedCategory((prev) => {
+          const newSet = new Set(prev);
+          if (newSet.has(value)) {
+            newSet.delete(value);
+          } else {
+            newSet.add(value);
+          }
+          return newSet;
+        });
+      },
+      region: (value: (typeof REGIONS)[number]['engName']) => {
+        setSelectedRegion((prev) => {
+          const newSet = new Set(prev);
+          if (newSet.has(value)) {
+            newSet.delete(value);
+          } else {
+            newSet.add(value);
+          }
+          return newSet;
+        });
+      },
+    }),
+    [],
+  );
+
+  const handleResetFilter = useCallback(() => {
+    setSelectedCategory(new Set());
+    setSelectedRegion(new Set());
   }, []);
 
   return (
@@ -71,15 +106,15 @@ export const SearchBar = ({
       <SideFilterDrawer
         isOpen={isOpenSideFilter}
         onClose={() => setIsOpenSideFilter(false)}
-        resetFilter={() => {}}
+        resetFilter={handleResetFilter}
       >
         <Accordion title="카테고리">
           <Accordion.Single>
             <Accordion.Content
-              title={CATEGORY_MENUS_LIST[0].name}
+              title="전체"
               value={CATEGORY_MENUS_LIST[0].id}
-              isSelected={true}
-              onClick={onAddKeyword}
+              isSelected={selectedCategory.size === 0}
+              onClick={() => setSelectedCategory(new Set())}
             />
           </Accordion.Single>
           <Accordion.Grid cols={2}>
@@ -88,8 +123,8 @@ export const SearchBar = ({
                 <Accordion.Content
                   title={v.name}
                   value={v.id}
-                  isSelected={false}
-                  onClick={onAddKeyword}
+                  isSelected={selectedCategory.has(v.id)}
+                  onClick={() => handleToggleOption.category(v.id)}
                   key={v.id}
                 />
               ),
@@ -102,8 +137,8 @@ export const SearchBar = ({
             <Accordion.Content
               title="전체"
               value={REGIONS[0].regionId}
-              isSelected={true}
-              onClick={onAddKeyword}
+              isSelected={selectedRegion.size === 0}
+              onClick={() => setSelectedRegion(new Set())}
             />
           </Accordion.Single>
           <Accordion.Grid cols={2}>
@@ -111,8 +146,10 @@ export const SearchBar = ({
               <Accordion.Content
                 title={v.korName}
                 value={v.korName}
-                isSelected={false}
-                onClick={onAddKeyword}
+                isSelected={selectedRegion.has(v.engName)}
+                onClick={() => {
+                  handleToggleOption.region(v.engName);
+                }}
                 key={v.regionId}
               />
             ))}

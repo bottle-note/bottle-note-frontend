@@ -17,7 +17,7 @@ const AccordionItemWrapper = ({
   forceOpen,
   children,
 }: React.PropsWithChildren<AccordionItemWrapperProps>) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const handleOpen = () => {
     setIsOpen(!isOpen);
