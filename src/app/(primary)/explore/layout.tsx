@@ -5,11 +5,5 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <NavLayout showNavbar>
-      <main className="mb-24 w-full h-full min-h-screen relative bg-gray-50">
-        {children}
-      </main>
-    </NavLayout>
-  );
+  return <NavLayout showNavbar>{children}</NavLayout>;
 }
