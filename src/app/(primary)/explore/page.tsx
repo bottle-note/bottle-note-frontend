@@ -29,7 +29,7 @@ export default function ExplorePage() {
           registerTab={registerTab}
         />
       </div>
-      <section className="w-full h-full mt-[100px] p-4 md:p-6">
+      <section className="w-full h-full mt-[100px] p-4 md:p-6 pt-14">
         {currentTab.id === 'EXPLORER_WISKEY' && <WhiskeyExplorerList />}
 
         {currentTab.id === 'REVIEW_WISKEY' && <ReviewExplorerList />}
