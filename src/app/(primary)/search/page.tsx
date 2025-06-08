@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { v4 as uuid } from 'uuid';
 import CategorySelector from '@/components/CategorySelector';

@@ -5,7 +5,7 @@ import { ExploreReview } from '@/types/Explore';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ExploreApi } from '@/app/api/ExploreApi';
 import List from '@/components/List/List';
-import ReviewCard from './ReviewCard';
+import ReviewCard from './ReviewListItem';
 import { SearchBar } from './SearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
 import Label from '../../_components/Label';
@@ -23,7 +23,7 @@ export const ReviewExplorerList = () => {
   } = usePaginatedQuery<{
     items: ExploreReview[];
   }>({
-    queryKey: ['explore.reviews', keywords],
+    queryKey: ['explore.reviews', ...keywords],
     queryFn: ({ pageParam }) => {
       return ExploreApi.getReviews({
         keywords: Array.from(keywords),
@@ -35,10 +35,6 @@ export const ReviewExplorerList = () => {
     },
     staleTime: 1000 * 60 * 5,
   });
-
-  const handleSearch = () => {
-    refetch();
-  };
 
   const handleAddKeyword = (newKeyword: string) => {
     setKeywords((prev) => new Set(prev).add(newKeyword));
@@ -55,8 +51,10 @@ export const ReviewExplorerList = () => {
   return (
     <section>
       <SearchBar
-        handleSearch={handleSearch}
+        handleSearch={refetch}
         handleAddKeyword={handleAddKeyword}
+        description={`보고싶은 리뷰의 내용, 플레이버태그, 작성자, 위스키이름을\n 추가하여 검색해보세요.`}
+        handleRemoveKeyword={handleRemoveKeyword}
       />
       <article className="flex gap-x-1 gap-y-1.5 flex-wrap">
         {Array.from(keywords).map((keyword) => (
@@ -90,9 +88,11 @@ export const ReviewExplorerList = () => {
       >
         <List.Section className="space-y-[30px] divide-y-[1px]">
           {reviewList &&
-            reviewList[0].data.items.map((review) => (
-              <ReviewCard key={uuid()} content={review} />
-            ))}
+            [...reviewList].map((listData) =>
+              listData.data.items
+                .flat()
+                .map((review) => <ReviewCard key={uuid()} content={review} />),
+            )}
         </List.Section>
         <div ref={targetRef} />
       </List>

@@ -7,6 +7,8 @@ interface Props {
   iconHeight?: number;
   pointContent: string;
   countContent: string;
+  mainTextClass?: string;
+  subTextClass?: string;
 }
 
 export const ItemStats = ({
@@ -15,9 +17,13 @@ export const ItemStats = ({
   iconHeight = 12,
   pointContent,
   countContent,
+  mainTextClass,
+  subTextClass,
 }: Props) => {
   return (
-    <div className="flex justify-end text-12 font-semibold gap-[1px]">
+    <div
+      className={`flex justify-end text-12 font-semibold gap-[1px] ${mainTextClass}`}
+    >
       {iconSrc && (
         <Image
           src={iconSrc}
@@ -28,7 +34,7 @@ export const ItemStats = ({
         />
       )}
       <span>{pointContent}</span>
-      <p className="flex">
+      <p className={`flex ${subTextClass}`}>
         (
         <>
           <Image

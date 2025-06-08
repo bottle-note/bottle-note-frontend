@@ -22,11 +22,18 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   const { userData, logout } = AuthService;
   const { handleLoginModal } = useModalStore();
   const [isMounted, setIsMounted] = useState(false);
-  const { handleModalState } = useModalStore();
+  const [lastTapTime, setLastTapTime] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
 
   const navItems: NavItem[] = [
     { name: '홈', link: ROUTES.HOME, icon: '/icon/navbar/home.svg' },
@@ -51,14 +58,28 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   ];
 
   const handleNavigation = async (menu: NavItem) => {
-    if (menu.link === ROUTES.EXPLORE.BASE) {
-      handleModalState({
-        mainText: '준비중인 기능입니다!',
-        type: 'ALERT',
-        isShowModal: true,
-      });
+    const currentTime = Date.now();
+    const lastTap = lastTapTime[menu.link] || 0;
+    const timeDiff = currentTime - lastTap;
+
+    if (isActive(menu.link) && timeDiff < 1000) {
+      scrollToTop();
       return;
     }
+
+    if (isActive(menu.link)) {
+      setLastTapTime((prev) => ({
+        ...prev,
+        [menu.link]: currentTime,
+      }));
+      return;
+    }
+
+    setLastTapTime((prev) => ({
+      ...prev,
+      [menu.link]: currentTime,
+    }));
+
     if (menu.requiresAuth) {
       const isAuthenticated = userData && (await checkTokenValidity());
 
@@ -75,9 +96,14 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   };
 
   const isActive = (link: string) => {
+    if (link === '') {
+      return false;
+    }
+
     if (link === '/') {
       return pathname === '/';
     }
+
     return pathname === link || pathname.startsWith(link);
   };
 
