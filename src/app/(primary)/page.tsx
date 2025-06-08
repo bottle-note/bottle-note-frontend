@@ -34,7 +34,6 @@ export default function Home() {
   const renderTopContent = () => {
     switch (firstMenuSelectedTab.id) {
       case 'week':
-      case 'spring':
       case 'recent':
         return (
           <PopularList
