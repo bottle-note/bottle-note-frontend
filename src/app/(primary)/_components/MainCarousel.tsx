@@ -6,6 +6,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from '@/components/ui/carousel';
+import { ROUTES } from '@/constants/routes';
 
 export interface ProductImage {
   id: string | number;
@@ -18,7 +19,7 @@ function textOverlay(id: string | number) {
     case 'bottleNote':
       return (
         <Link
-          href="/explore"
+          href={ROUTES.EXPLORE.BASE}
           className="absolute left-0 top-11 w-full h-full flex flex-col pl-7 z-10"
         >
           <div>
@@ -36,7 +37,7 @@ function textOverlay(id: string | number) {
     case 'summerRecommend':
       return (
         <Link
-          href="/search"
+          href={ROUTES.SEARCH.SEARCH('여름 추천 위스키')}
           className="absolute left-0 top-10 w-full h-full flex flex-col pl-[35px] z-10"
         >
           <div>
@@ -54,7 +55,7 @@ function textOverlay(id: string | number) {
     case 'rainDayRecommend':
       return (
         <Link
-          href="/search"
+          href={ROUTES.SEARCH.SEARCH('비 오는 날 추천 위스키')}
           className="absolute left-0 top-[121px] w-full h-full flex flex-col pl-6 z-10"
         >
           <div>
