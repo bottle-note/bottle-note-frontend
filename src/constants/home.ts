@@ -20,7 +20,6 @@ export const BANNER_IMAGES: ProductImage[] = [
 
 export const TOP_MENU_ITEMS = [
   { id: 'week', name: 'HOT 5' },
-  { id: 'spring', name: '봄 추천 위스키' },
   { id: 'recent', name: '최근에 본 위스키' },
 ];
 
