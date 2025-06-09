@@ -4,7 +4,7 @@ import { ReviewFilterType, PicksStatus } from '@/types/History';
 import { handleFilterValues } from '@/utils/historyFilter';
 import { Accordion } from '@/components/SideFilterDrawer/Accordion';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
-import DateRange from './DateRange';
+import FilterDateRange from './FilterDateRange';
 
 interface Props {
   type?: 'DATA' | 'DATE';
@@ -80,7 +80,7 @@ export default function FilterGroup({
   };
 
   if (type === 'DATE') {
-    return <DateRange />;
+    return <FilterDateRange />;
   }
 
   return (
