@@ -79,13 +79,9 @@ export default function FilterGroup({
     }
   };
 
-  if (type === 'DATE') {
-    return <FilterDateRange />;
-  }
-
   return (
     <Accordion title={title}>
-      {data && data.length > 0 && (
+      {type !== 'DATE' ? (
         <>
           <Accordion.Single>
             {firstItem && (
@@ -113,6 +109,8 @@ export default function FilterGroup({
             </Accordion.Grid>
           )}
         </>
+      ) : (
+        <FilterDateRange />
       )}
     </Accordion>
   );
