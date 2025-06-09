@@ -5,6 +5,7 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselApi,
 } from '@/components/ui/carousel';
 import { ROUTES } from '@/constants/routes';
 
@@ -55,7 +56,7 @@ function textOverlay(id: string | number) {
     case 'rainDayRecommend':
       return (
         <Link
-          href={ROUTES.SEARCH.SEARCH('비 오는 날 추천 위스키')}
+          href={ROUTES.SEARCH.SEARCH('비')}
           className="absolute left-0 top-[121px] w-full h-full flex flex-col pl-6 z-10"
         >
           <div>
@@ -76,7 +77,7 @@ function textOverlay(id: string | number) {
 }
 
 export default function MainCarousel({ images }: { images: ProductImage[] }) {
-  const [api, setApi] = useState<any>(null);
+  const [api, setApi] = useState<CarouselApi | null>(null);
 
   if (!images || images.length === 0) {
     return <></>;
