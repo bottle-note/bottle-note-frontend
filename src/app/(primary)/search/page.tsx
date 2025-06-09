@@ -20,6 +20,7 @@ import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
 import { ROUTES } from '@/constants/routes';
 import ListItemSkeleton from '@/components/Skeletons/ListItemSkeleton';
+import { SearchHistoryService } from '@/lib/SearchHistoryService';
 import SearchContainer from '../../../components/Search/SearchContainer';
 
 interface InitialState {
@@ -137,6 +138,13 @@ export default function Search() {
     tabList: [{ id: 'week', name: 'HOT 5' }],
     scroll: true,
   });
+
+  useEffect(() => {
+    if (currSearchKeyword && currSearchKeyword.trim() !== '') {
+      const searchHistory = new SearchHistoryService();
+      searchHistory.save(currSearchKeyword);
+    }
+  }, [currSearchKeyword]);
 
   return (
     <Suspense>
