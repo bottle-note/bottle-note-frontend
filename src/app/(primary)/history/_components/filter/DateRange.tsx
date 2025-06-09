@@ -4,7 +4,7 @@ import { useHistoryFilterStore } from '@/store/historyFilterStore';
 
 const MAX_YEARS = 2;
 
-export default function DateRangeFilter() {
+export default function DateRange() {
   const { state: filterState, setDate } = useHistoryFilterStore();
 
   const getDefaultDates = () => {

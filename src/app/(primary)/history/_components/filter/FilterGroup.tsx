@@ -4,7 +4,7 @@ import { ReviewFilterType, PicksStatus } from '@/types/History';
 import { handleFilterValues } from '@/utils/historyFilter';
 import { Accordion } from '@/components/SideFilterDrawer/Accordion';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
-import DateRangeFilter from './DateRangeFilter';
+import DateRange from './DateRange';
 
 interface Props {
   type?: 'DATA' | 'DATE';
@@ -17,7 +17,7 @@ interface Props {
   gridCols?: number;
 }
 
-export default function FilterContainer({
+export default function FilterGroup({
   type = 'DATA',
   title,
   data,
@@ -80,7 +80,7 @@ export default function FilterContainer({
   };
 
   if (type === 'DATE') {
-    return <DateRangeFilter />;
+    return <DateRange />;
   }
 
   return (
