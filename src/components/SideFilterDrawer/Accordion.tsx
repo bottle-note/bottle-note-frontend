@@ -150,14 +150,14 @@ const AccordionItemContent = ({
     >
       <div className={contentStyles}>
         {IconComponent && (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 whitespace-nowrap">
             {IconComponent && (
               <IconComponent color={isSelected ? '#FFFFFF' : '#BFBFBF'} />
             )}
-            <span>{title}</span>
+            <span className="whitespace-nowrap">{title}</span>
           </div>
         )}
-        {!IconComponent && <span>{title}</span>}
+        {!IconComponent && <span className="whitespace-nowrap">{title}</span>}
         {isSelected && <Image src={CheckedIcon} alt="CheckedIcon" />}
       </div>
     </div>
