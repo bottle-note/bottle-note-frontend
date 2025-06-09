@@ -2,11 +2,9 @@ import React, { FC } from 'react';
 import { REVIEW_FILTER_TYPES, PICKS_STATUS } from '@/constants/history';
 import { ReviewFilterType, PicksStatus } from '@/types/History';
 import { handleFilterValues } from '@/utils/historyFilter';
+import { Accordion } from '@/components/SideFilterDrawer/Accordion';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
 import DateRangeFilter from './DateRangeFilter';
-import ToggleContainer from './ToggleContainer';
-import FilterOption from './FilterOption';
-import ToggleDarkGrayIcon from 'public/icon/arrow-down-darkgray.svg';
 
 interface Props {
   type?: 'DATA' | 'DATE';
@@ -40,7 +38,6 @@ export default function FilterContainer({
       case '별점':
         handleFilterValues(filterState.ratingPoint, value, setRatingPoint);
         break;
-
       case '리뷰':
         handleFilterValues(
           filterState.historyReviewFilterType,
@@ -48,13 +45,11 @@ export default function FilterContainer({
           (values) => setHistoryReviewFilterType(values as ReviewFilterType[]),
         );
         break;
-
       case '찜':
         handleFilterValues(filterState.picksStatus, value, (values) =>
           setPicksStatus(values as PicksStatus[]),
         );
         break;
-
       default:
         break;
     }
@@ -84,47 +79,41 @@ export default function FilterContainer({
     }
   };
 
+  if (type === 'DATE') {
+    return <DateRangeFilter />;
+  }
+
   return (
-    <article>
-      <ToggleContainer title={title} toggleIcon={ToggleDarkGrayIcon}>
-        {type === 'DATA' ? (
-          <div className="py-3 px-5 bg-sectionWhite">
+    <Accordion title={title}>
+      {data && data.length > 0 && (
+        <>
+          <Accordion.Single>
             {firstItem && (
-              <div className="mb-1">
-                <FilterOption
-                  key={0}
-                  value={firstItem.value}
-                  title={firstItem.name}
-                  IconComponent={firstItem?.icon}
+              <Accordion.Content
+                title={firstItem.name}
+                value={firstItem.value}
+                IconComponent={firstItem.icon}
+                isSelected={checkValueExists(firstItem.value)}
+                onClick={handleFilter}
+              />
+            )}
+          </Accordion.Single>
+          {restItems.length > 0 && (
+            <Accordion.Grid cols={gridCols}>
+              {restItems.map((item) => (
+                <Accordion.Content
+                  key={item.name}
+                  title={item.name}
+                  value={item.value}
+                  IconComponent={item.icon}
+                  isSelected={checkValueExists(item.value)}
                   onClick={handleFilter}
-                  isSelected={checkValueExists(firstItem.value)}
                 />
-              </div>
-            )}
-            {restItems.length > 0 && (
-              <div
-                className="grid gap-1"
-                style={{
-                  gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
-                }}
-              >
-                {restItems.map((item) => (
-                  <FilterOption
-                    key={item.name}
-                    value={item.value}
-                    title={item.name}
-                    IconComponent={item.icon}
-                    onClick={handleFilter}
-                    isSelected={checkValueExists(item.value)}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
-          <DateRangeFilter />
-        )}
-      </ToggleContainer>
-    </article>
+              ))}
+            </Accordion.Grid>
+          )}
+        </>
+      )}
+    </Accordion>
   );
 }
