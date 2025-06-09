@@ -8,72 +8,118 @@ import {
   CarouselApi,
 } from '@/components/ui/carousel';
 import { ROUTES } from '@/constants/routes';
+interface OverlayConfig {
+  link: string;
+  mainText: React.ReactNode;
+  topSubText: string;
+  bottomSubText: string;
+  styles: {
+    mainTextColor: string;
+    topSubTextColor: string;
+    bottomSubTextColor: string;
+    containerClass: string;
+  };
+}
+
+const overlayConfigs: Record<string, OverlayConfig> = {
+  bottleNote: {
+    link: ROUTES.EXPLORE.BASE,
+    mainText: (
+      <>
+        기억에 남는 첫 향,
+        <br />
+        보틀노트에서
+      </>
+    ),
+    topSubText: '',
+    bottomSubText: '둘러보기',
+    styles: {
+      mainTextColor: 'text-white',
+      topSubTextColor: '',
+      bottomSubTextColor: 'text-textGray',
+      containerClass: 'top-11 pl-7',
+    },
+  },
+  summerRecommend: {
+    link: ROUTES.SEARCH.SEARCH('여름 추천 위스키'),
+    mainText: (
+      <>
+        올여름을 완성해 줄
+        <br />
+        위스키 한 잔
+      </>
+    ),
+    topSubText: '',
+    bottomSubText: '여름 추천 위스키 보기',
+    styles: {
+      mainTextColor: 'text-white',
+      topSubTextColor: '',
+      bottomSubTextColor: 'text-[#165E59] font-extrabold',
+      containerClass: 'top-10 pl-[35px]',
+    },
+  },
+  rainDayRecommend: {
+    link: ROUTES.SEARCH.SEARCH('비 오는 날 추천 위스키'),
+    mainText: (
+      <>
+        비오는 날은 피트!
+        <br />
+        보틀노트가 추천하는
+      </>
+    ),
+    topSubText: '장마철 피트 위스키',
+    bottomSubText: '',
+    styles: {
+      mainTextColor: 'text-white',
+      topSubTextColor: 'text-white font-extrabold',
+      bottomSubTextColor: '',
+      containerClass: 'top-[121px] pl-6',
+    },
+  },
+} as const;
+
+function OverlayContent({ config }: { config: OverlayConfig }) {
+  return (
+    <Link
+      href={config.link}
+      className={`absolute left-0 ${config.styles.containerClass} w-full h-full flex flex-col z-10`}
+    >
+      {config.topSubText && (
+        <div
+          className={`inline-flex items-center gap-1 mt-2 ${config.styles.topSubTextColor}`}
+        >
+          {config.topSubText}
+        </div>
+      )}
+      <div>
+        <span
+          className={`block ${config.styles.mainTextColor} text-24 font-semiBold leading-tight drop-shadow-md`}
+        >
+          {config.mainText}
+        </span>
+      </div>
+      {config.bottomSubText && (
+        <div
+          className={`inline-flex items-center gap-1 mt-2 ${config.styles.bottomSubTextColor}`}
+        >
+          {config.bottomSubText}
+        </div>
+      )}
+    </Link>
+  );
+}
+
+function textOverlay(id: string | number) {
+  const config = overlayConfigs[String(id)];
+  if (!config) return null;
+
+  return <OverlayContent config={config} />;
+}
 
 export interface ProductImage {
   id: string | number;
   src: string;
   alt: string;
-}
-
-function textOverlay(id: string | number) {
-  switch (id) {
-    case 'bottleNote':
-      return (
-        <Link
-          href={ROUTES.EXPLORE.BASE}
-          className="absolute left-0 top-11 w-full h-full flex flex-col pl-7 z-10"
-        >
-          <div>
-            <span className="block text-white text-24 font-semiBold leading-tight drop-shadow-md">
-              기억에 남는 첫 향,
-              <br />
-              보틀노트에서
-            </span>
-          </div>
-          <div className="inline-flex items-center gap-1 text-textGray mt-2">
-            둘러보기
-          </div>
-        </Link>
-      );
-    case 'summerRecommend':
-      return (
-        <Link
-          href={ROUTES.SEARCH.SEARCH('여름 추천 위스키')}
-          className="absolute left-0 top-10 w-full h-full flex flex-col pl-[35px] z-10"
-        >
-          <div>
-            <span className="block text-white text-24 font-semiBold leading-tight drop-shadow-md">
-              올여름을 완성해 줄
-              <br />
-              위스키 한 잔
-            </span>
-          </div>
-          <div className="inline-flex items-center gap-1 text-[#165E59] font-extrabold mt-2">
-            여름 추천 위스키 보기
-          </div>
-        </Link>
-      );
-    case 'rainDayRecommend':
-      return (
-        <Link
-          href={ROUTES.SEARCH.SEARCH('비')}
-          className="absolute left-0 top-[121px] w-full h-full flex flex-col pl-6 z-10"
-        >
-          <div>
-            <div className="inline-flex items-center gap-1 text-white font-extrabold mt-2">
-              비오는 날은 피트!
-            </div>
-            <span className="block text-white text-24 font-semiBold leading-tight drop-shadow-md">
-              보틀노트가 추천하는
-              <br />
-              장마철 피트 위스키
-            </span>
-          </div>
-        </Link>
-      );
-    default:
-      return null;
-  }
 }
 
 export default function MainCarousel({ images }: { images: ProductImage[] }) {
