@@ -6,10 +6,11 @@ export const tailwindColors = {
   subCoral: '#E58257',
   bgGray: '#E6E6DD',
   brightGray: '#BFBFBF',
+  mainGray: '#666666',
+  textGray: '#C6C6C6',
   gray: '#2B2B2B',
   mainBlack: '#101010',
   mainDarkGray: '#252525',
-  mainGray: '#666666',
   sectionWhite: '#F7F7F7',
 };
 
@@ -74,6 +75,7 @@ const config: Config = {
         '15': ['15px', '19px'],
         '16': ['16px', '20px'],
         '20': ['20px', '24px'],
+        '24': ['24px', '28px'],
         '27': ['27px', '31px'],
       },
       lineHeight: {
