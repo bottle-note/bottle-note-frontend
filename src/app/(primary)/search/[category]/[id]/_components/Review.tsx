@@ -134,7 +134,14 @@ function Review({ data, onRefresh }: Props) {
             {data.price ? `${numberWithCommas(data.price)} ₩` : '-'}
           </p>
         </div>
-        <Link href={ROUTES.REVIEW.DETAIL(data.reviewId)}>
+        <Link
+          href={ROUTES.REVIEW.DETAIL(data.reviewId)}
+          style={{
+            touchAction: 'manipulation',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+          prefetch={false}
+        >
           <div className="grid grid-cols-5 space-x-2 mt-[6px]">
             <p className="col-span-4 text-mainDarkGray text-12">
               {truncStr(data.reviewContent, 135)}

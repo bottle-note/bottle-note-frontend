@@ -3,7 +3,7 @@ import Link from 'next/link';
 import {
   HISTORY_TYPE_INFO,
   DescriptionProps,
-} from '@/app/(primary)/history/_components/filter/HistoryDescription';
+} from '@/app/(primary)/history/_components/HistoryDescription';
 import BaseImage from '@/components/BaseImage';
 import { formatDate } from '@/utils/formatDate';
 import { truncStr } from '@/utils/truncStr';
