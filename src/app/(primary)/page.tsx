@@ -1,13 +1,17 @@
 'use client';
 
-import Header from '@/app/(primary)/_components/Header';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
 import MainCarousel from '@/app/(primary)/_components/MainCarousel';
+import { ROUTES } from '@/constants/routes';
 import { BANNER_IMAGES, TOP_MENU_ITEMS, MENU_CATEGORY } from '@/constants/home';
 import CategoryList from './_components/CategoryList';
 import PopularList from './_components/PopularList';
 import NavLayout from './_components/NavLayout';
+import mainLogo from 'public/bottle_note_logo_main.svg';
+import EnterIcon from 'public/icon/search-subcoral.svg';
 
 export default function Home() {
   const {
@@ -57,7 +61,12 @@ export default function Home() {
 
   return (
     <NavLayout>
-      <Header />
+      <header className="bg-white  py-[15px] px-[17px] pt-14 flex items-center justify-between">
+        <Image src={mainLogo} alt="Logo" priority />
+        <Link href={ROUTES.SEARCH.BASE} className="relative">
+          <Image src={EnterIcon} alt="search button" />
+        </Link>
+      </header>
       <MainCarousel images={BANNER_IMAGES} />
       <div className="pt-[9px] space-y-1 relative">
         <section className="pb-20">
