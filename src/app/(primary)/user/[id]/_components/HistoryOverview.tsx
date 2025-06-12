@@ -24,14 +24,16 @@ const HistoryOverview = ({ rates, reviews, likes, id }: Props) => {
   ];
 
   return (
-    <article className="flex justify-center pt-2.75 divide-x divide-subCoral divide-opacity-30 text-fontBurgundy">
+    <article className="flex justify-center pt-[25px] divide-x divide-subCoral divide-opacity-30 text-fontBurgundy">
       {HISTORY_OVERVIEW.map((item) => (
         <button onClick={() => router.push(item.link)} key={item.name}>
           <p className="flex flex-col items-center px-8.5" key={item.name}>
-            <span className="text-[2.125rem] font-bold text-subCoral">
+            <span className="text-27 font-extrabold text-subCoral">
               {item.value}
             </span>
-            <span className="text-sm whitespace-nowrap">{item.name}</span>
+            <span className="text-13 font-bold whitespace-nowrap">
+              {item.name}
+            </span>
           </p>
         </button>
       ))}
