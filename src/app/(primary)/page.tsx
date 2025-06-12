@@ -68,9 +68,9 @@ export default function Home() {
         </Link>
       </header>
       <MainCarousel images={BANNER_IMAGES} />
-      <div className="pt-[9px] space-y-1 relative">
+      <div className="pt-[22px] space-y-1 relative">
         <section className="pb-20">
-          <article className="space-y-[18px]">
+          <article className="space-y-[30px]">
             <Tab
               variant="bookmark"
               tabList={firstMenuList}
@@ -79,11 +79,9 @@ export default function Home() {
               scrollContainerRef={firstMenuScrollContainerRef}
               registerTab={firstMenuRegisterTab}
             />
-            <div className="pt-[33px] pb-[59px] pl-[25px]">
-              {renderTopContent()}
-            </div>
+            <div className="pb-[59px] pl-[25px]">{renderTopContent()}</div>
           </article>
-          <article className="space-y-[18px]">
+          <article className="space-y-[30px]">
             <Tab
               variant="bookmark"
               tabList={secondMenuList}
