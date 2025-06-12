@@ -20,6 +20,7 @@ import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
 import { ROUTES } from '@/constants/routes';
 import ListItemSkeleton from '@/components/Skeletons/ListItemSkeleton';
+import { SearchHistoryService } from '@/lib/SearchHistoryService';
 import SearchContainer from '../../../components/Search/SearchContainer';
 
 interface InitialState {
@@ -138,12 +139,19 @@ export default function Search() {
     scroll: true,
   });
 
+  useEffect(() => {
+    if (currSearchKeyword && currSearchKeyword.trim() !== '') {
+      const searchHistory = new SearchHistoryService();
+      searchHistory.save(currSearchKeyword);
+    }
+  }, [currSearchKeyword]);
+
   return (
     <Suspense>
       <main className="mb-24 w-full h-full">
         <SearchContainer
           handleSearchCallback={handleSearchCallback}
-          styleProps="px-5 pt-16 pb-5 bg-subCoral"
+          styleProps="px-5 pt-16 pb-[6px]"
         />
 
         <section className="flex flex-col gap-7 py-5">

@@ -2,14 +2,11 @@
 
 import React, { useEffect, useState, Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { ROUTES } from '@/constants/routes';
 import EnterIcon from 'public/icon/search-subcoral.svg';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
 
 interface Props {
-  type?: 'Link' | 'Search';
   handleSearch?: (value: string) => void;
   handleFocus?: (status: boolean) => void;
   placeholder?: string;
@@ -25,7 +22,6 @@ const SearchButton = () => (
 );
 
 export default function SearchBar({
-  type = 'Search',
   handleSearch,
   handleFocus,
   placeholder = '어떤 술을 찾고 계신가요?',
@@ -49,9 +45,8 @@ export default function SearchBar({
 
   const inputProps = {
     type: 'text',
-    className: `w-full bg-white rounded-lg h-10 pl-4 pr-12 outline-none text-mainCoral placeholder-mainCoral text-15 border border-mainCoral${
-      type === 'Link' ? ' cursor-pointer' : ''
-    }`,
+    className:
+      'w-full bg-white rounded-lg h-10 pl-4 pr-12 outline-none text-mainCoral placeholder-mainCoral text-15 border border-mainCoral',
     placeholder,
     'aria-label': '검색어 입력',
   };
@@ -61,24 +56,13 @@ export default function SearchBar({
   }, [currSearchKeyword]);
 
   useEffect(() => {
-    if (type === 'Search' && setUpdateSearchText) {
+    if (setUpdateSearchText) {
       setUpdateSearchText(() => (newText: string) => {
         setSearchText(newText);
       });
       return () => setUpdateSearchText(null);
     }
-  }, [setUpdateSearchText, type]);
-
-  if (type === 'Link') {
-    return (
-      <div className="relative">
-        <Link href={ROUTES.SEARCH.BASE} className="relative">
-          <input {...inputProps} readOnly />
-          <SearchButton />
-        </Link>
-      </div>
-    );
-  }
+  }, [setUpdateSearchText]);
 
   return (
     <div className="relative">
