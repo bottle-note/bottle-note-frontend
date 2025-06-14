@@ -19,7 +19,7 @@ export const useWebViewInit = () => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    if (window.isInApp) {
+    if (typeof window.isInApp !== 'undefined') {
       setIsMobile(window.isInApp);
     } else {
       setIsMobile(null);
