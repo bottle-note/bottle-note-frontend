@@ -1,13 +1,5 @@
 import { DeviceService } from '@/lib/DeviceService';
 
-export function checkIsInApp(status: string) {
-  const result = status === 'false' ? false : Boolean(status);
-  window.isInApp = result;
-  DeviceService.setIsInApp(result);
-
-  return result;
-}
-
 export function checkPlatform(platform: string) {
   window.platform = platform;
   DeviceService.setPlatform(platform);
@@ -23,7 +15,6 @@ export function getDeviceToken(token: string, platform: string) {
 
 export function handleWebViewMessage(
   message:
-    | 'checkIsInApp'
     | 'checkPlatform'
     | 'deviceToken'
     | 'logToFlutter'

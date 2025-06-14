@@ -131,8 +131,8 @@ export const useLogin = () => {
   const handleInitKakaoSdkLogin = () => {
     const kakaoSDK = document.createElement('script');
     kakaoSDK.async = false;
-    kakaoSDK.src = `https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js`;
-    kakaoSDK.integrity = process.env.KAKAO_INTEGIRITY!;
+    kakaoSDK.src = `https://t1.kakaocdn.net/kakao_js_sdk/2.7.5/kakao.min.js`;
+    kakaoSDK.integrity = process.env.NEXT_PUBLIC_KAKAO_INTEGRITY_HASH!;
     kakaoSDK.crossOrigin = `anonymous`;
     document.head.appendChild(kakaoSDK);
 
