@@ -13,17 +13,48 @@ export function getDeviceToken(token: string, platform: string) {
   return { deviceToken: token, platform };
 }
 
-export function handleWebViewMessage(
-  message:
-    | 'checkPlatform'
-    | 'deviceToken'
-    | 'logToFlutter'
-    | 'openAlbum'
-    | 'openCamera'
-    | 'loginWithKakao'
-    | 'loginWithApple',
+type WebViewMessageType = {
+  checkPlatform: {
+    message: 'checkPlatform';
+    args?: never;
+  };
+  deviceToken: {
+    message: 'deviceToken';
+    args?: never;
+  };
+  logToFlutter: {
+    message: 'logToFlutter';
+    args: { log: string };
+  };
+  openAlbum: {
+    message: 'openAlbum';
+    args?: never;
+  };
+  openCamera: {
+    message: 'openCamera';
+    args?: never;
+  };
+  loginWithKakao: {
+    message: 'loginWithKakao';
+    args?: never;
+  };
+  loginWithApple: {
+    message: 'loginWithApple';
+    args?: never;
+  };
+  triggerHaptic: {
+    message: 'triggerHaptic';
+    args?: { type: 'light' | 'medium' | 'heavy' };
+  };
+};
+
+type WebViewMessage = WebViewMessageType[keyof WebViewMessageType];
+
+export function handleWebViewMessage<T extends WebViewMessage['message']>(
+  message: T,
+  args?: WebViewMessageType[T]['args'],
 ) {
-  return window.FlutterMessageQueue.postMessage(message);
+  return window.FlutterMessageQueue.postMessage(message, args);
 }
 
 export function openAlbum(imgDataBase64: string): string {
