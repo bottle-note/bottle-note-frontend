@@ -44,7 +44,7 @@ type WebViewMessageType = {
   };
   triggerHaptic: {
     message: 'triggerHaptic';
-    args?: { type: 'light' | 'medium' | 'heavy' };
+    args?: { type: 'light' | 'medium' | 'heavy' | 'selection' | 'vibrate' };
   };
 };
 
@@ -54,7 +54,8 @@ export function handleWebViewMessage<T extends WebViewMessage['message']>(
   message: T,
   args?: WebViewMessageType[T]['args'],
 ) {
-  return window.FlutterMessageQueue.postMessage(message, args);
+  if (!window.isInApp) return;
+  window.FlutterMessageQueue.postMessage(message, args);
 }
 
 export function openAlbum(imgDataBase64: string): string {
