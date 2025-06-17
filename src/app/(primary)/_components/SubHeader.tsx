@@ -26,7 +26,7 @@ const HeaderCenter = ({
 }: HeaderCenterProps) => {
   return (
     <p
-      className={`${textColor} whitespace-nowrap text-[clamp(12px,5vw,18px)] font-semibold absolute left-1/2 -translate-x-1/2`}
+      className={`${textColor} whitespace-nowrap text-[clamp(12px,5vw,16px)] font-bold absolute left-1/2 -translate-x-1/2`}
     >
       {children}
     </p>
