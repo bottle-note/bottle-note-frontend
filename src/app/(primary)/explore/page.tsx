@@ -20,8 +20,8 @@ export default function ExplorePage() {
     <Suspense>
       <div className="fixed top-0 left-0 right-0 bg-white z-10 shadow-sm">
         <SubHeader>
-          <SubHeader.Left useHomeLogo />
-          <SubHeader.Right useSideMenu />
+          <SubHeader.Left showLogo />
+          <SubHeader.Right showSideMenu />
         </SubHeader>
         <Tab
           variant="bookmark"

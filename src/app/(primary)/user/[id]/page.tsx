@@ -23,8 +23,8 @@ export default function User({ params: { id } }: { params: { id: string } }) {
     <NavLayout>
       <main className="text-mainBlack mb-24">
         <SubHeader>
-          <SubHeader.Left useHomeLogo />
-          <SubHeader.Right useSideMenu />
+          <SubHeader.Left showLogo />
+          <SubHeader.Right showSideMenu />
         </SubHeader>
         <section className="bg-white px-5 pb-[35px]">
           <section className="border-y border-subCoral pb-[22px]">

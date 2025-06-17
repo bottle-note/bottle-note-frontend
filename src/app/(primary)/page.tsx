@@ -58,8 +58,8 @@ export default function Home() {
   return (
     <NavLayout>
       <SubHeader>
-        <SubHeader.Left useHomeLogo />
-        <SubHeader.Right useSideMenu />
+        <SubHeader.Left showLogo />
+        <SubHeader.Right showSideMenu />
       </SubHeader>
       <MainCarousel images={BANNER_IMAGES} />
       <div className="pt-[22px] space-y-1 relative">

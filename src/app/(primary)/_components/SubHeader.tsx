@@ -11,17 +11,17 @@ import Logo from 'public/bottle_note_Icon_logo.svg';
 interface HeaderLeftProps {
   children?: ReactNode;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
-  useHomeLogo?: boolean;
+  showLogo?: boolean;
 }
 
 const HeaderLeft = ({
   children,
   onClick,
-  useHomeLogo = false,
+  showLogo = false,
 }: HeaderLeftProps) => {
   const leftLayoutClass = 'pl-[17px]';
 
-  if (useHomeLogo) {
+  if (showLogo) {
     return (
       <Link href={ROUTES.HOME} className={leftLayoutClass}>
         <Image src={Logo} alt="Logo" priority />
@@ -65,13 +65,13 @@ const HeaderCenter = ({
 interface HeaderRightProps {
   children?: ReactNode;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
-  useSideMenu?: boolean;
+  showSideMenu?: boolean;
 }
 
 const HeaderRight = ({
   children,
   onClick,
-  useSideMenu = false,
+  showSideMenu = false,
 }: HeaderRightProps) => {
   return (
     <div
@@ -84,7 +84,7 @@ const HeaderRight = ({
       }}
     >
       {children}
-      {useSideMenu && <SidebarHeader />}
+      {showSideMenu && <SidebarHeader />}
     </div>
   );
 };
