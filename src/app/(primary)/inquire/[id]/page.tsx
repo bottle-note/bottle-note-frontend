@@ -41,7 +41,7 @@ export default function Inquire() {
   return (
     <>
       <section className="pb-8 relative">
-        <SubHeader bgColor="bg-bgGray">
+        <SubHeader>
           <SubHeader.Left
             onClick={() => {
               router.back();
@@ -54,9 +54,7 @@ export default function Inquire() {
               height={23}
             />
           </SubHeader.Left>
-          <SubHeader.Center textColor="text-subCoral">
-            나의 문의 상세
-          </SubHeader.Center>
+          <SubHeader.Center>나의 문의 상세</SubHeader.Center>
         </SubHeader>
         {inquireDetails !== null && (
           <>

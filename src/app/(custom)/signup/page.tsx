@@ -93,7 +93,7 @@ export default function Signup() {
   return (
     <>
       <main className="bg-white flex flex-col h-full flex-grow pb-16">
-        <SubHeader bgColor="bg-bgGray">
+        <SubHeader>
           <SubHeader.Left
             onClick={() => {
               router.back();
@@ -106,9 +106,7 @@ export default function Signup() {
               height={23}
             />
           </SubHeader.Left>
-          <SubHeader.Center textColor="text-subCoral">
-            회원가입
-          </SubHeader.Center>
+          <SubHeader.Center>회원가입</SubHeader.Center>
         </SubHeader>
 
         <form

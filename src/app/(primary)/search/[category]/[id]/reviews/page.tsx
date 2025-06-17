@@ -107,7 +107,7 @@ function Reviews() {
 
   return (
     <div className="pb-8 relative">
-      <SubHeader bgColor="bg-bgGray">
+      <SubHeader>
         <SubHeader.Left
           onClick={() => {
             router.back();
@@ -120,9 +120,7 @@ function Reviews() {
             height={23}
           />
         </SubHeader.Left>
-        <SubHeader.Center textColor="text-subCoral">
-          {alcoholKorName}
-        </SubHeader.Center>
+        <SubHeader.Center>{alcoholKorName}</SubHeader.Center>
       </SubHeader>
       <section className="pt-5 px-5 pb-7 space-y-9">
         <div className="flex gap-3 relative">

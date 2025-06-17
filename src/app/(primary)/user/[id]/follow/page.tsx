@@ -53,7 +53,7 @@ export default function UserFollowPage({
   return (
     <Suspense>
       <main>
-        <SubHeader bgColor="bg-bgGray">
+        <SubHeader>
           <SubHeader.Left
             onClick={() => {
               router.back();
@@ -66,9 +66,7 @@ export default function UserFollowPage({
               height={23}
             />
           </SubHeader.Left>
-          <SubHeader.Center textColor="text-subCoral">
-            팔로잉 / 팔로워
-          </SubHeader.Center>
+          <SubHeader.Center>팔로잉 / 팔로워</SubHeader.Center>
         </SubHeader>
 
         <section className="pt-5 px-5 space-y-7.5">

@@ -17,10 +17,13 @@ const HeaderLeft = ({ children, onClick }: HeaderLeftProps) => {
 
 interface HeaderCenterProps {
   children: ReactNode;
-  textColor: string;
+  textColor?: string;
 }
 
-const HeaderCenter = ({ children, textColor }: HeaderCenterProps) => {
+const HeaderCenter = ({
+  children,
+  textColor = 'text-subCoral',
+}: HeaderCenterProps) => {
   return (
     <p
       className={`${textColor} whitespace-nowrap text-[clamp(12px,5vw,18px)] font-semibold absolute left-1/2 -translate-x-1/2`}
@@ -45,10 +48,10 @@ const HeaderRight = ({ children, onClick }: HeaderRightProps) => {
 
 interface SubHeaderMainProps {
   children?: ReactNode;
-  bgColor: string;
+  bgColor?: string;
 }
 
-function SubHeaderMain({ children, bgColor }: SubHeaderMainProps) {
+function SubHeaderMain({ children, bgColor = 'bg-white' }: SubHeaderMainProps) {
   return (
     <div
       className={`${bgColor} flex justify-between items-center relative pb-8 px-5 pt-20`}
