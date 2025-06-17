@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { UserInfoApi } from '@/types/User';
 import { UserApi } from '@/app/api/UserApi';
+import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import UserInfo from './_components/UserInfo';
 import HistoryOverview from './_components/HistoryOverview';
-import SidebarHeader from './_components/SidebarHeader';
 import Timeline from './_components/Timeline';
 import NavLayout from '../../_components/NavLayout';
 
@@ -22,8 +22,11 @@ export default function User({ params: { id } }: { params: { id: string } }) {
   return (
     <NavLayout>
       <main className="text-mainBlack mb-24">
-        <section className="bg-white px-7.5 pb-[35px]">
-          <SidebarHeader />
+        <SubHeader>
+          <SubHeader.Left useHomeLogo />
+          <SubHeader.Right useSideMenu />
+        </SubHeader>
+        <section className="bg-white px-5 pb-[35px]">
           <section className="border-y border-subCoral pb-[22px]">
             <UserInfo
               profileImgSrc={userData?.imageUrl ?? null}

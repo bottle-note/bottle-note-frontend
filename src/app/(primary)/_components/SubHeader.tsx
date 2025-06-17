@@ -1,17 +1,46 @@
 'use client';
 
 import React, { ReactNode, MouseEvent } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ROUTES } from '@/constants/routes';
+import SidebarHeader from '@/app/(primary)/_components/SidebarHeader';
+
+import Logo from 'public/bottle_note_Icon_logo.svg';
 
 interface HeaderLeftProps {
-  children: ReactNode;
-  onClick: (e: MouseEvent<HTMLButtonElement>) => void;
+  children?: ReactNode;
+  onClick?: (e: MouseEvent<HTMLDivElement>) => void;
+  useHomeLogo?: boolean;
 }
 
-const HeaderLeft = ({ children, onClick }: HeaderLeftProps) => {
+const HeaderLeft = ({
+  children,
+  onClick,
+  useHomeLogo = false,
+}: HeaderLeftProps) => {
+  const leftLayoutClass = 'pl-[17px]';
+
+  if (useHomeLogo) {
+    return (
+      <Link href={ROUTES.HOME} className={leftLayoutClass}>
+        <Image src={Logo} alt="Logo" priority />
+      </Link>
+    );
+  }
+
   return (
-    <button className="absolute left-3" onClick={onClick}>
+    <div
+      className={leftLayoutClass}
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          onClick?.(e as unknown as MouseEvent<HTMLDivElement>);
+        }
+      }}
+    >
       {children}
-    </button>
+    </div>
   );
 };
 
@@ -26,7 +55,7 @@ const HeaderCenter = ({
 }: HeaderCenterProps) => {
   return (
     <p
-      className={`${textColor} whitespace-nowrap text-[clamp(12px,5vw,16px)] font-bold absolute left-1/2 -translate-x-1/2`}
+      className={`${textColor} whitespace-nowrap text-[clamp(12px,5vw,16px)] font-bold `}
     >
       {children}
     </p>
@@ -34,15 +63,29 @@ const HeaderCenter = ({
 };
 
 interface HeaderRightProps {
-  children: ReactNode;
-  onClick: (e: MouseEvent<HTMLButtonElement>) => void;
+  children?: ReactNode;
+  onClick?: (e: MouseEvent<HTMLDivElement>) => void;
+  useSideMenu?: boolean;
 }
 
-const HeaderRight = ({ children, onClick }: HeaderRightProps) => {
+const HeaderRight = ({
+  children,
+  onClick,
+  useSideMenu = false,
+}: HeaderRightProps) => {
   return (
-    <button className="absolute right-5" onClick={onClick}>
+    <div
+      className="pr-[17px]"
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          onClick?.(e as unknown as MouseEvent<HTMLDivElement>);
+        }
+      }}
+    >
       {children}
-    </button>
+      {useSideMenu && <SidebarHeader />}
+    </div>
   );
 };
 
@@ -54,7 +97,7 @@ interface SubHeaderMainProps {
 function SubHeaderMain({ children, bgColor = 'bg-white' }: SubHeaderMainProps) {
   return (
     <div
-      className={`${bgColor} flex justify-between items-center relative pb-8 px-5 pt-20`}
+      className={`${bgColor} flex justify-between items-center relative pt-[74px] pb-[15px]`}
     >
       {children}
     </div>

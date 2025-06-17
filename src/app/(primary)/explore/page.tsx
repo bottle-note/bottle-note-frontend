@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
-import { Header } from './_components/Header';
+import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { ReviewExplorerList } from './_components/ReviewExploreList';
 import { WhiskeyExplorerList } from './_components/WhiskeyExploreList';
 
@@ -19,7 +19,10 @@ export default function ExplorePage() {
   return (
     <Suspense>
       <div className="fixed top-0 left-0 right-0 bg-white z-10 shadow-sm">
-        <Header />
+        <SubHeader>
+          <SubHeader.Left useHomeLogo />
+          <SubHeader.Right useSideMenu />
+        </SubHeader>
         <Tab
           variant="bookmark"
           tabList={tabList}

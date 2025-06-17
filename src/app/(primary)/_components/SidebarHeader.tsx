@@ -27,18 +27,24 @@ const Header = ({
   const logoSrc = isOpen ? LogoWhite : Logo;
   const menuSrc = isOpen ? MenuWhite : Menu;
   const menuAlt = isOpen ? '메뉴 닫기' : '메뉴 열기';
-  const bgColor = isOpen ? 'bg-subCoral' : '';
-  const padding = isOpen ? 'p-7.5' : 'pb-6';
+
+  if (isOpen) {
+    return (
+      <article className="flex justify-between bg-subCoral p-7.5 pt-16">
+        <button>
+          <Image src={logoSrc} alt="보틀노트" />
+        </button>
+        <button onClick={handleOpen}>
+          <Image src={menuSrc} alt={menuAlt} />
+        </button>
+      </article>
+    );
+  }
 
   return (
-    <article className={`flex justify-between ${bgColor} ${padding} pt-16`}>
-      <button>
-        <Image src={logoSrc} alt="보틀노트" />
-      </button>
-      <button onClick={handleOpen}>
-        <Image src={menuSrc} alt={menuAlt} />
-      </button>
-    </article>
+    <button onClick={handleOpen}>
+      <Image src={menuSrc} alt={menuAlt} />
+    </button>
   );
 };
 
@@ -99,7 +105,7 @@ const SidebarHeader = () => {
             handleConfirm: handleLogout,
           });
         } catch (e) {
-          console.log(e);
+          console.error(e);
           handleCloseModal();
         }
       },
