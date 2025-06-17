@@ -143,7 +143,7 @@ export default function Report() {
   return (
     <>
       <section className="pb-8 relative">
-        <SubHeader bgColor="bg-bgGray">
+        <SubHeader>
           <SubHeader.Left
             onClick={() => {
               if (watch('content')?.length > 0) {
@@ -172,9 +172,7 @@ export default function Report() {
               height={23}
             />
           </SubHeader.Left>
-          <SubHeader.Center textColor="text-subCoral">
-            {reportTitle}
-          </SubHeader.Center>
+          <SubHeader.Center>{reportTitle}</SubHeader.Center>
         </SubHeader>
         <article className="m-5">
           <OptionSelect

@@ -10,7 +10,7 @@ export default function NotFound() {
   const router = useRouter();
   return (
     <NavLayout>
-      <SubHeader bgColor="bg-bgGray">
+      <SubHeader>
         <SubHeader.Left
           onClick={() => {
             router.back();
@@ -23,7 +23,7 @@ export default function NotFound() {
             height={23}
           />
         </SubHeader.Left>
-        <SubHeader.Center textColor="text-subCoral">ERROR</SubHeader.Center>
+        <SubHeader.Center>ERROR</SubHeader.Center>
       </SubHeader>
       <div className="h-screen flex flex-col justify-center items-center gap-5">
         <Image

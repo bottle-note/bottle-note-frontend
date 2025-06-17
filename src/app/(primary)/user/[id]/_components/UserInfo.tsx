@@ -33,7 +33,7 @@ const UserInfo = ({
   }, []);
 
   return (
-    <section className="flex space-x-5.25 py-8.75 border-b border-t border-subCoral">
+    <section className="flex space-x-5.25 pt-8.75 ">
       <ProfileImage profileImgSrc={profileImgSrc} />
 
       <article className="py-[13.5px] space-y-3">

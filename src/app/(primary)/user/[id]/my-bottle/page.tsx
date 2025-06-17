@@ -113,7 +113,7 @@ export default function MyBottle({
   return (
     <Suspense>
       <main>
-        <SubHeader bgColor="bg-bgGray">
+        <SubHeader>
           <SubHeader.Left
             onClick={() => {
               router.back();
@@ -126,9 +126,7 @@ export default function MyBottle({
               height={23}
             />
           </SubHeader.Left>
-          <SubHeader.Center textColor="text-subCoral">
-            마이보틀
-          </SubHeader.Center>
+          <SubHeader.Center>마이보틀</SubHeader.Center>
         </SubHeader>
 
         <SearchContainer

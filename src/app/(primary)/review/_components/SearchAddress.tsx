@@ -25,7 +25,7 @@ export default function SearchAddress({ handleCloseModal }: Props) {
 
   return (
     <PageModal>
-      <SubHeader bgColor="bg-bgGray">
+      <SubHeader>
         <SubHeader.Left
           onClick={() => {
             handleCloseModal();
@@ -38,7 +38,7 @@ export default function SearchAddress({ handleCloseModal }: Props) {
             height={23}
           />
         </SubHeader.Left>
-        <SubHeader.Center textColor="text-subCoral">장소찾기</SubHeader.Center>
+        <SubHeader.Center>장소찾기</SubHeader.Center>
       </SubHeader>
       <KakaoAddressMap handleSaveData={saveAddress} />
     </PageModal>
