@@ -73,7 +73,7 @@ const WhiskeyListItem = ({ content }: Props) => {
       {/* info */}
       <Link
         href={ROUTES.SEARCH.ALL(content.alcoholId)}
-        className="flex flex-col items-start justify-center space-y-1.5"
+        className="flex flex-col items-start justify-center space-y-1"
       >
         <div>
           <ItemInfo
@@ -88,7 +88,7 @@ const WhiskeyListItem = ({ content }: Props) => {
         <div className="flex items-center gap-x-1">
           <Label
             name="나의 별점"
-            styleClass="label-default text-10 px-2 py-[2px] rounded-[2px] flex items-end"
+            styleClass="label-default text-10 px-2 py-[1px] rounded-[2px] flex items-end"
             position="after"
             icon={
               <Star

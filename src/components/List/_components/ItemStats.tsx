@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import RatingCountIcon from 'public/icon/rating-count-black.svg';
+import RatingCountIcon from 'public/icon/rating-count-gray.svg';
 
 interface Props {
   iconSrc?: string;
@@ -33,14 +33,14 @@ export const ItemStats = ({
           height={iconHeight}
         />
       )}
-      <span>{pointContent}</span>
-      <p className={`flex ${subTextClass}`}>
+      <span>{pointContent === '0.0' ? '-' : pointContent}</span>
+      <p className={`flex ${subTextClass} items-center`}>
         (
         <>
           <Image
             src={RatingCountIcon}
             alt="평가 참여자 수"
-            className="pb-[2px]"
+            className="w-[12px] h-[12px] "
           />
           <span>{countContent}</span>
         </>
