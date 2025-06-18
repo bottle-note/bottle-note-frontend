@@ -40,7 +40,7 @@ export const ItemStats = ({
           <Image
             src={RatingCountIcon}
             alt="평가 참여자 수"
-            className="w-[12px] h-[12px] "
+            className="w-[12px] h-[12px]"
           />
           <span>{countContent}</span>
         </>
