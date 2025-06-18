@@ -26,8 +26,8 @@ export default function User({ params: { id } }: { params: { id: string } }) {
           <SubHeader.Left showLogo />
           <SubHeader.Right showSideMenu />
         </SubHeader>
-        <section className="bg-white px-5 pb-[35px]">
-          <section className="border-y border-subCoral pb-[22px]">
+        <section className="bg-white px-5">
+          <section className="border-t border-subCoral">
             <UserInfo
               profileImgSrc={userData?.imageUrl ?? null}
               follower={userData?.followerCount ?? 0}
