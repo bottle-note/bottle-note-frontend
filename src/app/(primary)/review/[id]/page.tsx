@@ -133,55 +133,34 @@ export default function ReviewDetail() {
             <div className="relative">
               {alcoholInfo.imageUrl && (
                 <div
-                  className="absolute w-full h-full bg-cover bg-center"
+                  className="absolute inset-0 bg-cover bg-center"
                   style={{
                     backgroundImage: `url(${alcoholInfo.imageUrl})`,
                   }}
                 />
               )}
               <div
-                className={`absolute w-full h-full bg-mainCoral bg-opacity-90 ${isUnmounting ? 'hidden' : ''}`}
+                className={`absolute inset-0 bg-mainCoral bg-opacity-90 ${isUnmounting ? 'hidden' : ''}`}
               />
-              <SubHeader bgColor="bg-mainCoral/10">
-                <SubHeader.Left
-                  onClick={() => {
-                    router.back();
-                  }}
-                >
-                  <Image
-                    src="/icon/arrow-left-white.svg"
-                    alt="arrowIcon"
-                    width={23}
-                    height={23}
-                  />
-                </SubHeader.Left>
-                <SubHeader.Center textColor="text-white">
-                  리뷰 상세보기
-                </SubHeader.Center>
-                {/* <SubHeader.Right
-                  onClick={() => {
-                    shareOrCopy(
-                      `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_URL}/review/${reviewId}`,
-                      handleModalState,
-                      `${alcoholInfo.korName} 리뷰`,
-                      `${alcoholInfo.korName} 리뷰 상세보기`,
-                    );
-                    handleModalState({
-                      isShowModal: true,
-                      type: 'ALERT',
-                      mainText:
-                        '아직 준비 중인 기능입니다. 조금만 기다려주세요!',
-                    });
-                  }}
-                >
-                  <Image
-                    src="/icon/externallink-outlined-white.svg"
-                    alt="linkIcon"
-                    width={23}
-                    height={23}
-                  />
-                </SubHeader.Right> */}
-              </SubHeader>
+              <div className="relative z-10">
+                <SubHeader bgColor="bg-none">
+                  <SubHeader.Left
+                    onClick={() => {
+                      router.back();
+                    }}
+                  >
+                    <Image
+                      src="/icon/arrow-left-white.svg"
+                      alt="arrowIcon"
+                      width={23}
+                      height={23}
+                    />
+                  </SubHeader.Left>
+                  <SubHeader.Center textColor="text-white">
+                    리뷰 상세보기
+                  </SubHeader.Center>
+                </SubHeader>
+              </div>
               {alcoholInfo && (
                 <AlcoholInfo data={alcoholInfo} handleLogin={handleLogin} />
               )}

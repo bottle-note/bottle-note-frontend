@@ -30,7 +30,7 @@ const Header = ({
 
   if (isOpen) {
     return (
-      <article className="flex justify-between bg-subCoral p-7.5 pt-16">
+      <article className="flex justify-between bg-subCoral px-[17px] pb-[15px] pt-[74px]">
         <button>
           <Image src={logoSrc} alt="보틀노트" />
         </button>

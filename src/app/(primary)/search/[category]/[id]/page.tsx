@@ -13,7 +13,6 @@ import NavLayout from '@/app/(primary)/_components/NavLayout';
 import StarRating from '@/components/StarRaiting';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
 import Modal from '@/components/Modal';
-import Loading from '@/components/Loading';
 import { truncStr } from '@/utils/truncStr';
 // import { shareOrCopy } from '@/utils/shareOrCopy';
 import { AuthService } from '@/lib/AuthService';
@@ -159,56 +158,62 @@ export default function SearchAlcohol() {
           <AlcoholDetailsSkeleton />
         ) : (
           <>
-            <div className="relative ">
+            <div className="relative">
+              {/* 배경 레이어들 */}
               {data?.alcohols?.alcoholUrlImg && (
                 <div
-                  className="absolute w-full h-full bg-cover bg-center"
+                  className="absolute inset-0 bg-cover bg-center"
                   style={{
                     backgroundImage: `url(${data.alcohols.alcoholUrlImg})`,
                   }}
                 />
               )}
               <div
-                className={`absolute w-full h-full bg-mainCoral bg-opacity-90 ${
+                className={`absolute inset-0 bg-mainCoral bg-opacity-90 ${
                   isUnmounting ? 'hidden' : ''
                 }`}
               />
-              <SubHeader bgColor="bg-mainCoral/10">
-                <SubHeader.Left
-                  onClick={() => {
-                    router.back();
-                  }}
-                >
-                  <Image
-                    src="/icon/arrow-left-white.svg"
-                    alt="arrowIcon"
-                    width={23}
-                    height={23}
-                  />
-                </SubHeader.Left>
-                <SubHeader.Right
-                  onClick={() => {
-                    handleModalState({
-                      isShowModal: true,
-                      type: 'ALERT',
-                      mainText:
-                        '아직 준비 중인 기능입니다. 조금만 기다려주세요!',
-                    });
-                  }}
-                >
-                  <Image
-                    src="/icon/externallink-outlined-white.svg"
-                    alt="linkIcon"
-                    width={23}
-                    height={23}
-                  />
-                </SubHeader.Right>
-              </SubHeader>
-              <AlcoholBox
-                data={data?.alcohols}
-                isPicked={isPicked}
-                setIsPicked={setIsPicked}
-              />
+
+              {/* 콘텐츠 레이어 */}
+              <div className="relative z-10">
+                <SubHeader bgColor="bg-none">
+                  <SubHeader.Left
+                    onClick={() => {
+                      router.back();
+                    }}
+                  >
+                    <Image
+                      src="/icon/arrow-left-white.svg"
+                      alt="arrowIcon"
+                      width={23}
+                      height={23}
+                    />
+                  </SubHeader.Left>
+                  <SubHeader.Right
+                    onClick={() => {
+                      handleModalState({
+                        isShowModal: true,
+                        type: 'ALERT',
+                        mainText:
+                          '아직 준비 중인 기능입니다. 조금만 기다려주세요!',
+                      });
+                    }}
+                  >
+                    <Image
+                      src="/icon/externallink-outlined-white.svg"
+                      alt="linkIcon"
+                      width={23}
+                      height={23}
+                    />
+                  </SubHeader.Right>
+                </SubHeader>
+
+                <AlcoholBox
+                  data={data?.alcohols}
+                  isPicked={isPicked}
+                  setIsPicked={setIsPicked}
+                />
+              </div>
             </div>
             <div className="mb-5">
               <article className="grid place-items-center space-y-2 pt-[25px] pb-[21px]">
