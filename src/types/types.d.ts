@@ -3,10 +3,10 @@ declare global {
     kakao: any;
     Kakao: any;
     FlutterMessageQueue: {
-      postMessage: (message: string, args?: any) => any;
+      postMessage: (payload: any) => any;
     };
      LogToFlutter: {
-      postMessage: (payload: string) => any;
+      postMessage: (payload: any) => any;
     };
     getDeviceToken: (
       token: string,

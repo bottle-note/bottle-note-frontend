@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
+  checkIsInApp,
   getDeviceToken,
   handleWebViewMessage,
   sendLogToFlutter,
@@ -19,17 +20,16 @@ export const useWebViewInit = () => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    if (typeof window.isInApp !== 'undefined') {
-      setIsMobile(window.isInApp);
-    } else {
-      setIsMobile(null);
-    }
+    const { userAgent } = navigator;
+    const mobile = /iPhone|iPad|iPod|Android/i.test(userAgent);
+    setIsMobile(mobile);
   }, []);
 
   const initWebView = () => {
     if (typeof window === 'undefined') return;
 
     window.getDeviceToken = getDeviceToken;
+    window.checkIsInApp = checkIsInApp;
     window.checkPlatform = checkPlatform;
     window.sendLogToFlutter = sendLogToFlutter;
     window.onKakaoLoginSuccess = onKakaoLoginSuccess;
@@ -38,6 +38,7 @@ export const useWebViewInit = () => {
     window.onAppleLoginError = onAppleLoginError;
 
     if (isMobile) {
+      handleWebViewMessage('checkIsInApp');
       handleWebViewMessage('checkPlatform');
     }
   };

@@ -1,5 +1,13 @@
 import { DeviceService } from '@/lib/DeviceService';
 
+export function checkIsInApp(status: string) {
+  const result = status === 'false' ? false : Boolean(status);
+  window.isInApp = result;
+  DeviceService.setIsInApp(result);
+
+  return result;
+}
+
 export function checkPlatform(platform: string) {
   window.platform = platform;
   DeviceService.setPlatform(platform);
@@ -13,53 +21,18 @@ export function getDeviceToken(token: string, platform: string) {
   return { deviceToken: token, platform };
 }
 
-type WebViewMessageType = {
-  checkPlatform: {
-    message: 'checkPlatform';
-    args?: never;
-  };
-  deviceToken: {
-    message: 'deviceToken';
-    args?: never;
-  };
-  logToFlutter: {
-    message: 'logToFlutter';
-    args: { log: string };
-  };
-  openAlbum: {
-    message: 'openAlbum';
-    args?: never;
-  };
-  openCamera: {
-    message: 'openCamera';
-    args?: never;
-  };
-  loginWithKakao: {
-    message: 'loginWithKakao';
-    args?: never;
-  };
-  loginWithApple: {
-    message: 'loginWithApple';
-    args?: never;
-  };
-  switchEnv: {
-    message: 'switchEnv';
-    args?: 'dev' | 'prod';
-  };
-  triggerHaptic: {
-    message: 'triggerHaptic';
-    args?: { type: 'light' | 'medium' | 'heavy' | 'selection' | 'vibrate' };
-  };
-};
-
-type WebViewMessage = WebViewMessageType[keyof WebViewMessageType];
-
-export function handleWebViewMessage<T extends WebViewMessage['message']>(
-  message: T,
-  args?: WebViewMessageType[T]['args'],
+export function handleWebViewMessage(
+  message:
+    | 'checkIsInApp'
+    | 'checkPlatform'
+    | 'deviceToken'
+    | 'logToFlutter'
+    | 'openAlbum'
+    | 'openCamera'
+    | 'loginWithKakao'
+    | 'loginWithApple',
 ) {
-  if (!window.isInApp) return;
-  window.FlutterMessageQueue.postMessage(message, args);
+  return window.FlutterMessageQueue.postMessage(message);
 }
 
 export function openAlbum(imgDataBase64: string): string {
