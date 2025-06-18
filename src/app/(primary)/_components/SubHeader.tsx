@@ -1,6 +1,12 @@
 'use client';
 
-import React, { ReactNode, MouseEvent } from 'react';
+import React, {
+  ReactNode,
+  MouseEvent,
+  Children,
+  ReactElement,
+  isValidElement,
+} from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ROUTES } from '@/constants/routes';
@@ -19,11 +25,9 @@ const HeaderLeft = ({
   onClick,
   showLogo = false,
 }: HeaderLeftProps) => {
-  const leftLayoutClass = 'pl-[17px]';
-
   if (showLogo) {
     return (
-      <Link href={ROUTES.HOME} className={leftLayoutClass}>
+      <Link href={ROUTES.HOME}>
         <Image src={Logo} alt="Logo" priority />
       </Link>
     );
@@ -31,7 +35,6 @@ const HeaderLeft = ({
 
   return (
     <div
-      className={leftLayoutClass}
       onClick={onClick}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -75,7 +78,6 @@ const HeaderRight = ({
 }: HeaderRightProps) => {
   return (
     <div
-      className="pr-[17px]"
       onClick={onClick}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -84,7 +86,7 @@ const HeaderRight = ({
       }}
     >
       {children}
-      {showSideMenu && <SidebarHeader />}
+      <div className="pt-2">{showSideMenu && <SidebarHeader />}</div>
     </div>
   );
 };
@@ -95,11 +97,35 @@ interface SubHeaderMainProps {
 }
 
 function SubHeaderMain({ children, bgColor = 'bg-white' }: SubHeaderMainProps) {
+  let leftComponent = null;
+  let centerComponent = null;
+  let rightComponent = null;
+
+  Children.forEach(children, (child) => {
+    if (isValidElement(child)) {
+      const childType = (child as ReactElement).type;
+
+      if (childType === HeaderLeft) {
+        leftComponent = child;
+      } else if (childType === HeaderCenter) {
+        centerComponent = child;
+      } else if (childType === HeaderRight) {
+        rightComponent = child;
+      }
+    }
+  });
+
   return (
     <div
-      className={`${bgColor} flex justify-between items-center relative pt-[74px] pb-[15px]`}
+      className={`${bgColor} flex items-center w-full px-[17px] pb-[15px] pt-[74px]`}
     >
-      {children}
+      <div className="flex-1 flex items-center min-w-0">{leftComponent}</div>
+      <div className="flex-1 flex justify-center items-center min-w-0">
+        {centerComponent}
+      </div>
+      <div className="flex-1 flex justify-end items-center min-w-0">
+        {rightComponent}
+      </div>
     </div>
   );
 }
