@@ -7,6 +7,7 @@ import { AuthService } from '@/lib/AuthService';
 import { checkTokenValidity } from '@/utils/checkTokenValidity';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
+import { handleWebViewMessage } from '@/utils/flutterUtil';
 import Modal from './Modal';
 
 export interface NavItem {
@@ -117,6 +118,9 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
             <button
               className={`flex flex-col items-center space-y-1 ${isMounted && !isActive(menu.link) ? 'opacity-40' : ''}`}
               onClick={() => handleNavigation(menu)}
+              onTouchEnd={() =>
+                handleWebViewMessage('triggerHaptic', { type: 'light' })
+              }
             >
               <div className="flex flex-col items-center justify-center space-y-[2px]">
                 <Image

@@ -33,34 +33,36 @@ const UserInfo = ({
   }, []);
 
   return (
-    <section className="flex space-x-5.25 py-8.75 border-b border-t border-subCoral">
+    <section className="flex space-x-5.25 py-7">
       <ProfileImage profileImgSrc={profileImgSrc} />
 
-      <article className="space-y-2.5">
-        <h1 className="text-3xl font-bold text-subCoral">{nickName}</h1>
+      <article className="py-[13.5px] space-y-3">
+        <div className="space-y-1">
+          <h1 className="text-20 font-extrabold text-subCoral">{nickName}</h1>
 
-        <div className="flex gap-2">
-          <button
-            onClick={() =>
-              router.push(ROUTES.USER.FOLLOW(currentId, 'follower'))
-            }
-          >
-            <p className="text-sm font-thin">
-              <strong className="font-black">팔로워 </strong>
-              <span>{follower}</span>
-            </p>
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() =>
+                router.push(ROUTES.USER.FOLLOW(currentId, 'follower'))
+              }
+            >
+              <p className="text-13">
+                <strong className="font-bold">팔로워 </strong>
+                <span>{follower}</span>
+              </p>
+            </button>
 
-          <button
-            onClick={() =>
-              router.push(ROUTES.USER.FOLLOW(currentId, 'following'))
-            }
-          >
-            <p className="text-sm">
-              <strong className="font-black">팔로잉 </strong>
-              <span>{following}</span>
-            </p>
-          </button>
+            <button
+              onClick={() =>
+                router.push(ROUTES.USER.FOLLOW(currentId, 'following'))
+              }
+            >
+              <p className="text-13">
+                <strong className="font-bold">팔로잉 </strong>
+                <span>{following}</span>
+              </p>
+            </button>
+          </div>
         </div>
 
         <div className="space-x-1 text-sm">

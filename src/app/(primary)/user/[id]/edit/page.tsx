@@ -75,7 +75,7 @@ export default function UserEditPage() {
 
   return (
     <main>
-      <SubHeader bgColor="bg-bgGray">
+      <SubHeader>
         <SubHeader.Left
           onClick={() => {
             router.back();
@@ -88,9 +88,7 @@ export default function UserEditPage() {
             height={23}
           />
         </SubHeader.Left>
-        <SubHeader.Center textColor="text-subCoral">
-          마이페이지
-        </SubHeader.Center>
+        <SubHeader.Center>마이페이지</SubHeader.Center>
       </SubHeader>
 
       <input

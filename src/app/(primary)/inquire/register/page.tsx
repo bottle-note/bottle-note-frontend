@@ -133,7 +133,7 @@ export default function InquireRegister() {
     <>
       <FormProvider {...formMethods}>
         <section className="pb-8 relative">
-          <SubHeader bgColor="bg-bgGray">
+          <SubHeader>
             <SubHeader.Left
               onClick={() => {
                 if (watch('content')?.length > 0) {
@@ -162,9 +162,7 @@ export default function InquireRegister() {
                 height={23}
               />
             </SubHeader.Left>
-            <SubHeader.Center textColor="text-subCoral">
-              문의글 작성
-            </SubHeader.Center>
+            <SubHeader.Center>문의글 작성</SubHeader.Center>
           </SubHeader>
           <article className="m-5">
             <OptionSelect

@@ -132,7 +132,7 @@ export default function History() {
 
   return (
     <NavLayout>
-      <SubHeader bgColor="bg-bgGray">
+      <SubHeader>
         <SubHeader.Left
           onClick={() => {
             router.back();
@@ -145,15 +145,14 @@ export default function History() {
             height={23}
           />
         </SubHeader.Left>
-        <SubHeader.Center textColor="text-subCoral">
-          나의 히스토리
-        </SubHeader.Center>
+        <SubHeader.Center>나의 히스토리</SubHeader.Center>
+        <SubHeader.Right showSideMenu />
       </SubHeader>
       <main>
         <SearchContainer
           placeholder="위스키 이름 검색"
           handleSearchCallback={handleSearchCallback}
-          styleProps="px-5 pt-5"
+          styleProps="px-5"
         />
         <Timeline
           data={accumulatedHistories}
