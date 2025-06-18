@@ -42,6 +42,10 @@ type WebViewMessageType = {
     message: 'loginWithApple';
     args?: never;
   };
+  switchEnv: {
+    message: 'switchEnv';
+    args?: 'dev' | 'prod';
+  };
   triggerHaptic: {
     message: 'triggerHaptic';
     args?: { type: 'light' | 'medium' | 'heavy' | 'selection' | 'vibrate' };
