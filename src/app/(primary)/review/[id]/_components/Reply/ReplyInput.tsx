@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useFormContext, FieldValues, SubmitHandler } from 'react-hook-form';
 import { AuthService } from '@/lib/AuthService';
 import useModalStore from '@/store/modalStore';
@@ -15,7 +15,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
   const { register, watch, handleSubmit, setValue } = useFormContext();
   const content = watch('content');
   const mentionName = watch('replyToReplyUserName');
-  const newTextareaRef = React.useRef<HTMLTextAreaElement | null>(null);
+  const newTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const { handleLoginModal } = useModalStore();
 
   const handleResizeHeight = () => {
