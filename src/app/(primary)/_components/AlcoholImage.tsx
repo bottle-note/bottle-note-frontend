@@ -1,5 +1,6 @@
 'use client';
 
+import React, { memo } from 'react';
 import BaseImage from '@/components/BaseImage';
 
 interface Props {
@@ -48,4 +49,4 @@ const AlcoholImage = ({
   );
 };
 
-export default AlcoholImage;
+export default memo(AlcoholImage);
