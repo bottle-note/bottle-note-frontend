@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { truncStr } from '@/utils/truncStr';
 import { AlcoholInfo as AlcoholType } from '@/types/Alcohol';
-import useModalStore from '@/store/modalStore';
 import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
 import Label from '@/app/(primary)/_components/Label';
-import PickBtn from '../../_components/PickBtn';
 
 interface Props {
   data: AlcoholType;
@@ -16,16 +14,8 @@ interface DetailItem {
 }
 
 function AlcoholInfo({ data }: Props) {
-  const {
-    korName,
-    engName,
-    korCategory,
-    isPicked: originalIsPicked,
-    alcoholUrlImg,
-    alcoholId,
-  } = data;
-  const { handleLoginModal } = useModalStore();
-  const [isPicked, setIsPicked] = useState<boolean>(originalIsPicked ?? false);
+  const { korName, engName, korCategory, alcoholUrlImg, alcoholsTastingTags } =
+    data;
 
   const alcoholDetails: DetailItem[] = [
     { title: '캐스크', content: data.cask },
@@ -35,46 +25,55 @@ function AlcoholInfo({ data }: Props) {
   ];
 
   return (
-    <section className="relative z-10 flex px-5 pb-6 space-x-5">
-      <AlcoholImage imageUrl={alcoholUrlImg} />
-      <article className="w-full py-3 text-white space-y-2 overflow-x-hidden">
-        <div className="space-y-2">
-          <div className="space-y-1">
-            <Label
-              name={korCategory}
-              styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
-            />
-            <h1 className="text-15 font-semibold whitespace-normal break-words">
-              {truncStr(korName, 27)}
-            </h1>
-            <p className="text-13 whitespace-normal break-words">
-              {truncStr(engName.toUpperCase(), 45)}
-            </p>
+    <section className="relative z-10 px-5 pb-[10px] ">
+      <div className="flex gap-5">
+        <AlcoholImage imageUrl={alcoholUrlImg} />
+        <article className="w-full text-white space-y-2 overflow-x-hidden">
+          <div className="space-y-[8px]">
+            <div className="space-y-[6px]">
+              <Label
+                name={korCategory}
+                styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
+              />
+              <h1 className="text-16 font-bold whitespace-normal break-words">
+                {truncStr(korName, 27)}
+              </h1>
+              <p className="text-12 whitespace-normal break-words">
+                {truncStr(engName.toUpperCase(), 45)}
+              </p>
+            </div>
+            <div>
+              {alcoholDetails.map((item: DetailItem) => (
+                <div
+                  key={item.content}
+                  className="flex items-start gap-2 text-white"
+                >
+                  <div className="w-[52px] text-13 font-semibold">
+                    {item.title}
+                  </div>
+                  <div className="flex-1 text-12 font-light">
+                    {item.content || '-'}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="border-[0.5px] border-white" />
           </div>
-          <div>
-            {alcoholDetails.map((item: DetailItem) => (
-              <div
-                key={item.content}
-                className="flex items-start text-11 gap-2 text-white"
-              >
-                <div className="w-12 font-semibold">{item.title}</div>
-                <div className="flex-1 font-light">{item.content || '-'}</div>
-              </div>
+        </article>
+      </div>
+      <div className="mt-[10px]">
+        {alcoholsTastingTags && alcoholsTastingTags.length > 0 && (
+          <div className="flex flex-wrap gap-[6px]">
+            {alcoholsTastingTags.map((tag: string) => (
+              <Label
+                key={tag}
+                name={tag}
+                styleClass="border-white px-[10px] py-[5px] rounded-md text-12 text-white"
+              />
             ))}
           </div>
-          <div className="space-y-1">
-            <div className="border-[0.5px] border-white" />
-            <PickBtn
-              isPicked={isPicked}
-              handleUpdatePicked={() => setIsPicked(!isPicked)}
-              handleError={() => setIsPicked(originalIsPicked)}
-              pickBtnName="찜하기"
-              alcoholId={alcoholId}
-              handleNotLogin={handleLoginModal}
-            />
-          </div>
-        </div>
-      </article>
+        )}
+      </div>
     </section>
   );
 }
