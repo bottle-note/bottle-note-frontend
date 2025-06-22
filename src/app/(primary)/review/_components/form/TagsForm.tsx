@@ -86,6 +86,7 @@ export default function TagsForm() {
       <OptionsContainer
         iconSrc="/icon/success-subcoral.svg"
         iconAlt="tagIcon"
+        forceOpen
         title="플레이버 태그 남기실래요?"
         subTitle="(선택)"
         titleSideArea={{
