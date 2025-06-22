@@ -135,15 +135,9 @@ function ReviewRegister() {
         type: 'CONFIRM',
         cancelBtnName: '예',
         confirmBtnName: '아니요',
-        handleConfirm: () => {
-          handleModalState({
-            isShowModal: false,
-          });
-        },
+        handleConfirm: () => handleModalState({ isShowModal: false }),
         handleCancel: () => {
-          handleModalState({
-            isShowModal: false,
-          });
+          handleModalState({ isShowModal: false });
           router.back();
         },
       });
@@ -153,30 +147,24 @@ function ReviewRegister() {
   };
 
   return (
-    <>
-      <FormProvider {...formMethods}>
-        <div className="relative min-h-screen">
-          <div className="fixed inset-0 overflow-y-auto">
-            <ReviewHeaderLayout
-              alcoholData={alcoholData}
-              onBack={handleBack}
-              headerTitle="리뷰 작성"
-            />
-            <ReviewForm />
-            <article className="sticky bottom-3 px-5 z-10">
-              <Button
-                onClick={handleSubmit(onSave)}
-                btnName="리뷰 등록"
-                disabled={isProcessing}
-              />
-            </article>
-          </div>
-        </div>
-        {isToastVisible && <Toast message={toastMessage} />}
-      </FormProvider>
-      {isProcessing && <Loading />}
+    <FormProvider {...formMethods}>
+      <ReviewHeaderLayout
+        alcoholData={alcoholData}
+        onBack={handleBack}
+        headerTitle="리뷰 작성"
+      />
+      <ReviewForm />
+      <article className="sticky bottom-5 px-5 z-10 flex justify-center">
+        <Button
+          onClick={handleSubmit(onSave)}
+          btnName="리뷰 등록"
+          disabled={isProcessing}
+        />
+      </article>
+      {isToastVisible && <Toast message={toastMessage} />}
+      {isProcessing ? <Loading /> : null}
       <Modal />
-    </>
+    </FormProvider>
   );
 }
 
