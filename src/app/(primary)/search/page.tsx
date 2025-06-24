@@ -151,10 +151,10 @@ export default function Search() {
       <main className="mb-24 w-full h-full">
         <SearchContainer
           handleSearchCallback={handleSearchCallback}
-          styleProps="px-5 pt-16 pb-[6px]"
+          styleProps="px-5 pt-[70px]"
         />
 
-        <section className="flex flex-col gap-7 py-5">
+        <section className="flex flex-col gap-7 pt-[11px] pb-5">
           <article className="space-y-4">
             <Tab
               variant="bookmark"
