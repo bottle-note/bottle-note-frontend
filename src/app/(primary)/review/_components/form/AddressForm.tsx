@@ -10,9 +10,7 @@ export default function AddressForm() {
   const { watch, register, setValue } = useFormContext();
   const currentLocationName = watch('locationName');
   const [searchModal, setSearchModal] = useState(false);
-  const [title, setTitle] = useState(
-    '이 술을 마셨을 때, 좋았던 장소가 있나요?',
-  );
+  const [title, setTitle] = useState('장소');
 
   const handleCloseModal = () => {
     setSearchModal(false);
@@ -29,7 +27,7 @@ export default function AddressForm() {
 
   useEffect(() => {
     if (currentLocationName) setTitle(currentLocationName);
-    else setTitle('이 술을 마셨을 때, 좋았던 장소가 있나요?');
+    else setTitle('장소');
   }, [currentLocationName]);
 
   const ExtraButtons = (

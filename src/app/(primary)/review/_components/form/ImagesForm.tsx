@@ -139,7 +139,7 @@ export default function ImagesForm() {
     <OptionsContainer
       iconSrc="/icon/photo-subcoral.svg"
       iconAlt="photoIcon"
-      title="사진을 남겨보실래요?"
+      title="사진"
       subTitle="(선택·최대 5장)"
       forceOpen={forceOpen}
       titleSideArea={{

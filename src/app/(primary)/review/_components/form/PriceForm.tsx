@@ -31,7 +31,7 @@ export default function PriceForm() {
     <OptionsContainer
       iconSrc="/icon/money-subcoral.svg"
       iconAlt="moneyIcon"
-      title="이 술의 가격이 얼마인가요?"
+      title="가격"
       subTitle="(선택)"
     >
       <div className="w-full pl-7 space-y-3">

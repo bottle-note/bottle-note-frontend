@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import SkeletonBase from '@/components/Skeletons/SkeletonBase';
+import PickBtn from '@/app/(primary)/_components/PickBtn';
+import { AlcoholInfo as AlcoholDetails } from '@/types/Alcohol';
+import useModalStore from '@/store/modalStore';
 import AlcoholInfo from './AlcoholInfo';
 
 interface ReviewHeaderLayoutProps {
-  alcoholData: any;
+  alcoholData: AlcoholDetails | undefined;
   onBack: () => void;
   headerTitle: string;
   headerTextColor?: string;
@@ -17,6 +20,11 @@ export default function ReviewHeaderLayout({
   headerTitle,
   headerTextColor = 'text-white',
 }: ReviewHeaderLayoutProps) {
+  const originalIsPicked = alcoholData?.isPicked ?? false;
+  const [isPicked, setIsPicked] = useState<boolean>(originalIsPicked);
+
+  const { handleLoginModal } = useModalStore();
+
   return alcoholData ? (
     <div className="relative">
       {alcoholData?.alcoholUrlImg && (
@@ -41,6 +49,16 @@ export default function ReviewHeaderLayout({
           <SubHeader.Center textColor={headerTextColor}>
             {headerTitle}
           </SubHeader.Center>
+          <SubHeader.Right>
+            <PickBtn
+              size={19}
+              isPicked={isPicked}
+              handleUpdatePicked={() => setIsPicked(!isPicked)}
+              handleError={() => setIsPicked(originalIsPicked)}
+              handleNotLogin={handleLoginModal}
+              alcoholId={alcoholData.alcoholId}
+            />
+          </SubHeader.Right>
         </SubHeader>
         <AlcoholInfo data={alcoholData} />
       </div>
