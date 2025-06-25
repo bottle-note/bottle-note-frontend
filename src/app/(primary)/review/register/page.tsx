@@ -162,7 +162,7 @@ function ReviewRegister() {
         />
       </article>
       {isToastVisible && <Toast message={toastMessage} />}
-      {isProcessing ? <Loading /> : null}
+      {isProcessing && <Loading />}
       <Modal />
     </FormProvider>
   );
