@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Children } from 'react';
 import ImagesForm from './ImagesForm';
 import PriceForm from './PriceForm';
 import AddressForm from './AddressForm';
@@ -10,10 +10,10 @@ const Section = ({ children }: { children: React.ReactNode }) => {
   return (
     <div>
       {children &&
-        React.Children.map(children, (child, index) => (
+        Children.map(children, (child, index) => (
           <>
             {child}
-            {index < React.Children.count(children) - 1 && (
+            {index < Children.count(children) - 1 && (
               <div className="line-border" />
             )}
           </>
@@ -28,10 +28,10 @@ function ReviewForm() {
       <Section>
         <RatingForm />
         <ContentForm />
-        <PriceForm />
-        <AddressForm />
-        <ImagesForm />
         <TagsForm />
+        <AddressForm />
+        <PriceForm />
+        <ImagesForm />
       </Section>
     </section>
   );

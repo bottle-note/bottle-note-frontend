@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -21,7 +21,7 @@ import ReviewHeaderLayout from '../_components/ReviewHeaderLayout';
 
 function ReviewModify() {
   const router = useRouter();
-  const { state, handleModalState } = useModalStore();
+  const { handleModalState } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
   const searchParams = useSearchParams();
   const reviewId = searchParams.get('reviewId');
@@ -53,14 +53,14 @@ function ReviewModify() {
   };
 
   useEffect(() => {
-    (async () => {
+    const fetchReviewDetails = async () => {
       if (reviewId) {
         const result = await ReviewApi.getReviewDetails(reviewId);
         const { reviewInfo, reviewImageList } = result;
         const locationInfo = reviewInfo.locationInfo || {};
 
         setAlcoholId(result.alcoholInfo.alcoholId.toString());
-        setInitialRating(result.reviewInfo.rating);
+        setInitialRating(reviewInfo.rating);
 
         reset({
           review: reviewInfo.reviewContent,
@@ -77,7 +77,9 @@ function ReviewModify() {
           mapUrl: locationInfo.mapUrl || null,
         });
       }
-    })();
+    };
+
+    fetchReviewDetails();
   }, [reviewId, reset]);
 
   const { showErrorModal } = useErrorModal<FormValues>(errors);
@@ -94,15 +96,9 @@ function ReviewModify() {
         type: 'CONFIRM',
         cancelBtnName: '예',
         confirmBtnName: '아니요',
-        handleConfirm: () => {
-          handleModalState({
-            isShowModal: false,
-          });
-        },
+        handleConfirm: () => handleModalState({ isShowModal: false }),
         handleCancel: () => {
-          handleModalState({
-            isShowModal: false,
-          });
+          handleModalState({ isShowModal: false });
           router.back();
         },
       });
@@ -112,21 +108,23 @@ function ReviewModify() {
   };
 
   return (
-    <Suspense>
-      <FormProvider {...formMethods}>
-        <ReviewHeaderLayout
-          alcoholData={alcoholData}
-          onBack={handleBack}
-          headerTitle="리뷰 수정"
+    <FormProvider {...formMethods}>
+      <ReviewHeaderLayout
+        alcoholData={alcoholData}
+        onBack={handleBack}
+        headerTitle="리뷰 수정"
+      />
+      <ReviewForm />
+      <article className="sticky bottom-5 px-5 z-10 flex justify-center">
+        <Button
+          onClick={handleSubmit(onSave)}
+          btnName="리뷰 수정"
+          disabled={isProcessing}
         />
-        <ReviewForm />
-        <article className="px-5 fixed bottom-6 center left-0 right-0">
-          <Button onClick={handleSubmit(onSave)} btnName="리뷰 수정" />
-        </article>
-      </FormProvider>
-      {isProcessing && <Loading />}
-      {state.isShowModal && <Modal />}
-    </Suspense>
+      </article>
+      {isProcessing ? <Loading /> : null}
+      <Modal />
+    </FormProvider>
   );
 }
 
