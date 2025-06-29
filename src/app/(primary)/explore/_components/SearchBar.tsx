@@ -74,8 +74,8 @@ export const SearchBar = ({
   }, []);
 
   return (
-    <>
-      <article className="w-full relative">
+    <section className="pt-[5px]">
+      <article className="w-full relative ">
         <input
           type="text"
           placeholder="입력..."
@@ -168,6 +168,6 @@ export const SearchBar = ({
           </Accordion>
         </SideFilterDrawer>
       )}
-    </>
+    </section>
   );
 };

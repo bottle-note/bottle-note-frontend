@@ -91,11 +91,13 @@ const WhiskeyListItem = ({ content }: Props) => {
             styleClass="label-default text-10 px-2 py-[1px] rounded-[2px] flex items-end"
             position="after"
             icon={
-              <Star
-                rating={content.myRating}
-                size={11}
-                textStyle="text-12 font-semibold ml-[1px]"
-              />
+              <div className="pt-[2px]">
+                <Star
+                  rating={content.myRating}
+                  size={11}
+                  textStyle="text-12 font-semibold ml-[1px]"
+                />
+              </div>
             }
           />
           <div className="text-mainGray">
