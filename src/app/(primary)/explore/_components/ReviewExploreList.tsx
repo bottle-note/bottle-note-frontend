@@ -49,7 +49,7 @@ export const ReviewExplorerList = () => {
   };
 
   return (
-    <section>
+    <section className="pb-20">
       <SearchBar
         handleSearch={refetch}
         handleAddKeyword={handleAddKeyword}
