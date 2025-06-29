@@ -34,6 +34,14 @@
     font-weight: 800;
   }
 
+  * {
+    -ms-overflow-style: none; /* IE, Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  ::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
+  }
+
   body {
     font-family: 'suit', sans-serif;
     font-weight: 400; /* Default weight */
@@ -177,8 +185,6 @@
 .react-datepicker__current-month {
   @apply !text-white;
 }
-
-
 
 @layer base {
   * {
