@@ -18,7 +18,7 @@ export default function ExplorePage() {
 
   return (
     <Suspense>
-      <div className="fixed top-0 left-0 right-0 bg-white z-10 shadow-sm">
+      <div className="fixed top-0 left-0 right-0 bg-white z-10">
         <SubHeader>
           <SubHeader.Left showLogo />
           <SubHeader.Right showSideMenu />

@@ -132,8 +132,9 @@ export default function Login() {
           </article>
         </section>
 
-        <footer className="border-t border-white w-full pt-2">
-          <p className="text-xxs text-white text-center">
+        <footer className="w-full pt-2 flex flex-col gap-2 px-4">
+          <div className="w-full h-[1px] bg-white" />
+          <p className="text-12 text-white text-center">
             © Copyright 2024. Bottle Note. All rights reserved.
           </p>
         </footer>
