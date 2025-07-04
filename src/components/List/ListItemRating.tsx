@@ -70,7 +70,6 @@ const ListItemRating = ({ data }: Props) => {
               alcoholId={alcoholId}
               iconColor="subcoral"
               handleUpdatePicked={() => setIsPicked(!isPicked)}
-              handleError={() => alert('에러가 발생했습니다.')}
               handleNotLogin={handleLoginModal}
             />
           </div>

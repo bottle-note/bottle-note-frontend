@@ -70,7 +70,6 @@ export const PicksListItem = ({ data }: Props) => {
           isPicked={isPicked}
           alcoholId={alcoholId}
           handleUpdatePicked={() => setIsPicked(!isPicked)}
-          handleError={() => console.error('찜하기 도중 에러 발생')}
           size={25}
           iconColor="subcoral"
           handleNotLogin={handleLoginModal}

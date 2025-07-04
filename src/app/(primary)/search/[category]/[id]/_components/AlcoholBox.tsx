@@ -82,13 +82,12 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
                 </button>
                 <div className="border-[0.5px] border-white my-[0.1rem]" />
                 <PickBtn
+                  size={16}
                   isPicked={isPicked}
+                  alcoholId={Number(data.alcoholId)}
                   handleUpdatePicked={() => setIsPicked(!isPicked)}
-                  handleError={() => setIsPicked(data.isPicked)}
                   handleNotLogin={handleLoginModal}
                   pickBtnName="찜하기"
-                  alcoholId={Number(data.alcoholId)}
-                  size={16}
                 />
               </div>
             </div>
