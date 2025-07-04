@@ -23,6 +23,8 @@ import useModalStore from '@/store/modalStore';
 import { AlcoholDetails } from '@/types/Alcohol';
 import { ROUTES } from '@/constants/routes';
 import AlcoholDetailsSkeleton from '@/components/Skeletons/custom/AlcoholDetailsSkeleton';
+import { DEBOUNCE_DELAY } from '@/constants/common';
+import useDebounceAction from '@/hooks/useDebounceAction';
 import AlcoholBox from './_components/AlcoholBox';
 import FlavorTag from '../../../_components/FlavorTag';
 
@@ -37,6 +39,7 @@ export default function SearchAlcohol() {
   const { isLogin } = AuthService;
   const { id: alcoholId } = params;
   const { state, handleModalState, handleLoginModal } = useModalStore();
+  const { debounce } = useDebounceAction(DEBOUNCE_DELAY);
 
   const [data, setData] = useState<AlcoholDetails | null>(null);
   const [alcoholDetails, setAlcoholDetails] = useState<DetailItem[]>([]);
@@ -104,15 +107,24 @@ export default function SearchAlcohol() {
     };
   }, []);
 
-  const handleRate = async (selectedRate: number) => {
-    if (!isLogin) return handleLoginModal();
+  const handleRate = useCallback(
+    async (selectedRate: number) => {
+      if (!isLogin) return handleLoginModal();
 
-    setRate(selectedRate);
-    return RateApi.postRating({
-      alcoholId: String(alcoholId),
-      rating: selectedRate,
-    });
-  };
+      setRate(selectedRate);
+
+      debounce(() =>
+        RateApi.postRating({
+          alcoholId: String(alcoholId),
+          rating: selectedRate,
+        }).catch((error) => {
+          fetchUserRating(alcoholId.toString());
+          console.error(error);
+        }),
+      );
+    },
+    [isLogin, alcoholId, debounce],
+  );
 
   const getRatingMessage = (myAvgRating: number, myRating: number) => {
     if (myAvgRating !== 0 && myRating !== 0)
