@@ -13,7 +13,7 @@ import { ROUTES } from '@/constants/routes';
 interface Props {
   data: AlcoholInfo;
   isPicked: boolean;
-  setIsPicked: (isPicked: boolean) => void;
+  setIsPicked: (value: boolean | ((prev: boolean) => boolean)) => void;
 }
 
 function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
@@ -82,13 +82,13 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
                 </button>
                 <div className="border-[0.5px] border-white my-[0.1rem]" />
                 <PickBtn
+                  size={16}
                   isPicked={isPicked}
-                  handleUpdatePicked={() => setIsPicked(!isPicked)}
-                  handleError={() => setIsPicked(data.isPicked)}
+                  alcoholId={Number(data.alcoholId)}
+                  handleUpdatePicked={() => setIsPicked((prev) => !prev)}
+                  onApiError={() => setIsPicked(isPicked)}
                   handleNotLogin={handleLoginModal}
                   pickBtnName="찜하기"
-                  alcoholId={Number(data.alcoholId)}
-                  size={16}
                 />
               </div>
             </div>

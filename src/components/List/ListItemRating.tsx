@@ -69,8 +69,8 @@ const ListItemRating = ({ data }: Props) => {
               isPicked={isPicked}
               alcoholId={alcoholId}
               iconColor="subcoral"
-              handleUpdatePicked={() => setIsPicked(!isPicked)}
-              handleError={() => alert('에러가 발생했습니다.')}
+              handleUpdatePicked={() => setIsPicked((prev) => !prev)}
+              onApiError={() => setIsPicked(initialIsPicked)}
               handleNotLogin={handleLoginModal}
             />
           </div>

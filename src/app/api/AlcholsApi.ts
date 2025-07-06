@@ -191,8 +191,5 @@ export const AlcoholsApi = {
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
-
-    const result: ApiResponse<PickPutApi> = await response.data;
-    return result;
   },
 };

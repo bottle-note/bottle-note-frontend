@@ -174,3 +174,5 @@ export const REGIONS = [
     engName: 'Netherlands',
   },
 ] as const;
+
+export const DEBOUNCE_DELAY = 2000;
