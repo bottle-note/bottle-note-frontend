@@ -91,7 +91,13 @@ export const ReviewExplorerList = () => {
             [...reviewList].map((listData) =>
               listData.data.items
                 .flat()
-                .map((review) => <ReviewCard key={uuid()} content={review} />),
+                .map((review) => (
+                  <ReviewCard
+                    key={uuid()}
+                    content={review}
+                    onRefresh={refetch}
+                  />
+                )),
             )}
         </List.Section>
         <div ref={targetRef} />

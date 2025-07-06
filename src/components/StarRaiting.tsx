@@ -57,6 +57,13 @@ const Star = ({
         className="relative"
         style={{ width: `${size}px`, height: `${size}px` }}
         onClick={handleAction}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            handleAction(event as unknown as React.MouseEvent);
+          }
+        }}
+        role="button"
+        tabIndex={0}
       >
         <Image
           src={src}

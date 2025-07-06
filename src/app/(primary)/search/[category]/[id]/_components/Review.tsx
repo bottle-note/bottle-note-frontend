@@ -30,9 +30,11 @@ function Review({ data, onRefresh }: Props) {
   const { userData, isLogin } = AuthService;
   const { isLikedByMe } = data;
   const { handleModalState, handleLoginModal } = useModalStore();
+
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(isLikedByMe);
   const [currentStatus, setCurrentStatus] = useState(data.status === 'PUBLIC');
+  const [likeCount, setLikeCount] = useState(data.likeCount);
 
   const handleCloseOption = () => {
     handleModalState({
@@ -72,6 +74,10 @@ function Review({ data, onRefresh }: Props) {
   useEffect(() => {
     setCurrentStatus(data.status === 'PUBLIC');
   }, [data.status]);
+
+  useEffect(() => {
+    setLikeCount(data.likeCount);
+  }, [data.likeCount]);
 
   return (
     <>
@@ -170,15 +176,16 @@ function Review({ data, onRefresh }: Props) {
                 isLiked={isLiked}
                 handleUpdateLiked={() => {
                   setIsLiked((prev) => !prev);
-                  onRefresh();
+                  setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
                 }}
-                handleError={() => {
-                  setIsLiked(isLikedByMe);
+                onApiSuccess={onRefresh}
+                onApiError={() => {
+                  setLikeCount(data.likeCount);
                 }}
                 handleNotLogin={handleLoginModal}
                 size={12}
               />
-              <p>{data.likeCount}</p>
+              <p>{likeCount}</p>
             </div>
             <div className="flex items-center space-x-[2px]">
               <Image

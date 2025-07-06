@@ -81,6 +81,10 @@ const PickBtn = ({
       }
     });
   };
+
+  const iconType = isPicked ? 'filled' : 'outlined';
+  const iconSrc = `/icon/pick-${iconType}-${iconColor}.svg`;
+
   return (
     <button
       className={
@@ -90,21 +94,12 @@ const PickBtn = ({
       }
       onClick={handleClick}
     >
-      {isPicked ? (
-        <Image
-          src={`/icon/pick-filled-${iconColor}.svg`}
-          width={size}
-          height={size}
-          alt="Pick"
-        />
-      ) : (
-        <Image
-          src={`/icon/pick-outlined-${iconColor}.svg`}
-          width={size}
-          height={size}
-          alt="unPick"
-        />
-      )}
+      <Image
+        src={iconSrc}
+        width={size}
+        height={size}
+        alt={isPicked ? 'Pick' : 'Unpick'}
+      />
       {pickBtnName && <p className="text-12 font-normal">{pickBtnName}</p>}
     </button>
   );

@@ -32,6 +32,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
   const { handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(data?.reviewInfo?.isLikedByMe);
+  const [likeCount, setLikeCount] = useState(data?.reviewInfo?.likeCount);
 
   const handleCloseOption = () => {
     handleModalState({
@@ -247,16 +248,18 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
               size={16}
               reviewId={data?.reviewInfo?.reviewId}
               isLiked={isLiked}
-              handleUpdateLiked={() => setIsLiked((prev) => !prev)}
-              handleError={() => {
-                setIsLiked(data?.reviewInfo?.isLikedByMe);
+              handleUpdateLiked={() => {
+                setIsLiked((prev) => !prev);
+                setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+              }}
+              onApiSuccess={onRefresh}
+              onApiError={() => {
+                setLikeCount(data?.reviewInfo?.likeCount);
               }}
               handleNotLogin={handleLogin}
               likeBtnName="좋아요"
             />
-            <div className="text-mainGray text-10">
-              {data.reviewInfo?.likeCount}개
-            </div>
+            <div className="text-mainGray text-10">{likeCount}개</div>
           </div>
 
           <span className="border-[0.01rem] w-px border-mainGray opacity-40 h-4" />
