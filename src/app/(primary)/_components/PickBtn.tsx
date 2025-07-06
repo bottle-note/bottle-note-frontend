@@ -11,7 +11,8 @@ import useDebounceAction from '@/hooks/useDebounceAction';
 interface Props {
   isPicked: boolean;
   handleUpdatePicked: () => void;
-  handleError?: () => void;
+  onApiSuccess?: () => void;
+  onApiError?: () => void;
   handleNotLogin: () => void;
   pickBtnName?: string;
   iconColor?: 'white' | 'subcoral';
@@ -22,7 +23,8 @@ interface Props {
 const PickBtn = ({
   isPicked,
   handleUpdatePicked,
-  handleError,
+  onApiSuccess,
+  onApiError,
   handleNotLogin,
   alcoholId,
   pickBtnName,
@@ -64,6 +66,10 @@ const PickBtn = ({
         await AlcoholsApi.putPick(alcoholId, stateToSync);
         lastSyncedPickedRef.current = stateToSync;
         pendingPickedRef.current = null;
+
+        if (onApiSuccess) {
+          onApiSuccess();
+        }
       } catch (error) {
         console.error('Error updating pick status:', error);
 
@@ -75,8 +81,8 @@ const PickBtn = ({
           mainText: '찜하기 업데이트에 실패했습니다. 다시 시도해주세요.',
         });
 
-        if (handleError) {
-          handleError();
+        if (onApiError) {
+          onApiError();
         }
       }
     });

@@ -58,7 +58,8 @@ export default function ReviewHeaderLayout({
               size={19}
               isPicked={isPicked}
               alcoholId={alcoholData.alcoholId}
-              handleUpdatePicked={() => setIsPicked(!isPicked)}
+              handleUpdatePicked={() => setIsPicked((prev) => !prev)}
+              onApiError={() => setIsPicked(alcoholData.isPicked)}
               handleNotLogin={handleLoginModal}
             />
           </SubHeader.Right>

@@ -83,6 +83,7 @@ function AlcoholInfo({ data, handleLogin }: Props) {
                 isPicked={isPicked}
                 alcoholId={data.alcoholId}
                 handleUpdatePicked={() => setIsPicked((prev) => !prev)}
+                onApiError={() => setIsPicked(originalIsPicked)}
                 handleNotLogin={handleLogin}
                 pickBtnName="찜하기"
               />

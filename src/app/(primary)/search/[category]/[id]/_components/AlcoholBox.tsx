@@ -13,7 +13,7 @@ import { ROUTES } from '@/constants/routes';
 interface Props {
   data: AlcoholInfo;
   isPicked: boolean;
-  setIsPicked: (isPicked: boolean) => void;
+  setIsPicked: (value: boolean | ((prev: boolean) => boolean)) => void;
 }
 
 function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
@@ -85,7 +85,8 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
                   size={16}
                   isPicked={isPicked}
                   alcoholId={Number(data.alcoholId)}
-                  handleUpdatePicked={() => setIsPicked(!isPicked)}
+                  handleUpdatePicked={() => setIsPicked((prev) => !prev)}
+                  onApiError={() => setIsPicked(isPicked)}
                   handleNotLogin={handleLoginModal}
                   pickBtnName="찜하기"
                 />

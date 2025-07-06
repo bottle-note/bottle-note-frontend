@@ -72,7 +72,8 @@ const ListItem = ({ data }: Props) => {
             isPicked={isPicked}
             alcoholId={alcoholId}
             iconColor="subcoral"
-            handleUpdatePicked={() => setIsPicked(!isPicked)}
+            handleUpdatePicked={() => setIsPicked((prev) => !prev)}
+            onApiError={() => setIsPicked(initialIsPicked)}
             handleNotLogin={handleLoginModal}
           />
         </div>

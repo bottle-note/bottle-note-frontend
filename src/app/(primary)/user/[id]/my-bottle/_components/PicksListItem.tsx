@@ -69,7 +69,8 @@ export const PicksListItem = ({ data }: Props) => {
         <PickBtn
           isPicked={isPicked}
           alcoholId={alcoholId}
-          handleUpdatePicked={() => setIsPicked(!isPicked)}
+          handleUpdatePicked={() => setIsPicked((prev) => !prev)}
+          onApiError={() => setIsPicked(initialIsPicked)}
           size={25}
           iconColor="subcoral"
           handleNotLogin={handleLoginModal}
