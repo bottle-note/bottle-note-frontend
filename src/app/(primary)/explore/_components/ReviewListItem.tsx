@@ -32,10 +32,9 @@ const convertImageUrlsToProductImageArray = (
 
 interface Props {
   content: ExploreReview;
-  onRefresh: () => void;
 }
 
-const ReviewListItem = ({ content, onRefresh }: Props) => {
+const ReviewListItem = ({ content }: Props) => {
   const router = useRouter();
   const { handleLoginModal, handleModalState } = useModalStore();
   const { isLogin, userData } = AuthService;
@@ -156,9 +155,9 @@ const ReviewListItem = ({ content, onRefresh }: Props) => {
                   setIsLiked((prev) => !prev);
                   setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
                 }}
-                onApiSuccess={onRefresh}
                 onApiError={() => {
                   setLikeCount(content.likeCount);
+                  setIsLiked(content.isLikedByMe);
                 }}
                 handleNotLogin={handleLoginModal}
                 size={12}

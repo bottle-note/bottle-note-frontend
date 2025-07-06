@@ -252,9 +252,9 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
                 setIsLiked((prev) => !prev);
                 setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
               }}
-              onApiSuccess={onRefresh}
               onApiError={() => {
                 setLikeCount(data?.reviewInfo?.likeCount);
+                setIsLiked(data?.reviewInfo?.isLikedByMe);
               }}
               handleNotLogin={handleLogin}
               likeBtnName="좋아요"

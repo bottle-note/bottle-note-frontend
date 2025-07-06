@@ -178,8 +178,8 @@ function Review({ data, onRefresh }: Props) {
                   setIsLiked((prev) => !prev);
                   setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
                 }}
-                onApiSuccess={onRefresh}
                 onApiError={() => {
+                  setIsLiked(isLikedByMe);
                   setLikeCount(data.likeCount);
                 }}
                 handleNotLogin={handleLoginModal}
