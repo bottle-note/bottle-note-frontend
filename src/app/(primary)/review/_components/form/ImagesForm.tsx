@@ -149,7 +149,7 @@ export default function ImagesForm() {
           ExtraButtons,
       }}
     >
-      <div className="flex justify-start items-center h-[3.8rem] space-x-2">
+      <div className="flex justify-start items-center h-[3.8rem] space-x-2 ml-7">
         {previewImages?.map((data: SaveImages) => (
           <figure key={data?.order} className="relative h-full">
             <Image

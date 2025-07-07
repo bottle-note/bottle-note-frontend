@@ -54,6 +54,24 @@ export default function AddressForm() {
       >
         주소변경
       </button>
+      <div className="text-subCoral">|</div>
+      <button
+        className="flex items-center space-x-[2px]"
+        onClick={resetAddress}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            resetAddress();
+          }
+        }}
+      >
+        <p className="text-12 text-mainGray">주소삭제</p>
+        <Image
+          src="/icon/reset-mainGray.svg"
+          alt="resetIcon"
+          width={13}
+          height={13}
+        />
+      </button>
     </div>
   );
 
@@ -65,52 +83,35 @@ export default function AddressForm() {
         title={title}
         subTitle={currentLocationName ? '' : '(선택)'}
         forceOpen={searchModal}
-        titleSideArea={{
-          component: watch('mapUrl') && ExtraButtons,
-        }}
       >
-        {!watch('address') ? (
-          <button
-            className="w-full border-subCoral border rounded-lg py-2"
-            onClick={() => {
-              setSearchModal(true);
-            }}
-          >
-            <p className="text-subCoral font-14 text-14">장소 검색</p>
-          </button>
-        ) : (
-          <div className="w-full pl-7 space-y-1">
-            <p className="text-10 text-mainDarkGray">{watch('address')}</p>
-            <div className="flex items-center justify-between">
-              <div className="w-60 h-5 border-b border-subCoral flex items-center">
-                <input
-                  type="text"
-                  placeholder="상세 주소를 입력하세요."
-                  className="text-10 font-[#BFBFBF] w-full text-mainDarkGray"
-                  maxLength={30}
-                  {...register('detailAddress')}
-                />
-              </div>
-              <div
-                className="flex items-center space-x-[2px]"
-                onClick={resetAddress}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    resetAddress();
-                  }
-                }}
-              >
-                <p className="text-12 text-mainGray">초기화</p>
-                <Image
-                  src="/icon/reset-mainGray.svg"
-                  alt="resetIcon"
-                  width={13}
-                  height={13}
-                />
+        <article className="ml-7">
+          {!watch('address') ? (
+            <button
+              className="w-full border-subCoral border rounded-lg py-2"
+              onClick={() => {
+                setSearchModal(true);
+              }}
+            >
+              <p className="text-subCoral font-14 text-14">장소 검색</p>
+            </button>
+          ) : (
+            <div className="w-full space-y-1">
+              <div className="pb-1">{watch('mapUrl') && ExtraButtons}</div>
+              <p className="text-10 text-mainDarkGray">{watch('address')}</p>
+              <div className="flex items-center justify-between">
+                <div className="w-60 h-5 border-b border-subCoral flex items-center">
+                  <input
+                    type="text"
+                    placeholder="상세 주소를 입력하세요."
+                    className="text-10 font-[#BFBFBF] w-full text-mainDarkGray"
+                    maxLength={30}
+                    {...register('detailAddress')}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </article>
       </OptionsContainer>
       {searchModal && <SearchAddress handleCloseModal={handleCloseModal} />}
     </>

@@ -93,54 +93,56 @@ export default function TagsForm() {
           component: ExtraButtons,
         }}
       >
-        <div className="h-9 flex items-center border-b border-subCoral">
-          <input
-            type="text"
-            className="text-13 text-mainDarkGray w-full"
-            placeholder="예) 반건조 된 건자두"
-            value={tagValue}
-            maxLength={12}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setTagValue(e.target.value);
-            }}
-          />
-          <button
-            className={`text-13 px-2 py-1 rounded-md border w-24 ${watchTags?.length !== 10 ? 'border-subCoral text-subCoral' : 'border-[#BFBFBF] text-[#BFBFBF]'}`}
-            disabled={watchTags?.length === 10}
-            onClick={handleAddTag}
-          >
-            태그 등록
-          </button>
-        </div>
-        {watchTags && watchTags.length !== 0 && (
-          <div className="flex flex-wrap gap-1 pt-2">
-            {watchTags.map((tag: string) => (
-              <div key={tag} className="overflow-hidden flex-shrink-0">
-                <div className="inline-block text-13 bg-white text-subCoral border border-subCoral px-2 py-1 rounded-md">
-                  <div className="flex items-center justify-center space-x-1">
-                    <p>{tag}</p>
-                    <span
-                      onClick={() => handleDeleteTag(tag)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          handleDeleteTag(tag);
-                        }
-                      }}
-                    >
-                      <Image
-                        className="mr-1"
-                        src="/icon/reset-mainGray.svg"
-                        alt="deleteIcon"
-                        width={15}
-                        height={15}
-                      />
-                    </span>
+        <article className=" ml-7">
+          <div className="h-9 flex items-center border-b border-subCoral">
+            <input
+              type="text"
+              className="text-13 text-mainDarkGray w-full"
+              placeholder="예) 반건조 된 건자두"
+              value={tagValue}
+              maxLength={12}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setTagValue(e.target.value);
+              }}
+            />
+            <button
+              className={`text-13 px-2 py-1 rounded-md border w-24 ${watchTags?.length !== 10 ? 'border-subCoral text-subCoral' : 'border-[#BFBFBF] text-[#BFBFBF]'}`}
+              disabled={watchTags?.length === 10}
+              onClick={handleAddTag}
+            >
+              태그 등록
+            </button>
+          </div>
+          {watchTags && watchTags.length !== 0 && (
+            <div className="flex flex-wrap gap-1 pt-2">
+              {watchTags.map((tag: string) => (
+                <div key={tag} className="overflow-hidden flex-shrink-0">
+                  <div className="inline-block text-13 bg-white text-subCoral border border-subCoral px-2 py-1 rounded-md">
+                    <div className="flex items-center justify-center space-x-1">
+                      <p>{tag}</p>
+                      <span
+                        onClick={() => handleDeleteTag(tag)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleDeleteTag(tag);
+                          }
+                        }}
+                      >
+                        <Image
+                          className="mr-1"
+                          src="/icon/reset-mainGray.svg"
+                          alt="deleteIcon"
+                          width={15}
+                          height={15}
+                        />
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </article>
       </OptionsContainer>
     </>
   );
