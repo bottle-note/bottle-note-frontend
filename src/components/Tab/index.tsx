@@ -14,7 +14,7 @@ interface BaseTabProps<T extends TabItem> {
 
 interface BookmarkTabProps<T extends TabItem> extends BaseTabProps<T> {
   variant: 'bookmark';
-  scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
+  scrollContainerRef?: React.RefObject<HTMLDivElement>;
   registerTab?: (
     id: string,
   ) => (el: HTMLDivElement | HTMLButtonElement | null) => void;

@@ -9,7 +9,7 @@ type Props<T extends { id: string; name: string }> = {
     id: string,
   ) => (el: HTMLDivElement | HTMLButtonElement | null) => void;
   tabList: T[];
-  scrollContainerRef?: RefObject<HTMLDivElement | null>;
+  scrollContainerRef?: RefObject<HTMLDivElement>;
 };
 
 const TAB_WIDTH = 146;

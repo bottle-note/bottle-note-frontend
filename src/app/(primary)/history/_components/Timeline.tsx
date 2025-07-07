@@ -17,7 +17,7 @@ interface TimelineProps {
   handleOpenFilterModal: () => void;
   shouldReset: boolean;
   onResetComplete: () => void;
-  targetRef: React.RefObject<HTMLDivElement | null>;
+  targetRef?: React.RefObject<HTMLDivElement>;
   isLoading: boolean;
   isFetching: boolean;
   error: Error | null;
