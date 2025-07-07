@@ -35,7 +35,7 @@ function ReviewRegister() {
   const defaultFormData: ReviewTempData['content'] = {
     review: '',
     status: 'PUBLIC',
-    price: 0,
+    price: null,
     price_type: null,
     flavor_tags: [],
     rating: userRating ?? null,

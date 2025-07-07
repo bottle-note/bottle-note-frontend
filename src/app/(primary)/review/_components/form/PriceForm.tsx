@@ -65,7 +65,10 @@ export default function PriceForm() {
                 placeholder="얼마에 마셨는지 기록해보세요!"
                 className="text-10 font-[#BFBFBF] w-full text-mainDarkGray text-right"
                 maxLength={10}
-                {...register('price')}
+                {...register('price', {
+                  setValueAs: (value) =>
+                    value === '' || value === 0 ? null : value,
+                })}
               />
               <Image
                 src="/icon/won-subcoral.svg"
