@@ -22,11 +22,10 @@ import ProfileDefaultImg from 'public/profile-default.svg';
 interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;
   handleLogin: () => void;
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
   onRefresh: () => void;
 }
 
-function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
+function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
   const router = useRouter();
   const { userData, isLogin } = AuthService;
   const { handleModalState, handleLoginModal } = useModalStore();
@@ -267,11 +266,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
           <button
             className="flex-1 flex text-center justify-center items-center space-x-1"
             onClick={() => {
-              if (!isLogin) {
-                handleLogin();
-              } else {
-                textareaRef.current?.focus();
-              }
+              if (!isLogin) handleLogin();
             }}
           >
             <Image

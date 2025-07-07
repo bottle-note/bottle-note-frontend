@@ -115,7 +115,6 @@ const LikeBtn = ({
           className="text-mainGray font-bold text-13"
           style={{
             marginLeft: '4px',
-            transform: 'translateY(1px)',
           }}
         >
           {likeBtnName}
