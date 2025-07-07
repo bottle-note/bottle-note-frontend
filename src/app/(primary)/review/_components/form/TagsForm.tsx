@@ -105,7 +105,7 @@ export default function TagsForm() {
             }}
           />
           <button
-            className={`text-10 py-[0.13rem] px-2 rounded border  w-16 ${watchTags?.length !== 10 ? 'border-subCoral text-subCoral' : 'border-[#BFBFBF] text-[#BFBFBF]'}`}
+            className={`text-13 px-2 py-1 rounded-md border w-20 ${watchTags?.length !== 10 ? 'border-subCoral text-subCoral' : 'border-[#BFBFBF] text-[#BFBFBF]'}`}
             disabled={watchTags?.length === 10}
             onClick={handleAddTag}
           >
