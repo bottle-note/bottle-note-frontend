@@ -9,6 +9,7 @@ type Props<T extends { id: string; name: string }> = {
     id: string,
   ) => (el: HTMLDivElement | HTMLButtonElement | null) => void;
   tabList: T[];
+  scrollContainerRef?: RefObject<HTMLDivElement>;
 };
 
 const TAB_WIDTH = 146;
@@ -23,9 +24,7 @@ const BookmarkTab = <T extends { id: string; name: string }>({
   tabList,
   scrollContainerRef,
   registerTab,
-}: Props<T> & {
-  scrollContainerRef?: RefObject<HTMLDivElement>;
-}) => {
+}: Props<T>) => {
   return (
     <div className="w-full bg-white">
       <div className="relative">
