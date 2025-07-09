@@ -34,24 +34,35 @@ export default function OptionsContainer({
 
   return (
     <article className={isOpen ? 'space-y-2' : ''}>
-      <div className="flex items-center justify-between">
+      <div
+        className="flex items-center justify-between cursor-pointer"
+        onClick={handleOpen}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleOpen();
+          }
+        }}
+      >
         <div className="flex items-center space-x-1">
           <Image src={iconSrc} alt={iconAlt} width={24} height={24} />
           <p className="text-12 text-mainDarkGray font-bold">
             {title}{' '}
             <span className="text-mainGray font-normal">{subTitle}</span>
           </p>
-          {titleSideArea?.component}
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.stopPropagation();
+              }
+            }}
+          >
+            {titleSideArea?.component}
+          </div>
         </div>
-        <div
-          className="flex items-center cursor-pointer"
-          onClick={handleOpen}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              handleOpen();
-            }
-          }}
-        >
+        <div className="flex items-center">
           <Image
             className={`transition-transform duration-300 ${
               isOpen ? 'rotate-0' : 'rotate-180'

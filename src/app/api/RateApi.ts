@@ -71,9 +71,5 @@ export const RateApi = {
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
-
-    const result: ApiResponse<{ message: string; rating: string }> =
-      await response;
-    return result.data;
   },
 };

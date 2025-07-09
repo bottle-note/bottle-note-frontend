@@ -81,11 +81,11 @@ function AlcoholInfo({ data, handleLogin }: Props) {
               <PickBtn
                 size={16}
                 isPicked={isPicked}
-                handleUpdatePicked={() => setIsPicked(!isPicked)}
-                handleError={() => setIsPicked(originalIsPicked)}
+                alcoholId={data.alcoholId}
+                handleUpdatePicked={() => setIsPicked((prev) => !prev)}
+                onApiError={() => setIsPicked(originalIsPicked)}
                 handleNotLogin={handleLogin}
                 pickBtnName="찜하기"
-                alcoholId={data.alcoholId}
               />
             </div>
           </div>

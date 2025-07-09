@@ -168,7 +168,6 @@ export default function ReviewDetail() {
             <ReviewDetails
               data={reviewDetails}
               handleLogin={handleLogin}
-              textareaRef={textareaRef}
               onRefresh={fetchReviewDetails}
             />
             <ReplyList

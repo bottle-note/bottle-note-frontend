@@ -22,16 +22,16 @@ import ProfileDefaultImg from 'public/profile-default.svg';
 interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;
   handleLogin: () => void;
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
   onRefresh: () => void;
 }
 
-function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
+function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
   const router = useRouter();
   const { userData, isLogin } = AuthService;
   const { handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(data?.reviewInfo?.isLikedByMe);
+  const [likeCount, setLikeCount] = useState(data?.reviewInfo?.likeCount);
 
   const handleCloseOption = () => {
     handleModalState({
@@ -247,16 +247,18 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
               size={16}
               reviewId={data?.reviewInfo?.reviewId}
               isLiked={isLiked}
-              handleUpdateLiked={() => setIsLiked((prev) => !prev)}
-              handleError={() => {
+              handleUpdateLiked={() => {
+                setIsLiked((prev) => !prev);
+                setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+              }}
+              onApiError={() => {
+                setLikeCount(data?.reviewInfo?.likeCount);
                 setIsLiked(data?.reviewInfo?.isLikedByMe);
               }}
               handleNotLogin={handleLogin}
               likeBtnName="좋아요"
             />
-            <div className="text-mainGray text-10">
-              {data.reviewInfo?.likeCount}개
-            </div>
+            <div className="text-mainGray text-10">{likeCount}개</div>
           </div>
 
           <span className="border-[0.01rem] w-px border-mainGray opacity-40 h-4" />
@@ -264,11 +266,7 @@ function ReviewDetails({ data, handleLogin, textareaRef, onRefresh }: Props) {
           <button
             className="flex-1 flex text-center justify-center items-center space-x-1"
             onClick={() => {
-              if (!isLogin) {
-                handleLogin();
-              } else {
-                textareaRef.current?.focus();
-              }
+              if (!isLogin) handleLogin();
             }}
           >
             <Image

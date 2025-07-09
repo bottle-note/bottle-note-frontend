@@ -79,7 +79,7 @@ const ListMain = ({
         )}
 
         {isListFirstLoading && (
-          <section className="px-5">
+          <section>
             {Array.from({ length: 5 }).map(() => (
               <ListItemSkeleton key={uuid()} />
             ))}

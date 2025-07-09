@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import SkeletonBase from '@/components/Skeletons/SkeletonBase';
@@ -20,10 +20,14 @@ export default function ReviewHeaderLayout({
   headerTitle,
   headerTextColor = 'text-white',
 }: ReviewHeaderLayoutProps) {
-  const originalIsPicked = alcoholData?.isPicked ?? false;
-  const [isPicked, setIsPicked] = useState<boolean>(originalIsPicked);
-
   const { handleLoginModal } = useModalStore();
+  const [isPicked, setIsPicked] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (alcoholData?.isPicked !== undefined) {
+      setIsPicked(alcoholData.isPicked);
+    }
+  }, [alcoholData?.isPicked]);
 
   return alcoholData ? (
     <div className="relative">
@@ -53,10 +57,10 @@ export default function ReviewHeaderLayout({
             <PickBtn
               size={19}
               isPicked={isPicked}
-              handleUpdatePicked={() => setIsPicked(!isPicked)}
-              handleError={() => setIsPicked(originalIsPicked)}
-              handleNotLogin={handleLoginModal}
               alcoholId={alcoholData.alcoholId}
+              handleUpdatePicked={() => setIsPicked((prev) => !prev)}
+              onApiError={() => setIsPicked(alcoholData.isPicked)}
+              handleNotLogin={handleLoginModal}
             />
           </SubHeader.Right>
         </SubHeader>

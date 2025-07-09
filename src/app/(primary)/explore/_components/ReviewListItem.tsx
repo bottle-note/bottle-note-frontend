@@ -39,6 +39,7 @@ const ReviewListItem = ({ content }: Props) => {
   const { handleLoginModal, handleModalState } = useModalStore();
   const { isLogin, userData } = AuthService;
   const [isLiked, setIsLiked] = useState(content.isLikedByMe);
+  const [likeCount, setLikeCount] = useState(content.likeCount);
   const [isReportOptionShow, setIsReportOptionShow] = useState(false);
   const productImages = convertImageUrlsToProductImageArray(
     content.reviewImages,
@@ -152,14 +153,16 @@ const ReviewListItem = ({ content }: Props) => {
                 isLiked={isLiked}
                 handleUpdateLiked={() => {
                   setIsLiked((prev) => !prev);
+                  setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
                 }}
-                handleError={() => {
+                onApiError={() => {
+                  setLikeCount(content.likeCount);
                   setIsLiked(content.isLikedByMe);
                 }}
                 handleNotLogin={handleLoginModal}
                 size={12}
               />
-              <p className="text-12 text-mainGray">{content.likeCount}</p>
+              <p className="text-12 text-mainGray">{likeCount}</p>
             </div>
             <div className="flex items-center space-x-[2px]">
               <Image

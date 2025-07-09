@@ -1,14 +1,18 @@
 'use client';
 
+import { useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import useModalStore from '@/store/modalStore';
 import { AuthService } from '@/lib/AuthService';
+import { DEBOUNCE_DELAY } from '@/constants/common';
+import useDebounceAction from '@/hooks/useDebounceAction';
 
 interface Props {
   isPicked: boolean;
   handleUpdatePicked: () => void;
-  handleError: () => void;
+  onApiSuccess?: () => void;
+  onApiError?: () => void;
   handleNotLogin: () => void;
   pickBtnName?: string;
   iconColor?: 'white' | 'subcoral';
@@ -19,7 +23,8 @@ interface Props {
 const PickBtn = ({
   isPicked,
   handleUpdatePicked,
-  handleError,
+  onApiSuccess,
+  onApiError,
   handleNotLogin,
   alcoholId,
   pickBtnName,
@@ -28,25 +33,64 @@ const PickBtn = ({
 }: Props) => {
   const { isLogin } = AuthService;
   const { handleModalState } = useModalStore();
+  const { debounce } = useDebounceAction(DEBOUNCE_DELAY);
+
+  const lastSyncedPickedRef = useRef(isPicked);
+  const pendingPickedRef = useRef<boolean | null>(null);
+
+  useEffect(() => {
+    if (pendingPickedRef.current === null) {
+      lastSyncedPickedRef.current = isPicked;
+    }
+  }, [isPicked]);
 
   const handleClick = async () => {
     if (!isLogin) {
       handleNotLogin();
-    } else {
-      handleUpdatePicked();
+      return;
+    }
+
+    handleUpdatePicked();
+
+    const newPickState = !isPicked;
+    pendingPickedRef.current = newPickState;
+
+    debounce(async () => {
+      const stateToSync = pendingPickedRef.current;
+
+      if (stateToSync === null || stateToSync === lastSyncedPickedRef.current) {
+        return;
+      }
+
       try {
-        await AlcoholsApi.putPick(alcoholId, !isPicked);
+        await AlcoholsApi.putPick(alcoholId, stateToSync);
+        lastSyncedPickedRef.current = stateToSync;
+        pendingPickedRef.current = null;
+
+        if (onApiSuccess) {
+          onApiSuccess();
+        }
       } catch (error) {
+        console.error('Error updating pick status:', error);
+
+        pendingPickedRef.current = null;
+
         handleModalState({
           isShowModal: true,
           type: 'ALERT',
           mainText: '찜하기 업데이트에 실패했습니다. 다시 시도해주세요.',
         });
-        console.error('Error updating pick status:', error);
-        handleError();
+
+        if (onApiError) {
+          onApiError();
+        }
       }
-    }
+    });
   };
+
+  const iconType = isPicked ? 'filled' : 'outlined';
+  const iconSrc = `/icon/pick-${iconType}-${iconColor}.svg`;
+
   return (
     <button
       className={
@@ -56,21 +100,12 @@ const PickBtn = ({
       }
       onClick={handleClick}
     >
-      {isPicked ? (
-        <Image
-          src={`/icon/pick-filled-${iconColor}.svg`}
-          width={size}
-          height={size}
-          alt="Pick"
-        />
-      ) : (
-        <Image
-          src={`/icon/pick-outlined-${iconColor}.svg`}
-          width={size}
-          height={size}
-          alt="unPick"
-        />
-      )}
+      <Image
+        src={iconSrc}
+        width={size}
+        height={size}
+        alt={isPicked ? 'Pick' : 'Unpick'}
+      />
       {pickBtnName && <p className="text-12 font-normal">{pickBtnName}</p>}
     </button>
   );

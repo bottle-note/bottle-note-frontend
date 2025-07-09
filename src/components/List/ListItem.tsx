@@ -10,8 +10,6 @@ import { ROUTES } from '@/constants/routes';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
 import RatingCountIcon from 'public/icon/rating-count-black.svg';
-import HasReviewIcon from 'public/icon/edit-filled-subcoral.svg';
-import ReviewIcon from 'public/icon/edit-outlined-subcoral.svg';
 
 interface Props {
   data: AlcoholAPI & { hasReviewByMe?: boolean; isMyPage?: boolean };
@@ -74,8 +72,8 @@ const ListItem = ({ data }: Props) => {
             isPicked={isPicked}
             alcoholId={alcoholId}
             iconColor="subcoral"
-            handleUpdatePicked={() => setIsPicked(!isPicked)}
-            handleError={() => console.error('찜하기 도중 에러 발생')}
+            handleUpdatePicked={() => setIsPicked((prev) => !prev)}
+            onApiError={() => setIsPicked(initialIsPicked)}
             handleNotLogin={handleLoginModal}
           />
         </div>
