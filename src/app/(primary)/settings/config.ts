@@ -1,4 +1,5 @@
 import { ScreenConfig, MenuCategory, ScreenType } from '@/types/Settings';
+import BlockManagement from './components/BlockManagement';
 
 export const createScreenConfigs = (
   handleLogout: () => void,
@@ -31,6 +32,10 @@ export const createScreenConfigs = (
       },
     ],
   },
+  blockManagement: {
+    title: '차단 사용자 관리',
+    component: BlockManagement,
+  },
 });
 
 export const createMenuCategories = (
@@ -46,7 +51,7 @@ export const createMenuCategories = (
       },
       {
         text: '차단 사용자 관리',
-        action: () => onScreenNavigate('inquiryManagement'),
+        action: () => onScreenNavigate('blockManagement'),
       },
     ],
   },

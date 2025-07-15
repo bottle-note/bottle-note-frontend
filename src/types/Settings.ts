@@ -1,4 +1,4 @@
-export type ScreenType = 'main' | 'loginManagement' | 'inquiryManagement';
+export type ScreenType = 'main' | 'loginManagement' | 'inquiryManagement' | 'blockManagement';
 
 export interface MenuItem {
   text: string;
@@ -8,7 +8,8 @@ export interface MenuItem {
 
 export interface ScreenConfig {
   title: string;
-  items: MenuItem[];
+  items?: MenuItem[];
+  component?: React.ComponentType;
 }
 
 export interface MenuCategory {

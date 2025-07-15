@@ -23,11 +23,20 @@ const itemVariants = {
 };
 
 export const SettingsSubScreen = ({ config }: SettingsSubScreenProps) => {
+  if (config.component) {
+    const Component = config.component;
+    return (
+      <section className="flex-1 overflow-y-auto">
+        <Component />
+      </section>
+    );
+  }
+
   return (
     <section className="flex-1 overflow-y-auto px-6">
       <div className="pt-[26px]">
         <div className="space-y-0 text-15 font-medium text-mainBlack border-b border-brightGray">
-          {config.items.map((item, index) => (
+          {config.items?.map((item, index) => (
             <motion.div
               key={item.text}
               className="py-4"
