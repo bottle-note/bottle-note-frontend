@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { AuthService } from '@/lib/AuthService';
 import { ROUTES } from '@/constants/routes';
 import Menu from 'public/icon/menu-subcoral.svg';
 import Logo from 'public/bottle_note_Icon_logo.svg';
@@ -78,6 +79,8 @@ const HeaderRight = ({
   onClick,
   showSideMenu = false,
 }: HeaderRightProps) => {
+  const { userData } = AuthService;
+
   return (
     <div
       onClick={onClick}
@@ -89,11 +92,11 @@ const HeaderRight = ({
     >
       {children}
       <div className="pt-2">
-        {showSideMenu && (
+        {showSideMenu && userData ? (
           <Link href={ROUTES.SETTINGS.BASE}>
             <Image src={Menu} alt="Settings" />
           </Link>
-        )}
+        ) : null}
       </div>
     </div>
   );
