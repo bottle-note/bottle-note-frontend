@@ -1,4 +1,8 @@
-export type ScreenType = 'main' | 'loginManagement' | 'inquiryManagement' | 'blockManagement';
+export type ScreenType =
+  | 'main'
+  | 'loginManagement'
+  | 'inquiryManagement'
+  | 'blockManagement';
 
 export interface MenuItem {
   text: string;
@@ -15,4 +19,13 @@ export interface ScreenConfig {
 export interface MenuCategory {
   title: string;
   items: MenuItem[];
+}
+
+export interface BlockListApi {
+  totalCount: number;
+  items: {
+    userId: string;
+    nickName: string;
+    blockedAt: string;
+  };
 }
