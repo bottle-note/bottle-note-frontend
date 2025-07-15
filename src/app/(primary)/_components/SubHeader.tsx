@@ -10,8 +10,7 @@ import React, {
 import Link from 'next/link';
 import Image from 'next/image';
 import { ROUTES } from '@/constants/routes';
-import SidebarHeader from '@/app/(primary)/_components/SidebarHeader';
-
+import Menu from 'public/icon/menu-subcoral.svg';
 import Logo from 'public/bottle_note_Icon_logo.svg';
 
 interface HeaderLeftProps {
@@ -41,6 +40,9 @@ const HeaderLeft = ({
           onClick?.(e as unknown as MouseEvent<HTMLDivElement>);
         }
       }}
+      role="button"
+      tabIndex={0}
+      className="cursor-pointer"
     >
       {children}
     </div>
@@ -86,7 +88,13 @@ const HeaderRight = ({
       }}
     >
       {children}
-      <div className="pt-2">{showSideMenu && <SidebarHeader />}</div>
+      <div className="pt-2">
+        {showSideMenu && (
+          <Link href={ROUTES.SETTINGS.BASE}>
+            <Image src={Menu} alt="Settings" />
+          </Link>
+        )}
+      </div>
     </div>
   );
 };
