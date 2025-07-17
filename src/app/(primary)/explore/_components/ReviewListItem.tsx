@@ -134,7 +134,7 @@ const ReviewListItem = ({ content }: Props) => {
           <div className="flex flex-col gap-[14px]">
             <ReviewImageCarousel images={productImages} />
             <p className="text-12 text-mainDarkGray">{content.reviewContent}</p>
-            <div className="flex gap-[6px]">
+            <div className="flex flex-wrap gap-[6px]">
               {content.reviewTags.map((tag) => (
                 <div key={tag} className="overflow-hidden flex-shrink-0">
                   <Label name={tag} styleClass="label-default text-11" />
