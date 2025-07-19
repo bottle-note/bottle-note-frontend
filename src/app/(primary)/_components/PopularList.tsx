@@ -113,7 +113,7 @@ const LoginRequired = () => {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full -ml-[25px]">
       <div className="flex flex-col items-center justify-center flex-grow space-y-[14px]">
         <Image
           src="/icon/logo-subcoral.svg"
