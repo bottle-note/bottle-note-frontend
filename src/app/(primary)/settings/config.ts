@@ -1,10 +1,10 @@
 import { ScreenConfig, MenuCategory, ScreenType } from '@/types/Settings';
+import { ROUTES } from '@/constants/routes';
 import BlockManagement from './_components/BlockManagement';
 
 export const createScreenConfigs = (
   handleLogout: () => void,
   handleDeleteAccount: () => void,
-  onRouteNavigate: (path: string) => void,
 ): Record<string, ScreenConfig> => ({
   loginManagement: {
     title: '로그인관리',
@@ -16,19 +16,6 @@ export const createScreenConfigs = (
       {
         text: '서비스 탈퇴',
         action: handleDeleteAccount,
-      },
-    ],
-  },
-  inquiryManagement: {
-    title: '문의 관리',
-    items: [
-      {
-        text: '문의 내역 조회',
-        action: () => onRouteNavigate('/inquire'),
-      },
-      {
-        text: '문의하기',
-        action: () => onRouteNavigate('/inquire/register'),
       },
     ],
   },
@@ -49,7 +36,7 @@ export const createMenuCategories = (
     items: [
       {
         text: '내 정보',
-        action: () => onRouteNavigate(`/user/${userId}/edit`),
+        action: () => onRouteNavigate(ROUTES.USER.EDIT(userId!)),
       },
       {
         text: '차단 사용자 관리',
@@ -62,11 +49,11 @@ export const createMenuCategories = (
     items: [
       {
         text: '서비스 문의',
-        action: () => onScreenNavigate('inquiryManagement'),
+        action: () => onRouteNavigate(`${ROUTES.INQUIRE.BASE}?type=service`),
       },
       {
         text: '비즈니스 문의',
-        action: () => onRouteNavigate('/business-inquiry'),
+        action: () => onRouteNavigate(`${ROUTES.INQUIRE.BASE}?type=business`),
       },
     ],
   },

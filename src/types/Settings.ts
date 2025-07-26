@@ -1,8 +1,4 @@
-export type ScreenType =
-  | 'main'
-  | 'loginManagement'
-  | 'inquiryManagement'
-  | 'blockManagement';
+export type ScreenType = 'main' | 'loginManagement' | 'blockManagement';
 
 export interface MenuItem {
   text: string;
