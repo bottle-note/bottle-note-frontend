@@ -1,5 +1,5 @@
 import { ScreenConfig, MenuCategory, ScreenType } from '@/types/Settings';
-import BlockManagement from './components/BlockManagement';
+import BlockManagement from './_components/BlockManagement';
 
 export const createScreenConfigs = (
   handleLogout: () => void,

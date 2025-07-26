@@ -11,8 +11,8 @@ import { UserApi } from '@/app/api/UserApi';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import Modal from '@/components/Modal';
 import { ScreenType, ScreenConfig, MenuCategory } from '@/types/Settings';
-import { SettingsMainScreen } from './components/SettingsMainScreen';
-import { SettingsSubScreen } from './components/SettingsSubScreen';
+import { SettingsMainScreen } from './_components/SettingsMainScreen';
+import { SettingsSubScreen } from './_components/SettingsSubScreen';
 import { createScreenConfigs, createMenuCategories } from './config';
 
 export default function Settings() {

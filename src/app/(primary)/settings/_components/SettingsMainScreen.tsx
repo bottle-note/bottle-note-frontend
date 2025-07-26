@@ -29,15 +29,14 @@ export const SettingsMainScreen = ({
       {menuCategories.map((category, categoryIndex) => (
         <div key={category.title}>
           {categoryIndex > 0 && <div className="border-t border-brightGray" />}
-          <div className="pt-[26px] pb-[31px]">
+          <div className="py-[22px]">
             <h2 className="text-subCoral text-13 font-bold">
               {category.title}
             </h2>
-            <div className="space-y-0 text-15 font-medium text-mainBlack">
+            <div className="mt-[27px] space-y-[25px] text-15 font-medium text-mainBlack">
               {category.items.map((item, index) => (
                 <motion.div
                   key={item.text}
-                  className="pt-[26px]"
                   variants={itemVariants}
                   initial="hidden"
                   animate="visible"
@@ -65,7 +64,7 @@ export const SettingsMainScreen = ({
         </div>
       ))}
 
-      <div className="py-[26px] border-t border-brightGray">
+      <div className="py-[22px] border-t border-brightGray">
         <div className="flex justify-between items-center text-15 text-brightGray">
           <span>앱 버전 1.1.4</span>
           <span>운영앱이동</span>
