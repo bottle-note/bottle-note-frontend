@@ -18,7 +18,7 @@ import { createScreenConfigs, createMenuCategories } from './config';
 
 export default function Settings() {
   const route = useRouter();
-  const { logout } = AuthService;
+  const { logout, userData } = AuthService;
   const { data: session } = useSession();
   const { handleModalState, handleCloseModal } = useModalStore();
   const { currentScreen, setCurrentScreen, resetToMain, clearStorage } =
@@ -121,8 +121,13 @@ export default function Settings() {
 
   const menuCategories: MenuCategory[] = useMemo(
     () =>
-      createMenuCategories(navigateToScreen, route.push, handleEnvSwitchModal),
-    [navigateToScreen, route],
+      createMenuCategories(
+        navigateToScreen,
+        route.push,
+        handleEnvSwitchModal,
+        userData?.userId,
+      ),
+    [navigateToScreen, route, userData?.userId],
   );
 
   const getHeaderTitle = () => {

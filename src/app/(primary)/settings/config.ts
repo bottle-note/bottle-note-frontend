@@ -42,13 +42,14 @@ export const createMenuCategories = (
   onScreenNavigate: (screen: ScreenType) => void,
   onRouteNavigate: (path: string) => void,
   handleSwitchEnv?: () => void,
+  userId?: string | number,
 ): MenuCategory[] => [
   {
     title: '내 정보',
     items: [
       {
         text: '내 정보',
-        action: () => onScreenNavigate('inquiryManagement'),
+        action: () => onRouteNavigate(`/user/${userId}/edit`),
       },
       {
         text: '차단 사용자 관리',
