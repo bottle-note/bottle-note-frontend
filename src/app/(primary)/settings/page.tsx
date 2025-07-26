@@ -8,6 +8,7 @@ import { AuthService } from '@/lib/AuthService';
 import useModalStore from '@/store/modalStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { UserApi } from '@/app/api/UserApi';
+import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import Modal from '@/components/Modal';
 import { ScreenType, ScreenConfig, MenuCategory } from '@/types/Settings';
@@ -93,6 +94,23 @@ export default function Settings() {
     });
   };
 
+  const handleSwitchEnv = (env: 'dev' | 'prod') => {
+    handleWebViewMessage('switchEnv', env);
+    handleCloseModal();
+  };
+
+  const handleEnvSwitchModal = () => {
+    handleModalState({
+      isShowModal: true,
+      type: 'CONFIRM',
+      mainText: '개발 환경으로 전환하시겠습니까?',
+      confirmBtnName: '개발',
+      cancelBtnName: '상용',
+      handleConfirm: () => handleSwitchEnv('dev'),
+      handleCancel: () => handleSwitchEnv('prod'),
+    });
+  };
+
   const screenConfigs: Record<
     Exclude<ScreenType, 'main'>,
     ScreenConfig
@@ -102,7 +120,8 @@ export default function Settings() {
   );
 
   const menuCategories: MenuCategory[] = useMemo(
-    () => createMenuCategories(navigateToScreen, route.push),
+    () =>
+      createMenuCategories(navigateToScreen, route.push, handleEnvSwitchModal),
     [navigateToScreen, route],
   );
 

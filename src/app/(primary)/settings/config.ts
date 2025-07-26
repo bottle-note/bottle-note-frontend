@@ -41,6 +41,7 @@ export const createScreenConfigs = (
 export const createMenuCategories = (
   onScreenNavigate: (screen: ScreenType) => void,
   onRouteNavigate: (path: string) => void,
+  handleSwitchEnv?: () => void,
 ): MenuCategory[] => [
   {
     title: '내 정보',
@@ -59,7 +60,7 @@ export const createMenuCategories = (
     title: '문의 관리',
     items: [
       {
-        text: '내 문의글 관리',
+        text: '서비스 문의',
         action: () => onScreenNavigate('inquiryManagement'),
       },
       {
@@ -90,6 +91,31 @@ export const createMenuCategories = (
         text: '로그인 관리',
         action: () => onScreenNavigate('loginManagement'),
       },
+    ],
+  },
+  {
+    title: '관리자 메뉴',
+    items: [
+      {
+        text: '개발환경변경',
+        action: handleSwitchEnv,
+      },
+      // {
+      //   text: '위스키 정보 관리',
+      //   action: undefined,
+      // },
+      // {
+      //   text: '문의 관리',
+      //   action: undefined,
+      // },
+      // {
+      //   text: '신고 관리',
+      //   action: undefined,
+      // },
+      // {
+      //   text: '유저 관리',
+      //   action: undefined,
+      // },
     ],
   },
 ];
