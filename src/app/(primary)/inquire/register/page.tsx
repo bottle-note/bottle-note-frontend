@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import * as yup from 'yup';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -16,8 +16,13 @@ import useModalStore from '@/store/modalStore';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import Modal from '@/components/Modal';
 import { useErrorModal } from '@/hooks/useErrorModal';
-import OptionSelect from '@/components/List/OptionSelect';
 import Loading from '@/components/Loading';
+import Label from '@/app/(primary)/_components/Label';
+import {
+  INQUIRE_TYPE,
+  SERVICE_TYPE_LIST,
+  BUSINESS_TYPE_LIST,
+} from '@/constants/Inquire';
 
 // FIXME: 이유를 알 수 없지만 해당 컴포넌트가 SSR 로 import 가 되어, 강제로 CSR import 로 변환
 const ImagesForm = dynamic(
@@ -27,32 +32,23 @@ const ImagesForm = dynamic(
   },
 );
 
-const TYPE_OPTIONS = [
-  {
-    type: 'WHISKEY',
-    name: '위스키 관련 문의',
-  },
-  {
-    type: 'REVIEW',
-    name: '리뷰 관련 문의',
-  },
-  {
-    type: 'USER',
-    name: '회원 관련 문의',
-  },
-  {
-    type: 'ETC',
-    name: '그 외 기타 문의',
-  },
-];
-
 // TODO: 탭 초기값 props 로 받아오도록 수정
 export default function InquireRegister() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const paramsType =
+    (searchParams.get('type') as keyof typeof INQUIRE_TYPE) || 'service';
+  const serviceType = INQUIRE_TYPE[paramsType] || paramsType;
   const { state, handleModalState } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
 
+  const labelBaseStyle = 'border border-subCoral rounded-md text-15 px-3 py-2';
+
   const schema = yup.object({
+    title: yup
+      .string()
+      .min(5, '최소 5글자 이상 입력이 필요합니다.')
+      .required('제목을 작성해주세요.'),
     content: yup
       .string()
       .min(10, '최소 10글자 이상 입력이 필요합니다.')
@@ -96,6 +92,7 @@ export default function InquireRegister() {
       }
 
       const params = {
+        title: data.title,
         content: data.content,
         type: data.type,
         imageUrlList: uploadedImageUrls ?? null,
@@ -126,7 +123,7 @@ export default function InquireRegister() {
   const { showErrorModal } = useErrorModal<FormValues>(errors);
 
   useEffect(() => {
-    showErrorModal(['content', 'type']);
+    showErrorModal(['title', 'content', 'type']);
   }, [errors]);
 
   return (
@@ -162,38 +159,76 @@ export default function InquireRegister() {
                 height={23}
               />
             </SubHeader.Left>
-            <SubHeader.Center>문의글 작성</SubHeader.Center>
+            <SubHeader.Center>{serviceType} 문의하기</SubHeader.Center>
           </SubHeader>
-          <article className="m-5">
-            <OptionSelect
-              options={TYPE_OPTIONS}
-              title="문의하기"
-              defaultLabel="어떤 문의사항인가요?"
-              handleOptionCallback={(value) => {
-                setValue('type', value);
-              }}
-            />
-          </article>
-          <article className="m-5 border-t-[0.01rem] border-b-[0.01rem] border-mainGray">
-            <textarea
-              placeholder="문의 내용을 작성해주세요. (최소 10자)"
-              className="w-full h-56 bg-white p-4 text-10 outline-none resize-none text-mainGray"
-              minLength={10}
-              maxLength={1000}
-              {...register('content')}
-            />
-            <div className="text-right text-mainGray text-10 pb-2">
-              ({watch('content')?.length} / 1000)
-            </div>
-          </article>
+          <section className="mx-5 my-[30px] space-y-[30px]">
+            <article className="space-y-[10px]">
+              <label
+                className="block font-bold text-mainGray text-13 mb-1"
+                htmlFor="title"
+              >
+                문의 제목
+              </label>
+              <input
+                id="title"
+                type="text"
+                placeholder=""
+                className="w-full h-9 bg-sectionWhite rounded-none px-3 text-14 outline-none focus:border focus:border-subCoral"
+                {...register('title')}
+              />
+            </article>
+            <article className="space-y-[10px]">
+              <label
+                className="block text-12 mb-1 text-mainGray"
+                htmlFor="content"
+              >
+                <span className="font-bold">문의 내용 </span>
+                <span className="font-light">(자세한 내용을 적어주세요)</span>
+              </label>
+              <textarea
+                id="content"
+                placeholder="문의 내용을 작성해주세요. (최소 10자)"
+                className="w-full h-56 bg-sectionWhite rounded-none px-3 py-3 text-14 outline-none focus:border focus:border-subCoral"
+                minLength={10}
+                maxLength={1000}
+                {...register('content')}
+              />
+              <div className="text-right text-mainGray text-10">
+                ({watch('content')?.length} / 1000)
+              </div>
+            </article>
+            <article className="space-y-[10px]">
+              <label
+                className="block font-bold text-mainGray text-13 mb-1"
+                htmlFor="type"
+              >
+                문의 유형
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {(paramsType === 'business'
+                  ? BUSINESS_TYPE_LIST
+                  : SERVICE_TYPE_LIST
+                ).map((item) => (
+                  <Label
+                    key={item.name}
+                    name={item.name}
+                    isSelected={watch('type') === item.name}
+                    onClick={() => setValue('type', item.name)}
+                    selectedStyle={labelBaseStyle + ' bg-subCoral text-white'}
+                    unselectedStyle={labelBaseStyle + ' bg-white text-subCoral'}
+                  />
+                ))}
+              </div>
+            </article>
 
-          <article className="m-5 pb-5 border-b-[0.01rem] border-mainGray">
-            <ImagesForm />
-          </article>
+            <article className="m-5 pb-5 border-b-[0.01rem] border-mainGray">
+              <ImagesForm />
+            </article>
 
-          <article className="mx-5 space-y-9">
-            <Button onClick={handleSubmit(onSave)} btnName="전송" />
-          </article>
+            <article className="mx-5 space-y-9">
+              <Button onClick={handleSubmit(onSave)} btnName="전송" />
+            </article>
+          </section>
         </section>
         {isProcessing && <Loading />}
         {state.isShowModal && <Modal />}

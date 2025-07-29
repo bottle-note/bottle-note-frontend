@@ -1,4 +1,5 @@
 export interface FormValues {
+  title: string;
   content: string;
   type: string;
   images?: { order: number; image: File }[] | null;
