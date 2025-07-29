@@ -1,20 +1,29 @@
 'use client';
 
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { Button } from '@/components/Button';
 import { AuthService } from '@/lib/AuthService';
 import useModalStore from '@/store/modalStore';
 import List from '@/components/List/List';
-import BoardListItem from '@/components/List/BoardListItem';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { InquireApi } from '@/app/api/InquireApi';
 import { InquireList } from '@/types/Inquire';
 import { ROUTES } from '@/constants/routes';
+import InquireTable from '@/app/(primary)/inquire/_components/InquireTable';
+
+const SERVICE_TYPE_MAP = {
+  service: '서비스',
+  business: '비즈니스',
+};
 
 export default function Inquire() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const paramsType =
+    (searchParams.get('type') as keyof typeof SERVICE_TYPE_MAP) || 'service';
+  const serviceType = SERVICE_TYPE_MAP[paramsType] || paramsType;
   const { isLogin } = AuthService;
   const { handleLoginModal } = useModalStore();
 
@@ -36,6 +45,10 @@ export default function Inquire() {
     },
   });
 
+  const handleItemClick = (helpId: number) => {
+    router.push(`/inquire/${helpId}`);
+  };
+
   return (
     <div>
       <SubHeader>
@@ -51,7 +64,7 @@ export default function Inquire() {
             height={23}
           />
         </SubHeader.Left>
-        <SubHeader.Center>나의 문의 목록</SubHeader.Center>
+        <SubHeader.Center>{serviceType} 문의 내역</SubHeader.Center>
       </SubHeader>
       <section className="py-8 px-5">
         <List
@@ -64,19 +77,14 @@ export default function Inquire() {
             total={inquireList ? inquireList[0].data.totalCount : 0}
           />
           <List.Section>
-            {inquireList &&
-              [...inquireList.map((list) => list.data.helpList)]
-                .flat()
-                .map((item: InquireList) => (
-                  <BoardListItem
-                    key={item.helpId}
-                    id={item.helpId}
-                    title={item.content}
-                    date={item.createAt}
-                    type={item.helpStatus}
-                    hrefUrl={`/inquire/${item.helpId}`}
-                  />
-                ))}
+            {inquireList && (
+              <InquireTable
+                inquireList={[
+                  ...inquireList.map((list) => list.data.helpList),
+                ].flat()}
+                onItemClick={handleItemClick}
+              />
+            )}
           </List.Section>
         </List>
         <div ref={targetRef} />

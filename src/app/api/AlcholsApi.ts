@@ -54,10 +54,7 @@ export const AlcoholsApi = {
   },
 
   async getHistory() {
-    const response = await fetchWithAuth(`/bottle-api/history/view/alcohols`, {
-      requireAuth: false,
-      cache: 'force-cache',
-    });
+    const response = await fetchWithAuth(`/bottle-api/history/view/alcohols`);
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
