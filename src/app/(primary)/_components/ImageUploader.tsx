@@ -10,11 +10,13 @@ import { useWebviewCamera } from '@/hooks/useWebviewCamera';
 interface ImageUploaderProps {
   onForceOpen?: (value: boolean) => void;
   onExtraButtonsChange?: (extraButtons: React.ReactNode) => void;
+  useMarginLeft?: boolean;
 }
 
 export default function ImageUploader({
   onForceOpen,
   onExtraButtonsChange,
+  useMarginLeft = true,
 }: ImageUploaderProps) {
   const imageRef = useRef<HTMLInputElement>(null);
   const imageRefModify = useRef<HTMLInputElement>(null);
@@ -147,7 +149,9 @@ export default function ImageUploader({
 
   return (
     <>
-      <div className="flex justify-start items-center h-[3.8rem] space-x-2 ml-7">
+      <div
+        className={`flex justify-start items-center h-[3.8rem] space-x-2 ${useMarginLeft ? 'ml-7' : ''}`}
+      >
         {previewImages?.map((data: SaveImages) => (
           <figure key={data?.order} className="relative h-full">
             <Image

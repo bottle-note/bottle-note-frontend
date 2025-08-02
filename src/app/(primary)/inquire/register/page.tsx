@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import * as yup from 'yup';
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -17,20 +16,13 @@ import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import Modal from '@/components/Modal';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import Loading from '@/components/Loading';
+import ImageUploader from '@/app/(primary)/_components/ImageUploader';
 import Label from '@/app/(primary)/_components/Label';
 import {
   INQUIRE_TYPE,
   SERVICE_TYPE_LIST,
   BUSINESS_TYPE_LIST,
 } from '@/constants/Inquire';
-
-// FIXME: 이유를 알 수 없지만 해당 컴포넌트가 SSR 로 import 가 되어, 강제로 CSR import 로 변환
-const ImagesForm = dynamic(
-  () => import('../../review/_components/form/ImagesForm'),
-  {
-    ssr: false,
-  },
-);
 
 // TODO: 탭 초기값 props 로 받아오도록 수정
 export default function InquireRegister() {
@@ -41,6 +33,7 @@ export default function InquireRegister() {
   const serviceType = INQUIRE_TYPE[paramsType] || paramsType;
   const { state, handleModalState } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
+  const [showImageUploader, setShowImageUploader] = useState(false);
 
   const labelBaseStyle = 'border border-subCoral rounded-md text-15 px-3 py-2';
 
@@ -221,8 +214,23 @@ export default function InquireRegister() {
               </div>
             </article>
 
-            <article className="m-5 pb-5 border-b-[0.01rem] border-mainGray">
-              <ImagesForm />
+            <article className="space-y-[10px]">
+              <label className="block text-12 mb-1 text-mainGray">
+                <span className="font-bold">이미지 첨부 </span>
+                <span className="font-light">(선택·최대 5장)</span>
+              </label>
+              <button
+                onClick={() => setShowImageUploader(!showImageUploader)}
+                className="py-[10px] px-5 text-15 text-mainGray border border-brightGray bg-sectionWhite"
+              >
+                파일 첨부하기
+              </button>
+
+              {showImageUploader && (
+                <div className="mt-4">
+                  <ImageUploader useMarginLeft={false} />
+                </div>
+              )}
             </article>
 
             <article className="mx-5 space-y-9">
