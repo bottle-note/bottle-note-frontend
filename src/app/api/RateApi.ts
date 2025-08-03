@@ -1,6 +1,6 @@
 import { RateAlcoholAPI, RateAPI, UserRatingApi } from '@/types/Rate';
 import { ApiResponse, ListQueryParams } from '@/types/common';
-import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { apiClient } from '@/shared/api/apiClient';
 
 // TODO: API 수정되면 요청 방식 변경
 export const RateApi = {
@@ -13,31 +13,21 @@ export const RateApi = {
     cursor,
     pageSize,
   }: ListQueryParams) {
-    const response = await fetch(
-      `/bottle-api/rating?keyword=${keyword}&category=${category}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
+    const response = await apiClient.get<
+      ApiResponse<{ ratings: RateAPI[]; totalCount: number }>
+    >(
+      `/rating?keyword=${keyword}&category=${category}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
+      { useAuth: false },
     );
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch data');
-    }
-
-    const result: ApiResponse<{ ratings: RateAPI[]; totalCount: number }> =
-      await response.json();
 
     const formattedResult: ApiResponse<{
       ratings: RateAlcoholAPI[];
       totalCount: number;
     }> = {
-      ...result,
+      ...response,
       data: {
-        ...result.data,
-        ratings: result.data.ratings.map((item) => ({
+        ...response.data,
+        ratings: response.data.ratings.map((item) => ({
           ...item,
           engCategory: item.engCategoryName,
           korCategory: item.korCategoryName,
@@ -49,27 +39,15 @@ export const RateApi = {
   },
 
   async getUserRating(alcoholId: string) {
-    const response = await fetchWithAuth(`/bottle-api/rating/${alcoholId}`, {
-      requireAuth: false,
-    });
+    const response = await apiClient.get<ApiResponse<UserRatingApi>>(
+      `/rating/${alcoholId}`,
+      { useAuth: false },
+    );
 
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
-
-    const result: ApiResponse<UserRatingApi> = await response;
-
-    return result.data;
+    return response.data;
   },
 
   async postRating(params: { alcoholId: string; rating: number }) {
-    const response = await fetchWithAuth(`/bottle-api/rating/register`, {
-      method: 'POST',
-      body: JSON.stringify(params),
-    });
-
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
+    await apiClient.post(`/rating/register`, params);
   },
 };

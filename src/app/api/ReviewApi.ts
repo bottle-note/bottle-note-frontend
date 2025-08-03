@@ -1,5 +1,5 @@
 import { ApiResponse, ListQueryParams } from '@/types/common';
-import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { apiClient } from '@/shared/api/apiClient';
 import {
   ReviewDetailsApi,
   ReviewPostApi,
@@ -18,16 +18,16 @@ export const ReviewApi = {
     cursor,
     pageSize,
   }: ListQueryParams) {
-    const response = await fetchWithAuth(
-      `/bottle-api/reviews/${alcoholId}?sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
-      { requireAuth: false },
+    const response = await apiClient.get<ApiResponse<ReviewListApi>>(
+      `/reviews/${alcoholId}?sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
+      { useAuth: false },
     );
+
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<ReviewListApi> = await response;
-    return result;
+    return response;
   },
 
   async getMyReviewList({
@@ -37,43 +37,38 @@ export const ReviewApi = {
     cursor,
     pageSize,
   }: ListQueryParams) {
-    const response = await fetchWithAuth(
-      `/bottle-api/reviews/me/${alcoholId}?sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
+    const response = await apiClient.get<ApiResponse<ReviewListApi>>(
+      `/reviews/me/${alcoholId}?sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
     );
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<ReviewListApi> = await response;
-
-    return result;
+    return response;
   },
 
   async getReviewDetails(reviewId: string | string[]) {
-    const response = await fetchWithAuth(
-      `/bottle-api/reviews/detail/${reviewId}`,
-      { requireAuth: false },
-    );
+    const response = await apiClient.get<
+      ApiResponse<{
+        alcoholInfo: any;
+        reviewInfo: any;
+        reviewImageList: any[];
+      }>
+    >(`/reviews/detail/${reviewId}`, { useAuth: false });
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<{
-      alcoholInfo: any;
-      reviewInfo: any;
-      reviewImageList: any[];
-    }> = await response;
-
     const formattedResult: ApiResponse<ReviewDetailsApi> = {
-      ...result,
+      ...response,
       data: {
-        ...result.data,
+        ...response.data,
         alcoholInfo: {
-          ...result.data.alcoholInfo,
-          engCategory: result.data.alcoholInfo.engCategoryName,
-          korCategory: result.data.alcoholInfo.korCategoryName,
+          ...response.data.alcoholInfo,
+          engCategory: response.data.alcoholInfo.engCategoryName,
+          korCategory: response.data.alcoholInfo.korCategoryName,
         },
       },
     };
@@ -82,10 +77,10 @@ export const ReviewApi = {
   },
 
   async registerReview(params: ReviewQueryParams) {
-    const response = await fetchWithAuth(`/bottle-api/reviews`, {
-      method: 'POST',
-      body: JSON.stringify(params),
-    });
+    const response = await apiClient.post<ApiResponse<ReviewPostApi>>(
+      `/reviews`,
+      params,
+    );
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
@@ -96,62 +91,54 @@ export const ReviewApi = {
   },
 
   async modifyReview(reviewId: string, params: ReviewQueryParams) {
-    const response = await fetchWithAuth(`/bottle-api/reviews/${reviewId}`, {
-      method: 'PATCH',
-      body: JSON.stringify(params),
-    });
+    const response = await apiClient.patch<ApiResponse<ReviewPatchApi>>(
+      `/reviews/${reviewId}`,
+      params,
+    );
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<ReviewPatchApi> = await response;
-    return result.data;
+    return response.data;
   },
 
   async deleteReview(reviewId: string) {
-    const response = await fetchWithAuth(`/bottle-api/reviews/${reviewId}`, {
-      method: 'DELETE',
-    });
+    const response = await apiClient.delete<ApiResponse<ReviewPatchApi>>(
+      `/reviews/${reviewId}`,
+    );
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<ReviewPatchApi> = await response;
-    return result.data;
+    return response.data;
   },
 
   async putLike(reviewId: string | number, isLiked: boolean) {
-    const response = await fetchWithAuth(`/bottle-api/likes`, {
-      method: 'PUT',
-      body: JSON.stringify({
+    const response = await apiClient.put<ApiResponse<ReviewLikePutApi>>(
+      `/likes`,
+      {
         reviewId,
         status: isLiked ? 'LIKE' : 'DISLIKE',
-      }),
-    });
+      },
+    );
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<ReviewLikePutApi> = await response;
-    return result.data;
+    return response.data;
   },
 
   async putVisibility(reviewId: string | number, status: 'PUBLIC' | 'PRIVATE') {
-    const response = await fetchWithAuth(
-      `/bottle-api/reviews/${reviewId}/display`,
-      {
-        method: 'PATCH',
-        body: JSON.stringify({
-          reviewId,
-          status,
-        }),
-      },
-    );
+    const response = await apiClient.patch<
+      ApiResponse<ReviewVisibilityPatchApi>
+    >(`/reviews/${reviewId}/display`, {
+      reviewId,
+      status,
+    });
 
-    const result: ApiResponse<ReviewVisibilityPatchApi> = await response;
-    return result.data;
+    return response.data;
   },
 };

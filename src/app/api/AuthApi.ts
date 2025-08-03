@@ -9,6 +9,7 @@ import {
 } from '@/types/Auth';
 import { ApiResponse } from '@/types/common';
 import { ApiError } from '@/utils/ApiError';
+import { apiClient } from '@/shared/api/apiClient';
 
 export const AuthApi = {
   // NOTE: 서버사이드에서 활용되는 로그인 메서드
@@ -45,65 +46,79 @@ export const AuthApi = {
       socialUniqueId?: string;
     },
   ): Promise<{ tokens: TokenData; info: UserData }> {
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      body: JSON.stringify({
+    const response = await apiClient.post<{
+      tokens: TokenData;
+      info: UserData;
+    }>(
+      '/login',
+      {
         ...body,
         socialUniqueId: body.socialUniqueId ?? '',
-      }),
-      headers: {
-        'Content-Type': 'application/json',
       },
-    });
+      {
+        baseUrl: 'api',
+        useAuth: false,
+      },
+    );
 
-    if (!response.ok) {
-      throw new Error('Failed to log in');
-    }
-
-    const { tokens, info } = await response.json();
-    return { tokens, info };
+    return response;
   },
 
-  async renewTokenClientSide(refreshToken: string) {
+  async renewTokenClientSide(refreshToken: string): Promise<TokenData> {
     try {
-      const response = await fetch('/api/token/renew', {
-        method: 'POST',
-        body: JSON.stringify(refreshToken),
-      });
+      const response = await apiClient.post<{ data: TokenData }>(
+        '/token/renew',
+        refreshToken,
+        {
+          baseUrl: 'api',
+          useAuth: false,
+        },
+      );
 
-      if (!response.ok) {
-        const statusCode = response.status;
-        const body = await response.json();
-
-        if (statusCode === 400) {
+      return response.data;
+    } catch (e) {
+      // 더 안전한 타입 체크
+      if (e instanceof ApiError) {
+        // 400 에러: 리프레시 토큰 만료/무효
+        if (e.response.status === 400) {
+          console.warn('Refresh token expired or invalid');
           AuthService.logout();
-
-          const { handleLoginState } = useModalStore.getState();
-          return handleLoginState(true);
+          const { handleLoginState: handleShowNeedLoginModal } =
+            useModalStore.getState();
+          handleShowNeedLoginModal(true);
+          throw new ApiError(
+            '리프레시 토큰이 만료되어 로그인이 필요합니다.',
+            e.response,
+          );
         }
 
-        throw new Error(`HTTP error! message: ${body.errors.message}`);
+        // 기타 API 에러
+        console.error(
+          `Token renewal failed: ${e.message} (Status: ${e.response.status})`,
+        );
+        throw e; // 원본 에러 유지
       }
 
-      const { data: newTokens } = await response.json();
-
-      return newTokens;
-    } catch (e) {
-      const error = e as Error;
-
+      // 네트워크 에러 등 기타 에러
+      const error =
+        e instanceof Error ? e : new Error('Unknown error occurred');
       console.error(
         `토큰 업데이트 도중 에러가 발생했습니다. 사유: ${error.message}`,
       );
+      throw error;
     }
   },
 
   async kakaoLogin(code: string | string[]): Promise<LoginReturn> {
     try {
-      const res = await fetch(`/api/oauth/kakao?code=${code}`, {
-        method: 'POST',
-      });
-
-      const result: LoginReturn = await res.json();
+      const result = await apiClient.post<LoginReturn>(
+        `/oauth/kakao?code=${code}`,
+        {},
+        {
+          baseUrl: 'api',
+          useAuth: false,
+        },
+      );
 
       return result;
     } catch (e) {
@@ -124,25 +139,10 @@ export const AuthApi = {
     password: string;
   }): Promise<{ accessToken: string }> {
     try {
-      const res = await fetch(`/bottle-api/oauth/basic/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const result: ApiResponse<{ accessToken: string }> = await res.json();
-
-      if (!res.ok) {
-        const errorCode = result.errors?.[0]?.code;
-
-        throw new ApiError(
-          result.errors?.[0]?.message || 'Login failed.',
-          res,
-          errorCode,
-        );
-      }
+      const result = await apiClient.post<ApiResponse<{ accessToken: string }>>(
+        `/oauth/basic/login`,
+        { email, password },
+      );
 
       return result.data;
     } catch (e) {
@@ -168,28 +168,17 @@ export const AuthApi = {
     gender: 'MALE' | 'FEMALE' | null;
   }): Promise<BasicSignupRes> {
     try {
-      const res = await fetch(`/bottle-api/oauth/basic/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await apiClient.post<{ data: BasicSignupRes }>(
+        `/oauth/basic/signup`,
+        {
           email,
           password,
           age,
           gender,
-        }),
-      });
+        },
+      );
 
-      if (!res.ok) {
-        const result: ApiResponse<BasicSignupRes> = await res.json();
-
-        throw new Error(result.errors[0].message);
-      }
-
-      const { data } = await res.json();
-
-      return data;
+      return response.data;
     } catch (e) {
       const error = e as Error;
       console.error(error.message);
@@ -206,25 +195,10 @@ export const AuthApi = {
     password: string;
   }): Promise<{ data: string }> {
     try {
-      const res = await fetch(`/bottle-api/oauth/restore`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const result: ApiResponse<{ data: string }> = await res.json();
-
-      if (!res.ok) {
-        const errorCode = result.errors?.[0]?.code;
-
-        throw new ApiError(
-          result.errors?.[0]?.message || 'Restore failed.',
-          res,
-          errorCode,
-        );
-      }
+      const result = await apiClient.post<ApiResponse<{ data: string }>>(
+        `/oauth/restore`,
+        { email, password },
+      );
 
       return result.data;
     } catch (e) {
@@ -240,19 +214,14 @@ export const AuthApi = {
 
   async verifyToken(accessToken: string) {
     try {
-      const res = await fetch(`/bottle-api/oauth/token/verify`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await apiClient.put<{ data: string }>(
+        `/oauth/token/verify`,
+        {
           token: accessToken,
-        }),
-      });
+        },
+      );
 
-      const { data } = await res.json();
-
-      return { data };
+      return { data: response.data };
     } catch (e) {
       const error = e as Error;
       console.error(error.message);

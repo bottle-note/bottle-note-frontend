@@ -1,6 +1,6 @@
 import { ApiResponse } from '@/types/common';
 import { RelationInfo } from '@/types/User';
-import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { apiClient } from '@/shared/api/apiClient';
 
 export const FollowApi = {
   async getRelationList({
@@ -10,15 +10,13 @@ export const FollowApi = {
     userId: number;
     type: 'follower' | 'following';
   }) {
-    const response: ApiResponse<{
-      followingList: RelationInfo[];
-      followerList: RelationInfo[];
-      totalCount: number;
-    }> = await fetchWithAuth(`/bottle-api/follow/${userId}/${type}-list`);
-
-    if (!response.data) {
-      throw new Error('Failed to fetch data');
-    }
+    const response = await apiClient.get<
+      ApiResponse<{
+        followingList: RelationInfo[];
+        followerList: RelationInfo[];
+        totalCount: number;
+      }>
+    >(`/follow/${userId}/${type}-list`);
 
     return response;
   },
@@ -30,25 +28,18 @@ export const FollowApi = {
     followUserId: number;
     status: RelationInfo['status'];
   }) {
-    const response = await fetchWithAuth(`/bottle-api/follow`, {
-      method: 'POST',
-      body: JSON.stringify({
-        followUserId,
-        status,
-      }),
+    const response = await apiClient.post<
+      ApiResponse<{
+        followerId: number;
+        nickName: string;
+        imageUrl: string;
+        message: string;
+      }>
+    >(`/follow`, {
+      followUserId,
+      status,
     });
 
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
-
-    const result: ApiResponse<{
-      followerId: number;
-      nickName: string;
-      imageUrl: string;
-      message: string;
-    }> = await response.data;
-
-    return result;
+    return response.data;
   },
 };

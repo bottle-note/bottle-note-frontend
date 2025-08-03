@@ -1,6 +1,6 @@
 import { ApiResponse } from '@/types/common';
 import { UserInfoApi, CurrentUserInfoApi } from '@/types/User';
-import { apiClient } from '@/lib/apiClient';
+import { apiClient } from '@/shared/api/apiClient';
 
 export const UserApi = {
   async changeNickname(nickName: string): Promise<

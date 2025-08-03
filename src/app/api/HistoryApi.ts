@@ -1,5 +1,5 @@
 import { ApiResponse } from '@/types/common';
-import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { apiClient } from '@/shared/api/apiClient';
 import { HistoryListApi, HistoryListQueryParams } from '@/types/History';
 
 export const HistoryApi = {
@@ -8,16 +8,10 @@ export const HistoryApi = {
     filterParams?: string,
   ) {
     const { userId, cursor, pageSize } = baseParams;
-    const response = await fetchWithAuth(
-      `/bottle-api/history/${userId}?cursor=${cursor}&pageSize=${pageSize}${filterParams ? `&${filterParams}` : ''}`,
+    const response = await apiClient.get<ApiResponse<HistoryListApi>>(
+      `/history/${userId}?cursor=${cursor}&pageSize=${pageSize}${filterParams ? `&${filterParams}` : ''}`,
     );
 
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
-
-    const result: ApiResponse<HistoryListApi> = await response;
-
-    return result;
+    return response;
   },
 };
