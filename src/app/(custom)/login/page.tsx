@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { useForm } from 'react-hook-form';
 import { AuthService } from '@/lib/AuthService';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
@@ -15,16 +14,10 @@ import { ROUTES } from '@/constants/routes';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
-type FormValues = {
-  email: string;
-  password: string;
-};
-
 export default function Login() {
   const router = useRouter();
   const { data: session } = useSession();
   const {
-    handleBasicLogin,
     handleRedirectWithSession,
     handleSendDeviceInfo,
     handleInitKakaoSdkLogin,
@@ -32,11 +25,6 @@ export default function Login() {
     handleAppleLogin,
   } = useLogin();
   const { isLogin } = AuthService;
-  const { register, handleSubmit } = useForm<FormValues>();
-
-  const handleSignup = () => {
-    router.push(ROUTES.SIGNUP);
-  };
 
   useEffect(() => {
     handleRedirectWithSession();
