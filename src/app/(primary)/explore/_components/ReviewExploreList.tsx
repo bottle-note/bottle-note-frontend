@@ -33,7 +33,6 @@ export const ReviewExplorerList = () => {
         },
       });
     },
-    staleTime: 1000 * 60 * 5,
   });
 
   const handleAddKeyword = (newKeyword: string) => {
