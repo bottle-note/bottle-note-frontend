@@ -17,6 +17,10 @@ import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { deleteReview } from '@/lib/Review';
 import { AuthService } from '@/lib/AuthService';
 import { ROUTES } from '@/constants/routes';
+import {
+  ImageCarousel,
+  convertImageUrlsToProductImageArray,
+} from '@/app/(primary)/_components/ImageCarousel';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 interface Props {
@@ -32,6 +36,11 @@ function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(data?.reviewInfo?.isLikedByMe);
   const [likeCount, setLikeCount] = useState(data?.reviewInfo?.likeCount);
+  const formatUrl = data?.reviewImageList?.map((url) => url.viewUrl);
+  const productImages = convertImageUrlsToProductImageArray(
+    formatUrl,
+    '리뷰 이미지',
+  );
 
   const handleCloseOption = () => {
     handleModalState({
@@ -129,21 +138,9 @@ function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
               />
             )}
           </article>
-          {data.reviewImageList && (
-            <div className="my-[22px] whitespace-nowrap overflow-x-auto flex space-x-2 scrollbar-hide">
-              {data.reviewImageList.map((imgData) => (
-                <div
-                  className="relative w-[147px] h-[147px] flex-shrink-0"
-                  key={imgData.viewUrl}
-                >
-                  <Image
-                    src={imgData.viewUrl}
-                    alt="review_img"
-                    fill
-                    className="cover"
-                  />
-                </div>
-              ))}
+          {productImages && (
+            <div className="my-[22px]">
+              <ImageCarousel images={productImages} />
             </div>
           )}
           <div

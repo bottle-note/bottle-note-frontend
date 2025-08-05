@@ -11,24 +11,12 @@ import { AuthService } from '@/lib/AuthService';
 import OptionDropdown from '@/components/OptionDropdown';
 import { deleteReview } from '@/lib/Review';
 import { ROUTES } from '@/constants/routes';
-import { ProductImage, ReviewImageCarousel } from './ReviewImageCarousel';
+import {
+  ImageCarousel,
+  convertImageUrlsToProductImageArray,
+} from '@/app/(primary)/_components/ImageCarousel';
 import LikeBtn from '../../_components/LikeBtn';
 import Label from '../../_components/Label';
-
-const convertImageUrlsToProductImageArray = (
-  imageUrls: string[] | undefined | null,
-  altTextPrefix: string = 'Image',
-): ProductImage[] => {
-  if (!imageUrls || imageUrls.length === 0) {
-    return [];
-  }
-
-  return imageUrls.map((url, index) => ({
-    id: url,
-    src: url,
-    alt: `${altTextPrefix} ${index + 1}`,
-  }));
-};
 
 interface Props {
   content: ExploreReview;
@@ -136,7 +124,7 @@ const ReviewListItem = ({ content }: Props) => {
         {/* 리뷰 본문 */}
         <Link href={ROUTES.REVIEW.DETAIL(content.reviewId)}>
           <div className="flex flex-col gap-[14px]">
-            <ReviewImageCarousel images={productImages} />
+            <ImageCarousel images={productImages} />
             <p className="text-15 text-mainDarkGray">{content.reviewContent}</p>
             <div className="flex flex-wrap gap-[6px]">
               {content.reviewTags.map((tag) => (

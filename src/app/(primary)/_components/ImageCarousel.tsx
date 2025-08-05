@@ -15,8 +15,23 @@ export interface ProductImage {
   alt: string;
 }
 
+export const convertImageUrlsToProductImageArray = (
+  imageUrls: string[] | undefined | null,
+  altTextPrefix: string = 'Image',
+): ProductImage[] => {
+  if (!imageUrls || imageUrls.length === 0) {
+    return [];
+  }
+
+  return imageUrls.map((url, index) => ({
+    id: url,
+    src: url,
+    alt: `${altTextPrefix} ${index + 1}`,
+  }));
+};
+
 // TODO: 이미지 여러장일 때 슬라이드 수정
-export const ReviewImageCarousel = ({ images }: { images: ProductImage[] }) => {
+export const ImageCarousel = ({ images }: { images: ProductImage[] }) => {
   if (!images || images.length === 0) {
     return <></>;
   }
