@@ -80,6 +80,10 @@ const ReviewListItem = ({ content }: Props) => {
     }
   };
 
+  const moveToReviewDetail = () => {
+    router.push(ROUTES.REVIEW.DETAIL(content.reviewId) + `?scrollTo=replies`);
+  };
+
   return (
     <>
       <article className="flex flex-col w-full pt-[30px]">
@@ -164,7 +168,17 @@ const ReviewListItem = ({ content }: Props) => {
               />
               <p className="text-13 text-mainGray">{likeCount}</p>
             </div>
-            <div className="flex items-center space-x-[2px]">
+            <div
+              className="flex items-center space-x-[2px] cursor-pointer"
+              onClick={moveToReviewDetail}
+              tabIndex={0}
+              role="button"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  moveToReviewDetail();
+                }
+              }}
+            >
               <Image
                 src={
                   content.hasReplyByMe
