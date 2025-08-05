@@ -5,7 +5,6 @@ import Label from '@/app/(primary)/_components/Label';
 import { truncStr } from '@/utils/truncStr';
 import Star from '@/components/Star';
 import VisibilityToggle from '@/app/(primary)/_components/VisibilityToggle';
-import { formatDate } from '@/utils/formatDate';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { AuthService } from '@/lib/AuthService';
 import { ROUTES } from '@/constants/routes';
@@ -14,18 +13,16 @@ import ProfileDefaultImg from 'public/profile-default.svg';
 interface ReviewUserHeaderProps {
   data: ReviewDetailsWithoutAlcoholInfo;
   onRefresh: () => void;
-  onOptionClick: () => void;
 }
 
 export default function ReviewUserHeader({
   data,
   onRefresh,
-  onOptionClick,
 }: ReviewUserHeaderProps) {
   const { userData } = AuthService;
 
   return (
-    <section className="mx-5 pb-5 border-b border-mainGray/30">
+    <section className="mx-5 pb-5">
       <article className="flex items-center justify-between">
         <Link href={ROUTES.USER.BASE(userData?.userId!)}>
           <div className="flex items-center space-x-[7px]">
@@ -77,22 +74,6 @@ export default function ReviewUserHeader({
             onSuccess={onRefresh}
           />
         )}
-      </article>
-
-      <article className="flex justify-between mt-[10px]">
-        {data.reviewInfo?.createAt && (
-          <p className="text-mainGray text-10">
-            {formatDate(data.reviewInfo.createAt) as string}
-          </p>
-        )}
-        <button className="cursor-pointer" onClick={onOptionClick}>
-          <Image
-            src="/icon/ellipsis-darkgray.svg"
-            width={14}
-            height={14}
-            alt="report"
-          />
-        </button>
       </article>
     </section>
   );

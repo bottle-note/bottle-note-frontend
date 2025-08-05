@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import FlavorTag from '@/app/(primary)/_components/FlavorTag';
 import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
+import { formatDate } from '@/utils/formatDate';
 import { deleteReview } from '@/lib/Review';
 import { AuthService } from '@/lib/AuthService';
 import { ROUTES } from '@/constants/routes';
@@ -72,14 +74,10 @@ function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
   return (
     <>
       <section className="pt-[38px]">
-        <ReviewUserHeader
-          data={data}
-          onRefresh={onRefresh}
-          onOptionClick={() => setIsOptionShow(true)}
-        />
+        <ReviewUserHeader data={data} onRefresh={onRefresh} />
         <section className="mx-5 pb-5 border-b border-mainGray/30">
-          {productImages && (
-            <div className="my-[22px]">
+          {productImages?.length > 0 && (
+            <div className="mb-[22px]">
               <ReviewImageCarousel images={productImages} />
             </div>
           )}
@@ -89,6 +87,24 @@ function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
               __html: data.reviewInfo?.reviewContent?.replace(/\n/g, '<br />'),
             }}
           />
+          <article className="flex justify-between mt-[10px]">
+            {data.reviewInfo?.createAt && (
+              <p className="text-mainGray text-10">
+                {formatDate(data.reviewInfo.createAt) as string}
+              </p>
+            )}
+            <button
+              className="cursor-pointer"
+              onClick={() => setIsOptionShow(true)}
+            >
+              <Image
+                src="/icon/ellipsis-darkgray.svg"
+                width={14}
+                height={14}
+                alt="report"
+              />
+            </button>
+          </article>
         </section>
         {data.reviewInfo?.tastingTagList?.length &&
           data.reviewInfo.tastingTagList.length !== 0 && (
