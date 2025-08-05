@@ -12,6 +12,7 @@ import { numberWithCommas } from '@/utils/formatNum';
 import { formatDate } from '@/utils/formatDate';
 import VisibilityToggle from '@/app/(primary)/_components/VisibilityToggle';
 import LikeBtn from '@/app/(primary)/_components/LikeBtn';
+import ReplyButton from '@/app/(primary)/_components/ReplyButton';
 import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 import { deleteReview } from '@/lib/Review';
@@ -191,19 +192,12 @@ function Review({ data, onRefresh }: Props) {
               />
               <p>{likeCount}</p>
             </div>
-            <div className="flex items-center space-x-[2px]">
-              <Image
-                src={
-                  data.hasReplyByMe
-                    ? '/icon/comment-filled-subcoral.svg'
-                    : '/icon/comment-outlined-gray.svg'
-                }
-                width={12}
-                height={12}
-                alt="comment"
-              />
-              <p>{data.replyCount}</p>
-            </div>
+            <ReplyButton
+              reviewId={data.reviewId}
+              replyCount={data.replyCount}
+              hasReplyByMe={data.hasReplyByMe}
+              textSize="text-11"
+            />
             {data.userInfo.userId === userData?.userId && (
               <VisibilityToggle
                 initialStatus={currentStatus}

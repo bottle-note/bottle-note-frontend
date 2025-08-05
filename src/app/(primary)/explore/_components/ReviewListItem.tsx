@@ -15,6 +15,7 @@ import {
   ReviewImageCarousel,
   convertImageUrlsToProductImageArray,
 } from '@/app/(primary)/_components/ReviewImageCarousel';
+import ReplyButton from '@/app/(primary)/_components/ReplyButton';
 import LikeBtn from '../../_components/LikeBtn';
 import Label from '../../_components/Label';
 
@@ -66,10 +67,6 @@ const ReviewListItem = ({ content }: Props) => {
     } else if (option.type === 'USER_REPORT') {
       router.push(ROUTES.REPORT.USER(content.userInfo.userId));
     }
-  };
-
-  const moveToReviewDetail = () => {
-    router.push(ROUTES.REVIEW.DETAIL(content.reviewId) + `?scrollTo=replies`);
   };
 
   return (
@@ -156,29 +153,13 @@ const ReviewListItem = ({ content }: Props) => {
               />
               <p className="text-13 text-mainGray">{likeCount}</p>
             </div>
-            <div
-              className="flex items-center space-x-[2px] cursor-pointer"
-              onClick={moveToReviewDetail}
-              tabIndex={0}
-              role="button"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  moveToReviewDetail();
-                }
-              }}
-            >
-              <Image
-                src={
-                  content.hasReplyByMe
-                    ? '/icon/comment-filled-subcoral.svg'
-                    : '/icon/comment-outlined-gray.svg'
-                }
-                width={17}
-                height={17}
-                alt="comment"
-              />
-              <p className="text-13 text-mainGray">{content.replyCount}</p>
-            </div>
+            <ReplyButton
+              reviewId={content.reviewId}
+              replyCount={content.replyCount}
+              hasReplyByMe={content.hasReplyByMe}
+              size={17}
+              textSize="text-13"
+            />
           </div>
           <div className="flex items-center space-x-1">
             <p className="text-13 text-mainGray">
