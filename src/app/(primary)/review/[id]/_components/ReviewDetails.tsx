@@ -18,9 +18,9 @@ import { deleteReview } from '@/lib/Review';
 import { AuthService } from '@/lib/AuthService';
 import { ROUTES } from '@/constants/routes';
 import {
-  ImageCarousel,
+  ReviewImageCarousel,
   convertImageUrlsToProductImageArray,
-} from '@/app/(primary)/_components/ImageCarousel';
+} from '@/app/(primary)/_components/ReviewImageCarousel';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 interface Props {
@@ -140,7 +140,7 @@ function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
           </article>
           {productImages && (
             <div className="my-[22px]">
-              <ImageCarousel images={productImages} />
+              <ReviewImageCarousel images={productImages} />
             </div>
           )}
           <div

@@ -31,7 +31,7 @@ export const convertImageUrlsToProductImageArray = (
 };
 
 // TODO: 이미지 여러장일 때 슬라이드 수정
-export const ImageCarousel = ({ images }: { images: ProductImage[] }) => {
+export const ReviewImageCarousel = ({ images }: { images: ProductImage[] }) => {
   if (!images || images.length === 0) {
     return <></>;
   }

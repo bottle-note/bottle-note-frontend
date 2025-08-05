@@ -12,9 +12,9 @@ import OptionDropdown from '@/components/OptionDropdown';
 import { deleteReview } from '@/lib/Review';
 import { ROUTES } from '@/constants/routes';
 import {
-  ImageCarousel,
+  ReviewImageCarousel,
   convertImageUrlsToProductImageArray,
-} from '@/app/(primary)/_components/ImageCarousel';
+} from '@/app/(primary)/_components/ReviewImageCarousel';
 import LikeBtn from '../../_components/LikeBtn';
 import Label from '../../_components/Label';
 
@@ -124,7 +124,7 @@ const ReviewListItem = ({ content }: Props) => {
         {/* 리뷰 본문 */}
         <Link href={ROUTES.REVIEW.DETAIL(content.reviewId)}>
           <div className="flex flex-col gap-[14px]">
-            <ImageCarousel images={productImages} />
+            <ReviewImageCarousel images={productImages} />
             <p className="text-15 text-mainDarkGray">{content.reviewContent}</p>
             <div className="flex flex-wrap gap-[6px]">
               {content.reviewTags.map((tag) => (
