@@ -95,7 +95,7 @@ function Review({ data, onRefresh }: Props) {
                     height={22}
                   />
                 </div>
-                <p className="text-mainGray text-11">
+                <p className="text-mainGray text-12">
                   {truncStr(data.userInfo.nickName, 12)}
                 </p>
               </div>
@@ -119,24 +119,28 @@ function Review({ data, onRefresh }: Props) {
             </div>
           </div>
           {data.rating !== undefined && data.rating !== null && (
-            <Star rating={data.rating} size={20} />
+            <Star
+              rating={data.rating}
+              size={22}
+              textStyle="text-subCoral font-semibold text-20 min-w-5"
+            />
           )}
         </div>
-        <div className="flex items-center space-x-1 mt-[10px]">
+        <div className="flex items-center space-x-1 mt-[10px] text-14">
           <Image
             src={
               data.sizeType === 'BOTTLE'
                 ? '/bottle.svg'
                 : '/icon/glass-filled-subcoral.svg'
             }
-            width={14}
-            height={14}
+            width={17}
+            height={17}
             alt={data.sizeType === 'BOTTLE' ? 'Bottle Price' : 'Glass Price'}
           />
-          <p className="text-mainGray text-12 font-bold">
+          <p className="text-mainGray font-bold">
             {data.sizeType === 'BOTTLE' ? '병 가격 ' : '잔 가격'}
           </p>
-          <p className="text-mainGray text-12 font-normal">
+          <p className="text-mainGray font-normal">
             {data.price ? `${numberWithCommas(data.price)} ₩` : '-'}
           </p>
         </div>
@@ -149,7 +153,7 @@ function Review({ data, onRefresh }: Props) {
           prefetch={false}
         >
           <div className="grid grid-cols-5 space-x-2 mt-[6px]">
-            <p className="col-span-4 text-mainDarkGray text-12">
+            <p className="col-span-4 text-mainDarkGray text-14">
               {truncStr(data.reviewContent, 135)}
               {data.reviewContent.length > 135 && (
                 <span className="text-mainGray">더보기</span>
@@ -220,8 +224,8 @@ function Review({ data, onRefresh }: Props) {
             >
               <Image
                 src="/icon/ellipsis-darkgray.svg"
-                width={10}
-                height={10}
+                width={14}
+                height={14}
                 alt="report"
               />
             </button>

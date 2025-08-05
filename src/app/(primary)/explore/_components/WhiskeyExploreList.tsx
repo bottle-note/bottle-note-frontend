@@ -66,7 +66,7 @@ export const WhiskeyExplorerList = () => {
           <div key={keyword} className="overflow-hidden flex-shrink-0">
             <Label
               name={keyword}
-              styleClass="label-default text-12"
+              styleClass="label-default text-13"
               position="after"
               icon={
                 <button

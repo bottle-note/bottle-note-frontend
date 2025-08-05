@@ -81,14 +81,14 @@ const WhiskeyListItem = ({ content }: Props) => {
             engName={content.engName}
             length={50}
           />
-          <p className="text-10 text-mainDarkGray">{`도수 ${content.abv}% · ${content.korCategory}`}</p>
+          <p className="text-13 text-mainDarkGray">{`도수 ${content.abv}% · ${content.korCategory}`}</p>
         </div>
 
         {/* 별점 */}
         <div className="flex items-center gap-x-1">
           <Label
             name="나의 별점"
-            styleClass="label-default text-10 px-2 py-[1px] rounded-[2px] flex items-end"
+            styleClass="label-default text-12 px-2 py-[1px] rounded-[2px] flex items-end"
             position="after"
             icon={
               <div className="pt-[2px]">
@@ -120,7 +120,7 @@ const WhiskeyListItem = ({ content }: Props) => {
             >
               <Label
                 name={tag}
-                styleClass="label-default border-mainGray text-mainGray px-2 py-1 text-9"
+                styleClass="label-default border-mainGray text-mainGray px-2 py-1 text-11"
               />
             </div>
           ))}

@@ -133,11 +133,11 @@ const ReviewListItem = ({ content }: Props) => {
         <Link href={ROUTES.REVIEW.DETAIL(content.reviewId)}>
           <div className="flex flex-col gap-[14px]">
             <ReviewImageCarousel images={productImages} />
-            <p className="text-12 text-mainDarkGray">{content.reviewContent}</p>
+            <p className="text-15 text-mainDarkGray">{content.reviewContent}</p>
             <div className="flex flex-wrap gap-[6px]">
               {content.reviewTags.map((tag) => (
                 <div key={tag} className="overflow-hidden flex-shrink-0">
-                  <Label name={tag} styleClass="label-default text-11" />
+                  <Label name={tag} styleClass="label-default text-13" />
                 </div>
               ))}
             </div>
@@ -160,9 +160,9 @@ const ReviewListItem = ({ content }: Props) => {
                   setIsLiked(content.isLikedByMe);
                 }}
                 handleNotLogin={handleLoginModal}
-                size={12}
+                size={17}
               />
-              <p className="text-12 text-mainGray">{likeCount}</p>
+              <p className="text-13 text-mainGray">{likeCount}</p>
             </div>
             <div className="flex items-center space-x-[2px]">
               <Image
@@ -171,15 +171,15 @@ const ReviewListItem = ({ content }: Props) => {
                     ? '/icon/comment-filled-subcoral.svg'
                     : '/icon/comment-outlined-gray.svg'
                 }
-                width={12}
-                height={12}
+                width={17}
+                height={17}
                 alt="comment"
               />
-              <p className="text-12 text-mainGray">{content.replyCount}</p>
+              <p className="text-13 text-mainGray">{content.replyCount}</p>
             </div>
           </div>
           <div className="flex items-center space-x-1">
-            <p className="text-12 text-mainGray">
+            <p className="text-13 text-mainGray">
               {formatDate(content.createAt) as string}
             </p>
             <button
@@ -191,8 +191,8 @@ const ReviewListItem = ({ content }: Props) => {
             >
               <Image
                 src="/icon/ellipsis-darkgray.svg"
-                width={10}
-                height={10}
+                width={17}
+                height={17}
                 alt="report"
               />
             </button>
