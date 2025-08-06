@@ -5,7 +5,16 @@ import { apiClient } from './apiClient';
 
 // Mock dependencies
 jest.mock('@/lib/AuthService');
-jest.mock('@/app/api/AuthApi');
+jest.mock('@/app/api/AuthApi', () => ({
+  AuthApi: {
+    server: {
+      renewToken: jest.fn(),
+    },
+    client: {
+      renewToken: jest.fn(),
+    },
+  },
+}));
 jest.mock('@/store/modalStore');
 
 // Mock ApiError
@@ -140,7 +149,9 @@ describe('ApiClient', () => {
         .mockReturnValueOnce(mockToken) // 토큰 갱신 시도
         .mockReturnValueOnce(mockNewToken); // 재시도 요청
 
-      mockAuthApi.renewTokenClientSide.mockResolvedValueOnce(mockNewToken);
+      (mockAuthApi.client.renewToken as jest.Mock).mockResolvedValueOnce(
+        mockNewToken,
+      );
 
       // 첫 번째 요청: 403 에러
       mockFetch
@@ -156,7 +167,7 @@ describe('ApiClient', () => {
 
       const result = await apiClient.get('/test');
 
-      expect(mockAuthApi.renewTokenClientSide).toHaveBeenCalledWith(
+      expect(mockAuthApi.client.renewToken).toHaveBeenCalledWith(
         'refresh-token',
       );
       expect(mockAuthService.setToken).toHaveBeenCalledWith(mockNewToken);
@@ -174,7 +185,7 @@ describe('ApiClient', () => {
         .mockReturnValueOnce(mockToken) // 첫 번째 요청
         .mockReturnValueOnce(mockToken); // 토큰 갱신 시도
 
-      mockAuthApi.renewTokenClientSide.mockRejectedValueOnce(
+      (mockAuthApi.client.renewToken as jest.Mock).mockRejectedValueOnce(
         new Error('Refresh failed'),
       );
 

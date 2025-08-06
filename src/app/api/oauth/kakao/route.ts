@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     };
 
     // Step 4: Log in with the Auth API
-    const tokens = await AuthApi.login(loginPayload);
+    const tokens = await AuthApi.server.login(loginPayload);
     const info = jwt.decode(tokens.accessToken);
 
     // TODO: 정제된 세션 데이터 만드는 로직 추가 및 유틸함수로 분리

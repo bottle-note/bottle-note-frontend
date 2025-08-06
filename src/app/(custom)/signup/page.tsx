@@ -57,7 +57,7 @@ export default function Signup() {
     gender,
   }: SignupFormValues) => {
     try {
-      const result = await AuthApi.basicSignup({
+      const result = await AuthApi.client.basicSignup({
         email,
         password,
         age,

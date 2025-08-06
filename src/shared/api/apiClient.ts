@@ -85,7 +85,7 @@ class ApiClient {
           try {
             const token = AuthService.getToken();
             if (token) {
-              const newTokens = await AuthApi.renewTokenClientSide(
+              const newTokens = await AuthApi.client.renewToken(
                 token.refreshToken,
               );
               AuthService.setToken(newTokens);

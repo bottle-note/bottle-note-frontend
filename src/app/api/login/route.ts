@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       socialUniqueId: '',
     };
 
-    const tokens = await AuthApi.login(loginPayload);
+    const tokens = await AuthApi.server.login(loginPayload);
     const info = jwt.decode(tokens.accessToken) as UserData;
 
     return NextResponse.json({ tokens, info });

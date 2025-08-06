@@ -15,7 +15,7 @@ export default function OauthKakaoCallbackPage() {
 
   const loginHandler = async (code: string | string[]) => {
     try {
-      const result = await AuthApi.kakaoLogin(code);
+      const result = await AuthApi.client.kakaoLogin(code);
       login(result.info, result.tokens);
       router.push(ROUTES.LOGIN);
     } catch (e) {

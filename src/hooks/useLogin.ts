@@ -28,7 +28,7 @@ export const useLogin = () => {
 
   const handleRestore = async (data: LoginFormValues) => {
     try {
-      await AuthApi.restore(data);
+      await AuthApi.client.restore(data);
       handleModalState({
         isShowModal: true,
         type: 'ALERT',
@@ -51,7 +51,7 @@ export const useLogin = () => {
 
   const handleBasicLogin = async (data: LoginFormValues) => {
     try {
-      const result = await AuthApi.basicLogin(data);
+      const result = await AuthApi.client.basicLogin(data);
 
       const decoded: UserData = jwt.decode(result.accessToken);
 

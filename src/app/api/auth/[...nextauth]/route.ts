@@ -60,7 +60,7 @@ const handler = NextAuth({
           socialUniqueId,
         };
 
-        const { accessToken, refreshToken } = await AuthApi.login(body);
+        const { accessToken, refreshToken } = await AuthApi.server.login(body);
 
         const info = jwt.decode(accessToken);
 

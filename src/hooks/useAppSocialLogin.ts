@@ -20,7 +20,7 @@ export const useAppSocialLogin = () => {
 
   const onKakaoLoginSuccess = async (email: string) => {
     try {
-      const loginResult = await AuthApi.clientLogin({
+      const loginResult = await AuthApi.client.login({
         email,
         socialType: SOCIAL_TYPE.KAKAO,
       });
@@ -49,7 +49,7 @@ export const useAppSocialLogin = () => {
         id: string;
       };
 
-      const loginResult = await AuthApi.clientLogin({
+      const loginResult = await AuthApi.client.login({
         email: email ?? '',
         socialUniqueId: id,
         socialType: SOCIAL_TYPE.APPLE,
