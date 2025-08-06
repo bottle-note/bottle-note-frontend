@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 import Star from '@/components/Star';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
-import Review from '@/app/(primary)/search/[category]/[id]/_components/Review';
+import ReviewItem from '@/app/(primary)/search/[category]/[id]/_components/ReviewItem';
 import LinkButton from '@/components/LinkButton';
 import NavLayout from '@/app/(primary)/_components/NavLayout';
 import StarRating from '@/components/StarRaiting';
@@ -312,7 +312,7 @@ export default function SearchAlcohol() {
                     <div className="border-b border-mainGray/30" />
                     {data.reviewInfo.reviewList.map((review) => (
                       <React.Fragment key={review.reviewId}>
-                        <Review
+                        <ReviewItem
                           data={review}
                           onRefresh={refreshAlcoholDetails}
                         />

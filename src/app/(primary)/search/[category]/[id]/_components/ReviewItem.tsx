@@ -26,7 +26,7 @@ interface Props {
   onRefresh: () => void;
 }
 
-function Review({ data, onRefresh }: Props) {
+function ReviewItem({ data, onRefresh }: Props) {
   const router = useRouter();
   const { userData, isLogin } = AuthService;
   const { isLikedByMe } = data;
@@ -154,7 +154,7 @@ function Review({ data, onRefresh }: Props) {
           prefetch={false}
         >
           <div className="grid grid-cols-5 space-x-2 mt-[6px]">
-            <p className="col-span-4 text-mainDarkGray text-14">
+            <p className="col-span-4 text-mainDarkGray text-13">
               {truncStr(data.reviewContent, 135)}
               {data.reviewContent.length > 135 && (
                 <span className="text-mainGray">더보기</span>
@@ -173,7 +173,7 @@ function Review({ data, onRefresh }: Props) {
             )}
           </div>
         </Link>
-        <div className="flex justify-between text-11 text-mainGray mt-[10px]">
+        <div className="flex justify-between text-12 text-mainGray mt-[10px]">
           <div className="flex space-x-3">
             <div className="flex items-center space-x-[2px]">
               <LikeBtn
@@ -188,7 +188,7 @@ function Review({ data, onRefresh }: Props) {
                   setLikeCount(data.likeCount);
                 }}
                 handleNotLogin={handleLoginModal}
-                size={12}
+                size={15}
               />
               <p>{likeCount}</p>
             </div>
@@ -196,7 +196,8 @@ function Review({ data, onRefresh }: Props) {
               reviewId={data.reviewId}
               replyCount={data.replyCount}
               hasReplyByMe={data.hasReplyByMe}
-              textSize="text-11"
+              size={15}
+              textSize="text-12"
             />
             {data.userInfo.userId === userData?.userId && (
               <VisibilityToggle
@@ -204,11 +205,12 @@ function Review({ data, onRefresh }: Props) {
                 reviewId={data.reviewId}
                 handleNotLogin={handleLoginModal}
                 onSuccess={onRefresh}
+                textSize="text-12"
               />
             )}
           </div>
           <div className="flex items-center">
-            <p className="text-11">{formatDate(data.createAt) as string}</p>
+            <p className="text-12">{formatDate(data.createAt) as string}</p>
             <button
               className="cursor-pointer"
               onClick={() => {
@@ -250,4 +252,4 @@ function Review({ data, onRefresh }: Props) {
   );
 }
 
-export default Review;
+export default ReviewItem;
