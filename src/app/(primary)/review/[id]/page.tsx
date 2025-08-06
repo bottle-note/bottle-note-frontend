@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import * as yup from 'yup';
 import {
   useForm,
@@ -33,9 +33,11 @@ import ReplyList from './_components/Reply/ReplyList';
 export default function ReviewDetail() {
   const router = useRouter();
   const { id: reviewId } = useParams();
+  const searchParams = useSearchParams();
   const { state, handleLoginModal } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const replyListRef = useRef<HTMLDivElement>(null);
   const [alcoholInfo, setAlcoholInfo] = useState<AlcoholInfoType | null>(null);
   const [reviewDetails, setReviewDetails] =
     useState<ReviewDetailsWithoutAlcoholInfo | null>(null);
@@ -120,6 +122,23 @@ export default function ReviewDetail() {
   }, [reviewId, reset, fetchReviewDetails]);
 
   useEffect(() => {
+    const scrollTo = searchParams.get('scrollTo');
+    if (
+      scrollTo === 'replies' &&
+      replyListRef.current &&
+      alcoholInfo &&
+      reviewDetails
+    ) {
+      setTimeout(() => {
+        replyListRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 300);
+    }
+  }, [searchParams, alcoholInfo, reviewDetails]);
+
+  useEffect(() => {
     return () => {
       setIsUnmounting(true);
     };
@@ -170,11 +189,13 @@ export default function ReviewDetail() {
               handleLogin={handleLogin}
               onRefresh={fetchReviewDetails}
             />
-            <ReplyList
-              reviewId={reviewId}
-              isRefetch={isRefetch}
-              setIsRefetch={setIsRefetch}
-            />
+            <div ref={replyListRef}>
+              <ReplyList
+                reviewId={reviewId}
+                isRefetch={isRefetch}
+                setIsRefetch={setIsRefetch}
+              />
+            </div>
             <ReplyInput
               textareaRef={textareaRef}
               handleCreateReply={handleCreateReply}
