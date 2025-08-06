@@ -9,6 +9,7 @@ interface Props {
   reviewId: string | number;
   handleNotLogin: () => void;
   onSuccess: () => void;
+  textSize?: string;
 }
 
 const VisibilityToggle = ({
@@ -16,6 +17,7 @@ const VisibilityToggle = ({
   initialStatus,
   handleNotLogin,
   onSuccess,
+  textSize,
 }: Props) => {
   const { isLogin } = AuthService;
   const { handleModalState } = useModalStore();
@@ -59,7 +61,9 @@ const VisibilityToggle = ({
     setIsActive(initialStatus);
   }, [initialStatus]);
 
-  return <Toggle isActive={isActive} onToggle={handleToggle} />;
+  return (
+    <Toggle isActive={isActive} onToggle={handleToggle} textSize={textSize} />
+  );
 };
 
 export default VisibilityToggle;
