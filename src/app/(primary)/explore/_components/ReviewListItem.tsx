@@ -122,7 +122,12 @@ const ReviewListItem = ({ content }: Props) => {
         <Link href={ROUTES.REVIEW.DETAIL(content.reviewId)}>
           <div className="flex flex-col gap-[14px]">
             <ReviewImageCarousel images={productImages} />
-            <p className="text-15 text-mainDarkGray">{content.reviewContent}</p>
+            <div
+              className="text-15 text-mainDarkGray whitespace-pre-line"
+              dangerouslySetInnerHTML={{
+                __html: content.reviewContent.replace(/\n/g, '<br />'),
+              }}
+            />
             <div className="flex flex-wrap gap-[6px]">
               {content.reviewTags.map((tag) => (
                 <div key={tag} className="overflow-hidden flex-shrink-0">
