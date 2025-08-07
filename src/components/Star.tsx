@@ -11,7 +11,7 @@ interface Props {
 const Star = ({
   rating,
   size = 18,
-  textStyle = 'text-subCoral font-semibold text-15 w-5',
+  textStyle = 'text-subCoral font-semibold text-15 min-w-5',
   color = 'main',
   align = 'center',
 }: Props) => {
