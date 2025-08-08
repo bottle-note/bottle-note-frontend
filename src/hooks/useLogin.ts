@@ -1,14 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { AuthService } from '@/lib/AuthService';
 import { DeviceService } from '@/lib/DeviceService';
 import useModalStore from '@/store/modalStore';
 import { AuthApi } from '@/app/api/AuthApi';
 import { ApiError } from '@/utils/ApiError';
 import { UserApi } from '@/app/api/UserApi';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
+import { useAuth } from './auth/useAuth';
 
 export type LoginFormValues = {
   email: string;
@@ -16,9 +15,8 @@ export type LoginFormValues = {
 };
 
 export const useLogin = () => {
-  const { data: session } = useSession();
   const router = useRouter();
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const { isInApp } = DeviceService;
   const { handleModalState, handleCloseModal } = useModalStore();
 
@@ -45,31 +43,9 @@ export const useLogin = () => {
     }
   };
 
-  // TODO: 미들웨어로 이관
-  const handleRedirectWithSession = () => {
-    if (session && session.user) {
-      const { userId, email, profile, accessToken, refreshToken } =
-        session.user;
-
-      AuthService.login(
-        {
-          userId,
-          sub: email,
-          profile,
-        },
-        {
-          accessToken,
-          refreshToken,
-        },
-      );
-
-      router.replace('/');
-    }
-  };
-
   const handleSendDeviceInfo = async () => {
     try {
-      if (isInApp && isLogin) {
+      if (isInApp && isLoggedIn) {
         const result = await UserApi.sendDeviceInfo(
           DeviceService.deviceToken || '',
           DeviceService.platform || '',
@@ -82,7 +58,7 @@ export const useLogin = () => {
         return;
       }
 
-      if (!isInApp && isLogin) {
+      if (!isInApp && isLoggedIn) {
         router.replace('/');
       }
     } catch (e) {
@@ -129,7 +105,6 @@ export const useLogin = () => {
 
   return {
     handleRestore,
-    handleRedirectWithSession,
     handleSendDeviceInfo,
     handleInitKakaoSdkLogin,
     handleKakaoLogin,

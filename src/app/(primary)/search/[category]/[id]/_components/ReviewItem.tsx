@@ -12,7 +12,7 @@ import ReviewActions from '@/app/(primary)/search/[category]/[id]/_components/Re
 import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 import { deleteReview } from '@/lib/Review';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
 
 interface Props {
@@ -22,7 +22,7 @@ interface Props {
 
 function ReviewItem({ data, onRefresh }: Props) {
   const router = useRouter();
-  const { userData, isLogin } = AuthService;
+  const { user: userData, isLoggedIn } = useAuth();
   const { isLikedByMe } = data;
   const { handleModalState, handleLoginModal } = useModalStore();
 
@@ -105,65 +105,88 @@ function ReviewItem({ data, onRefresh }: Props) {
             {data.price ? `${numberWithCommas(data.price)}₩` : '-'}
           </p>
         </div>
-        <div>
-          <Link
-            href={ROUTES.REVIEW.DETAIL(data.reviewId)}
-            style={{
-              touchAction: 'manipulation',
-              WebkitTapHighlightColor: 'transparent',
-            }}
-            prefetch={false}
-          >
-            <div className="flex space-x-2">
-              <div className="flex-1 min-w-0">
-                <p className="text-mainDarkGray text-13.5">
-                  {truncStr(data.reviewContent, 135)}
-                  {data.reviewContent.length > 135 && (
-                    <span className="text-mainGray">더보기</span>
-                  )}
-                </p>
-              </div>
-              {data.reviewImageUrl && (
-                <div className="flex-shrink-0">
-                  <Image
-                    className="w-[68px] h-[68px] object-cover"
-                    src={data.reviewImageUrl}
-                    alt="content_img"
-                    width={68}
-                    height={68}
-                  />
-                </div>
+        <Link
+          href={ROUTES.REVIEW.DETAIL(data.reviewId)}
+          style={{
+            touchAction: 'manipulation',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+          prefetch={false}
+        >
+          <div className="grid grid-cols-5 space-x-2 mt-[6px]">
+            <p className="col-span-4 text-mainDarkGray text-13">
+              {truncStr(data.reviewContent, 135)}
+              {data.reviewContent.length > 135 && (
+                <span className="text-mainGray">더보기</span>
               )}
+            </p>
+            {data.reviewImageUrl && (
+              <div className="flex justify-end items-center">
+                <Image
+                  className="w-[3.8rem] h-[3.8rem]"
+                  src={data.reviewImageUrl}
+                  alt="content_img"
+                  width={60}
+                  height={60}
+                />
+              </div>
+            )}
+          </div>
+        </Link>
+        <div className="flex justify-between text-12 text-mainGray mt-[10px]">
+          <div className="flex space-x-3">
+            <div className="flex items-center space-x-[2px]">
+              <LikeBtn
+                reviewId={data.reviewId}
+                isLiked={isLiked}
+                handleUpdateLiked={() => {
+                  setIsLiked((prev) => !prev);
+                  setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+                }}
+                onApiError={() => {
+                  setIsLiked(isLikedByMe);
+                  setLikeCount(data.likeCount);
+                }}
+                handleNotLogin={handleLoginModal}
+                size={15}
+              />
+              <p>{likeCount}</p>
             </div>
-          </Link>
+            <ReplyButton
+              reviewId={data.reviewId}
+              replyCount={data.replyCount}
+              hasReplyByMe={data.hasReplyByMe}
+              size={15}
+              textSize="text-12"
+            />
+            {data.userInfo.userId === userData?.userId && (
+              <VisibilityToggle
+                initialStatus={currentStatus}
+                reviewId={data.reviewId}
+                handleNotLogin={handleLoginModal}
+                onSuccess={onRefresh}
+                textSize="text-12"
+              />
+            )}
+          </div>
+          <div className="flex items-center">
+            <p className="text-12">{formatDate(data.createAt) as string}</p>
+            <button
+              className="cursor-pointer"
+              onClick={() => {
+                if (isLoggedIn) setIsOptionShow(true);
+                else handleLoginModal();
+              }}
+            >
+              <Image
+                src="/icon/ellipsis-darkgray.svg"
+                width={14}
+                height={14}
+                alt="report"
+              />
+            </button>
+          </div>
         </div>
-        <ReviewActions
-          reviewId={data.reviewId}
-          isLiked={isLiked}
-          likeCount={likeCount}
-          replyCount={data.replyCount}
-          hasReplyByMe={data.hasReplyByMe}
-          createAt={data.createAt}
-          isOwner={data.userInfo.userId === userData?.userId}
-          showVisibilityToggle={true}
-          visibilityStatus={currentStatus}
-          onLikeUpdate={() => {
-            setIsLiked((prev) => !prev);
-            setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
-          }}
-          onLikeError={() => {
-            setIsLiked(isLikedByMe);
-            setLikeCount(data.likeCount);
-          }}
-          onRefresh={onRefresh}
-          onOptionClick={() => {
-            if (isLogin) setIsOptionShow(true);
-            else handleLoginModal();
-          }}
-          handleNotLogin={handleLoginModal}
-          textSize="text-13"
-          iconSize={15.6}
-        />
       </div>
       {isOptionShow && (
         <OptionDropdown

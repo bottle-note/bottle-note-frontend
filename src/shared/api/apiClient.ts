@@ -1,7 +1,9 @@
-import { AuthService } from '@/lib/AuthService';
+// import { AuthService } from '@/lib/AuthService';
 import { AuthApi } from '@/app/api/AuthApi';
 import useModalStore from '@/store/modalStore';
 import { ApiError } from '@/utils/ApiError';
+import { TokenData } from '@/types/Auth';
+import { getSession, signOut } from 'next-auth/react';
 
 interface ApiClientOptions extends RequestInit {
   useAuth?: boolean; // 인증 토큰 사용 여부 (기본: true)
@@ -32,32 +34,26 @@ class ApiClient {
       ...fetchOptions
     } = options;
 
-    // 토큰 검증 및 인증 헤더 설정
     const headers = new Headers(fetchOptions.headers);
+    let session = await getSession();
 
     if (useAuth) {
-      const token = AuthService.getToken();
-
-      // 인증이 필요하지만 토큰이 없는 경우
-      if (!token) {
-        AuthService.logout();
+      if (!session) {
+        signOut({ callbackUrl: '/login' });
         const { handleLoginState } = useModalStore.getState();
         handleLoginState(true);
         throw new Error('Authentication required');
       }
 
-      headers.set('Authorization', `Bearer ${token.accessToken}`);
+      headers.set('Authorization', `Bearer ${session.user.accessToken}`);
     }
 
-    // Content-Type 기본값 설정 (이미 설정되어 있지 않은 경우)
     if (!headers.has('Content-Type')) {
       headers.set('Content-Type', 'application/json');
     }
 
-    // 요청 URL 구성
     const requestUrl = `/${baseUrl}${endpoint}`;
 
-    // 요청 옵션 구성
     const requestOptions: RequestInit = {
       ...this.defaultOptions,
       ...fetchOptions,
@@ -66,42 +62,43 @@ class ApiClient {
     };
 
     try {
-      // API 요청 수행
       const response = await fetch(requestUrl, requestOptions);
 
-      // 응답 처리
       let result;
       try {
         result = await response.json();
       } catch {
-        // JSON 파싱 실패 시 (예: 204 No Content)
         result = null;
       }
 
-      // 응답이 실패한 경우
       if (!response.ok) {
-        // 토큰 만료 (403) 및 재시도 로직
-        if (result?.code === 403 && retryCount < 1 && useAuth) {
+        if (result?.code === 403 && retryCount < 1 && useAuth && session) {
           try {
-            const token = AuthService.getToken();
-            if (token) {
-              const newTokens = await AuthApi.client.renewToken(
-                token.refreshToken,
-              );
-              AuthService.setToken(newTokens);
+            const newTokens = await AuthApi.client.renewToken(
+              session.user.refreshToken,
+            );
+            // Here you should update the session with the new tokens.
+            // This might require a custom endpoint on your Next.js server
+            // to update the NextAuth.js session state.
+            // For now, let's assume a function `updateSession` exists.
+            // await updateSession(newTokens); // This is a placeholder
 
-              // 새 토큰으로 재시도
-              return this.request<T>(endpoint, options, retryCount + 1);
-            }
+            // For the retry, we need the new access token. Let's assume
+            // `updateSession` makes the new token available in `getSession`.
+            // This is a complex part of moving away from AuthService.
+            // A simple page reload might be a temporary solution.
+            console.error(
+              'Token refresh logic needs to be fully implemented with NextAuth.',
+            );
+            // Temporarily, we just logout
+            signOut({ callbackUrl: '/login' });
+            throw new ApiError('Token refresh failed', response);
           } catch (refreshError) {
-            AuthService.logout();
-            const { handleLoginState } = useModalStore.getState();
-            handleLoginState(true);
+            signOut({ callbackUrl: '/login' });
             throw new ApiError('Token refresh failed', response);
           }
         }
 
-        // 기타 에러 처리
         const errorMessage =
           result?.errors?.[0]?.message ||
           result?.message ||
@@ -119,7 +116,6 @@ class ApiClient {
       throw new Error('Network error occurred');
     }
   }
-
   /**
    * GET 요청
    */

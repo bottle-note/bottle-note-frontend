@@ -70,3 +70,24 @@ export const kakaoProvider = CredentialsProvider({
     }
   },
 });
+
+export const appLoginProvider = CredentialsProvider({
+  id: 'app-login',
+  name: 'App Login',
+  credentials: {
+    accessToken: { type: 'text' },
+    refreshToken: { type: 'text' },
+  },
+  async authorize(credentials) {
+    if (!credentials?.accessToken || !credentials?.refreshToken) {
+      return null;
+    }
+
+    // 이미 인증된 토큰을 전달받으므로, 여기서는 토큰을 그대로 반환
+    return {
+      accessToken: credentials.accessToken,
+      refreshToken: credentials.refreshToken,
+      id: '', // id 필드가 User 타입에 필요할 수 있음
+    };
+  },
+});

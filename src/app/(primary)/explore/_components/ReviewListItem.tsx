@@ -7,7 +7,7 @@ import { UserInfoDisplay } from '@/components/UserInfoDisplay';
 import Star from '@/components/Star';
 import useModalStore from '@/store/modalStore';
 import { formatDate } from '@/utils/formatDate';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import OptionDropdown from '@/components/OptionDropdown';
 import { deleteReview } from '@/lib/Review';
 import { ROUTES } from '@/constants/routes';
@@ -26,7 +26,7 @@ interface Props {
 const ReviewListItem = ({ content }: Props) => {
   const router = useRouter();
   const { handleLoginModal, handleModalState } = useModalStore();
-  const { isLogin, userData } = AuthService;
+  const { isLoggedIn, user: userData } = useAuth();
   const [isLiked, setIsLiked] = useState(content.isLikedByMe);
   const [likeCount, setLikeCount] = useState(content.likeCount);
   const [isReportOptionShow, setIsReportOptionShow] = useState(false);
@@ -173,7 +173,7 @@ const ReviewListItem = ({ content }: Props) => {
             <button
               className="cursor-pointer"
               onClick={() => {
-                if (isLogin) setIsReportOptionShow(true);
+                if (isLoggedIn) setIsReportOptionShow(true);
                 else handleLoginModal();
               }}
             >

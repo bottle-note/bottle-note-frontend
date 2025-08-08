@@ -1,10 +1,10 @@
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { AuthApi } from '@/app/api/AuthApi';
 import useModalStore from '@/store/modalStore';
 import { apiClient } from './apiClient';
 
 // Mock dependencies
-jest.mock('@/lib/AuthService');
+jest.mock('@/hooks/auth/useAuth');
 jest.mock('@/app/api/AuthApi', () => ({
   AuthApi: {
     server: {
@@ -30,7 +30,7 @@ jest.mock('@/utils/ApiError', () => ({
 global.fetch = jest.fn();
 
 const mockFetch = fetch as jest.MockedFunction<typeof fetch>;
-const mockAuthService = AuthService as jest.Mocked<typeof AuthService>;
+const mockAuthService = useAuth as jest.Mocked<typeof useAuth>;
 const mockAuthApi = AuthApi as jest.Mocked<typeof AuthApi>;
 const mockModalStore = useModalStore as jest.MockedFunction<
   typeof useModalStore

@@ -5,6 +5,9 @@ declare module 'next-auth' {
   interface User {
     provider?: SOCIAL_TYPE;
     accessToken?: string;
+    refreshToken?: string;
+    userId?: number;
+    roles?: string;
     authorizationCode?: string;
     socialUniqueId?: string;
   }

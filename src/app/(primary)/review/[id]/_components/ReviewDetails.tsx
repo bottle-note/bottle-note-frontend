@@ -7,7 +7,7 @@ import useModalStore from '@/store/modalStore';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { formatDate } from '@/utils/formatDate';
 import { deleteReview } from '@/lib/Review';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
 import {
   ReviewImageCarousel,
@@ -25,7 +25,7 @@ interface Props {
 
 function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
   const router = useRouter();
-  const { userData } = AuthService;
+  const { user: userData } = useAuth();
   const { handleModalState } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(data?.reviewInfo?.isLikedByMe);

@@ -6,7 +6,7 @@ import { truncStr } from '@/utils/truncStr';
 import Star from '@/components/Star';
 import VisibilityToggle from '@/app/(primary)/_components/VisibilityToggle';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
@@ -19,7 +19,7 @@ export default function ReviewUserHeader({
   data,
   onRefresh,
 }: ReviewUserHeaderProps) {
-  const { userData } = AuthService;
+  const { user: userData } = useAuth();
 
   return (
     <section className="mx-5">

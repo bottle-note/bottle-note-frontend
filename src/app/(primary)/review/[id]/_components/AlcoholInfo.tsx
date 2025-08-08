@@ -8,7 +8,7 @@ import Label from '@/app/(primary)/_components/Label';
 import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
 import { truncStr } from '@/utils/truncStr';
 import type { AlcoholInfo as AlcoholType } from '@/types/Review';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
 
 interface Props {
@@ -18,12 +18,12 @@ interface Props {
 
 function AlcoholInfo({ data, handleLogin }: Props) {
   const router = useRouter();
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const { isPicked: originalIsPicked } = data;
   const [isPicked, setIsPicked] = useState<boolean>(originalIsPicked);
 
   const handleLoginConfirm = () => {
-    if (!isLogin || !data.alcoholId) {
+    if (!isLoggedIn || !data.alcoholId) {
       handleLogin();
       return;
     }

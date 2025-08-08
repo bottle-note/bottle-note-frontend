@@ -2,11 +2,15 @@ import NextAuth from 'next-auth';
 import { decodeJwt } from 'jose';
 import { UserData } from '@/types/Auth';
 import { providerHandlers } from '@/lib/auth/handler';
-import { appleProvider, kakaoProvider } from '@/lib/auth/providers';
+import {
+  appleProvider,
+  kakaoProvider,
+  appLoginProvider,
+} from '@/lib/auth/providers';
 
 const handler = NextAuth({
   debug: process.env.NODE_ENV === 'development',
-  providers: [appleProvider, kakaoProvider],
+  providers: [appleProvider, kakaoProvider, appLoginProvider],
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
@@ -27,11 +31,27 @@ const handler = NextAuth({
         );
       }
 
+      if (provider === 'app-login') {
+        return !!(credentials?.accessToken && credentials?.refreshToken);
+      }
+
       return false;
     },
 
     async jwt({ token, user, account }) {
-      // 최초 로그인 시, 백엔드에 로그인을 요청하고 JWT 토큰을 받아 저장합니다.
+      if (account?.provider === 'app-login' && user) {
+        const userInfo = decodeJwt(user.accessToken as string) as UserData;
+        return {
+          ...token,
+          email: userInfo.sub,
+          roles: userInfo.roles,
+          userId: userInfo.userId,
+          accessToken: user.accessToken,
+          refreshToken: user.refreshToken,
+        };
+      }
+
+      // 최초 소셜 로그인 시, 백엔드에 로그인을 요청하고 JWT 토큰을 받아 저장합니다.
       if (user && account) {
         try {
           const handler = providerHandlers[account.provider];

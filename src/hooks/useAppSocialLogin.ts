@@ -2,8 +2,8 @@ import { useRouter } from 'next/navigation';
 import { AuthApi } from '@/app/api/AuthApi';
 import { sendLogToFlutter } from '@/utils/flutterUtil';
 import useModalStore from '@/store/modalStore';
-import { AuthService } from '@/lib/AuthService';
 import { SOCIAL_TYPE } from '@/types/Auth';
+import { signIn } from 'next-auth/react';
 
 export const useAppSocialLogin = () => {
   const router = useRouter();
@@ -25,7 +25,10 @@ export const useAppSocialLogin = () => {
         socialType: SOCIAL_TYPE.KAKAO,
       });
 
-      AuthService.login(loginResult.info, loginResult.tokens);
+      await signIn('credentials', {
+        redirect: false,
+        ...loginResult.tokens,
+      });
 
       router.replace('/');
     } catch (e) {
@@ -55,7 +58,10 @@ export const useAppSocialLogin = () => {
         socialType: SOCIAL_TYPE.APPLE,
       });
 
-      AuthService.login(loginResult.info, loginResult.tokens);
+      await signIn('credentials', {
+        redirect: false,
+        ...loginResult.tokens,
+      });
 
       router.replace('/');
     } catch (e) {

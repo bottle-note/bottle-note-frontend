@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useFormContext, FieldValues, SubmitHandler } from 'react-hook-form';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const { register, watch, handleSubmit, setValue } = useFormContext();
   const content = watch('content');
   const mentionName = watch('replyToReplyUserName');
@@ -81,7 +81,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
     action: () => void,
     e?: React.MouseEvent<HTMLTextAreaElement | HTMLButtonElement>,
   ) => {
-    if (!isLogin) {
+    if (!isLoggedIn) {
       e?.preventDefault();
       e?.stopPropagation();
       handleLoginModal();
@@ -104,7 +104,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
         <div className="flex-grow flex items-center">
           <textarea
             placeholder={
-              isLogin
+              isLoggedIn
                 ? '댓글을 입력해 주세요'
                 : '로그인 후 댓글을 작성할 수 있어요:)'
             }
@@ -115,7 +115,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
               register('content').ref(e);
               newTextareaRef.current = e;
             }}
-            readOnly={!isLogin}
+            readOnly={!isLoggedIn}
             value={content}
             maxLength={300}
             onClick={handleTextareaClick}

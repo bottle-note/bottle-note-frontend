@@ -3,8 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { AuthService } from '@/lib/AuthService';
-import { checkTokenValidity } from '@/utils/checkTokenValidity';
+import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
@@ -20,7 +19,7 @@ export interface NavItem {
 function Navbar({ maxWidth }: { maxWidth: string }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { userData, logout } = AuthService;
+  const { user: userData, logout, isLoggedIn } = useAuth();
   const { handleLoginModal } = useModalStore();
   const [isMounted, setIsMounted] = useState(false);
   const [lastTapTime, setLastTapTime] = useState<{ [key: string]: number }>({});
@@ -82,9 +81,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
     }));
 
     if (menu.requiresAuth) {
-      const isAuthenticated = userData && (await checkTokenValidity());
-
-      if (!isAuthenticated) {
+      if (!isLoggedIn) {
         if (menu.link === '/history') {
           return handleLoginModal();
         }

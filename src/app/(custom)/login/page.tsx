@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { AuthService } from '@/lib/AuthService';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
@@ -13,26 +12,27 @@ import { useLogin } from '@/hooks/useLogin';
 import { ROUTES } from '@/constants/routes';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
+import { useAuth } from '@/hooks/auth/useAuth';
 
 export default function Login() {
   const router = useRouter();
-  const { data: session } = useSession();
   const {
-    handleRedirectWithSession,
     handleSendDeviceInfo,
     handleInitKakaoSdkLogin,
     handleKakaoLogin,
     handleAppleLogin,
   } = useLogin();
-  const { isLogin } = AuthService;
-
-  useEffect(() => {
-    handleRedirectWithSession();
-  }, [session]);
+  const { isLoggedIn } = useAuth();
 
   useEffect(() => {
     handleSendDeviceInfo();
-  }, [isLogin]);
+  }, []);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.replace('/');
+    }
+  }, [isLoggedIn]);
 
   // 인앱 환경에서 초기화
   useEffect(() => {

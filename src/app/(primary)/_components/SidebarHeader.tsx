@@ -5,9 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { signOut, useSession } from 'next-auth/react';
 import { useBlockScroll } from '@/hooks/useBlockScroll';
-import { AuthService } from '@/lib/AuthService';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { UserApi } from '@/app/api/UserApi';
@@ -17,6 +15,7 @@ import LogoWhite from 'public/bottle_note_Icon_logo_white.svg';
 import Menu from 'public/icon/menu-subcoral.svg';
 import MenuWhite from 'public/icon/menu-white.svg';
 import SidebarDeco from 'public/sidebar-deco.png';
+import { useAuth } from '@/hooks/auth/useAuth';
 
 const Header = ({
   handleOpen,
@@ -83,8 +82,7 @@ const Header = ({
 
 const SidebarHeader = () => {
   const route = useRouter();
-  const { logout } = AuthService;
-  const { data: session } = useSession();
+  const { logout, isLoggedIn } = useAuth();
   const { handleScroll } = useBlockScroll();
   const { handleModalState, handleCloseModal } = useModalStore();
   const [isOpen, setIsOpen] = useState(false);
@@ -116,8 +114,7 @@ const SidebarHeader = () => {
   };
 
   const handleLogout = async () => {
-    logout();
-    if (session) await signOut({ callbackUrl: '/', redirect: true });
+    await logout();
     handleCloseModal();
     route.push('/');
   };
@@ -167,16 +164,20 @@ const SidebarHeader = () => {
         link: process.env.NEXT_PUBLIC_BOTTLE_NOTE_NOTION_URL,
         action: null,
       },
-      {
-        text: '로그아웃',
-        action: handleLogout,
-      },
-      {
-        text: '서비스 탈퇴',
-        action: handleDeleteAccount,
-      },
+      ...(isLoggedIn
+        ? [
+            {
+              text: '로그아웃',
+              action: handleLogout,
+            },
+            {
+              text: '서비스 탈퇴',
+              action: handleDeleteAccount,
+            },
+          ]
+        : []),
     ],
-    [],
+    [isLoggedIn],
   );
 
   useEffect(() => {
