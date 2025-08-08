@@ -3,20 +3,20 @@ import { AuthApi } from '@/app/api/AuthApi';
 import { SOCIAL_TYPE, TokenData } from '@/types/Auth';
 
 async function handleAppleLogin(user: User): Promise<TokenData | null> {
-  if (!user.authroizationCode) return null;
+  if (!user.authorizationCode) return null;
 
   const body = {
     provider: SOCIAL_TYPE.APPLE,
-    authroizationCode: user.authroizationCode,
+    authorizationCode: user.authorizationCode,
   };
 
   return AuthApi.server.appleLogin(body);
 }
 
 async function handleKakaoLogin(user: User): Promise<TokenData | null> {
-  if (user.authroizationCode) {
+  if (user.authorizationCode) {
     const kakaoToken = await AuthApi.server.fetchKakaoToken(
-      user.authroizationCode,
+      user.authorizationCode,
     );
     const userData = await AuthApi.server.fetchKakaoUserInfo(
       kakaoToken.access_token,

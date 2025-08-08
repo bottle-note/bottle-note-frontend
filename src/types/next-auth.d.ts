@@ -5,7 +5,7 @@ declare module 'next-auth' {
   interface User {
     provider?: SOCIAL_TYPE;
     accessToken?: string;
-    authroizationCode?: string;
+    authorizationCode?: string;
     socialUniqueId?: string;
   }
 
@@ -17,6 +17,7 @@ declare module 'next-auth' {
       refreshToken: string;
       userId: number;
       profile: string | null;
+      roles: string;
     };
   }
 }

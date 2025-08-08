@@ -41,7 +41,7 @@ export const AuthApi = {
     // FIXME: 실제 애플 로그인 api 스펙에 맞추어 변경 필요
     async appleLogin(body: {
       provider: SOCIAL_TYPE;
-      authroizationCode: string;
+      authorizationCode: string;
     }): Promise<TokenData> {
       const response = await fetch(`${process.env.SERVER_URL}/oauth/apple`, {
         method: 'POST',
