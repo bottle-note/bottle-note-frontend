@@ -1,9 +1,8 @@
-/* eslint-disable no-param-reassign */
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { decodeJwt } from 'jose';
 import { SOCIAL_TYPE, UserData } from '@/types/Auth';
-import { AuthApi } from '../../AuthApi';
+import { providerHandlers } from '@/lib/auth/handler';
 
 const handler = NextAuth({
   debug: true,
@@ -110,50 +109,17 @@ const handler = NextAuth({
     // user : 최초 로그인시 사용되는 사용자 정보, authorize 에서 반환한 데이터.
     // account: provider 와 type 정보, 최초 로그인 시에만 조회 가능
     async jwt({ token, user, account }) {
+      // 최초 로그인 시
       if (user && account) {
         try {
-          let tokens;
-
-          if (account.provider === 'apple-login' && user.authroizationCode) {
-            const body = {
-              provider: SOCIAL_TYPE.APPLE,
-              authroizationCode: user.authroizationCode,
-            };
-            tokens = await AuthApi.server.appleLogin(body);
+          const handler = providerHandlers[account.provider];
+          if (!handler) {
+            throw new Error(
+              `No handler found for provider: ${account.provider}`,
+            );
           }
 
-          if (account.provider === 'kakao-login') {
-            if (user.authroizationCode) {
-              const kakaoToken = await AuthApi.server.fetchKakaoToken(
-                user.authroizationCode,
-              );
-              const userData = await AuthApi.server.fetchKakaoUserInfo(
-                kakaoToken.access_token,
-              );
-              const loginPayload = {
-                email: userData.kakao_account?.email ?? 'no-email',
-                gender: null,
-                age: null,
-                socialType: SOCIAL_TYPE.KAKAO,
-                socialUniqueId: '',
-              };
-              tokens = await AuthApi.server.login(loginPayload);
-            } else if (user.accessToken) {
-              const body = {
-                provider: SOCIAL_TYPE.KAKAO,
-                accessToken: user.accessToken,
-              };
-              tokens = await AuthApi.server.kakaoLogin(body);
-            } else if (user.email) {
-              tokens = await AuthApi.server.login({
-                socialType: SOCIAL_TYPE.KAKAO,
-                email: user.email,
-                socialUniqueId: '',
-                gender: null,
-                age: null,
-              });
-            }
-          }
+          const tokens = await handler(user);
 
           if (tokens && tokens.accessToken) {
             const info = decodeJwt(tokens.accessToken) as UserData;
@@ -166,8 +132,13 @@ const handler = NextAuth({
               refreshToken: tokens.refreshToken,
             };
           }
+
+          return { ...token, error: 'AuthenticationFailed' };
         } catch (error) {
-          console.error('JWT callback - initial sign in error:', error);
+          console.error(
+            `JWT callback error for provider ${account.provider}:`,
+            error,
+          );
           return { ...token, error: 'AuthenticationFailed' };
         }
       }
