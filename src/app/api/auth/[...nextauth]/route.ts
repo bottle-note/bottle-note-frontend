@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth';
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import { decodeJwt } from 'jose';
 import { UserData } from '@/types/Auth';
 import { providerHandlers } from '@/lib/auth/handler';
@@ -8,7 +8,7 @@ import {
   appLoginProvider,
 } from '@/lib/auth/providers';
 
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   debug: process.env.NODE_ENV === 'development',
   providers: [appleProvider, kakaoProvider, appLoginProvider],
   secret: process.env.NEXTAUTH_SECRET,
@@ -104,6 +104,8 @@ const handler = NextAuth({
   pages: {
     signIn: '/login',
   },
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

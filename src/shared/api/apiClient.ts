@@ -1,8 +1,6 @@
-// import { AuthService } from '@/lib/AuthService';
 import { AuthApi } from '@/app/api/AuthApi';
 import useModalStore from '@/store/modalStore';
 import { ApiError } from '@/utils/ApiError';
-import { TokenData } from '@/types/Auth';
 import { getSession, signOut } from 'next-auth/react';
 
 interface ApiClientOptions extends RequestInit {
@@ -35,7 +33,8 @@ class ApiClient {
     } = options;
 
     const headers = new Headers(fetchOptions.headers);
-    let session = await getSession();
+    // 요청 전에 항상 최신 세션을 가져옵니다.
+    const session = await getSession();
 
     if (useAuth) {
       if (!session) {
@@ -74,28 +73,18 @@ class ApiClient {
       if (!response.ok) {
         if (result?.code === 403 && retryCount < 1 && useAuth && session) {
           try {
-            const newTokens = await AuthApi.client.renewToken(
-              session.user.refreshToken,
-            );
-            // Here you should update the session with the new tokens.
-            // This might require a custom endpoint on your Next.js server
-            // to update the NextAuth.js session state.
-            // For now, let's assume a function `updateSession` exists.
-            // await updateSession(newTokens); // This is a placeholder
+            // /api/token/renew 가 next-auth 세션까지 갱신해 줄 것임
+            await AuthApi.client.renewToken(session.user.refreshToken);
 
-            // For the retry, we need the new access token. Let's assume
-            // `updateSession` makes the new token available in `getSession`.
-            // This is a complex part of moving away from AuthService.
-            // A simple page reload might be a temporary solution.
-            console.error(
-              'Token refresh logic needs to be fully implemented with NextAuth.',
-            );
-            // Temporarily, we just logout
-            signOut({ callbackUrl: '/login' });
-            throw new ApiError('Token refresh failed', response);
+            // 새 토큰으로 재시도
+            return this.request<T>(endpoint, options, retryCount + 1);
           } catch (refreshError) {
+            console.error('Token refresh failed:', refreshError);
             signOut({ callbackUrl: '/login' });
-            throw new ApiError('Token refresh failed', response);
+            throw new ApiError(
+              'Token refresh failed',
+              (refreshError as ApiError)?.response || response,
+            );
           }
         }
 

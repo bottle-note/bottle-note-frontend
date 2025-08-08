@@ -1,4 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
+import { AuthApi } from '@/app/api/AuthApi';
+import { decodeJwt } from 'jose';
+import { UserData } from '@/types/Auth';
+import { encode } from 'next-auth/jwt';
+
+const secret = process.env.NEXTAUTH_SECRET;
+const isProduction = process.env.NODE_ENV === 'production';
+
+const cookieName = isProduction
+  ? '__Secure-next-auth.session-token'
+  : 'next-auth.session-token';
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,39 +23,41 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 토큰 갱신 요청
-    const response = await fetch(`${process.env.SERVER_URL}/oauth/reissue`, {
-      method: 'POST',
-      headers: {
-        'refresh-token': refreshToken,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const body = await response.json();
-      return NextResponse.json(
-        { error: `HTTP error! message: ${body.errors.message}` },
-        { status: response.status },
-      );
+    const newTokens = await AuthApi.server.renewToken(refreshToken);
+    const currentToken = await getToken({ req, secret });
+    if (!currentToken) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    // 새 리프레시 토큰 파싱
-    const cookie: string = response.headers.getSetCookie()[0] ?? '';
-    const newRefreshToken = (
-      cookie
-        .split(';')
-        .find((item) => item.trim().startsWith('refresh-token=')) as string
-    ).split('=')[1];
+    const newUserInfo = decodeJwt(newTokens.accessToken) as UserData;
 
-    const { data } = await response.json();
+    const updatedNextAuthToken = {
+      ...currentToken,
+      accessToken: newTokens.accessToken,
+      refreshToken: newTokens.refreshToken,
+      iat: newUserInfo.iat,
+      exp: newUserInfo.exp,
+      email: newUserInfo.sub,
+      roles: newUserInfo.roles,
+      userId: newUserInfo.userId,
+    };
 
-    return NextResponse.json(
-      {
-        data: { accessToken: data.accessToken, refreshToken: newRefreshToken },
-      },
-      { status: 200 },
-    );
+    const newSessionCookie = await encode({
+      token: updatedNextAuthToken,
+      secret: secret!,
+    });
+
+    const response = NextResponse.json(newTokens, { status: 200 });
+    response.cookies.set({
+      name: cookieName,
+      value: newSessionCookie,
+      httpOnly: true,
+      secure: isProduction,
+      path: '/',
+      sameSite: 'lax',
+    });
+
+    return response;
   } catch (error) {
     console.error(
       `토큰 업데이트 도중 에러가 발생했습니다. 사유: ${(error as Error).message}`,

@@ -1,4 +1,4 @@
-import { AuthService } from '@/lib/AuthService';
+import { signOut } from 'next-auth/react';
 import useModalStore from '@/store/modalStore';
 import {
   BasicSignupRes,
@@ -164,7 +164,7 @@ export const AuthApi = {
       try {
         const response = await apiClient.post<{ data: TokenData }>(
           '/token/renew',
-          refreshToken,
+          { refreshToken },
           {
             baseUrl: 'api',
             useAuth: false,
@@ -178,7 +178,7 @@ export const AuthApi = {
           // 400 에러: 리프레시 토큰 만료/무효
           if (e.response.status === 400) {
             console.warn('Refresh token expired or invalid');
-            AuthService.logout();
+            signOut({ callbackUrl: '/login' });
             const { handleLoginState: handleShowNeedLoginModal } =
               useModalStore.getState();
             handleShowNeedLoginModal(true);
