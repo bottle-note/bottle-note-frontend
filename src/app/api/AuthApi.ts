@@ -13,6 +13,8 @@ import { ApiError } from '@/utils/ApiError';
 import { extractRefreshToken } from '@/utils/cookieUtils';
 import { apiClient } from '@/shared/api/apiClient';
 
+const getRedirectUrl = () => `${process.env.CLIENT_URL}/oauth/kakao`;
+
 export const AuthApi = {
   // ========== 서버사이드 API (Next.js API Routes에서 사용) ==========
   server: {
@@ -59,6 +61,29 @@ export const AuthApi = {
       };
     },
 
+    // FIXME: 실제 카카오 로그인 api 스펙에 맞추어 변경 필요
+    async kakaoLogin(body: {
+      provider: SOCIAL_TYPE;
+      accessToken: string;
+    }): Promise<TokenData> {
+      const response = await fetch(`${process.env.SERVER_URL}/oauth/kakao`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const refreshToken = extractRefreshToken(response);
+
+      const { data } = await response.json();
+
+      return {
+        accessToken: data.accessToken,
+        refreshToken,
+      };
+    },
+
     async renewToken(refreshToken: string): Promise<TokenData> {
       const response = await fetch(
         `${process.env.SERVER_URL}/oauth/token/renew`,
@@ -77,6 +102,35 @@ export const AuthApi = {
 
       const { data } = await response.json();
       return data;
+    },
+
+    async fetchKakaoToken(code: string) {
+      const clientId = process.env.KAKAO_REST_API_KEY;
+      const redirectUri = getRedirectUrl();
+
+      const res = await fetch('https://kauth.kakao.com/oauth/token', {
+        method: 'POST',
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          client_id: String(clientId),
+          redirect_uri: String(redirectUri),
+          code: String(code),
+        }),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      });
+
+      return res.json();
+    },
+
+    async fetchKakaoUserInfo(accessToken: string) {
+      const res = await fetch('https://kapi.kakao.com/v2/user/me', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+        },
+      });
+
+      return res.json();
     },
   },
 

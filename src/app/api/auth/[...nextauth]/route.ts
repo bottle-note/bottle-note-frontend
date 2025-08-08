@@ -45,6 +45,38 @@ const handler = NextAuth({
         return null;
       },
     }),
+    CredentialsProvider({
+      id: 'kakao-login',
+      name: 'Kakao Login',
+      credentials: {
+        accessToken: { type: 'text' }, // 앱을 통해 받아올 데이터 (수정 예정)
+        email: { type: 'text' }, // 앱을 통해 받아올 데이터 (기존)
+        authroizationCode: { type: 'text' }, // 웹 sdk 로그인
+      },
+      async authorize(credentials) {
+        if (
+          credentials?.accessToken ||
+          credentials?.email ||
+          credentials?.authroizationCode
+        ) {
+          try {
+            const body = {
+              provider: SOCIAL_TYPE.KAKAO,
+              accessToken: credentials.accessToken,
+              authroizationCode: credentials.authroizationCode,
+              email: credentials.email,
+              id: '',
+            };
+
+            return body;
+          } catch (error) {
+            console.error('Kakao login credentials parsing error:', error);
+            return null;
+          }
+        }
+        return null;
+      },
+    }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   session: {
@@ -58,6 +90,15 @@ const handler = NextAuth({
       if (
         account?.provider === 'apple-login' &&
         credentials?.authroizationCode
+      ) {
+        return true;
+      }
+
+      if (
+        account?.provider === 'kakao-login' &&
+        (credentials?.accessToken ||
+          credentials?.email ||
+          credentials?.authroizationCode)
       ) {
         return true;
       }
@@ -91,6 +132,86 @@ const handler = NextAuth({
         }
       }
 
+      // 카카오 로그인 with accessToken (아직 백엔드 반영X)
+      if (account?.provider === 'kakao-login' && user.accessToken) {
+        try {
+          const body = {
+            provider: SOCIAL_TYPE.KAKAO,
+            accessToken: user.accessToken,
+          };
+
+          const { accessToken, refreshToken } =
+            await AuthApi.server.kakaoLogin(body);
+          const info = decodeJwt(accessToken) as UserData;
+
+          token.email = info.sub;
+          token.roles = info.roles;
+          token.userId = info.userId;
+          token.accessToken = accessToken;
+          token.refreshToken = refreshToken;
+        } catch (error) {
+          console.error('JWT callback - Kakao login error:', error);
+        }
+      }
+
+      // 카카오 로그인 with email (현재 로그인 method)
+      if (account?.provider === 'kakao-login' && user.email) {
+        try {
+          const { accessToken, refreshToken } = await AuthApi.server.login({
+            socialType: SOCIAL_TYPE.KAKAO,
+            email: user.email,
+            socialUniqueId: '',
+            gender: null,
+            age: null,
+          });
+
+          const info = decodeJwt(accessToken) as UserData;
+
+          token.email = info.sub;
+          token.roles = info.roles;
+          token.userId = info.userId;
+          token.accessToken = accessToken;
+          token.refreshToken = refreshToken;
+        } catch (error) {
+          console.error('JWT callback - Kakao login error:', error);
+        }
+      }
+
+      // 웹 sdk 용 카카오 로그인
+      if (account?.provider === 'kakao-login' && user?.authroizationCode) {
+        try {
+          const kakaoToken = await AuthApi.server.fetchKakaoToken(
+            user.authroizationCode,
+          );
+
+          const userData = await AuthApi.server.fetchKakaoUserInfo(
+            kakaoToken.access_token,
+          );
+
+          const loginPayload = {
+            email: userData.kakao_account?.email ?? 'no-email',
+            gender: userData.kakao_account?.gender ?? null,
+            age: userData.kakao_account?.age_range ?? null,
+            socialType: SOCIAL_TYPE.KAKAO,
+            socialUniqueId: '',
+          };
+
+          const tokens = await AuthApi.server.login(loginPayload);
+          console.log(tokens, '토큰!!!!!!!!');
+          const info = decodeJwt(tokens.accessToken) as UserData;
+
+          token.email = info.sub;
+          token.roles = info.roles;
+          token.userId = info.userId;
+          token.accessToken = tokens.accessToken;
+          token.refreshToken = tokens.refreshToken;
+        } catch (error) {
+          console.error('JWT callback - Kakao web SDK login error:', error);
+        }
+      } else {
+        console.log('login - Kakao web SDK login skipped');
+      }
+
       return token;
     },
 
@@ -106,6 +227,9 @@ const handler = NextAuth({
       };
 
       return session;
+    },
+    async redirect({ baseUrl }) {
+      return baseUrl;
     },
   },
   pages: {

@@ -2,22 +2,20 @@
 
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { AuthApi } from '@/app/api/AuthApi';
-import { AuthService } from '@/lib/AuthService';
 import Loading from '@/components/Loading';
 import { ROUTES } from '@/constants/routes';
+import { signIn } from 'next-auth/react';
 
 export default function OauthKakaoCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const authCode = searchParams.get('code');
-  const { login } = AuthService;
 
   const loginHandler = async (code: string | string[]) => {
     try {
-      const result = await AuthApi.client.kakaoLogin(code);
-      login(result.info, result.tokens);
-      router.push(ROUTES.LOGIN);
+      signIn('kakao-login', {
+        authroizationCode: code,
+      });
     } catch (e) {
       console.log(e);
       router.push(ROUTES.ERROR);
