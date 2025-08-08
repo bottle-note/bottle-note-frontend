@@ -1,18 +1,14 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { signIn, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { AuthService } from '@/lib/AuthService';
 import { DeviceService } from '@/lib/DeviceService';
 import useModalStore from '@/store/modalStore';
 import { AuthApi } from '@/app/api/AuthApi';
 import { ApiError } from '@/utils/ApiError';
-import { UserData } from '@/types/Auth';
 import { UserApi } from '@/app/api/UserApi';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
-import { ROUTES } from '@/constants/routes';
-
-const jwt = require('jsonwebtoken');
 
 export type LoginFormValues = {
   email: string;
@@ -22,7 +18,7 @@ export type LoginFormValues = {
 export const useLogin = () => {
   const { data: session } = useSession();
   const router = useRouter();
-  const { isLogin, login } = AuthService;
+  const { isLogin } = AuthService;
   const { isInApp } = DeviceService;
   const { handleModalState, handleCloseModal } = useModalStore();
 
@@ -49,41 +45,7 @@ export const useLogin = () => {
     }
   };
 
-  const handleBasicLogin = async (data: LoginFormValues) => {
-    try {
-      const result = await AuthApi.client.basicLogin(data);
-
-      const decoded: UserData = jwt.decode(result.accessToken);
-
-      login(decoded, {
-        accessToken: result.accessToken,
-        refreshToken: '',
-      });
-
-      router.push(ROUTES.HOME);
-    } catch (error) {
-      if (error instanceof ApiError && error.code === 'USER_DELETED') {
-        return handleModalState({
-          isShowModal: true,
-          type: 'CONFIRM',
-          mainText: `${`탈퇴한 유저입니다. 재가입하시겠습니까?`}`,
-          handleConfirm: async () => {
-            handleCloseModal();
-            await handleRestore(data);
-          },
-        });
-      }
-
-      handleModalState({
-        isShowModal: true,
-        mainText: `${(error as unknown as Error).message}`,
-        handleConfirm: () => {
-          handleCloseModal();
-        },
-      });
-    }
-  };
-
+  // TODO: 미들웨어로 이관
   const handleRedirectWithSession = () => {
     if (session && session.user) {
       const { userId, email, profile, accessToken, refreshToken } =
@@ -162,13 +124,11 @@ export const useLogin = () => {
     if (window.isInApp) {
       return handleWebViewMessage('loginWithApple');
     }
-
-    return signIn('apple');
+    return;
   };
 
   return {
     handleRestore,
-    handleBasicLogin,
     handleRedirectWithSession,
     handleSendDeviceInfo,
     handleInitKakaoSdkLogin,

@@ -1,87 +1,94 @@
 /* eslint-disable no-param-reassign */
-import GoogleProvider from 'next-auth/providers/google';
-import NaverProvider from 'next-auth/providers/naver';
-import AppleProvider from 'next-auth/providers/apple';
 import NextAuth from 'next-auth';
-import { getAppleToken } from '@/utils/getAppleToken';
-import { SOCIAL_TYPE } from '@/types/Auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { decodeJwt } from 'jose';
+import { SOCIAL_TYPE, UserData } from '@/types/Auth';
 import { AuthApi } from '../../AuthApi';
-
-const jwt = require('jsonwebtoken');
 
 const handler = NextAuth({
   debug: true,
   providers: [
-    GoogleProvider({
-      clientId: `${process.env.GOOGLE_CLIENT_ID}`,
-      clientSecret: `${process.env.GOOGLE_CLIENT_SECRET}`,
-    }),
-    NaverProvider({
-      clientId: `${process.env.NAVER_CLIENT_ID}`,
-      clientSecret: `${process.env.NAVER_CLIENT_SECRET}`,
-    }),
-    AppleProvider({
-      clientId: process.env.APPLE_ID!,
-      clientSecret: await getAppleToken(),
+    CredentialsProvider({
+      id: 'apple-login',
+      name: 'Apple Login',
+      // signIn 호출시 전달되는 데이터 타입 정의
+      credentials: {
+        authroizationCode: { type: 'text' }, // 애플 로그인 인증 코드 (필수)
+        userInfo: { type: 'text' }, // 애플 로그인 사용자 정보 (옵션)
+        socialUniqueId: { type: 'text' }, // 애플 로그인 고유 아이디 (옵션)
+      },
+      // 클라이언트에서 signIn 호출시 실행되는 함수
+      // 매개변수 credentials 는 클라이언트에서 signIn 호출시에 전달한 데이터
+      async authorize(credentials) {
+        if (
+          credentials?.authroizationCode &&
+          credentials?.userInfo &&
+          credentials?.socialUniqueId
+        ) {
+          try {
+            const userInfo = JSON.parse(credentials.userInfo);
+            // 보틀노트 서비스 BE 에 전달할 로그인 데이터
+            const body = {
+              provider: SOCIAL_TYPE.APPLE, // 필수
+              authroizationCode: credentials.authroizationCode, // 필수
+              id: credentials.socialUniqueId, // 이하 나머지 api 문서 체크해 확인 필요
+              email: userInfo.email || 'no-email',
+              name: userInfo.name || 'Apple User',
+              socialUniqueId: credentials.socialUniqueId,
+            };
+            return body;
+          } catch (error) {
+            console.error('Apple login credentials parsing error:', error);
+            return null;
+          }
+        }
+        return null;
+      },
     }),
   ],
-  cookies: {
-    pkceCodeVerifier: {
-      name: 'next-auth.pkce.code_verifier',
-      options: {
-        httpOnly: true,
-        sameSite: 'none',
-        path: '/',
-        secure: true,
-      },
-    },
-  },
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
   },
   callbacks: {
-    async signIn({ user, account }) {
-      try {
-        let socialUniqueId = '';
-
-        if (account?.provider === 'apple' && account.id_token) {
-          const decoded = jwt.decode(account.id_token) as { sub: string };
-          socialUniqueId = decoded?.sub || '';
-        } else {
-          socialUniqueId = account?.providerAccountId || '';
-        }
-
-        const body = {
-          email: user.email as string,
-          gender: null,
-          age: null,
-          socialType: account?.provider as SOCIAL_TYPE,
-          socialUniqueId,
-        };
-
-        const { accessToken, refreshToken } = await AuthApi.server.login(body);
-
-        const info = jwt.decode(accessToken);
-
-        if (account) {
-          account.accessToken = accessToken;
-          account.refreshToken = refreshToken;
-          account.userId = info.userId;
-        }
-
-        return true;
-      } catch (error) {
-        console.error('Error :', error);
+    // user : 위 authorize 에서 반환한 데이터
+    // account : provider, type 데이터
+    // credentials : 클라이언트가 signin 호출시에 전달한 데이터
+    async signIn({ account, credentials }) {
+      if (
+        account?.provider === 'apple-login' &&
+        credentials?.authroizationCode
+      ) {
         return true;
       }
+
+      return false;
     },
 
-    async jwt({ token, account }) {
-      if (account && account.accessToken) {
-        token.accessToken = account.accessToken;
-        token.refreshToken = account.refreshToken;
-        token.userId = account.userId;
+    // token : jwt 토큰 객체, 이 객체를 수정해서 return 하면 세션에 반영.
+    // user : 최초 로그인시 사용되는 사용자 정보, authorize 에서 반환한 데이터.
+    // account: provider 와 type 정보, 최초 로그인 시에만 조회 가능
+    async jwt({ token, user, account }) {
+      // 애플 로그인 처리
+      if (account?.provider === 'apple-login' && user.authroizationCode) {
+        try {
+          const body = {
+            provider: SOCIAL_TYPE.APPLE,
+            authroizationCode: user.authroizationCode,
+          };
+
+          const { accessToken, refreshToken } =
+            await AuthApi.server.appleLogin(body);
+          const info = decodeJwt(accessToken) as UserData;
+
+          token.email = info.sub;
+          token.roles = info.roles;
+          token.userId = info.userId;
+          token.accessToken = accessToken;
+          token.refreshToken = refreshToken;
+        } catch (error) {
+          console.error('JWT callback - Apple login error:', error);
+        }
       }
 
       return token;

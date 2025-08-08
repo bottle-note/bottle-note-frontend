@@ -4,21 +4,20 @@ import {
   BasicSignupRes,
   LoginReq,
   LoginReturn,
+  SOCIAL_TYPE,
   TokenData,
   UserData,
 } from '@/types/Auth';
 import { ApiResponse } from '@/types/common';
 import { ApiError } from '@/utils/ApiError';
+import { extractRefreshToken } from '@/utils/cookieUtils';
 import { apiClient } from '@/shared/api/apiClient';
 
 export const AuthApi = {
   // ========== 서버사이드 API (Next.js API Routes에서 사용) ==========
   server: {
     // NOTE: 서버사이드에서 백엔드로 직접 요청
-    async login(body: LoginReq): Promise<{
-      accessToken: string;
-      refreshToken: string;
-    }> {
+    async login(body: LoginReq): Promise<TokenData> {
       const response = await fetch(`${process.env.SERVER_URL}/oauth/login`, {
         method: 'POST',
         body: JSON.stringify(body),
@@ -27,12 +26,30 @@ export const AuthApi = {
         },
       });
 
-      const cookie: string = response.headers.getSetCookie()[0] ?? '';
-      const refreshToken = (
-        cookie
-          .split(';')
-          .find((item) => item.trim().startsWith('refresh-token=')) as string
-      ).split('=')[1];
+      const refreshToken = extractRefreshToken(response);
+
+      const { data } = await response.json();
+
+      return {
+        accessToken: data.accessToken,
+        refreshToken,
+      };
+    },
+
+    // FIXME: 실제 애플 로그인 api 스펙에 맞추어 변경 필요
+    async appleLogin(body: {
+      provider: SOCIAL_TYPE;
+      authroizationCode: string;
+    }): Promise<TokenData> {
+      const response = await fetch(`${process.env.SERVER_URL}/oauth/apple`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const refreshToken = extractRefreshToken(response);
 
       const { data } = await response.json();
 
