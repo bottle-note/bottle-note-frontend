@@ -110,119 +110,81 @@ const handler = NextAuth({
     // user : 최초 로그인시 사용되는 사용자 정보, authorize 에서 반환한 데이터.
     // account: provider 와 type 정보, 최초 로그인 시에만 조회 가능
     async jwt({ token, user, account }) {
-      // 애플 로그인 처리
-      if (account?.provider === 'apple-login' && user.authroizationCode) {
+      if (user && account) {
         try {
-          const body = {
-            provider: SOCIAL_TYPE.APPLE,
-            authroizationCode: user.authroizationCode,
-          };
+          let tokens;
 
-          const { accessToken, refreshToken } =
-            await AuthApi.server.appleLogin(body);
-          const info = decodeJwt(accessToken) as UserData;
+          if (account.provider === 'apple-login' && user.authroizationCode) {
+            const body = {
+              provider: SOCIAL_TYPE.APPLE,
+              authroizationCode: user.authroizationCode,
+            };
+            tokens = await AuthApi.server.appleLogin(body);
+          }
 
-          token.email = info.sub;
-          token.roles = info.roles;
-          token.userId = info.userId;
-          token.accessToken = accessToken;
-          token.refreshToken = refreshToken;
+          if (account.provider === 'kakao-login') {
+            if (user.authroizationCode) {
+              const kakaoToken = await AuthApi.server.fetchKakaoToken(
+                user.authroizationCode,
+              );
+              const userData = await AuthApi.server.fetchKakaoUserInfo(
+                kakaoToken.access_token,
+              );
+              const loginPayload = {
+                email: userData.kakao_account?.email ?? 'no-email',
+                gender: null,
+                age: null,
+                socialType: SOCIAL_TYPE.KAKAO,
+                socialUniqueId: '',
+              };
+              tokens = await AuthApi.server.login(loginPayload);
+            } else if (user.accessToken) {
+              const body = {
+                provider: SOCIAL_TYPE.KAKAO,
+                accessToken: user.accessToken,
+              };
+              tokens = await AuthApi.server.kakaoLogin(body);
+            } else if (user.email) {
+              tokens = await AuthApi.server.login({
+                socialType: SOCIAL_TYPE.KAKAO,
+                email: user.email,
+                socialUniqueId: '',
+                gender: null,
+                age: null,
+              });
+            }
+          }
+
+          if (tokens && tokens.accessToken) {
+            const info = decodeJwt(tokens.accessToken) as UserData;
+            return {
+              ...token,
+              email: info.sub,
+              roles: info.roles,
+              userId: info.userId,
+              accessToken: tokens.accessToken,
+              refreshToken: tokens.refreshToken,
+            };
+          }
         } catch (error) {
-          console.error('JWT callback - Apple login error:', error);
+          console.error('JWT callback - initial sign in error:', error);
+          return { ...token, error: 'AuthenticationFailed' };
         }
-      }
-
-      // 카카오 로그인 with accessToken (아직 백엔드 반영X)
-      if (account?.provider === 'kakao-login' && user.accessToken) {
-        try {
-          const body = {
-            provider: SOCIAL_TYPE.KAKAO,
-            accessToken: user.accessToken,
-          };
-
-          const { accessToken, refreshToken } =
-            await AuthApi.server.kakaoLogin(body);
-          const info = decodeJwt(accessToken) as UserData;
-
-          token.email = info.sub;
-          token.roles = info.roles;
-          token.userId = info.userId;
-          token.accessToken = accessToken;
-          token.refreshToken = refreshToken;
-        } catch (error) {
-          console.error('JWT callback - Kakao login error:', error);
-        }
-      }
-
-      // 카카오 로그인 with email (현재 로그인 method)
-      if (account?.provider === 'kakao-login' && user.email) {
-        try {
-          const { accessToken, refreshToken } = await AuthApi.server.login({
-            socialType: SOCIAL_TYPE.KAKAO,
-            email: user.email,
-            socialUniqueId: '',
-            gender: null,
-            age: null,
-          });
-
-          const info = decodeJwt(accessToken) as UserData;
-
-          token.email = info.sub;
-          token.roles = info.roles;
-          token.userId = info.userId;
-          token.accessToken = accessToken;
-          token.refreshToken = refreshToken;
-        } catch (error) {
-          console.error('JWT callback - Kakao login error:', error);
-        }
-      }
-
-      // 웹 sdk 용 카카오 로그인
-      if (account?.provider === 'kakao-login' && user?.authroizationCode) {
-        try {
-          const kakaoToken = await AuthApi.server.fetchKakaoToken(
-            user.authroizationCode,
-          );
-
-          const userData = await AuthApi.server.fetchKakaoUserInfo(
-            kakaoToken.access_token,
-          );
-
-          const loginPayload = {
-            email: userData.kakao_account?.email ?? 'no-email',
-            gender: userData.kakao_account?.gender ?? null,
-            age: userData.kakao_account?.age_range ?? null,
-            socialType: SOCIAL_TYPE.KAKAO,
-            socialUniqueId: '',
-          };
-
-          const tokens = await AuthApi.server.login(loginPayload);
-          console.log(tokens, '토큰!!!!!!!!');
-          const info = decodeJwt(tokens.accessToken) as UserData;
-
-          token.email = info.sub;
-          token.roles = info.roles;
-          token.userId = info.userId;
-          token.accessToken = tokens.accessToken;
-          token.refreshToken = tokens.refreshToken;
-        } catch (error) {
-          console.error('JWT callback - Kakao web SDK login error:', error);
-        }
-      } else {
-        console.log('login - Kakao web SDK login skipped');
       }
 
       return token;
     },
 
     async session({ session, token }) {
-      const { accessToken, refreshToken, userId } = token;
+      const { accessToken, refreshToken, userId, roles, email } = token;
       session.user = {
         ...session.user,
         ...{
           accessToken: accessToken as string,
           refreshToken: refreshToken as string,
           userId: userId as number,
+          roles: roles as string,
+          email: email as string,
         },
       };
 
