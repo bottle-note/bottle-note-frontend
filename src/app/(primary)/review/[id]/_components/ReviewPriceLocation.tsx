@@ -19,7 +19,7 @@ export default function ReviewPriceLocation({
   if (!shouldShowPriceOrLocation) return null;
 
   return (
-    <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 text-12">
+    <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 text-13.5">
       {hasValidPrice && hasValidSizeType && (
         <div className="flex items-center space-x-[6px]">
           <Image
@@ -28,8 +28,8 @@ export default function ReviewPriceLocation({
                 ? '/bottle.svg'
                 : '/icon/glass-filled-subcoral.svg'
             }
-            width={17}
-            height={17}
+            width={18.4}
+            height={18.4}
             alt={
               data.reviewInfo.sizeType === 'BOTTLE'
                 ? 'Bottle Price'
@@ -48,8 +48,8 @@ export default function ReviewPriceLocation({
         <div className="flex items-start space-x-[6px]">
           <Image
             src="/icon/placepoint-subcoral.svg"
-            width={17}
-            height={17}
+            width={18.4}
+            height={18.4}
             alt="address"
           />
           <p className="text-mainDarkGray font-bold">장소</p>

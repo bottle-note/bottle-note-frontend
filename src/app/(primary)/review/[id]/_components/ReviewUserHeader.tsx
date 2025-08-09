@@ -22,7 +22,7 @@ export default function ReviewUserHeader({
   const { userData } = AuthService;
 
   return (
-    <section className="mx-5 pb-5">
+    <section className="mx-5">
       <article className="flex items-center justify-between">
         <Link href={ROUTES.USER.BASE(userData?.userId!)}>
           <div className="flex items-center space-x-[7px]">
@@ -46,32 +46,39 @@ export default function ReviewUserHeader({
         </Link>
         <Star
           rating={data.reviewInfo?.rating ?? 0}
-          size={21}
-          textStyle="text-20 text-subCoral font-semibold w-7"
+          size={27}
+          textStyle="text-24 text-subCoral font-semibold min-w-7"
         />
       </article>
 
-      <article className="flex items-center mt-[10px] space-x-2">
-        {data.reviewInfo?.isBestReview && (
-          <Label
-            name="베스트"
-            icon="/icon/thumbup-filled-white.svg"
-            styleClass="bg-mainCoral text-white px-2 py-[0.1rem] border-mainCoral text-10 rounded"
-          />
-        )}
-        {data.reviewInfo?.isMyReview && (
-          <Label
-            name="나의 코멘트"
-            icon="/icon/user-outlined-subcoral.svg"
-            styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-10 rounded"
-          />
-        )}
+      <article className="flex items-center justify-between mt-[10px]">
+        <div className="flex items-center space-x-1">
+          {data.reviewInfo?.isBestReview && (
+            <Label
+              name="베스트"
+              icon="/icon/thumbup-filled-white.svg"
+              iconHeight={11.45}
+              iconWidth={11.45}
+              styleClass="bg-mainCoral text-white px-2 py-[3px] border-mainCoral text-10 rounded"
+            />
+          )}
+          {data.reviewInfo?.isMyReview && (
+            <Label
+              name="나의 코멘트"
+              icon="/icon/user-outlined-subcoral.svg"
+              iconHeight={11.45}
+              iconWidth={11.45}
+              styleClass="border-mainCoral text-mainCoral px-2 py-[3px] text-10 rounded"
+            />
+          )}
+        </div>
         {data.reviewInfo?.userInfo?.userId === userData?.userId && (
           <VisibilityToggle
             initialStatus={data.reviewInfo.status === 'PUBLIC'}
             reviewId={data?.reviewInfo?.reviewId}
             handleNotLogin={() => {}}
             onSuccess={onRefresh}
+            textSize="text-13"
           />
         )}
       </article>

@@ -18,6 +18,7 @@ interface Props {
   iconColor?: 'white' | 'subcoral';
   size?: number;
   alcoholId: number;
+  fontSize?: string;
 }
 
 const PickBtn = ({
@@ -30,6 +31,7 @@ const PickBtn = ({
   pickBtnName,
   iconColor = 'white',
   size = 18,
+  fontSize = 'text-12',
 }: Props) => {
   const { isLogin } = AuthService;
   const { handleModalState } = useModalStore();
@@ -95,7 +97,7 @@ const PickBtn = ({
     <button
       className={
         pickBtnName
-          ? 'flex items-end space-x-[1px]'
+          ? 'flex items-center space-x-[3px]'
           : 'justify-self-end row-start-3'
       }
       onClick={handleClick}
@@ -106,7 +108,9 @@ const PickBtn = ({
         height={size}
         alt={isPicked ? 'Pick' : 'Unpick'}
       />
-      {pickBtnName && <p className="text-12 font-normal">{pickBtnName}</p>}
+      {pickBtnName && (
+        <p className={`${fontSize} font-normal`}>{pickBtnName}</p>
+      )}
     </button>
   );
 };
