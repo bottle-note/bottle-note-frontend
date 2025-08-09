@@ -112,7 +112,7 @@ const WhiskeyListItem = ({ content }: Props) => {
 
         {/*  태그 */}
         <div className="flex gap-x-1 w-full overflow-hidden">
-          {visibleTags.map((tag) => (
+          {visibleTags?.map((tag) => (
             <div
               key={tag}
               data-tag={tag}
@@ -124,7 +124,7 @@ const WhiskeyListItem = ({ content }: Props) => {
               />
             </div>
           ))}
-          {visibleTags.length < content.alcoholsTastingTags.length && (
+          {visibleTags?.length < content.alcoholsTastingTags?.length && (
             <div className="flex items-center pt-1.5">
               <Image
                 src={'/icon/ellipsis-vertical-mainGray.svg'}
