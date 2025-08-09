@@ -14,7 +14,7 @@ const Section = ({ children }: { children: React.ReactNode }) => {
           <>
             {child}
             {index < Children.count(children) - 1 && (
-              <div className="line-border" />
+              <div className="border-t border-mainGray/30 my-3" />
             )}
           </>
         ))}
