@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut, signIn } from 'next-auth/react';
 import { useMemo } from 'react';
 import { UserData } from '@/types/Auth';
 
@@ -22,8 +22,20 @@ export const useAuth = () => {
   const isLoggedIn = status === 'authenticated';
   const isLoading = status === 'loading';
 
-  const logout = async () => {
-    await signOut({ callbackUrl: '/' });
+  const logout = () => {
+    signOut({ redirect: false });
+  };
+
+  // FIXME: 로그인 provider id 타입 안정성 강화 (ex kakao-login,,)
+  const login = async (
+    provider: 'kakao-login' | 'apple-login',
+    credentials: Record<string, any>,
+    isRedirect = false,
+  ) => {
+    await signIn(provider, {
+      ...credentials,
+      redirect: isRedirect,
+    });
   };
 
   return {
@@ -31,6 +43,7 @@ export const useAuth = () => {
     isLoggedIn,
     isLoading,
     logout,
+    login,
     session,
     updateSession: update,
   };

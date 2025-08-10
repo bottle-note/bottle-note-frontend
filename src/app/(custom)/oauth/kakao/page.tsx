@@ -4,18 +4,24 @@ import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Loading from '@/components/Loading';
 import { ROUTES } from '@/constants/routes';
-import { signIn } from 'next-auth/react';
+import { useAuth } from '@/hooks/auth/useAuth';
 
 export default function OauthKakaoCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const authCode = searchParams.get('code');
+  const { login } = useAuth();
 
   const loginHandler = async (code: string | string[]) => {
     try {
-      signIn('kakao-login', {
-        authorizationCode: code,
-      });
+      login(
+        'kakao-login',
+        {
+          authorizationCode: code,
+          callbackUrl: '/',
+        },
+        true,
+      );
     } catch (e) {
       console.log(e);
       router.push(ROUTES.ERROR);

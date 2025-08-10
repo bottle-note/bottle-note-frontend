@@ -4,10 +4,12 @@ import { sendLogToFlutter } from '@/utils/flutterUtil';
 import useModalStore from '@/store/modalStore';
 import { SOCIAL_TYPE } from '@/types/Auth';
 import { signIn } from 'next-auth/react';
+import { useAuth } from './auth/useAuth';
 
 export const useAppSocialLogin = () => {
   const router = useRouter();
   const { handleModalState } = useModalStore();
+  const { login } = useAuth();
 
   const onKakaoLoginError = (error: string) => {
     handleModalState({
@@ -20,14 +22,13 @@ export const useAppSocialLogin = () => {
 
   const onKakaoLoginSuccess = async (email: string) => {
     try {
-      const loginResult = await AuthApi.client.login({
-        email,
-        socialType: SOCIAL_TYPE.KAKAO,
-      });
+      // const loginResult = await AuthApi.client.login({
+      //   email,
+      //   socialType: SOCIAL_TYPE.KAKAO,
+      // });
 
-      await signIn('credentials', {
-        redirect: false,
-        ...loginResult.tokens,
+      await login('kakao-login', {
+        email,
       });
 
       router.replace('/');
