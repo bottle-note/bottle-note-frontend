@@ -35,18 +35,6 @@ export const authOptions: NextAuthOptions = {
     },
 
     async jwt({ token, user, account }) {
-      if (account?.provider === 'app-login' && user) {
-        const userInfo = decodeJwt(user.accessToken as string) as UserData;
-        return {
-          ...token,
-          email: userInfo.sub,
-          roles: userInfo.roles,
-          userId: userInfo.userId,
-          accessToken: user.accessToken,
-          refreshToken: user.refreshToken,
-        };
-      }
-
       // 최초 소셜 로그인 시, 백엔드에 로그인을 요청하고 JWT 토큰을 받아 저장합니다.
       if (user && account) {
         try {

@@ -1,9 +1,6 @@
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
-import { AuthApi } from '@/app/api/AuthApi';
 import { sendLogToFlutter } from '@/utils/flutterUtil';
 import useModalStore from '@/store/modalStore';
-import { SOCIAL_TYPE } from '@/types/Auth';
 import { useAuth } from './auth/useAuth';
 
 export const useAppSocialLogin = () => {
@@ -22,11 +19,6 @@ export const useAppSocialLogin = () => {
 
   const onKakaoLoginSuccess = async (email: string) => {
     try {
-      // const loginResult = await AuthApi.client.login({
-      //   email,
-      //   socialType: SOCIAL_TYPE.KAKAO,
-      // });
-
       await login('kakao-login', {
         email,
       });
@@ -48,20 +40,13 @@ export const useAppSocialLogin = () => {
 
   const onAppleLoginSuccess = async (data: string) => {
     try {
-      const { email, id } = JSON.parse(data) as {
-        email: string | null;
-        id: string;
+      const { idToken } = JSON.parse(data) as {
+        idToken: string;
       };
 
-      const loginResult = await AuthApi.client.login({
-        email: email ?? '',
-        socialUniqueId: id,
-        socialType: SOCIAL_TYPE.APPLE,
-      });
-
-      await signIn('credentials', {
+      await login('apple-login', {
         redirect: false,
-        ...loginResult.tokens,
+        idToken,
       });
 
       router.replace('/');

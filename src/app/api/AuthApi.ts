@@ -1,13 +1,6 @@
 import { signOut } from 'next-auth/react';
 import useModalStore from '@/store/modalStore';
-import {
-  BasicSignupRes,
-  LoginReq,
-  LoginReturn,
-  SOCIAL_TYPE,
-  TokenData,
-  UserData,
-} from '@/types/Auth';
+import { BasicSignupRes, LoginReq, LoginReturn, TokenData } from '@/types/Auth';
 import { ApiResponse } from '@/types/common';
 import { ApiError } from '@/utils/ApiError';
 import { extractRefreshToken } from '@/utils/cookieUtils';
@@ -21,52 +14,6 @@ export const AuthApi = {
     // NOTE: 서버사이드에서 백엔드로 직접 요청
     async login(body: LoginReq): Promise<TokenData> {
       const response = await fetch(`${process.env.SERVER_URL}/oauth/login`, {
-        method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const refreshToken = extractRefreshToken(response);
-
-      const { data } = await response.json();
-
-      return {
-        accessToken: data.accessToken,
-        refreshToken,
-      };
-    },
-
-    // FIXME: 실제 애플 로그인 api 스펙에 맞추어 변경 필요
-    async appleLogin(body: {
-      provider: SOCIAL_TYPE;
-      authorizationCode: string;
-    }): Promise<TokenData> {
-      const response = await fetch(`${process.env.SERVER_URL}/oauth/apple`, {
-        method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const refreshToken = extractRefreshToken(response);
-
-      const { data } = await response.json();
-
-      return {
-        accessToken: data.accessToken,
-        refreshToken,
-      };
-    },
-
-    // FIXME: 실제 카카오 로그인 api 스펙에 맞추어 변경 필요
-    async kakaoLogin(body: {
-      provider: SOCIAL_TYPE;
-      accessToken: string;
-    }): Promise<TokenData> {
-      const response = await fetch(`${process.env.SERVER_URL}/oauth/kakao`, {
         method: 'POST',
         body: JSON.stringify(body),
         headers: {
@@ -136,37 +83,13 @@ export const AuthApi = {
 
   // ========== 클라이언트사이드 API (브라우저에서 사용) ==========
   client: {
-    // NOTE: 클라이언트에서 Next.js API Routes로 요청
-    async login(
-      body: Omit<LoginReq, 'gender' | 'age' | 'socialUniqueId'> & {
-        socialUniqueId?: string;
-      },
-    ): Promise<{ tokens: TokenData; info: UserData }> {
-      const response = await apiClient.post<{
-        tokens: TokenData;
-        info: UserData;
-      }>(
-        '/login',
-        {
-          ...body,
-          socialUniqueId: body.socialUniqueId ?? '',
-        },
-        {
-          baseUrl: 'api',
-          useAuth: false,
-        },
-      );
-
-      return response;
-    },
-
     async renewToken(refreshToken: string): Promise<TokenData> {
       try {
         const response = await apiClient.post<{ data: TokenData }>(
           '/token/renew',
           { refreshToken },
           {
-            baseUrl: 'api',
+            baseUrl: 'bottle-api/v2',
             useAuth: false,
           },
         );
@@ -211,7 +134,7 @@ export const AuthApi = {
           `/oauth/kakao?code=${code}`,
           {},
           {
-            baseUrl: 'api',
+            baseUrl: 'bottle-api/v2',
             useAuth: false,
           },
         );
@@ -227,61 +150,6 @@ export const AuthApi = {
       }
     },
 
-    async basicLogin({
-      email,
-      password,
-    }: {
-      email: string;
-      password: string;
-    }): Promise<{ accessToken: string }> {
-      try {
-        const result = await apiClient.post<
-          ApiResponse<{ accessToken: string }>
-        >(`/oauth/basic/login`, { email, password });
-
-        return result.data;
-      } catch (e) {
-        if (e instanceof ApiError) {
-          console.error(
-            `Login failed: ${e.message} (Status: ${e.response.status})`,
-          );
-        }
-
-        throw e;
-      }
-    },
-
-    async basicSignup({
-      email,
-      password,
-      age,
-      gender,
-    }: {
-      email: string;
-      password: string;
-      age: number;
-      gender: 'MALE' | 'FEMALE' | null;
-    }): Promise<BasicSignupRes> {
-      try {
-        const response = await apiClient.post<{ data: BasicSignupRes }>(
-          `/oauth/basic/signup`,
-          {
-            email,
-            password,
-            age,
-            gender,
-          },
-        );
-
-        return response.data;
-      } catch (e) {
-        const error = e as Error;
-        console.error(error.message);
-
-        throw new Error(error.message);
-      }
-    },
-
     // NOTE: 회원 복구 api
     async restore({
       email,
@@ -294,6 +162,7 @@ export const AuthApi = {
         const result = await apiClient.post<ApiResponse<{ data: string }>>(
           `/oauth/restore`,
           { email, password },
+          { baseUrl: 'bottle-api/v2' },
         );
 
         return result.data;
@@ -315,6 +184,7 @@ export const AuthApi = {
           {
             token: accessToken,
           },
+          { baseUrl: 'bottle-api/v2' },
         );
 
         return { data: response.data };
@@ -325,6 +195,81 @@ export const AuthApi = {
         throw new Error(
           `토큰 검증 도중 에러가 발생했습니다. 사유: ${error.message}`,
         );
+      }
+    },
+
+    async getAppleNonce() {
+      const response = await apiClient.get<{ data: string }>(
+        `/auth/apple/nonce`,
+        { baseUrl: 'bottle-api/v2' },
+      );
+
+      return response.data;
+    },
+
+    /**
+     * @deprecated
+     */
+    async basicLogin({
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    }): Promise<{ accessToken: string }> {
+      try {
+        const result = await apiClient.post<
+          ApiResponse<{ accessToken: string }>
+        >(
+          `/oauth/basic/login`,
+          { email, password },
+          { baseUrl: 'bottle-api/v2' },
+        );
+
+        return result.data;
+      } catch (e) {
+        if (e instanceof ApiError) {
+          console.error(
+            `Login failed: ${e.message} (Status: ${e.response.status})`,
+          );
+        }
+
+        throw e;
+      }
+    },
+
+    /**
+     * @deprecated
+     */
+    async basicSignup({
+      email,
+      password,
+      age,
+      gender,
+    }: {
+      email: string;
+      password: string;
+      age: number;
+      gender: 'MALE' | 'FEMALE' | null;
+    }): Promise<BasicSignupRes> {
+      try {
+        const response = await apiClient.post<{ data: BasicSignupRes }>(
+          `/oauth/basic/signup`,
+          {
+            email,
+            password,
+            age,
+            gender,
+          },
+          { baseUrl: 'bottle-api/v2' },
+        );
+
+        return response.data;
+      } catch (e) {
+        const error = e as Error;
+        console.error(error.message);
+
+        throw new Error(error.message);
       }
     },
   },
