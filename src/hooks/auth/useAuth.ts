@@ -26,7 +26,6 @@ export const useAuth = () => {
     signOut({ redirect: false });
   };
 
-  // FIXME: 로그인 provider id 타입 안정성 강화 (ex kakao-login,,)
   const login = async (
     provider: 'kakao-login' | 'apple-login',
     credentials: Record<string, any>,

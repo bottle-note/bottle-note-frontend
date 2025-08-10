@@ -96,9 +96,11 @@ export const useLogin = () => {
     });
   };
 
-  const handleAppleLogin = () => {
+  const handleAppleLogin = async () => {
     if (window.isInApp) {
-      return handleWebViewMessage('loginWithApple');
+      const nonce = await AuthApi.client.getAppleNonce();
+
+      return handleWebViewMessage('loginWithApple', { nonce });
     }
     return;
   };
