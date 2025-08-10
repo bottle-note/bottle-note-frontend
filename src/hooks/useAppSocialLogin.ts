@@ -40,14 +40,19 @@ export const useAppSocialLogin = () => {
 
   const onAppleLoginSuccess = async (data: string) => {
     try {
-      const { idToken } = JSON.parse(data) as {
+      const { idToken, nonce } = JSON.parse(data) as {
         idToken: string;
+        nonce: string;
       };
 
-      await login('apple-login', {
-        redirect: false,
-        idToken,
-      });
+      await login(
+        'apple-login',
+        {
+          idToken,
+          nonce,
+        },
+        false,
+      );
 
       router.replace('/');
     } catch (e) {

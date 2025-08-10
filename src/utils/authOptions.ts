@@ -16,7 +16,7 @@ export const authOptions: NextAuthOptions = {
       const provider = account?.provider;
 
       if (provider === 'apple-login') {
-        return !!credentials?.authorizationCode;
+        return !!(credentials?.idToken && credentials?.nonce);
       }
 
       if (provider === 'kakao-login') {
@@ -25,10 +25,6 @@ export const authOptions: NextAuthOptions = {
           credentials?.email ||
           credentials?.authorizationCode
         );
-      }
-
-      if (provider === 'app-login') {
-        return !!(credentials?.accessToken && credentials?.refreshToken);
       }
 
       return false;

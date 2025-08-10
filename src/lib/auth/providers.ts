@@ -6,9 +6,10 @@ export const appleProvider = CredentialsProvider({
   name: 'Apple Login',
   credentials: {
     idToken: { type: 'text' },
+    nonce: { type: 'text' },
   },
   async authorize(credentials) {
-    if (!credentials?.idToken) {
+    if (!credentials?.idToken || !credentials?.nonce) {
       return null;
     }
 
@@ -17,6 +18,7 @@ export const appleProvider = CredentialsProvider({
       const backendApiPayload = {
         provider: SOCIAL_TYPE.APPLE,
         idToken: credentials.idToken,
+        nonce: credentials.nonce,
         id: '',
       };
       return backendApiPayload;

@@ -31,6 +31,25 @@ export const AuthApi = {
       };
     },
 
+    async appleLogin(body: { idToken: string; nonce: string }) {
+      const response = await fetch(`${process.env.SERVER_URL_V2}/auth/apple`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const refreshToken = extractRefreshToken(response);
+
+      const data = await response.json();
+
+      return {
+        accessToken: data.accessToken,
+        refreshToken,
+      };
+    },
+
     async renewToken(refreshToken: string): Promise<TokenData> {
       const response = await fetch(
         `${process.env.SERVER_URL}/oauth/token/renew`,
@@ -199,72 +218,13 @@ export const AuthApi = {
     },
 
     async getAppleNonce() {
-      const response = await apiClient.get<{ data: string }>(
-        `/auth/apple/nonce`,
-        { baseUrl: 'bottle-api/v2' },
-      );
-
-      return response.data;
-    },
-
-    /**
-     * @deprecated
-     */
-    async basicLogin({
-      email,
-      password,
-    }: {
-      email: string;
-      password: string;
-    }): Promise<{ accessToken: string }> {
       try {
-        const result = await apiClient.post<
-          ApiResponse<{ accessToken: string }>
-        >(
-          `/oauth/basic/login`,
-          { email, password },
-          { baseUrl: 'bottle-api/v2' },
+        const response = await apiClient.get<{ nonce: string }>(
+          `/auth/apple/nonce`,
+          { baseUrl: 'bottle-api/v2', useAuth: false },
         );
 
-        return result.data;
-      } catch (e) {
-        if (e instanceof ApiError) {
-          console.error(
-            `Login failed: ${e.message} (Status: ${e.response.status})`,
-          );
-        }
-
-        throw e;
-      }
-    },
-
-    /**
-     * @deprecated
-     */
-    async basicSignup({
-      email,
-      password,
-      age,
-      gender,
-    }: {
-      email: string;
-      password: string;
-      age: number;
-      gender: 'MALE' | 'FEMALE' | null;
-    }): Promise<BasicSignupRes> {
-      try {
-        const response = await apiClient.post<{ data: BasicSignupRes }>(
-          `/oauth/basic/signup`,
-          {
-            email,
-            password,
-            age,
-            gender,
-          },
-          { baseUrl: 'bottle-api/v2' },
-        );
-
-        return response.data;
+        return response.nonce;
       } catch (e) {
         const error = e as Error;
         console.error(error.message);
@@ -272,5 +232,68 @@ export const AuthApi = {
         throw new Error(error.message);
       }
     },
+  },
+
+  /**
+   * @deprecated
+   */
+  async basicLogin({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }): Promise<{ accessToken: string }> {
+    try {
+      const result = await apiClient.post<ApiResponse<{ accessToken: string }>>(
+        `/oauth/basic/login`,
+        { email, password },
+        { baseUrl: 'bottle-api/v2' },
+      );
+
+      return result.data;
+    } catch (e) {
+      if (e instanceof ApiError) {
+        console.error(
+          `Login failed: ${e.message} (Status: ${e.response.status})`,
+        );
+      }
+
+      throw e;
+    }
+  },
+
+  /**
+   * @deprecated
+   */
+  async basicSignup({
+    email,
+    password,
+    age,
+    gender,
+  }: {
+    email: string;
+    password: string;
+    age: number;
+    gender: 'MALE' | 'FEMALE' | null;
+  }): Promise<BasicSignupRes> {
+    try {
+      const response = await apiClient.post<{ data: BasicSignupRes }>(
+        `/oauth/basic/signup`,
+        {
+          email,
+          password,
+          age,
+          gender,
+        },
+      );
+
+      return response.data;
+    } catch (e) {
+      const error = e as Error;
+      console.error(error.message);
+
+      throw new Error(error.message);
+    }
   },
 };

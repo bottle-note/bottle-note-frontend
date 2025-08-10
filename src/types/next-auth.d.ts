@@ -10,6 +10,8 @@ declare module 'next-auth' {
     roles?: string;
     authorizationCode?: string;
     socialUniqueId?: string;
+    idToken?: string;
+    nonce?: string;
   }
 
   interface Session {

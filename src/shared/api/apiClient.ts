@@ -33,7 +33,6 @@ class ApiClient {
     } = options;
 
     const headers = new Headers(fetchOptions.headers);
-    // 요청 전에 항상 최신 세션을 가져옵니다.
     const session = await getSession();
 
     if (useAuth) {
