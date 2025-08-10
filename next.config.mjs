@@ -2,7 +2,6 @@
 
 const BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 const BASE_URL_V2 = process.env.NEXT_PUBLIC_SERVER_URL_V2;
-const WHITE_LIST = ['*'];
 
 const nextConfig = {
   output: 'standalone',
@@ -10,7 +9,7 @@ const nextConfig = {
   experimental: {
     missingSuspenseWithCSRBailout: false,
     // 심볼릭 링크 비활성화
-    outputFileTracingIgnores: ['**/*'],
+    outputFileTracingExcludes: ['**/*'],
   },
   async rewrites() {
     return [
@@ -71,7 +70,6 @@ const nextConfig = {
       },
     ],
   },
-  domains: WHITE_LIST,
 };
 
 export default nextConfig;
