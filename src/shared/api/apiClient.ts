@@ -5,7 +5,7 @@ import { ApiError } from '@/utils/ApiError';
 
 interface ApiClientOptions extends RequestInit {
   useAuth?: boolean; // 인증 토큰 사용 여부 (기본: true)
-  baseUrl?: 'bottle-api' | 'api'; // API 기본 경로 (기본: 'bottle-api')
+  baseUrl?: 'bottle-api' | 'api' | 'bottle-api/v2'; // API 기본 경로 (기본: 'bottle-api')
   cache?: RequestCache; // 캐시 정책 (기본: 'no-store')
 }
 
@@ -51,7 +51,12 @@ class ApiClient {
       headers.set('Content-Type', 'application/json');
     }
 
-    const requestUrl = `/${baseUrl}${endpoint}`;
+    const version = baseUrl === 'bottle-api/v2' ? '/v2' : '/v1';
+    const finalBaseUrl = baseUrl.startsWith('bottle-api')
+      ? 'bottle-api'
+      : baseUrl;
+
+    const requestUrl = `/${finalBaseUrl}${version}${endpoint}`;
 
     const requestOptions: RequestInit = {
       ...this.defaultOptions,

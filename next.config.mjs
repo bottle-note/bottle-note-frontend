@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 
 const BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+const BASE_URL_V2 = process.env.NEXT_PUBLIC_SERVER_URL_V2;
 const WHITE_LIST = ['*'];
 
 const nextConfig = {
@@ -13,7 +14,9 @@ const nextConfig = {
   },
   async rewrites() {
     return [
-      { source: '/bottle-api/:path*', destination: BASE_URL + '/:path*' },
+      { source: '/bottle-api/v1/:path*', destination: `${BASE_URL}/:path*` },
+      { source: '/bottle-api/v2/:path*', destination: `${BASE_URL_V2}/:path*` },
+      { source: '/bottle-api/:path*', destination: `${BASE_URL}/:path*` },
     ];
   },
   images: {
