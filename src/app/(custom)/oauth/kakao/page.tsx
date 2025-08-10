@@ -14,7 +14,7 @@ export default function OauthKakaoCallbackPage() {
 
   const loginHandler = async (code: string | string[]) => {
     try {
-      login(
+      await login(
         'kakao-login',
         {
           authorizationCode: code,
