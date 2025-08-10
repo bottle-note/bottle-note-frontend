@@ -1,9 +1,9 @@
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { AuthApi } from '@/app/api/AuthApi';
 import { sendLogToFlutter } from '@/utils/flutterUtil';
 import useModalStore from '@/store/modalStore';
 import { SOCIAL_TYPE } from '@/types/Auth';
-import { signIn } from 'next-auth/react';
 import { useAuth } from './auth/useAuth';
 
 export const useAppSocialLogin = () => {

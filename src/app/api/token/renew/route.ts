@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
-import { AuthApi } from '@/app/api/AuthApi';
+import { getToken, encode } from 'next-auth/jwt';
 import { decodeJwt } from 'jose';
+import { AuthApi } from '@/app/api/AuthApi';
 import { UserData } from '@/types/Auth';
-import { encode } from 'next-auth/jwt';
 
 const secret = process.env.NEXTAUTH_SECRET;
 const isProduction = process.env.NODE_ENV === 'production';

@@ -6,16 +6,14 @@ import React, {
   Children,
   ReactElement,
   isValidElement,
-  useState,
-  useEffect,
 } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ROUTES } from '@/constants/routes';
 import SidebarHeader from '@/app/(primary)/_components/SidebarHeader';
 
-import Logo from 'public/bottle_note_Icon_logo.svg';
 import { useAuth } from '@/hooks/auth/useAuth';
+import Logo from 'public/bottle_note_Icon_logo.svg';
 
 interface HeaderLeftProps {
   children?: ReactNode;

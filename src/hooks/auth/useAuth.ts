@@ -1,7 +1,7 @@
 'use client';
 
-import { useSession, signOut, signIn } from 'next-auth/react';
 import { useMemo } from 'react';
+import { useSession, signOut, signIn } from 'next-auth/react';
 import { UserData } from '@/types/Auth';
 
 export const useAuth = () => {

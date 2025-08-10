@@ -10,9 +10,9 @@ import { DeviceService } from '@/lib/DeviceService';
 import Modal from '@/components/Modal';
 import { useLogin } from '@/hooks/useLogin';
 import { ROUTES } from '@/constants/routes';
+import { useAuth } from '@/hooks/auth/useAuth';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
-import { useAuth } from '@/hooks/auth/useAuth';
 
 export default function Login() {
   const router = useRouter();

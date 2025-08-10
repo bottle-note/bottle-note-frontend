@@ -10,12 +10,12 @@ import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { UserApi } from '@/app/api/UserApi';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
+import { useAuth } from '@/hooks/auth/useAuth';
 import Logo from 'public/bottle_note_Icon_logo.svg';
 import LogoWhite from 'public/bottle_note_Icon_logo_white.svg';
 import Menu from 'public/icon/menu-subcoral.svg';
 import MenuWhite from 'public/icon/menu-white.svg';
 import SidebarDeco from 'public/sidebar-deco.png';
-import { useAuth } from '@/hooks/auth/useAuth';
 
 const Header = ({
   handleOpen,

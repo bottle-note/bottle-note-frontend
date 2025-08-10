@@ -1,7 +1,7 @@
+import { getSession, signOut } from 'next-auth/react';
 import { AuthApi } from '@/app/api/AuthApi';
 import useModalStore from '@/store/modalStore';
 import { ApiError } from '@/utils/ApiError';
-import { getSession, signOut } from 'next-auth/react';
 
 interface ApiClientOptions extends RequestInit {
   useAuth?: boolean; // 인증 토큰 사용 여부 (기본: true)
