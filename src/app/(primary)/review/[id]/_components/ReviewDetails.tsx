@@ -74,7 +74,9 @@ function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
   return (
     <>
       <section className="pt-[38px]">
-        <ReviewUserHeader data={data} onRefresh={onRefresh} />
+        <div className="mb-[22px]">
+          <ReviewUserHeader data={data} onRefresh={onRefresh} />
+        </div>
         <section className="mx-5 pb-5 border-b border-mainGray/30">
           {productImages?.length > 0 && (
             <div className="mb-[22px]">
@@ -82,14 +84,14 @@ function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
             </div>
           )}
           <div
-            className="text-12 text-mainDarkGray whitespace-pre-line"
+            className="text-15 text-mainDarkGray whitespace-pre-line"
             dangerouslySetInnerHTML={{
               __html: data.reviewInfo?.reviewContent?.replace(/\n/g, '<br />'),
             }}
           />
-          <article className="flex justify-between mt-[10px]">
+          <article className="flex items-center justify-between mt-[10px]">
             {data.reviewInfo?.createAt && (
-              <p className="text-mainGray text-10">
+              <p className="text-mainGray text-13">
                 {formatDate(data.reviewInfo.createAt) as string}
               </p>
             )}
@@ -99,8 +101,8 @@ function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
             >
               <Image
                 src="/icon/ellipsis-darkgray.svg"
-                width={14}
-                height={14}
+                width={17.62}
+                height={17.62}
                 alt="report"
               />
             </button>

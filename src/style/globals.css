@@ -159,10 +159,6 @@
     @apply text-subCoral border-subCoral border-b;
   }
 
-  .line-border {
-    @apply border-t border-mainGray/30 my-3;
-  }
-
   .modal-mainText {
     @apply text-20 text-subCoral font-medium whitespace-pre-wrap mb-2;
   }

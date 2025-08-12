@@ -34,17 +34,17 @@ export default function PriceForm() {
       title="가격"
       subTitle="(선택)"
     >
-      <div className="w-full pl-7 space-y-3">
+      <div className="w-full pl-7 space-y-4 pt-[13px]">
         <div className="flex items-center space-x-3">
           {options.map((option) => (
             <label
               key={option.value}
               htmlFor={option.value}
-              className="flex items-center text-mainDarkGray text-10"
+              className="flex items-center text-mainDarkGray text-14"
             >
               <input
                 type="radio"
-                className="mr-1"
+                className="h-5 w-5 accent-subCoral mr-1"
                 id={option.value}
                 value={option.value}
                 {...register('price_type')}
@@ -56,26 +56,21 @@ export default function PriceForm() {
         </div>
         {watch('price_type') && (
           <div className="flex items-center justify-between">
-            <div className="h-5 w-60 border-b border-subCoral flex items-center">
-              <p className="text-subCoral text-10 font-semibold w-8">
+            <div className="h-7 w-60 border-b border-subCoral flex items-center">
+              <p className="text-subCoral text-15 w-10">
                 {getPriceTypeLabel(watch('price_type'))}
               </p>
               <input
                 type="number"
                 placeholder="얼마에 마셨는지 기록해보세요!"
-                className="text-10 font-[#BFBFBF] w-full text-mainDarkGray text-right"
+                className="text-15 w-full text-mainBlack text-right"
                 maxLength={10}
                 {...register('price', {
                   setValueAs: (value) =>
                     value === '' || value === 0 ? null : value,
                 })}
-              />
-              <Image
-                src="/icon/won-subcoral.svg"
-                alt="wonIcon"
-                width={15}
-                height={15}
-              />
+              />{' '}
+              <p className="text-subCoral text-15">원</p>
             </div>
             <div
               className="flex items-center space-x-[2px]"
@@ -86,12 +81,12 @@ export default function PriceForm() {
                 }
               }}
             >
-              <p className="text-12 text-mainGray">초기화</p>
+              <p className="text-14 text-mainGray">초기화</p>
               <Image
                 src="/icon/reset-mainGray.svg"
                 alt="resetIcon"
-                width={13}
-                height={13}
+                width={16}
+                height={16}
               />
             </div>
           </div>

@@ -51,7 +51,7 @@ export default function TagsForm() {
   };
 
   const ExtraButtons = (
-    <div className="flex gap-1 text-12 text-mainDarkGray">
+    <div className="flex gap-1 text-13 text-mainDarkGray">
       <HoverTouchBox
         id="flavor-tooltip"
         tooltipContent={
@@ -94,10 +94,10 @@ export default function TagsForm() {
         }}
       >
         <article className=" ml-7">
-          <div className="h-9 flex items-center border-b border-subCoral">
+          <div className="h-11 flex items-center border-b border-subCoral">
             <input
               type="text"
-              className="text-13 text-mainDarkGray w-full"
+              className="text-15 text-mainDarkGray w-full"
               placeholder="예) 반건조 된 건자두"
               value={tagValue}
               maxLength={12}
@@ -106,7 +106,7 @@ export default function TagsForm() {
               }}
             />
             <button
-              className={`text-13 px-2 py-1 rounded-md border w-24 ${watchTags?.length !== 10 ? 'border-subCoral text-subCoral' : 'border-[#BFBFBF] text-[#BFBFBF]'}`}
+              className={`text-15 px-2 py-1 rounded-md border w-24 ${watchTags?.length < 10 ? 'border-subCoral text-white bg-subCoral' : 'border-brightGray text-bgGray'}`}
               disabled={watchTags?.length === 10}
               onClick={handleAddTag}
             >

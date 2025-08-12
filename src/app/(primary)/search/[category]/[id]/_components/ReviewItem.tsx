@@ -5,21 +5,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Review as ReviewType } from '@/types/Review';
-import Label from '@/app/(primary)/_components/Label';
-import { truncStr } from '@/utils/truncStr';
-import Star from '@/components/Star';
+import ReviewUserInfo from '@/app/(primary)/search/[category]/[id]/_components/ReviewUserInfo';
 import { numberWithCommas } from '@/utils/formatNum';
-import { formatDate } from '@/utils/formatDate';
-import VisibilityToggle from '@/app/(primary)/_components/VisibilityToggle';
-import LikeBtn from '@/app/(primary)/_components/LikeBtn';
-import ReplyButton from '@/app/(primary)/_components/ReplyButton';
+import { truncStr } from '@/utils/truncStr';
+import ReviewActions from '@/app/(primary)/search/[category]/[id]/_components/ReviewActions';
 import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 import { deleteReview } from '@/lib/Review';
 import { AuthService } from '@/lib/AuthService';
 import { ROUTES } from '@/constants/routes';
-
-const DEFAULT_USER_IMAGE = '/profile-default.svg';
 
 interface Props {
   data: ReviewType;
@@ -82,151 +76,94 @@ function ReviewItem({ data, onRefresh }: Props) {
 
   return (
     <>
-      <div className="border-b border-mainGray/30 py-[15px]">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center  space-x-2">
-            <Link href={ROUTES.USER.BASE(data.userInfo.userId)}>
-              <div className="flex items-center space-x-1">
-                <div className="w-[22px] h-[22px] rounded-full overflow-hidden">
-                  <Image
-                    className="object-cover"
-                    src={data.userInfo.userProfileImage || DEFAULT_USER_IMAGE}
-                    alt="user_img"
-                    width={22}
-                    height={22}
-                  />
-                </div>
-                <p className="text-mainGray text-12">
-                  {truncStr(data.userInfo.nickName, 12)}
-                </p>
-              </div>
-            </Link>
-            <div className="flex items-center space-x-1">
-              {data.isBestReview && (
-                <Label
-                  name="베스트"
-                  icon="/icon/thumbup-filled-white.svg"
-                  styleClass="bg-mainCoral text-white px-2 py-[0.1rem] text-10 border-mainCoral rounded"
-                />
-              )}
-              {data.isMyReview && (
-                <Label
-                  name="나의 코멘트"
-                  icon="/icon/user-outlined-subcoral.svg"
-                  iconHeight={10}
-                  styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-10 rounded"
-                />
-              )}
-            </div>
-          </div>
-          {data.rating !== undefined && data.rating !== null && (
-            <Star
-              rating={data.rating}
-              size={22}
-              textStyle="text-subCoral font-semibold text-20 min-w-5"
-            />
-          )}
-        </div>
-        <div className="flex items-center space-x-1 mt-[10px] text-14">
+      <div className="border-b border-mainGray/30 py-[35px] space-y-[10px]">
+        <ReviewUserInfo
+          userInfo={data.userInfo}
+          rating={data.rating}
+          isBestReview={data.isBestReview}
+          isMyReview={data.isMyReview}
+          userImageSize={22}
+          userNameSize="text-12"
+          starSize={22}
+          starTextStyle="text-subCoral font-semibold text-20 min-w-5"
+        />
+        <div className="flex items-center space-x-1 text-13">
           <Image
             src={
               data.sizeType === 'BOTTLE'
                 ? '/bottle.svg'
                 : '/icon/glass-filled-subcoral.svg'
             }
-            width={17}
-            height={17}
+            width={23}
+            height={23}
             alt={data.sizeType === 'BOTTLE' ? 'Bottle Price' : 'Glass Price'}
           />
           <p className="text-mainGray font-bold">
             {data.sizeType === 'BOTTLE' ? '병 가격 ' : '잔 가격'}
           </p>
           <p className="text-mainGray font-normal">
-            {data.price ? `${numberWithCommas(data.price)} ₩` : '-'}
+            {data.price ? `${numberWithCommas(data.price)}₩` : '-'}
           </p>
         </div>
-        <Link
-          href={ROUTES.REVIEW.DETAIL(data.reviewId)}
-          style={{
-            touchAction: 'manipulation',
-            WebkitTapHighlightColor: 'transparent',
-          }}
-          prefetch={false}
-        >
-          <div className="grid grid-cols-5 space-x-2 mt-[6px]">
-            <p className="col-span-4 text-mainDarkGray text-13">
-              {truncStr(data.reviewContent, 135)}
-              {data.reviewContent.length > 135 && (
-                <span className="text-mainGray">더보기</span>
-              )}
-            </p>
-            {data.reviewImageUrl && (
-              <div className="flex justify-end items-center">
-                <Image
-                  className="w-[3.8rem] h-[3.8rem]"
-                  src={data.reviewImageUrl}
-                  alt="content_img"
-                  width={60}
-                  height={60}
-                />
+        <div>
+          <Link
+            href={ROUTES.REVIEW.DETAIL(data.reviewId)}
+            style={{
+              touchAction: 'manipulation',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+            prefetch={false}
+          >
+            <div className="flex space-x-2">
+              <div className="flex-1 min-w-0">
+                <p className="text-mainDarkGray text-13.5">
+                  {truncStr(data.reviewContent, 135)}
+                  {data.reviewContent.length > 135 && (
+                    <span className="text-mainGray">더보기</span>
+                  )}
+                </p>
               </div>
-            )}
-          </div>
-        </Link>
-        <div className="flex justify-between text-12 text-mainGray mt-[10px]">
-          <div className="flex space-x-3">
-            <div className="flex items-center space-x-[2px]">
-              <LikeBtn
-                reviewId={data.reviewId}
-                isLiked={isLiked}
-                handleUpdateLiked={() => {
-                  setIsLiked((prev) => !prev);
-                  setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
-                }}
-                onApiError={() => {
-                  setIsLiked(isLikedByMe);
-                  setLikeCount(data.likeCount);
-                }}
-                handleNotLogin={handleLoginModal}
-                size={15}
-              />
-              <p>{likeCount}</p>
+              {data.reviewImageUrl && (
+                <div className="flex-shrink-0">
+                  <Image
+                    className="w-[68px] h-[68px] object-cover"
+                    src={data.reviewImageUrl}
+                    alt="content_img"
+                    width={68}
+                    height={68}
+                  />
+                </div>
+              )}
             </div>
-            <ReplyButton
-              reviewId={data.reviewId}
-              replyCount={data.replyCount}
-              hasReplyByMe={data.hasReplyByMe}
-              size={15}
-              textSize="text-12"
-            />
-            {data.userInfo.userId === userData?.userId && (
-              <VisibilityToggle
-                initialStatus={currentStatus}
-                reviewId={data.reviewId}
-                handleNotLogin={handleLoginModal}
-                onSuccess={onRefresh}
-                textSize="text-12"
-              />
-            )}
-          </div>
-          <div className="flex items-center">
-            <p className="text-12">{formatDate(data.createAt) as string}</p>
-            <button
-              className="cursor-pointer"
-              onClick={() => {
-                if (isLogin) setIsOptionShow(true);
-                else handleLoginModal();
-              }}
-            >
-              <Image
-                src="/icon/ellipsis-darkgray.svg"
-                width={14}
-                height={14}
-                alt="report"
-              />
-            </button>
-          </div>
+          </Link>
         </div>
+        <ReviewActions
+          reviewId={data.reviewId}
+          isLiked={isLiked}
+          likeCount={likeCount}
+          replyCount={data.replyCount}
+          hasReplyByMe={data.hasReplyByMe}
+          createAt={data.createAt}
+          isOwner={data.userInfo.userId === userData?.userId}
+          showVisibilityToggle={true}
+          visibilityStatus={currentStatus}
+          onLikeUpdate={() => {
+            setIsLiked((prev) => !prev);
+            setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+          }}
+          onLikeError={() => {
+            setIsLiked(isLikedByMe);
+            setLikeCount(data.likeCount);
+          }}
+          onRefresh={onRefresh}
+          onOptionClick={() => {
+            if (isLogin) setIsOptionShow(true);
+            else handleLoginModal();
+          }}
+          handleNotLogin={handleLoginModal}
+          textSize="text-13"
+          iconSize={15.6}
+        />
       </div>
       {isOptionShow && (
         <OptionDropdown
