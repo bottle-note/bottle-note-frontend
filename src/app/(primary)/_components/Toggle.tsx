@@ -6,6 +6,7 @@ interface Props {
   isActive: boolean;
   onToggle: () => void;
   disabled?: boolean;
+  textSize?: string;
 }
 
 const Toggle = ({
@@ -16,6 +17,7 @@ const Toggle = ({
   isActive,
   onToggle,
   disabled = false,
+  textSize = 'text-10',
 }: Props) => {
   return (
     <div className="flex items-center space-x-[3px]">
@@ -33,7 +35,9 @@ const Toggle = ({
           }`}
         />
       </button>
-      <p className="text-10 text-mainGray">{isActive ? onName : offName}</p>
+      <p className={`${textSize} text-mainGray`}>
+        {isActive ? onName : offName}
+      </p>
     </div>
   );
 };

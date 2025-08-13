@@ -1,5 +1,5 @@
 import { ApiResponse, ListQueryParams } from '@/types/common';
-import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { apiClient } from '@/shared/api/apiClient';
 import {
   InquirePostApi,
   InquireQueryParams,
@@ -9,40 +9,27 @@ import {
 
 export const InquireApi = {
   async getInquireList({ cursor, pageSize }: ListQueryParams) {
-    const response = await fetchWithAuth(
-      `/bottle-api/help?cursor=${cursor}&pageSize=${pageSize}`,
+    const response = await apiClient.get<ApiResponse<InquireListApi>>(
+      `/help?cursor=${cursor}&pageSize=${pageSize}`,
     );
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
 
-    const result: ApiResponse<InquireListApi> = await response;
-    return result;
+    return response;
   },
 
   async registerInquire(params: InquireQueryParams) {
-    const response = await fetchWithAuth(`/bottle-api/help`, {
-      method: 'POST',
-      body: JSON.stringify(params),
-    });
+    const response = await apiClient.post<ApiResponse<InquirePostApi>>(
+      `/help`,
+      params,
+    );
 
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
-
-    const result: ApiResponse<InquirePostApi> = await response;
-    return result.data;
+    return response.data;
   },
 
   async getInquireDetails(helpId: string | string[]) {
-    const response = await fetchWithAuth(`/bottle-api/help/${helpId}`);
+    const response = await apiClient.get<ApiResponse<InquireDetailsApi>>(
+      `/help/${helpId}`,
+    );
 
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
-
-    const result: ApiResponse<InquireDetailsApi> = await response;
-
-    return result.data;
+    return response.data;
   },
 };

@@ -40,7 +40,7 @@ type WebViewMessageType = {
   };
   loginWithApple: {
     message: 'loginWithApple';
-    args?: never;
+    args?: { nonce: string };
   };
   switchEnv: {
     message: 'switchEnv';

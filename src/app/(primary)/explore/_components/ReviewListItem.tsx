@@ -7,28 +7,17 @@ import { UserInfoDisplay } from '@/components/UserInfoDisplay';
 import Star from '@/components/Star';
 import useModalStore from '@/store/modalStore';
 import { formatDate } from '@/utils/formatDate';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import OptionDropdown from '@/components/OptionDropdown';
 import { deleteReview } from '@/lib/Review';
 import { ROUTES } from '@/constants/routes';
-import { ProductImage, ReviewImageCarousel } from './ReviewImageCarousel';
+import {
+  ReviewImageCarousel,
+  convertImageUrlsToProductImageArray,
+} from '@/app/(primary)/_components/ReviewImageCarousel';
+import ReplyButton from '@/app/(primary)/_components/ReplyButton';
 import LikeBtn from '../../_components/LikeBtn';
 import Label from '../../_components/Label';
-
-const convertImageUrlsToProductImageArray = (
-  imageUrls: string[] | undefined | null,
-  altTextPrefix: string = 'Image',
-): ProductImage[] => {
-  if (!imageUrls || imageUrls.length === 0) {
-    return [];
-  }
-
-  return imageUrls.map((url, index) => ({
-    id: url,
-    src: url,
-    alt: `${altTextPrefix} ${index + 1}`,
-  }));
-};
 
 interface Props {
   content: ExploreReview;
@@ -37,7 +26,7 @@ interface Props {
 const ReviewListItem = ({ content }: Props) => {
   const router = useRouter();
   const { handleLoginModal, handleModalState } = useModalStore();
-  const { isLogin, userData } = AuthService;
+  const { isLoggedIn, user: userData } = useAuth();
   const [isLiked, setIsLiked] = useState(content.isLikedByMe);
   const [likeCount, setLikeCount] = useState(content.likeCount);
   const [isReportOptionShow, setIsReportOptionShow] = useState(false);
@@ -133,11 +122,16 @@ const ReviewListItem = ({ content }: Props) => {
         <Link href={ROUTES.REVIEW.DETAIL(content.reviewId)}>
           <div className="flex flex-col gap-[14px]">
             <ReviewImageCarousel images={productImages} />
-            <p className="text-12 text-mainDarkGray">{content.reviewContent}</p>
+            <div
+              className="text-15 text-mainDarkGray whitespace-pre-line"
+              dangerouslySetInnerHTML={{
+                __html: content.reviewContent.replace(/\n/g, '<br />'),
+              }}
+            />
             <div className="flex flex-wrap gap-[6px]">
               {content.reviewTags.map((tag) => (
                 <div key={tag} className="overflow-hidden flex-shrink-0">
-                  <Label name={tag} styleClass="label-default text-11" />
+                  <Label name={tag} styleClass="label-default text-13" />
                 </div>
               ))}
             </div>
@@ -160,39 +154,33 @@ const ReviewListItem = ({ content }: Props) => {
                   setIsLiked(content.isLikedByMe);
                 }}
                 handleNotLogin={handleLoginModal}
-                size={12}
+                size={17}
               />
-              <p className="text-12 text-mainGray">{likeCount}</p>
+              <p className="text-13 text-mainGray">{likeCount}</p>
             </div>
-            <div className="flex items-center space-x-[2px]">
-              <Image
-                src={
-                  content.hasReplyByMe
-                    ? '/icon/comment-filled-subcoral.svg'
-                    : '/icon/comment-outlined-gray.svg'
-                }
-                width={12}
-                height={12}
-                alt="comment"
-              />
-              <p className="text-12 text-mainGray">{content.replyCount}</p>
-            </div>
+            <ReplyButton
+              reviewId={content.reviewId}
+              replyCount={content.replyCount}
+              hasReplyByMe={content.hasReplyByMe}
+              size={17}
+              textSize="text-13"
+            />
           </div>
           <div className="flex items-center space-x-1">
-            <p className="text-12 text-mainGray">
+            <p className="text-13 text-mainGray">
               {formatDate(content.createAt) as string}
             </p>
             <button
               className="cursor-pointer"
               onClick={() => {
-                if (isLogin) setIsReportOptionShow(true);
+                if (isLoggedIn) setIsReportOptionShow(true);
                 else handleLoginModal();
               }}
             >
               <Image
                 src="/icon/ellipsis-darkgray.svg"
-                width={10}
-                height={10}
+                width={17}
+                height={17}
                 alt="report"
               />
             </button>

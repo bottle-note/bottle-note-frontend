@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import useModalStore from '@/store/modalStore';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import Toggle from './Toggle';
 
 interface Props {
@@ -9,6 +9,7 @@ interface Props {
   reviewId: string | number;
   handleNotLogin: () => void;
   onSuccess: () => void;
+  textSize?: string;
 }
 
 const VisibilityToggle = ({
@@ -16,13 +17,14 @@ const VisibilityToggle = ({
   initialStatus,
   handleNotLogin,
   onSuccess,
+  textSize,
 }: Props) => {
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const { handleModalState } = useModalStore();
   const [isActive, setIsActive] = useState(initialStatus);
 
   const handleToggle = async () => {
-    if (!isLogin) {
+    if (!isLoggedIn) {
       handleNotLogin();
     } else {
       try {
@@ -59,7 +61,9 @@ const VisibilityToggle = ({
     setIsActive(initialStatus);
   }, [initialStatus]);
 
-  return <Toggle isActive={isActive} onToggle={handleToggle} />;
+  return (
+    <Toggle isActive={isActive} onToggle={handleToggle} textSize={textSize} />
+  );
 };
 
 export default VisibilityToggle;

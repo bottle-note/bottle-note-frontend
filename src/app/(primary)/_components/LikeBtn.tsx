@@ -4,7 +4,7 @@ import { useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import useModalStore from '@/store/modalStore';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import useDebounceAction from '@/hooks/useDebounceAction';
 import { DEBOUNCE_DELAY } from '@/constants/common';
 
@@ -33,7 +33,7 @@ const LikeBtn = ({
   likeIconColor = 'subcoral',
   size = 18,
 }: Props) => {
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const { handleModalState } = useModalStore();
   const { debounce } = useDebounceAction(DEBOUNCE_DELAY);
 
@@ -47,7 +47,7 @@ const LikeBtn = ({
   }, [isLiked]);
 
   const handleClick = async () => {
-    if (!isLogin) {
+    if (!isLoggedIn) {
       handleNotLogin();
       return;
     }

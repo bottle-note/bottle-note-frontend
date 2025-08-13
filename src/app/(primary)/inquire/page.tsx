@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { Button } from '@/components/Button';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
 import List from '@/components/List/List';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
@@ -20,7 +20,7 @@ export default function Inquire() {
   const paramsType =
     (searchParams.get('type') as keyof typeof INQUIRE_TYPE) || 'service';
   const serviceType = INQUIRE_TYPE[paramsType] || paramsType;
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const { handleLoginModal } = useModalStore();
 
   const {
@@ -89,7 +89,7 @@ export default function Inquire() {
         <section className="px-5 fixed bottom-2 left-0 right-0">
           <Button
             onClick={() => {
-              if (!isLogin) {
+              if (!isLoggedIn) {
                 handleLoginModal();
                 return;
               }

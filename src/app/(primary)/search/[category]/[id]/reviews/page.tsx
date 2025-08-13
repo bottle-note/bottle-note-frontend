@@ -7,14 +7,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { Review as ReviewType } from '@/types/Review';
-import Review from '@/app/(primary)/search/[category]/[id]/_components/Review';
+import Review from '@/app/(primary)/search/[category]/[id]/_components/ReviewItem';
 import { Button } from '@/components/Button';
 import List from '@/components/List/List';
 import { SORT_TYPE, SORT_ORDER } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
 import useModalStore from '@/store/modalStore';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import Modal from '@/components/Modal';
 import { ROUTES } from '@/constants/routes';
 import ReviewItemSkeleton from '@/components/Skeletons/ReviewItemSkeleton';
@@ -35,7 +35,7 @@ function Reviews() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const alcoholId = params?.id as string;
   const alcoholKorName = searchParams.get('name');
   const { handleLoginModal } = useModalStore();
@@ -236,7 +236,7 @@ function Reviews() {
       <section className="px-5 fixed bottom-6 left-0 right-0">
         <Button
           onClick={() => {
-            if (!isLogin || !alcoholId) {
+            if (!isLoggedIn || !alcoholId) {
               handleLoginModal();
               return;
             }

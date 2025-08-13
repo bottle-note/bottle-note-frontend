@@ -1,6 +1,6 @@
 import { ApiResponse } from '@/types/common';
 import { UserInfoApi, CurrentUserInfoApi } from '@/types/User';
-import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { apiClient } from '@/shared/api/apiClient';
 
 export const UserApi = {
   async changeNickname(nickName: string): Promise<
@@ -11,89 +11,77 @@ export const UserApi = {
       changedNickname: string;
     }>
   > {
-    const response = await fetchWithAuth(`/bottle-api/users/nickname`, {
-      method: 'PATCH',
-      body: JSON.stringify({
-        nickName,
-      }),
-    });
+    const response = await apiClient.patch<
+      ApiResponse<{
+        message: string;
+        userId: number;
+        beforeNickname: string;
+        changedNickname: string;
+      }>
+    >('/users/nickname', { nickName });
 
     return response;
   },
 
   async getUserInfo({ userId }: { userId: string }): Promise<UserInfoApi> {
-    const response = await fetch(`/bottle-api/my-page/${userId}`, {
-      cache: 'force-cache',
-    });
+    const response = await apiClient.get<{ data: UserInfoApi }>(
+      `/my-page/${userId}`,
+      {
+        useAuth: false,
+        cache: 'force-cache',
+      },
+    );
 
-    const { data } = await response.json();
-
-    return data;
+    return response.data;
   },
 
   async changeProfileImage(profileImageSrc: string | null) {
-    const response = await fetchWithAuth(`/bottle-api/users/profile-image`, {
-      method: 'PATCH',
-      body: JSON.stringify({
-        viewUrl: profileImageSrc,
-      }),
+    const response = await apiClient.patch<
+      ApiResponse<{
+        userId: string;
+        profileImageUrl: string | null;
+        callback: string;
+      }>
+    >('/users/profile-image', {
+      viewUrl: profileImageSrc,
     });
 
-    const {
-      data,
-    }: ApiResponse<{
-      userId: string;
-      profileImageUrl: string | null;
-      callback: string;
-    }> = response;
-
-    return data;
+    return response.data;
   },
 
   async sendDeviceInfo(deviceToken: string, platform: string) {
-    const response = await fetchWithAuth(`/bottle-api/push/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        deviceToken,
-        platform,
-      }),
+    const response = await apiClient.post<
+      ApiResponse<{
+        deviceToken: string;
+        platform: string;
+        message: string;
+      }>
+    >('/push/token', {
+      deviceToken,
+      platform,
     });
 
-    const result: ApiResponse<{
-      deviceToken: string;
-      platform: string;
-      message: string;
-    }> = await response;
-
-    return result;
+    return response;
   },
 
   async deleteAccount() {
-    const response = await fetchWithAuth(`/bottle-api/users`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await apiClient.delete<
+      ApiResponse<{
+        codeMessage: string;
+        message: string;
+        userId: number;
+        responseAt: string;
+      }>
+    >('/users');
 
-    const result: ApiResponse<{
-      codeMessage: string;
-      message: string;
-      userId: number;
-      responseAt: string;
-    }> = await response;
-
-    return result;
+    return response;
   },
 
   async getCurUserInfo(): Promise<CurrentUserInfoApi> {
-    const response = await fetchWithAuth(`/bottle-api/users/current`);
+    const response = await apiClient.get<{ data: CurrentUserInfoApi }>(
+      '/users/current',
+    );
 
-    const result = await response.data;
-
-    return result;
+    return response.data;
   },
 };

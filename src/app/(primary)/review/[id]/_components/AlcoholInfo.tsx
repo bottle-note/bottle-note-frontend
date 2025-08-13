@@ -8,7 +8,7 @@ import Label from '@/app/(primary)/_components/Label';
 import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
 import { truncStr } from '@/utils/truncStr';
 import type { AlcoholInfo as AlcoholType } from '@/types/Review';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
 
 interface Props {
@@ -18,12 +18,12 @@ interface Props {
 
 function AlcoholInfo({ data, handleLogin }: Props) {
   const router = useRouter();
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const { isPicked: originalIsPicked } = data;
   const [isPicked, setIsPicked] = useState<boolean>(originalIsPicked);
 
   const handleLoginConfirm = () => {
-    if (!isLogin || !data.alcoholId) {
+    if (!isLoggedIn || !data.alcoholId) {
       handleLogin();
       return;
     }
@@ -59,7 +59,7 @@ function AlcoholInfo({ data, handleLogin }: Props) {
             <div className="border-[0.5px] border-white" />
             <div className="flex space-x-3">
               <div
-                className="text-12 font-normal flex"
+                className="text-14 font-normal flex"
                 onClick={handleLoginConfirm}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -71,21 +71,21 @@ function AlcoholInfo({ data, handleLogin }: Props) {
                   className="mr-1"
                   src="/icon/edit-outlined-white.svg"
                   alt="write"
-                  width={16}
-                  height={16}
+                  width={19}
+                  height={19}
                 />
-                {/* 추후 user당 하루 리뷰 count 확인하는 API 연동 필요 */}
                 <button>리뷰 작성</button>
               </div>
               <div className="border-[0.5px] border-white my-[0.1rem]" />
               <PickBtn
-                size={16}
+                size={19}
                 isPicked={isPicked}
                 alcoholId={data.alcoholId}
                 handleUpdatePicked={() => setIsPicked((prev) => !prev)}
                 onApiError={() => setIsPicked(originalIsPicked)}
                 handleNotLogin={handleLogin}
                 pickBtnName="찜하기"
+                fontSize="text-14"
               />
             </div>
           </div>

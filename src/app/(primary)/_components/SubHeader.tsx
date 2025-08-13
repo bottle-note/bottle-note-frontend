@@ -9,10 +9,11 @@ import React, {
 } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { AuthService } from '@/lib/AuthService';
 import { ROUTES } from '@/constants/routes';
-import Menu from 'public/icon/menu-subcoral.svg';
+import SidebarHeader from '@/app/(primary)/_components/SidebarHeader';
+import { useAuth } from '@/hooks/auth/useAuth';
 import Logo from 'public/bottle_note_Icon_logo.svg';
+import Menu from 'public/icon/menu-subcoral.svg';
 
 interface HeaderLeftProps {
   children?: ReactNode;
@@ -79,7 +80,7 @@ const HeaderRight = ({
   onClick,
   showSideMenu = false,
 }: HeaderRightProps) => {
-  const { userData } = AuthService;
+  const { isLoggedIn } = useAuth();
 
   return (
     <div
@@ -92,11 +93,12 @@ const HeaderRight = ({
     >
       {children}
       <div className="pt-2">
-        {showSideMenu && userData ? (
+        {showSideMenu && isLoggedIn ? (
           <Link href={ROUTES.SETTINGS.BASE}>
             <Image src={Menu} alt="Settings" />
           </Link>
         ) : null}
+        {showSideMenu && isLoggedIn && <SidebarHeader />}
       </div>
     </div>
   );

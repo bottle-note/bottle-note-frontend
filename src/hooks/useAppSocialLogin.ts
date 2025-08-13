@@ -1,13 +1,12 @@
 import { useRouter } from 'next/navigation';
-import { AuthApi } from '@/app/api/AuthApi';
 import { sendLogToFlutter } from '@/utils/flutterUtil';
 import useModalStore from '@/store/modalStore';
-import { AuthService } from '@/lib/AuthService';
-import { SOCIAL_TYPE } from '@/types/Auth';
+import { useAuth } from './auth/useAuth';
 
 export const useAppSocialLogin = () => {
   const router = useRouter();
   const { handleModalState } = useModalStore();
+  const { login } = useAuth();
 
   const onKakaoLoginError = (error: string) => {
     handleModalState({
@@ -20,12 +19,9 @@ export const useAppSocialLogin = () => {
 
   const onKakaoLoginSuccess = async (email: string) => {
     try {
-      const loginResult = await AuthApi.clientLogin({
+      await login('kakao-login', {
         email,
-        socialType: SOCIAL_TYPE.KAKAO,
       });
-
-      AuthService.login(loginResult.info, loginResult.tokens);
 
       router.replace('/');
     } catch (e) {
@@ -44,18 +40,19 @@ export const useAppSocialLogin = () => {
 
   const onAppleLoginSuccess = async (data: string) => {
     try {
-      const { email, id } = JSON.parse(data) as {
-        email: string | null;
-        id: string;
+      const { idToken, nonce } = JSON.parse(data) as {
+        idToken: string;
+        nonce: string;
       };
 
-      const loginResult = await AuthApi.clientLogin({
-        email: email ?? '',
-        socialUniqueId: id,
-        socialType: SOCIAL_TYPE.APPLE,
-      });
-
-      AuthService.login(loginResult.info, loginResult.tokens);
+      await login(
+        'apple-login',
+        {
+          idToken,
+          nonce,
+        },
+        false,
+      );
 
       router.replace('/');
     } catch (e) {
