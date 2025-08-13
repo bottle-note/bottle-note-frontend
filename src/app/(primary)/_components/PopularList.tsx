@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import AlcoholCard from '@/app/(primary)/_components/AlcoholCard';
 import { usePopularList } from '@/hooks/usePopularList';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import {
   DescriptionSkeleton,
   LoadingStateSkeleton,
@@ -160,10 +160,10 @@ const CardListContainer = ({ children }: { children: React.ReactNode }) => {
 
 function PopularList({ type = 'week' }: Props) {
   const { popularList, isLoading } = usePopularList({ type });
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
 
   const renderContent = () => {
-    if (type === 'recent' && !isLogin) {
+    if (type === 'recent' && !isLoggedIn) {
       return <LoginRequired />;
     }
 

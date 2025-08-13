@@ -1,6 +1,6 @@
 import { ApiResponse, ListQueryParams } from '@/types/common';
 import { ExploreAlcohol, ExploreReview } from '@/types/Explore';
-import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { apiClient } from '@/shared/api/apiClient';
 
 export const ExploreApi = {
   async getReviews({
@@ -8,33 +8,27 @@ export const ExploreApi = {
     cursor,
     pageSize,
   }: ListQueryParams & { keywords: string[] }) {
-    const response = await fetchWithAuth(
-      `/bottle-api/reviews/explore/standard?keywords=${keywords.join('&')}&cursor=${cursor}&size=${pageSize}`,
-      { requireAuth: false },
+    const response = await apiClient.get<
+      ApiResponse<{ items: ExploreReview[] }>
+    >(
+      `/reviews/explore/standard?keywords=${keywords.join('&keywords=')}&cursor=${cursor}&size=${pageSize}`,
+      { useAuth: false },
     );
 
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
-
-    const result: ApiResponse<{ items: ExploreReview[] }> = await response;
-    return result;
+    return response;
   },
   async getAlcohols({
     keywords,
     cursor,
     pageSize,
   }: ListQueryParams & { keywords: string[] }) {
-    const response = await fetchWithAuth(
-      `/bottle-api/alcohols/explore/standard?keywords=${keywords.join('&')}&cursor=${cursor}&size=${pageSize}`,
-      { requireAuth: false },
+    const response = await apiClient.get<
+      ApiResponse<{ items: ExploreAlcohol[] }>
+    >(
+      `/alcohols/explore/standard?keywords=${keywords.join('&keywords=')}&cursor=${cursor}&size=${pageSize}`,
+      { useAuth: false },
     );
 
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
-
-    const result: ApiResponse<{ items: ExploreAlcohol[] }> = await response;
-    return result;
+    return response;
   },
 };

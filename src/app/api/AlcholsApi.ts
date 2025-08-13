@@ -4,14 +4,15 @@ import {
   RegionApi,
   CategoryApi,
   AlcoholDetails,
-  PickPutApi,
 } from '@/types/Alcohol';
-import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { apiClient } from '@/shared/api/apiClient';
 
 export const AlcoholsApi = {
   async getWeeklyPopular() {
-    const response = await fetchWithAuth(`/bottle-api/popular/week`, {
-      requireAuth: false,
+    const response = await apiClient.get<
+      ApiResponse<{ alcohols: AlcoholAPI[] }>
+    >(`/popular/week`, {
+      useAuth: false,
       cache: 'force-cache',
     });
 
@@ -19,9 +20,7 @@ export const AlcoholsApi = {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<{ alcohols: AlcoholAPI[] }> = await response;
-
-    const formattedData = result.data.alcohols.map((alcohol: AlcoholAPI) => {
+    const formattedData = response.data.alcohols.map((alcohol: AlcoholAPI) => {
       return {
         ...alcohol,
         path: `/search/${alcohol.engCategory}/${alcohol.alcoholId}`,
@@ -32,18 +31,19 @@ export const AlcoholsApi = {
   },
 
   async getSpringPopular() {
-    const response = await fetchWithAuth(`/bottle-api/popular/spring`, {
-      requireAuth: false,
-      cache: 'force-cache',
-    });
+    const response = await apiClient.get<ApiResponse<AlcoholAPI[]>>(
+      `/popular/spring`,
+      {
+        useAuth: false,
+        cache: 'force-cache',
+      },
+    );
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<AlcoholAPI[]> = await response;
-
-    const formattedData = result.data.map((data) => {
+    const formattedData = response.data.map((data) => {
       return {
         ...data,
         path: `/search/${data.engCategory}/${data.alcoholId}`,
@@ -54,18 +54,19 @@ export const AlcoholsApi = {
   },
 
   async getHistory() {
-    const response = await fetchWithAuth(`/bottle-api/history/view/alcohols`, {
-      requireAuth: false,
-      cache: 'force-cache',
-    });
+    const response = await apiClient.get<ApiResponse<{ items: AlcoholAPI[] }>>(
+      `/history/view/alcohols`,
+      {
+        useAuth: false,
+        cache: 'force-cache',
+      },
+    );
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<{ items: AlcoholAPI[] }> = await response;
-
-    const formattedData = result.data.items.map((data) => {
+    const formattedData = response.data.items.map((data) => {
       return {
         ...data,
         path: `/search/${data.engCategory}/${data.alcoholId}`,
@@ -76,14 +77,11 @@ export const AlcoholsApi = {
   },
 
   async getRegion() {
-    const response = await fetch(`/bottle-api/regions`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch data');
-    }
+    const response = await apiClient.get<ApiResponse<RegionApi[]>>(`/regions`, {
+      useAuth: false,
+    });
 
-    const result: ApiResponse<RegionApi[]> = await response.json();
-
-    const regions = result.data.map((region) => {
+    const regions = response.data.map((region) => {
       return {
         id: region.regionId,
         value: region.korName,
@@ -96,16 +94,15 @@ export const AlcoholsApi = {
   },
 
   async getCategory(type = 'WHISKY') {
-    const response = await fetch(
-      `/bottle-api/alcohols/categories?type=${type}`,
+    const response = await apiClient.get<ApiResponse<CategoryApi[]>>(
+      `/alcohols/categories?type=${type}`,
       {
+        useAuth: false,
         cache: 'force-cache',
       },
     );
 
-    const result: ApiResponse<CategoryApi[]> = await response.json();
-
-    const categories = result.data.map((category) => {
+    const categories = response.data.map((category) => {
       if (category.korCategory === '버번') {
         return { ...category, korCategory: '아메리칸(버번)' };
       }
@@ -130,14 +127,12 @@ export const AlcoholsApi = {
     cursor,
     pageSize,
   }: ListQueryParams) {
-    const response = await fetchWithAuth(
-      `/bottle-api/alcohols/search?keyword=${decodeURI(keyword ?? '')}&category=${category}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
+    const response = await apiClient.get<
+      ApiResponse<{ alcohols: any[]; totalCount: number }>
+    >(
+      `/alcohols/search?keyword=${decodeURI(keyword ?? '')}&category=${category}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
       {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        requireAuth: false,
+        useAuth: false,
       },
     );
 
@@ -145,17 +140,14 @@ export const AlcoholsApi = {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<{ alcohols: any[]; totalCount: number }> =
-      await response;
-
     const formattedResult: ApiResponse<{
       alcohols: AlcoholAPI[];
       totalCount: number;
     }> = {
-      ...result,
+      ...response,
       data: {
-        ...result.data,
-        alcohols: result.data.alcohols.map((item) => ({
+        ...response.data,
+        alcohols: response.data.alcohols.map((item) => ({
           ...item,
           engCategory: item.engCategoryName,
           korCategory: item.korCategoryName,
@@ -167,25 +159,24 @@ export const AlcoholsApi = {
   },
 
   async getAlcoholDetails(alcoholId: string) {
-    const response = await fetchWithAuth(`/bottle-api/alcohols/${alcoholId}`, {
-      requireAuth: false,
-    });
+    const response = await apiClient.get<ApiResponse<AlcoholDetails>>(
+      `/alcohols/${alcoholId}`,
+      {
+        useAuth: false,
+      },
+    );
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
 
-    const result: ApiResponse<AlcoholDetails> = await response;
-    return result.data;
+    return response.data;
   },
 
   async putPick(alcoholId: string | number, isPicked: boolean) {
-    const response = await fetchWithAuth(`/bottle-api/picks`, {
-      method: 'PUT',
-      body: JSON.stringify({
-        alcoholId,
-        isPicked: isPicked ? 'PICK' : 'UNPICK',
-      }),
+    const response = await apiClient.put<ApiResponse<any>>(`/picks`, {
+      alcoholId,
+      isPicked: isPicked ? 'PICK' : 'UNPICK',
     });
 
     if (response.errors.length !== 0) {

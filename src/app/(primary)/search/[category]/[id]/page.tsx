@@ -15,7 +15,7 @@ import EmptyView from '@/app/(primary)/_components/EmptyView';
 import Modal from '@/components/Modal';
 import { truncStr } from '@/utils/truncStr';
 // import { shareOrCopy } from '@/utils/shareOrCopy';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { UserApi } from '@/app/api/UserApi';
 import { RateApi } from '@/app/api/RateApi';
@@ -36,7 +36,7 @@ interface DetailItem {
 export default function SearchAlcohol() {
   const router = useRouter();
   const params = useParams();
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const { id: alcoholId } = params;
   const { state, handleModalState, handleLoginModal } = useModalStore();
   const { debounce } = useDebounceAction(DEBOUNCE_DELAY);
@@ -94,12 +94,12 @@ export default function SearchAlcohol() {
       const alcoholIdString = alcoholId.toString();
       fetchAlcoholDetails(alcoholIdString);
 
-      if (isLogin) {
+      if (isLoggedIn) {
         fetchUserRating(alcoholIdString);
         getCurrentUserInfo();
       }
     }
-  }, [alcoholId, isLogin]);
+  }, [alcoholId, isLoggedIn]);
 
   useEffect(() => {
     return () => {
@@ -109,7 +109,7 @@ export default function SearchAlcohol() {
 
   const handleRate = useCallback(
     async (selectedRate: number) => {
-      if (!isLogin) return handleLoginModal();
+      if (!isLoggedIn) return handleLoginModal();
 
       setRate(selectedRate);
 
@@ -123,7 +123,7 @@ export default function SearchAlcohol() {
         }),
       );
     },
-    [isLogin, alcoholId, debounce],
+    [isLoggedIn, alcoholId, debounce],
   );
 
   const getRatingMessage = (myAvgRating: number, myRating: number) => {
@@ -334,7 +334,7 @@ export default function SearchAlcohol() {
                         handleBeforeRouteChange: (
                           e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
                         ) => {
-                          if (!isLogin) {
+                          if (!isLoggedIn) {
                             e.preventDefault();
                             handleLoginModal();
                           }

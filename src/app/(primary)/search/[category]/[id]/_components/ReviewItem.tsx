@@ -12,8 +12,8 @@ import ReviewActions from '@/app/(primary)/search/[category]/[id]/_components/Re
 import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 import { deleteReview } from '@/lib/Review';
-import { AuthService } from '@/lib/AuthService';
 import { ROUTES } from '@/constants/routes';
+import { useAuth } from '@/hooks/auth/useAuth';
 
 interface Props {
   data: ReviewType;
@@ -22,7 +22,7 @@ interface Props {
 
 function ReviewItem({ data, onRefresh }: Props) {
   const router = useRouter();
-  const { userData, isLogin } = AuthService;
+  const { user: userData, isLoggedIn } = useAuth();
   const { isLikedByMe } = data;
   const { handleModalState, handleLoginModal } = useModalStore();
 
@@ -157,7 +157,7 @@ function ReviewItem({ data, onRefresh }: Props) {
           }}
           onRefresh={onRefresh}
           onOptionClick={() => {
-            if (isLogin) setIsOptionShow(true);
+            if (isLoggedIn) setIsOptionShow(true);
             else handleLoginModal();
           }}
           handleNotLogin={handleLoginModal}

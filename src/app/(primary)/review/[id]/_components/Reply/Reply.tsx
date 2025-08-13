@@ -13,7 +13,7 @@ import OptionDropdown from '@/components/OptionDropdown';
 import { RootReply, SubReply } from '@/types/Reply';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
 import userImg from 'public/profile-default.svg';
 
@@ -37,7 +37,7 @@ function Reply({
   onToggleSubReply,
 }: Props) {
   const router = useRouter();
-  const { isLogin, userData } = AuthService;
+  const { isLoggedIn, user: userData } = useAuth();
   const { setValue } = useFormContext();
   const { state, handleModalState, handleLoginModal } = useModalStore();
   const [isOptionShow, setIsOptionShow] = useState(false);
@@ -138,7 +138,7 @@ function Reply({
               <button
                 className="cursor-pointer"
                 onClick={() => {
-                  if (isLogin) setIsOptionShow(true);
+                  if (isLoggedIn) setIsOptionShow(true);
                   else handleLoginModal();
                 }}
               >
@@ -166,7 +166,7 @@ function Reply({
               <button
                 className="text-10 text-subCoral"
                 onClick={() => {
-                  if (isLogin) {
+                  if (isLoggedIn) {
                     updateReplyUser();
                   } else {
                     handleLoginModal();

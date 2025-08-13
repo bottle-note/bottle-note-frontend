@@ -1,18 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { signIn, useSession } from 'next-auth/react';
-import { AuthService } from '@/lib/AuthService';
 import { DeviceService } from '@/lib/DeviceService';
 import useModalStore from '@/store/modalStore';
 import { AuthApi } from '@/app/api/AuthApi';
 import { ApiError } from '@/utils/ApiError';
-import { UserData } from '@/types/Auth';
 import { UserApi } from '@/app/api/UserApi';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
-import { ROUTES } from '@/constants/routes';
-
-const jwt = require('jsonwebtoken');
+import { useAuth } from './auth/useAuth';
 
 export type LoginFormValues = {
   email: string;
@@ -20,15 +15,14 @@ export type LoginFormValues = {
 };
 
 export const useLogin = () => {
-  const { data: session } = useSession();
   const router = useRouter();
-  const { isLogin, login } = AuthService;
+  const { isLoggedIn } = useAuth();
   const { isInApp } = DeviceService;
   const { handleModalState, handleCloseModal } = useModalStore();
 
   const handleRestore = async (data: LoginFormValues) => {
     try {
-      await AuthApi.restore(data);
+      await AuthApi.client.restore(data);
       handleModalState({
         isShowModal: true,
         type: 'ALERT',
@@ -49,65 +43,9 @@ export const useLogin = () => {
     }
   };
 
-  const handleBasicLogin = async (data: LoginFormValues) => {
-    try {
-      const result = await AuthApi.basicLogin(data);
-
-      const decoded: UserData = jwt.decode(result.accessToken);
-
-      login(decoded, {
-        accessToken: result.accessToken,
-        refreshToken: '',
-      });
-
-      router.push(ROUTES.HOME);
-    } catch (error) {
-      if (error instanceof ApiError && error.code === 'USER_DELETED') {
-        return handleModalState({
-          isShowModal: true,
-          type: 'CONFIRM',
-          mainText: `${`탈퇴한 유저입니다. 재가입하시겠습니까?`}`,
-          handleConfirm: async () => {
-            handleCloseModal();
-            await handleRestore(data);
-          },
-        });
-      }
-
-      handleModalState({
-        isShowModal: true,
-        mainText: `${(error as unknown as Error).message}`,
-        handleConfirm: () => {
-          handleCloseModal();
-        },
-      });
-    }
-  };
-
-  const handleRedirectWithSession = () => {
-    if (session && session.user) {
-      const { userId, email, profile, accessToken, refreshToken } =
-        session.user;
-
-      AuthService.login(
-        {
-          userId,
-          sub: email,
-          profile,
-        },
-        {
-          accessToken,
-          refreshToken,
-        },
-      );
-
-      router.replace('/');
-    }
-  };
-
   const handleSendDeviceInfo = async () => {
     try {
-      if (isInApp && isLogin) {
+      if (isInApp && isLoggedIn) {
         const result = await UserApi.sendDeviceInfo(
           DeviceService.deviceToken || '',
           DeviceService.platform || '',
@@ -120,7 +58,7 @@ export const useLogin = () => {
         return;
       }
 
-      if (!isInApp && isLogin) {
+      if (!isInApp && isLoggedIn) {
         router.replace('/');
       }
     } catch (e) {
@@ -158,18 +96,17 @@ export const useLogin = () => {
     });
   };
 
-  const handleAppleLogin = () => {
+  const handleAppleLogin = async () => {
     if (window.isInApp) {
-      return handleWebViewMessage('loginWithApple');
-    }
+      const nonce = await AuthApi.client.getAppleNonce();
 
-    return signIn('apple');
+      return handleWebViewMessage('loginWithApple', { nonce });
+    }
+    return;
   };
 
   return {
     handleRestore,
-    handleBasicLogin,
-    handleRedirectWithSession,
     handleSendDeviceInfo,
     handleInitKakaoSdkLogin,
     handleKakaoLogin,

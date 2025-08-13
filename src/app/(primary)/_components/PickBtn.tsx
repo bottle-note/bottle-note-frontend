@@ -4,7 +4,7 @@ import { useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import useModalStore from '@/store/modalStore';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import useDebounceAction from '@/hooks/useDebounceAction';
 
@@ -33,7 +33,7 @@ const PickBtn = ({
   size = 18,
   fontSize = 'text-12',
 }: Props) => {
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const { handleModalState } = useModalStore();
   const { debounce } = useDebounceAction(DEBOUNCE_DELAY);
 
@@ -47,7 +47,7 @@ const PickBtn = ({
   }, [isPicked]);
 
   const handleClick = async () => {
-    if (!isLogin) {
+    if (!isLoggedIn) {
       handleNotLogin();
       return;
     }

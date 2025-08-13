@@ -1,5 +1,5 @@
 import { ApiResponse, ListQueryParams } from '@/types/common';
-import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { apiClient } from '@/shared/api/apiClient';
 import {
   SubReplyListApi,
   ReplyQueryParams,
@@ -10,64 +10,37 @@ import {
 
 export const ReplyApi = {
   async getRootReplyList({ reviewId, cursor, pageSize }: ListQueryParams) {
-    const response = await fetchWithAuth(
-      `/bottle-api/review/reply/${reviewId}?cursor=${cursor}&pageSize=${pageSize}`,
-      { requireAuth: false },
+    const response = await apiClient.get<ApiResponse<RootReplyListApi>>(
+      `/review/reply/${reviewId}?cursor=${cursor}&pageSize=${pageSize}`,
+      { useAuth: false },
     );
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
 
-    const result: ApiResponse<RootReplyListApi> = await response;
-
-    return result;
+    return response;
   },
 
   async getSubReplyList({ reviewId, rootReplyId }: ListQueryParams) {
-    const response = await fetchWithAuth(
-      `/bottle-api/review/reply/${reviewId}/sub/${rootReplyId}`,
-      { requireAuth: false },
+    const response = await apiClient.get<ApiResponse<SubReplyListApi>>(
+      `/review/reply/${reviewId}/sub/${rootReplyId}`,
+      { useAuth: false },
     );
 
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
-
-    const result: ApiResponse<SubReplyListApi> = await response;
-
-    return result.data;
+    return response.data;
   },
 
   async registerReply(reviewId: string, params: ReplyQueryParams) {
-    const response = await fetchWithAuth(
-      `/bottle-api/review/reply/register/${reviewId}`,
-      {
-        method: 'POST',
-        body: JSON.stringify(params),
-      },
+    const response = await apiClient.post<ApiResponse<ReplyPostApi>>(
+      `/review/reply/register/${reviewId}`,
+      params,
     );
 
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
-
-    const result: ApiResponse<ReplyPostApi> = await response;
-    return result.data;
+    return response.data;
   },
 
   async deleteReply(reviewId: string, replyId: string) {
-    const response = await fetchWithAuth(
-      `/bottle-api/review/reply/${reviewId}/${replyId}`,
-      {
-        method: 'DELETE',
-      },
+    const response = await apiClient.delete<ApiResponse<ReplyPatchApi>>(
+      `/review/reply/${reviewId}/${replyId}`,
     );
 
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
-
-    const result: ApiResponse<ReplyPatchApi> = await response;
-    return result.data;
+    return response.data;
   },
 };

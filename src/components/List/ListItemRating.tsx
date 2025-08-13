@@ -6,7 +6,7 @@ import { RateAPI } from '@/types/Rate';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
@@ -25,13 +25,13 @@ const ListItemRating = ({ data }: Props) => {
     isPicked: initialIsPicked,
     alcoholId,
   } = data;
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const [rate, setRate] = useState(0);
   const [isPicked, setIsPicked] = useState(initialIsPicked);
   const { handleLoginModal } = useModalStore();
 
   const handleRate = async (selectedRate: number) => {
-    if (!isLogin) return handleLoginModal();
+    if (!isLoggedIn) return handleLoginModal();
     setRate(selectedRate);
     await RateApi.postRating({
       alcoholId: String(alcoholId),

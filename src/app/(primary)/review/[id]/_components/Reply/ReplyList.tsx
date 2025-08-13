@@ -4,7 +4,7 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ReplyApi } from '@/app/api/ReplyApi';
 import List from '@/components/List/List';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import Reply from './Reply';
 
 interface Props {
@@ -18,7 +18,7 @@ export default function ReplyList({
   isRefetch,
   setIsRefetch,
 }: Props) {
-  const { userData } = AuthService;
+  const { user: userData } = useAuth();
   const [subReplyList, setSubReplyList] = useState<SubReplyListApi | null>();
   const [openReplyIds, setOpenReplyIds] = useState<Set<number>>(new Set());
 

@@ -6,15 +6,13 @@ import React, {
   Children,
   ReactElement,
   isValidElement,
-  useState,
-  useEffect,
 } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ROUTES } from '@/constants/routes';
 import SidebarHeader from '@/app/(primary)/_components/SidebarHeader';
-import { AuthService } from '@/lib/AuthService';
 
+import { useAuth } from '@/hooks/auth/useAuth';
 import Logo from 'public/bottle_note_Icon_logo.svg';
 
 interface HeaderLeftProps {
@@ -79,11 +77,7 @@ const HeaderRight = ({
   onClick,
   showSideMenu = false,
 }: HeaderRightProps) => {
-  const [isLogin, setIsLogin] = useState(false);
-
-  useEffect(() => {
-    setIsLogin(AuthService.isLogin);
-  }, []);
+  const { isLoggedIn } = useAuth();
 
   return (
     <div
@@ -95,7 +89,9 @@ const HeaderRight = ({
       }}
     >
       {children}
-      <div className="pt-2">{showSideMenu && isLogin && <SidebarHeader />}</div>
+      <div className="pt-2">
+        {showSideMenu && isLoggedIn && <SidebarHeader />}
+      </div>
     </div>
   );
 };
