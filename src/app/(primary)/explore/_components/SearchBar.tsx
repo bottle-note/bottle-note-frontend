@@ -4,6 +4,7 @@ import { LucideSearch } from 'lucide-react';
 import SideFilterDrawer from '@/components/SideFilterDrawer';
 import { Accordion } from '@/components/SideFilterDrawer/Accordion';
 import { CATEGORY_MENUS_LIST, REGIONS } from '@/constants/common';
+import { useSearchInput } from '@/hooks/useSearchInput';
 import HelpIcon from 'public/icon/help-filled-subcoral.svg';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
 
@@ -22,7 +23,10 @@ export const SearchBar = ({
   description,
   isFilter = false,
 }: Props) => {
-  const [searchText, setSearchText] = useState('');
+  // useSearchInput 훅으로 검색 입력 상태와 키보드 이벤트 관리
+  const { searchText, inputRef, handleChange, handleKeyDown } =
+    useSearchInput();
+
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<
     Set<(typeof CATEGORY_MENUS_LIST)[number]['name']>
@@ -32,8 +36,11 @@ export const SearchBar = ({
   >(new Set());
 
   const onAddKeyword = (v: string) => {
-    handleAddKeyword(v);
-    setSearchText('');
+    if (v.trim()) {
+      handleAddKeyword(v.trim());
+      handleChange('');
+      handleSearch();
+    }
   };
 
   const handleToggleOption = useMemo(
@@ -77,11 +84,18 @@ export const SearchBar = ({
     <section className="pt-[5px]">
       <article className="w-full relative ">
         <input
+          ref={inputRef}
           type="text"
           placeholder="입력..."
           className="w-full py-2.5 px-2 border-b-2 border-gray-200 focus:border-amber-500 outline-none bg-transparent text-base placeholder-mainGray placeholder:text-13 transition-colors appearance-none rounded-none"
           value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
+          onChange={(e) => handleChange(e.target.value)}
+          onKeyDown={(e) => {
+            handleKeyDown(e);
+            if (e.key === 'Enter' && searchText.trim()) {
+              onAddKeyword(searchText);
+            }
+          }}
         />
 
         <div className="flex justify-end gap-[7px] absolute top-2.5 right-0">
@@ -93,7 +107,7 @@ export const SearchBar = ({
           </button>
           <button
             className="label-selected text-13 text-nowrap flex items-center gap-[2px]"
-            onClick={handleSearch}
+            onClick={() => onAddKeyword(searchText)}
           >
             <LucideSearch className="w-3.5 h-3.5" />
             검색
