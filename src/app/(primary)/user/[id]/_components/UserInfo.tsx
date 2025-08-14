@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
-import ProfileImage from './ProfileImage';
+import ProfileImage from '@/app/(primary)/_components/ProfileImage';
 import { FollowButton } from './FollowButton';
 
 interface Props {

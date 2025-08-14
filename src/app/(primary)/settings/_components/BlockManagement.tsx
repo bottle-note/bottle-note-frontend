@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { BlockApi } from '@/app/api/BlockApi';
+import ProfileImage from '@/app/(primary)/_components/ProfileImage';
+
 interface BlockedUser {
   userId: string;
   nickName: string;
@@ -81,7 +83,6 @@ export default function BlockManagement() {
   return (
     <>
       <div className="min-h-screen bg-white">
-        {/* Content */}
         <div className="px-6 pt-6">
           {loading ? (
             <div className="text-center py-12">
@@ -89,9 +90,9 @@ export default function BlockManagement() {
             </div>
           ) : (
             <>
-              {/* 차단 유저 수 */}
-              <p className="text-15 font-medium text-mainBlack mb-6">
-                차단 유저 {blockedUsers.length}명
+              <p className="text-12 font-bold text-mainGray mb-[9px]">
+                차단 유저{' '}
+                <span className="font-thin">{blockedUsers.length}명</span>
               </p>
 
               {/* 차단 유저 목록 */}
@@ -106,60 +107,13 @@ export default function BlockManagement() {
                       custom={index}
                       className="py-4"
                     >
-                      {/* 구분선 (첫 번째 아이템 제외) */}
-                      {index > 0 && (
-                        <div className="border-t border-brightGray -mt-4 mb-4" />
-                      )}
-
+                      <div className="border-t border-brightGray -mt-4 mb-4" />
                       {/* 유저 정보 */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
-                          {/* 프로필 이미지 */}
-                          <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
-                            <div className="w-full h-full bg-gray-300 rounded-full flex items-center justify-center">
-                              {/* 기본 프로필 아이콘 또는 실제 이미지 */}
-                              <svg
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                className="text-gray-500"
-                              >
-                                <path
-                                  d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <circle
-                                  cx="12"
-                                  cy="7"
-                                  r="4"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            </div>
-                            {/* 실제 이미지를 사용할 경우
-                        <Image
-                          src={user.profileImage}
-                          alt={`${user.nickname} 프로필`}
-                          width={48}
-                          height={48}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                          }}
-                        />
-                        */}
-                          </div>
-
-                          {/* 닉네임 */}
+                          <ProfileImage size={36} />
                           <span className="text-15 font-medium text-mainBlack">
-                            {user.nickName}
+                            {user.userName}
                           </span>
                         </div>
 
