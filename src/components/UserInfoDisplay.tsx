@@ -1,37 +1,15 @@
-import Image from 'next/image';
 import Link from 'next/link';
-import { number } from 'yup';
+import ProfileImage from '@/app/(primary)/_components/ProfileImage';
 import { ROUTES } from '@/constants/routes';
 import { ThemeColor } from '@/style/theme';
-import ProfileDefaultImg from 'public/profile-default.svg';
 
 export interface UserImageProps {
   imgSrc: string | null;
-  width?: number;
-  height?: number;
-  alt?: string;
+  size?: number;
 }
 
-export const UserImage = ({
-  imgSrc,
-  width = 30,
-  height = 30,
-  alt = 'user_img',
-}: UserImageProps) => {
-  return (
-    <div
-      style={{ width: `${width}px`, height: `${height}px` }}
-      className="rounded-full overflow-hidden shrink-0"
-    >
-      <Image
-        className="object-cover w-full h-full"
-        src={imgSrc ?? ProfileDefaultImg}
-        alt={alt}
-        width={width}
-        height={height}
-      />
-    </div>
-  );
+export const UserImage = ({ imgSrc, size = 30 }: UserImageProps) => {
+  return <ProfileImage profileImgSrc={imgSrc} size={size} />;
 };
 
 export interface UserNickNameProps {

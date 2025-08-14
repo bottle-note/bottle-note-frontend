@@ -1,12 +1,10 @@
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import Label from '@/app/(primary)/_components/Label';
+import ProfileImage from '@/app/(primary)/_components/ProfileImage';
 import { truncStr } from '@/utils/truncStr';
 import Star from '@/components/Star';
 import { ROUTES } from '@/constants/routes';
-
-const DEFAULT_USER_IMAGE = '/profile-default.svg';
 
 interface ReviewUserInfoProps {
   userInfo: {
@@ -40,18 +38,10 @@ export default function ReviewUserInfo({
       <div className="flex items-center space-x-2">
         <Link href={ROUTES.USER.BASE(userInfo.userId)}>
           <div className="flex items-center space-x-1">
-            <div
-              className="rounded-full overflow-hidden"
-              style={{ width: userImageSize, height: userImageSize }}
-            >
-              <Image
-                className="object-cover"
-                src={userInfo.userProfileImage || DEFAULT_USER_IMAGE}
-                alt="user_img"
-                width={userImageSize}
-                height={userImageSize}
-              />
-            </div>
+            <ProfileImage
+              profileImgSrc={userInfo.userProfileImage}
+              size={userImageSize}
+            />
             <p className={`text-mainGray ${userNameSize}`}>
               {truncStr(userInfo.nickName, 12)}
             </p>

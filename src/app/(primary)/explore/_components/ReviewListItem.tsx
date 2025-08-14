@@ -43,8 +43,7 @@ const ReviewListItem = ({ content }: Props) => {
               nickName={content.userInfo.nickName}
               userImageProps={{
                 imgSrc: content.userInfo.userProfileImage,
-                width: 30,
-                height: 30,
+                size: 30,
               }}
               userNickNameProps={{
                 size: 13,

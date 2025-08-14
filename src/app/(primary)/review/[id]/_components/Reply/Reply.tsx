@@ -10,12 +10,12 @@ import { truncStr } from '@/utils/truncStr';
 import { formatDate } from '@/utils/formatDate';
 import Label from '@/app/(primary)/_components/Label';
 import OptionDropdown from '@/components/OptionDropdown';
+import ProfileImage from '@/app/(primary)/_components/ProfileImage';
 import { RootReply, SubReply } from '@/types/Reply';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
-import userImg from 'public/profile-default.svg';
 
 interface Props {
   data: RootReply | SubReply;
@@ -110,15 +110,7 @@ function Reply({
         <div className="flex items-center justify-between">
           <Link href={ROUTES.USER.BASE(data?.userId!)}>
             <div className="flex items-center space-x-[5px] h-8 px-">
-              <div className="w-[1.4rem] h-[1.4rem] rounded-full overflow-hidden">
-                <Image
-                  className="object-cover"
-                  src={data?.imageUrl || userImg}
-                  alt="user_img"
-                  width={22}
-                  height={22}
-                />
-              </div>
+              <ProfileImage profileImgSrc={data?.imageUrl} size={22} />
               <p className="text-mainGray text-12 font-bold">
                 {truncStr(data?.nickName, 12)}
               </p>

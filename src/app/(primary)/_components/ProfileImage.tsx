@@ -4,11 +4,18 @@ import ProfileDefaultImg from 'public/profile-default.svg';
 interface Props {
   profileImgSrc?: string | null;
   size?: number;
-  showBorder?: boolean;
+  borderWidth?: 'thin' | 'bold';
+  opacity?: number;
 }
 
-function ProfileImage({ profileImgSrc, size = 104, showBorder = true }: Props) {
-  const borderClass = showBorder ? 'border-2 border-subCoral' : '';
+function ProfileImage({
+  profileImgSrc,
+  size = 104,
+  borderWidth = 'thin',
+  opacity = 1,
+}: Props) {
+  const borderClass = borderWidth === 'bold' ? 'border-2 border-subCoral' : '';
+  const opacityClass = !profileImgSrc && opacity < 1 ? 'opacity-50' : '';
 
   return (
     <div
@@ -19,7 +26,7 @@ function ProfileImage({ profileImgSrc, size = 104, showBorder = true }: Props) {
         src={profileImgSrc ?? ProfileDefaultImg}
         alt="프로필 이미지"
         fill
-        className={`rounded-full ${borderClass} object-cover`}
+        className={`rounded-full ${borderClass} ${opacityClass} object-cover`}
         priority
       />
     </div>

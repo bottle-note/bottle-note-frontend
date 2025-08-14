@@ -34,7 +34,7 @@ const UserInfo = ({
 
   return (
     <section className="flex space-x-5.25 py-7">
-      <ProfileImage profileImgSrc={profileImgSrc} />
+      <ProfileImage profileImgSrc={profileImgSrc} borderWidth="bold" />
 
       <article className="py-[13.5px] space-y-3">
         <div className="space-y-1">
