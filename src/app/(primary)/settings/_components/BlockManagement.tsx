@@ -6,28 +6,23 @@ import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { BlockApi } from '@/app/api/BlockApi';
 import ProfileImage from '@/app/(primary)/_components/ProfileImage';
-
-interface BlockedUser {
-  userId: string;
-  nickName: string;
-  blockedAt: string;
-}
+import { BlockListApi } from '@/types/Settings';
+import List from '@/components/List/List';
 
 export default function BlockManagement() {
   const { handleModalState, handleCloseModal } = useModalStore();
-  const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
+  const [blockedUsers, setBlockedUsers] = useState<BlockListApi | null>(null);
   const [loading, setLoading] = useState(true);
+  const [unblockingUsers, setUnblockingUsers] = useState<Set<string>>(
+    new Set(),
+  );
 
   useEffect(() => {
     const fetchBlockList = async () => {
       try {
         const response = await BlockApi.getBlockList();
         if (response.data?.items) {
-          setBlockedUsers(
-            Array.isArray(response.data.items)
-              ? response.data.items
-              : [response.data.items],
-          );
+          setBlockedUsers(response.data);
         }
       } catch (error) {
         console.error('차단 목록 조회 실패:', error);
@@ -52,27 +47,40 @@ export default function BlockManagement() {
     }),
   };
 
-  const handleUnblockUser = (userId: string, nickname: string) => {
+  const handleUnblockUser = async (userId: string) => {
+    try {
+      setUnblockingUsers((prev) => new Set(prev).add(userId));
+      await BlockApi.unblockUser(userId);
+    } catch (error) {
+      console.error('차단 해제 실패:', error);
+      setUnblockingUsers((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(userId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleBlockUser = (userId: string, nickname: string) => {
     handleModalState({
       isShowModal: true,
       type: 'CONFIRM',
-      mainText: `${nickname}님을 차단 해제하시겠습니까?`,
-      confirmBtnName: '해제',
-      cancelBtnName: '취소',
+      mainText: `${nickname}님을 차단하시겠습니까?`,
+      confirmBtnName: '예',
+      cancelBtnName: '아니오',
       handleConfirm: async () => {
         try {
-          // 실제 차단 해제 API 호출
-          // await unblockUserAPI(userId);
+          await BlockApi.blockUser(userId);
 
-          // 로컬 상태에서 해당 사용자 제거
-          setBlockedUsers((prev) =>
-            prev.filter((user) => user.userId !== userId),
-          );
+          setUnblockingUsers((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(userId);
+            return newSet;
+          });
 
-          console.log(`사용자 ${userId} 차단 해제 완료`);
           handleCloseModal();
         } catch (error) {
-          console.error('차단 해제 실패:', error);
+          console.error('차단 실패:', error);
           handleCloseModal();
         }
       },
@@ -84,62 +92,62 @@ export default function BlockManagement() {
     <>
       <div className="min-h-screen bg-white">
         <div className="px-6 pt-6">
-          {loading ? (
-            <div className="text-center py-12">
-              <p className="text-brightGray text-15">로딩중...</p>
-            </div>
-          ) : (
-            <>
-              <p className="text-12 font-bold text-mainGray mb-[9px]">
-                차단 유저{' '}
-                <span className="font-thin">{blockedUsers.length}명</span>
-              </p>
+          <List
+            emptyViewText="차단된 사용자가 없습니다."
+            isListFirstLoading={loading}
+            isEmpty={(blockedUsers?.items?.length ?? 0) === 0}
+          >
+            <List.Total total={blockedUsers?.totalCount ?? 0} unit="명" />
+            <List.Section>
+              {blockedUsers?.items?.map((user, index) => {
+                const isLast = index === blockedUsers.items.length - 1;
+                const isUnblocking = unblockingUsers.has(user.userId);
 
-              {/* 차단 유저 목록 */}
-              {blockedUsers.length > 0 ? (
-                <div className="space-y-0">
-                  {blockedUsers.map((user, index) => (
-                    <motion.div
-                      key={user.userId}
-                      variants={itemVariants}
-                      initial="hidden"
-                      animate="visible"
-                      custom={index}
-                      className="py-4"
-                    >
-                      <div className="border-t border-brightGray -mt-4 mb-4" />
-                      {/* 유저 정보 */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <ProfileImage size={36} />
-                          <span className="text-15 font-medium text-mainBlack">
-                            {user.userName}
-                          </span>
-                        </div>
+                return (
+                  <motion.div
+                    key={user.userId}
+                    variants={itemVariants}
+                    initial="hidden"
+                    animate="visible"
+                    custom={index}
+                    className="py-[14px]"
+                  >
+                    {index > 0 && (
+                      <div className="border-t border-brightGray -mt-[14px] mb-[14px]" />
+                    )}
 
-                        {/* 차단해제 버튼 */}
-                        <button
-                          onClick={() =>
-                            handleUnblockUser(user.userId, user.nickName)
-                          }
-                          className="px-4 py-2 border border-subCoral text-subCoral rounded-lg text-14 font-medium hover:bg-subCoral hover:text-white transition-colors flex-shrink-0"
-                        >
-                          차단해제
-                        </button>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-[10px]">
+                        <ProfileImage size={36} />
+                        <span className="text-13 font-bold text-mainDarkGray">
+                          {user?.userName}
+                        </span>
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
-              ) : (
-                /* 차단된 유저가 없을 때 */
-                <div className="text-center py-12">
-                  <p className="text-brightGray text-15">
-                    차단된 사용자가 없습니다.
-                  </p>
-                </div>
-              )}
-            </>
-          )}
+
+                      <button
+                        onClick={() =>
+                          isUnblocking
+                            ? handleBlockUser(user.userId, user.userName)
+                            : handleUnblockUser(user.userId)
+                        }
+                        className={`px-[10px] py-1 border border-subCoral rounded text-12 font-medium transition-colors flex-shrink-0 ${
+                          isUnblocking
+                            ? 'bg-subCoral text-white'
+                            : 'text-subCoral'
+                        }`}
+                      >
+                        {isUnblocking ? '차단하기' : '차단해제'}
+                      </button>
+                    </div>
+
+                    {isLast && (
+                      <div className="border-t border-brightGray mt-[14px] -mb-[14px]" />
+                    )}
+                  </motion.div>
+                );
+              })}
+            </List.Section>
+          </List>
         </div>
       </div>
 

@@ -3,17 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/constants/routes';
 import { Review as ReviewType } from '@/types/Review';
 import ReviewUserInfo from '@/app/(primary)/search/[category]/[id]/_components/ReviewUserInfo';
 import { numberWithCommas } from '@/utils/formatNum';
 import { truncStr } from '@/utils/truncStr';
 import ReviewActions from '@/app/(primary)/search/[category]/[id]/_components/ReviewActions';
-import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
-import { deleteReview } from '@/lib/Review';
-import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/auth/useAuth';
+import ReviewActionDropdown from '@/app/(primary)/_components/ReviewActionDropdown';
 
 interface Props {
   data: ReviewType;
@@ -21,50 +19,14 @@ interface Props {
 }
 
 function ReviewItem({ data, onRefresh }: Props) {
-  const router = useRouter();
   const { user: userData, isLoggedIn } = useAuth();
   const { isLikedByMe } = data;
-  const { handleModalState, handleLoginModal } = useModalStore();
+  const { handleLoginModal } = useModalStore();
 
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(isLikedByMe);
   const [currentStatus, setCurrentStatus] = useState(data.status === 'PUBLIC');
   const [likeCount, setLikeCount] = useState(data.likeCount);
-
-  const handleCloseOption = () => {
-    handleModalState({
-      isShowModal: true,
-      type: 'ALERT',
-      mainText: '성공적으로 삭제되었습니다.',
-      handleConfirm: () => {
-        setIsOptionShow(false);
-        handleModalState({
-          isShowModal: false,
-          mainText: '',
-        });
-        // refresh review list
-      },
-    });
-  };
-
-  const handleOptionSelect = (option: { name: string; type: string }) => {
-    if (option.type === 'DELETE') {
-      handleModalState({
-        isShowModal: true,
-        mainText: '정말 삭제하시겠습니까?',
-        type: 'CONFIRM',
-        handleConfirm: () => {
-          deleteReview(data.reviewId, handleCloseOption);
-        },
-      });
-    } else if (option.type === 'MODIFY') {
-      router.push(ROUTES.REVIEW.MODIFY(data.reviewId));
-    } else if (option.type === 'REVIEW_REPORT') {
-      router.push(ROUTES.REPORT.REVIEW(data.reviewId));
-    } else if (option.type === 'USER_REPORT') {
-      router.push(ROUTES.REPORT.USER(data.userInfo.userId));
-    }
-  };
 
   useEffect(() => {
     setCurrentStatus(data.status === 'PUBLIC');
@@ -165,26 +127,15 @@ function ReviewItem({ data, onRefresh }: Props) {
           iconSize={15.6}
         />
       </div>
-      {isOptionShow && (
-        <OptionDropdown
-          handleClose={() => setIsOptionShow(false)}
-          options={
-            userData?.userId === data.userInfo.userId
-              ? [
-                  { name: '수정하기', type: 'MODIFY' },
-                  { name: '삭제하기', type: 'DELETE' },
-                ]
-              : [
-                  { name: '리뷰 신고', type: 'REVIEW_REPORT' },
-                  { name: '유저 신고', type: 'USER_REPORT' },
-                ]
-          }
-          handleOptionSelect={handleOptionSelect}
-          title={
-            userData?.userId === data.userInfo.userId ? '내 리뷰' : '신고하기'
-          }
-        />
-      )}
+      <ReviewActionDropdown
+        isShow={isOptionShow}
+        onClose={() => setIsOptionShow(false)}
+        isOwnReview={userData?.userId === data.userInfo.userId}
+        reviewId={String(data.reviewId)}
+        userId={String(data.userInfo.userId)}
+        userNickname={data.userInfo.nickName}
+        onRefresh={onRefresh}
+      />
     </>
   );
 }

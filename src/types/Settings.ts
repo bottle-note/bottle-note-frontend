@@ -21,7 +21,7 @@ export interface BlockListApi {
   totalCount: number;
   items: {
     userId: string;
-    nickName: string;
+    userName: string;
     blockedAt: string;
-  };
+  }[];
 }
