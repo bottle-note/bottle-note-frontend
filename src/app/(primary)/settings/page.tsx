@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { UserApi } from '@/app/api/UserApi';
@@ -18,7 +18,7 @@ import { createScreenConfigs, createMenuCategories } from './config';
 
 export default function Settings() {
   const route = useRouter();
-  const { logout, userData } = AuthService;
+  const { logout, user } = useAuth();
   const { data: session } = useSession();
   const { handleModalState, handleCloseModal } = useModalStore();
   const { currentScreen, setCurrentScreen, resetToMain, clearStorage } =
@@ -115,7 +115,8 @@ export default function Settings() {
     Exclude<ScreenType, 'main'>,
     ScreenConfig
   > = useMemo(
-    () => createScreenConfigs(handleLogout, handleDeleteAccount, route.push),
+    () => createScreenConfigs(handleLogout, handleDeleteAccount),
+    // () => createScreenConfigs(handleLogout, handleDeleteAccount, route.push),
     [handleLogout, handleDeleteAccount, route],
   );
 
@@ -125,9 +126,9 @@ export default function Settings() {
         navigateToScreen,
         route.push,
         handleEnvSwitchModal,
-        userData?.userId,
+        user?.userId,
       ),
-    [navigateToScreen, route, userData?.userId],
+    [navigateToScreen, route, user?.userId],
   );
 
   const getHeaderTitle = () => {
