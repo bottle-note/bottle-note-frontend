@@ -1,7 +1,8 @@
 export interface FormValues {
   title: string;
   content: string;
-  type: string;
+  type?: string;
+  businessSupportType?: string;
   images?: { order: number; image: File }[] | null;
   imageUrlList?:
     | {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as yup from 'yup';
@@ -24,7 +24,6 @@ import {
   BUSINESS_TYPE_LIST,
 } from '@/constants/Inquire';
 
-// TODO: 탭 초기값 props 로 받아오도록 수정
 export default function InquireRegister() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -33,28 +32,44 @@ export default function InquireRegister() {
   const serviceType = INQUIRE_TYPE[paramsType] || paramsType;
   const { state, handleModalState } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
-  const [showImageUploader, setShowImageUploader] = useState(false);
 
   const labelBaseStyle = 'border border-subCoral rounded-md text-15 px-3 py-2';
 
-  const schema = yup.object({
-    title: yup
-      .string()
-      .min(5, '최소 5글자 이상 입력이 필요합니다.')
-      .required('제목을 작성해주세요.'),
-    content: yup
-      .string()
-      .min(10, '최소 10글자 이상 입력이 필요합니다.')
-      .required('내용을 작성해주세요.'),
-    type: yup.string().required('문의사항을 선택해주세요.'),
-  });
+  const createSchema = () => {
+    const baseSchema = {
+      title: yup
+        .string()
+        .min(5, '문의 제목은 최소 5글자 이상 입력이 필요합니다.')
+        .required('제목을 작성해주세요.'),
+      content: yup
+        .string()
+        .min(10, '문의 내용은 최소 10글자 이상 입력이 필요합니다.')
+        .required('내용을 작성해주세요.'),
+    };
+
+    if (paramsType === 'business') {
+      return yup.object({
+        ...baseSchema,
+        businessSupportType: yup.string().required('문의사항을 선택해주세요.'),
+      });
+    } else {
+      return yup.object({
+        ...baseSchema,
+        type: yup.string().required('문의사항을 선택해주세요.'),
+      });
+    }
+  };
+
+  const schema = createSchema();
 
   const formMethods = useForm<FormValues>({
     mode: 'onChange',
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema as yup.ObjectSchema<FormValues>),
     defaultValues: {
+      title: '',
       content: '',
-      type: '',
+      type: paramsType === 'service' ? '' : undefined,
+      businessSupportType: paramsType === 'business' ? '' : undefined,
       images: null,
       imageUrlList: null,
     },
@@ -73,7 +88,7 @@ export default function InquireRegister() {
     const processSubmission = async () => {
       let uploadedImageUrls = null;
       if (data.images?.length !== 0) {
-        const images = data?.images?.map((file) => file.image);
+        const images = data?.images?.map((file: any) => file.image);
         if (images) {
           try {
             uploadedImageUrls = await uploadImages('inquire', images);
@@ -84,14 +99,22 @@ export default function InquireRegister() {
         }
       }
 
-      const params = {
+      const params: any = {
         title: data.title,
         content: data.content,
-        type: data.type,
         imageUrlList: uploadedImageUrls ?? null,
       };
 
-      const result = await InquireApi.registerInquire(params);
+      if (paramsType === 'business') {
+        params.businessSupportType = data.businessSupportType;
+      } else {
+        params.type = data.type;
+      }
+
+      const result =
+        paramsType === 'business'
+          ? await InquireApi.registerBusinessInquire(params)
+          : await InquireApi.registerInquire(params);
 
       if (result) {
         handleModalState({
@@ -116,8 +139,14 @@ export default function InquireRegister() {
   const { showErrorModal } = useErrorModal<FormValues>(errors);
 
   useEffect(() => {
-    showErrorModal(['title', 'content', 'type']);
-  }, [errors]);
+    const fieldNames = ['title', 'content'];
+    if (paramsType === 'business') {
+      fieldNames.push('businessSupportType');
+    } else {
+      fieldNames.push('type');
+    }
+    showErrorModal(fieldNames as Array<keyof FormValues>);
+  }, [errors, paramsType]);
 
   return (
     <>
@@ -178,16 +207,18 @@ export default function InquireRegister() {
                 <span className="font-bold">문의 내용 </span>
                 <span className="font-light">(자세한 내용을 적어주세요)</span>
               </label>
-              <textarea
-                id="content"
-                placeholder="문의 내용을 작성해주세요. (최소 10자)"
-                className="w-full h-56 bg-sectionWhite rounded-none px-3 py-3 text-14 outline-none focus:border focus:border-subCoral"
-                minLength={10}
-                maxLength={1000}
-                {...register('content')}
-              />
-              <div className="text-right text-mainGray text-10">
-                ({watch('content')?.length} / 1000)
+              <div className="relative">
+                <textarea
+                  id="content"
+                  placeholder="문의 내용을 작성해주세요. (최소 10자)"
+                  className="w-full h-56 bg-sectionWhite rounded-none px-3 py-3 pb-8 text-14 outline-none focus:border focus:border-subCoral resize-none"
+                  minLength={10}
+                  maxLength={1000}
+                  {...register('content')}
+                />
+                <div className="absolute bottom-[10px] right-[14px] text-mainGray text-10">
+                  ({watch('content')?.length} / 1000)
+                </div>
               </div>
             </article>
             <article className="space-y-[10px]">
@@ -201,16 +232,31 @@ export default function InquireRegister() {
                 {(paramsType === 'business'
                   ? BUSINESS_TYPE_LIST
                   : SERVICE_TYPE_LIST
-                ).map((item) => (
-                  <Label
-                    key={item.name}
-                    name={item.name}
-                    isSelected={watch('type') === item.name}
-                    onClick={() => setValue('type', item.name)}
-                    selectedStyle={labelBaseStyle + ' bg-subCoral text-white'}
-                    unselectedStyle={labelBaseStyle + ' bg-white text-subCoral'}
-                  />
-                ))}
+                ).map((item) => {
+                  return (
+                    <Label
+                      key={item.name}
+                      name={item.name}
+                      isSelected={
+                        paramsType === 'business'
+                          ? (watch('businessSupportType') as string) ===
+                            item.type
+                          : (watch('type') as string) === item.type
+                      }
+                      onClick={() => {
+                        if (paramsType === 'business') {
+                          setValue('businessSupportType', item.type as string);
+                        } else {
+                          setValue('type', item.type as string);
+                        }
+                      }}
+                      selectedStyle={labelBaseStyle + ' bg-subCoral text-white'}
+                      unselectedStyle={
+                        labelBaseStyle + ' bg-white text-subCoral'
+                      }
+                    />
+                  );
+                })}
               </div>
             </article>
 
@@ -219,23 +265,13 @@ export default function InquireRegister() {
                 <span className="font-bold">이미지 첨부 </span>
                 <span className="font-light">(선택·최대 5장)</span>
               </label>
-              <button
-                onClick={() => setShowImageUploader(!showImageUploader)}
-                className="py-[10px] px-5 text-15 text-mainGray border border-brightGray bg-sectionWhite"
-              >
-                파일 첨부하기
-              </button>
 
-              {showImageUploader && (
-                <div className="mt-4">
-                  <ImageUploader useMarginLeft={false} />
-                </div>
-              )}
+              <div className="mt-4">
+                <ImageUploader useMarginLeft={false} />
+              </div>
             </article>
 
-            <article className="mx-5 space-y-9">
-              <Button onClick={handleSubmit(onSave)} btnName="전송" />
-            </article>
+            <Button onClick={handleSubmit(onSave)} btnName="문의 보내기" />
           </section>
         </section>
         {isProcessing && <Loading />}

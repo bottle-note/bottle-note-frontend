@@ -32,12 +32,17 @@ export default function Inquire() {
     helpList: InquireList[];
     totalCount: number;
   }>({
-    queryKey: ['inquireList'],
+    queryKey: ['inquireList', paramsType],
     queryFn: ({ pageParam }) => {
-      return InquireApi.getInquireList({
+      const queryParams = {
         cursor: pageParam,
         pageSize: 10,
-      });
+      };
+      if (paramsType === 'business') {
+        return InquireApi.getBusinessInquireList(queryParams);
+      } else {
+        return InquireApi.getInquireList(queryParams);
+      }
     },
   });
 
@@ -69,9 +74,6 @@ export default function Inquire() {
           emptyViewText="문의사항이 없습니다."
           isEmpty={!inquireList || inquireList[0].data.totalCount === 0}
         >
-          <List.Total
-            total={inquireList ? inquireList[0].data.totalCount : 0}
-          />
           <List.Section>
             {inquireList && (
               <InquireTable
@@ -95,7 +97,7 @@ export default function Inquire() {
               }
               router.push(`${ROUTES.INQUIRE.REGISTER}?type=${paramsType}`);
             }}
-            btnName="문의하기"
+            btnName="문의 작성하기"
           />
         </section>
       </section>

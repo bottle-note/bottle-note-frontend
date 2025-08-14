@@ -24,11 +24,11 @@ export const SERVICE_TYPE_LIST = [
 
 export const BUSINESS_TYPE_LIST = [
   {
-    type: 'WHISKEY',
+    type: 'EVENT',
     name: '이벤트 관련 문의',
   },
   {
-    type: 'REVIEW',
+    type: 'ADVERTISEMENT',
     name: '광고 관련 문의',
   },
   {
