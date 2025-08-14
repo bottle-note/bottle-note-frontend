@@ -17,12 +17,9 @@ import Modal from '@/components/Modal';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import Loading from '@/components/Loading';
 import ImageUploader from '@/app/(primary)/_components/ImageUploader';
-import Label from '@/app/(primary)/_components/Label';
-import {
-  INQUIRE_TYPE,
-  SERVICE_TYPE_LIST,
-  BUSINESS_TYPE_LIST,
-} from '@/constants/Inquire';
+import { INQUIRE_TYPE } from '@/constants/Inquire';
+import InquireForm from './_components/InquireForm';
+import InquireTypeSelector from './_components/InquireTypeSelector';
 
 export default function InquireRegister() {
   const router = useRouter();
@@ -32,8 +29,6 @@ export default function InquireRegister() {
   const serviceType = INQUIRE_TYPE[paramsType] || paramsType;
   const { state, handleModalState } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
-
-  const labelBaseStyle = 'border border-subCoral rounded-md text-15 px-3 py-2';
 
   const createSchema = () => {
     const baseSchema = {
@@ -79,8 +74,6 @@ export default function InquireRegister() {
     handleSubmit,
     reset,
     watch,
-    register,
-    setValue,
     formState: { errors },
   } = formMethods;
 
@@ -184,81 +177,8 @@ export default function InquireRegister() {
             <SubHeader.Center>{serviceType} 문의하기</SubHeader.Center>
           </SubHeader>
           <section className="mx-5 my-[30px] space-y-[30px]">
-            <article className="space-y-[10px]">
-              <label
-                className="block font-bold text-mainGray text-13 mb-1"
-                htmlFor="title"
-              >
-                문의 제목
-              </label>
-              <input
-                id="title"
-                type="text"
-                placeholder=""
-                className="w-full h-9 bg-sectionWhite rounded-none px-3 text-14 outline-none focus:border focus:border-subCoral"
-                {...register('title')}
-              />
-            </article>
-            <article className="space-y-[10px]">
-              <label
-                className="block text-12 mb-1 text-mainGray"
-                htmlFor="content"
-              >
-                <span className="font-bold">문의 내용 </span>
-                <span className="font-light">(자세한 내용을 적어주세요)</span>
-              </label>
-              <div className="relative">
-                <textarea
-                  id="content"
-                  placeholder="문의 내용을 작성해주세요. (최소 10자)"
-                  className="w-full h-56 bg-sectionWhite rounded-none px-3 py-3 pb-8 text-14 outline-none focus:border focus:border-subCoral resize-none"
-                  minLength={10}
-                  maxLength={1000}
-                  {...register('content')}
-                />
-                <div className="absolute bottom-[10px] right-[14px] text-mainGray text-10">
-                  ({watch('content')?.length} / 1000)
-                </div>
-              </div>
-            </article>
-            <article className="space-y-[10px]">
-              <label
-                className="block font-bold text-mainGray text-13 mb-1"
-                htmlFor="type"
-              >
-                문의 유형
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {(paramsType === 'business'
-                  ? BUSINESS_TYPE_LIST
-                  : SERVICE_TYPE_LIST
-                ).map((item) => {
-                  return (
-                    <Label
-                      key={item.name}
-                      name={item.name}
-                      isSelected={
-                        paramsType === 'business'
-                          ? (watch('businessSupportType') as string) ===
-                            item.type
-                          : (watch('type') as string) === item.type
-                      }
-                      onClick={() => {
-                        if (paramsType === 'business') {
-                          setValue('businessSupportType', item.type as string);
-                        } else {
-                          setValue('type', item.type as string);
-                        }
-                      }}
-                      selectedStyle={labelBaseStyle + ' bg-subCoral text-white'}
-                      unselectedStyle={
-                        labelBaseStyle + ' bg-white text-subCoral'
-                      }
-                    />
-                  );
-                })}
-              </div>
-            </article>
+            <InquireForm />
+            <InquireTypeSelector paramsType={paramsType} />
 
             <article className="space-y-[10px]">
               <label className="block text-12 mb-1 text-mainGray">
