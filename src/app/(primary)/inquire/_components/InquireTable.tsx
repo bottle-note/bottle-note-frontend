@@ -59,7 +59,7 @@ export default function InquireTable({
             >
               <td className="py-[15px] px-4 text-13 text-mainBlack">
                 <div className="text-gray-900 line-clamp-2 break-words">
-                  {item.content}
+                  {item.title}
                 </div>
               </td>
               <td className="py-[15px] px-4 text-13 text-mainBlack whitespace-nowrap">

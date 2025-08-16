@@ -25,6 +25,7 @@ type helpStatus = 'WAITING' | 'SUCCESS' | 'REJECT' | 'DELETED';
 
 export interface InquireList {
   helpId: number;
+  title: string;
   content: string;
   createAt: string;
   helpStatus: helpStatus;
@@ -37,6 +38,7 @@ export interface InquireListApi {
 
 export interface InquireDetailsApi {
   helpId: number;
+  title: string;
   content: string;
   helpType: string;
   createAt: string;

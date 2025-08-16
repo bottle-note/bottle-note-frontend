@@ -58,7 +58,7 @@ export default function InquireRegister() {
   const schema = createSchema();
 
   const formMethods = useForm<FormValues>({
-    mode: 'onChange',
+    mode: 'onSubmit',
     resolver: yupResolver(schema as yup.ObjectSchema<FormValues>),
     defaultValues: {
       title: '',

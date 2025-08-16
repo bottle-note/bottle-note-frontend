@@ -47,7 +47,7 @@ export default function Inquire() {
   });
 
   const handleItemClick = (helpId: number) => {
-    router.push(`/inquire/${helpId}`);
+    router.push(`/inquire/${helpId}?type=${paramsType}`);
   };
 
   return (
