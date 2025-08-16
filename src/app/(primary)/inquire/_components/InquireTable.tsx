@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import { InquireList } from '@/types/Inquire';
+import { truncStr } from '@/utils/truncStr';
 
 interface InquireTableProps {
   inquireList: InquireList[];
@@ -59,7 +60,7 @@ export default function InquireTable({
             >
               <td className="py-[15px] px-4 text-13 text-mainBlack">
                 <div className="text-gray-900 line-clamp-2 break-words">
-                  {item.title}
+                  {item.title && truncStr(item.title, 20)}
                 </div>
               </td>
               <td className="py-[15px] px-4 text-13 text-mainBlack whitespace-nowrap">

@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
-import BaseImage from '@/components/BaseImage';
 
 export default function ImageViewer() {
   const router = useRouter();
