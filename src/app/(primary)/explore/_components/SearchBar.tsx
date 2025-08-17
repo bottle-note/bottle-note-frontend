@@ -23,15 +23,18 @@ export const SearchBar = ({
   description,
   isFilter = false,
 }: Props) => {
-  const onAddKeyword = (v: string) => {
-    if (v.trim()) {
-      handleAddKeyword(v.trim());
-      handleChange('');
-      handleSearch();
-    }
-  };
+  const onAddKeyword = useCallback(
+    (v: string) => {
+      const trimmedValue = v.trim();
+      if (trimmedValue) {
+        handleAddKeyword(trimmedValue);
+        handleSearch();
+      }
+    },
+    [handleAddKeyword, handleSearch],
+  );
 
-  const { searchText, inputRef, handleChange, handleKeyDown } = useSearchInput({
+  const { searchText, inputRef, handleChange, handleSubmit } = useSearchInput({
     onSearch: onAddKeyword,
   });
 
@@ -91,9 +94,9 @@ export const SearchBar = ({
           value={searchText}
           onChange={(e) => handleChange(e.target.value)}
           onKeyDown={(e) => {
-            handleKeyDown(e);
-            if (e.key === 'Enter' && searchText.trim()) {
-              onAddKeyword(searchText);
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleSubmit();
             }
           }}
         />
@@ -101,13 +104,13 @@ export const SearchBar = ({
         <div className="flex justify-end gap-[7px] absolute top-2.5 right-0">
           <button
             className="label-default text-13 text-nowrap"
-            onClick={() => onAddKeyword(searchText)}
+            onClick={handleSubmit}
           >
             + 추가
           </button>
           <button
             className="label-selected text-13 text-nowrap flex items-center gap-[2px]"
-            onClick={() => onAddKeyword(searchText)}
+            onClick={handleSubmit}
           >
             <LucideSearch className="w-3.5 h-3.5" />
             검색
