@@ -23,9 +23,17 @@ export const SearchBar = ({
   description,
   isFilter = false,
 }: Props) => {
-  // useSearchInput 훅으로 검색 입력 상태와 키보드 이벤트 관리
-  const { searchText, inputRef, handleChange, handleKeyDown } =
-    useSearchInput({ onSearch: onAddKeyword });
+  const onAddKeyword = (v: string) => {
+    if (v.trim()) {
+      handleAddKeyword(v.trim());
+      handleChange('');
+      handleSearch();
+    }
+  };
+
+  const { searchText, inputRef, handleChange, handleKeyDown } = useSearchInput({
+    onSearch: onAddKeyword,
+  });
 
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<
@@ -34,14 +42,6 @@ export const SearchBar = ({
   const [selectedRegion, setSelectedRegion] = useState<
     Set<(typeof REGIONS)[number]['korName']>
   >(new Set());
-
-  const onAddKeyword = (v: string) => {
-    if (v.trim()) {
-      handleAddKeyword(v.trim());
-      handleChange('');
-      handleSearch(v.trim());
-    }
-  };
 
   const handleToggleOption = useMemo(
     () => ({
