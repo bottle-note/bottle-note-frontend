@@ -25,7 +25,7 @@ export const SearchBar = ({
 }: Props) => {
   // useSearchInput 훅으로 검색 입력 상태와 키보드 이벤트 관리
   const { searchText, inputRef, handleChange, handleKeyDown } =
-    useSearchInput();
+    useSearchInput({ onSearch: onAddKeyword });
 
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<
