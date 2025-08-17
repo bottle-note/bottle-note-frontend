@@ -39,7 +39,7 @@ export const SearchBar = ({
     if (v.trim()) {
       handleAddKeyword(v.trim());
       handleChange('');
-      handleSearch();
+      handleSearch(v.trim());
     }
   };
 
