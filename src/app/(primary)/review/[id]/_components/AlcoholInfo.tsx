@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, memo } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
@@ -48,12 +49,17 @@ function AlcoholInfo({ data, handleLogin }: Props) {
               name={data.korCategory}
               styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
             />
-            <h1 className="text-15 font-semibold whitespace-normal break-words">
-              {data.korName && truncStr(data.korName, 27)}
-            </h1>
-            <p className="text-12 whitespace-normal break-words font-normal">
-              {data.engName && truncStr(data.engName.toUpperCase(), 45)}
-            </p>
+            <Link
+              href={ROUTES.SEARCH.ALL(data.alcoholId)}
+              className="block space-y-[6px]"
+            >
+              <h1 className="text-15 font-semibold whitespace-normal break-words">
+                {data.korName && truncStr(data.korName, 27)}
+              </h1>
+              <p className="text-12 whitespace-normal break-words font-normal">
+                {data.engName && truncStr(data.engName.toUpperCase(), 45)}
+              </p>
+            </Link>
           </div>
           <div className="space-y-[10px] mt-[10px]">
             <div className="border-[0.5px] border-white" />
