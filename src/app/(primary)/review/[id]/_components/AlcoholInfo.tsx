@@ -41,6 +41,7 @@ function AlcoholInfo({ data, handleLogin }: Props) {
             outerHeightClass="h-[120px]"
             innerWidthClass="w-[53px]"
             innerHeightClass="h-[104px]"
+            enableModal
           />
         )}
         <article className="w-2/3 pt-[5px] pb-[9.15px] text-white space-y-2 overflow-x-hidden">

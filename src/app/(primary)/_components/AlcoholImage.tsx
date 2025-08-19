@@ -1,7 +1,8 @@
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import BaseImage from '@/components/BaseImage';
+import ImageModal from '@/components/ImageModal';
 
 interface Props {
   imageUrl: string;
@@ -13,6 +14,7 @@ interface Props {
   blendMode?: string;
   rounded?: string;
   priority?: boolean;
+  enableModal?: boolean;
 }
 
 const AlcoholImage = ({
@@ -25,27 +27,57 @@ const AlcoholImage = ({
   blendMode = '',
   rounded = 'rounded-lg',
   priority = true,
+  enableModal = false,
 }: Props) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const innerWidth = parseInt(innerWidthClass.match(/\d+/)?.[0] || '0', 10);
 
+  const handleImageClick = () => {
+    if (enableModal) {
+      setIsModalOpen(true);
+    }
+  };
+
   return (
-    <div
-      className={`${rounded} ${bgColor} flex items-center justify-center ${outerHeightClass} ${outerWidthClass} shrink-0`}
-    >
+    <>
       <div
-        className={`relative ${innerHeightClass} ${innerWidthClass} flex items-center justify-center`}
+        className={`${rounded} ${bgColor} flex items-center justify-center ${outerHeightClass} ${outerWidthClass} shrink-0 ${enableModal ? 'cursor-pointer' : ''}`}
+        onClick={handleImageClick}
+        tabIndex={enableModal ? 0 : -1}
+        role={enableModal ? 'button' : undefined}
+        onKeyDown={
+          enableModal
+            ? (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleImageClick();
+                }
+              }
+            : undefined
+        }
       >
-        <BaseImage
-          src={imageUrl}
-          alt="alcohol image"
-          priority={priority}
-          className={`object-contain ${blendMode}`}
-          rounded={rounded}
-          sizes={`${innerWidth}px`}
-          fill
-        />
+        <div
+          className={`relative ${innerHeightClass} ${innerWidthClass} flex items-center justify-center`}
+        >
+          <BaseImage
+            src={imageUrl}
+            alt="alcohol image"
+            priority={priority}
+            className={`object-contain ${blendMode}`}
+            rounded={rounded}
+            sizes={`${innerWidth}px`}
+            fill
+          />
+        </div>
       </div>
-    </div>
+
+      {enableModal && (
+        <ImageModal
+          imageUrl={imageUrl}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
+    </>
   );
 };
 
