@@ -42,6 +42,7 @@ export const InquireApi = {
   },
 
   async registerBusinessInquire(params: InquireQueryParams) {
+    console.log('params', params);
     const response = await apiClient.post<ApiResponse<InquirePostApi>>(
       `/business-support`,
       params,

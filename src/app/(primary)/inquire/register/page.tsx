@@ -63,6 +63,7 @@ export default function InquireRegister() {
     defaultValues: {
       title: '',
       content: '',
+      contact: paramsType === 'business' ? '' : undefined,
       type: paramsType === 'service' ? '' : undefined,
       businessSupportType: paramsType === 'business' ? '' : undefined,
       images: null,
@@ -100,6 +101,7 @@ export default function InquireRegister() {
 
       if (paramsType === 'business') {
         params.businessSupportType = data.businessSupportType;
+        params.contact = data.contact;
       } else {
         params.type = data.type;
       }

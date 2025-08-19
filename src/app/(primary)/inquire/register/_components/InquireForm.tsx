@@ -25,7 +25,24 @@ export default function InquireForm() {
       </article>
 
       <article className="space-y-[10px]">
-        <label className="block text-12 mb-1 text-mainGray" htmlFor="content">
+        <label
+          className="block font-bold text-mainGray text-13 mb-1"
+          htmlFor="contact"
+        >
+          <span className="font-bold">연락처 </span>
+          <span className="font-light">(이메일 혹은 전화번호)</span>
+        </label>
+        <input
+          id="contact"
+          type="text"
+          placeholder=""
+          className="w-full h-9 bg-sectionWhite rounded-none px-3 text-14 outline-none focus:border focus:border-subCoral"
+          {...register('contact')}
+        />
+      </article>
+
+      <article className="space-y-[10px]">
+        <label className="block text-13 mb-1 text-mainGray" htmlFor="content">
           <span className="font-bold">문의 내용 </span>
           <span className="font-light">(자세한 내용을 적어주세요)</span>
         </label>

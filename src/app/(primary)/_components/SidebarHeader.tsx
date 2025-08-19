@@ -9,6 +9,7 @@ import { useBlockScroll } from '@/hooks/useBlockScroll';
 import useModalStore from '@/store/modalStore';
 import Modal from '@/components/Modal';
 import { UserApi } from '@/app/api/UserApi';
+import { AdminApi } from '@/app/api/AdminApi';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { useAuth } from '@/hooks/auth/useAuth';
 import Logo from 'public/bottle_note_Icon_logo.svg';
@@ -42,17 +43,45 @@ const Header = ({
     handleCloseModal();
   };
 
-  useEffect(() => {
-    if (count === 5) {
+  const handleEnvSwitchModal = async () => {
+    try {
+      // Check admin permissions first
+      const hasPermission = await AdminApi.checkPermissions();
+      
+      if (hasPermission) {
+        // Show environment switch modal if permissions are granted
+        handleModalState({
+          isShowModal: true,
+          type: 'CONFIRM',
+          mainText: '개발 환경으로 전환하시겠습니까?',
+          confirmBtnName: '개발',
+          cancelBtnName: '상용',
+          handleConfirm: () => handleSwitchEnv('dev'),
+          handleCancel: () => handleSwitchEnv('prod'),
+        });
+      } else {
+        // Show error modal if permissions are denied
+        handleModalState({
+          isShowModal: true,
+          type: 'ALERT',
+          mainText: '개발 환경 전환 권한이 없습니다.',
+          handleConfirm: handleCloseModal,
+        });
+      }
+    } catch (error) {
+      // Show error modal if API call fails
       handleModalState({
         isShowModal: true,
-        type: 'CONFIRM',
-        mainText: '개발 환경으로 전환하시겠습니까?',
-        confirmBtnName: '개발',
-        cancelBtnName: '상용',
-        handleConfirm: () => handleSwitchEnv('dev'),
-        handleCancel: () => handleSwitchEnv('prod'),
+        type: 'ALERT',
+        mainText: error instanceof Error ? error.message : '권한 확인 중 오류가 발생했습니다.',
+        handleConfirm: handleCloseModal,
       });
+    }
+  };
+
+  useEffect(() => {
+    if (count === 5) {
+      handleEnvSwitchModal();
       setCount(0);
     }
   }, [count]);

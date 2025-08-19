@@ -1,6 +1,7 @@
 export interface FormValues {
   title: string;
   content: string;
+  contact?: string;
   type?: string;
   businessSupportType?: string;
   images?: { order: number; image: File }[] | null;

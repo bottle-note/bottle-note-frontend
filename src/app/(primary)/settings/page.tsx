@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { UserApi } from '@/app/api/UserApi';
+import { AdminApi } from '@/app/api/AdminApi';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import Modal from '@/components/Modal';
@@ -99,16 +100,43 @@ export default function Settings() {
     handleCloseModal();
   };
 
-  const handleEnvSwitchModal = () => {
-    handleModalState({
-      isShowModal: true,
-      type: 'CONFIRM',
-      mainText: '개발 환경으로 전환하시겠습니까?',
-      confirmBtnName: '개발',
-      cancelBtnName: '상용',
-      handleConfirm: () => handleSwitchEnv('dev'),
-      handleCancel: () => handleSwitchEnv('prod'),
-    });
+  const handleEnvSwitchModal = async () => {
+    try {
+      // Check admin permissions first
+      const hasPermission = await AdminApi.checkPermissions();
+
+      if (hasPermission) {
+        // Show environment switch modal if permissions are granted
+        handleModalState({
+          isShowModal: true,
+          type: 'CONFIRM',
+          mainText: '개발 환경으로 전환하시겠습니까?',
+          confirmBtnName: '개발',
+          cancelBtnName: '상용',
+          handleConfirm: () => handleSwitchEnv('dev'),
+          handleCancel: () => handleSwitchEnv('prod'),
+        });
+      } else {
+        // Show error modal if permissions are denied
+        handleModalState({
+          isShowModal: true,
+          type: 'ALERT',
+          mainText: '개발 환경 전환 권한이 없습니다.',
+          handleConfirm: handleCloseModal,
+        });
+      }
+    } catch (error) {
+      // Show error modal if API call fails
+      handleModalState({
+        isShowModal: true,
+        type: 'ALERT',
+        mainText:
+          error instanceof Error
+            ? error.message
+            : '권한 확인 중 오류가 발생했습니다.',
+        handleConfirm: handleCloseModal,
+      });
+    }
   };
 
   const screenConfigs: Record<
