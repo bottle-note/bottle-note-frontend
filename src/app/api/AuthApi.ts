@@ -109,7 +109,7 @@ export const AuthApi = {
           { refreshToken },
           {
             baseUrl: 'bottle-api/v2',
-            useAuth: false,
+            authRequired: false,
           },
         );
 
@@ -154,7 +154,7 @@ export const AuthApi = {
           {},
           {
             baseUrl: 'bottle-api/v2',
-            useAuth: false,
+            authRequired: false,
           },
         );
 
@@ -221,7 +221,7 @@ export const AuthApi = {
       try {
         const response = await apiClient.get<{ nonce: string }>(
           `/auth/apple/nonce`,
-          { baseUrl: 'bottle-api/v2', useAuth: false },
+          { baseUrl: 'bottle-api/v2', authRequired: false },
         );
 
         return response.nonce;

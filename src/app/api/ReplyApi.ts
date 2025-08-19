@@ -12,7 +12,7 @@ export const ReplyApi = {
   async getRootReplyList({ reviewId, cursor, pageSize }: ListQueryParams) {
     const response = await apiClient.get<ApiResponse<RootReplyListApi>>(
       `/review/reply/${reviewId}?cursor=${cursor}&pageSize=${pageSize}`,
-      { useAuth: false },
+      { authRequired: false },
     );
 
     return response;
@@ -21,7 +21,7 @@ export const ReplyApi = {
   async getSubReplyList({ reviewId, rootReplyId }: ListQueryParams) {
     const response = await apiClient.get<ApiResponse<SubReplyListApi>>(
       `/review/reply/${reviewId}/sub/${rootReplyId}`,
-      { useAuth: false },
+      { authRequired: false },
     );
 
     return response.data;
