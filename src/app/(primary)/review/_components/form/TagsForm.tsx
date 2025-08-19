@@ -93,7 +93,7 @@ export default function TagsForm() {
           component: ExtraButtons,
         }}
       >
-        <article className=" ml-7">
+        <article className="ml-7 mt-[6px]">
           <div className="h-11 flex items-center border-b border-subCoral">
             <input
               type="text"
