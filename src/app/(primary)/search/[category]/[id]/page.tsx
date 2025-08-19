@@ -55,13 +55,18 @@ export default function SearchAlcohol() {
         const { alcohols } = result;
         setData(result);
         setIsPicked(alcohols.isPicked);
+        const formatContent = (content: string | undefined) =>
+          content?.replace('/', '/\n') || '-';
+
         setAlcoholDetails([
-          { title: '증류소', content: alcohols.engDistillery },
+          { title: '카테고리', content: alcohols.engCategory },
+          { title: '증류소', content: formatContent(alcohols.engDistillery) },
+          { title: '캐스트', content: formatContent(alcohols.cask) },
+          { title: '국가/지역', content: formatContent(alcohols.engRegion) },
           {
-            title: '국가/지역',
-            content: alcohols.engRegion?.replace('/', '/\n') || '-',
+            title: '도수(%)',
+            content: formatContent(alcohols.abv),
           },
-          { title: '도수', content: `${alcohols.abv}%` },
         ]);
       }
     } catch (error) {
@@ -239,27 +244,17 @@ export default function SearchAlcohol() {
               </article>
               <section className="mx-5 py-[21px] border-y border-mainGray/30">
                 <div className="grid gap-2">
-                  <div className="grid grid-cols-2 gap-2">
-                    {alcoholDetails.map((item: DetailItem) => (
-                      <div
-                        key={item.content}
-                        className="flex text-12 text-mainDarkGray items-start gap-2"
-                      >
-                        <div className="min-w-14 font-semibold">
-                          {item.title}
-                        </div>
-                        <div className="flex-1 font-normal whitespace-pre-line">
-                          {item.content}
-                        </div>
+                  {alcoholDetails.map((item: DetailItem) => (
+                    <div
+                      key={item.content}
+                      className="flex text-12 text-mainDarkGray items-start gap-2"
+                    >
+                      <div className="min-w-14 font-semibold">{item.title}</div>
+                      <div className="flex-1 font-normal break-words">
+                        {item.content}
                       </div>
-                    ))}
-                  </div>
-                  <div className="flex text-12 text-mainDarkGray items-start gap-2">
-                    <div className="min-w-14 font-semibold">캐스크</div>
-                    <div className="flex-1 font-normal break-words">
-                      {data?.alcohols?.cask || '-'}
                     </div>
-                  </div>
+                  ))}
                 </div>
               </section>
               {data?.alcohols?.alcoholsTastingTags && (
