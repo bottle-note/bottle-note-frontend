@@ -163,11 +163,7 @@ export default function ReviewDetail() {
               />
               <div className="relative z-10">
                 <SubHeader bgColor="bg-none">
-                  <SubHeader.Left
-                    onClick={() => {
-                      router.back();
-                    }}
-                  >
+                  <SubHeader.Left onClick={() => router.back()}>
                     <Image
                       src="/icon/arrow-left-white.svg"
                       alt="arrowIcon"

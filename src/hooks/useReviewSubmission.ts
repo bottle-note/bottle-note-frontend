@@ -90,7 +90,7 @@ export const useReviewSubmission = ({
       subText,
       type: 'ALERT',
       handleConfirm: () => {
-        router.push(ROUTES.REVIEW.DETAIL(successReviewId));
+        router.replace(`${ROUTES.REVIEW.DETAIL(successReviewId)}`);
         handleModalState({
           isShowModal: false,
           mainText: '',
