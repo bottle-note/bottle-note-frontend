@@ -14,7 +14,6 @@ import { useReviewSubmission } from '@/hooks/useReviewSubmission';
 import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
 import { Button } from '@/components/Button';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
 import Loading from '@/components/Loading';
 import ReviewForm from '../_components/form/ReviewForm';
 import ReviewHeaderLayout from '../_components/ReviewHeaderLayout';
@@ -123,7 +122,6 @@ function ReviewModify() {
         />
       </article>
       {isProcessing ? <Loading /> : null}
-      <Modal />
     </FormProvider>
   );
 }

@@ -11,7 +11,6 @@ import { UserApi } from '@/app/api/UserApi';
 import { AdminApi } from '@/app/api/AdminApi';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
-import Modal from '@/components/Modal';
 import { ScreenType, ScreenConfig, MenuCategory } from '@/types/Settings';
 import { SettingsMainScreen } from './_components/SettingsMainScreen';
 import { SettingsSubScreen } from './_components/SettingsSubScreen';
@@ -200,7 +199,6 @@ export default function Settings() {
           />
         )}
       </div>
-      <Modal />
     </main>
   );
 }

@@ -8,7 +8,6 @@ import ProfileImage from '@/app/(primary)/_components/ProfileImage';
 import OptionDropdown from '@/components/OptionDropdown';
 import { UserApi } from '@/app/api/UserApi';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { uploadImages } from '@/utils/S3Upload';
 import { useWebviewCamera } from '@/hooks/useWebviewCamera';
@@ -137,7 +136,6 @@ export default function UserEditPage() {
           handleClose={() => setIsOptionShow(false)}
         />
       )}
-      <Modal />
     </main>
   );
 }

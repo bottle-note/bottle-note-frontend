@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useBlockScroll } from '@/hooks/useBlockScroll';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
 import { UserApi } from '@/app/api/UserApi';
 import { AdminApi } from '@/app/api/AdminApi';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
@@ -47,7 +46,7 @@ const Header = ({
     try {
       // Check admin permissions first
       const hasPermission = await AdminApi.checkPermissions();
-      
+
       if (hasPermission) {
         // Show environment switch modal if permissions are granted
         handleModalState({
@@ -73,7 +72,10 @@ const Header = ({
       handleModalState({
         isShowModal: true,
         type: 'ALERT',
-        mainText: error instanceof Error ? error.message : '권한 확인 중 오류가 발생했습니다.',
+        mainText:
+          error instanceof Error
+            ? error.message
+            : '권한 확인 중 오류가 발생했습니다.',
         handleConfirm: handleCloseModal,
       });
     }
@@ -275,7 +277,6 @@ const SidebarHeader = () => {
           </section>
         </motion.aside>
       )}
-      <Modal />
     </>
   );
 };

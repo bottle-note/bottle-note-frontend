@@ -13,7 +13,6 @@ import { FormValues, ReportTypeMap } from '@/types/Report';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
 import OptionSelect from '@/components/List/OptionSelect';
 import Loading from '@/components/Loading';
 import { REPORT_TYPE } from '@/app/(primary)/report/_constants/index';
@@ -205,7 +204,6 @@ export default function Report() {
         </article>
       </section>
       {isProcessing && <Loading />}
-      {state.isShowModal && <Modal />}
     </>
   );
 }

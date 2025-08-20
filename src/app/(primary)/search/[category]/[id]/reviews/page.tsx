@@ -15,7 +15,6 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
 import useModalStore from '@/store/modalStore';
 import { useAuth } from '@/hooks/auth/useAuth';
-import Modal from '@/components/Modal';
 import { ROUTES } from '@/constants/routes';
 import ReviewItemSkeleton from '@/components/Skeletons/ReviewItemSkeleton';
 
@@ -245,7 +244,6 @@ function Reviews() {
           btnName="리뷰 작성"
         />
       </section>
-      <Modal />
     </div>
   );
 }

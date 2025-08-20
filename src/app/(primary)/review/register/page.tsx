@@ -15,7 +15,6 @@ import { useErrorModal } from '@/hooks/useErrorModal';
 import { useReviewAutoSave } from '@/hooks/useReviewAutoSave';
 import { useReviewSubmission } from '@/hooks/useReviewSubmission';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
 import Toast from '@/components/Toast';
 import ReviewForm from '../_components/form/ReviewForm';
 import ReviewHeaderLayout from '../_components/ReviewHeaderLayout';
@@ -163,7 +162,6 @@ function ReviewRegister() {
       </article>
       {isToastVisible && <Toast message={toastMessage} />}
       {isProcessing && <Loading />}
-      <Modal />
     </FormProvider>
   );
 }

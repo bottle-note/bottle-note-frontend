@@ -4,6 +4,8 @@ import React, { ReactNode, useState } from 'react';
 import { SessionProvider } from 'next-auth/react';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthInitializer } from '@/components/AuthInitializer';
+import Modal from '@/components/Modal';
 import { FocusScrollProvider } from './FocusScrollProvider';
 
 interface Props {
@@ -29,7 +31,9 @@ export const Providers = ({ children }: Props) => {
     <SessionProvider>
       <QueryClientProvider client={queryClient}>
         <FocusScrollProvider>
+          <AuthInitializer />
           {children}
+          <Modal />
           {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
         </FocusScrollProvider>
       </QueryClientProvider>

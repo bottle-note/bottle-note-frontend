@@ -13,7 +13,6 @@ import OptionDropdown from '@/components/OptionDropdown';
 import ProfileImage from '@/app/(primary)/_components/ProfileImage';
 import { RootReply, SubReply } from '@/types/Reply';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
 
@@ -212,7 +211,6 @@ function Reply({
           title={userData?.userId === data.userId ? '내 댓글' : '신고하기'}
         />
       )}
-      {state.isShowModal && <Modal />}
     </>
   );
 }

@@ -13,7 +13,6 @@ import { uploadImages } from '@/utils/S3Upload';
 import { FormValues } from '@/types/Inquire';
 import useModalStore from '@/store/modalStore';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
-import Modal from '@/components/Modal';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import Loading from '@/components/Loading';
 import ImageUploader from '@/app/(primary)/_components/ImageUploader';
@@ -197,7 +196,6 @@ export default function InquireRegister() {
           </section>
         </section>
         {isProcessing && <Loading />}
-        {state.isShowModal && <Modal />}
       </FormProvider>
     </>
   );
