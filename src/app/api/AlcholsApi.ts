@@ -161,9 +161,9 @@ export const AlcoholsApi = {
   async getAlcoholDetails(alcoholId: string) {
     const response = await apiClient.get<ApiResponse<AlcoholDetails>>(
       `/alcohols/${alcoholId}`,
-      // {
-      //   useAuth: false,
-      // },
+      {
+        useAuth: false,
+      },
     );
 
     if (response.errors.length !== 0) {
