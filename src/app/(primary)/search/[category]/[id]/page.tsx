@@ -26,6 +26,7 @@ import AlcoholDetailsSkeleton from '@/components/Skeletons/custom/AlcoholDetails
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import useDebounceAction from '@/hooks/useDebounceAction';
 import AlcoholBox from './_components/AlcoholBox';
+import ProfileDefaultImg from 'public/profile-default.svg';
 import FlavorTag from '../../../_components/FlavorTag';
 
 interface DetailItem {
@@ -275,20 +276,22 @@ export default function SearchAlcohol() {
                         className="flex-shrink-0 flex flex-col items-center space-y-1"
                       >
                         <Link href={ROUTES.USER.BASE(user.userId)}>
-                          <div className="w-14 h-14 rounded-full overflow-hidden">
+                          <div
+                            className={`${user.user_image_url && 'border border-brightGray'} w-14 h-14 rounded-full overflow-hidden border border-bgGray`}
+                          >
                             <Image
                               className="object-cover"
-                              src={user.user_image_url}
+                              src={user.user_image_url || ProfileDefaultImg}
                               alt="user_img"
-                              width={56}
-                              height={56}
+                              width={59}
+                              height={59}
                             />
                           </div>
                         </Link>
-                        <p className="text-10 text-mainDarkGray">
+                        <p className="text-11 text-mainDarkGray">
                           {truncStr(user.nickName, 4)}
                         </p>
-                        <Star rating={user.rating} size={12} />
+                        <Star rating={user.rating} size={14} />
                       </div>
                     ))}
                   </div>
