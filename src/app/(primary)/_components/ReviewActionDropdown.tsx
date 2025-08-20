@@ -2,7 +2,7 @@ import { useRouter } from 'next/navigation';
 import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 import useRelationshipsStore from '@/store/relationshipsStore';
-import { BlockApi } from '@/app/api/BlockApi';
+import { useBlockActions } from '@/hooks/useBlockActions';
 import { deleteReview } from '@/lib/Review';
 import { ROUTES } from '@/constants/routes';
 
@@ -27,7 +27,8 @@ const ReviewActionDropdown = ({
 }: ReviewActionDropdownProps) => {
   const router = useRouter();
   const { handleModalState } = useModalStore();
-  const { addBlocked, isUserBlocked } = useRelationshipsStore();
+  const { isUserBlocked } = useRelationshipsStore();
+  const { handleBlockUser } = useBlockActions();
 
   const handleCloseOption = () => {
     handleModalState({
@@ -45,53 +46,6 @@ const ReviewActionDropdown = ({
         } else {
           router.back();
         }
-      },
-    });
-  };
-
-  const handleBlockUser = (targetUserId: string, nickname: string) => {
-    handleModalState({
-      isShowModal: true,
-      type: 'CONFIRM',
-      mainText: `${nickname}님을 차단하시겠습니까?`,
-      confirmBtnName: '예',
-      cancelBtnName: '아니오',
-      handleConfirm: async () => {
-        try {
-          await BlockApi.blockUser(targetUserId);
-          addBlocked(String(targetUserId));
-          handleModalState({
-            isShowModal: true,
-            type: 'ALERT',
-            mainText: '성공적으로 차단되었습니다.',
-            handleConfirm: () => {
-              handleModalState({
-                isShowModal: false,
-                mainText: '',
-              });
-              if (onRefresh) onRefresh();
-            },
-          });
-        } catch (error) {
-          console.error('차단 실패:', error);
-          handleModalState({
-            isShowModal: true,
-            type: 'ALERT',
-            mainText: '차단에 실패했습니다.',
-            handleConfirm: () => {
-              handleModalState({
-                isShowModal: false,
-                mainText: '',
-              });
-            },
-          });
-        }
-      },
-      handleCancel: () => {
-        handleModalState({
-          isShowModal: false,
-          mainText: '',
-        });
       },
     });
   };

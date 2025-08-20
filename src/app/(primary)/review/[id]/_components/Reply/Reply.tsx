@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useFormContext } from 'react-hook-form';
 import { ReplyApi } from '@/app/api/ReplyApi';
-import { BlockApi } from '@/app/api/BlockApi';
+import { useBlockActions } from '@/hooks/useBlockActions';
 import { truncStr } from '@/utils/truncStr';
 import { formatDate } from '@/utils/formatDate';
 import Label from '@/app/(primary)/_components/Label';
@@ -41,7 +41,8 @@ function Reply({
   const { isLoggedIn, user: userData } = useAuth();
   const { setValue } = useFormContext();
   const { handleModalState, handleLoginModal } = useModalStore();
-  const { isUserBlocked, removeBlocked, addBlocked } = useRelationshipsStore();
+  const { isUserBlocked } = useRelationshipsStore();
+  const { handleBlockUser, handleUnblockUser } = useBlockActions();
 
   const [isOptionShow, setIsOptionShow] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -93,52 +94,6 @@ function Reply({
     }
   };
 
-  const handleBlockUser = (userId: string, userName: string) => {
-    handleModalState({
-      isShowModal: true,
-      type: 'CONFIRM',
-      mainText: `${userName}님을 차단하시겠습니까?`,
-      confirmBtnName: '예',
-      cancelBtnName: '아니오',
-      handleConfirm: async () => {
-        try {
-          await BlockApi.blockUser(userId);
-          addBlocked(String(userId));
-          handleModalState({
-            isShowModal: true,
-            type: 'ALERT',
-            mainText: '성공적으로 차단되었습니다.',
-            handleConfirm: () => {
-              handleModalState({
-                isShowModal: false,
-                mainText: '',
-              });
-            },
-          });
-        } catch (error) {
-          console.error('차단 실패:', error);
-          handleModalState({
-            isShowModal: true,
-            type: 'ALERT',
-            mainText: '차단에 실패했습니다.',
-            handleConfirm: () => {
-              handleModalState({
-                isShowModal: false,
-                mainText: '',
-              });
-            },
-          });
-        }
-      },
-      handleCancel: () => {
-        handleModalState({
-          isShowModal: false,
-          mainText: '',
-        });
-      },
-    });
-  };
-
   const handleOptionSelect = (option: { name: string; type: string }) => {
     if (option.type === 'DELETE') {
       handleModalState({
@@ -154,41 +109,6 @@ function Reply({
     } else if (option.type === 'USER_BLOCK') {
       handleBlockUser(String(data.userId), data.nickName);
     }
-  };
-
-  const handleUnblockUser = (userId: string, userName: string) => {
-    handleModalState({
-      isShowModal: true,
-      type: 'CONFIRM',
-      mainText: `${userName}님을 차단 해제하시겠습니까?`,
-      confirmBtnName: '예',
-      cancelBtnName: '아니오',
-      handleConfirm: async () => {
-        try {
-          await BlockApi.unblockUser(userId);
-          removeBlocked(userId);
-          handleModalState({
-            isShowModal: false,
-            mainText: '',
-            subText: '',
-          });
-        } catch (error) {
-          console.error('차단 해제 실패:', error);
-          handleModalState({
-            isShowModal: false,
-            mainText: '',
-            subText: '',
-          });
-        }
-      },
-      handleCancel: () => {
-        handleModalState({
-          isShowModal: false,
-          mainText: '',
-          subText: '',
-        });
-      },
-    });
   };
 
   return (

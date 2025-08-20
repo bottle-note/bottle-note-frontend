@@ -13,7 +13,7 @@ import useModalStore from '@/store/modalStore';
 import useRelationshipsStore from '@/store/relationshipsStore';
 import { useAuth } from '@/hooks/auth/useAuth';
 import ReviewActionDropdown from '@/app/(primary)/_components/ReviewActionDropdown';
-import { BlockApi } from '@/app/api/BlockApi';
+import { useBlockActions } from '@/hooks/useBlockActions';
 
 interface Props {
   data: ReviewType;
@@ -23,8 +23,9 @@ interface Props {
 function ReviewItem({ data, onRefresh }: Props) {
   const { user: userData, isLoggedIn } = useAuth();
   const { isLikedByMe } = data;
-  const { handleLoginModal, handleModalState } = useModalStore();
-  const { isUserBlocked, removeBlocked } = useRelationshipsStore();
+  const { handleLoginModal } = useModalStore();
+  const { isUserBlocked } = useRelationshipsStore();
+  const { handleUnblockUser } = useBlockActions();
 
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(isLikedByMe);
@@ -38,41 +39,6 @@ function ReviewItem({ data, onRefresh }: Props) {
   useEffect(() => {
     setLikeCount(data.likeCount);
   }, [data.likeCount]);
-
-  const handleUnblockUser = (userId: string, userName: string) => {
-    handleModalState({
-      isShowModal: true,
-      type: 'CONFIRM',
-      mainText: `${userName}님을 차단 해제하시겠습니까?`,
-      confirmBtnName: '예',
-      cancelBtnName: '아니오',
-      handleConfirm: async () => {
-        try {
-          await BlockApi.unblockUser(userId);
-          removeBlocked(userId);
-          handleModalState({
-            isShowModal: false,
-            mainText: '',
-            subText: '',
-          });
-        } catch (error) {
-          console.error('차단 해제 실패:', error);
-          handleModalState({
-            isShowModal: false,
-            mainText: '',
-            subText: '',
-          });
-        }
-      },
-      handleCancel: () => {
-        handleModalState({
-          isShowModal: false,
-          mainText: '',
-          subText: '',
-        });
-      },
-    });
-  };
 
   return (
     <>

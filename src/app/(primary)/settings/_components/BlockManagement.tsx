@@ -2,21 +2,38 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import useModalStore from '@/store/modalStore';
-import useRelationshipsStore from '@/store/relationshipsStore';
+import { useBlockActions } from '@/hooks/useBlockActions';
 import { BlockApi } from '@/app/api/BlockApi';
 import ProfileImage from '@/app/(primary)/_components/ProfileImage';
 import { BlockListApi } from '@/types/Settings';
 import List from '@/components/List/List';
 
 export default function BlockManagement() {
-  const { handleModalState, handleCloseModal } = useModalStore();
-  const { addBlocked, removeBlocked } = useRelationshipsStore();
   const [blockedUsers, setBlockedUsers] = useState<BlockListApi | null>(null);
   const [loading, setLoading] = useState(true);
   const [unblockingUsers, setUnblockingUsers] = useState<Set<string>>(
     new Set(),
   );
+
+  const { handleBlockUser, handleUnblockUser } = useBlockActions({
+    onUnblockStart: (userId) => {
+      setUnblockingUsers((prev) => new Set(prev).add(userId));
+    },
+    onUnblockError: (userId) => {
+      setUnblockingUsers((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(userId);
+        return newSet;
+      });
+    },
+    onBlockSuccess: (userId) => {
+      setUnblockingUsers((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(userId);
+        return newSet;
+      });
+    },
+  });
 
   useEffect(() => {
     const fetchBlockList = async () => {
@@ -46,49 +63,6 @@ export default function BlockManagement() {
         stiffness: 100,
       },
     }),
-  };
-
-  const handleUnblockUser = async (userId: string) => {
-    try {
-      setUnblockingUsers((prev) => new Set(prev).add(userId));
-      await BlockApi.unblockUser(userId);
-      removeBlocked(String(userId));
-    } catch (error) {
-      console.error('차단 해제 실패:', error);
-      setUnblockingUsers((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(userId);
-        return newSet;
-      });
-    }
-  };
-
-  const handleBlockUser = (userId: string, nickname: string) => {
-    handleModalState({
-      isShowModal: true,
-      type: 'CONFIRM',
-      mainText: `${nickname}님을 차단하시겠습니까?`,
-      confirmBtnName: '예',
-      cancelBtnName: '아니오',
-      handleConfirm: async () => {
-        try {
-          await BlockApi.blockUser(userId);
-          addBlocked(String(userId));
-
-          setUnblockingUsers((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(userId);
-            return newSet;
-          });
-
-          handleCloseModal();
-        } catch (error) {
-          console.error('차단 실패:', error);
-          handleCloseModal();
-        }
-      },
-      handleCancel: handleCloseModal,
-    });
   };
 
   return (
@@ -131,7 +105,7 @@ export default function BlockManagement() {
                         onClick={() =>
                           isUnblocking
                             ? handleBlockUser(user.userId, user.userName)
-                            : handleUnblockUser(user.userId)
+                            : handleUnblockUser(user.userId, user.userName)
                         }
                         className={`px-[10px] py-1 border border-subCoral rounded text-12 font-medium transition-colors flex-shrink-0 ${
                           isUnblocking
