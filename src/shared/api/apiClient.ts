@@ -4,7 +4,7 @@ import useModalStore from '@/store/modalStore';
 import { ApiError } from '@/utils/ApiError';
 
 interface ApiClientOptions extends RequestInit {
-  useAuth?: boolean; // 인증 토큰 사용 여부 (기본: true)
+  authRequired?: boolean; // 인증 토큰 사용 여부 (기본: true)
   baseUrl?: 'bottle-api' | 'api' | 'bottle-api/v2'; // API 기본 경로 (기본: 'bottle-api')
   cache?: RequestCache; // 캐시 정책 (기본: 'no-store')
 }
@@ -26,7 +26,7 @@ class ApiClient {
     retryCount = 0,
   ): Promise<T> {
     const {
-      useAuth = true,
+      authRequired = true,
       baseUrl = 'bottle-api',
       cache = 'no-store',
       ...fetchOptions
@@ -35,14 +35,16 @@ class ApiClient {
     const headers = new Headers(fetchOptions.headers);
     const session = await getSession();
 
-    if (useAuth) {
+    if (authRequired) {
       if (!session) {
         signOut({ callbackUrl: '/login' });
         const { handleLoginState } = useModalStore.getState();
         handleLoginState(true);
         throw new Error('Authentication required');
       }
+    }
 
+    if (session?.user?.accessToken) {
       headers.set('Authorization', `Bearer ${session.user.accessToken}`);
     }
 
@@ -75,7 +77,7 @@ class ApiClient {
       }
 
       if (!response.ok) {
-        if (result?.code === 403 && retryCount < 1 && useAuth && session) {
+        if (result?.code === 403 && retryCount < 1 && authRequired && session) {
           try {
             // /api/token/renew 가 next-auth 세션까지 갱신해 줄 것임
             await AuthApi.client.renewToken(session.user.refreshToken);

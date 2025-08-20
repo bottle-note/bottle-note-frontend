@@ -12,7 +12,7 @@ export const AlcoholsApi = {
     const response = await apiClient.get<
       ApiResponse<{ alcohols: AlcoholAPI[] }>
     >(`/popular/week`, {
-      useAuth: false,
+      authRequired: false,
       cache: 'force-cache',
     });
 
@@ -34,7 +34,7 @@ export const AlcoholsApi = {
     const response = await apiClient.get<ApiResponse<AlcoholAPI[]>>(
       `/popular/spring`,
       {
-        useAuth: false,
+        authRequired: false,
         cache: 'force-cache',
       },
     );
@@ -57,7 +57,7 @@ export const AlcoholsApi = {
     const response = await apiClient.get<ApiResponse<{ items: AlcoholAPI[] }>>(
       `/history/view/alcohols`,
       {
-        useAuth: false,
+        authRequired: false,
         cache: 'force-cache',
       },
     );
@@ -78,7 +78,7 @@ export const AlcoholsApi = {
 
   async getRegion() {
     const response = await apiClient.get<ApiResponse<RegionApi[]>>(`/regions`, {
-      useAuth: false,
+      authRequired: false,
     });
 
     const regions = response.data.map((region) => {
@@ -97,7 +97,7 @@ export const AlcoholsApi = {
     const response = await apiClient.get<ApiResponse<CategoryApi[]>>(
       `/alcohols/categories?type=${type}`,
       {
-        useAuth: false,
+        authRequired: false,
         cache: 'force-cache',
       },
     );
@@ -132,7 +132,7 @@ export const AlcoholsApi = {
     >(
       `/alcohols/search?keyword=${decodeURI(keyword ?? '')}&category=${category}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
       {
-        useAuth: false,
+        authRequired: false,
       },
     );
 
@@ -162,7 +162,7 @@ export const AlcoholsApi = {
     const response = await apiClient.get<ApiResponse<AlcoholDetails>>(
       `/alcohols/${alcoholId}`,
       {
-        useAuth: false,
+        authRequired: false,
       },
     );
 
