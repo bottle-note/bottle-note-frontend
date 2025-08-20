@@ -13,7 +13,6 @@ import {
   SERVICE_TYPE_LIST,
   BUSINESS_TYPE_LIST,
 } from '@/constants/Inquire';
-import adminDefaultImg from 'public/bottle_note_profile.svg';
 
 export default function Inquire() {
   const router = useRouter();
@@ -135,35 +134,22 @@ export default function Inquire() {
             </article>
 
             <article className="border-t border-b border-bgGray mx-5 my-[26px] py-[26px]">
-              <p className="text-13 text-subCoral">
-                {getStatusText(inquireDetails.statusType)}
-              </p>
-            </article>
-
-            {inquireDetails.adminId && (
-              <article className="mx-5 py-3 space-y-4 border-b-[0.01rem] border-mainGray/30">
-                <div className="flex justify-between items-center space-x-1 ">
-                  <div className="flex justify-start items-center space-x-2">
-                    <div className="w-[1.9rem] h-[1.9rem] rounded-full overflow-hidden">
-                      <Image
-                        className="object-cover"
-                        src={adminDefaultImg}
-                        alt="bottle_note_img"
-                        width={30}
-                        height={30}
-                      />
-                    </div>
-                    <p className="text-mainGray text-10">보틀노트</p>
-                  </div>
-                  <p className="text-mainGray text-10">
+              <div className="flex items-center justify-between">
+                <p className="text-13 text-subCoral font-bold">
+                  {getStatusText(inquireDetails.statusType)}
+                </p>
+                {inquireDetails.lastModifyAt && (
+                  <p className="text-mainGray text-12">
                     {formatDate(inquireDetails.lastModifyAt) as string}
                   </p>
-                </div>
-                <div className="text-10 break-words leading-none text-mainDarkGray">
+                )}
+              </div>
+              {inquireDetails.adminId && (
+                <div className="pt-5 text-10 break-words leading-none text-mainDarkGray">
                   {inquireDetails.responseContent}
                 </div>
-              </article>
-            )}
+              )}
+            </article>
           </>
         )}
       </section>
