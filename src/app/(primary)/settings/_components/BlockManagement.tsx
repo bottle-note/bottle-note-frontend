@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
+import useRelationshipsStore from '@/store/relationshipsStore';
 import { BlockApi } from '@/app/api/BlockApi';
 import ProfileImage from '@/app/(primary)/_components/ProfileImage';
 import { BlockListApi } from '@/types/Settings';
@@ -11,6 +11,7 @@ import List from '@/components/List/List';
 
 export default function BlockManagement() {
   const { handleModalState, handleCloseModal } = useModalStore();
+  const { addBlocked, removeBlocked } = useRelationshipsStore();
   const [blockedUsers, setBlockedUsers] = useState<BlockListApi | null>(null);
   const [loading, setLoading] = useState(true);
   const [unblockingUsers, setUnblockingUsers] = useState<Set<string>>(
@@ -51,6 +52,7 @@ export default function BlockManagement() {
     try {
       setUnblockingUsers((prev) => new Set(prev).add(userId));
       await BlockApi.unblockUser(userId);
+      removeBlocked(String(userId));
     } catch (error) {
       console.error('차단 해제 실패:', error);
       setUnblockingUsers((prev) => {
@@ -71,6 +73,7 @@ export default function BlockManagement() {
       handleConfirm: async () => {
         try {
           await BlockApi.blockUser(userId);
+          addBlocked(String(userId));
 
           setUnblockingUsers((prev) => {
             const newSet = new Set(prev);
@@ -150,8 +153,6 @@ export default function BlockManagement() {
           </List>
         </div>
       </div>
-
-      <Modal />
     </>
   );
 }

@@ -9,6 +9,12 @@ export const BlockApi = {
     return response;
   },
 
+  async getBlockUserIdList() {
+    const response = await apiClient.get<ApiResponse<string[]>>(`/blocks/ids`);
+
+    return response;
+  },
+
   async unblockUser(userId: string) {
     const response = await apiClient.delete<ApiResponse<BlockListApi>>(
       `/blocks/${userId}`,

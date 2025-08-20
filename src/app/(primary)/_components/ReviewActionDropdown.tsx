@@ -1,6 +1,7 @@
 import { useRouter } from 'next/navigation';
 import OptionDropdown from '@/components/OptionDropdown';
 import useModalStore from '@/store/modalStore';
+import useRelationshipsStore from '@/store/relationshipsStore';
 import { BlockApi } from '@/app/api/BlockApi';
 import { deleteReview } from '@/lib/Review';
 import { ROUTES } from '@/constants/routes';
@@ -26,6 +27,7 @@ const ReviewActionDropdown = ({
 }: ReviewActionDropdownProps) => {
   const router = useRouter();
   const { handleModalState } = useModalStore();
+  const { addBlocked, isUserBlocked } = useRelationshipsStore();
 
   const handleCloseOption = () => {
     handleModalState({
@@ -57,6 +59,7 @@ const ReviewActionDropdown = ({
       handleConfirm: async () => {
         try {
           await BlockApi.blockUser(targetUserId);
+          addBlocked(String(targetUserId));
           handleModalState({
             isShowModal: true,
             type: 'ALERT',
@@ -128,7 +131,9 @@ const ReviewActionDropdown = ({
           : [
               { name: '리뷰 신고', type: 'REVIEW_REPORT' },
               { name: '유저 신고', type: 'USER_REPORT' },
-              { name: '유저 차단', type: 'USER_BLOCK' },
+              ...(isUserBlocked(userId)
+                ? []
+                : [{ name: '유저 차단', type: 'USER_BLOCK' }]),
             ]
       }
       handleOptionSelect={handleOptionSelect}

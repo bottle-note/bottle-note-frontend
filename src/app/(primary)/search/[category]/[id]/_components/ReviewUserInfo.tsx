@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Label from '@/app/(primary)/_components/Label';
 import ProfileImage from '@/app/(primary)/_components/ProfileImage';
+import useRelationshipsStore from '@/store/relationshipsStore';
 import { truncStr } from '@/utils/truncStr';
 import Star from '@/components/Star';
 import { ROUTES } from '@/constants/routes';
@@ -33,18 +34,31 @@ export default function ReviewUserInfo({
   starTextStyle = 'text-subCoral font-semibold text-20 min-w-5',
   className = '',
 }: ReviewUserInfoProps) {
+  const { isUserBlocked } = useRelationshipsStore();
+  const isBlocked = isUserBlocked(String(userInfo.userId));
+
   return (
     <div className={`flex items-center justify-between ${className}`}>
       <div className="flex items-center space-x-2">
         <Link href={ROUTES.USER.BASE(userInfo.userId)}>
           <div className="flex items-center space-x-1">
-            <ProfileImage
-              profileImgSrc={userInfo.userProfileImage}
-              size={userImageSize}
-            />
-            <p className={`text-mainGray ${userNameSize}`}>
-              {truncStr(userInfo.nickName, 12)}
-            </p>
+            {isBlocked ? (
+              <>
+                <div className="rounded-full w-[22px] h-[22px] bg-brightGray" />
+
+                <p className={`text-mainGray ${userNameSize}`}>차단한 사용자</p>
+              </>
+            ) : (
+              <>
+                <ProfileImage
+                  profileImgSrc={userInfo.userProfileImage}
+                  size={userImageSize}
+                />
+                <p className={`text-mainGray ${userNameSize}`}>
+                  {truncStr(userInfo.nickName, 12)}
+                </p>
+              </>
+            )}
           </div>
         </Link>
         <div className="flex items-center space-x-1">
@@ -54,7 +68,7 @@ export default function ReviewUserInfo({
               icon="/icon/thumbup-filled-white.svg"
               iconHeight={12}
               iconWidth={12}
-              styleClass="bg-mainCoral text-white px-2 py-[3px] text-10 border-mainCoral rounded"
+              styleClass={`${isBlocked ? 'bg-brightGray border-brightGray' : 'bg-mainCoral border-mainCoral'} text-white px-2 py-[3px] text-10 rounded`}
             />
           )}
           {isMyReview && (
@@ -68,7 +82,7 @@ export default function ReviewUserInfo({
           )}
         </div>
       </div>
-      {rating !== undefined && rating !== null && (
+      {rating !== undefined && rating !== null && !isBlocked && (
         <Star rating={rating} size={starSize} textStyle={starTextStyle} />
       )}
     </div>
