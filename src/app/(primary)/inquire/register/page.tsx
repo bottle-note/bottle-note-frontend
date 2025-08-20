@@ -26,7 +26,7 @@ export default function InquireRegister() {
   const paramsType =
     (searchParams.get('type') as keyof typeof INQUIRE_TYPE) || 'service';
   const serviceType = INQUIRE_TYPE[paramsType] || paramsType;
-  const { state, handleModalState } = useModalStore();
+  const { handleModalState } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
 
   const createSchema = () => {

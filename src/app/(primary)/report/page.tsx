@@ -48,7 +48,7 @@ const getSchemaByType = (reportType: ReportType) => {
 export default function Report() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { state, handleModalState } = useModalStore();
+  const { handleModalState } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
 
   const type = searchParams.get('type') as ReportType;
