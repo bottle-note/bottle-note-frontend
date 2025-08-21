@@ -132,8 +132,6 @@ function ReviewRegister() {
         isShowModal: true,
         mainText: '작성 중인 내용이 있습니다.\n정말 뒤로 가시겠습니까?',
         type: 'CONFIRM',
-        cancelBtnName: '예',
-        confirmBtnName: '아니요',
         handleConfirm: () => handleModalState({ isShowModal: false }),
         handleCancel: () => {
           handleModalState({ isShowModal: false });

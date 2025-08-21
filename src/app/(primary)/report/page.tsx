@@ -148,8 +148,6 @@ export default function Report() {
               if (watch('content')?.length > 0) {
                 handleModalState({
                   isShowModal: true,
-                  confirmBtnName: '예',
-                  cancelBtnName: '아니요',
                   mainText: '작성 중인 내용이 있습니다. 정말 나가시겠습니까?',
                   type: 'CONFIRM',
                   handleConfirm: () => {

@@ -20,8 +20,6 @@ export const useBlockActions = (options: UseBlockActionsOptions = {}) => {
       isShowModal: true,
       type: 'CONFIRM',
       mainText: `${userName}님을 차단하시겠습니까?`,
-      confirmBtnName: '예',
-      cancelBtnName: '아니오',
       handleConfirm: async () => {
         try {
           options.onBlockStart?.(userId);
@@ -71,8 +69,6 @@ export const useBlockActions = (options: UseBlockActionsOptions = {}) => {
       isShowModal: true,
       type: 'CONFIRM',
       mainText: `${userName}님을 차단 해제하시겠습니까?`,
-      confirmBtnName: '예',
-      cancelBtnName: '아니오',
       handleConfirm: async () => {
         try {
           options.onUnblockStart?.(userId);

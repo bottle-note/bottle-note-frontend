@@ -32,7 +32,6 @@ export default function Settings() {
         mainText:
           '로그인이 필요한 서비스입니다.\n로그인 페이지로 이동하시겠습니까?',
         confirmBtnName: '로그인',
-        cancelBtnName: '취소',
         handleConfirm: () => {
           handleCloseModal();
           route.push('/login');
@@ -70,8 +69,6 @@ export default function Settings() {
   const handleLogout = async () => {
     handleModalState({
       isShowModal: true,
-      cancelBtnName: '아니오',
-      confirmBtnName: '예',
       type: 'CONFIRM',
       mainText: `정말 로그아웃하시겠습니까?`,
       handleConfirm: async () => {
@@ -93,8 +90,6 @@ export default function Settings() {
   const handleDeleteAccount = async () => {
     handleModalState({
       isShowModal: true,
-      cancelBtnName: '아니오',
-      confirmBtnName: '예',
       type: 'CONFIRM',
       mainText: `서비스를 탈퇴하시겠습니까?`,
       handleConfirm: async () => {
