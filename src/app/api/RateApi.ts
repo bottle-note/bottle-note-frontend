@@ -17,7 +17,7 @@ export const RateApi = {
       ApiResponse<{ ratings: RateAPI[]; totalCount: number }>
     >(
       `/rating?keyword=${keyword}&category=${category}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
-      { useAuth: false },
+      { authRequired: false },
     );
 
     const formattedResult: ApiResponse<{
