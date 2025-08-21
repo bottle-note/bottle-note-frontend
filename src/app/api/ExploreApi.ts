@@ -12,7 +12,7 @@ export const ExploreApi = {
       ApiResponse<{ items: ExploreReview[] }>
     >(
       `/reviews/explore/standard?keywords=${keywords.join('&keywords=')}&cursor=${cursor}&size=${pageSize}`,
-      { useAuth: false },
+      { authRequired: false },
     );
 
     return response;
@@ -26,7 +26,7 @@ export const ExploreApi = {
       ApiResponse<{ items: ExploreAlcohol[] }>
     >(
       `/alcohols/explore/standard?keywords=${keywords.join('&keywords=')}&cursor=${cursor}&size=${pageSize}`,
-      { useAuth: false },
+      { authRequired: false },
     );
 
     return response;

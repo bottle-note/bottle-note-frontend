@@ -27,7 +27,7 @@ export const UserApi = {
     const response = await apiClient.get<{ data: UserInfoApi }>(
       `/my-page/${userId}`,
       {
-        useAuth: false,
+        authRequired: false,
         cache: 'force-cache',
       },
     );

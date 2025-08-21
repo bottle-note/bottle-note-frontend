@@ -20,7 +20,7 @@ export const ReviewApi = {
   }: ListQueryParams) {
     const response = await apiClient.get<ApiResponse<ReviewListApi>>(
       `/reviews/${alcoholId}?sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
-      { useAuth: false },
+      { authRequired: false },
     );
 
     if (response.errors.length !== 0) {
@@ -55,7 +55,7 @@ export const ReviewApi = {
         reviewInfo: any;
         reviewImageList: any[];
       }>
-    >(`/reviews/detail/${reviewId}`, { useAuth: false });
+    >(`/reviews/detail/${reviewId}`, { authRequired: false });
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
