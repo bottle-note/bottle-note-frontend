@@ -1,26 +1,12 @@
 import { format } from 'date-fns';
 import { InquireList } from '@/types/Inquire';
 import { truncStr } from '@/utils/truncStr';
+import { getStatusText } from '@/constants/Inquire';
 
 interface InquireTableProps {
   inquireList: InquireList[];
   onItemClick: (helpId: number) => void;
 }
-
-const getStatusText = (status: string) => {
-  switch (status) {
-    case 'WAITING':
-      return '대기';
-    case 'SUCCESS':
-      return '답변완료';
-    case 'REJECT':
-      return '반려';
-    case 'DELETED':
-      return '삭제';
-    default:
-      return status;
-  }
-};
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -54,8 +40,8 @@ export default function InquireTable({
         <tbody>
           {inquireList.map((item) => (
             <tr
-              key={item.helpId}
-              onClick={() => onItemClick(item.helpId)}
+              key={item.id}
+              onClick={() => onItemClick(item.id)}
               className="border-t border-bgGray hover:bg-gray-50 cursor-pointer transition-colors"
             >
               <td className="py-[15px] px-4 text-13 text-mainBlack">
@@ -67,8 +53,8 @@ export default function InquireTable({
                 {format(new Date(item.createAt), 'yyyy.MM.dd')}
               </td>
               <td className="py-[15px] px-4">
-                <span className={`text-13 ${getStatusColor(item.helpStatus)}`}>
-                  {getStatusText(item.helpStatus)}
+                <span className={`text-13 ${getStatusColor(item.status)}`}>
+                  {getStatusText(item.status)}
                 </span>
               </td>
             </tr>

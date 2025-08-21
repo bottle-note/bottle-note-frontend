@@ -29,7 +29,7 @@ export default function Inquire() {
     isFetching,
     targetRef,
   } = usePaginatedQuery<{
-    helpList: InquireList[];
+    items: InquireList[];
     totalCount: number;
   }>({
     queryKey: ['inquireList', paramsType],
@@ -77,9 +77,7 @@ export default function Inquire() {
           <List.Section>
             {inquireList && (
               <InquireTable
-                inquireList={[
-                  ...inquireList.map((list) => list.data.helpList),
-                ].flat()}
+                inquireList={inquireList.flatMap((list) => list.data.items)}
                 onItemClick={handleItemClick}
               />
             )}

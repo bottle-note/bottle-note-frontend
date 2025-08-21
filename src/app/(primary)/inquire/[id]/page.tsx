@@ -7,12 +7,39 @@ import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import BaseImage from '@/components/BaseImage';
 import { InquireApi } from '@/app/api/InquireApi';
 import { formatDate } from '@/utils/formatDate';
-import { InquireDetailsApi } from '@/types/Inquire';
+import {
+  ServiceInquireDetailsApi,
+  BusinessInquireDetailsApi,
+  UnifiedInquireDetails,
+  Status,
+} from '@/types/Inquire';
 import {
   INQUIRE_TYPE,
   SERVICE_TYPE_LIST,
   BUSINESS_TYPE_LIST,
+  getStatusText,
 } from '@/constants/Inquire';
+
+const createServiceAdapter = (
+  data: ServiceInquireDetailsApi,
+  typeList: any[],
+): UnifiedInquireDetails => ({
+  ...data,
+  id: data.helpId,
+  status: data.statusType,
+  type: data.helpType,
+  typeName: typeList.find((item) => item.type === data.helpType)?.name || '',
+});
+
+const createBusinessAdapter = (
+  data: BusinessInquireDetailsApi,
+  typeList: any[],
+): UnifiedInquireDetails => ({
+  ...data,
+  type: data.businessSupportType,
+  typeName:
+    typeList.find((item) => item.type === data.businessSupportType)?.name || '',
+});
 
 export default function Inquire() {
   const router = useRouter();
@@ -22,38 +49,40 @@ export default function Inquire() {
     (searchParams.get('type') as keyof typeof INQUIRE_TYPE) || 'service';
   const serviceType = INQUIRE_TYPE[paramsType] || paramsType;
   const typeList =
-    paramsType === 'business' ? BUSINESS_TYPE_LIST : SERVICE_TYPE_LIST;
+    paramsType === 'business'
+      ? [...BUSINESS_TYPE_LIST]
+      : [...SERVICE_TYPE_LIST];
   const [inquireDetails, setInquireDetails] =
-    useState<InquireDetailsApi | null>(null);
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'WAITING':
-        return '답변대기중';
-      case 'SUCCESS':
-        return '답변완료';
-      case 'REJECT':
-        return '반려';
-      case 'DELETED':
-        return '삭제';
-      default:
-        return '답변대기중';
-    }
-  };
+    useState<UnifiedInquireDetails | null>(null);
 
   useEffect(() => {
     async function fetchInquireDetails() {
       if (!helpId) return;
       try {
-        const result = await InquireApi.getInquireDetails(helpId);
-        setInquireDetails(result);
+        const result =
+          paramsType === 'business'
+            ? await InquireApi.getBusinessInquireDetails(helpId)
+            : await InquireApi.getInquireDetails(helpId);
+
+        const adaptedResult =
+          paramsType === 'business'
+            ? createBusinessAdapter(
+                result as BusinessInquireDetailsApi,
+                typeList,
+              )
+            : createServiceAdapter(
+                result as ServiceInquireDetailsApi,
+                typeList,
+              );
+
+        setInquireDetails(adaptedResult);
       } catch (error) {
         console.error('Failed to fetch review details:', error);
       }
     }
 
     fetchInquireDetails();
-  }, [helpId]);
+  }, [helpId, paramsType]);
 
   return (
     <>
@@ -77,11 +106,7 @@ export default function Inquire() {
           <>
             <article className="mt-4 mx-5 flex justify-between items-center">
               <p className="text-13 font-bold text-subCoral">
-                {
-                  typeList.find((item) => item.type === inquireDetails.helpType)
-                    ?.name
-                }{' '}
-                문의
+                {inquireDetails.typeName} 문의
               </p>
               <p className="text-12 text-mainGray">
                 {formatDate(inquireDetails.createAt) as string}
@@ -100,45 +125,47 @@ export default function Inquire() {
                   }}
                 />
               </div>
-              <div className="flex overflow-x-auto gap-[6px] pb-2">
-                {inquireDetails.imageUrlList.map((imgData) => (
-                  <div
-                    className="relative flex-shrink-0 cursor-pointer"
-                    key={imgData.viewUrl}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() =>
-                      router.push(
-                        `/image-viewer?src=${encodeURIComponent(imgData.viewUrl)}&title=${encodeURIComponent('첨부이미지')}`,
-                      )
-                    }
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
+              {inquireDetails.imageUrlList.length > 0 && (
+                <div className="flex overflow-x-auto gap-[6px] pb-2">
+                  {inquireDetails.imageUrlList.map((imgData) => (
+                    <div
+                      className="relative flex-shrink-0 cursor-pointer"
+                      key={imgData.viewUrl}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() =>
                         router.push(
                           `/image-viewer?src=${encodeURIComponent(imgData.viewUrl)}&title=${encodeURIComponent('첨부이미지')}`,
-                        );
+                        )
                       }
-                    }}
-                  >
-                    <BaseImage
-                      src={imgData.viewUrl}
-                      alt="Inquire image"
-                      priority
-                      className="cover"
-                      width={104}
-                      height={104}
-                    />
-                  </div>
-                ))}
-              </div>
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          router.push(
+                            `/image-viewer?src=${encodeURIComponent(imgData.viewUrl)}&title=${encodeURIComponent('첨부이미지')}`,
+                          );
+                        }
+                      }}
+                    >
+                      <BaseImage
+                        src={imgData.viewUrl}
+                        alt="Inquire image"
+                        priority
+                        className="cover"
+                        width={104}
+                        height={104}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </article>
 
             <article className="border-t border-b border-bgGray mx-5 my-[26px] py-[26px]">
               <div className="flex items-center justify-between">
                 <p className="text-13 text-subCoral font-bold">
-                  {getStatusText(inquireDetails.statusType)}
+                  {getStatusText(inquireDetails.status as Status)}
                 </p>
-                {inquireDetails.lastModifyAt && (
+                {inquireDetails.adminId && inquireDetails.lastModifyAt && (
                   <p className="text-mainGray text-12">
                     {formatDate(inquireDetails.lastModifyAt) as string}
                   </p>

@@ -1,3 +1,8 @@
+import { SERVICE_TYPE_LIST, BUSINESS_TYPE_LIST } from '@/constants/Inquire';
+
+export type ServiceType = (typeof SERVICE_TYPE_LIST)[number]['type'];
+export type BusinessType = (typeof BUSINESS_TYPE_LIST)[number]['type'];
+export type Status = 'WAITING' | 'SUCCESS' | 'REJECT' | 'DELETED';
 export interface FormValues {
   title: string;
   content: string;
@@ -22,28 +27,34 @@ export interface InquirePostApi {
   responseAt: string;
 }
 
-type helpStatus = 'WAITING' | 'SUCCESS' | 'REJECT' | 'DELETED';
-
 export interface InquireList {
-  helpId: number;
+  id: number;
   title: string;
   content: string;
   createAt: string;
-  helpStatus: helpStatus;
+  status: Status;
 }
 
-export interface InquireListApi {
-  helpList: InquireList[];
+export interface ServiceInquireListApi {
+  helpList: {
+    helpId: number;
+    title: string;
+    content: string;
+    createAt: string;
+    helpStatus: Status;
+  }[];
   totalCount: number;
 }
 
-export interface InquireDetailsApi {
-  helpId: number;
+export interface BusinessInquireListApi {
+  items: InquireList[];
+  totalCount: number;
+}
+
+interface InquireDetailsApi {
   title: string;
   content: string;
-  helpType: string;
   createAt: string;
-  statusType: helpStatus;
   adminId: number;
   lastModifyAt: string;
   responseContent: string;
@@ -51,4 +62,32 @@ export interface InquireDetailsApi {
     order: number;
     viewUrl: string;
   }[];
+}
+
+export interface ServiceInquireDetailsApi extends InquireDetailsApi {
+  helpId: number;
+  helpType: ServiceType;
+  statusType: Status;
+}
+
+export interface BusinessInquireDetailsApi extends InquireDetailsApi {
+  id: number;
+  contact: string;
+  businessSupportType: BusinessType;
+  status: Status;
+}
+
+// Unified interface for inquire details
+export interface UnifiedInquireDetails {
+  id: string | number;
+  title: string;
+  content: string;
+  createAt: string;
+  status: string;
+  type: string;
+  typeName: string;
+  adminId: number;
+  lastModifyAt: string;
+  responseContent: string;
+  imageUrlList: { order: number; viewUrl: string }[];
 }

@@ -1,3 +1,5 @@
+import { Status } from '@/types/Inquire';
+
 export const INQUIRE_TYPE = {
   service: '서비스',
   business: '비즈니스',
@@ -20,7 +22,7 @@ export const SERVICE_TYPE_LIST = [
     type: 'ETC',
     name: '기타 문의',
   },
-];
+] as const;
 
 export const BUSINESS_TYPE_LIST = [
   {
@@ -35,4 +37,19 @@ export const BUSINESS_TYPE_LIST = [
     type: 'ETC',
     name: '기타 문의',
   },
-];
+] as const;
+
+export const getStatusText = (status: Status): string => {
+  switch (status) {
+    case 'WAITING':
+      return '답변대기중';
+    case 'SUCCESS':
+      return '답변완료';
+    case 'REJECT':
+      return '반려';
+    case 'DELETED':
+      return '삭제';
+    default:
+      return '답변대기중';
+  }
+};
