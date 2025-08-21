@@ -50,7 +50,7 @@ export default function SearchBar({
   const inputProps = {
     type: 'text',
     className:
-      'w-full bg-white rounded-lg h-10 pl-4 pr-12 outline-none text-mainCoral placeholder-mainCoral text-15 border border-mainCoral',
+      'w-full bg-white rounded-lg h-10 pl-4 pr-12 outline-none text-mainDarkGray placeholder-mainCoral text-15 border border-mainCoral',
     placeholder,
     'aria-label': '검색어 입력',
   };
