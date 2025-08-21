@@ -18,14 +18,38 @@ import { createScreenConfigs, createMenuCategories } from './config';
 
 export default function Settings() {
   const route = useRouter();
-  const { logout, user } = useAuth();
+  const { logout, user, isLoggedIn } = useAuth();
   const { data: session } = useSession();
   const { handleModalState, handleCloseModal } = useModalStore();
   const { currentScreen, setCurrentScreen, resetToMain, clearStorage } =
     useSettingsStore();
 
+  const checkAuthAndExecute = (callback: () => void) => {
+    if (!isLoggedIn) {
+      handleModalState({
+        isShowModal: true,
+        type: 'CONFIRM',
+        mainText:
+          '로그인이 필요한 서비스입니다.\n로그인 페이지로 이동하시겠습니까?',
+        confirmBtnName: '로그인',
+        cancelBtnName: '취소',
+        handleConfirm: () => {
+          handleCloseModal();
+          route.push('/login');
+        },
+        handleCancel: handleCloseModal,
+      });
+      return;
+    }
+    callback();
+  };
+
   const navigateToScreen = (screen: ScreenType) => {
-    setCurrentScreen(screen);
+    checkAuthAndExecute(() => setCurrentScreen(screen));
+  };
+
+  const navigateToRoute = (path: string) => {
+    checkAuthAndExecute(() => route.push(path));
   };
 
   const navigateBack = () => {
@@ -96,16 +120,20 @@ export default function Settings() {
 
   const handleSwitchEnv = (env: 'dev' | 'prod') => {
     handleWebViewMessage('switchEnv', env);
-    handleCloseModal();
+
+    handleModalState({
+      isShowModal: true,
+      type: 'ALERT',
+      mainText: `${env === 'dev' ? '개발' : '상용'} 환경으로 전환되었습니다.`,
+      handleConfirm: handleCloseModal,
+    });
   };
 
   const handleEnvSwitchModal = async () => {
     try {
-      // Check admin permissions first
       const hasPermission = await AdminApi.checkPermissions();
 
       if (hasPermission) {
-        // Show environment switch modal if permissions are granted
         handleModalState({
           isShowModal: true,
           type: 'CONFIRM',
@@ -116,7 +144,6 @@ export default function Settings() {
           handleCancel: () => handleSwitchEnv('prod'),
         });
       } else {
-        // Show error modal if permissions are denied
         handleModalState({
           isShowModal: true,
           type: 'ALERT',
@@ -125,7 +152,6 @@ export default function Settings() {
         });
       }
     } catch (error) {
-      // Show error modal if API call fails
       handleModalState({
         isShowModal: true,
         type: 'ALERT',
@@ -143,7 +169,6 @@ export default function Settings() {
     ScreenConfig
   > = useMemo(
     () => createScreenConfigs(handleLogout, handleDeleteAccount),
-    // () => createScreenConfigs(handleLogout, handleDeleteAccount, route.push),
     [handleLogout, handleDeleteAccount, route],
   );
 
@@ -151,11 +176,11 @@ export default function Settings() {
     () =>
       createMenuCategories(
         navigateToScreen,
-        route.push,
+        navigateToRoute,
         handleEnvSwitchModal,
         user?.userId,
       ),
-    [navigateToScreen, route, user?.userId],
+    [navigateToScreen, navigateToRoute, user?.userId],
   );
 
   const getHeaderTitle = () => {

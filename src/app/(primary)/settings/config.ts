@@ -27,7 +27,7 @@ export const createScreenConfigs = (
 
 export const createMenuCategories = (
   onScreenNavigate: (screen: ScreenType) => void,
-  onRouteNavigate: (path: string) => void,
+  onAuthRouteNavigate: (path: string) => void,
   handleSwitchEnv?: () => void,
   userId?: string | number,
 ): MenuCategory[] => [
@@ -36,7 +36,7 @@ export const createMenuCategories = (
     items: [
       {
         text: '내 정보',
-        action: () => onRouteNavigate(ROUTES.USER.EDIT(userId!)),
+        action: () => onAuthRouteNavigate(ROUTES.USER.EDIT(userId!)),
       },
       {
         text: '차단 사용자 관리',
@@ -49,11 +49,13 @@ export const createMenuCategories = (
     items: [
       {
         text: '서비스 문의',
-        action: () => onRouteNavigate(`${ROUTES.INQUIRE.BASE}?type=service`),
+        action: () =>
+          onAuthRouteNavigate(`${ROUTES.INQUIRE.BASE}?type=service`),
       },
       {
         text: '비즈니스 문의',
-        action: () => onRouteNavigate(`${ROUTES.INQUIRE.BASE}?type=business`),
+        action: () =>
+          onAuthRouteNavigate(`${ROUTES.INQUIRE.BASE}?type=business`),
       },
     ],
   },
