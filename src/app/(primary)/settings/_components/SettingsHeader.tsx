@@ -32,7 +32,7 @@ export const SettingsHeader = ({ handleOpen, isOpen }: SettingsHeaderProps) => {
     try {
       // Check admin permissions first
       const hasPermission = await AdminApi.checkPermissions();
-      
+
       if (hasPermission) {
         // Show environment switch modal if permissions are granted
         handleModalState({
@@ -58,7 +58,10 @@ export const SettingsHeader = ({ handleOpen, isOpen }: SettingsHeaderProps) => {
       handleModalState({
         isShowModal: true,
         type: 'ALERT',
-        mainText: error instanceof Error ? error.message : '권한 확인 중 오류가 발생했습니다.',
+        mainText:
+          error instanceof Error
+            ? error.message
+            : '권한 확인 중 오류가 발생했습니다.',
         handleConfirm: handleCloseModal,
       });
     }
