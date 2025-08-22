@@ -40,7 +40,8 @@ function Reply({
   const router = useRouter();
   const { isLoggedIn, user: userData } = useAuth();
   const { setValue } = useFormContext();
-  const { handleModalState, handleLoginModal } = useModalStore();
+  const { handleModalState, handleLoginModal, handleCloseModal } =
+    useModalStore();
   const { isUserBlocked } = useRelationshipsStore();
   const { handleBlockUser, handleUnblockUser } = useBlockActions();
 
@@ -78,14 +79,10 @@ function Reply({
 
         handleModalState({
           isShowModal: true,
-          type: 'ALERT',
           mainText: '성공적으로 댓글이 삭제되었습니다.',
           handleConfirm: () => {
             setIsOptionShow(false);
-            handleModalState({
-              isShowModal: false,
-              mainText: '',
-            });
+            handleCloseModal();
           },
         });
       }

@@ -204,7 +204,6 @@ export default function SearchAlcohol() {
                     onClick={() => {
                       handleModalState({
                         isShowModal: true,
-                        type: 'ALERT',
                         mainText:
                           '아직 준비 중인 기능입니다. 조금만 기다려주세요!',
                       });

@@ -113,7 +113,6 @@ export default function InquireRegister() {
       if (result) {
         handleModalState({
           isShowModal: true,
-          type: 'ALERT',
           mainText: '성공적으로 문의가 접수되었습니다.',
           handleConfirm: () => {
             handleModalState({

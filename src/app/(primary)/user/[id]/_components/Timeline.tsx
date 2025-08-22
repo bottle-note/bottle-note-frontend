@@ -28,15 +28,8 @@ function Timeline() {
     if (loginUserData?.userId !== Number(userId)) {
       handleModalState({
         isShowModal: true,
-        type: 'ALERT',
         mainText: '여기까지 볼 수 있어요!',
         subText: '더 자세한 히스토리는 다른사람에게\n공유되지않아요~😘',
-        handleConfirm: () => {
-          handleModalState({
-            isShowModal: false,
-            mainText: '',
-          });
-        },
       });
     } else {
       router.push(ROUTES.HISTORY.BASE);

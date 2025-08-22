@@ -42,14 +42,12 @@ const VisibilityToggle = ({
             subText: !isActive
               ? '공개 된 리뷰는 모두가 볼 수 있어요!'
               : '비공개 된 리뷰는 나만 볼 수 있어요!',
-            type: 'ALERT',
           });
           onSuccess();
         }
       } catch (error) {
         handleModalState({
           isShowModal: true,
-          type: 'ALERT',
           mainText: `${!isActive ? '공개' : '비공개'}로 변경을 실패했습니다.`,
           subText: '다시 시도해주세요.',
         });

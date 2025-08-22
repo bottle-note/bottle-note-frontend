@@ -86,7 +86,6 @@ export default function Report() {
 
         handleModalState({
           isShowModal: true,
-          type: 'ALERT',
           mainText: '성공적으로 신고되었습니다.',
           handleConfirm: () => {
             handleModalState({
@@ -103,7 +102,6 @@ export default function Report() {
           if (apiError.errors?.length > 0) {
             handleModalState({
               isShowModal: true,
-              type: 'ALERT',
               mainText: apiError.errors[0].message,
               handleConfirm: () => {
                 handleModalState({

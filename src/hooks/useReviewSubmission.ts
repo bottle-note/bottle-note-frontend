@@ -88,7 +88,7 @@ export const useReviewSubmission = ({
       isShowModal: true,
       mainText,
       subText,
-      type: 'ALERT',
+
       handleConfirm: () => {
         router.push(ROUTES.REVIEW.DETAIL(successReviewId));
         handleModalState({

@@ -54,9 +54,19 @@ const useModalStore = create<ModalStore>((set) => ({
       },
     })),
   handleCloseModal: () => {
-    set((state) => ({
-      state: { ...state.state, mainText: '', subText: '', isShowModal: false },
-    }));
+    set({
+      state: {
+        isShowModal: false,
+        type: 'ALERT',
+        mainText: '',
+        subText: '',
+        alertBtnName: '확인',
+        confirmBtnName: '예',
+        cancelBtnName: '아니요',
+        handleCancel: null,
+        handleConfirm: null,
+      },
+    });
   },
   handleLoginModal: () =>
     set((state) => ({

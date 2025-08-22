@@ -26,21 +26,17 @@ const ReviewActionDropdown = ({
   onRefresh,
 }: ReviewActionDropdownProps) => {
   const router = useRouter();
-  const { handleModalState } = useModalStore();
+  const { handleModalState, handleCloseModal } = useModalStore();
   const { isUserBlocked } = useRelationshipsStore();
   const { handleBlockUser } = useBlockActions();
 
   const handleCloseOption = () => {
     handleModalState({
       isShowModal: true,
-      type: 'ALERT',
       mainText: '성공적으로 삭제되었습니다.',
       handleConfirm: () => {
         onClose();
-        handleModalState({
-          isShowModal: false,
-          mainText: '',
-        });
+        handleCloseModal();
         if (onRefresh) {
           onRefresh();
         } else {

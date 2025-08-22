@@ -36,7 +36,6 @@ export default function Settings() {
           handleCloseModal();
           route.push('/login');
         },
-        handleCancel: handleCloseModal,
       });
       return;
     }
@@ -77,13 +76,10 @@ export default function Settings() {
         } catch (e) {
           console.error('로그아웃 중 오류:', e);
           handleModalState({
-            type: 'ALERT',
             mainText: '로그아웃 중 오류가 발생했습니다.',
-            handleConfirm: handleCloseModal,
           });
         }
       },
-      handleCancel: handleCloseModal,
     });
   };
 
@@ -96,20 +92,16 @@ export default function Settings() {
         try {
           await UserApi.deleteAccount();
           handleModalState({
-            type: 'ALERT',
             mainText: `탈퇴가 완료되었습니다.`,
             handleConfirm: signOutAndRedirect,
           });
         } catch (e) {
           console.error('계정 삭제 중 오류:', e);
           handleModalState({
-            type: 'ALERT',
             mainText: '탈퇴 처리 중 오류가 발생했습니다.',
-            handleConfirm: handleCloseModal,
           });
         }
       },
-      handleCancel: handleCloseModal,
     });
   };
 
@@ -118,9 +110,8 @@ export default function Settings() {
 
     handleModalState({
       isShowModal: true,
-      type: 'ALERT',
+
       mainText: `${env === 'dev' ? '개발' : '상용'} 환경으로 전환되었습니다.`,
-      handleConfirm: handleCloseModal,
     });
   };
 
@@ -138,25 +129,22 @@ export default function Settings() {
           type: 'CONFIRM',
           mainText: `${targetEnv} 환경으로 전환하시겠습니까?`,
           handleConfirm: () => handleSwitchEnv(targetEnvEng),
-          handleCancel: handleCloseModal,
         });
       } else {
         handleModalState({
           isShowModal: true,
-          type: 'ALERT',
+
           mainText: '개발 환경 전환 권한이 없습니다.',
-          handleConfirm: handleCloseModal,
         });
       }
     } catch (error) {
       handleModalState({
         isShowModal: true,
-        type: 'ALERT',
+
         mainText:
           error instanceof Error
             ? error.message
             : '권한 확인 중 오류가 발생했습니다.',
-        handleConfirm: handleCloseModal,
       });
     }
   };

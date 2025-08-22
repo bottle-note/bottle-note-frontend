@@ -29,7 +29,7 @@ export const useBlockActions = (options: UseBlockActionsOptions = {}) => {
 
           handleModalState({
             isShowModal: true,
-            type: 'ALERT',
+
             mainText: '성공적으로 차단되었습니다.',
             handleConfirm: () => {
               handleModalState({
@@ -44,7 +44,6 @@ export const useBlockActions = (options: UseBlockActionsOptions = {}) => {
 
           handleModalState({
             isShowModal: true,
-            type: 'ALERT',
             mainText: '차단에 실패했습니다.',
             handleConfirm: () => {
               handleModalState({

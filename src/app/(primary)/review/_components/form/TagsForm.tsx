@@ -24,19 +24,16 @@ export default function TagsForm() {
       handleModalState({
         isShowModal: true,
         mainText: '추가하고 싶은 태그를 작성해주세요:)',
-        type: 'ALERT',
       });
     } else if (watchTags && watchTags.includes(tagValue)) {
       handleModalState({
         isShowModal: true,
         mainText: '이미 동일한 태그가 있습니다.',
-        type: 'ALERT',
       });
     } else if (!validateText(tagValue)) {
       handleModalState({
         isShowModal: true,
         mainText: '태그에 숫자와 특수문자는 추가할 수 없습니다.',
-        type: 'ALERT',
       });
     } else {
       const newTags = [...watchTags, tagValue];
