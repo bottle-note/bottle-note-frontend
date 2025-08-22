@@ -12,7 +12,7 @@ interface UseBlockActionsOptions {
 }
 
 export const useBlockActions = (options: UseBlockActionsOptions = {}) => {
-  const { handleModalState } = useModalStore();
+  const { handleModalState, handleCloseModal } = useModalStore();
   const { addBlocked, removeBlocked } = useRelationshipsStore();
 
   const handleBlockUser = (userId: string, userName: string) => {
@@ -29,36 +29,16 @@ export const useBlockActions = (options: UseBlockActionsOptions = {}) => {
 
           handleModalState({
             isShowModal: true,
-
             mainText: '성공적으로 차단되었습니다.',
-            handleConfirm: () => {
-              handleModalState({
-                isShowModal: false,
-                mainText: '',
-              });
-            },
           });
         } catch (error) {
           console.error('차단 실패:', error);
           options.onBlockError?.(userId);
-
           handleModalState({
             isShowModal: true,
             mainText: '차단에 실패했습니다.',
-            handleConfirm: () => {
-              handleModalState({
-                isShowModal: false,
-                mainText: '',
-              });
-            },
           });
         }
-      },
-      handleCancel: () => {
-        handleModalState({
-          isShowModal: false,
-          mainText: '',
-        });
       },
     });
   };
@@ -75,28 +55,13 @@ export const useBlockActions = (options: UseBlockActionsOptions = {}) => {
           removeBlocked(String(userId));
           options.onUnblockSuccess?.(userId);
 
-          handleModalState({
-            isShowModal: false,
-            mainText: '',
-            subText: '',
-          });
+          handleCloseModal();
         } catch (error) {
           console.error('차단 해제 실패:', error);
           options.onUnblockError?.(userId);
 
-          handleModalState({
-            isShowModal: false,
-            mainText: '',
-            subText: '',
-          });
+          handleCloseModal();
         }
-      },
-      handleCancel: () => {
-        handleModalState({
-          isShowModal: false,
-          mainText: '',
-          subText: '',
-        });
       },
     });
   };

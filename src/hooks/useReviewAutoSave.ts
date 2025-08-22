@@ -24,7 +24,7 @@ export const useReviewAutoSave = ({
   const MAX_SAVE_DAYS = 3 * 24 * 60 * 60 * 1000; // 3일
 
   const { showToast, isVisible, message } = useToast();
-  const { handleModalState } = useModalStore();
+  const { handleModalState, handleCloseModal } = useModalStore();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const getStorageKey = useCallback(
     (id: string) => `${STORAGE_KEY_PREFIX}_${id}`,
@@ -76,20 +76,12 @@ export const useReviewAutoSave = ({
           const savedData = loadSavedReview();
           if (savedData && onLoad) {
             onLoad(savedData);
-            handleModalState({
-              isShowModal: false,
-              mainText: '',
-              subText: '',
-            });
+            handleCloseModal();
           }
         },
         handleCancel: () => {
           removeSavedReview();
-          handleModalState({
-            isShowModal: false,
-            mainText: '',
-            subText: '',
-          });
+          handleCloseModal();
         },
       });
     } else {

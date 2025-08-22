@@ -48,7 +48,7 @@ const getSchemaByType = (reportType: ReportType) => {
 export default function Report() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { handleModalState } = useModalStore();
+  const { handleModalState, handleCloseModal } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
 
   const type = searchParams.get('type') as ReportType;
@@ -88,10 +88,7 @@ export default function Report() {
           isShowModal: true,
           mainText: '성공적으로 신고되었습니다.',
           handleConfirm: () => {
-            handleModalState({
-              isShowModal: false,
-              mainText: '',
-            });
+            handleCloseModal();
             reset();
             router.back();
           },
@@ -103,12 +100,6 @@ export default function Report() {
             handleModalState({
               isShowModal: true,
               mainText: apiError.errors[0].message,
-              handleConfirm: () => {
-                handleModalState({
-                  isShowModal: false,
-                  mainText: '',
-                });
-              },
             });
           }
         }
@@ -149,10 +140,7 @@ export default function Report() {
                   mainText: '작성 중인 내용이 있습니다. 정말 나가시겠습니까?',
                   type: 'CONFIRM',
                   handleConfirm: () => {
-                    handleModalState({
-                      isShowModal: false,
-                      mainText: '',
-                    });
+                    handleCloseModal();
                     reset();
                     router.back();
                   },

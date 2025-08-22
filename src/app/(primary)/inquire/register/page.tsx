@@ -26,7 +26,7 @@ export default function InquireRegister() {
   const paramsType =
     (searchParams.get('type') as keyof typeof INQUIRE_TYPE) || 'service';
   const serviceType = INQUIRE_TYPE[paramsType] || paramsType;
-  const { handleModalState } = useModalStore();
+  const { handleModalState, handleCloseModal } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
 
   const createSchema = () => {
@@ -115,10 +115,7 @@ export default function InquireRegister() {
           isShowModal: true,
           mainText: '성공적으로 문의가 접수되었습니다.',
           handleConfirm: () => {
-            handleModalState({
-              isShowModal: false,
-              mainText: '',
-            });
+            handleCloseModal();
             reset();
             router.back();
           },
@@ -154,10 +151,7 @@ export default function InquireRegister() {
                     mainText: '작성 중인 내용이 있습니다. 정말 나가시겠습니까?',
                     type: 'CONFIRM',
                     handleConfirm: () => {
-                      handleModalState({
-                        isShowModal: false,
-                        mainText: '',
-                      });
+                      handleCloseModal();
                       reset();
                       router.back();
                     },
