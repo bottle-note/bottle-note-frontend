@@ -17,10 +17,10 @@ export const useAppSocialLogin = () => {
     });
   };
 
-  const onKakaoLoginSuccess = async (email: string) => {
+  const onKakaoLoginSuccess = async (accessToken: string) => {
     try {
       await login('kakao-login', {
-        email,
+        accessToken,
       });
 
       router.replace('/');

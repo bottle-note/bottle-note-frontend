@@ -49,14 +49,9 @@ async function handleKakaoLogin(user: User): Promise<TokenData | null> {
       return await AuthApi.server.login(loginPayload);
     }
 
-    // FIXME: 카카오 accessToken 인증방식 BE 추가되면 수정 필요
-    // if (user.accessToken) {
-    //   const body = {
-    //     provider: SOCIAL_TYPE.KAKAO,
-    //     accessToken: user.accessToken,
-    //   };
-    //   return AuthApi.server.kakaoLogin(body);
-    // }
+    if (user.accessToken) {
+      return await AuthApi.server.kakaoLogin({ accessToken: user.accessToken });
+    }
 
     // 이메일 기반 로그인 (fallback)
     if (user.email) {
