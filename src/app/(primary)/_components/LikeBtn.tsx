@@ -78,7 +78,6 @@ const LikeBtn = ({
 
         handleModalState({
           isShowModal: true,
-          type: 'ALERT',
           mainText: '좋아요 업데이트에 실패했습니다. 다시 시도해주세요.',
         });
 

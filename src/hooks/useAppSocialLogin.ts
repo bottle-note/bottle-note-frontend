@@ -11,16 +11,15 @@ export const useAppSocialLogin = () => {
   const onKakaoLoginError = (error: string) => {
     handleModalState({
       isShowModal: true,
-      type: 'ALERT',
       mainText: '로그인 실패',
       subText: error,
     });
   };
 
-  const onKakaoLoginSuccess = async (email: string) => {
+  const onKakaoLoginSuccess = async (accessToken: string) => {
     try {
       await login('kakao-login', {
-        email,
+        accessToken,
       });
 
       router.replace('/');
@@ -32,7 +31,6 @@ export const useAppSocialLogin = () => {
   const onAppleLoginError = (error: string) => {
     handleModalState({
       isShowModal: true,
-      type: 'ALERT',
       mainText: '로그인 실패',
       subText: error,
     });

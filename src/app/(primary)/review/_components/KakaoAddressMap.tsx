@@ -169,7 +169,6 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
             handleModalState({
               isShowModal: true,
               mainText: '검색 결과 중 오류가 발생했습니다.',
-              type: 'ALERT',
             });
           }
         }
@@ -180,7 +179,6 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
             handleModalState({
               isShowModal: true,
               mainText: '도로명 주소 혹은 상호명을 입력해주세요:)',
-              type: 'ALERT',
             });
             return false;
           }

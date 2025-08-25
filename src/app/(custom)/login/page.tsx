@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
-import Modal from '@/components/Modal';
 import { useLogin } from '@/hooks/useLogin';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/auth/useAuth';
@@ -94,8 +93,6 @@ export default function Login() {
           </p>
         </footer>
       </main>
-
-      <Modal />
     </>
   );
 }

@@ -7,7 +7,6 @@ import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
-import Modal from './Modal';
 
 export interface NavItem {
   name: string;
@@ -135,7 +134,6 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
           </React.Fragment>
         ))}
       </section>
-      <Modal />
     </nav>
   );
 }

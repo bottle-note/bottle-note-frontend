@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
-import ProfileImage from './ProfileImage';
+import ProfileImage from '@/app/(primary)/_components/ProfileImage';
 import { FollowButton } from './FollowButton';
 
 interface Props {
@@ -34,7 +34,7 @@ const UserInfo = ({
 
   return (
     <section className="flex space-x-5.25 py-7">
-      <ProfileImage profileImgSrc={profileImgSrc} />
+      <ProfileImage profileImgSrc={profileImgSrc} borderWidth="bold" />
 
       <article className="py-[13.5px] space-y-3">
         <div className="space-y-1">

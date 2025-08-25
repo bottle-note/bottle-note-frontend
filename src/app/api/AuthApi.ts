@@ -50,6 +50,33 @@ export const AuthApi = {
       };
     },
 
+    async kakaoLogin({ accessToken }: { accessToken: string }) {
+      try {
+        const response = await fetch(
+          `${process.env.SERVER_URL_V2}/auth/kakao`,
+          {
+            method: 'POST',
+            body: JSON.stringify({ accessToken }),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+
+        const refreshToken = extractRefreshToken(response);
+
+        const data = await response.json();
+
+        return {
+          accessToken: data.accessToken,
+          refreshToken,
+        };
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    },
+
     async renewToken(refreshToken: string): Promise<TokenData> {
       const response = await fetch(
         `${process.env.SERVER_URL}/oauth/token/renew`,
@@ -70,6 +97,10 @@ export const AuthApi = {
       return data;
     },
 
+    /**
+     *
+     * @description web 환경 client side 에서 sdk 로그인을 위한 함수
+     */
     async fetchKakaoToken(code: string) {
       const clientId = process.env.KAKAO_REST_API_KEY;
       const redirectUri = getRedirectUrl();
@@ -88,6 +119,10 @@ export const AuthApi = {
       return res.json();
     },
 
+    /**
+     *
+     * @description web 환경 client side 에서 sdk 로그인을 위한 함수
+     */
     async fetchKakaoUserInfo(accessToken: string) {
       const res = await fetch('https://kapi.kakao.com/v2/user/me', {
         headers: {
@@ -144,28 +179,6 @@ export const AuthApi = {
           `토큰 업데이트 도중 에러가 발생했습니다. 사유: ${error.message}`,
         );
         throw error;
-      }
-    },
-
-    async kakaoLogin(code: string | string[]): Promise<LoginReturn> {
-      try {
-        const result = await apiClient.post<LoginReturn>(
-          `/oauth/kakao?code=${code}`,
-          {},
-          {
-            baseUrl: 'bottle-api/v2',
-            authRequired: false,
-          },
-        );
-
-        return result;
-      } catch (e) {
-        const error = e as Error;
-        console.error(error.message);
-
-        throw new Error(
-          `카카오 소셜 로그인 도중 에러가 발생했습니다. 사유: ${error.message}`,
-        );
       }
     },
 

@@ -40,6 +40,9 @@ export const ROUTES = {
     FOLLOW: (id: string | number, type: 'follower' | 'following') =>
       `/user/${id}/follow?type=${type}`,
   },
+  SETTINGS: {
+    BASE: '/settings',
+  },
   ANNOUNCEMENT: {
     BASE: '/announcement',
     DETAIL: (id: string | number) => `/announcement/${id}`,
