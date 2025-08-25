@@ -20,7 +20,7 @@ export const useReviewSubmission = ({
   removeSavedReview,
 }: UseReviewSubmissionProps) => {
   const router = useRouter();
-  const { handleModalState } = useModalStore();
+  const { handleModalState, handleCloseModal } = useModalStore();
 
   const handleUploadImages = async (images: File[]) => {
     if (!images.length) return null;
@@ -88,14 +88,10 @@ export const useReviewSubmission = ({
       isShowModal: true,
       mainText,
       subText,
-      type: 'ALERT',
+
       handleConfirm: () => {
         router.push(ROUTES.REVIEW.DETAIL(successReviewId));
-        handleModalState({
-          isShowModal: false,
-          mainText: '',
-          subText: '',
-        });
+        handleCloseModal();
         if (isNew && removeSavedReview) {
           removeSavedReview();
         }

@@ -2,8 +2,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { RelationInfo } from '@/types/User';
 import { ROUTES } from '@/constants/routes';
+import ProfileImage from '@/app/(primary)/_components/ProfileImage';
 import { FollowButton } from './FollowButton';
-import DefaultProfile from 'public/profile-default.svg';
 import CommentGray from 'public/icon/comment-filled-gray.svg';
 import StarGray from 'public/icon/star-filled-gray.svg';
 
@@ -21,15 +21,7 @@ export const FollowerListItem = ({ userInfo }: Props) => {
         className="grid grid-cols-[0.45fr_1fr]"
         href={ROUTES.USER.BASE(userInfo.userId)}
       >
-        <div className="w-9 h-9 rounded-full overflow-hidden">
-          <Image
-            src={userInfo.userProfileImage ?? DefaultProfile}
-            width={36}
-            height={36}
-            alt="유저 프로필"
-            className="object-cover w-full h-full"
-          />
-        </div>
+        <ProfileImage profileImgSrc={userInfo.userProfileImage} size={36} />
         <div className="flex flex-col gap-1">
           <p className="text-12 font-bold">{userInfo.followUserNickname}</p>
           <p className="text-10 text-brightGray font-semibold flex gap-2">

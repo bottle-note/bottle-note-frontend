@@ -12,7 +12,6 @@ import LinkButton from '@/components/LinkButton';
 import NavLayout from '@/app/(primary)/_components/NavLayout';
 import StarRating from '@/components/StarRaiting';
 import EmptyView from '@/app/(primary)/_components/EmptyView';
-import Modal from '@/components/Modal';
 import { truncStr } from '@/utils/truncStr';
 // import { shareOrCopy } from '@/utils/shareOrCopy';
 import { useAuth } from '@/hooks/auth/useAuth';
@@ -38,7 +37,7 @@ export default function SearchAlcohol() {
   const params = useParams();
   const { isLoggedIn } = useAuth();
   const { id: alcoholId } = params;
-  const { state, handleModalState, handleLoginModal } = useModalStore();
+  const { handleModalState, handleLoginModal } = useModalStore();
   const { debounce } = useDebounceAction(DEBOUNCE_DELAY);
 
   const [data, setData] = useState<AlcoholDetails | null>(null);
@@ -205,7 +204,6 @@ export default function SearchAlcohol() {
                     onClick={() => {
                       handleModalState({
                         isShowModal: true,
-                        type: 'ALERT',
                         mainText:
                           '아직 준비 중인 기능입니다. 조금만 기다려주세요!',
                       });
@@ -355,7 +353,6 @@ export default function SearchAlcohol() {
           </>
         )}
       </NavLayout>
-      {state.isShowModal && <Modal />}
     </>
   );
 }

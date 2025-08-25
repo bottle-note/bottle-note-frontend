@@ -13,7 +13,6 @@ import { FormValues, ReportTypeMap } from '@/types/Report';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
 import OptionSelect from '@/components/List/OptionSelect';
 import Loading from '@/components/Loading';
 import { REPORT_TYPE } from '@/app/(primary)/report/_constants/index';
@@ -49,7 +48,7 @@ const getSchemaByType = (reportType: ReportType) => {
 export default function Report() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { state, handleModalState } = useModalStore();
+  const { handleModalState, handleCloseModal } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
 
   const type = searchParams.get('type') as ReportType;
@@ -87,13 +86,9 @@ export default function Report() {
 
         handleModalState({
           isShowModal: true,
-          type: 'ALERT',
           mainText: '성공적으로 신고되었습니다.',
           handleConfirm: () => {
-            handleModalState({
-              isShowModal: false,
-              mainText: '',
-            });
+            handleCloseModal();
             reset();
             router.back();
           },
@@ -104,14 +99,7 @@ export default function Report() {
           if (apiError.errors?.length > 0) {
             handleModalState({
               isShowModal: true,
-              type: 'ALERT',
               mainText: apiError.errors[0].message,
-              handleConfirm: () => {
-                handleModalState({
-                  isShowModal: false,
-                  mainText: '',
-                });
-              },
             });
           }
         }
@@ -149,15 +137,10 @@ export default function Report() {
               if (watch('content')?.length > 0) {
                 handleModalState({
                   isShowModal: true,
-                  confirmBtnName: '예',
-                  cancelBtnName: '아니요',
                   mainText: '작성 중인 내용이 있습니다. 정말 나가시겠습니까?',
                   type: 'CONFIRM',
                   handleConfirm: () => {
-                    handleModalState({
-                      isShowModal: false,
-                      mainText: '',
-                    });
+                    handleCloseModal();
                     reset();
                     router.back();
                   },
@@ -205,7 +188,6 @@ export default function Report() {
         </article>
       </section>
       {isProcessing && <Loading />}
-      {state.isShowModal && <Modal />}
     </>
   );
 }

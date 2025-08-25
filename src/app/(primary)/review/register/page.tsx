@@ -15,7 +15,6 @@ import { useErrorModal } from '@/hooks/useErrorModal';
 import { useReviewAutoSave } from '@/hooks/useReviewAutoSave';
 import { useReviewSubmission } from '@/hooks/useReviewSubmission';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
 import Toast from '@/components/Toast';
 import ReviewForm from '../_components/form/ReviewForm';
 import ReviewHeaderLayout from '../_components/ReviewHeaderLayout';
@@ -133,8 +132,6 @@ function ReviewRegister() {
         isShowModal: true,
         mainText: '작성 중인 내용이 있습니다.\n정말 뒤로 가시겠습니까?',
         type: 'CONFIRM',
-        cancelBtnName: '예',
-        confirmBtnName: '아니요',
         handleConfirm: () => handleModalState({ isShowModal: false }),
         handleCancel: () => {
           handleModalState({ isShowModal: false });
@@ -163,7 +160,6 @@ function ReviewRegister() {
       </article>
       {isToastVisible && <Toast message={toastMessage} />}
       {isProcessing && <Loading />}
-      <Modal />
     </FormProvider>
   );
 }

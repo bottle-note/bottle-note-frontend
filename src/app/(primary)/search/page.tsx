@@ -14,7 +14,6 @@ import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { REGIONS } from '@/constants/common';
 import LinkButton from '@/components/LinkButton';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
@@ -259,8 +258,6 @@ export default function Search() {
           )}
         </section>
       </main>
-
-      <Modal />
     </Suspense>
   );
 }

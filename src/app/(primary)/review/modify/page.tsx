@@ -14,7 +14,6 @@ import { useReviewSubmission } from '@/hooks/useReviewSubmission';
 import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
 import { Button } from '@/components/Button';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
 import Loading from '@/components/Loading';
 import ReviewForm from '../_components/form/ReviewForm';
 import ReviewHeaderLayout from '../_components/ReviewHeaderLayout';
@@ -94,8 +93,6 @@ function ReviewModify() {
         isShowModal: true,
         mainText: '작성 중인 내용이 있습니다.\n정말 뒤로 가시겠습니까?',
         type: 'CONFIRM',
-        cancelBtnName: '예',
-        confirmBtnName: '아니요',
         handleConfirm: () => handleModalState({ isShowModal: false }),
         handleCancel: () => {
           handleModalState({ isShowModal: false });
@@ -123,7 +120,6 @@ function ReviewModify() {
         />
       </article>
       {isProcessing ? <Loading /> : null}
-      <Modal />
     </FormProvider>
   );
 }

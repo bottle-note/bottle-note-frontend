@@ -11,7 +11,6 @@ export const useAppSocialLogin = () => {
   const onKakaoLoginError = (error: string) => {
     handleModalState({
       isShowModal: true,
-      type: 'ALERT',
       mainText: '로그인 실패',
       subText: error,
     });
@@ -32,7 +31,6 @@ export const useAppSocialLogin = () => {
   const onAppleLoginError = (error: string) => {
     handleModalState({
       isShowModal: true,
-      type: 'ALERT',
       mainText: '로그인 실패',
       subText: error,
     });

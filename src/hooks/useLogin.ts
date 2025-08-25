@@ -18,27 +18,19 @@ export const useLogin = () => {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
   const { isInApp } = DeviceService;
-  const { handleModalState, handleCloseModal } = useModalStore();
+  const { handleModalState } = useModalStore();
 
   const handleRestore = async (data: LoginFormValues) => {
     try {
       await AuthApi.client.restore(data);
       handleModalState({
         isShowModal: true,
-        type: 'ALERT',
         mainText: `재가입에 성공하였습니다.`,
-        handleConfirm: () => {
-          handleCloseModal();
-        },
       });
     } catch (error) {
       handleModalState({
         isShowModal: true,
-        type: 'ALERT',
         mainText: `${(error as unknown as ApiError).message}`,
-        handleConfirm: () => {
-          handleCloseModal();
-        },
       });
     }
   };

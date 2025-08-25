@@ -1,20 +1,25 @@
 'use client';
 
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import { Button } from '@/components/Button';
 import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
 import List from '@/components/List/List';
-import BoardListItem from '@/components/List/BoardListItem';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { InquireApi } from '@/app/api/InquireApi';
 import { InquireList } from '@/types/Inquire';
 import { ROUTES } from '@/constants/routes';
+import InquireTable from '@/app/(primary)/inquire/_components/InquireTable';
+import { INQUIRE_TYPE } from '@/constants/Inquire';
 
 export default function Inquire() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const paramsType =
+    (searchParams.get('type') as keyof typeof INQUIRE_TYPE) || 'service';
+  const serviceType = INQUIRE_TYPE[paramsType] || paramsType;
   const { isLoggedIn } = useAuth();
   const { handleLoginModal } = useModalStore();
 
@@ -24,17 +29,26 @@ export default function Inquire() {
     isFetching,
     targetRef,
   } = usePaginatedQuery<{
-    helpList: InquireList[];
+    items: InquireList[];
     totalCount: number;
   }>({
-    queryKey: ['inquireList'],
+    queryKey: ['inquireList', paramsType],
     queryFn: ({ pageParam }) => {
-      return InquireApi.getInquireList({
+      const queryParams = {
         cursor: pageParam,
         pageSize: 10,
-      });
+      };
+      if (paramsType === 'business') {
+        return InquireApi.getBusinessInquireList(queryParams);
+      } else {
+        return InquireApi.getInquireList(queryParams);
+      }
     },
   });
+
+  const handleItemClick = (helpId: number) => {
+    router.push(`/inquire/${helpId}?type=${paramsType}`);
+  };
 
   return (
     <div>
@@ -51,7 +65,7 @@ export default function Inquire() {
             height={23}
           />
         </SubHeader.Left>
-        <SubHeader.Center>나의 문의 목록</SubHeader.Center>
+        <SubHeader.Center>{serviceType} 문의 내역</SubHeader.Center>
       </SubHeader>
       <section className="py-8 px-5">
         <List
@@ -60,23 +74,13 @@ export default function Inquire() {
           emptyViewText="문의사항이 없습니다."
           isEmpty={!inquireList || inquireList[0].data.totalCount === 0}
         >
-          <List.Total
-            total={inquireList ? inquireList[0].data.totalCount : 0}
-          />
           <List.Section>
-            {inquireList &&
-              [...inquireList.map((list) => list.data.helpList)]
-                .flat()
-                .map((item: InquireList) => (
-                  <BoardListItem
-                    key={item.helpId}
-                    id={item.helpId}
-                    title={item.content}
-                    date={item.createAt}
-                    type={item.helpStatus}
-                    hrefUrl={`/inquire/${item.helpId}`}
-                  />
-                ))}
+            {inquireList && (
+              <InquireTable
+                inquireList={inquireList.flatMap((list) => list.data.items)}
+                onItemClick={handleItemClick}
+              />
+            )}
           </List.Section>
         </List>
         <div ref={targetRef} />
@@ -89,9 +93,9 @@ export default function Inquire() {
                 handleLoginModal();
                 return;
               }
-              router.push(ROUTES.INQUIRE.REGISTER);
+              router.push(`${ROUTES.INQUIRE.REGISTER}?type=${paramsType}`);
             }}
-            btnName="문의하기"
+            btnName="문의 작성하기"
           />
         </section>
       </section>
