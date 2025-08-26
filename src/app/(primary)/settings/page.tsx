@@ -117,10 +117,24 @@ export default function Settings() {
 
   const handleEnvSwitchModal = async () => {
     try {
+      const isDev = process.env.NODE_ENV === 'development';
+
+      if (isDev) {
+        const targetEnv = '상용';
+        const targetEnvEng = 'prod';
+
+        handleModalState({
+          isShowModal: true,
+          type: 'CONFIRM',
+          mainText: `${targetEnv} 환경으로 전환하시겠습니까?`,
+          handleConfirm: () => handleSwitchEnv(targetEnvEng),
+        });
+        return;
+      }
+
       const hasPermission = await AdminApi.checkPermissions();
 
       if (hasPermission) {
-        const isDev = process.env.NODE_ENV === 'development';
         const targetEnv = isDev ? '상용' : '개발';
         const targetEnvEng = isDev ? 'dev' : 'prod';
 

@@ -79,7 +79,7 @@ export default function SearchBar({
         <button
           type="button"
           onMouseDown={handleDelete}
-          className="absolute right-11 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
+          className="absolute right-14 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
           aria-label="검색어 지우기"
         >
           <Image src={DeleteIcon} alt="delete" />
