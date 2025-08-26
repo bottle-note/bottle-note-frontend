@@ -25,6 +25,7 @@ import AlcoholDetailsSkeleton from '@/components/Skeletons/custom/AlcoholDetails
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import useDebounceAction from '@/hooks/useDebounceAction';
 import AlcoholBox from './_components/AlcoholBox';
+import ProfileDefaultImg from 'public/profile-default.svg';
 import FlavorTag from '../../../_components/FlavorTag';
 
 interface DetailItem {
@@ -54,13 +55,18 @@ export default function SearchAlcohol() {
         const { alcohols } = result;
         setData(result);
         setIsPicked(alcohols.isPicked);
+        const formatContent = (content: string | undefined) =>
+          content?.replace('/', '/\n') || '-';
+
         setAlcoholDetails([
-          { title: '증류소', content: alcohols.engDistillery },
+          { title: '카테고리', content: alcohols.engCategory },
+          { title: '증류소', content: formatContent(alcohols.engDistillery) },
+          { title: '캐스트', content: formatContent(alcohols.cask) },
+          { title: '국가/지역', content: formatContent(alcohols.engRegion) },
           {
-            title: '국가/지역',
-            content: alcohols.engRegion?.replace('/', '/\n') || '-',
+            title: '도수(%)',
+            content: formatContent(alcohols.abv),
           },
-          { title: '도수', content: `${alcohols.abv}%` },
         ]);
       }
     } catch (error) {
@@ -237,27 +243,17 @@ export default function SearchAlcohol() {
               </article>
               <section className="mx-5 py-[21px] border-y border-mainGray/30">
                 <div className="grid gap-2">
-                  <div className="grid grid-cols-2 gap-2">
-                    {alcoholDetails.map((item: DetailItem) => (
-                      <div
-                        key={item.content}
-                        className="flex text-12 text-mainDarkGray items-start gap-2"
-                      >
-                        <div className="min-w-14 font-semibold">
-                          {item.title}
-                        </div>
-                        <div className="flex-1 font-normal whitespace-pre-line">
-                          {item.content}
-                        </div>
+                  {alcoholDetails.map((item: DetailItem) => (
+                    <div
+                      key={item.content}
+                      className="flex text-12 text-mainDarkGray items-start gap-2"
+                    >
+                      <div className="min-w-14 font-semibold">{item.title}</div>
+                      <div className="flex-1 font-normal break-words">
+                        {item.content}
                       </div>
-                    ))}
-                  </div>
-                  <div className="flex text-12 text-mainDarkGray items-start gap-2">
-                    <div className="min-w-14 font-semibold">캐스크</div>
-                    <div className="flex-1 font-normal break-words">
-                      {data?.alcohols?.cask || '-'}
                     </div>
-                  </div>
+                  ))}
                 </div>
               </section>
               {data?.alcohols?.alcoholsTastingTags && (
@@ -278,20 +274,22 @@ export default function SearchAlcohol() {
                         className="flex-shrink-0 flex flex-col items-center space-y-1"
                       >
                         <Link href={ROUTES.USER.BASE(user.userId)}>
-                          <div className="w-14 h-14 rounded-full overflow-hidden">
+                          <div
+                            className={`${user.user_image_url && 'border border-brightGray'} w-14 h-14 rounded-full overflow-hidden border border-bgGray`}
+                          >
                             <Image
                               className="object-cover"
-                              src={user.user_image_url}
+                              src={user.user_image_url || ProfileDefaultImg}
                               alt="user_img"
-                              width={56}
-                              height={56}
+                              width={59}
+                              height={59}
                             />
                           </div>
                         </Link>
-                        <p className="text-10 text-mainDarkGray">
+                        <p className="text-11 text-mainDarkGray">
                           {truncStr(user.nickName, 4)}
                         </p>
-                        <Star rating={user.rating} size={12} />
+                        <Star rating={user.rating} size={14} />
                       </div>
                     ))}
                   </div>

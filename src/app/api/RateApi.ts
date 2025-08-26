@@ -41,7 +41,6 @@ export const RateApi = {
   async getUserRating(alcoholId: string) {
     const response = await apiClient.get<ApiResponse<UserRatingApi>>(
       `/rating/${alcoholId}`,
-      { authRequired: false },
     );
 
     return response.data;

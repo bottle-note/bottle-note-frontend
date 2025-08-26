@@ -66,7 +66,7 @@ export const RatingsListItem = ({ data, isMyPage }: Props) => {
           rating={myRatingPoint}
           size={20}
           color="main"
-          textStyle="text-16 text-mainCoral font-black pr-6"
+          textStyle="text-16 text-mainCoral font-black"
         />
       </div>
     </section>

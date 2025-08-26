@@ -75,6 +75,7 @@
     user-select: text;
     @apply outline-none;
     touch-action: manipulation;
+    font-family: 'Noto Sans', sans-serif;
   }
   :root {
     --background: 0 0% 100%;
@@ -136,6 +137,7 @@
   textarea {
     @apply outline-none;
     touch-action: manipulation;
+    font-family: 'Noto Sans', sans-serif;
   }
 }
 @layer components {

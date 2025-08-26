@@ -90,7 +90,7 @@ export const useReviewSubmission = ({
       subText,
 
       handleConfirm: () => {
-        router.push(ROUTES.REVIEW.DETAIL(successReviewId));
+        router.replace(`${ROUTES.REVIEW.DETAIL(successReviewId)}`);
         handleCloseModal();
         if (isNew && removeSavedReview) {
           removeSavedReview();

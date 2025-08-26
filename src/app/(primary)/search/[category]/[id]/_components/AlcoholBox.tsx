@@ -30,6 +30,7 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
           outerWidthClass="w-[140px]"
           innerHeightClass="h-[200px]"
           innerWidthClass="w-[100px]"
+          enableModal={true}
         />
       )}
       <article className="flex-1 py-3 text-white overflow-x-hidden">
