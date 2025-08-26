@@ -45,15 +45,12 @@ const AlcoholImage = ({
         onClick={handleImageClick}
         tabIndex={enableModal ? 0 : -1}
         role={enableModal ? 'button' : undefined}
-        onKeyDown={
-          enableModal
-            ? (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  handleImageClick();
-                }
-              }
-            : undefined
-        }
+        onKeyDown={(e) => {
+          if (enableModal && (e.key === 'Enter' || e.key === ' ')) {
+            handleImageClick();
+            return;
+          }
+        }}
       >
         <div
           className={`relative ${innerHeightClass} ${innerWidthClass} flex items-center justify-center`}
