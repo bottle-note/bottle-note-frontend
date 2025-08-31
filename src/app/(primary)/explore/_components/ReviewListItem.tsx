@@ -1,16 +1,14 @@
 import { useState } from 'react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
+import { ROUTES } from '@/constants/routes';
 import { ExploreReview } from '@/types/Explore';
 import { UserInfoDisplay } from '@/components/UserInfoDisplay';
 import Star from '@/components/Star';
 import useModalStore from '@/store/modalStore';
 import { formatDate } from '@/utils/formatDate';
-import { AuthService } from '@/lib/AuthService';
-import OptionDropdown from '@/components/OptionDropdown';
-import { deleteReview } from '@/lib/Review';
-import { ROUTES } from '@/constants/routes';
+import { useAuth } from '@/hooks/auth/useAuth';
+import ReviewActionDropdown from '@/app/(primary)/_components/ReviewActionDropdown';
 import {
   ReviewImageCarousel,
   convertImageUrlsToProductImageArray,
@@ -24,9 +22,8 @@ interface Props {
 }
 
 const ReviewListItem = ({ content }: Props) => {
-  const router = useRouter();
-  const { handleLoginModal, handleModalState } = useModalStore();
-  const { isLogin, userData } = AuthService;
+  const { handleLoginModal } = useModalStore();
+  const { isLoggedIn, user: userData } = useAuth();
   const [isLiked, setIsLiked] = useState(content.isLikedByMe);
   const [likeCount, setLikeCount] = useState(content.likeCount);
   const [isReportOptionShow, setIsReportOptionShow] = useState(false);
@@ -34,40 +31,6 @@ const ReviewListItem = ({ content }: Props) => {
     content.reviewImages,
     '리뷰 이미지',
   );
-
-  const handleCloseOption = () => {
-    handleModalState({
-      isShowModal: true,
-      type: 'ALERT',
-      mainText: '성공적으로 삭제되었습니다.',
-      handleConfirm: () => {
-        setIsReportOptionShow(false);
-        handleModalState({
-          isShowModal: false,
-          mainText: '',
-        });
-      },
-    });
-  };
-
-  const handleOptionSelect = (option: { name: string; type: string }) => {
-    if (option.type === 'DELETE') {
-      handleModalState({
-        isShowModal: true,
-        mainText: '정말 삭제하시겠습니까?',
-        type: 'CONFIRM',
-        handleConfirm: () => {
-          deleteReview(content.reviewId, handleCloseOption);
-        },
-      });
-    } else if (option.type === 'MODIFY') {
-      router.push(ROUTES.REVIEW.MODIFY(content.reviewId));
-    } else if (option.type === 'REVIEW_REPORT') {
-      router.push(ROUTES.REPORT.REVIEW(content.reviewId));
-    } else if (option.type === 'USER_REPORT') {
-      router.push(ROUTES.REPORT.USER(content.userInfo.userId));
-    }
-  };
 
   return (
     <>
@@ -80,8 +43,7 @@ const ReviewListItem = ({ content }: Props) => {
               nickName={content.userInfo.nickName}
               userImageProps={{
                 imgSrc: content.userInfo.userProfileImage,
-                width: 30,
-                height: 30,
+                size: 30,
               }}
               userNickNameProps={{
                 size: 13,
@@ -173,7 +135,7 @@ const ReviewListItem = ({ content }: Props) => {
             <button
               className="cursor-pointer"
               onClick={() => {
-                if (isLogin) setIsReportOptionShow(true);
+                if (isLoggedIn) setIsReportOptionShow(true);
                 else handleLoginModal();
               }}
             >
@@ -187,28 +149,14 @@ const ReviewListItem = ({ content }: Props) => {
           </div>
         </div>
       </article>
-      {isReportOptionShow && (
-        <OptionDropdown
-          handleClose={() => setIsReportOptionShow(false)}
-          options={
-            userData?.userId === content.userInfo.userId
-              ? [
-                  { name: '수정하기', type: 'MODIFY' },
-                  { name: '삭제하기', type: 'DELETE' },
-                ]
-              : [
-                  { name: '리뷰 신고', type: 'REVIEW_REPORT' },
-                  { name: '유저 신고', type: 'USER_REPORT' },
-                ]
-          }
-          handleOptionSelect={handleOptionSelect}
-          title={
-            userData?.userId === content.userInfo.userId
-              ? '내 리뷰'
-              : '신고하기'
-          }
-        />
-      )}
+      <ReviewActionDropdown
+        isShow={isReportOptionShow}
+        onClose={() => setIsReportOptionShow(false)}
+        isOwnReview={userData?.userId === content.userInfo.userId}
+        reviewId={String(content.reviewId)}
+        userId={String(content.userInfo.userId)}
+        userNickname={content.userInfo.nickName}
+      />
     </>
   );
 };

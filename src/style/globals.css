@@ -75,6 +75,7 @@
     user-select: text;
     @apply outline-none;
     touch-action: manipulation;
+    font-family: 'Noto Sans', sans-serif;
   }
   :root {
     --background: 0 0% 100%;
@@ -136,6 +137,7 @@
   textarea {
     @apply outline-none;
     touch-action: manipulation;
+    font-family: 'Noto Sans', sans-serif;
   }
 }
 @layer components {
@@ -157,10 +159,6 @@
 
   .tab-selected {
     @apply text-subCoral border-subCoral border-b;
-  }
-
-  .line-border {
-    @apply border-t border-mainGray/30 my-3;
   }
 
   .modal-mainText {

@@ -2,41 +2,87 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
 import BaseImage from '@/components/BaseImage';
 import { InquireApi } from '@/app/api/InquireApi';
 import { formatDate } from '@/utils/formatDate';
-import { InquireDetailsApi } from '@/types/Inquire';
-import Badge from '@/components/Badge';
-import adminDefaultImg from 'public/bottle_note_profile.svg';
+import {
+  ServiceInquireDetailsApi,
+  BusinessInquireDetailsApi,
+  UnifiedInquireDetails,
+  Status,
+} from '@/types/Inquire';
+import {
+  INQUIRE_TYPE,
+  SERVICE_TYPE_LIST,
+  BUSINESS_TYPE_LIST,
+  getStatusText,
+} from '@/constants/Inquire';
 
-const TYPE_OPTIONS: { [key: string]: string } = {
-  WHISKEY: '위스키',
-  REVIEW: '리뷰',
-  USER: '사용자',
-  ETC: '기타',
-};
+const createServiceAdapter = (
+  data: ServiceInquireDetailsApi,
+  typeList: any[],
+): UnifiedInquireDetails => ({
+  ...data,
+  id: data.helpId,
+  status: data.statusType,
+  type: data.helpType,
+  typeName: typeList.find((item) => item.type === data.helpType)?.name || '',
+});
+
+const createBusinessAdapter = (
+  data: BusinessInquireDetailsApi,
+  typeList: any[],
+): UnifiedInquireDetails => ({
+  ...data,
+  type: data.businessSupportType,
+  typeName:
+    typeList.find((item) => item.type === data.businessSupportType)?.name || '',
+});
 
 export default function Inquire() {
   const router = useRouter();
   const { id: helpId } = useParams();
+  const searchParams = useSearchParams();
+  const paramsType =
+    (searchParams.get('type') as keyof typeof INQUIRE_TYPE) || 'service';
+  const serviceType = INQUIRE_TYPE[paramsType] || paramsType;
+  const typeList =
+    paramsType === 'business'
+      ? [...BUSINESS_TYPE_LIST]
+      : [...SERVICE_TYPE_LIST];
   const [inquireDetails, setInquireDetails] =
-    useState<InquireDetailsApi | null>(null);
+    useState<UnifiedInquireDetails | null>(null);
 
   useEffect(() => {
     async function fetchInquireDetails() {
       if (!helpId) return;
       try {
-        const result = await InquireApi.getInquireDetails(helpId);
-        setInquireDetails(result);
+        const result =
+          paramsType === 'business'
+            ? await InquireApi.getBusinessInquireDetails(helpId)
+            : await InquireApi.getInquireDetails(helpId);
+
+        const adaptedResult =
+          paramsType === 'business'
+            ? createBusinessAdapter(
+                result as BusinessInquireDetailsApi,
+                typeList,
+              )
+            : createServiceAdapter(
+                result as ServiceInquireDetailsApi,
+                typeList,
+              );
+
+        setInquireDetails(adaptedResult);
       } catch (error) {
         console.error('Failed to fetch review details:', error);
       }
     }
 
     fetchInquireDetails();
-  }, [helpId]);
+  }, [helpId, paramsType]);
 
   return (
     <>
@@ -54,63 +100,83 @@ export default function Inquire() {
               height={23}
             />
           </SubHeader.Left>
-          <SubHeader.Center>나의 문의 상세</SubHeader.Center>
+          <SubHeader.Center>{serviceType} 문의 내역</SubHeader.Center>
         </SubHeader>
         {inquireDetails !== null && (
           <>
-            <article className="mt-5 mx-5 text-13 text-mainGray">
-              {formatDate(inquireDetails.createAt) as string}
+            <article className="mt-4 mx-5 flex justify-between items-center">
+              <p className="text-13 font-bold text-subCoral">
+                {inquireDetails.typeName} 문의
+              </p>
+              <p className="text-12 text-mainGray">
+                {formatDate(inquireDetails.createAt) as string}
+              </p>
             </article>
-            <article className="mx-5 mt-2 py-3 border-t-[0.01rem] border-b-[0.01rem] border-mainGray/30">
-              <div className="flex pb-3 items-center space-x-2">
-                <h3 className="text-lg font-semibold">
-                  [{TYPE_OPTIONS[inquireDetails.helpType]} 문의]
-                </h3>
-                <Badge type={inquireDetails.statusType} />
+
+            <article className="mx-5 mt-2 space-y-[18px]">
+              <h3 className="text-16 font-bold text-black">
+                {inquireDetails.title}
+              </h3>
+              <div>
+                <p
+                  className="text-12 text-black whitespace-pre-line"
+                  dangerouslySetInnerHTML={{
+                    __html: inquireDetails.content?.replace(/\n/g, '<br />'),
+                  }}
+                />
               </div>
-              <div className="space-y-2">
-                {inquireDetails.imageUrlList.map((imgData) => (
-                  <div className="relative w-full h-52" key={imgData.viewUrl}>
-                    <BaseImage
-                      src={imgData.viewUrl}
-                      alt="Inquire image"
-                      priority
-                      className="cover"
-                    />
-                  </div>
-                ))}
-              </div>
-              <p
-                className="pt-3 text-13 break-words leading-none text-mainDarkGray "
-                dangerouslySetInnerHTML={{
-                  __html: inquireDetails.content?.replace(/\n/g, '<br />'),
-                }}
-              />
-            </article>
-            {inquireDetails.adminId && (
-              <article className="mx-5 py-3 space-y-4 border-b-[0.01rem] border-mainGray/30">
-                <div className="flex justify-between items-center space-x-1 ">
-                  <div className="flex justify-start items-center space-x-2">
-                    <div className="w-[1.9rem] h-[1.9rem] rounded-full overflow-hidden">
-                      <Image
-                        className="object-cover"
-                        src={adminDefaultImg}
-                        alt="bottle_note_img"
-                        width={30}
-                        height={30}
+              {inquireDetails.imageUrlList.length > 0 && (
+                <div className="flex overflow-x-auto gap-[6px] pb-2">
+                  {inquireDetails.imageUrlList.map((imgData) => (
+                    <div
+                      className="relative flex-shrink-0 cursor-pointer"
+                      key={imgData.viewUrl}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() =>
+                        router.push(
+                          `/image-viewer?src=${encodeURIComponent(imgData.viewUrl)}&title=${encodeURIComponent('첨부이미지')}`,
+                        )
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          router.push(
+                            `/image-viewer?src=${encodeURIComponent(imgData.viewUrl)}&title=${encodeURIComponent('첨부이미지')}`,
+                          );
+                        }
+                      }}
+                    >
+                      <BaseImage
+                        src={imgData.viewUrl}
+                        alt="Inquire image"
+                        priority
+                        className="cover"
+                        width={104}
+                        height={104}
                       />
                     </div>
-                    <p className="text-mainGray text-10">보틀노트</p>
-                  </div>
-                  <p className="text-mainGray text-10">
+                  ))}
+                </div>
+              )}
+            </article>
+
+            <article className="border-t border-b border-bgGray mx-5 my-[26px] py-[26px]">
+              <div className="flex items-center justify-between">
+                <p className="text-13 text-subCoral font-bold">
+                  {getStatusText(inquireDetails.status as Status)}
+                </p>
+                {inquireDetails.adminId && inquireDetails.lastModifyAt && (
+                  <p className="text-mainGray text-12">
                     {formatDate(inquireDetails.lastModifyAt) as string}
                   </p>
-                </div>
-                <div className="text-10 break-words leading-none text-mainDarkGray">
+                )}
+              </div>
+              {inquireDetails.adminId && (
+                <div className="pt-5 text-10 break-words leading-none text-mainDarkGray">
                   {inquireDetails.responseContent}
                 </div>
-              </article>
-            )}
+              )}
+            </article>
           </>
         )}
       </section>

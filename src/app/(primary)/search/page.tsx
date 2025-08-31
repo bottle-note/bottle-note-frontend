@@ -14,8 +14,7 @@ import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { REGIONS } from '@/constants/common';
 import LinkButton from '@/components/LinkButton';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/Tab';
 import { ROUTES } from '@/constants/routes';
@@ -34,7 +33,7 @@ interface InitialState {
 export default function Search() {
   const router = useRouter();
   const { popularList, isLoading: isPopularLoading } = usePopularList();
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const currCategory = useSearchParams().get('category') as Category;
   const currSearchKeyword = useSearchParams().get('query');
   const isEmptySearch = currCategory === null && currSearchKeyword === null;
@@ -89,7 +88,7 @@ export default function Search() {
       mainText: '위스키 추가 요청을 하겠습니까?',
       subText: '문의글을 작성하여 위스키를 요청할까요?',
       handleConfirm: () => {
-        if (!isLogin) {
+        if (!isLoggedIn) {
           handleCloseModal();
           handleLoginModal();
           return;
@@ -259,8 +258,6 @@ export default function Search() {
           )}
         </section>
       </main>
-
-      <Modal />
     </Suspense>
   );
 }

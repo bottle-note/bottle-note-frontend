@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 
 const BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL;
-const WHITE_LIST = ['*'];
+const BASE_URL_V2 = process.env.NEXT_PUBLIC_SERVER_URL_V2;
 
 const nextConfig = {
   output: 'standalone',
@@ -9,11 +9,13 @@ const nextConfig = {
   experimental: {
     missingSuspenseWithCSRBailout: false,
     // 심볼릭 링크 비활성화
-    outputFileTracingIgnores: ['**/*'],
+    outputFileTracingExcludes: ['**/*'],
   },
   async rewrites() {
     return [
-      { source: '/bottle-api/:path*', destination: BASE_URL + '/:path*' },
+      { source: '/bottle-api/v1/:path*', destination: `${BASE_URL}/:path*` },
+      { source: '/bottle-api/v2/:path*', destination: `${BASE_URL_V2}/:path*` },
+      { source: '/bottle-api/:path*', destination: `${BASE_URL}/:path*` },
     ];
   },
   images: {
@@ -60,9 +62,14 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '*.cloudfront.net',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
-  domains: WHITE_LIST,
 };
 
 export default nextConfig;

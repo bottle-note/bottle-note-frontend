@@ -13,13 +13,6 @@ export const useErrorModal = <T extends Record<string, any>>(
       handleModalState({
         isShowModal: true,
         mainText: errors[firstError]?.message as string,
-        handleConfirm: () => {
-          handleModalState({
-            isShowModal: false,
-            mainText: '',
-          });
-        },
-        type: 'ALERT',
       });
     }
   };

@@ -4,21 +4,20 @@ import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import ProfileImage from '@/app/(primary)/_components/ProfileImage';
 import OptionDropdown from '@/components/OptionDropdown';
 import { UserApi } from '@/app/api/UserApi';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { uploadImages } from '@/utils/S3Upload';
 import { useWebviewCamera } from '@/hooks/useWebviewCamera';
 import { useWebViewInit } from '@/hooks/useWebViewInit';
 import { ROUTES } from '@/constants/routes';
 import EditForm from './_components/EditForm';
-import ProfileDefaultImg from 'public/profile-default.svg';
 import ChangeProfile from 'public/change-profile.svg';
 
 export default function UserEditPage() {
-  const { userData } = AuthService;
+  const { user: userData } = useAuth();
   const router = useRouter();
   const { isMobile } = useWebViewInit();
   const { handleModalState, handleCloseModal } = useModalStore();
@@ -116,12 +115,12 @@ export default function UserEditPage() {
           className="absolute top-[20%] z-20"
           onClick={() => setIsOptionShow(true)}
         />
-        <div className="w-[104px] h-[104px] bg-white bg-opacity-60 border-subCoral border-2 rounded-full z-10 absolute top-[20%]">
-          <Image
-            src={profileImg ?? ProfileDefaultImg}
-            alt="프로필 이미지"
-            fill
-            className={`rounded-full object-cover ${!profileImg && 'opacity-50'}`}
+        <div className="bg-white bg-opacity-60 rounded-full z-10 absolute top-[20%]">
+          <ProfileImage
+            profileImgSrc={profileImg}
+            size={104}
+            borderWidth="bold"
+            opacity={0.5}
           />
         </div>
       </section>
@@ -137,7 +136,6 @@ export default function UserEditPage() {
           handleClose={() => setIsOptionShow(false)}
         />
       )}
-      <Modal />
     </main>
   );
 }

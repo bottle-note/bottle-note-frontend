@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, memo } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
@@ -8,7 +9,7 @@ import Label from '@/app/(primary)/_components/Label';
 import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
 import { truncStr } from '@/utils/truncStr';
 import type { AlcoholInfo as AlcoholType } from '@/types/Review';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
 
 interface Props {
@@ -18,12 +19,12 @@ interface Props {
 
 function AlcoholInfo({ data, handleLogin }: Props) {
   const router = useRouter();
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const { isPicked: originalIsPicked } = data;
   const [isPicked, setIsPicked] = useState<boolean>(originalIsPicked);
 
   const handleLoginConfirm = () => {
-    if (!isLogin || !data.alcoholId) {
+    if (!isLoggedIn || !data.alcoholId) {
       handleLogin();
       return;
     }
@@ -40,6 +41,7 @@ function AlcoholInfo({ data, handleLogin }: Props) {
             outerHeightClass="h-[120px]"
             innerWidthClass="w-[53px]"
             innerHeightClass="h-[104px]"
+            enableModal
           />
         )}
         <article className="w-2/3 pt-[5px] pb-[9.15px] text-white space-y-2 overflow-x-hidden">
@@ -48,18 +50,23 @@ function AlcoholInfo({ data, handleLogin }: Props) {
               name={data.korCategory}
               styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
             />
-            <h1 className="text-15 font-semibold whitespace-normal break-words">
-              {data.korName && truncStr(data.korName, 27)}
-            </h1>
-            <p className="text-12 whitespace-normal break-words font-normal">
-              {data.engName && truncStr(data.engName.toUpperCase(), 45)}
-            </p>
+            <Link
+              href={ROUTES.SEARCH.ALL(data.alcoholId)}
+              className="block space-y-[6px]"
+            >
+              <h1 className="text-15 font-semibold whitespace-normal break-words">
+                {data.korName && truncStr(data.korName, 27)}
+              </h1>
+              <p className="text-12 whitespace-normal break-words font-normal">
+                {data.engName && truncStr(data.engName.toUpperCase(), 45)}
+              </p>
+            </Link>
           </div>
           <div className="space-y-[10px] mt-[10px]">
             <div className="border-[0.5px] border-white" />
             <div className="flex space-x-3">
               <div
-                className="text-12 font-normal flex"
+                className="text-14 font-normal flex"
                 onClick={handleLoginConfirm}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -71,21 +78,21 @@ function AlcoholInfo({ data, handleLogin }: Props) {
                   className="mr-1"
                   src="/icon/edit-outlined-white.svg"
                   alt="write"
-                  width={16}
-                  height={16}
+                  width={19}
+                  height={19}
                 />
-                {/* 추후 user당 하루 리뷰 count 확인하는 API 연동 필요 */}
                 <button>리뷰 작성</button>
               </div>
               <div className="border-[0.5px] border-white my-[0.1rem]" />
               <PickBtn
-                size={16}
+                size={19}
                 isPicked={isPicked}
                 alcoholId={data.alcoholId}
                 handleUpdatePicked={() => setIsPicked((prev) => !prev)}
                 onApiError={() => setIsPicked(originalIsPicked)}
                 handleNotLogin={handleLogin}
                 pickBtnName="찜하기"
+                fontSize="text-14"
               />
             </div>
           </div>

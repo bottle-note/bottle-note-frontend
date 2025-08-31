@@ -6,16 +6,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useFormContext } from 'react-hook-form';
 import { ReplyApi } from '@/app/api/ReplyApi';
+import { useBlockActions } from '@/hooks/useBlockActions';
 import { truncStr } from '@/utils/truncStr';
 import { formatDate } from '@/utils/formatDate';
 import Label from '@/app/(primary)/_components/Label';
 import OptionDropdown from '@/components/OptionDropdown';
+import ProfileImage from '@/app/(primary)/_components/ProfileImage';
 import { RootReply, SubReply } from '@/types/Reply';
 import useModalStore from '@/store/modalStore';
-import Modal from '@/components/Modal';
-import { AuthService } from '@/lib/AuthService';
+import useRelationshipsStore from '@/store/relationshipsStore';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
-import userImg from 'public/profile-default.svg';
 
 interface Props {
   data: RootReply | SubReply;
@@ -37,11 +38,16 @@ function Reply({
   onToggleSubReply,
 }: Props) {
   const router = useRouter();
-  const { isLogin, userData } = AuthService;
+  const { isLoggedIn, user: userData } = useAuth();
   const { setValue } = useFormContext();
-  const { state, handleModalState, handleLoginModal } = useModalStore();
+  const { handleModalState, handleLoginModal, handleCloseModal } =
+    useModalStore();
+  const { isUserBlocked } = useRelationshipsStore();
+  const { handleBlockUser, handleUnblockUser } = useBlockActions();
+
   const [isOptionShow, setIsOptionShow] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isBlocked = isUserBlocked(data?.userId.toString());
 
   const handleUpdateSubReply = () => {
     if (onToggleSubReply) {
@@ -73,14 +79,10 @@ function Reply({
 
         handleModalState({
           isShowModal: true,
-          type: 'ALERT',
           mainText: '성공적으로 댓글이 삭제되었습니다.',
           handleConfirm: () => {
             setIsOptionShow(false);
-            handleModalState({
-              isShowModal: false,
-              mainText: '',
-            });
+            handleCloseModal();
           },
         });
       }
@@ -101,72 +103,88 @@ function Reply({
       });
     } else if (option.type === 'USER_REPORT') {
       router.push(ROUTES.REPORT.USER(data.userId));
+    } else if (option.type === 'USER_BLOCK') {
+      handleBlockUser(String(data.userId), data.nickName);
     }
   };
 
   return (
     <>
       <div>
-        <div className="flex items-center justify-between">
-          <Link href={ROUTES.USER.BASE(data?.userId!)}>
-            <div className="flex items-center space-x-[5px] h-8 px-">
-              <div className="w-[1.4rem] h-[1.4rem] rounded-full overflow-hidden">
-                <Image
-                  className="object-cover"
-                  src={data?.imageUrl || userImg}
-                  alt="user_img"
-                  width={22}
-                  height={22}
-                />
-              </div>
-              <p className="text-mainGray text-12 font-bold">
-                {truncStr(data?.nickName, 12)}
-              </p>
-              {isReviewUser && (
-                <Label
-                  name="리뷰 작성자"
-                  styleClass="border-mainCoral text-mainCoral px-[5.82px] py-[2.91px] rounded text-9"
-                />
-              )}
+        {isBlocked ? (
+          <div className="space-y-[10px] mb-2">
+            <div className="flex items-center space-x-1">
+              <div className="rounded-full w-[22px] h-[22px] bg-brightGray" />
+              <p className="text-mainGray text-12">차단한 사용자</p>
             </div>
-          </Link>
-          <div className="flex justify-between">
-            <p className="text-mainGray text-11">
-              {formatDate(data?.createAt) as string}
-            </p>
-            {data?.status !== 'DELETED' && (
+            <div className="flex items-center justify-between text-mainGray">
+              <div className="text-13">차단한 사용자의 리뷰입니다.</div>
               <button
-                className="cursor-pointer"
-                onClick={() => {
-                  if (isLogin) setIsOptionShow(true);
-                  else handleLoginModal();
-                }}
+                className="text-13 border-b border-mainGray"
+                onClick={() =>
+                  handleUnblockUser(String(data?.userId), data.nickName)
+                }
               >
-                <Image
-                  src="/icon/ellipsis-darkgray.svg"
-                  width={14}
-                  height={14}
-                  alt="report"
-                />
+                차단해제
               </button>
-            )}
-          </div>
-        </div>
-        <div className="text-12 text-mainDarkGray whitespace-pre-wrap break-words flex mt-[12px] mb-2">
-          {'rootReviewId' in data && (
-            <div className="text-mainCoral mr-1">
-              {data?.parentReviewReplyAuthor}
             </div>
-          )}
-          {data?.reviewReplyContent}
-        </div>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between">
+              <Link href={ROUTES.USER.BASE(data?.userId!)}>
+                <div className="flex items-center space-x-[5px] h-8 px-">
+                  <ProfileImage profileImgSrc={data?.imageUrl} size={22} />
+                  <p className="text-mainGray text-12 font-bold">
+                    {truncStr(data?.nickName, 12)}
+                  </p>
+                  {isReviewUser && (
+                    <Label
+                      name="리뷰 작성자"
+                      styleClass="border-mainCoral text-mainCoral px-[5.82px] py-[2.91px] rounded text-9"
+                    />
+                  )}
+                </div>
+              </Link>
+              <div className="flex justify-between">
+                <p className="text-mainGray text-11">
+                  {formatDate(data?.createAt) as string}
+                </p>
+                {data?.status !== 'DELETED' && (
+                  <button
+                    className="cursor-pointer"
+                    onClick={() => {
+                      if (isLoggedIn) setIsOptionShow(true);
+                      else handleLoginModal();
+                    }}
+                  >
+                    <Image
+                      src="/icon/ellipsis-darkgray.svg"
+                      width={14}
+                      height={14}
+                      alt="report"
+                    />
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="text-12 text-mainDarkGray whitespace-pre-wrap break-words flex mt-[12px] mb-2">
+              {'rootReviewId' in data && (
+                <div className="text-mainCoral mr-1">
+                  {data?.parentReviewReplyAuthor}
+                </div>
+              )}
+              {data?.reviewReplyContent}
+            </div>
+          </>
+        )}
         <div className="space-y-[14px]">
           <div className="flex space-x-[6px]">
-            {data?.status !== 'DELETED' && (
+            {data?.status !== 'DELETED' && !isBlocked && (
               <button
                 className="text-10 text-subCoral"
                 onClick={() => {
-                  if (isLogin) {
+                  if (isLoggedIn) {
                     updateReplyUser();
                   } else {
                     handleLoginModal();
@@ -178,7 +196,7 @@ function Reply({
             )}
             {'subReplyCount' in data && data?.subReplyCount !== 0 && (
               <>
-                <p className="text-10 text-subCoral">·</p>
+                {!isBlocked && <p className="text-10 text-subCoral">·</p>}
                 <button
                   className="flex items-center space-x-[2px]"
                   onClick={handleUpdateSubReply}
@@ -214,13 +232,17 @@ function Reply({
                   // { name: '수정하기', type: 'MODIFY' },
                   { name: '삭제하기', type: 'DELETE' },
                 ]
-              : [{ name: '유저 신고', type: 'USER_REPORT' }]
+              : [
+                  { name: '유저 신고', type: 'USER_REPORT' },
+                  ...(isBlocked
+                    ? []
+                    : [{ name: '유저 차단', type: 'USER_BLOCK' }]),
+                ]
           }
           handleOptionSelect={handleOptionSelect}
           title={userData?.userId === data.userId ? '내 댓글' : '신고하기'}
         />
       )}
-      {state.isShowModal && <Modal />}
     </>
   );
 }

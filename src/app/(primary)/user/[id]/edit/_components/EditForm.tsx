@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { UserApi } from '@/app/api/UserApi';
 import { validate } from '@/utils/validate';
-import Modal from '@/components/Modal';
 import useModalStore from '@/store/modalStore';
 import { ApiResponse } from '@/types/common';
 import CloseIconGray from 'public/icon/close-brightgray.svg';
@@ -114,7 +113,6 @@ function EditForm() {
           <div className="text-right clear-start text-mainGray text-10 mt-1">{`${nickName.length}/20`}</div>
         </div>
       </div>
-      <Modal />
     </>
   );
 }

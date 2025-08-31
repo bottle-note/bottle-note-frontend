@@ -5,7 +5,7 @@ import {
   RatingMyBottleListResponse,
   ReviewMyBottleListResponse,
 } from '@/types/MyBottle';
-import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { apiClient } from '@/shared/api/apiClient';
 
 export const MyBottleApi = {
   getMyBottle(type: MyBottleTabType) {
@@ -25,19 +25,13 @@ export const MyBottleApi = {
   }) {
     const { keyword, regionId, sortType, sortOrder, cursor, pageSize } = params;
 
-    const response = await fetchWithAuth(
-      `/bottle-api/my-page/${userId}/my-bottle/reviews?keyword=${decodeURI(keyword ?? '')}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
+    const response = await apiClient.get<
+      ApiResponse<ReviewMyBottleListResponse>
+    >(
+      `/my-page/${userId}/my-bottle/reviews?keyword=${decodeURI(keyword ?? '')}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
     );
 
-    const result: ApiResponse<ReviewMyBottleListResponse> = await response;
-
-    return result;
+    return response;
   },
 
   async getRatings({
@@ -49,19 +43,13 @@ export const MyBottleApi = {
   }) {
     const { keyword, regionId, sortType, sortOrder, cursor, pageSize } = params;
 
-    const response = await fetchWithAuth(
-      `/bottle-api/my-page/${userId}/my-bottle/ratings?keyword=${decodeURI(keyword ?? '')}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
+    const response = await apiClient.get<
+      ApiResponse<RatingMyBottleListResponse>
+    >(
+      `/my-page/${userId}/my-bottle/ratings?keyword=${decodeURI(keyword ?? '')}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
     );
 
-    const result: ApiResponse<RatingMyBottleListResponse> = await response;
-
-    return result;
+    return response;
   },
 
   async getPicks({
@@ -73,18 +61,10 @@ export const MyBottleApi = {
   }) {
     const { keyword, regionId, sortType, sortOrder, cursor, pageSize } = params;
 
-    const response = await fetchWithAuth(
-      `/bottle-api/my-page/${userId}/my-bottle/picks?keyword=${decodeURI(keyword ?? '')}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
+    const response = await apiClient.get<ApiResponse<PickMyBottleListResponse>>(
+      `/my-page/${userId}/my-bottle/picks?keyword=${decodeURI(keyword ?? '')}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
     );
 
-    const result: ApiResponse<PickMyBottleListResponse> = await response;
-
-    return result;
+    return response;
   },
 };

@@ -4,7 +4,7 @@ import TimeLineItem from '@/app/(primary)/_components/TimeLineItem';
 import Label from '@/app/(primary)/_components/Label';
 import LinkButton from '@/components/LinkButton';
 import useModalStore from '@/store/modalStore';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { History } from '@/types/History';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { HistoryApi } from '@/app/api/HistoryApi';
@@ -17,10 +17,10 @@ function Timeline() {
   const router = useRouter();
   const { id: userId } = useParams();
   const { handleModalState, handleLoginModal } = useModalStore();
-  const { userData: loginUserData, isLogin } = AuthService;
+  const { user: loginUserData, isLoggedIn } = useAuth();
 
   const handleConfirmUser = () => {
-    if (!isLogin) {
+    if (!isLoggedIn) {
       handleLoginModal();
       return;
     }
@@ -28,15 +28,8 @@ function Timeline() {
     if (loginUserData?.userId !== Number(userId)) {
       handleModalState({
         isShowModal: true,
-        type: 'ALERT',
         mainText: '여기까지 볼 수 있어요!',
         subText: '더 자세한 히스토리는 다른사람에게\n공유되지않아요~😘',
-        handleConfirm: () => {
-          handleModalState({
-            isShowModal: false,
-            mainText: '',
-          });
-        },
       });
     } else {
       router.push(ROUTES.HISTORY.BASE);

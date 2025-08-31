@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import FlavorTag from '@/app/(primary)/_components/FlavorTag';
-import OptionDropdown from '@/components/OptionDropdown';
-import useModalStore from '@/store/modalStore';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { formatDate } from '@/utils/formatDate';
-import { deleteReview } from '@/lib/Review';
-import { AuthService } from '@/lib/AuthService';
-import { ROUTES } from '@/constants/routes';
+import { useAuth } from '@/hooks/auth/useAuth';
+import ReviewActionDropdown from '@/app/(primary)/_components/ReviewActionDropdown';
 import {
   ReviewImageCarousel,
   convertImageUrlsToProductImageArray,
@@ -24,9 +20,7 @@ interface Props {
 }
 
 function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
-  const router = useRouter();
-  const { userData } = AuthService;
-  const { handleModalState } = useModalStore();
+  const { user: userData } = useAuth();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(data?.reviewInfo?.isLikedByMe);
   const [likeCount, setLikeCount] = useState(data?.reviewInfo?.likeCount);
@@ -36,45 +30,12 @@ function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
     '리뷰 이미지',
   );
 
-  const handleCloseOption = () => {
-    handleModalState({
-      isShowModal: true,
-      type: 'ALERT',
-      mainText: '성공적으로 삭제되었습니다.',
-      handleConfirm: () => {
-        setIsOptionShow(false);
-        handleModalState({
-          isShowModal: false,
-          mainText: '',
-        });
-        router.back();
-      },
-    });
-  };
-
-  const handleOptionSelect = (option: { name: string; type: string }) => {
-    if (option.type === 'DELETE') {
-      handleModalState({
-        isShowModal: true,
-        mainText: '정말 삭제하시겠습니까?',
-        type: 'CONFIRM',
-        handleConfirm: () => {
-          deleteReview(data.reviewInfo?.reviewId, handleCloseOption);
-        },
-      });
-    } else if (option.type === 'MODIFY') {
-      router.push(ROUTES.REVIEW.MODIFY(data.reviewInfo?.reviewId));
-    } else if (option.type === 'REVIEW_REPORT') {
-      router.push(ROUTES.REPORT.REVIEW(data.reviewInfo?.reviewId));
-    } else if (option.type === 'USER_REPORT') {
-      router.push(ROUTES.REPORT.USER(data.reviewInfo?.userInfo?.userId));
-    }
-  };
-
   return (
     <>
       <section className="pt-[38px]">
-        <ReviewUserHeader data={data} onRefresh={onRefresh} />
+        <div className="mb-[22px]">
+          <ReviewUserHeader data={data} onRefresh={onRefresh} />
+        </div>
         <section className="mx-5 pb-5 border-b border-mainGray/30">
           {productImages?.length > 0 && (
             <div className="mb-[22px]">
@@ -82,14 +43,14 @@ function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
             </div>
           )}
           <div
-            className="text-12 text-mainDarkGray whitespace-pre-line"
+            className="text-15 text-mainDarkGray whitespace-pre-line"
             dangerouslySetInnerHTML={{
               __html: data.reviewInfo?.reviewContent?.replace(/\n/g, '<br />'),
             }}
           />
-          <article className="flex justify-between mt-[10px]">
+          <article className="flex items-center justify-between mt-[10px]">
             {data.reviewInfo?.createAt && (
-              <p className="text-mainGray text-10">
+              <p className="text-mainGray text-13">
                 {formatDate(data.reviewInfo.createAt) as string}
               </p>
             )}
@@ -99,8 +60,8 @@ function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
             >
               <Image
                 src="/icon/ellipsis-darkgray.svg"
-                width={14}
-                height={14}
+                width={17.62}
+                height={17.62}
                 alt="report"
               />
             </button>
@@ -133,28 +94,15 @@ function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
           handleLogin={handleLogin}
         />
       </section>
-      {isOptionShow && (
-        <OptionDropdown
-          handleClose={() => setIsOptionShow(false)}
-          options={
-            userData?.userId === data.reviewInfo?.userInfo?.userId
-              ? [
-                  { name: '수정하기', type: 'MODIFY' },
-                  { name: '삭제하기', type: 'DELETE' },
-                ]
-              : [
-                  { name: '리뷰 신고', type: 'REVIEW_REPORT' },
-                  { name: '유저 신고', type: 'USER_REPORT' },
-                ]
-          }
-          handleOptionSelect={handleOptionSelect}
-          title={
-            userData?.userId === data.reviewInfo?.userInfo?.userId
-              ? '내 리뷰'
-              : '신고하기'
-          }
-        />
-      )}
+      <ReviewActionDropdown
+        isShow={isOptionShow}
+        onClose={() => setIsOptionShow(false)}
+        isOwnReview={userData?.userId === data.reviewInfo?.userInfo?.userId}
+        reviewId={String(data.reviewInfo?.reviewId)}
+        userId={String(data.reviewInfo?.userInfo?.userId)}
+        userNickname={data.reviewInfo?.userInfo?.nickName}
+        onRefresh={onRefresh}
+      />
     </>
   );
 }

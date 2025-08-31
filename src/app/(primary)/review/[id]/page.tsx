@@ -23,7 +23,6 @@ import type {
 } from '@/types/Review';
 import useModalStore from '@/store/modalStore';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
-import Modal from '@/components/Modal';
 import ReviewDetailsSkeleton from '@/components/Skeletons/custom/ReviewDetailsSkeleton';
 import ReplyInput from './_components/Reply/ReplyInput';
 import ReviewDetails from './_components/ReviewDetails';
@@ -34,7 +33,7 @@ export default function ReviewDetail() {
   const router = useRouter();
   const { id: reviewId } = useParams();
   const searchParams = useSearchParams();
-  const { state, handleLoginModal } = useModalStore();
+  const { handleLoginModal } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const replyListRef = useRef<HTMLDivElement>(null);
@@ -163,11 +162,7 @@ export default function ReviewDetail() {
               />
               <div className="relative z-10">
                 <SubHeader bgColor="bg-none">
-                  <SubHeader.Left
-                    onClick={() => {
-                      router.back();
-                    }}
-                  >
+                  <SubHeader.Left onClick={() => router.back()}>
                     <Image
                       src="/icon/arrow-left-white.svg"
                       alt="arrowIcon"
@@ -201,7 +196,6 @@ export default function ReviewDetail() {
               handleCreateReply={handleCreateReply}
             />
           </NavLayout>
-          {state.isShowModal && <Modal />}
         </>
       ) : (
         <ReviewDetailsSkeleton />

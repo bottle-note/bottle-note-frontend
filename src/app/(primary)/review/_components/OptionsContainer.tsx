@@ -44,8 +44,8 @@ export default function OptionsContainer({
         }}
       >
         <div className="flex items-center space-x-1">
-          <Image src={iconSrc} alt={iconAlt} width={24} height={24} />
-          <p className="text-12 text-mainDarkGray font-bold">
+          <Image src={iconSrc} alt={iconAlt} width={20} height={20} />
+          <p className="text-14 text-mainDarkGray font-bold">
             {title}{' '}
             <span className="text-mainGray font-normal">{subTitle}</span>
           </p>

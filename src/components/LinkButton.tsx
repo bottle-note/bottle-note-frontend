@@ -58,7 +58,7 @@ function LinkButton({
         </div>
         {imgSrc && (
           <Image
-            className="absolute bottom-[0.5px] left-[5.7rem] z-10"
+            className="absolute bottom-[0.5px] right-4 z-10"
             src={imgSrc}
             height={imageSize?.height}
             width={imageSize?.width}

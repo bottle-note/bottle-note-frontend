@@ -14,8 +14,7 @@ import { SORT_TYPE, SORT_ORDER } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
 import useModalStore from '@/store/modalStore';
-import { AuthService } from '@/lib/AuthService';
-import Modal from '@/components/Modal';
+import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
 import ReviewItemSkeleton from '@/components/Skeletons/ReviewItemSkeleton';
 
@@ -35,7 +34,7 @@ function Reviews() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const alcoholId = params?.id as string;
   const alcoholKorName = searchParams.get('name');
   const { handleLoginModal } = useModalStore();
@@ -236,7 +235,7 @@ function Reviews() {
       <section className="px-5 fixed bottom-6 left-0 right-0">
         <Button
           onClick={() => {
-            if (!isLogin || !alcoholId) {
+            if (!isLoggedIn || !alcoholId) {
               handleLoginModal();
               return;
             }
@@ -245,7 +244,6 @@ function Reviews() {
           btnName="리뷰 작성"
         />
       </section>
-      <Modal />
     </div>
   );
 }

@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useState, Dispatch, SetStateAction } from 'react';
+import React, { useEffect, Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
+import { useSearchInput } from '@/hooks/useSearchInput';
 import EnterIcon from 'public/icon/search-subcoral.svg';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
 
@@ -27,58 +27,59 @@ export default function SearchBar({
   placeholder = '어떤 술을 찾고 계신가요?',
   setUpdateSearchText,
 }: Props) {
-  const currSearchKeyword = useSearchParams().get('query');
-  const [searchText, setSearchText] = useState<string>(currSearchKeyword ?? '');
-
-  const handleSubmit = () => {
-    if (handleSearch) {
-      handleSearch(searchText);
-    }
-    if (handleFocus) handleFocus(false);
-  };
+  const {
+    searchText,
+    inputRef,
+    handleChange,
+    handleSubmit,
+    handleClear,
+    handleFocusChange,
+    handleKeyDown,
+    handleSetText,
+  } = useSearchInput({
+    onSearch: handleSearch,
+    onFocusChange: handleFocus,
+    syncWithUrlParams: true,
+  });
 
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
-    setSearchText('');
-    if (handleFocus) handleFocus(true);
+    handleClear();
   };
 
   const inputProps = {
     type: 'text',
     className:
-      'w-full bg-white rounded-lg h-10 pl-4 pr-12 outline-none text-mainCoral placeholder-mainCoral text-15 border border-mainCoral',
+      'w-full bg-white rounded-lg h-10 pl-4 pr-12 outline-none text-mainDarkGray placeholder-mainCoral text-15 border border-mainCoral',
     placeholder,
     'aria-label': '검색어 입력',
   };
 
   useEffect(() => {
-    setSearchText(currSearchKeyword ?? '');
-  }, [currSearchKeyword]);
-
-  useEffect(() => {
     if (setUpdateSearchText) {
       setUpdateSearchText(() => (newText: string) => {
-        setSearchText(newText);
+        handleSetText(newText);
       });
       return () => setUpdateSearchText(null);
     }
-  }, [setUpdateSearchText]);
+  }, [setUpdateSearchText, handleSetText]);
 
   return (
     <div className="relative">
       <input
+        ref={inputRef}
         {...inputProps}
         value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-        onFocus={() => handleFocus?.(true)}
-        onBlur={() => handleFocus?.(false)}
+        onChange={(e) => handleChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onFocus={() => handleFocusChange(true)}
+        onBlur={() => handleFocusChange(false)}
       />
       {searchText?.length > 0 && (
         <button
           type="button"
           onMouseDown={handleDelete}
-          className="absolute right-11 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
+          className="absolute right-14 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
           aria-label="검색어 지우기"
         >
           <Image src={DeleteIcon} alt="delete" />

@@ -1,48 +1,76 @@
 import { ApiResponse, ListQueryParams } from '@/types/common';
-import { fetchWithAuth } from '@/utils/fetchWithAuth';
+import { apiClient } from '@/shared/api/apiClient';
 import {
   InquirePostApi,
   InquireQueryParams,
-  InquireListApi,
-  InquireDetailsApi,
+  ServiceInquireListApi,
+  BusinessInquireListApi,
+  ServiceInquireDetailsApi,
+  BusinessInquireDetailsApi,
 } from '@/types/Inquire';
 
 export const InquireApi = {
   async getInquireList({ cursor, pageSize }: ListQueryParams) {
-    const response = await fetchWithAuth(
-      `/bottle-api/help?cursor=${cursor}&pageSize=${pageSize}`,
+    const response = await apiClient.get<ApiResponse<ServiceInquireListApi>>(
+      `/help?cursor=${cursor}&pageSize=${pageSize}`,
     );
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
 
-    const result: ApiResponse<InquireListApi> = await response;
-    return result;
+    const inquiries = response.data.helpList.map((inquiry) => ({
+      id: inquiry.helpId,
+      title: inquiry.title,
+      content: inquiry.content,
+      createAt: inquiry.createAt,
+      status: inquiry.helpStatus,
+    }));
+
+    return {
+      ...response,
+      data: {
+        items: inquiries,
+        totalCount: response.data.totalCount,
+      },
+    };
   },
 
   async registerInquire(params: InquireQueryParams) {
-    const response = await fetchWithAuth(`/bottle-api/help`, {
-      method: 'POST',
-      body: JSON.stringify(params),
-    });
+    const response = await apiClient.post<ApiResponse<InquirePostApi>>(
+      `/help`,
+      params,
+    );
 
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
-
-    const result: ApiResponse<InquirePostApi> = await response;
-    return result.data;
+    return response.data;
   },
 
   async getInquireDetails(helpId: string | string[]) {
-    const response = await fetchWithAuth(`/bottle-api/help/${helpId}`);
+    const response = await apiClient.get<ApiResponse<ServiceInquireDetailsApi>>(
+      `/help/${helpId}`,
+    );
 
-    if (response.errors.length !== 0) {
-      throw new Error('Failed to fetch data');
-    }
+    return response.data;
+  },
 
-    const result: ApiResponse<InquireDetailsApi> = await response;
+  async getBusinessInquireList({ cursor, pageSize }: ListQueryParams) {
+    const response = await apiClient.get<ApiResponse<BusinessInquireListApi>>(
+      `/business-support?cursor=${cursor}&pageSize=${pageSize}`,
+    );
 
-    return result.data;
+    return response;
+  },
+
+  async registerBusinessInquire(params: InquireQueryParams) {
+    const response = await apiClient.post<ApiResponse<InquirePostApi>>(
+      `/business-support`,
+      params,
+    );
+
+    return response.data;
+  },
+
+  async getBusinessInquireDetails(businessHelpId: string | string[]) {
+    const response = await apiClient.get<
+      ApiResponse<BusinessInquireDetailsApi>
+    >(`/business-support/${businessHelpId}`);
+
+    return response.data;
   },
 };

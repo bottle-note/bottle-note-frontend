@@ -3,12 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { AuthService } from '@/lib/AuthService';
-import { checkTokenValidity } from '@/utils/checkTokenValidity';
+import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
-import Modal from './Modal';
 
 export interface NavItem {
   name: string;
@@ -20,7 +18,7 @@ export interface NavItem {
 function Navbar({ maxWidth }: { maxWidth: string }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { userData, logout } = AuthService;
+  const { user: userData, isLoggedIn } = useAuth();
   const { handleLoginModal } = useModalStore();
   const [isMounted, setIsMounted] = useState(false);
   const [lastTapTime, setLastTapTime] = useState<{ [key: string]: number }>({});
@@ -52,7 +50,7 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
     },
     {
       name: '마이',
-      link: userData?.userId ? ROUTES.USER.BASE(userData.userId) : '',
+      link: userData?.userId ? ROUTES.USER.BASE(userData.userId) : ROUTES.LOGIN,
       icon: '/icon/navbar/user.svg',
       requiresAuth: true,
     },
@@ -81,16 +79,11 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
       [menu.link]: currentTime,
     }));
 
-    if (menu.requiresAuth) {
-      const isAuthenticated = userData && (await checkTokenValidity());
-
-      if (!isAuthenticated) {
-        if (menu.link === '/history') {
-          return handleLoginModal();
-        }
-        logout();
-        return router.push(ROUTES.LOGIN);
+    if (menu.requiresAuth && !isLoggedIn) {
+      if (menu.link === ROUTES.HISTORY.BASE) {
+        return handleLoginModal();
       }
+      return router.push(ROUTES.LOGIN);
     }
 
     router.push(menu.link);
@@ -141,7 +134,6 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
           </React.Fragment>
         ))}
       </section>
-      <Modal />
     </nav>
   );
 }

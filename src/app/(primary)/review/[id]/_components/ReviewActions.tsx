@@ -3,7 +3,7 @@ import Image from 'next/image';
 import LikeBtn from '@/app/(primary)/_components/LikeBtn';
 import useModalStore from '@/store/modalStore';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 
 interface ReviewActionsProps {
   data: ReviewDetailsWithoutAlcoholInfo;
@@ -22,14 +22,14 @@ export default function ReviewActions({
   onLikeError,
   handleLogin,
 }: ReviewActionsProps) {
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const { handleModalState } = useModalStore();
 
   return (
-    <section className="mx-5 py-5 flex items-center space-x-4">
-      <div className="flex-1 flex text-center justify-center items-center space-x-1">
+    <section className="mx-5 py-5 flex items-center">
+      <div className="flex-1 flex justify-center items-center space-x-1">
         <LikeBtn
-          size={16}
+          size={19}
           reviewId={data?.reviewInfo?.reviewId}
           isLiked={isLiked}
           handleUpdateLiked={onLikeUpdate}
@@ -43,7 +43,7 @@ export default function ReviewActions({
       <button
         className="flex-1 flex text-center justify-center items-center space-x-1"
         onClick={() => {
-          if (!isLogin) handleLogin();
+          if (!isLoggedIn) handleLogin();
         }}
       >
         <Image
@@ -66,7 +66,6 @@ export default function ReviewActions({
         onClick={() => {
           handleModalState({
             isShowModal: true,
-            type: 'ALERT',
             mainText: '아직 준비 중인 기능입니다. 조금만 기다려주세요!',
           });
         }}

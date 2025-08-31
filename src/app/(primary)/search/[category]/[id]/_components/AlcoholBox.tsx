@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import Label from '@/app/(primary)/_components/Label';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
-import { AuthService } from '@/lib/AuthService';
+import { useAuth } from '@/hooks/auth/useAuth';
 import Star from '@/components/Star';
 import { truncStr } from '@/utils/truncStr';
 import useModalStore from '@/store/modalStore';
@@ -18,7 +18,7 @@ interface Props {
 
 function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
   const router = useRouter();
-  const { isLogin } = AuthService;
+  const { isLoggedIn } = useAuth();
   const { handleLoginModal } = useModalStore();
 
   return (
@@ -30,6 +30,7 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
           outerWidthClass="w-[140px]"
           innerHeightClass="h-[200px]"
           innerWidthClass="w-[100px]"
+          enableModal={true}
         />
       )}
       <article className="flex-1 py-3 text-white overflow-x-hidden">
@@ -65,7 +66,7 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
                 <button
                   className="flex items-end space-x-[0.5px]"
                   onClick={() => {
-                    if (!isLogin || !data.alcoholId) {
+                    if (!isLoggedIn || !data.alcoholId) {
                       handleLoginModal();
                       return;
                     }
