@@ -16,12 +16,17 @@ export const useAppSocialLogin = () => {
     });
   };
 
-  const onKakaoLoginSuccess = async (accessToken: string) => {
+  const onKakaoLoginSuccess = async (payload: string) => {
     try {
-      await login('kakao-login', {
-        accessToken,
-      });
-
+      if (payload.includes('@')) {
+        await login('kakao-login', {
+          email: payload,
+        });
+      } else {
+        await login('kakao-login', {
+          accessToken: payload,
+        });
+      }
       router.replace('/');
     } catch (e) {
       onKakaoLoginError((e as Error).message);
