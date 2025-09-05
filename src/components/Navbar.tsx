@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
-import { throttle } from '@/utils/throttle';
+import { useScrollState } from '@/hooks/useScrollState';
 
 export interface NavItem {
   name: string;
@@ -23,33 +23,10 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   const { handleLoginModal } = useModalStore();
   const [isMounted, setIsMounted] = useState(false);
   const [lastTapTime, setLastTapTime] = useState<{ [key: string]: number }>({});
-  const [isVisible, setIsVisible] = useState(true);
-  const lastScrollY = useRef(0);
+  const { isVisible } = useScrollState(100);
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = throttle(() => {
-      const currentScrollY = window.scrollY;
-      const scrollThreshold = 10;
-
-      if (Math.abs(currentScrollY - lastScrollY.current) < scrollThreshold) {
-        return;
-      }
-
-      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
-        setIsVisible(false);
-      } else if (currentScrollY < lastScrollY.current) {
-        setIsVisible(true);
-      }
-
-      lastScrollY.current = currentScrollY;
-    }, 16);
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const scrollToTop = () => {
