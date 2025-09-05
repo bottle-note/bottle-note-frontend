@@ -61,7 +61,7 @@ export default function SearchAlcohol() {
         setAlcoholDetails([
           { title: '카테고리', content: alcohols.engCategory },
           { title: '증류소', content: formatContent(alcohols.engDistillery) },
-          { title: '캐스트', content: formatContent(alcohols.cask) },
+          { title: '캐스크', content: formatContent(alcohols.cask) },
           { title: '국가/지역', content: formatContent(alcohols.engRegion) },
           {
             title: '도수(%)',
