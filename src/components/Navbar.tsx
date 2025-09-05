@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
+import { throttle } from '@/utils/throttle';
 
 export interface NavItem {
   name: string;
@@ -22,9 +23,33 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
   const { handleLoginModal } = useModalStore();
   const [isMounted, setIsMounted] = useState(false);
   const [lastTapTime, setLastTapTime] = useState<{ [key: string]: number }>({});
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = throttle(() => {
+      const currentScrollY = window.scrollY;
+      const scrollThreshold = 10;
+
+      if (Math.abs(currentScrollY - lastScrollY.current) < scrollThreshold) {
+        return;
+      }
+
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        setIsVisible(false);
+      } else if (currentScrollY < lastScrollY.current) {
+        setIsVisible(true);
+      }
+
+      lastScrollY.current = currentScrollY;
+    }, 16);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const scrollToTop = () => {
@@ -103,7 +128,9 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
 
   return (
     <nav
-      className={`fixed bottom-6 left-0 right-0 mx-auto w-full max-w-[${maxWidth}] px-4 z-10`}
+      className={`fixed bottom-6 left-0 right-0 mx-auto w-full max-w-[${maxWidth}] px-4 z-10 transition-transform duration-300 ease-in-out ${
+        isVisible ? 'translate-y-0' : 'translate-y-[calc(100%+24px)]'
+      }`}
     >
       <section className="h-[4.4rem] flex justify-between bg-[#F6F6F6] py-4 px-[26px] rounded-[0.8rem] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
         {navItems.map((menu, index) => (
