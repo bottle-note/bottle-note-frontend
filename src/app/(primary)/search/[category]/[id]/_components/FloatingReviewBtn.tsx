@@ -1,24 +1,15 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { useAuth } from '@/hooks/auth/useAuth';
-import useModalStore from '@/store/modalStore';
-import { ROUTES } from '@/constants/routes';
 import { useScrollState } from '@/hooks/useScrollState';
+import { useReviewWrite } from '@/hooks/useReviewWrite';
 
 const FloatingReviewBtn = ({ alcoholId }: { alcoholId: string }) => {
-  const router = useRouter();
-  const { isLoggedIn } = useAuth();
-  const { handleLoginModal } = useModalStore();
   const { isAtTop, isVisible } = useScrollState();
+  const { handleReviewWrite } = useReviewWrite();
 
   const handleClick = () => {
-    if (!isLoggedIn || !alcoholId) {
-      handleLoginModal();
-      return;
-    }
-    router.push(ROUTES.REVIEW.REGISTER(alcoholId));
+    handleReviewWrite(alcoholId);
   };
 
   const getPositionClass = () => {

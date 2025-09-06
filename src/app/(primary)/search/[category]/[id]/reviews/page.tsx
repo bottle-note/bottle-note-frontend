@@ -13,9 +13,7 @@ import List from '@/components/List/List';
 import { SORT_TYPE, SORT_ORDER } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
-import useModalStore from '@/store/modalStore';
-import { useAuth } from '@/hooks/auth/useAuth';
-import { ROUTES } from '@/constants/routes';
+import { useReviewWrite } from '@/hooks/useReviewWrite';
 import ReviewItemSkeleton from '@/components/Skeletons/ReviewItemSkeleton';
 
 const SORT_OPTIONS = [
@@ -34,10 +32,9 @@ function Reviews() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
-  const { isLoggedIn } = useAuth();
   const alcoholId = params?.id as string;
   const alcoholKorName = searchParams.get('name');
-  const { handleLoginModal } = useModalStore();
+  const { handleReviewWrite } = useReviewWrite();
   const [activeTab, setActiveTab] = useState('tab1');
 
   const handleTabClick = (tab: string) => {
@@ -234,13 +231,7 @@ function Reviews() {
       </section>
       <section className="px-5 fixed bottom-6 left-0 right-0">
         <Button
-          onClick={() => {
-            if (!isLoggedIn || !alcoholId) {
-              handleLoginModal();
-              return;
-            }
-            router.push(ROUTES.REVIEW.REGISTER(alcoholId));
-          }}
+          onClick={() => handleReviewWrite(alcoholId)}
           btnName="리뷰 작성"
         />
       </section>
