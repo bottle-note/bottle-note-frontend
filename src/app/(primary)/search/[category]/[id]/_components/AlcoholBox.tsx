@@ -1,14 +1,12 @@
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import Label from '@/app/(primary)/_components/Label';
 import PickBtn from '@/app/(primary)/_components/PickBtn';
 import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
-import { useAuth } from '@/hooks/auth/useAuth';
 import Star from '@/components/Star';
 import { truncStr } from '@/utils/truncStr';
 import useModalStore from '@/store/modalStore';
 import { AlcoholInfo } from '@/types/Alcohol';
-import { ROUTES } from '@/constants/routes';
+import { useReviewWrite } from '@/hooks/useReviewWrite';
 
 interface Props {
   data: AlcoholInfo;
@@ -17,9 +15,8 @@ interface Props {
 }
 
 function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
-  const router = useRouter();
-  const { isLoggedIn } = useAuth();
   const { handleLoginModal } = useModalStore();
+  const { handleReviewWrite } = useReviewWrite();
 
   return (
     <section className="relative z-20 flex px-5 pb-[23px] space-x-5">
@@ -65,13 +62,7 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
               <div className="flex space-x-3">
                 <button
                   className="flex items-end space-x-[0.5px]"
-                  onClick={() => {
-                    if (!isLoggedIn || !data.alcoholId) {
-                      handleLoginModal();
-                      return;
-                    }
-                    router.push(ROUTES.REVIEW.REGISTER(data.alcoholId));
-                  }}
+                  onClick={() => handleReviewWrite(data.alcoholId)}
                 >
                   <Image
                     src="/icon/edit-outlined-white.svg"
