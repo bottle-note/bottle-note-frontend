@@ -126,26 +126,18 @@ export default function Settings() {
 
   const handleSwitchEnv = (env: 'dev' | 'prod') => {
     handleWebViewMessage('switchEnv', env);
-
-    handleModalState({
-      isShowModal: true,
-      mainText: `${env === 'dev' ? '개발' : '상용'} 환경으로 전환되었습니다.`,
-    });
+    handleCloseModal();
   };
 
   const handleEnvSwitchModal = () => {
-    const isDev = process.env.NODE_ENV === 'development';
-    const targetEnv = isDev ? '상용' : '개발';
-    const targetEnvEng = isDev ? 'prod' : 'dev';
-
     handleModalState({
       isShowModal: true,
       type: 'CONFIRM',
-      mainText: `${targetEnv} 환경으로 전환하시겠습니까?`,
-      handleConfirm: () => {
-        handleCloseModal();
-        handleSwitchEnv(targetEnvEng);
-      },
+      mainText: '개발 환경으로 전환하시겠습니까?',
+      confirmBtnName: '개발',
+      cancelBtnName: '상용',
+      handleConfirm: () => handleSwitchEnv('dev'),
+      handleCancel: () => handleSwitchEnv('prod'),
     });
   };
 
