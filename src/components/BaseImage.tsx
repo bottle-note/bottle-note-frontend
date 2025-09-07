@@ -31,7 +31,7 @@ const BaseImage = ({
   height,
   rounded = '',
 }: Props) => {
-  const [imgSrc, setImgSrc] = useState(src);
+  const [imgSrc, setImgSrc] = useState(src || Fallback);
   const [isLoading, setIsLoading] = useState(true);
 
   const handleError = () => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
@@ -23,6 +23,25 @@ export default function Settings() {
   const { handleModalState, handleCloseModal } = useModalStore();
   const { currentScreen, setCurrentScreen, resetToMain, clearStorage } =
     useSettingsStore();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdminPermissions = async () => {
+      if (isLoggedIn) {
+        try {
+          const hasPermission = await AdminApi.checkPermissions();
+          setIsAdmin(hasPermission);
+        } catch (error) {
+          console.error('Admin permission check failed:', error);
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
+    };
+
+    checkAdminPermissions();
+  }, [isLoggedIn]);
 
   const checkAuthAndExecute = (callback: () => void) => {
     if (!isLoggedIn) {
@@ -107,60 +126,19 @@ export default function Settings() {
 
   const handleSwitchEnv = (env: 'dev' | 'prod') => {
     handleWebViewMessage('switchEnv', env);
-
-    handleModalState({
-      isShowModal: true,
-
-      mainText: `${env === 'dev' ? '개발' : '상용'} 환경으로 전환되었습니다.`,
-    });
+    handleCloseModal();
   };
 
-  const handleEnvSwitchModal = async () => {
-    try {
-      const isDev = process.env.NODE_ENV === 'development';
-
-      if (isDev) {
-        const targetEnv = '상용';
-        const targetEnvEng = 'prod';
-
-        handleModalState({
-          isShowModal: true,
-          type: 'CONFIRM',
-          mainText: `${targetEnv} 환경으로 전환하시겠습니까?`,
-          handleConfirm: () => handleSwitchEnv(targetEnvEng),
-        });
-        return;
-      }
-
-      const hasPermission = await AdminApi.checkPermissions();
-
-      if (hasPermission) {
-        const targetEnv = isDev ? '상용' : '개발';
-        const targetEnvEng = isDev ? 'dev' : 'prod';
-
-        handleModalState({
-          isShowModal: true,
-          type: 'CONFIRM',
-          mainText: `${targetEnv} 환경으로 전환하시겠습니까?`,
-          handleConfirm: () => handleSwitchEnv(targetEnvEng),
-        });
-      } else {
-        handleModalState({
-          isShowModal: true,
-
-          mainText: '개발 환경 전환 권한이 없습니다.',
-        });
-      }
-    } catch (error) {
-      handleModalState({
-        isShowModal: true,
-
-        mainText:
-          error instanceof Error
-            ? error.message
-            : '권한 확인 중 오류가 발생했습니다.',
-      });
-    }
+  const handleEnvSwitchModal = () => {
+    handleModalState({
+      isShowModal: true,
+      type: 'CONFIRM',
+      mainText: '개발 환경으로 전환하시겠습니까?',
+      confirmBtnName: '개발',
+      cancelBtnName: '상용',
+      handleConfirm: () => handleSwitchEnv('dev'),
+      handleCancel: () => handleSwitchEnv('prod'),
+    });
   };
 
   const screenConfigs: Record<
@@ -178,8 +156,9 @@ export default function Settings() {
         navigateToRoute,
         handleEnvSwitchModal,
         user?.userId,
+        isAdmin,
       ),
-    [navigateToScreen, navigateToRoute, user?.userId],
+    [navigateToScreen, navigateToRoute, user?.userId, isAdmin],
   );
 
   const getHeaderTitle = () => {
