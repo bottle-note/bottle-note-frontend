@@ -1,6 +1,12 @@
 export const useBlockScroll = () => {
   const handleScroll = ({ isScroll = true }: { isScroll: boolean }) => {
-    document.body.style.overflow = isScroll ? 'unset' : 'hidden';
+    if (isScroll) {
+      document.body.style.overflow = 'unset';
+      document.body.style.touchAction = 'unset';
+    } else {
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+    }
   };
 
   return { handleScroll };
