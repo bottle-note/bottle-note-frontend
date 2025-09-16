@@ -207,6 +207,7 @@ export default function SearchAlcohol() {
                       height={23}
                     />
                   </SubHeader.Left>
+                  {/* TODO: 앱링크 기능 추가 */}
                   <SubHeader.Right
                     onClick={() => {
                       handleModalState({
