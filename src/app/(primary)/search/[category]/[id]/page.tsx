@@ -22,13 +22,13 @@ import useModalStore from '@/store/modalStore';
 import { AlcoholDetails } from '@/types/Alcohol';
 import { ROUTES } from '@/constants/routes';
 import AlcoholDetailsSkeleton from '@/components/Skeletons/custom/AlcoholDetailsSkeleton';
+import ShareModal from '@/components/ShareModal';
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import useDebounceAction from '@/hooks/useDebounceAction';
 import FloatingReviewBtn from './_components/FloatingReviewBtn';
 import AlcoholBox from './_components/AlcoholBox';
 import ProfileDefaultImg from 'public/profile-default.svg';
 import FlavorTag from '../../../_components/FlavorTag';
-import ShareModal from '@/components/ShareModal';
 
 interface DetailItem {
   title: string;
