@@ -44,6 +44,7 @@ export default function SearchBar({
 
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     handleClear();
   };
 
@@ -78,7 +79,7 @@ export default function SearchBar({
       {searchText?.length > 0 && (
         <button
           type="button"
-          onMouseDown={handleDelete}
+          onClick={handleDelete}
           className="absolute right-14 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
           aria-label="검색어 지우기"
         >
@@ -87,7 +88,7 @@ export default function SearchBar({
       )}
       <button
         className="px-2 w-10 absolute top-0 right-1 h-full flex items-center justify-center"
-        onMouseDown={handleSubmit}
+        onClick={handleSubmit}
         aria-label="검색"
       >
         <SearchButton />
