@@ -17,9 +17,10 @@ interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;
   handleLogin: () => void;
   onRefresh: () => void;
+  textareaRef?: React.MutableRefObject<HTMLTextAreaElement | null>;
 }
 
-function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
+function ReviewDetails({ data, handleLogin, onRefresh, textareaRef }: Props) {
   const { user: userData } = useAuth();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(data?.reviewInfo?.isLikedByMe);
@@ -92,6 +93,7 @@ function ReviewDetails({ data, handleLogin, onRefresh }: Props) {
             setIsLiked(data?.reviewInfo?.isLikedByMe);
           }}
           handleLogin={handleLogin}
+          textareaRef={textareaRef}
         />
       </section>
       <ReviewActionDropdown

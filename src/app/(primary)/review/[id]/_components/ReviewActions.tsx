@@ -12,6 +12,7 @@ interface ReviewActionsProps {
   onLikeUpdate: () => void;
   onLikeError: () => void;
   handleLogin: () => void;
+  textareaRef?: React.MutableRefObject<HTMLTextAreaElement | null>;
 }
 
 export default function ReviewActions({
@@ -21,6 +22,7 @@ export default function ReviewActions({
   onLikeUpdate,
   onLikeError,
   handleLogin,
+  textareaRef,
 }: ReviewActionsProps) {
   const { isLoggedIn } = useAuth();
   const { handleModalState } = useModalStore();
@@ -43,7 +45,11 @@ export default function ReviewActions({
       <button
         className="flex-1 flex text-center justify-center items-center space-x-1"
         onClick={() => {
-          if (!isLoggedIn) handleLogin();
+          if (!isLoggedIn) {
+            handleLogin();
+          } else if (textareaRef?.current) {
+            textareaRef.current.focus();
+          }
         }}
       >
         <Image

@@ -183,6 +183,7 @@ export default function ReviewDetail() {
               data={reviewDetails}
               handleLogin={handleLogin}
               onRefresh={fetchReviewDetails}
+              textareaRef={textareaRef}
             />
             <div ref={replyListRef}>
               <ReplyList

@@ -37,7 +37,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
   };
 
   const insertAtCaret = (text: string) => {
-    const el = textareaRef.current;
+    const el = newTextareaRef.current;
     if (el) {
       el.focus();
       const { selectionStart, selectionEnd, value } = el;
@@ -73,11 +73,12 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
     }
   }, [mentionName]);
 
-  // textareaRef를 newTextareaRef에 복사
-  // 해당 부분 조금 문제가 있어서 다음 PR에서 수정할 예정
   useEffect(() => {
-    newTextareaRef.current = textareaRef.current;
-  }, [textareaRef]);
+    if (newTextareaRef.current && textareaRef) {
+      const refObject = textareaRef;
+      refObject.current = newTextareaRef.current;
+    }
+  }, [textareaRef, newTextareaRef.current]);
 
   const handleLoginOrAction = (
     action: () => void,
