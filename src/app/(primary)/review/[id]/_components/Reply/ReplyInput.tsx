@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import { useFormContext, FieldValues, SubmitHandler } from 'react-hook-form';
 import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
+import { useScrollState } from '@/hooks/useScrollState';
 
 interface Props {
   textareaRef: React.MutableRefObject<HTMLTextAreaElement | null>;
@@ -17,6 +18,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
   const mentionName = watch('replyToReplyUserName');
   const newTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const { handleLoginModal } = useModalStore();
+  const { isVisible } = useScrollState(100);
 
   const handleResizeHeight = () => {
     if (newTextareaRef.current) {
@@ -99,7 +101,11 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
   };
 
   return (
-    <div className="fixed bottom-[6.7rem] left-0 right-0 mx-auto w-full max-w-2xl px-4 z-10">
+    <div
+      className={`fixed left-0 right-0 mx-auto w-full max-w-2xl px-4 z-10 transition-all duration-500 ease-out ${
+        isVisible ? 'bottom-[6.7rem]' : 'bottom-4'
+      }`}
+    >
       <div className="bg-[#f6f6f6] pt-1 px-3 rounded-lg shadow-md flex items-center">
         <div className="flex-grow flex items-center">
           <textarea
