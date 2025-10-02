@@ -84,7 +84,7 @@ function EditForm() {
             <label className="text-13 text-mainDarkGray">닉네임</label>
             <input
               placeholder="닉네임 입력"
-              className="border-b border-mainGray py-2 text-15 placeholder:text-[#BFBFBF] bg-transparent outline-none appearance-none rounded-none border-0"
+              className="border-b border-mainGray py-2 text-15 placeholder:text-[#BFBFBF] bg-transparent outline-none appearance-none rounded-none"
               value={nickName}
               onChange={(e) => setNickName(e.target.value)}
               type="text"
