@@ -55,7 +55,7 @@ export default function ReviewActions({
         <Image
           src={
             data.reviewInfo?.hasReplyByMe
-              ? 'icon/comment-filled-subcoral.svg'
+              ? '/icon/comment-filled-subcoral.svg'
               : '/icon/comment-outlined-gray.svg'
           }
           width={16}
