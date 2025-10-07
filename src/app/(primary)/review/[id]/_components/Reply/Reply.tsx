@@ -57,7 +57,6 @@ function Reply({
 
   const updateReplyUser = () => {
     if (data?.nickName) {
-      setValue('content', `@${data.nickName} `);
       setValue('replyToReplyUserName', data.nickName);
       setValue('parentReplyId', data.reviewReplyId);
 
@@ -80,6 +79,7 @@ function Reply({
         handleModalState({
           isShowModal: true,
           mainText: '성공적으로 댓글이 삭제되었습니다.',
+          type: 'ALERT',
           handleConfirm: () => {
             setIsOptionShow(false);
             handleCloseModal();
