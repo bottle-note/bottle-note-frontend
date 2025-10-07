@@ -22,6 +22,7 @@ import useModalStore from '@/store/modalStore';
 import { AlcoholDetails } from '@/types/Alcohol';
 import { ROUTES } from '@/constants/routes';
 import AlcoholDetailsSkeleton from '@/components/Skeletons/custom/AlcoholDetailsSkeleton';
+import ShareModal from '@/components/ShareModal';
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import useDebounceAction from '@/hooks/useDebounceAction';
 import FloatingReviewBtn from './_components/FloatingReviewBtn';
@@ -48,6 +49,7 @@ export default function SearchAlcohol() {
   const [rate, setRate] = useState(0);
   const [userNickName, setUserNickName] = useState<string>('');
   const [isUnmounting, setIsUnmounting] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const fetchAlcoholDetails = async (id: string) => {
     try {
@@ -169,6 +171,16 @@ export default function SearchAlcohol() {
     fetchAlcoholDetails(alcoholId.toString());
   }, [alcoholId]);
 
+  const generateShareUrl = useCallback(() => {
+    const baseUrl = window.location.origin;
+    const currentPath = window.location.pathname;
+    return `${baseUrl}${currentPath}`;
+  }, []);
+
+  const handleShareClick = useCallback(() => {
+    setIsShareModalOpen(true);
+  }, []);
+
   return (
     <>
       <NavLayout>
@@ -207,15 +219,7 @@ export default function SearchAlcohol() {
                       height={23}
                     />
                   </SubHeader.Left>
-                  <SubHeader.Right
-                    onClick={() => {
-                      handleModalState({
-                        isShowModal: true,
-                        mainText:
-                          '아직 준비 중인 기능입니다. 조금만 기다려주세요!',
-                      });
-                    }}
-                  >
+                  <SubHeader.Right onClick={handleShareClick}>
                     <Image
                       src="/icon/externallink-outlined-white.svg"
                       alt="linkIcon"
@@ -355,6 +359,17 @@ export default function SearchAlcohol() {
           <FloatingReviewBtn alcoholId={String(data.alcohols.alcoholId)} />
         )}
       </NavLayout>
+
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        shareUrl={generateShareUrl()}
+        title={
+          data?.alcohols?.korName
+            ? `${data.alcohols.korName} 공유하기`
+            : '공유하기'
+        }
+      />
     </>
   );
 }
