@@ -6,12 +6,14 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ExploreApi } from '@/app/api/ExploreApi';
 import List from '@/components/List/List';
 import ReviewCard from './ReviewListItem';
-import { SearchBar } from './SearchBar';
+import { SearchBar, type SearchKeyword } from './SearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
 import Label from '../../_components/Label';
 
 export const ReviewExplorerList = () => {
-  const [keywords, setKeywords] = useState<Set<string>>(new Set());
+  const [keywords, setKeywords] = useState<SearchKeyword[]>([]);
+
+  const keywordValues = keywords.map((keyword) => keyword.value);
 
   const {
     data: reviewList,
@@ -23,10 +25,10 @@ export const ReviewExplorerList = () => {
   } = usePaginatedQuery<{
     items: ExploreReview[];
   }>({
-    queryKey: ['explore.reviews', ...keywords],
+    queryKey: ['explore.reviews', ...keywordValues],
     queryFn: ({ pageParam }) => {
       return ExploreApi.getReviews({
-        keywords: Array.from(keywords),
+        keywords: keywordValues,
         ...{
           cursor: pageParam,
           pageSize: 10,
@@ -35,16 +37,20 @@ export const ReviewExplorerList = () => {
     },
   });
 
-  const handleAddKeyword = (newKeyword: string) => {
-    setKeywords((prev) => new Set(prev).add(newKeyword));
+  const handleAddKeyword = (newKeyword: SearchKeyword) => {
+    setKeywords((prev) => {
+      if (prev.some((keyword) => keyword.value === newKeyword.value)) {
+        return prev;
+      }
+
+      return [...prev, newKeyword];
+    });
   };
 
-  const handleRemoveKeyword = (keywordToRemove: string) => {
-    setKeywords((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(keywordToRemove);
-      return newSet;
-    });
+  const handleRemoveKeyword = (keywordValueToRemove: string) => {
+    setKeywords((prev) =>
+      prev.filter((keyword) => keyword.value !== keywordValueToRemove),
+    );
   };
 
   return (
@@ -54,18 +60,19 @@ export const ReviewExplorerList = () => {
         handleAddKeyword={handleAddKeyword}
         description={`보고싶은 리뷰의 내용, 플레이버태그, 작성자, 위스키이름을\n 추가하여 검색해보세요.`}
         handleRemoveKeyword={handleRemoveKeyword}
+        activeKeywords={keywords}
       />
       <article className="flex gap-x-1 gap-y-1.5 flex-wrap">
-        {Array.from(keywords).map((keyword) => (
-          <div key={keyword} className="overflow-hidden flex-shrink-0">
+        {keywords.map((keyword) => (
+          <div key={keyword.value} className="overflow-hidden flex-shrink-0">
             <Label
-              name={keyword}
+              name={keyword.label}
               styleClass="label-default text-12"
               position="after"
               icon={
                 <button
                   type="button"
-                  onMouseDown={() => handleRemoveKeyword(keyword)}
+                  onMouseDown={() => handleRemoveKeyword(keyword.value)}
                   className=""
                   aria-label="검색어 지우기"
                 >
