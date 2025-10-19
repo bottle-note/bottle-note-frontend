@@ -158,7 +158,7 @@ const ItemListContainer = ({ children }: { children: React.ReactNode }) => {
   return <div className="h-[321px]">{children}</div>;
 };
 
-function PopularList({ type = 'week' }: Props) {
+function DynamicAlcoholList({ type = 'week' }: Props) {
   const { popularList, isLoading } = usePopularList({ type });
   const { isLoggedIn } = useAuth();
 
@@ -186,4 +186,4 @@ function PopularList({ type = 'week' }: Props) {
   return <ItemListContainer>{renderContent()}</ItemListContainer>;
 }
 
-export default PopularList;
+export default DynamicAlcoholList;

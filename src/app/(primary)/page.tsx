@@ -6,7 +6,7 @@ import HomeCarousel from '@/components/feature/home/HomeCarousel';
 import { BANNER_IMAGES, TOP_MENU_ITEMS, MENU_CATEGORY } from '@/constants/home';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import CategoryList from '@/components/feature/home/CategoryList';
-import PopularList from '@/components/feature/home/PopularList';
+import DynamicAlcoholList from '@/components/feature/home/DynamicAlcoholList';
 import NavLayout from '@/components/ui/Layout/NavLayout';
 
 export default function Home() {
@@ -36,7 +36,7 @@ export default function Home() {
       case 'week':
       case 'recent':
         return (
-          <PopularList
+          <DynamicAlcoholList
             key={firstMenuSelectedTab.id}
             type={firstMenuSelectedTab.id}
           />
