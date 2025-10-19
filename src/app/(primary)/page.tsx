@@ -1,13 +1,13 @@
 'use client';
 
 import { useTab } from '@/hooks/useTab';
-import Tab from '@/components/Tab';
-import MainCarousel from '@/app/(primary)/_components/MainCarousel';
+import { Tab } from '@/components/ui/Navigation';
+import HomeCarousel from '@/components/feature/home/HomeCarousel';
 import { BANNER_IMAGES, TOP_MENU_ITEMS, MENU_CATEGORY } from '@/constants/home';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
-import CategoryList from './_components/CategoryList';
-import PopularList from './_components/PopularList';
-import NavLayout from './_components/NavLayout';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import CategoryList from '@/components/feature/home/CategoryList';
+import PopularList from '@/components/feature/home/PopularList';
+import NavLayout from '@/components/ui/Layout/NavLayout';
 
 export default function Home() {
   const {
@@ -61,7 +61,7 @@ export default function Home() {
         <SubHeader.Left showLogo />
         <SubHeader.Right showSideMenu />
       </SubHeader>
-      <MainCarousel images={BANNER_IMAGES} />
+      <HomeCarousel images={BANNER_IMAGES} />
       <div className="pt-[22px] space-y-1 relative">
         <section className="pb-20">
           <article className="space-y-[30px]">
