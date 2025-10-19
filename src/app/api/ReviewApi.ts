@@ -127,8 +127,6 @@ export const ReviewApi = {
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');
     }
-
-    return response.data;
   },
 
   async putVisibility(reviewId: string | number, status: 'PUBLIC' | 'PRIVATE') {
