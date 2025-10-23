@@ -40,24 +40,6 @@ const overlayConfigs: Record<string, OverlayConfig> = {
       containerClass: 'top-11 pl-7',
     },
   },
-  summerRecommend: {
-    link: ROUTES.SEARCH.SEARCH('여름 추천 위스키'),
-    mainText: (
-      <>
-        올여름을 완성해 줄
-        <br />
-        위스키 한 잔
-      </>
-    ),
-    topSubText: '',
-    bottomSubText: '여름 추천 위스키 보기',
-    styles: {
-      mainTextColor: 'text-white',
-      topSubTextColor: '',
-      bottomSubTextColor: 'text-[#165E59] font-extrabold',
-      containerClass: 'top-10 pl-[35px]',
-    },
-  },
   rainDayRecommend: {
     link: ROUTES.SEARCH.SEARCH('비 오는 날 추천 위스키'),
     mainText: (

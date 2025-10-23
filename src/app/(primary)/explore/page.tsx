@@ -34,7 +34,6 @@ export default function ExplorePage() {
       </div>
       <section className="w-full h-full mt-[100px] p-4 md:p-6 pt-14">
         {currentTab.id === 'EXPLORER_WHISKEY' && <WhiskeyExplorerList />}
-
         {currentTab.id === 'REVIEW_WHISKEY' && <ReviewExplorerList />}
       </section>
     </Suspense>
