@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { LucideSearch } from 'lucide-react';
 import SideFilterDrawer from '@/components/SideFilterDrawer';
@@ -8,12 +8,18 @@ import { useSearchInput } from '@/hooks/useSearchInput';
 import HelpIcon from 'public/icon/help-filled-subcoral.svg';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
 
+export interface SearchKeyword {
+  label: string;
+  value: string;
+}
+
 interface Props {
   handleSearch: () => void;
-  handleAddKeyword: (keyword: string) => void;
-  handleRemoveKeyword: (keyword: string) => void;
+  handleAddKeyword: (keyword: SearchKeyword) => void;
+  handleRemoveKeyword: (keywordValue: string) => void;
   description: string;
   isFilter?: boolean;
+  activeKeywords?: SearchKeyword[];
 }
 
 export const SearchBar = ({
@@ -23,65 +29,107 @@ export const SearchBar = ({
   description,
   isFilter = false,
 }: Props) => {
-  const onAddKeyword = useCallback(
-    (v: string) => {
-      const trimmedValue = v.trim();
-      if (trimmedValue) {
-        handleAddKeyword(trimmedValue);
-        handleSearch();
-      }
-    },
-    [handleAddKeyword, handleSearch],
-  );
+  const onAddKeyword = (rawValue: string) => {
+    const trimmedValue = rawValue.trim();
+    if (!trimmedValue) return;
+
+    handleAddKeyword({
+      label: trimmedValue,
+      value: trimmedValue,
+    });
+    handleSearch();
+  };
 
   const { searchText, inputRef, handleChange, handleSubmit } = useSearchInput({
     onSearch: onAddKeyword,
   });
 
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<
-    Set<(typeof CATEGORY_MENUS_LIST)[number]['name']>
-  >(new Set());
+  const [selectedCategory, setSelectedCategory] = useState<Set<string>>(
+    new Set(),
+  );
   const [selectedRegion, setSelectedRegion] = useState<
     Set<(typeof REGIONS)[number]['korName']>
   >(new Set());
 
-  const handleToggleOption = useMemo(
-    () => ({
-      category: (value: (typeof CATEGORY_MENUS_LIST)[number]['name']) => {
-        setSelectedCategory((prev) => {
-          const newSet = new Set(prev);
-          if (newSet.has(value)) {
-            newSet.delete(value);
-            handleRemoveKeyword(value);
-          } else {
-            newSet.add(value);
-            handleAddKeyword(value);
-          }
-          return newSet;
-        });
-      },
-      region: (value: (typeof REGIONS)[number]['korName']) => {
-        setSelectedRegion((prev) => {
-          const newSet = new Set(prev);
-          if (newSet.has(value)) {
-            newSet.delete(value);
-            handleRemoveKeyword(value);
-          } else {
-            newSet.add(value);
-            handleAddKeyword(value);
-          }
-          return newSet;
-        });
-      },
-    }),
-    [],
-  );
+  const clearCategorySelections = () => {
+    if (selectedCategory.size === 0) return;
 
-  const handleResetFilter = useCallback(() => {
+    selectedCategory.forEach((categoryValue) => {
+      handleRemoveKeyword(categoryValue);
+    });
     setSelectedCategory(new Set());
+  };
+
+  const clearRegionSelections = () => {
+    if (selectedRegion.size === 0) return;
+
+    selectedRegion.forEach((regionValue) => {
+      handleRemoveKeyword(regionValue);
+    });
     setSelectedRegion(new Set());
-  }, []);
+  };
+
+  const clearFilterSelections = () => {
+    clearCategorySelections();
+    clearRegionSelections();
+  };
+
+  const toggleCategoryFilterSelection = (
+    categoryOption: (typeof CATEGORY_MENUS_LIST)[number],
+  ) => {
+    const categoryValue = String(categoryOption.id ?? '');
+
+    if (!categoryValue) {
+      clearCategorySelections();
+      return;
+    }
+
+    setSelectedCategory((prev) => {
+      const nextSelection = new Set(prev);
+
+      if (nextSelection.has(categoryValue)) {
+        nextSelection.delete(categoryValue);
+        handleRemoveKeyword(categoryValue);
+      } else {
+        nextSelection.add(categoryValue);
+        handleAddKeyword({
+          label: categoryOption.name,
+          value: categoryValue,
+        });
+      }
+
+      return nextSelection;
+    });
+  };
+
+  const toggleRegionFilterSelection = (
+    regionOption: (typeof REGIONS)[number],
+  ) => {
+    const regionValue = regionOption.korName;
+
+    if (!regionOption.regionId) {
+      clearRegionSelections();
+      return;
+    }
+
+    setSelectedRegion((prev) => {
+      const nextSelection = new Set(prev);
+
+      if (nextSelection.has(regionValue)) {
+        nextSelection.delete(regionValue);
+        handleRemoveKeyword(regionValue);
+      } else {
+        nextSelection.add(regionValue);
+        handleAddKeyword({
+          label: regionOption.korName,
+          value: regionValue,
+        });
+      }
+
+      return nextSelection;
+    });
+  };
 
   return (
     <section className="pt-[5px]">
@@ -134,7 +182,7 @@ export const SearchBar = ({
         <SideFilterDrawer
           isOpen={isOpenSideFilter}
           onClose={() => setIsOpenSideFilter(false)}
-          resetFilter={handleResetFilter}
+          resetFilter={clearFilterSelections}
         >
           <Accordion title="카테고리">
             <Accordion.Single>
@@ -142,21 +190,19 @@ export const SearchBar = ({
                 title="전체"
                 value={CATEGORY_MENUS_LIST[0].id}
                 isSelected={selectedCategory.size === 0}
-                onClick={() => setSelectedCategory(new Set())}
+                onClick={clearCategorySelections}
               />
             </Accordion.Single>
             <Accordion.Grid cols={2}>
-              {CATEGORY_MENUS_LIST.slice(1, CATEGORY_MENUS_LIST.length).map(
-                (v) => (
-                  <Accordion.Content
-                    title={v.name}
-                    value={v.id}
-                    isSelected={selectedCategory.has(v.name)}
-                    onClick={() => handleToggleOption.category(v.name)}
-                    key={v.id}
-                  />
-                ),
-              )}
+              {CATEGORY_MENUS_LIST.slice(1).map((category) => (
+                <Accordion.Content
+                  title={category.name}
+                  value={category.id}
+                  isSelected={selectedCategory.has(String(category.id))}
+                  onClick={() => toggleCategoryFilterSelection(category)}
+                  key={category.id}
+                />
+              ))}
             </Accordion.Grid>
           </Accordion>
 
@@ -166,19 +212,17 @@ export const SearchBar = ({
                 title="전체"
                 value={REGIONS[0].regionId}
                 isSelected={selectedRegion.size === 0}
-                onClick={() => setSelectedRegion(new Set())}
+                onClick={clearRegionSelections}
               />
             </Accordion.Single>
             <Accordion.Grid cols={2}>
-              {REGIONS.slice(1, REGIONS.length).map((v) => (
+              {REGIONS.slice(1).map((region) => (
                 <Accordion.Content
-                  title={v.korName}
-                  value={v.korName}
-                  isSelected={selectedRegion.has(v.korName)}
-                  onClick={() => {
-                    handleToggleOption.region(v.korName);
-                  }}
-                  key={v.regionId}
+                  title={region.korName}
+                  value={region.korName}
+                  isSelected={selectedRegion.has(region.korName)}
+                  onClick={() => toggleRegionFilterSelection(region)}
+                  key={region.regionId}
                 />
               ))}
             </Accordion.Grid>

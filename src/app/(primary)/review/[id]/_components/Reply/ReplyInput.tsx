@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import { useFormContext, FieldValues, SubmitHandler } from 'react-hook-form';
 import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
+import { useScrollState } from '@/hooks/useScrollState';
 
 interface Props {
   textareaRef: React.MutableRefObject<HTMLTextAreaElement | null>;
@@ -17,6 +18,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
   const mentionName = watch('replyToReplyUserName');
   const newTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const { handleLoginModal } = useModalStore();
+  const { isVisible } = useScrollState(100);
 
   const handleResizeHeight = () => {
     if (newTextareaRef.current) {
@@ -35,7 +37,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
   };
 
   const insertAtCaret = (text: string) => {
-    const el = textareaRef.current;
+    const el = newTextareaRef.current;
     if (el) {
       el.focus();
       const { selectionStart, selectionEnd, value } = el;
@@ -71,11 +73,12 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
     }
   }, [mentionName]);
 
-  // textareaRef를 newTextareaRef에 복사
-  // 해당 부분 조금 문제가 있어서 다음 PR에서 수정할 예정
   useEffect(() => {
-    newTextareaRef.current = textareaRef.current;
-  }, [textareaRef]);
+    if (newTextareaRef.current && textareaRef) {
+      const refObject = textareaRef;
+      refObject.current = newTextareaRef.current;
+    }
+  }, [textareaRef, newTextareaRef.current]);
 
   const handleLoginOrAction = (
     action: () => void,
@@ -99,7 +102,11 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
   };
 
   return (
-    <div className="fixed bottom-[6.7rem] left-0 right-0 mx-auto w-full max-w-2xl px-4 z-10">
+    <div
+      className={`fixed left-0 right-0 mx-auto w-full max-w-2xl px-4 z-10 transition-all duration-500 ease-out ${
+        isVisible ? 'bottom-[6.7rem]' : 'bottom-4'
+      }`}
+    >
       <div className="bg-[#f6f6f6] pt-1 px-3 rounded-lg shadow-md flex items-center">
         <div className="flex-grow flex items-center">
           <textarea

@@ -6,12 +6,13 @@ import { ExploreAlcohol } from '@/types/Explore';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import List from '@/components/List/List';
 import WhiskeyListItem from './WhiskeyListItem';
-import { SearchBar } from './SearchBar';
+import { SearchBar, type SearchKeyword } from './SearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
 import Label from '../../_components/Label';
 
 export const WhiskeyExplorerList = () => {
-  const [keywords, setKeywords] = useState<Set<string>>(new Set());
+  const [keywords, setKeywords] = useState<SearchKeyword[]>([]);
+  const keywordValues = keywords.map((keyword) => keyword.value);
 
   const {
     data: alcoholList,
@@ -23,10 +24,10 @@ export const WhiskeyExplorerList = () => {
   } = usePaginatedQuery<{
     items: ExploreAlcohol[];
   }>({
-    queryKey: ['explore.alcohols', ...keywords],
+    queryKey: ['explore.alcohols', ...keywordValues],
     queryFn: ({ pageParam }) => {
       return ExploreApi.getAlcohols({
-        keywords: Array.from(keywords),
+        keywords: keywordValues,
         ...{
           cursor: pageParam,
           pageSize: 10,
@@ -40,16 +41,20 @@ export const WhiskeyExplorerList = () => {
     refetch();
   };
 
-  const handleAddKeyword = (newKeyword: string) => {
-    setKeywords((prev) => new Set(prev).add(newKeyword));
+  const handleAddKeyword = (newKeyword: SearchKeyword) => {
+    setKeywords((prev) => {
+      if (prev.some((keyword) => keyword.value === newKeyword.value)) {
+        return prev;
+      }
+
+      return [...prev, newKeyword];
+    });
   };
 
-  const handleRemoveKeyword = (keywordToRemove: string) => {
-    setKeywords((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(keywordToRemove);
-      return newSet;
-    });
+  const handleRemoveKeyword = (keywordValueToRemove: string) => {
+    setKeywords((prev) =>
+      prev.filter((keyword) => keyword.value !== keywordValueToRemove),
+    );
   };
 
   return (
@@ -59,19 +64,20 @@ export const WhiskeyExplorerList = () => {
         handleAddKeyword={handleAddKeyword}
         handleRemoveKeyword={handleRemoveKeyword}
         description={`이름이나 플레이버 태그를 추가하여 검색해보세요.`}
+        activeKeywords={keywords}
         isFilter
       />
       <article className="flex gap-x-1 gap-y-1.5 flex-wrap border-b border-borderGray pb-6">
-        {Array.from(keywords).map((keyword) => (
-          <div key={keyword} className="overflow-hidden flex-shrink-0">
+        {keywords.map((keyword) => (
+          <div key={keyword.value} className="overflow-hidden flex-shrink-0">
             <Label
-              name={keyword}
+              name={keyword.label}
               styleClass="label-default text-13"
               position="after"
               icon={
                 <button
                   type="button"
-                  onMouseDown={() => handleRemoveKeyword(keyword)}
+                  onMouseDown={() => handleRemoveKeyword(keyword.value)}
                   className=""
                   aria-label="검색어 지우기"
                 >
