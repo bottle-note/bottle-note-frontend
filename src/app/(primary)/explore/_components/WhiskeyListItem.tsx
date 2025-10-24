@@ -73,9 +73,9 @@ const WhiskeyListItem = ({ content }: Props) => {
       {/* info */}
       <Link
         href={ROUTES.SEARCH.ALL(content.alcoholId)}
-        className="flex flex-col items-start justify-center space-y-1"
+        className="flex flex-col items-start justify-center space-y-2"
       >
-        <div>
+        <div className="space-y-2">
           <ItemInfo
             korName={addNewLine(content.korName)}
             engName={content.engName}

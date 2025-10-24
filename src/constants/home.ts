@@ -7,11 +7,6 @@ export const BANNER_IMAGES: ProductImage[] = [
     alt: 'bottleNote 배너',
   },
   {
-    id: 'summerRecommend',
-    src: '/bannerImg/summer-banner.png',
-    alt: '여름 추천 위스키 배너',
-  },
-  {
     id: 'rainDayRecommend',
     src: '/bannerImg/rain-banner.png',
     alt: '비오는 날 추천 위스키 배너',
