@@ -56,12 +56,15 @@ const ReviewListItem = ({ content }: Props) => {
               textStyle="text-20 text-subCoral font-semibold w-7"
             />
           </div>
-          <div className="flex justify-between items-center w-full">
-            <Link href={ROUTES.SEARCH.ALL(content.alcoholId)}>
-              <p className="text-12 text-mainDarkGray">{`${content.alcoholName}  >`}</p>
+          <div className="flex justify-between items-start w-full gap-2">
+            <Link
+              href={ROUTES.SEARCH.ALL(content.alcoholId)}
+              className="min-w-0 flex-1"
+            >
+              <p className="text-12 text-mainDarkGray break-words">{`${content.alcoholName}  >`}</p>
             </Link>
 
-            <div className="flex gap-1">
+            <div className="flex gap-1 flex-shrink-0">
               {content.isBestReview && (
                 <Label
                   name="베스트"
