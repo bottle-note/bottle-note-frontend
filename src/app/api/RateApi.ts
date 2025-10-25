@@ -47,6 +47,6 @@ export const RateApi = {
   },
 
   async postRating(params: { alcoholId: string; rating: number }) {
-    await apiClient.post(`/rating/register`, params);
+    return await apiClient.post(`/rating/register`, params);
   },
 };
