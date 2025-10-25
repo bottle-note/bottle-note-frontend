@@ -44,7 +44,7 @@ function ReviewDetails({ data, handleLogin, onRefresh, textareaRef }: Props) {
             </div>
           )}
           <div
-            className="text-15 text-mainDarkGray whitespace-pre-line"
+            className="text-15 text-mainDarkGray whitespace-pre-line break-words"
             dangerouslySetInnerHTML={{
               __html: data.reviewInfo?.reviewContent?.replace(/\n/g, '<br />'),
             }}
