@@ -5,7 +5,7 @@ import { SessionProvider } from 'next-auth/react';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthInitializer } from '@/components/AuthInitializer';
-import Modal from '@/components/Modal';
+import Modal from '@/components/ui/Modal/Modal';
 import { FocusScrollProvider } from './FocusScrollProvider';
 
 interface Props {

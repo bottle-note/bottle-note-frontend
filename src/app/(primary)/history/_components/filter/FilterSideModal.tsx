@@ -5,7 +5,7 @@ import {
   LIKE_FILTERS,
 } from '@/constants/history';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
-import SideFilterDrawer from '@/components/SideFilterDrawer';
+import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
 import FilterGroup from './FilterGroup';
 
 interface Props {

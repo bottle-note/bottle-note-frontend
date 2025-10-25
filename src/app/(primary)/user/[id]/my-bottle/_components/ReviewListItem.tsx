@@ -1,9 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import Label from '@/app/(primary)/_components/Label';
-import ItemImage from '@/components/List/_components/ItemImage';
-import ItemInfo from '@/components/List/_components/ItemInfo';
+import Label from '@/components/ui/Display/Label';
+import ItemImage from '@/components/feature/List/_components/ItemImage';
+import ItemInfo from '@/components/feature/List/_components/ItemInfo';
 import { ReviewMyBottleListResponse } from '@/types/MyBottle';
 import { addNewLine } from '@/utils/addNewLine';
 import { truncStr } from '@/utils/truncStr';

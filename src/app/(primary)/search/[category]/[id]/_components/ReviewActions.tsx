@@ -1,8 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
-import LikeBtn from '@/app/(primary)/_components/LikeBtn';
-import ReplyButton from '@/app/(primary)/_components/ReplyButton';
-import VisibilityToggle from '@/app/(primary)/_components/VisibilityToggle';
+import ReviewLikeButton from '@/components/domain/review/ReviewLikeButton';
+import ReplyButton from '@/components/domain/review/ReplyButton';
+import VisibilityToggle from '@/components/ui/Form/VisibilityToggle';
 import { formatDate } from '@/utils/formatDate';
 
 interface ReviewFooterProps {
@@ -50,7 +50,7 @@ export default function ReviewActions({
     >
       <div className="flex space-x-4">
         <div className="flex items-center space-x-[2px]">
-          <LikeBtn
+          <ReviewLikeButton
             reviewId={reviewId}
             isLiked={isLiked}
             handleUpdateLiked={onLikeUpdate}

@@ -4,9 +4,9 @@ import React, { useState, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import PickBtn from '@/app/(primary)/_components/PickBtn';
-import Label from '@/app/(primary)/_components/Label';
-import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
+import AlcoholPickButton from '@/components/domain/alcohol/AlcoholPickButton';
+import Label from '@/components/ui/Display/Label';
+import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import { truncStr } from '@/utils/truncStr';
 import type { AlcoholInfo as AlcoholType } from '@/types/Review';
 import { useAuth } from '@/hooks/auth/useAuth';
@@ -84,7 +84,7 @@ function AlcoholInfo({ data, handleLogin }: Props) {
                 <button>리뷰 작성</button>
               </div>
               <div className="border-[0.5px] border-white my-[0.1rem]" />
-              <PickBtn
+              <AlcoholPickButton
                 size={19}
                 isPicked={isPicked}
                 alcoholId={data.alcoholId}

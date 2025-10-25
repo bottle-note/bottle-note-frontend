@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import Label from '@/app/(primary)/_components/Label';
-import PickBtn from '@/app/(primary)/_components/PickBtn';
-import ItemImage from '@/components/List/_components/ItemImage';
-import ItemInfo from '@/components/List/_components/ItemInfo';
-import { ItemStats } from '@/components/List/_components/ItemStats';
+import Label from '@/components/ui/Display/Label';
+import AlcoholPickButton from '@/components/domain/alcohol/AlcoholPickButton';
+import ItemImage from '@/components/feature/List/_components/ItemImage';
+import ItemInfo from '@/components/feature/List/_components/ItemInfo';
+import { ItemStats } from '@/components/feature/List/_components/ItemStats';
 import useModalStore from '@/store/modalStore';
 import { PickMyBottleListResponse } from '@/types/MyBottle';
 import { addNewLine } from '@/utils/addNewLine';
@@ -66,7 +66,7 @@ export const PicksListItem = ({ data }: Props) => {
       <div className="ml-auto pr-1 flex flex-col items-end">
         {/* FIXME: api 에서 정보를 주면 노출 조건 변경 */}
         <p className="text-10 text-mainGray font-bold">통했찜</p>
-        <PickBtn
+        <AlcoholPickButton
           isPicked={isPicked}
           alcoholId={alcoholId}
           handleUpdatePicked={() => setIsPicked((prev) => !prev)}

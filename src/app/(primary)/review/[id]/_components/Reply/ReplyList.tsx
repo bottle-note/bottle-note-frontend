@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { RootReply, SubReplyListApi, SubReply } from '@/types/Reply';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ReplyApi } from '@/app/api/ReplyApi';
-import List from '@/components/List/List';
-import EmptyView from '@/app/(primary)/_components/EmptyView';
+import List from '@/components/feature/List/List';
+import EmptyView from '@/components/ui/Display/EmptyView';
 import { useAuth } from '@/hooks/auth/useAuth';
 import Reply from './Reply';
 

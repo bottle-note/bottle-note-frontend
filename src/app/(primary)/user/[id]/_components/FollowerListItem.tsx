@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { RelationInfo } from '@/types/User';
 import { ROUTES } from '@/constants/routes';
-import ProfileImage from '@/app/(primary)/_components/ProfileImage';
+import ProfileImage from '@/components/domain/user/ProfileImage';
 import { FollowButton } from './FollowButton';
 import CommentGray from 'public/icon/comment-filled-gray.svg';
 import StarGray from 'public/icon/star-filled-gray.svg';

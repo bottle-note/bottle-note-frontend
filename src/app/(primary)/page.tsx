@@ -1,7 +1,7 @@
 'use client';
 
 import { useTab } from '@/hooks/useTab';
-import { Tab } from '@/components/ui/Navigation';
+import Tab from '@/components/ui/Navigation/Tab';
 import HomeCarousel from '@/components/feature/home/HomeCarousel';
 import { BANNER_IMAGES, TOP_MENU_ITEMS, MENU_CATEGORY } from '@/constants/home';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';

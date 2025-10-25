@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Star } from '@/components/ui/Feedback';
+import Star from '@/components/ui/Display/Star';
 import { truncStr } from '@/utils/truncStr';
 import { AlcoholAPI } from '@/types/Alcohol';
 

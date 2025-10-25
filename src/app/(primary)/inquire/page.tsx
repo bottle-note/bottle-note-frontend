@@ -2,11 +2,11 @@
 
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
-import { Button } from '@/components/Button';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import Button from '@/components/ui/Button/Button';
 import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
-import List from '@/components/List/List';
+import List from '@/components/feature/List/List';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { InquireApi } from '@/app/api/InquireApi';
 import { InquireList } from '@/types/Inquire';

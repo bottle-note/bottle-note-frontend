@@ -1,8 +1,8 @@
 import Image from 'next/image';
-import Label from '@/app/(primary)/_components/Label';
-import PickBtn from '@/app/(primary)/_components/PickBtn';
-import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
-import Star from '@/components/Star';
+import Label from '@/components/ui/Display/Label';
+import AlcoholPickButton from '@/components/domain/alcohol/AlcoholPickButton';
+import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
+import Star from '@/components/ui/Display/Star';
 import { truncStr } from '@/utils/truncStr';
 import useModalStore from '@/store/modalStore';
 import { AlcoholInfo } from '@/types/Alcohol';
@@ -73,7 +73,7 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
                   <p className="text-12 font-normal">리뷰 작성</p>
                 </button>
                 <div className="border-[0.5px] border-white my-[0.1rem]" />
-                <PickBtn
+                <AlcoholPickButton
                   size={16}
                   isPicked={isPicked}
                   alcoholId={Number(data.alcoholId)}

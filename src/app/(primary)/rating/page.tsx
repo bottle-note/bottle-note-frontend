@@ -2,16 +2,16 @@
 
 import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import CategorySelector from '@/components/CategorySelector';
-import List from '@/components/List/List';
+import CategorySelector from '@/components/ui/Form/CategorySelector';
+import List from '@/components/feature/List/List';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import LinkButton from '@/components/LinkButton';
+import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import { RateApi } from '@/app/api/RateApi';
 import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
 import { useFilter } from '@/hooks/useFilter';
 import { RateAPI } from '@/types/Rate';
 import { REGIONS } from '@/constants/common';
-import SearchContainer from '../../../components/Search/SearchContainer';
+import SearchContainer from '@/components/feature/Search/SearchContainer';
 
 interface InitialState {
   keyword: string;
@@ -134,7 +134,7 @@ export default function Rating() {
 
           <div ref={targetRef} />
 
-          <LinkButton
+          <PrimaryLinkButton
             data={{
               korName: '혹시 찾는 술이 없으신가요?',
               engName: 'NO RESULTS',
