@@ -8,9 +8,9 @@ import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
+import StarRating from '@/components/ui/Form/StarRating';
 import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
-import StarRating from '@/components/ui/Form/StarRating';
 
 interface Props {
   data: RateAPI;

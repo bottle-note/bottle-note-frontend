@@ -13,9 +13,9 @@ import { History } from '@/types/History';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { HistoryApi } from '@/app/api/HistoryApi';
 import { ROUTES } from '@/constants/routes';
+import NavLayout from '@/components/ui/Layout/NavLayout';
 import UserInfo from './_components/UserInfo';
 import HistoryOverview from './_components/HistoryOverview';
-import NavLayout from '@/components/ui/Layout/NavLayout';
 
 export default function User({ params: { id } }: { params: { id: string } }) {
   const router = useRouter();

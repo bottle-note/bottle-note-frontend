@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
-import ArrowDownIcon from 'public/icon/arrow-down-subcoral.svg';
 import OptionDropdown from '@/components/ui/Modal/OptionDropdown';
+import ArrowDownIcon from 'public/icon/arrow-down-subcoral.svg';
 
 interface SortOptionProps {
   options: { type: string; name: string }[];

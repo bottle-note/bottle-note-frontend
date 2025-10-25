@@ -5,10 +5,10 @@ import { ExploreApi } from '@/app/api/ExploreApi';
 import { ExploreAlcohol } from '@/types/Explore';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import List from '@/components/feature/List/List';
+import Label from '@/components/ui/Display/Label';
 import WhiskeyListItem from './WhiskeyListItem';
 import { SearchBar, type SearchKeyword } from './SearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
-import Label from '@/components/ui/Display/Label';
 
 export const WhiskeyExplorerList = () => {
   const [keywords, setKeywords] = useState<SearchKeyword[]>([]);

@@ -3,9 +3,9 @@
 import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { BackDrop } from '@/components/ui/Layout';
 import Button from '@/components/ui/Button/Button';
 import { ROUTES } from '@/constants/routes';
+import BackDrop from '@/components/ui/Modal/BackDrop';
 
 interface Props {
   handleClose: () => void;

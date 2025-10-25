@@ -5,10 +5,10 @@ import { ExploreReview } from '@/types/Explore';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ExploreApi } from '@/app/api/ExploreApi';
 import List from '@/components/feature/List/List';
+import Label from '@/components/ui/Display/Label';
 import ReviewCard from './ReviewListItem';
 import { SearchBar, type SearchKeyword } from './SearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
-import Label from '@/components/ui/Display/Label';
 
 export const ReviewExplorerList = () => {
   const [keywords, setKeywords] = useState<SearchKeyword[]>([]);

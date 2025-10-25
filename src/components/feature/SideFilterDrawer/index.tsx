@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import CloseGrayIcon from 'public/icon/close-gray.svg';
 import BackDrop from '@/components/ui/Modal/BackDrop';
+import CloseGrayIcon from 'public/icon/close-gray.svg';
 
 interface Props {
   isOpen: boolean;

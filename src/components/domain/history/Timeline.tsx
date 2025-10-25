@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
-import TimeLineItem from '@/components/domain/user/TimeLineItem';
 import Label from '@/components/ui/Display/Label';
 import List from '@/components/feature/List/List';
 import { groupHistoryByDate, shouldShowDivider } from '@/utils/historyUtils';
@@ -9,10 +8,10 @@ import { CurrentUserInfoApi } from '@/types/User';
 import { ApiResponse } from '@/types/common';
 import { TimelineSkeleton } from '@/components/ui/Loading/Skeletons/custom/TimelineSkeleton';
 import { HistoryEmptyState } from '@/app/(primary)/history/_components/HistoryEmptyState';
+import TimeLineItem from '@/components/domain/history/TimeLineItem';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
 
 interface TimelineProps {
-  // 공통 props
   data?:
     | HistoryListApi
     | ApiResponse<{
