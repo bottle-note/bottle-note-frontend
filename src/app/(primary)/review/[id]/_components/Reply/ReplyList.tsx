@@ -128,7 +128,11 @@ export default function ReplyList({
                   <React.Fragment key={comment.userId + comment.reviewReplyId}>
                     <Reply
                       data={comment}
-                      isReviewUser={comment.userId === userData?.userId}
+                      isReviewUser={
+                        !!(
+                          userData?.userId && comment.userId == userData.userId
+                        )
+                      }
                       reviewId={reviewId}
                       setIsRefetch={setIsRefetch}
                       isSubReplyShow={openReplyIds.has(comment.reviewReplyId)}
@@ -155,7 +159,10 @@ export default function ReplyList({
                                   <Reply
                                     data={subComment}
                                     isReviewUser={
-                                      subComment.userId === userData?.userId
+                                      !!(
+                                        userData?.userId &&
+                                        subComment.userId == userData.userId
+                                      )
                                     }
                                     reviewId={reviewId}
                                     setIsRefetch={setIsRefetch}
