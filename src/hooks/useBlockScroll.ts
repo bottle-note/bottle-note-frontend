@@ -1,17 +1,13 @@
 export const useBlockScroll = () => {
-  const preventScroll = (e: TouchEvent) => {
-    e.preventDefault();
-  };
-
   const handleScroll = ({ isScroll = true }: { isScroll: boolean }) => {
     if (isScroll) {
-      document.body.style.overflow = 'unset';
-      document.body.style.touchAction = 'unset';
-      document.removeEventListener('touchmove', preventScroll);
+      // 스크롤 활성화
+      document.body.style.overflow = '';
+      document.body.style.overscrollBehavior = '';
     } else {
+      // 스크롤 비활성화
       document.body.style.overflow = 'hidden';
-      document.body.style.touchAction = 'none';
-      document.addEventListener('touchmove', preventScroll, { passive: false });
+      document.body.style.overscrollBehavior = 'contain';
     }
   };
 

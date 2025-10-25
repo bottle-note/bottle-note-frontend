@@ -65,15 +65,7 @@ function SearchContainer({
 
   return (
     <>
-      <div
-        className={styleProps}
-        style={
-          isOnSearch && showRecentSearch ? { touchAction: 'none' } : undefined
-        }
-        onTouchMove={
-          isOnSearch && showRecentSearch ? (e) => e.preventDefault() : undefined
-        }
-      >
+      <div className={styleProps}>
         <SearchBar
           handleSearch={onSearch}
           handleFocus={(status) => setIsOnSearch(status)}
@@ -83,7 +75,7 @@ function SearchContainer({
       </div>
 
       {isOnSearch && showRecentSearch && (
-        <div className="w-full h-full fixed z-40 bg-white p-3">
+        <div className="w-full fixed left-0 right-0 bottom-0 top-[130px] z-40 bg-white p-3 overflow-y-auto">
           <RecentSearch handleSearch={onSearch} />
         </div>
       )}
