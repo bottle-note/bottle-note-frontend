@@ -1,10 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
-import Label from '@/app/(primary)/_components/Label';
-import ProfileImage from '@/app/(primary)/_components/ProfileImage';
+import Label from '@/components/ui/Display/Label';
+import ProfileImage from '@/components/domain/user/ProfileImage';
 import useRelationshipsStore from '@/store/relationshipsStore';
 import { truncStr } from '@/utils/truncStr';
-import Star from '@/components/Star';
+import Star from '@/components/ui/Display/Star';
 import { ROUTES } from '@/constants/routes';
 
 interface ReviewUserInfoProps {

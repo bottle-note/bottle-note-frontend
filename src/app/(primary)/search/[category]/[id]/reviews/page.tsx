@@ -5,16 +5,16 @@ import Image from 'next/image';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import { ReviewApi } from '@/app/api/ReviewApi';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { Review as ReviewType } from '@/types/Review';
 import Review from '@/app/(primary)/search/[category]/[id]/_components/ReviewItem';
-import { Button } from '@/components/Button';
-import List from '@/components/List/List';
+import Button from '@/components/ui/Button/Button';
+import List from '@/components/feature/List/List';
 import { SORT_TYPE, SORT_ORDER } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
 import { useReviewWrite } from '@/hooks/useReviewWrite';
-import ReviewItemSkeleton from '@/components/Skeletons/ReviewItemSkeleton';
+import ReviewItemSkeleton from '@/components/ui/Loading/Skeletons/ReviewItemSkeleton';
 
 const SORT_OPTIONS = [
   { name: '인기도순', type: SORT_TYPE.POPULAR },

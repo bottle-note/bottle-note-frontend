@@ -10,7 +10,7 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { UserApi } from '@/app/api/UserApi';
 import { AdminApi } from '@/app/api/AdminApi';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { ScreenType, ScreenConfig, MenuCategory } from '@/types/Settings';
 import { SettingsMainScreen } from './_components/SettingsMainScreen';
 import { SettingsSubScreen } from './_components/SettingsSubScreen';

@@ -3,7 +3,7 @@ import Image from 'next/image';
 import useModalStore from '@/store/modalStore';
 import { KakaoPlace } from '@/types/Review';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
-import RecentSearch from '@/components/Search/RecentSearch';
+import RecentSearch from '@/components/feature/Search/RecentSearch';
 import DeleteIcon from 'public//icon/reset-mainGray.svg';
 import SearchIcon from 'public/icon/search-subcoral.svg';
 

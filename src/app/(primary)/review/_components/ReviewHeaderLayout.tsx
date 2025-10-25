@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
-import SkeletonBase from '@/components/Skeletons/SkeletonBase';
-import PickBtn from '@/app/(primary)/_components/PickBtn';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
+import AlcoholPickButton from '@/components/domain/alcohol/AlcoholPickButton';
 import { AlcoholInfo as AlcoholDetails } from '@/types/Alcohol';
 import useModalStore from '@/store/modalStore';
 import AlcoholInfo from './AlcoholInfo';
@@ -54,7 +54,7 @@ export default function ReviewHeaderLayout({
             {headerTitle}
           </SubHeader.Center>
           <SubHeader.Right>
-            <PickBtn
+            <AlcoholPickButton
               size={19}
               isPicked={isPicked}
               alcoholId={alcoholData.alcoholId}

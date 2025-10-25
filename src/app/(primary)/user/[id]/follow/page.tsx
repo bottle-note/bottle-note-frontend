@@ -3,13 +3,13 @@
 import React, { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { useTab } from '@/hooks/useTab';
-import List from '@/components/List/List';
+import List from '@/components/feature/List/List';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { RelationInfo } from '@/types/User';
-import ListSection from '@/components/List/ListSection';
-import Tab from '@/components/Tab';
+import ListSection from '@/components/feature/List/ListSection';
+import Tab from '@/components/ui/Navigation/Tab';
 import { FollowApi } from '@/app/api/FollowApi';
 import { FollowerListItem } from '../_components/FollowerListItem';
 

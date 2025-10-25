@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { SubHeader } from '../_components/SubHeader';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 
 export default function Layout({
   children,

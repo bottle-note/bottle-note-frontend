@@ -1,5 +1,5 @@
 import { subMonths, subYears, isAfter, isBefore } from 'date-fns';
-import DateRangePicker from '@/components/DateRangePicker';
+import DateRangePicker from '@/components/ui/Form/DateRangePicker';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
 
 const MAX_YEARS = 2;

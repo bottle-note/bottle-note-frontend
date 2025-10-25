@@ -4,9 +4,9 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
-import NavLayout from '@/app/(primary)/_components/NavLayout';
-import SearchContainer from '@/components/Search/SearchContainer';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import NavLayout from '@/components/ui/Layout/NavLayout';
+import SearchContainer from '@/components/feature/Search/SearchContainer';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { HistoryApi } from '@/app/api/HistoryApi';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
@@ -14,7 +14,7 @@ import { UserApi } from '@/app/api/UserApi';
 import { HistoryListApi, HistoryListQueryParams } from '@/types/History';
 import { RATING_NUM_VALUES, PICKS_STATUS } from '@/constants/history';
 import { CurrentUserInfoApi } from '@/types/User';
-import Timeline from './_components/Timeline';
+import Timeline from '@/components/domain/history/Timeline';
 import FilterSideModal from './_components/filter/FilterSideModal';
 
 export default function History() {
@@ -155,6 +155,7 @@ export default function History() {
           styleProps="px-5"
         />
         <Timeline
+          variant="full"
           data={accumulatedHistories}
           isLastPage={
             historyData &&

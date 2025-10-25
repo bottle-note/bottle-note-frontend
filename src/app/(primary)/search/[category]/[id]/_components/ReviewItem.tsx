@@ -12,7 +12,7 @@ import ReviewActions from '@/app/(primary)/search/[category]/[id]/_components/Re
 import useModalStore from '@/store/modalStore';
 import useRelationshipsStore from '@/store/relationshipsStore';
 import { useAuth } from '@/hooks/auth/useAuth';
-import ReviewActionDropdown from '@/app/(primary)/_components/ReviewActionDropdown';
+import ReviewActionDropdown from '@/components/domain/review/ReviewActionDropdown';
 import { useBlockActions } from '@/hooks/useBlockActions';
 
 interface Props {

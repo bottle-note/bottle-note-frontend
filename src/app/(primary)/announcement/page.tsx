@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import List from '@/components/List/List';
+import List from '@/components/feature/List/List';
 import { ROUTES } from '@/constants/routes';
 
 function AccnouncementPage() {

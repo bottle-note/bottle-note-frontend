@@ -12,9 +12,9 @@ import { useAlcoholDetails } from '@/hooks/useAlcoholDetails';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import { useReviewSubmission } from '@/hooks/useReviewSubmission';
 import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
-import { Button } from '@/components/Button';
+import Button from '@/components/ui/Button/Button';
 import useModalStore from '@/store/modalStore';
-import Loading from '@/components/Loading';
+import Loading from '@/components/ui/Loading/Loading';
 import ReviewForm from '../_components/form/ReviewForm';
 import ReviewHeaderLayout from '../_components/ReviewHeaderLayout';
 

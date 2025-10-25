@@ -3,19 +3,19 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ROUTES } from '@/constants/routes';
 import { ExploreReview } from '@/types/Explore';
-import { UserInfoDisplay } from '@/components/UserInfoDisplay';
-import Star from '@/components/Star';
+import UserInfoDisplay from '@/components/domain/user/UserInfoDisplay';
+import Star from '@/components/ui/Display/Star';
 import useModalStore from '@/store/modalStore';
 import { formatDate } from '@/utils/formatDate';
 import { useAuth } from '@/hooks/auth/useAuth';
-import ReviewActionDropdown from '@/app/(primary)/_components/ReviewActionDropdown';
+import ReviewActionDropdown from '@/components/domain/review/ReviewActionDropdown';
 import {
   ReviewImageCarousel,
   convertImageUrlsToProductImageArray,
-} from '@/app/(primary)/_components/ReviewImageCarousel';
-import ReplyButton from '@/app/(primary)/_components/ReplyButton';
-import LikeBtn from '../../_components/LikeBtn';
-import Label from '../../_components/Label';
+} from '@/components/domain/review/ReviewImageCarousel';
+import ReplyButton from '@/components/domain/review/ReplyButton';
+import ReviewLikeButton from '@/components/domain/review/ReviewLikeButton';
+import Label from '@/components/ui/Display/Label';
 
 interface Props {
   content: ExploreReview;
@@ -104,7 +104,7 @@ const ReviewListItem = ({ content }: Props) => {
         <div className="flex items-center justify-between mt-[14px]">
           <div className="flex items-center gap-4">
             <div className="flex items-center space-x-[2px]">
-              <LikeBtn
+              <ReviewLikeButton
                 reviewId={content.reviewId}
                 isLiked={isLiked}
                 handleUpdateLiked={() => {

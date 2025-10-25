@@ -1,8 +1,8 @@
 import React from 'react';
 import { truncStr } from '@/utils/truncStr';
 import { AlcoholInfo as AlcoholType } from '@/types/Alcohol';
-import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
-import Label from '@/app/(primary)/_components/Label';
+import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
+import Label from '@/components/ui/Display/Label';
 
 interface Props {
   data: AlcoholType;

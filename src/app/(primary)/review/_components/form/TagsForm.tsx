@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import useModalStore from '@/store/modalStore';
-import HoverTouchBox from '@/components/HoverTouchBox';
+import HoverTouchBox from '@/components/ui/Interactive/HoverTouchBox';
 import OptionsContainer from '../OptionsContainer';
 
 function validateText(text: string) {

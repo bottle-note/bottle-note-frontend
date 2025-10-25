@@ -2,8 +2,8 @@
 
 import { Suspense } from 'react';
 import { useTab } from '@/hooks/useTab';
-import Tab from '@/components/Tab';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import Tab from '@/components/ui/Navigation/Tab';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { ReviewExplorerList } from './_components/ReviewExploreList';
 import { WhiskeyExplorerList } from './_components/WhiskeyExploreList';
 

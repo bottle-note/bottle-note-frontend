@@ -1,11 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
-import Label from '@/app/(primary)/_components/Label';
+import Label from '@/components/ui/Display/Label';
 import { truncStr } from '@/utils/truncStr';
-import Star from '@/components/Star';
-import VisibilityToggle from '@/app/(primary)/_components/VisibilityToggle';
+import Star from '@/components/ui/Display/Star';
+import VisibilityToggle from '@/components/ui/Form/VisibilityToggle';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
-import ProfileImage from '@/app/(primary)/_components/ProfileImage';
+import ProfileImage from '@/components/domain/user/ProfileImage';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
 

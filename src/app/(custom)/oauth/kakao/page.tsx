@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Loading from '@/components/Loading';
+import Loading from '@/components/ui/Loading/Loading';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/auth/useAuth';
 

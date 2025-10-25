@@ -3,8 +3,8 @@
 import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { v4 as uuid } from 'uuid';
-import CategorySelector from '@/components/CategorySelector';
-import List from '@/components/List/List';
+import CategorySelector from '@/components/ui/Form/CategorySelector';
+import List from '@/components/feature/List/List';
 import { usePopularList } from '@/hooks/usePopularList';
 import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
 import { useFilter } from '@/hooks/useFilter';
@@ -12,15 +12,15 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { AlcoholAPI } from '@/types/Alcohol';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { REGIONS } from '@/constants/common';
-import LinkButton from '@/components/LinkButton';
+import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import useModalStore from '@/store/modalStore';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { useTab } from '@/hooks/useTab';
-import Tab from '@/components/Tab';
+import Tab from '@/components/ui/Navigation/Tab';
 import { ROUTES } from '@/constants/routes';
-import ListItemSkeleton from '@/components/Skeletons/ListItemSkeleton';
+import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
-import SearchContainer from '../../../components/Search/SearchContainer';
+import SearchContainer from '@/components/feature/Search/SearchContainer';
 
 interface InitialState {
   keyword: string;
@@ -132,7 +132,7 @@ export default function Search() {
   const {
     currentTab: popularSelectedTab,
     handleTab: handelPopular,
-    tabList: PopularList,
+    tabList: popularTabList,
   } = useTab({
     tabList: [{ id: 'week', name: 'HOT 5' }],
     scroll: true,
@@ -172,7 +172,7 @@ export default function Search() {
             <>
               <Tab
                 variant="bookmark"
-                tabList={PopularList}
+                tabList={popularTabList}
                 handleTab={handelPopular}
                 currentTab={popularSelectedTab}
               />
@@ -242,7 +242,7 @@ export default function Search() {
 
           {!isEmptySearch && (
             <div className="px-5">
-              <LinkButton
+              <PrimaryLinkButton
                 data={{
                   engName: 'NO RESULTS',
                   korName: '혹시 찾는 술이 없으신가요?',

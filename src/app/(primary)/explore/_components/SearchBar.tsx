@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { LucideSearch } from 'lucide-react';
-import SideFilterDrawer from '@/components/SideFilterDrawer';
-import { Accordion } from '@/components/SideFilterDrawer/Accordion';
+import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
+import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
 import { CATEGORY_MENUS_LIST, REGIONS } from '@/constants/common';
 import { useSearchInput } from '@/hooks/useSearchInput';
 import HelpIcon from 'public/icon/help-filled-subcoral.svg';

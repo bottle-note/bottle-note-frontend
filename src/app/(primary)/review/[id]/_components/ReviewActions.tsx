@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import LikeBtn from '@/app/(primary)/_components/LikeBtn';
+import ReviewLikeButton from '@/components/domain/review/ReviewLikeButton';
 import useModalStore from '@/store/modalStore';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { useAuth } from '@/hooks/auth/useAuth';
@@ -30,7 +30,7 @@ export default function ReviewActions({
   return (
     <section className="mx-5 py-5 flex items-center">
       <div className="flex-1 flex justify-center items-center space-x-1">
-        <LikeBtn
+        <ReviewLikeButton
           size={19}
           reviewId={data?.reviewInfo?.reviewId}
           isLiked={isLiked}
