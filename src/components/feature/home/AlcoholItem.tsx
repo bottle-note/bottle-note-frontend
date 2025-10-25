@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import Star from '@/components/ui/Display/Star';
 import { truncStr } from '@/utils/truncStr';
 import { AlcoholAPI } from '@/types/Alcohol';
@@ -25,16 +26,24 @@ const AlcoholImage: React.FC<AlcoholImageProps> = ({
   blendMode = '',
   rounded = '',
 }) => {
+  const extractSize = (className: string) => {
+    const match = className.match(/[hw]-\[(\d+)px\]/);
+    return match ? parseInt(match[1]) : 125;
+  };
+
+  const width = extractSize(innerWidthClass);
+  const height = extractSize(innerHeightClass);
+
   return (
     <div
       className={`${outerHeightClass} ${outerWidthClass} ${bgColor} ${blendMode} ${rounded} flex items-center justify-center`}
     >
       {imageUrl ? (
-        // use a plain img to avoid introducing extra dependencies; Next.js Image can be swapped back if desired
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Image
           src={imageUrl}
           alt=""
+          width={width}
+          height={height}
           className={`${innerHeightClass} ${innerWidthClass} object-cover`}
         />
       ) : (
