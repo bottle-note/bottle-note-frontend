@@ -7,7 +7,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/carousel';
+} from '@/components/ui/Display/carousel';
 
 export interface ProductImage {
   id: string | number;

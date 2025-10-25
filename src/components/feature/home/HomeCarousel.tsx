@@ -6,7 +6,7 @@ import {
   CarouselContent,
   CarouselItem,
   CarouselApi,
-} from '@/components/ui/carousel';
+} from '@/components/ui/Display/carousel';
 import { ROUTES } from '@/constants/routes';
 interface OverlayConfig {
   link: string;
