@@ -88,7 +88,7 @@ const ReviewListItem = ({ content }: Props) => {
           <div className="flex flex-col gap-[14px]">
             <ReviewImageCarousel images={productImages} />
             <div
-              className="text-15 text-mainDarkGray whitespace-pre-line"
+              className="text-15 text-mainDarkGray whitespace-pre-line break-words"
               dangerouslySetInnerHTML={{
                 __html: content.reviewContent.replace(/\n/g, '<br />'),
               }}
