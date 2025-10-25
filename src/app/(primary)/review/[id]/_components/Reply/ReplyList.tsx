@@ -130,7 +130,8 @@ export default function ReplyList({
                       data={comment}
                       isReviewUser={
                         !!(
-                          userData?.userId && comment.userId == userData.userId
+                          userData?.userId &&
+                          Number(comment.userId) === Number(userData.userId)
                         )
                       }
                       reviewId={reviewId}
@@ -161,7 +162,8 @@ export default function ReplyList({
                                     isReviewUser={
                                       !!(
                                         userData?.userId &&
-                                        subComment.userId == userData.userId
+                                        Number(subComment.userId) ===
+                                          Number(userData.userId)
                                       )
                                     }
                                     reviewId={reviewId}
