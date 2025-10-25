@@ -3,7 +3,6 @@ import Label from '@/components/ui/Display/Label';
 import AlcoholPickButton from '@/components/domain/alcohol/AlcoholPickButton';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import Star from '@/components/ui/Display/Star';
-import { truncStr } from '@/utils/truncStr';
 import useModalStore from '@/store/modalStore';
 import { AlcoholInfo } from '@/types/Alcohol';
 import { useReviewWrite } from '@/hooks/useReviewWrite';
@@ -39,10 +38,10 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
                 styleClass="border-white px-[7.69px] py-[3.85px] rounded-[4.62px] text-10"
               />
               <h1 className="text-20 font-bold whitespace-normal break-words">
-                {data.korName && truncStr(data.korName, 27)}
+                {data?.korName}
               </h1>
               <p className="text-12 whitespace-normal break-words">
-                {data.engName && truncStr(data.engName.toUpperCase(), 45)}
+                {data?.engName.toUpperCase()}
               </p>
             </div>
             <div className="space-y-[10px] pt-5">
