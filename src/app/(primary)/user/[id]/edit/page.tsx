@@ -16,7 +16,11 @@ import { ROUTES } from '@/constants/routes';
 import EditForm from './_components/EditForm';
 import ChangeProfile from 'public/change-profile.svg';
 
-export default function UserEditPage() {
+export default function UserEditPage({
+  params: { id },
+}: {
+  params: { id: string };
+}) {
   const { user: userData } = useAuth();
   const router = useRouter();
   const { isMobile } = useWebViewInit();
@@ -126,7 +130,7 @@ export default function UserEditPage() {
       </section>
 
       <section className="px-5">
-        <EditForm />
+        <EditForm userId={id} />
       </section>
       {isOptionShow && (
         <OptionDropdown

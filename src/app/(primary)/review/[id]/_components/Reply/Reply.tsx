@@ -168,7 +168,7 @@ function Reply({
                 )}
               </div>
             </div>
-            <div className="text-12 text-mainDarkGray whitespace-pre-wrap break-words flex mt-[12px] mb-2">
+            <div className="text-15 text-mainDarkGray whitespace-pre-wrap break-words flex mt-[12px] mb-2">
               {'rootReviewId' in data && (
                 <div className="text-mainCoral mr-1">
                   {data?.parentReviewReplyAuthor}

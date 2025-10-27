@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import AlcoholPickButton from '@/components/domain/alcohol/AlcoholPickButton';
 import Label from '@/components/ui/Display/Label';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
-import { truncStr } from '@/utils/truncStr';
 import type { AlcoholInfo as AlcoholType } from '@/types/Review';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
@@ -55,10 +54,10 @@ function AlcoholInfo({ data, handleLogin }: Props) {
               className="block space-y-[6px]"
             >
               <h1 className="text-15 font-semibold whitespace-normal break-words">
-                {data.korName && truncStr(data.korName, 27)}
+                {data?.korName}
               </h1>
               <p className="text-12 whitespace-normal break-words font-normal">
-                {data.engName && truncStr(data.engName.toUpperCase(), 45)}
+                {data?.engName.toUpperCase()}
               </p>
             </Link>
           </div>

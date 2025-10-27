@@ -38,38 +38,39 @@ export default function ReviewUserHeader({
           textStyle="text-24 text-subCoral font-semibold min-w-7"
         />
       </article>
-
-      <article className="flex items-center justify-between mt-[10px]">
-        <div className="flex items-center space-x-1">
-          {data.reviewInfo?.isBestReview && (
-            <Label
-              name="베스트"
-              icon="/icon/thumbup-filled-white.svg"
-              iconHeight={11.45}
-              iconWidth={11.45}
-              styleClass="bg-mainCoral text-white px-2 py-[3px] border-mainCoral text-10 rounded"
+      {(data.reviewInfo?.isBestReview || data.reviewInfo?.isMyReview) && (
+        <article className="flex items-center justify-between mt-[10px] mb-[22px]">
+          <div className="flex items-center space-x-1">
+            {data.reviewInfo?.isBestReview && (
+              <Label
+                name="베스트"
+                icon="/icon/thumbup-filled-white.svg"
+                iconHeight={11.45}
+                iconWidth={11.45}
+                styleClass="bg-mainCoral text-white px-2 py-[3px] border-mainCoral text-10 rounded"
+              />
+            )}
+            {data.reviewInfo?.isMyReview && (
+              <Label
+                name="나의 코멘트"
+                icon="/icon/user-outlined-subcoral.svg"
+                iconHeight={11.45}
+                iconWidth={11.45}
+                styleClass="border-mainCoral text-mainCoral px-2 py-[3px] text-10 rounded"
+              />
+            )}
+          </div>
+          {data.reviewInfo?.userInfo?.userId === userData?.userId && (
+            <VisibilityToggle
+              initialStatus={data.reviewInfo.status === 'PUBLIC'}
+              reviewId={data?.reviewInfo?.reviewId}
+              handleNotLogin={() => {}}
+              onSuccess={onRefresh}
+              textSize="text-13"
             />
           )}
-          {data.reviewInfo?.isMyReview && (
-            <Label
-              name="나의 코멘트"
-              icon="/icon/user-outlined-subcoral.svg"
-              iconHeight={11.45}
-              iconWidth={11.45}
-              styleClass="border-mainCoral text-mainCoral px-2 py-[3px] text-10 rounded"
-            />
-          )}
-        </div>
-        {data.reviewInfo?.userInfo?.userId === userData?.userId && (
-          <VisibilityToggle
-            initialStatus={data.reviewInfo.status === 'PUBLIC'}
-            reviewId={data?.reviewInfo?.reviewId}
-            handleNotLogin={() => {}}
-            onSuccess={onRefresh}
-            textSize="text-13"
-          />
-        )}
-      </article>
+        </article>
+      )}
     </section>
   );
 }

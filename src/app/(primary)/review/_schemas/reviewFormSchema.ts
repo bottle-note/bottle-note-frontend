@@ -1,7 +1,10 @@
 import * as yup from 'yup';
 
 export const reviewSchema = yup.object({
-  review: yup.string().required('리뷰 내용을 작성해주세요.'),
+  review: yup
+    .string()
+    .required('리뷰 내용을 작성해주세요.')
+    .max(500, '리뷰는 500자 이하로 작성해주세요.'),
   status: yup.string().required(),
   price: yup.number().nullable(),
   price_type: yup

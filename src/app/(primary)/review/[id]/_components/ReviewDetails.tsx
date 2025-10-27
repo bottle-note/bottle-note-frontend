@@ -34,7 +34,7 @@ function ReviewDetails({ data, handleLogin, onRefresh, textareaRef }: Props) {
   return (
     <>
       <section className="pt-[38px]">
-        <div className="mb-[22px]">
+        <div className="mb-[10px]">
           <ReviewUserHeader data={data} onRefresh={onRefresh} />
         </div>
         <section className="mx-5 pb-5 border-b border-mainGray/30">
@@ -44,7 +44,7 @@ function ReviewDetails({ data, handleLogin, onRefresh, textareaRef }: Props) {
             </div>
           )}
           <div
-            className="text-15 text-mainDarkGray whitespace-pre-line"
+            className="text-15 text-mainDarkGray whitespace-pre-line break-words"
             dangerouslySetInnerHTML={{
               __html: data.reviewInfo?.reviewContent?.replace(/\n/g, '<br />'),
             }}
