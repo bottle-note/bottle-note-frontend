@@ -61,7 +61,7 @@ const ReviewListItem = ({ content }: Props) => {
               href={ROUTES.SEARCH.ALL(content.alcoholId)}
               className="min-w-0 flex-1"
             >
-              <p className="text-12 text-mainDarkGray break-words">{`${content.alcoholName}  >`}</p>
+              <p className="text-13 text-mainDarkGray break-words">{`${content.alcoholName}  >`}</p>
             </Link>
 
             <div className="flex gap-1 flex-shrink-0">
