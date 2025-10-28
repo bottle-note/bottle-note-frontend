@@ -179,10 +179,10 @@ function Reply({
           </>
         )}
         <div className="space-y-[14px]">
-          <div className="flex space-x-[6px]">
+          <div className="flex space-x-[6px] text-13">
             {data?.status !== 'DELETED' && !isBlocked && (
               <button
-                className="text-10 text-subCoral"
+                className=" text-subCoral"
                 onClick={() => {
                   if (isLoggedIn) {
                     updateReplyUser();
@@ -196,12 +196,12 @@ function Reply({
             )}
             {'subReplyCount' in data && data?.subReplyCount !== 0 && (
               <>
-                {!isBlocked && <p className="text-10 text-subCoral">·</p>}
+                {!isBlocked && <p className="text-subCoral">·</p>}
                 <button
                   className="flex items-center space-x-[2px]"
                   onClick={handleUpdateSubReply}
                 >
-                  <div className="text-10 text-subCoral pr-[1px]">
+                  <div className="text-subCoral pr-[1px]">
                     답글 {data?.subReplyCount}개
                   </div>
                   <Image
@@ -211,8 +211,8 @@ function Reply({
                         : '/icon/arrow-down-subcoral.svg'
                     }
                     alt="arrowUpIcon"
-                    width={10}
-                    height={8}
+                    width={12}
+                    height={12}
                   />
                 </button>
               </>
