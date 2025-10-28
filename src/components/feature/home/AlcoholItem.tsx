@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Star from '@/components/ui/Display/Star';
 import { truncStr } from '@/utils/truncStr';
 import { AlcoholAPI } from '@/types/Alcohol';
+import Fallback from 'public/bottle.svg';
 
 type AlcoholImageProps = {
   imageUrl?: string | null;
@@ -38,17 +39,13 @@ const AlcoholImage: React.FC<AlcoholImageProps> = ({
     <div
       className={`${outerHeightClass} ${outerWidthClass} ${bgColor} ${blendMode} ${rounded} flex items-center justify-center`}
     >
-      {imageUrl ? (
-        <Image
-          src={imageUrl}
-          alt=""
-          width={width}
-          height={height}
-          className={`${innerHeightClass} ${innerWidthClass} object-contain ${blendMode}`}
-        />
-      ) : (
-        <div className={`${innerHeightClass} ${innerWidthClass} bg-gray-200`} />
-      )}
+      <Image
+        src={imageUrl || Fallback}
+        alt=""
+        width={width}
+        height={height}
+        className={`${innerHeightClass} ${innerWidthClass} object-contain ${blendMode}`}
+      />
     </div>
   );
 };
