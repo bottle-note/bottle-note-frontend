@@ -101,7 +101,7 @@ function ReviewItem({ data, onRefresh }: Props) {
               >
                 <div className="flex space-x-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-mainDarkGray text-13.5">
+                    <p className="text-mainDarkGray text-13.5 break-words">
                       {truncStr(data.reviewContent, 135)}
                       {data.reviewContent.length > 135 && (
                         <span className="text-mainGray">더보기</span>
