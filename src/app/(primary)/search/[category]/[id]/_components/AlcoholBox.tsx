@@ -19,16 +19,14 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
 
   return (
     <section className="relative z-20 flex px-5 pb-[23px] space-x-5">
-      {data?.alcoholUrlImg && (
-        <AlcoholImage
-          imageUrl={data?.alcoholUrlImg}
-          outerHeightClass="h-[230px]"
-          outerWidthClass="w-[140px]"
-          innerHeightClass="h-[200px]"
-          innerWidthClass="w-[100px]"
-          enableModal={true}
-        />
-      )}
+      <AlcoholImage
+        imageUrl={data?.alcoholUrlImg}
+        outerHeightClass="h-[230px]"
+        outerWidthClass="w-[140px]"
+        innerHeightClass="h-[200px]"
+        innerWidthClass="w-[100px]"
+        enableModal={true}
+      />
       <article className="flex-1 py-3 text-white overflow-x-hidden">
         {data && (
           <>
