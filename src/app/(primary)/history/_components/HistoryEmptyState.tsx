@@ -1,5 +1,5 @@
 import React from 'react';
-import EmptyView from '@/app/(primary)/_components/EmptyView';
+import EmptyView from '@/components/ui/Display/EmptyView';
 
 interface HistoryEmptyStateProps {
   isLoading?: boolean;

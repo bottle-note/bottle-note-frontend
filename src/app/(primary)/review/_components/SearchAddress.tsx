@@ -1,8 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
-import PageModal from '@/components/PageModal';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import PageModal from '@/components/ui/Modal/PageModal';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import KakaoAddressMap from '@/app/(primary)/review/_components/KakaoAddressMap';
 import { KakaoPlace } from '@/types/Review';
 

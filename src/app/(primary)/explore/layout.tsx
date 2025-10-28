@@ -1,4 +1,4 @@
-import NavLayout from '../_components/NavLayout';
+import NavLayout from '@/components/ui/Layout/NavLayout';
 
 export default function Layout({
   children,

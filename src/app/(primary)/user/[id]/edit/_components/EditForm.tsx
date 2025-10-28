@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { UserApi } from '@/app/api/UserApi';
@@ -8,10 +8,23 @@ import useModalStore from '@/store/modalStore';
 import { ApiResponse } from '@/types/common';
 import CloseIconGray from 'public/icon/close-brightgray.svg';
 
-function EditForm() {
+interface Props {
+  userId: string;
+}
+
+function EditForm({ userId }: Props) {
   const router = useRouter();
   const [nickName, setNickName] = useState('');
   const { handleModalState, handleCloseModal } = useModalStore();
+
+  useEffect(() => {
+    (async () => {
+      if (userId) {
+        const res = await UserApi.getUserInfo({ userId });
+        setNickName(res.nickName ?? '');
+      }
+    })();
+  }, [userId]);
 
   const handleResetNickName = () => {
     setNickName('');

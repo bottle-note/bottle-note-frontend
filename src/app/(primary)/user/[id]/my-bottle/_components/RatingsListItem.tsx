@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import ItemImage from '@/components/List/_components/ItemImage';
-import ItemInfo from '@/components/List/_components/ItemInfo';
+import ItemImage from '@/components/feature/List/_components/ItemImage';
+import ItemInfo from '@/components/feature/List/_components/ItemInfo';
 import { addNewLine } from '@/utils/addNewLine';
 import { RatingMyBottleListResponse } from '@/types/MyBottle';
-import Label from '@/app/(primary)/_components/Label';
-import Star from '@/components/Star';
-import { ItemStats } from '@/components/List/_components/ItemStats';
+import Label from '@/components/ui/Display/Label';
+import Star from '@/components/ui/Display/Star';
+import { ItemStats } from '@/components/feature/List/_components/ItemStats';
 import { ROUTES } from '@/constants/routes';
 
 interface Props {

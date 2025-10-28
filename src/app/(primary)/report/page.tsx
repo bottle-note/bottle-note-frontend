@@ -7,14 +7,14 @@ import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ReportApi } from '@/app/api/ReportApi';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
-import { Button } from '@/components/Button';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import Button from '@/components/ui/Button/Button';
 import { FormValues, ReportTypeMap } from '@/types/Report';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import useModalStore from '@/store/modalStore';
-import OptionSelect from '@/components/List/OptionSelect';
-import Loading from '@/components/Loading';
+import OptionSelect from '@/components/feature/List/OptionSelect';
+import Loading from '@/components/ui/Loading/Loading';
 import { REPORT_TYPE } from '@/app/(primary)/report/_constants/index';
 
 type ReportType = 'review' | 'comment' | 'user';

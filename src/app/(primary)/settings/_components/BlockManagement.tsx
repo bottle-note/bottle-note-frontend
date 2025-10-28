@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useBlockActions } from '@/hooks/useBlockActions';
 import { BlockApi } from '@/app/api/BlockApi';
-import ProfileImage from '@/app/(primary)/_components/ProfileImage';
+import ProfileImage from '@/components/domain/user/ProfileImage';
 import { BlockListApi } from '@/types/Settings';
-import List from '@/components/List/List';
+import List from '@/components/feature/List/List';
 
 export default function BlockManagement() {
   const [blockedUsers, setBlockedUsers] = useState<BlockListApi | null>(null);

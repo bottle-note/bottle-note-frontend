@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import useModalStore from '@/store/modalStore';
 import { useWebViewInit } from '@/hooks/useWebViewInit';
-import LoginModal from './_components/LoginModal';
+import LoginModal from '@/components/domain/auth/LoginModal';
 
 export default function Layout({
   children,

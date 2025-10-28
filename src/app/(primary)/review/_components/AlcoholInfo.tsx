@@ -1,8 +1,7 @@
 import React from 'react';
-import { truncStr } from '@/utils/truncStr';
 import { AlcoholInfo as AlcoholType } from '@/types/Alcohol';
-import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
-import Label from '@/app/(primary)/_components/Label';
+import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
+import Label from '@/components/ui/Display/Label';
 
 interface Props {
   data: AlcoholType;
@@ -36,10 +35,10 @@ function AlcoholInfo({ data }: Props) {
                 styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
               />
               <h1 className="text-16 font-bold whitespace-normal break-words">
-                {truncStr(korName, 27)}
+                {korName}
               </h1>
               <p className="text-12 whitespace-normal break-words">
-                {truncStr(engName.toUpperCase(), 45)}
+                {engName?.toUpperCase()}
               </p>
             </div>
             <div>

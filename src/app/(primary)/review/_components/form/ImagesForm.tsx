@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, ReactNode } from 'react';
-import ImageUploader from '@/app/(primary)/_components/ImageUploader';
+import ImageUploader from '@/components/ui/Form/ImageUploader';
 import OptionsContainer from '../OptionsContainer';
 
 export default function ImagesForm() {

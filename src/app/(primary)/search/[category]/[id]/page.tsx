@@ -5,13 +5,13 @@ import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import Star from '@/components/Star';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import Star from '@/components/ui/Display/Star';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import ReviewItem from '@/app/(primary)/search/[category]/[id]/_components/ReviewItem';
-import LinkButton from '@/components/LinkButton';
-import NavLayout from '@/app/(primary)/_components/NavLayout';
-import StarRating from '@/components/StarRaiting';
-import EmptyView from '@/app/(primary)/_components/EmptyView';
+import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
+import NavLayout from '@/components/ui/Layout/NavLayout';
+import StarRating from '@/components/ui/Form/StarRating';
+import EmptyView from '@/components/ui/Display/EmptyView';
 import { truncStr } from '@/utils/truncStr';
 // import { shareOrCopy } from '@/utils/shareOrCopy';
 import { useAuth } from '@/hooks/auth/useAuth';
@@ -21,13 +21,13 @@ import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { AlcoholDetails } from '@/types/Alcohol';
 import { ROUTES } from '@/constants/routes';
-import AlcoholDetailsSkeleton from '@/components/Skeletons/custom/AlcoholDetailsSkeleton';
+import AlcoholDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/AlcoholDetailsSkeleton';
+import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import useDebounceAction from '@/hooks/useDebounceAction';
 import FloatingReviewBtn from './_components/FloatingReviewBtn';
 import AlcoholBox from './_components/AlcoholBox';
 import ProfileDefaultImg from 'public/profile-default.svg';
-import FlavorTag from '../../../_components/FlavorTag';
 
 interface DetailItem {
   title: string;
@@ -258,7 +258,7 @@ export default function SearchAlcohol() {
                 </div>
               </section>
               {data?.alcohols?.alcoholsTastingTags && (
-                <FlavorTag tagList={data.alcohols.alcoholsTastingTags} />
+                <FlavorTags tagList={data.alcohols.alcoholsTastingTags} />
               )}
               {data?.friendsInfo && data.friendsInfo.followerCount !== 0 && (
                 <section className="mx-5 py-5 border-b border-mainGray/30 space-y-2">
@@ -317,7 +317,7 @@ export default function SearchAlcohol() {
                     ))}
                   </section>
                   <section className="mx-5 mb-24">
-                    <LinkButton
+                    <PrimaryLinkButton
                       data={{
                         engName: 'MORE COMMENTS',
                         korName: '리뷰 더 보기',

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import FlavorTag from '@/app/(primary)/_components/FlavorTag';
+import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { formatDate } from '@/utils/formatDate';
 import { useAuth } from '@/hooks/auth/useAuth';
-import ReviewActionDropdown from '@/app/(primary)/_components/ReviewActionDropdown';
+import ReviewActionDropdown from '@/components/domain/review/ReviewActionDropdown';
 import {
   ReviewImageCarousel,
   convertImageUrlsToProductImageArray,
-} from '@/app/(primary)/_components/ReviewImageCarousel';
+} from '@/components/domain/review/ReviewImageCarousel';
 import ReviewUserHeader from './ReviewUserHeader';
 import ReviewPriceLocation from './ReviewPriceLocation';
 import ReviewActions from './ReviewActions';
@@ -34,7 +34,7 @@ function ReviewDetails({ data, handleLogin, onRefresh, textareaRef }: Props) {
   return (
     <>
       <section className="pt-[38px]">
-        <div className="mb-[22px]">
+        <div className="mb-[10px]">
           <ReviewUserHeader data={data} onRefresh={onRefresh} />
         </div>
         <section className="mx-5 pb-5 border-b border-mainGray/30">
@@ -44,7 +44,7 @@ function ReviewDetails({ data, handleLogin, onRefresh, textareaRef }: Props) {
             </div>
           )}
           <div
-            className="text-15 text-mainDarkGray whitespace-pre-line"
+            className="text-15 text-mainDarkGray whitespace-pre-line break-words"
             dangerouslySetInnerHTML={{
               __html: data.reviewInfo?.reviewContent?.replace(/\n/g, '<br />'),
             }}
@@ -70,7 +70,7 @@ function ReviewDetails({ data, handleLogin, onRefresh, textareaRef }: Props) {
         </section>
         {data.reviewInfo?.tastingTagList?.length &&
           data.reviewInfo.tastingTagList.length !== 0 && (
-            <FlavorTag
+            <FlavorTags
               tagList={data.reviewInfo.tastingTagList}
               styleClass="border-subCoral text-subCoral py-[5px] px-[10px] rounded-md text-12"
             />

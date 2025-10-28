@@ -2,7 +2,7 @@
 
 import { useFormContext } from 'react-hook-form';
 import { FormValues } from '@/types/Inquire';
-import Label from '@/app/(primary)/_components/Label';
+import Label from '@/components/ui/Display/Label';
 import { SERVICE_TYPE_LIST, BUSINESS_TYPE_LIST } from '@/constants/Inquire';
 
 interface InquireTypeSelectorProps {

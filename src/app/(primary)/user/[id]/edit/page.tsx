@@ -3,9 +3,9 @@
 import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
-import ProfileImage from '@/app/(primary)/_components/ProfileImage';
-import OptionDropdown from '@/components/OptionDropdown';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import ProfileImage from '@/components/domain/user/ProfileImage';
+import OptionDropdown from '@/components/ui/Modal/OptionDropdown';
 import { UserApi } from '@/app/api/UserApi';
 import useModalStore from '@/store/modalStore';
 import { useAuth } from '@/hooks/auth/useAuth';
@@ -16,7 +16,11 @@ import { ROUTES } from '@/constants/routes';
 import EditForm from './_components/EditForm';
 import ChangeProfile from 'public/change-profile.svg';
 
-export default function UserEditPage() {
+export default function UserEditPage({
+  params: { id },
+}: {
+  params: { id: string };
+}) {
   const { user: userData } = useAuth();
   const router = useRouter();
   const { isMobile } = useWebViewInit();
@@ -126,7 +130,7 @@ export default function UserEditPage() {
       </section>
 
       <section className="px-5">
-        <EditForm />
+        <EditForm userId={id} />
       </section>
       {isOptionShow && (
         <OptionDropdown

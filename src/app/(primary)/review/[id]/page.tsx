@@ -12,10 +12,10 @@ import {
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FormValues } from '@/types/Reply';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import { ReplyApi } from '@/app/api/ReplyApi';
-import NavLayout from '@/app/(primary)/_components/NavLayout';
+import NavLayout from '@/components/ui/Layout/NavLayout';
 // import { shareOrCopy } from '@/utils/shareOrCopy';
 import type {
   AlcoholInfo as AlcoholInfoType,
@@ -23,7 +23,7 @@ import type {
 } from '@/types/Review';
 import useModalStore from '@/store/modalStore';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
-import ReviewDetailsSkeleton from '@/components/Skeletons/custom/ReviewDetailsSkeleton';
+import ReviewDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/ReviewDetailsSkeleton';
 import ReplyInput from './_components/Reply/ReplyInput';
 import ReviewDetails from './_components/ReviewDetails';
 import AlcoholInfo from './_components/AlcoholInfo';

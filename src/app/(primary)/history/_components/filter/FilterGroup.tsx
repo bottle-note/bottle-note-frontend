@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { REVIEW_FILTER_TYPES, PICKS_STATUS } from '@/constants/history';
 import { ReviewFilterType, PicksStatus } from '@/types/History';
 import { handleFilterValues } from '@/utils/historyFilter';
-import { Accordion } from '@/components/SideFilterDrawer/Accordion';
+import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
 import FilterDateRange from './FilterDateRange';
 

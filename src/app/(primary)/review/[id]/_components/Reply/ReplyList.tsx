@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { RootReply, SubReplyListApi, SubReply } from '@/types/Reply';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ReplyApi } from '@/app/api/ReplyApi';
-import List from '@/components/List/List';
-import EmptyView from '@/app/(primary)/_components/EmptyView';
+import List from '@/components/feature/List/List';
+import EmptyView from '@/components/ui/Display/EmptyView';
 import { useAuth } from '@/hooks/auth/useAuth';
 import Reply from './Reply';
 
@@ -128,7 +128,12 @@ export default function ReplyList({
                   <React.Fragment key={comment.userId + comment.reviewReplyId}>
                     <Reply
                       data={comment}
-                      isReviewUser={comment.userId === userData?.userId}
+                      isReviewUser={
+                        !!(
+                          userData?.userId &&
+                          Number(comment.userId) === Number(userData.userId)
+                        )
+                      }
                       reviewId={reviewId}
                       setIsRefetch={setIsRefetch}
                       isSubReplyShow={openReplyIds.has(comment.reviewReplyId)}
@@ -155,7 +160,11 @@ export default function ReplyList({
                                   <Reply
                                     data={subComment}
                                     isReviewUser={
-                                      subComment.userId === userData?.userId
+                                      !!(
+                                        userData?.userId &&
+                                        Number(subComment.userId) ===
+                                          Number(userData.userId)
+                                      )
                                     }
                                     reviewId={reviewId}
                                     setIsRefetch={setIsRefetch}

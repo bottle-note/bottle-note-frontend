@@ -7,15 +7,15 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FormValues, ReviewTempData } from '@/types/Review';
 import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
-import { Button } from '@/components/Button';
-import Loading from '@/components/Loading';
+import Button from '@/components/ui/Button/Button';
+import Loading from '@/components/ui/Loading/Loading';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import { useAlcoholDetails } from '@/hooks/useAlcoholDetails';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import { useReviewAutoSave } from '@/hooks/useReviewAutoSave';
 import { useReviewSubmission } from '@/hooks/useReviewSubmission';
 import useModalStore from '@/store/modalStore';
-import Toast from '@/components/Toast';
+import Toast from '@/components/ui/Interactive/Toast';
 import ReviewForm from '../_components/form/ReviewForm';
 import ReviewHeaderLayout from '../_components/ReviewHeaderLayout';
 

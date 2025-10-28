@@ -1,9 +1,8 @@
 import Image from 'next/image';
-import Label from '@/app/(primary)/_components/Label';
-import PickBtn from '@/app/(primary)/_components/PickBtn';
-import AlcoholImage from '@/app/(primary)/_components/AlcoholImage';
-import Star from '@/components/Star';
-import { truncStr } from '@/utils/truncStr';
+import Label from '@/components/ui/Display/Label';
+import AlcoholPickButton from '@/components/domain/alcohol/AlcoholPickButton';
+import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
+import Star from '@/components/ui/Display/Star';
 import useModalStore from '@/store/modalStore';
 import { AlcoholInfo } from '@/types/Alcohol';
 import { useReviewWrite } from '@/hooks/useReviewWrite';
@@ -20,16 +19,14 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
 
   return (
     <section className="relative z-20 flex px-5 pb-[23px] space-x-5">
-      {data?.alcoholUrlImg && (
-        <AlcoholImage
-          imageUrl={data?.alcoholUrlImg}
-          outerHeightClass="h-[230px]"
-          outerWidthClass="w-[140px]"
-          innerHeightClass="h-[200px]"
-          innerWidthClass="w-[100px]"
-          enableModal={true}
-        />
-      )}
+      <AlcoholImage
+        imageUrl={data?.alcoholUrlImg}
+        outerHeightClass="h-[230px]"
+        outerWidthClass="w-[140px]"
+        innerHeightClass="h-[200px]"
+        innerWidthClass="w-[100px]"
+        enableModal={true}
+      />
       <article className="flex-1 py-3 text-white overflow-x-hidden">
         {data && (
           <>
@@ -39,10 +36,10 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
                 styleClass="border-white px-[7.69px] py-[3.85px] rounded-[4.62px] text-10"
               />
               <h1 className="text-20 font-bold whitespace-normal break-words">
-                {data.korName && truncStr(data.korName, 27)}
+                {data?.korName}
               </h1>
               <p className="text-12 whitespace-normal break-words">
-                {data.engName && truncStr(data.engName.toUpperCase(), 45)}
+                {data?.engName.toUpperCase()}
               </p>
             </div>
             <div className="space-y-[10px] pt-5">
@@ -73,7 +70,7 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
                   <p className="text-12 font-normal">리뷰 작성</p>
                 </button>
                 <div className="border-[0.5px] border-white my-[0.1rem]" />
-                <PickBtn
+                <AlcoholPickButton
                   size={16}
                   isPicked={isPicked}
                   alcoholId={Number(data.alcoholId)}

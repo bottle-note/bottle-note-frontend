@@ -3,8 +3,8 @@
 import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { SubHeader } from '@/app/(primary)/_components/SubHeader';
-import NavLayout from '@/app/(primary)/_components/NavLayout';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import NavLayout from '@/components/ui/Layout/NavLayout';
 
 export default function NotFound() {
   const router = useRouter();

@@ -1,5 +1,5 @@
 import { signIn } from 'next-auth/react';
-import BackDrop from '@/components/BackDrop';
+import BackDrop from '@/components/ui/Modal/BackDrop';
 import SocialLoginBtn from './SocialLoginBtn';
 
 interface Props {

@@ -9,9 +9,9 @@ import { ReplyApi } from '@/app/api/ReplyApi';
 import { useBlockActions } from '@/hooks/useBlockActions';
 import { truncStr } from '@/utils/truncStr';
 import { formatDate } from '@/utils/formatDate';
-import Label from '@/app/(primary)/_components/Label';
-import OptionDropdown from '@/components/OptionDropdown';
-import ProfileImage from '@/app/(primary)/_components/ProfileImage';
+import Label from '@/components/ui/Display/Label';
+import OptionDropdown from '@/components/ui/Modal/OptionDropdown';
+import ProfileImage from '@/components/domain/user/ProfileImage';
 import { RootReply, SubReply } from '@/types/Reply';
 import useModalStore from '@/store/modalStore';
 import useRelationshipsStore from '@/store/relationshipsStore';
@@ -168,7 +168,7 @@ function Reply({
                 )}
               </div>
             </div>
-            <div className="text-12 text-mainDarkGray whitespace-pre-wrap break-words flex mt-[12px] mb-2">
+            <div className="text-15 text-mainDarkGray whitespace-pre-wrap break-words flex mt-[12px] mb-2">
               {'rootReviewId' in data && (
                 <div className="text-mainCoral mr-1">
                   {data?.parentReviewReplyAuthor}
