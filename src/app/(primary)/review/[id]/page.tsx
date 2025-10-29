@@ -24,10 +24,10 @@ import type {
 import useModalStore from '@/store/modalStore';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import ReviewDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/ReviewDetailsSkeleton';
-import ReplyInput from './_components/Reply/ReplyInput';
+import ReplyForm from './_components/Reply/ReplyForm';
 import ReviewDetails from './_components/ReviewDetails';
 import AlcoholInfo from './_components/AlcoholInfo';
-import ReplyList from './_components/Reply/ReplyList';
+import ReplyItemList from './_components/Reply/ReplyItemList';
 
 export default function ReviewDetail() {
   const router = useRouter();
@@ -186,14 +186,14 @@ export default function ReviewDetail() {
               textareaRef={textareaRef}
             />
             <div ref={replyListRef}>
-              <ReplyList
+              <ReplyItemList
                 reviewUserId={reviewDetails.reviewInfo.userInfo.userId}
                 reviewId={reviewId}
                 isRefetch={isRefetch}
                 setIsRefetch={setIsRefetch}
               />
             </div>
-            <ReplyInput
+            <ReplyForm
               textareaRef={textareaRef}
               handleCreateReply={handleCreateReply}
             />

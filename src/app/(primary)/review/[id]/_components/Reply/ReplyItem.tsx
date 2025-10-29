@@ -28,7 +28,7 @@ interface Props {
   onToggleSubReply?: () => void;
 }
 
-function Reply({
+function ReplyItem({
   data,
   children,
   isReviewUser,
@@ -247,4 +247,4 @@ function Reply({
   );
 }
 
-export default Reply;
+export default ReplyItem;

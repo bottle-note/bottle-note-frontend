@@ -4,7 +4,7 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ReplyApi } from '@/app/api/ReplyApi';
 import List from '@/components/feature/List/List';
 import EmptyView from '@/components/ui/Display/EmptyView';
-import Reply from './Reply';
+import ReplyItem from './ReplyItem';
 
 interface Props {
   reviewId: string | string[];
@@ -13,7 +13,7 @@ interface Props {
   setIsRefetch: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function ReplyList({
+export default function ReplyItemList({
   reviewId,
   reviewUserId,
   isRefetch,
@@ -126,7 +126,7 @@ export default function ReplyList({
               <section className="mx-5 py-5 space-y-3 pb-40">
                 {rootReplyList[0]?.data?.reviewReplies.map((comment, index) => (
                   <React.Fragment key={comment.userId + comment.reviewReplyId}>
-                    <Reply
+                    <ReplyItem
                       data={comment}
                       isReviewUser={reviewUserId === comment.userId}
                       reviewId={reviewId}
@@ -152,7 +152,7 @@ export default function ReplyList({
                               <div className="relative ml-[6px]">
                                 <div className="absolute top-0 w-px h-full bg-gray/30" />
                                 <div className="ml-4">
-                                  <Reply
+                                  <ReplyItem
                                     data={subComment}
                                     isReviewUser={
                                       reviewUserId === subComment.userId
@@ -164,7 +164,7 @@ export default function ReplyList({
                               </div>
                             </React.Fragment>
                           ))}
-                    </Reply>
+                    </ReplyItem>
                     {index !==
                       Number(rootReplyList[0]?.data?.totalCount) - 1 && (
                       <div className="border-b border-mainGray/30" />

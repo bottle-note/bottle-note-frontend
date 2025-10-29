@@ -11,7 +11,7 @@ interface Props {
   handleCreateReply: SubmitHandler<FieldValues>;
 }
 
-export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
+export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
   const { isLoggedIn } = useAuth();
   const { register, watch, handleSubmit, setValue } = useFormContext();
   const content = watch('content');
