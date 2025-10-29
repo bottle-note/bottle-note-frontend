@@ -187,6 +187,7 @@ export default function ReviewDetail() {
             />
             <div ref={replyListRef}>
               <ReplyList
+                reviewUserId={reviewDetails.reviewInfo.userInfo.userId}
                 reviewId={reviewId}
                 isRefetch={isRefetch}
                 setIsRefetch={setIsRefetch}

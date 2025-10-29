@@ -4,21 +4,21 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ReplyApi } from '@/app/api/ReplyApi';
 import List from '@/components/feature/List/List';
 import EmptyView from '@/components/ui/Display/EmptyView';
-import { useAuth } from '@/hooks/auth/useAuth';
 import Reply from './Reply';
 
 interface Props {
   reviewId: string | string[];
+  reviewUserId: number;
   isRefetch: boolean;
   setIsRefetch: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function ReplyList({
   reviewId,
+  reviewUserId,
   isRefetch,
   setIsRefetch,
 }: Props) {
-  const { user: userData } = useAuth();
   const [subReplyList, setSubReplyList] = useState<SubReplyListApi | null>();
   const [openReplyIds, setOpenReplyIds] = useState<Set<number>>(new Set());
 
@@ -128,12 +128,7 @@ export default function ReplyList({
                   <React.Fragment key={comment.userId + comment.reviewReplyId}>
                     <Reply
                       data={comment}
-                      isReviewUser={
-                        !!(
-                          userData?.userId &&
-                          Number(comment.userId) === Number(userData.userId)
-                        )
-                      }
+                      isReviewUser={reviewUserId === comment.userId}
                       reviewId={reviewId}
                       setIsRefetch={setIsRefetch}
                       isSubReplyShow={openReplyIds.has(comment.reviewReplyId)}
@@ -160,11 +155,7 @@ export default function ReplyList({
                                   <Reply
                                     data={subComment}
                                     isReviewUser={
-                                      !!(
-                                        userData?.userId &&
-                                        Number(subComment.userId) ===
-                                          Number(userData.userId)
-                                      )
+                                      reviewUserId === subComment.userId
                                     }
                                     reviewId={reviewId}
                                     setIsRefetch={setIsRefetch}
