@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ROUTES } from '@/constants/routes';
+import { LABEL_NAMES } from '@/constants/common';
 import { ExploreAlcohol } from '@/types/Explore';
 import ItemImage from '@/components/feature/List/_components/ItemImage';
 import ItemInfo from '@/components/feature/List/_components/ItemInfo';
@@ -87,7 +88,7 @@ const WhiskeyListItem = ({ content }: Props) => {
         {/* 별점 */}
         <div className="flex items-center gap-x-1">
           <Label
-            name="나의 별점"
+            name={LABEL_NAMES.MY_RATING}
             styleClass="label-default text-12 px-2 py-[1px] rounded-[2px] flex items-end"
             position="after"
             icon={

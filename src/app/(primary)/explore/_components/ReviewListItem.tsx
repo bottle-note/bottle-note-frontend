@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ROUTES } from '@/constants/routes';
+import { LABEL_NAMES } from '@/constants/common';
 import { ExploreReview } from '@/types/Explore';
 import UserInfoDisplay from '@/components/domain/user/UserInfoDisplay';
 import Star from '@/components/ui/Display/Star';
@@ -67,14 +68,14 @@ const ReviewListItem = ({ content }: Props) => {
             <div className="flex gap-1 flex-shrink-0">
               {content.isBestReview && (
                 <Label
-                  name="베스트"
+                  name={LABEL_NAMES.BEST}
                   icon="/icon/thumbup-filled-white.svg"
                   styleClass="bg-mainCoral text-white px-2 py-[0.1rem] border-mainCoral text-10 rounded"
                 />
               )}
               {content.isMyReview && (
                 <Label
-                  name="나의 코멘트"
+                  name={LABEL_NAMES.MY_REVIEW}
                   icon="/icon/user-outlined-subcoral.svg"
                   styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-10 rounded"
                 />

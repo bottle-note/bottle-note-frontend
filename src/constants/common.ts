@@ -176,3 +176,11 @@ export const REGIONS = [
 ] as const;
 
 export const DEBOUNCE_DELAY = 2000;
+
+export const LABEL_NAMES = {
+  BEST: '베스트',
+  MY_REVIEW: '나의 리뷰',
+  HOT_5: 'HOT 5',
+  REVIEW_AUTHOR: '리뷰 작성자',
+  MY_RATING: '나의 별점',
+} as const;

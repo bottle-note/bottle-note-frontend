@@ -17,6 +17,7 @@ import useModalStore from '@/store/modalStore';
 import useRelationshipsStore from '@/store/relationshipsStore';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
+import { LABEL_NAMES } from '@/constants/common';
 
 interface Props {
   data: RootReply | SubReply;
@@ -142,7 +143,7 @@ const ReplyItem = memo(function ReplyItem({
                   </p>
                   {isReviewUser && (
                     <Label
-                      name="리뷰 작성자"
+                      name={LABEL_NAMES.REVIEW_AUTHOR}
                       styleClass="border-mainCoral text-mainCoral px-[5.82px] py-[2.91px] rounded text-9"
                     />
                   )}
