@@ -11,7 +11,7 @@ import {
 } from '@/components/domain/review/ReviewImageCarousel';
 import ReviewUserHeader from './ReviewUserHeader';
 import ReviewPriceLocation from './ReviewPriceLocation';
-import ReviewActions from './ReviewActions';
+import ReviewInteractionBar from './ReviewInteractionBar';
 
 interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;
@@ -80,7 +80,7 @@ function ReviewDetails({ data, handleLogin, onRefresh, textareaRef }: Props) {
         <ReviewPriceLocation data={data} />
 
         {/* 좋아요, 댓글, 공유 버튼 */}
-        <ReviewActions
+        <ReviewInteractionBar
           data={data}
           isLiked={isLiked}
           likeCount={likeCount}

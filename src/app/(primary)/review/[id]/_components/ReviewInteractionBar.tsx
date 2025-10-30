@@ -5,7 +5,7 @@ import useModalStore from '@/store/modalStore';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { useAuth } from '@/hooks/auth/useAuth';
 
-interface ReviewActionsProps {
+interface ReviewInteractionBarProps {
   data: ReviewDetailsWithoutAlcoholInfo;
   isLiked: boolean;
   likeCount: number;
@@ -15,7 +15,7 @@ interface ReviewActionsProps {
   textareaRef?: React.MutableRefObject<HTMLTextAreaElement | null>;
 }
 
-export default function ReviewActions({
+export default function ReviewInteractionBar({
   data,
   isLiked,
   likeCount,
@@ -23,7 +23,7 @@ export default function ReviewActions({
   onLikeError,
   handleLogin,
   textareaRef,
-}: ReviewActionsProps) {
+}: ReviewInteractionBarProps) {
   const { isLoggedIn } = useAuth();
   const { handleModalState } = useModalStore();
 
