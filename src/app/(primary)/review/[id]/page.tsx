@@ -41,6 +41,9 @@ export default function ReviewDetail() {
   const [reviewDetails, setReviewDetails] =
     useState<ReviewDetailsWithoutAlcoholInfo | null>(null);
   const [isRefetch, setIsRefetch] = useState<boolean>(false);
+  const [lastCreatedParentReplyId, setLastCreatedParentReplyId] = useState<
+    number | null
+  >(null);
   const [isUnmounting, setIsUnmounting] = useState(false);
 
   const schema = yup.object({
@@ -86,6 +89,9 @@ export default function ReviewDetail() {
       );
 
       if (response) {
+        setLastCreatedParentReplyId(
+          saveParentReplyId ? Number(saveParentReplyId) : null,
+        );
         setIsRefetch(true);
         reset({
           content: '',
@@ -191,6 +197,7 @@ export default function ReviewDetail() {
                 reviewId={reviewId}
                 isRefetch={isRefetch}
                 setIsRefetch={setIsRefetch}
+                lastCreatedParentReplyId={lastCreatedParentReplyId}
               />
             </div>
             <ReplyForm

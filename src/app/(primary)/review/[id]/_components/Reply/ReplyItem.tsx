@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -46,7 +46,6 @@ function ReplyItem({
   const { handleBlockUser, handleUnblockUser } = useBlockActions();
 
   const [isOptionShow, setIsOptionShow] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isBlocked = isUserBlocked(data?.userId.toString());
 
   const handleUpdateSubReply = () => {
@@ -59,10 +58,6 @@ function ReplyItem({
     if (data?.nickName) {
       setValue('replyToReplyUserName', data.nickName);
       setValue('parentReplyId', data.reviewReplyId);
-
-      if (textareaRef?.current) {
-        textareaRef.current.focus();
-      }
     }
   };
 
@@ -74,7 +69,7 @@ function ReplyItem({
         data.reviewReplyId.toString(),
       );
       if (result) {
-        await setIsRefetch(true);
+        setIsRefetch(true);
 
         handleModalState({
           isShowModal: true,
@@ -87,7 +82,7 @@ function ReplyItem({
         });
       }
     } catch (error) {
-      console.error('Failed to delete review:', error);
+      console.error('Failed to delete reply:', error);
     }
   };
 
@@ -168,7 +163,7 @@ function ReplyItem({
                 )}
               </div>
             </div>
-            <div className="text-15 text-mainDarkGray whitespace-pre-wrap break-words flex mt-[12px] mb-2">
+            <div className="text-15 text-mainDarkGray whitespace-pre-wrap break-words flex my-2">
               {'rootReviewId' in data && (
                 <div className="text-mainCoral mr-1">
                   {data?.parentReviewReplyAuthor}
