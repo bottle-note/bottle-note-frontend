@@ -73,14 +73,12 @@ export default function HistoryFilterDateRange() {
   };
 
   return (
-    <div className="px-5 py-3 bg-sectionWhite z-50">
-      <DateRangePicker
-        startDate={filterState.date.startDate || getDefaultDates().startDate}
-        endDate={filterState.date.endDate || getDefaultDates().endDate}
-        onChange={handleDate}
-        minDate={getDateLimits().minDate}
-        maxDate={getDateLimits().maxDate}
-      />
-    </div>
+    <DateRangePicker
+      startDate={filterState.date.startDate || getDefaultDates().startDate}
+      endDate={filterState.date.endDate || getDefaultDates().endDate}
+      onChange={handleDate}
+      minDate={getDateLimits().minDate}
+      maxDate={getDateLimits().maxDate}
+    />
   );
 }
