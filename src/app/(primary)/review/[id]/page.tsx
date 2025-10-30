@@ -34,7 +34,7 @@ export default function ReviewDetail() {
   const { id: reviewId } = useParams();
   const searchParams = useSearchParams();
   const { handleLoginModal } = useModalStore();
-  const { isProcessing, executeApiCall } = useSingleApiCall();
+  const { executeApiCall } = useSingleApiCall();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const replyListRef = useRef<HTMLDivElement>(null);
   const [alcoholInfo, setAlcoholInfo] = useState<AlcoholInfoType | null>(null);
@@ -151,7 +151,7 @@ export default function ReviewDetail() {
 
   return (
     <FormProvider {...formMethods}>
-      {alcoholInfo && reviewDetails && !isProcessing ? (
+      {alcoholInfo && reviewDetails ? (
         <>
           <NavLayout>
             <div className="relative">
