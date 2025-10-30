@@ -41,7 +41,7 @@ export default function ReviewDetail() {
   const [reviewDetails, setReviewDetails] =
     useState<ReviewDetailsWithoutAlcoholInfo | null>(null);
   const [isRefetch, setIsRefetch] = useState<boolean>(false);
-  const [lastCreatedParentReplyId, setLastCreatedParentReplyId] = useState<
+  const [lastCreatedRootReplyId, setLastCreatedRootReplyId] = useState<
     number | null
   >(null);
   const [isUnmounting, setIsUnmounting] = useState(false);
@@ -89,14 +89,13 @@ export default function ReviewDetail() {
       );
 
       if (response) {
-        setLastCreatedParentReplyId(
-          saveParentReplyId ? Number(saveParentReplyId) : null,
-        );
+        setLastCreatedRootReplyId(data.rootReplyId ? data.rootReplyId : null);
         setIsRefetch(true);
         reset({
           content: '',
           parentReplyId: null,
           replyToReplyUserName: null,
+          rootReplyId: null,
         });
       }
     };
@@ -123,6 +122,7 @@ export default function ReviewDetail() {
       content: '',
       parentReplyId: null,
       replyToReplyUserName: null,
+      rootReplyId: null,
     });
   }, [reviewId, reset, fetchReviewDetails]);
 
@@ -197,7 +197,7 @@ export default function ReviewDetail() {
                 reviewId={reviewId}
                 isRefetch={isRefetch}
                 setIsRefetch={setIsRefetch}
-                lastCreatedParentReplyId={lastCreatedParentReplyId}
+                lastCreatedRootReplyId={lastCreatedRootReplyId}
               />
             </div>
             <ReplyForm

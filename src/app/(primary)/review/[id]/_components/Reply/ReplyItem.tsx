@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -28,7 +28,7 @@ interface Props {
   onToggleSubReply?: () => void;
 }
 
-function ReplyItem({
+const ReplyItem = memo(function ReplyItem({
   data,
   children,
   isReviewUser,
@@ -58,6 +58,13 @@ function ReplyItem({
     if (data?.nickName) {
       setValue('replyToReplyUserName', data.nickName);
       setValue('parentReplyId', data.reviewReplyId);
+
+      // rootReplyId 설정: SubReply면 rootReviewId 사용, RootReply면 자기 자신의 ID 사용
+      if ('rootReviewId' in data) {
+        setValue('rootReplyId', data.rootReviewId);
+      } else {
+        setValue('rootReplyId', data.reviewReplyId);
+      }
     }
   };
 
@@ -191,7 +198,9 @@ function ReplyItem({
             )}
             {'subReplyCount' in data && data?.subReplyCount !== 0 && (
               <>
-                {!isBlocked && <p className="text-subCoral">·</p>}
+                {!isBlocked && data?.status !== 'DELETED' && (
+                  <p className="text-subCoral">·</p>
+                )}
                 <button
                   className="flex items-center space-x-[2px]"
                   onClick={handleUpdateSubReply}
@@ -240,6 +249,6 @@ function ReplyItem({
       )}
     </>
   );
-}
+});
 
 export default ReplyItem;
