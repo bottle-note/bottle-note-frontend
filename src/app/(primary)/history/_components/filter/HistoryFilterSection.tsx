@@ -4,7 +4,7 @@ import { ReviewFilterType, PicksStatus } from '@/types/History';
 import { handleFilterValues } from '@/utils/historyFilter';
 import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
-import FilterDateRange from './FilterDateRange';
+import HistoryFilterDateRange from './HistoryFilterDateRange';
 
 interface Props {
   type?: 'DATA' | 'DATE';
@@ -17,7 +17,7 @@ interface Props {
   gridCols?: number;
 }
 
-export default function FilterGroup({
+export default function HistoryFilterSection({
   type = 'DATA',
   title,
   data,
@@ -110,7 +110,7 @@ export default function FilterGroup({
           )}
         </>
       ) : (
-        <FilterDateRange />
+        <HistoryFilterDateRange />
       )}
     </Accordion>
   );

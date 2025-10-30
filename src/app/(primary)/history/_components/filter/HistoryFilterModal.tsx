@@ -6,14 +6,14 @@ import {
 } from '@/constants/history';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
 import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
-import FilterGroup from './FilterGroup';
+import HistoryFilterSection from './HistoryFilterSection';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function FilterSideModal({ isOpen, onClose }: Props) {
+export default function HistoryFilterModal({ isOpen, onClose }: Props) {
   const { resetFilter } = useHistoryFilterStore();
 
   return (
@@ -24,10 +24,10 @@ export default function FilterSideModal({ isOpen, onClose }: Props) {
           onClose={onClose}
           resetFilter={resetFilter}
         >
-          <FilterGroup title="별점" data={RATINGS_FILTERS} />
-          <FilterGroup title="리뷰" data={REVIEW_FILTERS} gridCols={3} />
-          <FilterGroup title="찜" data={LIKE_FILTERS} />
-          <FilterGroup title="기간" type="DATE" />
+          <HistoryFilterSection title="별점" data={RATINGS_FILTERS} />
+          <HistoryFilterSection title="리뷰" data={REVIEW_FILTERS} gridCols={3} />
+          <HistoryFilterSection title="찜" data={LIKE_FILTERS} />
+          <HistoryFilterSection title="기간" type="DATE" />
         </SideFilterDrawer>
       )}
     </>
