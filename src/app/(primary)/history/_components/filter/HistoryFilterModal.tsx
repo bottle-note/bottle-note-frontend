@@ -25,7 +25,11 @@ export default function HistoryFilterModal({ isOpen, onClose }: Props) {
           resetFilter={resetFilter}
         >
           <HistoryFilterSection title="별점" data={RATINGS_FILTERS} />
-          <HistoryFilterSection title="리뷰" data={REVIEW_FILTERS} gridCols={3} />
+          <HistoryFilterSection
+            title="리뷰"
+            data={REVIEW_FILTERS}
+            gridCols={3}
+          />
           <HistoryFilterSection title="찜" data={LIKE_FILTERS} />
           <HistoryFilterSection title="기간" type="DATE" />
         </SideFilterDrawer>
