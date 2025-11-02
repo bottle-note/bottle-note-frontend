@@ -55,6 +55,34 @@ export default function ImageUploader({
     }
   };
 
+  const onUploadMultiplePreview = (imgDataList: File[]) => {
+    if (imgDataList && imgDataList.length > 0) {
+      // 이미지 미리보기용
+      const previewImgCount = previewImages.length ?? 0;
+      const maxOrderId =
+        previewImages.length > 0
+          ? Math.max(...previewImages.map((img) => img.order))
+          : 0;
+      const imgForPreview = Array.from(imgDataList)
+        .slice(0, 5 - previewImgCount)
+        .map((file, index) => ({
+          order: maxOrderId + index + 1,
+          image: URL.createObjectURL(file),
+        }));
+      setPreviewImages([...previewImages, ...imgForPreview]);
+
+      // S3 업로드용
+      const addedNewImages = watch('images') ?? [];
+      const imgForS3 = Array.from(imgDataList)
+        .slice(0, 5 - previewImgCount)
+        .map((file, index) => ({
+          order: maxOrderId + index + 1,
+          image: file,
+        }));
+      setValue('images', [...addedNewImages, ...imgForS3]);
+    }
+  };
+
   const removeImage = (image: string, order: number) => {
     let updatedPreviews;
     let updatedFiles;
@@ -85,12 +113,13 @@ export default function ImageUploader({
     setPreviewImages(updatedPreviews);
   };
 
-  const { handleOpenAlbum } = useWebviewCamera({
+  const { handleOpenAlbumMultiple } = useWebviewCamera({
     handleImg: onUploadPreview,
+    handleMultipleImgs: onUploadMultiplePreview,
   });
 
   const onClickAddImage = () => {
-    if (isMobile) return handleOpenAlbum();
+    if (isMobile) return handleOpenAlbumMultiple();
     return imageRef.current?.click();
   };
 
@@ -125,10 +154,11 @@ export default function ImageUploader({
           ref={imageRefModify}
           onChange={(event) => {
             const fileInput = event.target;
-            const file = fileInput.files?.[0];
+            const files = fileInput.files;
 
-            if (file) {
-              onUploadPreview(file);
+            if (files && files.length > 0) {
+              const filesArray = Array.from(files);
+              onUploadMultiplePreview(filesArray);
               fileInput.value = '';
             }
             onForceOpen?.(true);
@@ -194,10 +224,11 @@ export default function ImageUploader({
               ref={imageRef}
               onChange={(event) => {
                 const fileInput = event.target;
-                const file = fileInput.files?.[0];
+                const files = fileInput.files;
 
-                if (file) {
-                  onUploadPreview(file);
+                if (files && files.length > 0) {
+                  const filesArray = Array.from(files);
+                  onUploadMultiplePreview(filesArray);
                   fileInput.value = '';
                 }
                 onForceOpen?.(true);
