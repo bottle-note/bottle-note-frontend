@@ -23,14 +23,8 @@ export default function ExplorePage() {
   const { currentTab, handleTab, refs, registerTab } = useTab({
     tabList,
     scroll: true,
+    initialTab,
   });
-
-  useEffect(() => {
-    if (currentTab.id !== initialTab.id) {
-      handleTab(initialTab.id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     const currentParams = new URLSearchParams(searchParams.toString());
