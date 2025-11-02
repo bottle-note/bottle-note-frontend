@@ -73,6 +73,10 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
         ...prev,
         [menu.link]: currentTime,
       }));
+
+      if (menu.link === ROUTES.SEARCH.BASE) {
+        router.push(ROUTES.SEARCH.BASE);
+      }
       return;
     }
 

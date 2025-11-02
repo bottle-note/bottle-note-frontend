@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { useFormContext, FieldValues, SubmitHandler } from 'react-hook-form';
 import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
@@ -11,7 +11,7 @@ interface Props {
   handleCreateReply: SubmitHandler<FieldValues>;
 }
 
-export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
+export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
   const { isLoggedIn } = useAuth();
   const { register, watch, handleSubmit, setValue } = useFormContext();
   const content = watch('content');
@@ -34,6 +34,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
   const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
     const text = (e.target as HTMLTextAreaElement).value;
     setValue('content', text);
+    handleResizeHeight();
   };
 
   const insertAtCaret = (text: string) => {
@@ -41,44 +42,37 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
     if (el) {
       el.focus();
       const { selectionStart, selectionEnd, value } = el;
-      el.value =
+      const newValue =
         value.slice(0, selectionStart) + text + value.slice(selectionEnd);
-      el.selectionStart = selectionStart + text.length;
-      el.selectionEnd = selectionStart + text.length;
-      const updatedContent = el.value;
-      setValue('content', updatedContent);
+      const newCursorPosition = selectionStart + text.length;
+
+      setValue('content', newValue);
+
+      setTimeout(() => {
+        el.selectionStart = newCursorPosition;
+        el.selectionEnd = newCursorPosition;
+      }, 0);
     }
   };
-
-  const handleReplyToUser = (userName: string) => {
-    const mention = `@${userName} `;
-    insertAtCaret(mention);
-  };
-
-  useEffect(() => {
-    const el = textareaRef.current;
-
-    if (el) {
-      const updatedHTML = content.replace(/@\w+/g, (match: any) => {
-        // span은 적용이 되는데 style은 적용이 안됨, 추후 수정 필요
-        return `<span style="color:blue">${match}</span>`;
-      });
-      el.innerHTML = updatedHTML;
-    }
-  }, [content]);
 
   useEffect(() => {
     if (mentionName) {
-      handleReplyToUser(mentionName);
+      const mention = `@${mentionName} `;
+      insertAtCaret(mention);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mentionName]);
 
-  useEffect(() => {
-    if (newTextareaRef.current && textareaRef) {
-      const refObject = textareaRef;
-      refObject.current = newTextareaRef.current;
-    }
-  }, [textareaRef, newTextareaRef.current]);
+  const setRefs = useCallback(
+    (element: HTMLTextAreaElement | null) => {
+      register('content').ref(element);
+      newTextareaRef.current = element;
+      // eslint-disable-next-line no-param-reassign
+      textareaRef.current = element;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [register],
+  );
 
   const handleLoginOrAction = (
     action: () => void,
@@ -104,10 +98,10 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
   return (
     <div
       className={`fixed left-0 right-0 mx-auto w-full max-w-2xl px-4 z-10 transition-all duration-500 ease-out ${
-        isVisible ? 'bottom-[6.7rem]' : 'bottom-6'
+        isVisible ? 'bottom-[6.7rem]' : 'bottom-8'
       }`}
     >
-      <div className="bg-[#f6f6f6] pt-1 px-3 rounded-lg shadow-md flex items-center">
+      <div className="bg-[#f6f6f6] py-2 px-3 rounded-lg shadow-md flex items-center">
         <div className="flex-grow flex items-center">
           <textarea
             placeholder={
@@ -118,10 +112,7 @@ export default function ReplyInput({ textareaRef, handleCreateReply }: Props) {
             className="flex-grow p-1 text-mainGray text-13 bg-[#f6f6f6] resize-none max-h-[50px] overflow-hidden focus:outline-none"
             onInput={handleInput}
             rows={1}
-            ref={(e) => {
-              register('content').ref(e);
-              newTextareaRef.current = e;
-            }}
+            ref={setRefs}
             readOnly={!isLoggedIn}
             value={content}
             maxLength={300}

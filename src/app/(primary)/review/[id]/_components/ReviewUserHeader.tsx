@@ -8,6 +8,7 @@ import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import ProfileImage from '@/components/domain/user/ProfileImage';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
+import { LABEL_NAMES } from '@/constants/common';
 
 interface ReviewUserHeaderProps {
   data: ReviewDetailsWithoutAlcoholInfo;
@@ -43,7 +44,7 @@ export default function ReviewUserHeader({
           <div className="flex items-center space-x-1">
             {data.reviewInfo?.isBestReview && (
               <Label
-                name="베스트"
+                name={LABEL_NAMES.BEST}
                 icon="/icon/thumbup-filled-white.svg"
                 iconHeight={11.45}
                 iconWidth={11.45}
@@ -52,7 +53,7 @@ export default function ReviewUserHeader({
             )}
             {data.reviewInfo?.isMyReview && (
               <Label
-                name="나의 코멘트"
+                name={LABEL_NAMES.MY_REVIEW}
                 icon="/icon/user-outlined-subcoral.svg"
                 iconHeight={11.45}
                 iconWidth={11.45}

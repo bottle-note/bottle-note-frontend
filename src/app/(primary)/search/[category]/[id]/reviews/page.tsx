@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { Review as ReviewType } from '@/types/Review';
-import Review from '@/app/(primary)/search/[category]/[id]/_components/ReviewItem';
+import ReviewListItem from '@/app/(primary)/search/[category]/[id]/_components/ReviewListItem';
 import Button from '@/components/ui/Button/Button';
 import List from '@/components/feature/List/List';
 import { SORT_TYPE, SORT_ORDER } from '@/types/common';
@@ -164,7 +164,7 @@ function Reviews() {
                     [...reviewList.map((list) => list.data.reviewList)]
                       .flat()
                       .map((item: ReviewType) => (
-                        <Review
+                        <ReviewListItem
                           data={item}
                           key={uuidv4()}
                           onRefresh={refreshReviews}
@@ -172,8 +172,8 @@ function Reviews() {
                       ))
                   ) : (
                     <div className="flex flex-col gap-2">
-                      {Array.from({ length: 3 }).map((_, idx) => (
-                        <ReviewItemSkeleton key={idx} />
+                      {Array.from({ length: 3 }).map(() => (
+                        <ReviewItemSkeleton key={uuidv4()} />
                       ))}
                     </div>
                   )}
@@ -209,7 +209,7 @@ function Reviews() {
                     [...myReviewList.map((list) => list.data.reviewList)]
                       .flat()
                       .map((item: ReviewType) => (
-                        <Review
+                        <ReviewListItem
                           data={item}
                           key={uuidv4()}
                           onRefresh={refreshReviews}
@@ -217,8 +217,8 @@ function Reviews() {
                       ))
                   ) : (
                     <div className="flex flex-col gap-2">
-                      {Array.from({ length: 3 }).map((_, idx) => (
-                        <ReviewItemSkeleton key={idx} />
+                      {Array.from({ length: 3 }).map(() => (
+                        <ReviewItemSkeleton key={uuidv4()} />
                       ))}
                     </div>
                   )}

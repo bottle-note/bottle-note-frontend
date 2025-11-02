@@ -6,8 +6,9 @@ import useRelationshipsStore from '@/store/relationshipsStore';
 import { truncStr } from '@/utils/truncStr';
 import Star from '@/components/ui/Display/Star';
 import { ROUTES } from '@/constants/routes';
+import { LABEL_NAMES } from '@/constants/common';
 
-interface ReviewUserInfoProps {
+interface ReviewListUserInfoProps {
   userInfo: {
     userId: number;
     nickName: string;
@@ -23,7 +24,7 @@ interface ReviewUserInfoProps {
   className?: string;
 }
 
-export default function ReviewUserInfo({
+export default function ReviewListUserInfo({
   userInfo,
   rating,
   isBestReview,
@@ -33,7 +34,7 @@ export default function ReviewUserInfo({
   starSize = 22,
   starTextStyle = 'text-subCoral font-semibold text-20 min-w-5',
   className = '',
-}: ReviewUserInfoProps) {
+}: ReviewListUserInfoProps) {
   const { isUserBlocked } = useRelationshipsStore();
   const isBlocked = isUserBlocked(String(userInfo.userId));
 
@@ -64,7 +65,7 @@ export default function ReviewUserInfo({
         <div className="flex items-center space-x-1">
           {isBestReview && (
             <Label
-              name="베스트"
+              name={LABEL_NAMES.BEST}
               icon="/icon/thumbup-filled-white.svg"
               iconHeight={12}
               iconWidth={12}
@@ -73,7 +74,7 @@ export default function ReviewUserInfo({
           )}
           {isMyReview && (
             <Label
-              name="나의 코멘트"
+              name={LABEL_NAMES.MY_REVIEW}
               icon="/icon/user-outlined-subcoral.svg"
               iconHeight={12}
               iconWidth={12}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
+import { isWithinInterval, parseISO } from 'date-fns';
 import Label from '@/components/ui/Display/Label';
 import List from '@/components/feature/List/List';
 import { groupHistoryByDate, shouldShowDivider } from '@/utils/historyUtils';
@@ -9,6 +10,7 @@ import { ApiResponse } from '@/types/common';
 import { TimelineSkeleton } from '@/components/ui/Loading/Skeletons/custom/TimelineSkeleton';
 import { HistoryEmptyState } from '@/app/(primary)/history/_components/HistoryEmptyState';
 import TimeLineItem from '@/components/domain/history/TimeLineItem';
+import { useHistoryFilterStore } from '@/store/historyFilterStore';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
 
 interface TimelineProps {
@@ -54,6 +56,7 @@ export default function Timeline({
   limit = 7,
   showGradient = false,
 }: TimelineProps) {
+  const { state: filterState } = useHistoryFilterStore();
   const [processedHistory, setProcessedHistory] = useState<{
     groupedHistory: Record<string, HistoryType[]>;
     yearMonths: string[];
@@ -100,6 +103,21 @@ export default function Timeline({
 
     const [year, month] = latestYearMonth.split('.').map(Number);
     return { year, month };
+  }
+
+  function isSubscriptionDateInRange(subscriptionDate: string): boolean {
+    if (!subscriptionDate) return false;
+    if (!filterState.date.startDate || !filterState.date.endDate) return true;
+
+    try {
+      const subDate = parseISO(subscriptionDate);
+      return isWithinInterval(subDate, {
+        start: filterState.date.startDate,
+        end: filterState.date.endDate,
+      });
+    } catch {
+      return false;
+    }
   }
 
   useEffect(() => {
@@ -221,7 +239,7 @@ export default function Timeline({
                     );
                   })}
                 </div>
-                {isLastPage && (
+                {isLastPage && isSubscriptionDateInRange(subscriptionDate) && (
                   <div className="relative z-10 pb-3 mt-5">
                     <div className="relative pb-5">
                       <div className="absolute left-0 right-0 h-px bg-bgGray" />

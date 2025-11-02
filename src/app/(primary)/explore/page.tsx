@@ -1,6 +1,7 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/ui/Navigation/Tab';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
@@ -8,13 +9,45 @@ import { ReviewExplorerList } from './_components/ReviewExploreList';
 import { WhiskeyExplorerList } from './_components/WhiskeyExploreList';
 
 export default function ExplorePage() {
-  const { currentTab, handleTab, tabList, refs, registerTab } = useTab({
-    tabList: [
-      { name: '위스키 둘러보기', id: 'EXPLORER_WHISKEY' },
-      { name: '리뷰 둘러보기', id: 'REVIEW_WHISKEY' },
-    ],
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const tabFromUrl = searchParams.get('tab') || 'EXPLORER_WHISKEY';
+
+  const tabList = [
+    { name: '위스키 둘러보기', id: 'EXPLORER_WHISKEY' },
+    { name: '리뷰 둘러보기', id: 'REVIEW_WHISKEY' },
+  ];
+
+  const initialTab = tabList.find((tab) => tab.id === tabFromUrl) || tabList[0];
+
+  const { currentTab, handleTab, refs, registerTab } = useTab({
+    tabList,
     scroll: true,
   });
+
+  useEffect(() => {
+    if (currentTab.id !== initialTab.id) {
+      handleTab(initialTab.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const currentParams = new URLSearchParams(searchParams.toString());
+    if (currentParams.get('tab') !== currentTab.id) {
+      currentParams.set('tab', currentTab.id);
+      router.replace(`/explore?${currentParams.toString()}`, {
+        scroll: false,
+      });
+    }
+  }, [currentTab.id, router, searchParams]);
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  }, [currentTab.id]);
 
   return (
     <Suspense>

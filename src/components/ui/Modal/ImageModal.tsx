@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import Image from 'next/image';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
@@ -23,7 +24,9 @@ export default function ImageModal({ imageUrl, isOpen, onClose }: Props) {
     };
   }, [isOpen]);
 
-  return (
+  if (typeof window === 'undefined') return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -43,7 +46,7 @@ export default function ImageModal({ imageUrl, isOpen, onClose }: Props) {
             width: '100vw',
             height: '100vh',
           }}
-          className="z-[50] flex items-center justify-center"
+          className="z-[9999] flex items-center justify-center"
         >
           <motion.button
             initial={{ scale: 0.5, opacity: 0 }}
@@ -91,6 +94,7 @@ export default function ImageModal({ imageUrl, isOpen, onClose }: Props) {
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }

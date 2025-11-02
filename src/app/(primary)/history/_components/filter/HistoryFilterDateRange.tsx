@@ -4,7 +4,7 @@ import { useHistoryFilterStore } from '@/store/historyFilterStore';
 
 const MAX_YEARS = 2;
 
-export default function FilterDateRange() {
+export default function HistoryFilterDateRange() {
   const { state: filterState, setDate } = useHistoryFilterStore();
 
   const getDefaultDates = () => {
@@ -73,14 +73,12 @@ export default function FilterDateRange() {
   };
 
   return (
-    <div className="px-5 py-3 bg-sectionWhite z-50">
-      <DateRangePicker
-        startDate={filterState.date.startDate || getDefaultDates().startDate}
-        endDate={filterState.date.endDate || getDefaultDates().endDate}
-        onChange={handleDate}
-        minDate={getDateLimits().minDate}
-        maxDate={getDateLimits().maxDate}
-      />
-    </div>
+    <DateRangePicker
+      startDate={filterState.date.startDate || getDefaultDates().startDate}
+      endDate={filterState.date.endDate || getDefaultDates().endDate}
+      onChange={handleDate}
+      minDate={getDateLimits().minDate}
+      maxDate={getDateLimits().maxDate}
+    />
   );
 }

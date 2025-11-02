@@ -7,6 +7,7 @@ import Label from '@/components/ui/Display/Label';
 import Star from '@/components/ui/Display/Star';
 import { ItemStats } from '@/components/feature/List/_components/ItemStats';
 import { ROUTES } from '@/constants/routes';
+import { LABEL_NAMES } from '@/constants/common';
 
 interface Props {
   data: RatingMyBottleListResponse['myBottleList'][number];
@@ -42,7 +43,7 @@ export const RatingsListItem = ({ data, isMyPage }: Props) => {
       >
         {isHot && (
           <Label
-            name="HOT 5"
+            name={LABEL_NAMES.HOT_5}
             styleClass="bg-subCoral text-white px-2 py-[0.1rem] border-subCoral text-[8px] rounded mb-1"
           />
         )}

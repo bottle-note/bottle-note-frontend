@@ -25,7 +25,7 @@ interface ReviewFooterProps {
   className?: string;
 }
 
-export default function ReviewActions({
+export default function ReviewListActions({
   reviewId,
   isLiked,
   likeCount,

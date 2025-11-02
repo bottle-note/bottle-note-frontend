@@ -5,10 +5,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ROUTES } from '@/constants/routes';
 import { Review as ReviewType } from '@/types/Review';
-import ReviewUserInfo from '@/app/(primary)/search/[category]/[id]/_components/ReviewUserInfo';
+import ReviewListUserInfo from '@/app/(primary)/search/[category]/[id]/_components/ReviewListUserInfo';
 import { numberWithCommas } from '@/utils/formatNum';
 import { truncStr } from '@/utils/truncStr';
-import ReviewActions from '@/app/(primary)/search/[category]/[id]/_components/ReviewActions';
+import ReviewListActions from '@/app/(primary)/search/[category]/[id]/_components/ReviewListActions';
 import useModalStore from '@/store/modalStore';
 import useRelationshipsStore from '@/store/relationshipsStore';
 import { useAuth } from '@/hooks/auth/useAuth';
@@ -20,7 +20,7 @@ interface Props {
   onRefresh: () => void;
 }
 
-function ReviewItem({ data, onRefresh }: Props) {
+function ReviewListItem({ data, onRefresh }: Props) {
   const { user: userData, isLoggedIn } = useAuth();
   const { isLikedByMe } = data;
   const { handleLoginModal } = useModalStore();
@@ -43,7 +43,7 @@ function ReviewItem({ data, onRefresh }: Props) {
   return (
     <>
       <div className="border-b border-mainGray/30 py-[35px] space-y-[10px]">
-        <ReviewUserInfo
+        <ReviewListUserInfo
           userInfo={data.userInfo}
           rating={data.rating}
           isBestReview={data.isBestReview}
@@ -101,7 +101,7 @@ function ReviewItem({ data, onRefresh }: Props) {
               >
                 <div className="flex space-x-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-mainDarkGray text-13.5">
+                    <p className="text-mainDarkGray text-13.5 break-words">
                       {truncStr(data.reviewContent, 135)}
                       {data.reviewContent.length > 135 && (
                         <span className="text-mainGray">더보기</span>
@@ -122,7 +122,7 @@ function ReviewItem({ data, onRefresh }: Props) {
                 </div>
               </Link>
             </div>
-            <ReviewActions
+            <ReviewListActions
               reviewId={data.reviewId}
               isLiked={isLiked}
               likeCount={likeCount}
@@ -165,4 +165,4 @@ function ReviewItem({ data, onRefresh }: Props) {
   );
 }
 
-export default ReviewItem;
+export default ReviewListItem;

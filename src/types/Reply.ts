@@ -44,6 +44,7 @@ export interface FormValues {
   content: string;
   parentReplyId?: string | null;
   replyToReplyUserName?: string | null;
+  rootReplyId?: number | null;
 }
 
 export interface ReplyPatchApi {

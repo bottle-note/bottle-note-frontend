@@ -8,6 +8,7 @@ import { ReviewMyBottleListResponse } from '@/types/MyBottle';
 import { addNewLine } from '@/utils/addNewLine';
 import { truncStr } from '@/utils/truncStr';
 import { ROUTES } from '@/constants/routes';
+import { LABEL_NAMES } from '@/constants/common';
 import Ellipsis from 'public/icon/ellipsis-vertical-subcoral.svg';
 
 interface Props {
@@ -46,13 +47,13 @@ export const ReviewListItem = ({ data }: Props) => {
         {/* labels */}
         {isHot && (
           <Label
-            name="HOT 5"
+            name={LABEL_NAMES.HOT_5}
             styleClass="bg-subCoral text-white px-2 py-[0.1rem] border-subCoral text-[8px] rounded mb-1"
           />
         )}
         {isBestReview && (
           <Label
-            name="베스트"
+            name={LABEL_NAMES.BEST}
             icon="/icon/thumbup-filled-white.svg"
             styleClass="bg-mainCoral text-white px-2 py-[0.1rem] text-10 border-mainCoral rounded"
           />
