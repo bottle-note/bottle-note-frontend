@@ -30,6 +30,10 @@ type WebViewMessageType = {
     message: 'openAlbum';
     args?: never;
   };
+  openAlbumMultiple: {
+    message: 'openAlbumMultiple';
+    args?: never;
+  };
   openCamera: {
     message: 'openCamera';
     args?: never;

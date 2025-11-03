@@ -99,8 +99,8 @@ export const ReviewExplorerList = () => {
                 .flat()
                 .map((review) => <ReviewCard key={uuid()} content={review} />),
             )}
+          <div ref={targetRef} className="h-10" />
         </List.Section>
-        <div ref={targetRef} />
       </List>
     </section>
   );
