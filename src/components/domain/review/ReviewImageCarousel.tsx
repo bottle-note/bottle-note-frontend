@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
 import {
@@ -8,7 +9,6 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from '@/components/ui/Display/carousel';
-import { useEffect, useState } from 'react';
 
 export interface ProductImage {
   id: string | number;

@@ -23,7 +23,8 @@ export const useWebviewCamera = ({ handleImg, handleMultipleImgs }: Params) => {
     return alert('모바일에서만 이용 가능합니다.');
   };
   const handleOpenAlbum = () => handleWebViewMessage('openAlbum');
-  const handleOpenAlbumMultiple = () => handleWebViewMessage('openAlbumMultiple');
+  const handleOpenAlbumMultiple = () =>
+    handleWebViewMessage('openAlbumMultiple');
 
   useLayoutEffect(() => {
     window.openAlbum = (data: string) => {
