@@ -24,23 +24,26 @@ import type {
 import useModalStore from '@/store/modalStore';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import ReviewDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/ReviewDetailsSkeleton';
-import ReplyInput from './_components/Reply/ReplyInput';
+import ReplyForm from './_components/Reply/ReplyForm';
 import ReviewDetails from './_components/ReviewDetails';
 import AlcoholInfo from './_components/AlcoholInfo';
-import ReplyList from './_components/Reply/ReplyList';
+import ReplyItemList from './_components/Reply/ReplyItemList';
 
 export default function ReviewDetail() {
   const router = useRouter();
   const { id: reviewId } = useParams();
   const searchParams = useSearchParams();
   const { handleLoginModal } = useModalStore();
-  const { isProcessing, executeApiCall } = useSingleApiCall();
+  const { executeApiCall } = useSingleApiCall();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const replyListRef = useRef<HTMLDivElement>(null);
   const [alcoholInfo, setAlcoholInfo] = useState<AlcoholInfoType | null>(null);
   const [reviewDetails, setReviewDetails] =
     useState<ReviewDetailsWithoutAlcoholInfo | null>(null);
   const [isRefetch, setIsRefetch] = useState<boolean>(false);
+  const [lastCreatedRootReplyId, setLastCreatedRootReplyId] = useState<
+    number | null
+  >(null);
   const [isUnmounting, setIsUnmounting] = useState(false);
 
   const schema = yup.object({
@@ -86,11 +89,13 @@ export default function ReviewDetail() {
       );
 
       if (response) {
+        setLastCreatedRootReplyId(data.rootReplyId ? data.rootReplyId : null);
         setIsRefetch(true);
         reset({
           content: '',
           parentReplyId: null,
           replyToReplyUserName: null,
+          rootReplyId: null,
         });
       }
     };
@@ -117,6 +122,7 @@ export default function ReviewDetail() {
       content: '',
       parentReplyId: null,
       replyToReplyUserName: null,
+      rootReplyId: null,
     });
   }, [reviewId, reset, fetchReviewDetails]);
 
@@ -145,7 +151,7 @@ export default function ReviewDetail() {
 
   return (
     <FormProvider {...formMethods}>
-      {alcoholInfo && reviewDetails && !isProcessing ? (
+      {alcoholInfo && reviewDetails ? (
         <>
           <NavLayout>
             <div className="relative">
@@ -186,13 +192,15 @@ export default function ReviewDetail() {
               textareaRef={textareaRef}
             />
             <div ref={replyListRef}>
-              <ReplyList
+              <ReplyItemList
+                reviewUserId={reviewDetails.reviewInfo.userInfo.userId}
                 reviewId={reviewId}
                 isRefetch={isRefetch}
                 setIsRefetch={setIsRefetch}
+                lastCreatedRootReplyId={lastCreatedRootReplyId}
               />
             </div>
-            <ReplyInput
+            <ReplyForm
               textareaRef={textareaRef}
               handleCreateReply={handleCreateReply}
             />

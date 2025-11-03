@@ -35,6 +35,13 @@ export default function DateRangePicker({
 
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+
+      setTimeout(() => {
+        ref.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);

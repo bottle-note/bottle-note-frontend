@@ -13,7 +13,7 @@ interface Props {
   setIsPicked: (value: boolean | ((prev: boolean) => boolean)) => void;
 }
 
-function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
+function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
   const { handleLoginModal } = useModalStore();
   const { handleReviewWrite } = useReviewWrite();
 
@@ -88,4 +88,4 @@ function AlcoholBox({ data, isPicked, setIsPicked }: Props) {
   );
 }
 
-export default AlcoholBox;
+export default AlcoholDetailHeader;

@@ -5,6 +5,7 @@ interface Props<T> {
   scroll?: boolean;
   offset?: number;
   align?: 'center' | 'left';
+  initialTab?: T;
 }
 
 export const useTab = <T extends { name: string; id: string }>({
@@ -12,8 +13,9 @@ export const useTab = <T extends { name: string; id: string }>({
   scroll = false,
   offset = 0,
   align = 'center',
+  initialTab,
 }: Props<T>) => {
-  const [currentTab, setCurrentTab] = useState(tabList[0]);
+  const [currentTab, setCurrentTab] = useState(initialTab || tabList[0]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<
     Record<string, HTMLDivElement | HTMLButtonElement | null>

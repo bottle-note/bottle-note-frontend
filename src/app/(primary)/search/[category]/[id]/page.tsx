@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 import Star from '@/components/ui/Display/Star';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
-import ReviewItem from '@/app/(primary)/search/[category]/[id]/_components/ReviewItem';
+import ReviewListItem from '@/app/(primary)/search/[category]/[id]/_components/ReviewListItem';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import NavLayout from '@/components/ui/Layout/NavLayout';
 import StarRating from '@/components/ui/Form/StarRating';
@@ -25,8 +25,8 @@ import AlcoholDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/Alc
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import useDebounceAction from '@/hooks/useDebounceAction';
-import FloatingReviewBtn from './_components/FloatingReviewBtn';
-import AlcoholBox from './_components/AlcoholBox';
+import FloatingReviewButton from './_components/FloatingReviewButton';
+import AlcoholDetailHeader from './_components/AlcoholDetailHeader';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 interface DetailItem {
@@ -225,7 +225,7 @@ export default function SearchAlcohol() {
                   </SubHeader.Right>
                 </SubHeader>
 
-                <AlcoholBox
+                <AlcoholDetailHeader
                   data={data?.alcohols}
                   isPicked={isPicked}
                   setIsPicked={setIsPicked}
@@ -309,7 +309,7 @@ export default function SearchAlcohol() {
                     <div className="border-b border-mainGray/30" />
                     {data.reviewInfo.reviewList.map((review) => (
                       <React.Fragment key={review.reviewId}>
-                        <ReviewItem
+                        <ReviewListItem
                           data={review}
                           onRefresh={refreshAlcoholDetails}
                         />
@@ -352,7 +352,7 @@ export default function SearchAlcohol() {
           </>
         )}
         {data?.alcohols?.alcoholId && (
-          <FloatingReviewBtn alcoholId={String(data.alcohols.alcoholId)} />
+          <FloatingReviewButton alcoholId={String(data.alcohols.alcoholId)} />
         )}
       </NavLayout>
     </>

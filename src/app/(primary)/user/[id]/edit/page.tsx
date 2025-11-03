@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
@@ -27,7 +27,14 @@ export default function UserEditPage({
   const { handleModalState, handleCloseModal } = useModalStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isOptionShow, setIsOptionShow] = useState(false);
-  const [profileImg, setProfileImg] = useState(userData?.profile);
+  const [profileImg, setProfileImg] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const userInfo = await UserApi.getUserInfo({ userId: id });
+      setProfileImg(userInfo.imageUrl);
+    })();
+  }, [id]);
 
   async function handleUploadImg(data: File) {
     const imgData = await uploadImages('userProfile', [data]);

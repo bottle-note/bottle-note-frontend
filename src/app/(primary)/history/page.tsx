@@ -15,7 +15,7 @@ import { HistoryListApi, HistoryListQueryParams } from '@/types/History';
 import { RATING_NUM_VALUES, PICKS_STATUS } from '@/constants/history';
 import { CurrentUserInfoApi } from '@/types/User';
 import Timeline from '@/components/domain/history/Timeline';
-import FilterSideModal from './_components/filter/FilterSideModal';
+import HistoryFilterModal from './_components/filter/HistoryFilterModal';
 
 export default function History() {
   const queryClient = useQueryClient();
@@ -171,7 +171,7 @@ export default function History() {
           error={error}
         />
       </main>
-      <FilterSideModal isOpen={isOpen} onClose={handleClose} />
+      <HistoryFilterModal isOpen={isOpen} onClose={handleClose} />
     </NavLayout>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -17,6 +17,7 @@ import useModalStore from '@/store/modalStore';
 import useRelationshipsStore from '@/store/relationshipsStore';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
+import { LABEL_NAMES } from '@/constants/common';
 
 interface Props {
   data: RootReply | SubReply;
@@ -28,7 +29,7 @@ interface Props {
   onToggleSubReply?: () => void;
 }
 
-function Reply({
+const ReplyItem = memo(function ReplyItem({
   data,
   children,
   isReviewUser,
@@ -46,7 +47,6 @@ function Reply({
   const { handleBlockUser, handleUnblockUser } = useBlockActions();
 
   const [isOptionShow, setIsOptionShow] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isBlocked = isUserBlocked(data?.userId.toString());
 
   const handleUpdateSubReply = () => {
@@ -60,8 +60,11 @@ function Reply({
       setValue('replyToReplyUserName', data.nickName);
       setValue('parentReplyId', data.reviewReplyId);
 
-      if (textareaRef?.current) {
-        textareaRef.current.focus();
+      // rootReplyId 설정: SubReply면 rootReviewId 사용, RootReply면 자기 자신의 ID 사용
+      if ('rootReviewId' in data) {
+        setValue('rootReplyId', data.rootReviewId);
+      } else {
+        setValue('rootReplyId', data.reviewReplyId);
       }
     }
   };
@@ -74,7 +77,7 @@ function Reply({
         data.reviewReplyId.toString(),
       );
       if (result) {
-        await setIsRefetch(true);
+        setIsRefetch(true);
 
         handleModalState({
           isShowModal: true,
@@ -87,7 +90,7 @@ function Reply({
         });
       }
     } catch (error) {
-      console.error('Failed to delete review:', error);
+      console.error('Failed to delete reply:', error);
     }
   };
 
@@ -140,7 +143,7 @@ function Reply({
                   </p>
                   {isReviewUser && (
                     <Label
-                      name="리뷰 작성자"
+                      name={LABEL_NAMES.REVIEW_AUTHOR}
                       styleClass="border-mainCoral text-mainCoral px-[5.82px] py-[2.91px] rounded text-9"
                     />
                   )}
@@ -168,7 +171,7 @@ function Reply({
                 )}
               </div>
             </div>
-            <div className="text-15 text-mainDarkGray whitespace-pre-wrap break-words flex mt-[12px] mb-2">
+            <div className="text-15 text-mainDarkGray whitespace-pre-wrap break-words flex my-2">
               {'rootReviewId' in data && (
                 <div className="text-mainCoral mr-1">
                   {data?.parentReviewReplyAuthor}
@@ -179,10 +182,10 @@ function Reply({
           </>
         )}
         <div className="space-y-[14px]">
-          <div className="flex space-x-[6px]">
+          <div className="flex space-x-[6px] text-13">
             {data?.status !== 'DELETED' && !isBlocked && (
               <button
-                className="text-10 text-subCoral"
+                className=" text-subCoral"
                 onClick={() => {
                   if (isLoggedIn) {
                     updateReplyUser();
@@ -196,12 +199,14 @@ function Reply({
             )}
             {'subReplyCount' in data && data?.subReplyCount !== 0 && (
               <>
-                {!isBlocked && <p className="text-10 text-subCoral">·</p>}
+                {!isBlocked && data?.status !== 'DELETED' && (
+                  <p className="text-subCoral">·</p>
+                )}
                 <button
                   className="flex items-center space-x-[2px]"
                   onClick={handleUpdateSubReply}
                 >
-                  <div className="text-10 text-subCoral pr-[1px]">
+                  <div className="text-subCoral pr-[1px]">
                     답글 {data?.subReplyCount}개
                   </div>
                   <Image
@@ -211,8 +216,8 @@ function Reply({
                         : '/icon/arrow-down-subcoral.svg'
                     }
                     alt="arrowUpIcon"
-                    width={10}
-                    height={8}
+                    width={12}
+                    height={12}
                   />
                 </button>
               </>
@@ -245,6 +250,6 @@ function Reply({
       )}
     </>
   );
-}
+});
 
-export default Reply;
+export default ReplyItem;

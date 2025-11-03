@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useScrollState } from '@/hooks/useScrollState';
 import { useReviewWrite } from '@/hooks/useReviewWrite';
 
-const FloatingReviewBtn = ({ alcoholId }: { alcoholId: string }) => {
+const FloatingReviewButton = ({ alcoholId }: { alcoholId: string }) => {
   const { isAtTop, isVisible } = useScrollState();
   const { handleReviewWrite } = useReviewWrite();
 
@@ -51,4 +51,4 @@ const FloatingReviewBtn = ({ alcoholId }: { alcoholId: string }) => {
   );
 };
 
-export default FloatingReviewBtn;
+export default FloatingReviewButton;

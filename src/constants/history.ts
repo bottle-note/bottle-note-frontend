@@ -1,4 +1,4 @@
-import { Icons } from '@/app/(primary)/history/_components/Icons';
+import { Icons } from '@/app/(primary)/history/_components/HistoryIcons';
 
 export const RATING_NUM_VALUES = [
   '0.5',
