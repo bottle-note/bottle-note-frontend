@@ -166,10 +166,7 @@ export default function Timeline({
 
     return (
       <section className="p-5 mb-10 flex flex-col items-center w-full">
-        <div className="flex items-center justify-between mb-[0.65rem] w-full">
-          <span className="text-xs text-mainGray shrink-0">
-            {historyData ? `총 ${historyData.totalCount}개` : ''}
-          </span>
+        <div className="flex items-center justify-end mb-[0.65rem] w-full">
           <div className="flex items-center">
             <Image
               src={FilterIcon}
