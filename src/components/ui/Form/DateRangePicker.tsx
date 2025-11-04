@@ -114,7 +114,7 @@ export default function DateRangePicker({
           selectsEnd={selectingField === 'end'}
           inline
           minDate={selectingField === 'start' ? minDate : startDate || minDate}
-          maxDate={selectingField === 'end' ? maxDate : endDate || maxDate}
+          maxDate={selectingField === 'start' ? endDate || maxDate : maxDate}
           dateFormat="yy.MM.dd"
           wrapperClassName="w-full"
           calendarClassName="bg-white !border-mainCoral rounded-lg shadow-lg"
