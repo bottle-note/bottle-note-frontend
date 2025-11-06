@@ -12,6 +12,8 @@ function validateText(text: string) {
   return regex.test(text);
 }
 
+const TAGS_LIMIT = 15;
+
 export default function TagsForm() {
   const { handleModalState } = useModalStore();
   const { setValue, watch } = useFormContext();
@@ -101,10 +103,16 @@ export default function TagsForm() {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setTagValue(e.target.value);
               }}
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                if (e.key === 'Enter' && watchTags?.length < TAGS_LIMIT) {
+                  e.preventDefault();
+                  handleAddTag();
+                }
+              }}
             />
             <button
-              className={`text-15 px-2 py-1 rounded-md border w-24 ${watchTags?.length < 10 ? 'border-subCoral text-white bg-subCoral' : 'border-brightGray text-bgGray'}`}
-              disabled={watchTags?.length === 10}
+              className={`text-15 px-2 py-1 rounded-md border w-24 ${watchTags?.length < TAGS_LIMIT ? 'border-subCoral text-white bg-subCoral' : 'border-brightGray text-bgGray'}`}
+              disabled={watchTags?.length === TAGS_LIMIT}
               onClick={handleAddTag}
             >
               태그 등록
