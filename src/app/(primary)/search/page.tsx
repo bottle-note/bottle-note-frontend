@@ -179,8 +179,8 @@ export default function Search() {
               <section className="px-5">
                 {isPopularLoading ? (
                   <div className="flex flex-col gap-2">
-                    {Array.from({ length: 5 }).map((_, idx) => (
-                      <ListItemSkeleton key={idx} />
+                    {Array.from({ length: 5 }).map(() => (
+                      <ListItemSkeleton key={uuid()} />
                     ))}
                   </div>
                 ) : (

@@ -16,10 +16,6 @@ export const ROUTES = {
         `/search/${category}/${id}/reviews`,
     },
   },
-  DETAIL: {
-    BASE: (id: string | number) => `/detail/${id}`,
-    COMMENTS: (id: string | number) => `/detail/${id}/comments`,
-  },
   EXPLORE: {
     BASE: '/explore',
   },
