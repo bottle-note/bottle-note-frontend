@@ -1,13 +1,12 @@
 'use client';
 
 import { Suspense, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { v4 as uuid } from 'uuid';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
 import List from '@/components/feature/List/List';
 import { usePopularList } from '@/hooks/usePopularList';
-import { Category, RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
-import { useFilter } from '@/hooks/useFilter';
+import { Category, SORT_TYPE } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { AlcoholAPI } from '@/types/Alcohol';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
@@ -21,32 +20,21 @@ import { ROUTES } from '@/constants/routes';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
 import SearchContainer from '@/components/feature/Search/SearchContainer';
+import { useSearchPageState } from '@/hooks/useSearchPageState';
 
-interface InitialState {
-  keyword: string;
-  category: Category;
-  regionId: RegionId;
-  sortType: SORT_TYPE;
-  sortOrder: SORT_ORDER;
-}
+const SORT_OPTIONS = [
+  { name: '인기도순', type: SORT_TYPE.POPULAR },
+  { name: '별점순', type: SORT_TYPE.RATING },
+  { name: '찜하기순', type: SORT_TYPE.PICK },
+  { name: '댓글순', type: SORT_TYPE.REVIEW },
+];
 
 export default function Search() {
   const router = useRouter();
-  const { popularList, isLoading: isPopularLoading } = usePopularList();
   const { isLoggedIn } = useAuth();
-  const currCategory = useSearchParams().get('category') as Category;
-  const currSearchKeyword = useSearchParams().get('query');
-  const isEmptySearch = currCategory === null && currSearchKeyword === null;
-
-  const initialState: InitialState = {
-    category: currCategory || '',
-    keyword: currSearchKeyword || '',
-    regionId: '',
-    sortType: SORT_TYPE.POPULAR,
-    sortOrder: SORT_ORDER.DESC,
-  };
-
-  const { state: filterState, handleFilter } = useFilter(initialState);
+  const { popularList, isLoading: isPopularLoading } = usePopularList();
+  const { filterState, handleFilter, isEmptySearch, urlKeyword } =
+    useSearchPageState();
 
   const {
     data: alcoholList,
@@ -69,13 +57,15 @@ export default function Search() {
     queryFn: ({ pageParam }) => {
       return AlcoholsApi.getList({
         ...filterState,
+        regionId:
+          filterState.regionId === '' ? '' : Number(filterState.regionId),
         ...{
           cursor: pageParam,
           pageSize: 10,
         },
       });
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
   });
 
   const { handleModalState, handleCloseModal, handleLoginModal } =
@@ -101,24 +91,11 @@ export default function Search() {
 
   const handleSearchCallback = (searchedKeyword: string) => {
     handleFilter('keyword', searchedKeyword);
-    router.replace(
-      `/search?category=${currCategory ?? ''}&query=${searchedKeyword ?? ''}`,
-    );
   };
 
   const handleCategoryCallback = (selectedCategory: Category) => {
     handleFilter('category', selectedCategory);
-    router.replace(
-      `/search?category=${selectedCategory}&query=${currSearchKeyword ?? ''}`,
-    );
   };
-
-  const SORT_OPTIONS = [
-    { name: '인기도순', type: SORT_TYPE.POPULAR },
-    { name: '별점순', type: SORT_TYPE.RATING },
-    { name: '찜하기순', type: SORT_TYPE.PICK },
-    { name: '댓글순', type: SORT_TYPE.REVIEW },
-  ];
 
   const {
     currentTab: categorySelectedTab,
@@ -139,11 +116,11 @@ export default function Search() {
   });
 
   useEffect(() => {
-    if (currSearchKeyword && currSearchKeyword.trim() !== '') {
+    if (urlKeyword && urlKeyword.trim() !== '') {
       const searchHistory = new SearchHistoryService();
-      searchHistory.save(currSearchKeyword);
+      searchHistory.save(urlKeyword);
     }
-  }, [currSearchKeyword]);
+  }, [urlKeyword]);
 
   return (
     <Suspense>
@@ -186,12 +163,7 @@ export default function Search() {
                 ) : (
                   <List>
                     {popularList.map((item: AlcoholAPI) => (
-                      <List.Item
-                        key={item.alcoholId}
-                        data={{
-                          ...item,
-                        }}
-                      />
+                      <List.Item key={item.alcoholId} data={item} />
                     ))}
                   </List>
                 )}
@@ -213,6 +185,7 @@ export default function Search() {
                 />
                 <List.OptionSelect
                   options={SORT_OPTIONS}
+                  currentValue={filterState.sortType}
                   handleOptionCallback={(value) =>
                     handleFilter('sortType', value)
                   }
@@ -222,6 +195,7 @@ export default function Search() {
                     type: String(region.regionId),
                     name: region.korName,
                   }))}
+                  currentValue={filterState.regionId}
                   handleOptionCallback={(value) =>
                     handleFilter('regionId', value)
                   }
