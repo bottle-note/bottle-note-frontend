@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { UserInfoApi } from '@/types/User';
 import { UserApi } from '@/app/api/UserApi';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
-import Timeline from '@/components/domain/history/Timeline';
+import TimelinePreview from '@/components/domain/history/TimelinePreview';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import useModalStore from '@/store/modalStore';
 import { useAuth } from '@/hooks/auth/useAuth';
@@ -106,8 +106,7 @@ export default function User({ params: { id } }: { params: { id: string } }) {
                 </p>
               </div>
 
-              <Timeline
-                variant="preview"
+              <TimelinePreview
                 data={historyData}
                 limit={7}
                 showGradient={true}
