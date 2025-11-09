@@ -26,14 +26,17 @@ export default function RootLayout({
     <html lang="en" className="touch-manipulation">
       <body suppressHydrationWarning>
         <Providers>
-          <div className="relative">
+          <div className="relative w-full bg-bgGray">
             {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID &&
               process.env.NODE_ENV === 'production' && (
                 <GoogleAnalytics
                   gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}
                 />
               )}
-            {children}
+            <div className="max-w-[430px] justify-center items-center mx-auto">
+              {children}
+            </div>
+
             <div id="modal" />
           </div>
         </Providers>
