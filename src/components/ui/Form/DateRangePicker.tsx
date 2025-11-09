@@ -7,8 +7,8 @@ import CalendarSubcoralIcon from 'public/icon/calendar-subcoral.svg';
 import 'react-datepicker/dist/react-datepicker.css';
 
 interface Props {
-  startDate: Date;
-  endDate: Date;
+  startDate: Date | null;
+  endDate: Date | null;
   onChange: (start: Date | null, end: Date | null) => void;
   minDate: Date;
   maxDate: Date;
@@ -25,6 +25,9 @@ export default function DateRangePicker({
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [selectingField, setSelectingField] = useState<'start' | 'end'>(
+    'start',
+  );
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -54,18 +57,34 @@ export default function DateRangePicker({
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center">
             <span className="text-mainCoral text-12">
-              {format(startDate, 'yy.MM.dd')}
+              {startDate ? format(startDate, 'yy.MM.dd') : 'YY.MM.DD'}
             </span>
-            <button onClick={() => setIsOpen((prev) => !prev)} className="ml-2">
+            <button
+              onClick={() => {
+                setSelectingField('start');
+                if (!isOpen) {
+                  setIsOpen(true);
+                }
+              }}
+              className="ml-2"
+            >
               <Image src={CalendarSubcoralIcon} alt="calendar" />
             </button>
           </div>
           <span className="text-black text-12">~</span>
           <div className="flex items-center">
             <span className="text-mainCoral text-12">
-              {format(endDate, 'yy.MM.dd')}
+              {endDate ? format(endDate, 'yy.MM.dd') : 'YY.MM.DD'}
             </span>
-            <button onClick={() => setIsOpen((prev) => !prev)} className="ml-2">
+            <button
+              onClick={() => {
+                setSelectingField('end');
+                if (!isOpen) {
+                  setIsOpen(true);
+                }
+              }}
+              className="ml-2"
+            >
               <Image src={CalendarSubcoralIcon} alt="calendar" />
             </button>
           </div>
@@ -81,16 +100,21 @@ export default function DateRangePicker({
           locale={ko}
           monthClassName={() => '!text-white'}
           weekDayClassName={() => '!text-white'}
-          onChange={(dates) => {
-            const [start, end] = dates;
-            onChange(start, end);
+          onChange={(date) => {
+            if (selectingField === 'start') {
+              onChange(date, endDate);
+            } else {
+              onChange(startDate, date);
+            }
           }}
+          selected={selectingField === 'start' ? startDate : endDate}
           startDate={startDate}
           endDate={endDate}
-          selectsRange
+          selectsStart={selectingField === 'start'}
+          selectsEnd={selectingField === 'end'}
           inline
-          minDate={minDate}
-          maxDate={maxDate}
+          minDate={selectingField === 'start' ? minDate : startDate || minDate}
+          maxDate={selectingField === 'start' ? endDate || maxDate : maxDate}
           dateFormat="yy.MM.dd"
           wrapperClassName="w-full"
           calendarClassName="bg-white !border-mainCoral rounded-lg shadow-lg"
