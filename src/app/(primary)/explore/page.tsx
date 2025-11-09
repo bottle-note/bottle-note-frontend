@@ -45,7 +45,7 @@ export default function ExplorePage() {
 
   return (
     <Suspense>
-      <div className="fixed top-0 left-0 right-0 bg-white z-10">
+      <div className="fixed top-0 left-0 right-0 bg-white z-10 max-w-[430px] justify-center items-center mx-auto">
         <SubHeader>
           <SubHeader.Left showLogo />
           <SubHeader.Right showSideMenu />
@@ -59,7 +59,7 @@ export default function ExplorePage() {
           registerTab={registerTab}
         />
       </div>
-      <section className="w-full h-full mt-[100px] p-4 md:p-6 pt-14">
+      <section className="w-full h-full p-4 mt-[140px]">
         {currentTab.id === 'EXPLORER_WHISKEY' && <WhiskeyExplorerList />}
         {currentTab.id === 'REVIEW_WHISKEY' && <ReviewExplorerList />}
       </section>
