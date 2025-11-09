@@ -22,7 +22,7 @@ function Modal({ children }: Props) {
 
   return (
     <BackDrop isShow={state.isShowModal}>
-      <div className="w-full h-full flex flex-col justify-center items-center px-4 gap-3">
+      <div className="w-full h-full flex flex-col justify-center items-center px-4 gap-3 max-w-[430px] mx-auto">
         <section className="relative w-full min-h-52 pt-16 pb-4 bg-white rounded-xl text-center flex flex-col items-center space-y-3 px-4">
           <article className="absolute top-[-10px]">
             <Image
