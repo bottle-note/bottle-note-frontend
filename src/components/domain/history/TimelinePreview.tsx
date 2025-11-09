@@ -41,14 +41,12 @@ export default function TimelinePreview({
   const historyList: HistoryType[] = historyData?.userHistories || [];
   const totalCount = historyData?.totalCount || 0;
 
-  const gradientHeight = useMemo(() => {
-    if (showGradient) {
-      if (totalCount < 3) return '0px';
-      if (totalCount === 3) return '150px';
-      return '400px';
-    }
-    return '0px';
-  }, [showGradient, totalCount]);
+  let gradientHeight = '0px';
+  if (showGradient) {
+    if (totalCount < 3) gradientHeight = '0px';
+    else if (totalCount === 3) gradientHeight = '150px';
+    else gradientHeight = '400px';
+  }
 
   useEffect(() => {
     if (historyList.length === 0) {
