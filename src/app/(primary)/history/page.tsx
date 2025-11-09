@@ -157,10 +157,7 @@ export default function History() {
         <TimelineFull
           data={accumulatedHistories}
           isLastPage={
-            !!(
-              historyData &&
-              !historyData[historyData.length - 1].meta.pageable?.hasNext
-            )
+            !!(historyData && !historyData.at(-1)?.meta.pageable?.hasNext)
           }
           currentUserInfo={currentUserInfo}
           handleOpenFilterModal={() => setIsOpen(true)}
