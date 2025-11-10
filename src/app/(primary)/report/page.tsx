@@ -15,7 +15,7 @@ import { useErrorModal } from '@/hooks/useErrorModal';
 import useModalStore from '@/store/modalStore';
 import OptionSelect from '@/components/feature/List/OptionSelect';
 import Loading from '@/components/ui/Loading/Loading';
-import { REPORT_TYPE } from '@/app/(primary)/report/_constants/index';
+import { REPORT_TYPE } from '@/constants/Report';
 
 type ReportType = 'review' | 'comment' | 'user';
 
