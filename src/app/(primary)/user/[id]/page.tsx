@@ -67,6 +67,15 @@ export default function User({ params: { id } }: { params: { id: string } }) {
     })();
   }, [id]);
 
+  const isMyPage = loginUserData?.userId === Number(id);
+  const nickName = userData?.nickName;
+
+  const historyTitle = (() => {
+    if (isMyPage) return '나의 보틀 여정 히스토리';
+    if (nickName) return `${nickName}의 보틀 여정 히스토리`;
+    return '';
+  })();
+
   return (
     <NavLayout>
       <main className="text-mainBlack mb-24">
@@ -100,7 +109,7 @@ export default function User({ params: { id } }: { params: { id: string } }) {
           <article>
             <div className="mb-[26px]">
               <div className="font-semibold">
-                <p className="text-15 text-subCoral">나의 보틀 여정 히스토리</p>
+                <p className="text-15 text-subCoral">{historyTitle}</p>
                 <p className="text-10 text-brightGray">
                   별점, 평가, 찜하기 활동내역을 살펴볼 수 있어요.
                 </p>

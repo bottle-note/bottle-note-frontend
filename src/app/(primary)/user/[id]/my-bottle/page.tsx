@@ -110,6 +110,21 @@ export default function MyBottle({
     handleTab(myBottleType);
   }, []);
 
+  const isMyPage = alcoholList?.[0]?.data.isMyPage;
+  const nickName = userInfo?.nickName;
+
+  const headerTitle = (() => {
+    if (isMyPage) return '마이보틀';
+    if (nickName) return `${nickName}의 보틀`;
+    return '';
+  })();
+
+  const listTitle = (() => {
+    if (isMyPage) return `나의 ${currentTab.name}`;
+    if (nickName) return `${nickName}님의 ${currentTab.name}`;
+    return '';
+  })();
+
   return (
     <Suspense>
       <main>
@@ -126,7 +141,7 @@ export default function MyBottle({
               height={23}
             />
           </SubHeader.Left>
-          <SubHeader.Center>마이보틀</SubHeader.Center>
+          <SubHeader.Center>{headerTitle}</SubHeader.Center>
         </SubHeader>
 
         <SearchContainer
@@ -151,9 +166,7 @@ export default function MyBottle({
               (!alcoholList || alcoholList[0]?.data.myBottleList.length === 0)
             }
           >
-            <List.Title
-              title={`${userInfo ? `${userInfo.nickName}님` : '나'}의 ${currentTab.name}`}
-            />
+            <List.Title title={listTitle} />
             <List.Total
               total={alcoholList ? alcoholList[0].data.totalCount : 0}
             />
@@ -211,6 +224,7 @@ export default function MyBottle({
                           data={
                             item as PickMyBottleListResponse['myBottleList'][number]
                           }
+                          isMyPage={isMyPage}
                           key={
                             (
                               item as PickMyBottleListResponse['myBottleList'][number]
