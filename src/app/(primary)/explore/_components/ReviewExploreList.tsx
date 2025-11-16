@@ -17,13 +17,11 @@ export const ReviewExplorerList = () => {
   const searchParams = useSearchParams();
 
   // URL에서 키워드 읽기 (초기값)
-  const keywordsFromUrl = searchParams.get('keywords');
-  const initialKeywords: SearchKeyword[] = keywordsFromUrl
-    ? keywordsFromUrl.split(',').map((value) => ({
-        label: value,
-        value: value,
-      }))
-    : [];
+  const keywordsArray = searchParams.getAll('keywords');
+  const initialKeywords: SearchKeyword[] = keywordsArray.map((value) => ({
+    label: value,
+    value: value,
+  }));
 
   const [keywords, setKeywords] = useState<SearchKeyword[]>(initialKeywords);
 
@@ -33,12 +31,13 @@ export const ReviewExplorerList = () => {
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (keywords.length > 0) {
-      const keywordString = keywords.map((k) => k.value).join(',');
-      params.set('keywords', keywordString);
-    } else {
-      params.delete('keywords');
-    }
+    // 기존 keywords 파라미터 모두 제거
+    params.delete('keywords');
+
+    // 각 키워드를 개별 파라미터로 추가
+    keywords.forEach((keyword) => {
+      params.append('keywords', keyword.value);
+    });
 
     const newUrl = `${pathname}?${params.toString()}`;
     router.replace(newUrl, { scroll: false });
