@@ -40,9 +40,10 @@ export const SearchBar = ({
     handleSearch();
   };
 
-  const { searchText, inputRef, handleChange, handleSubmit } = useSearchInput({
-    onSearch: onAddKeyword,
-  });
+  const { searchText, inputRef, handleChange, handleSubmit, handleKeyDown } =
+    useSearchInput({
+      onSearch: onAddKeyword,
+    });
 
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Set<string>>(
@@ -141,12 +142,7 @@ export const SearchBar = ({
           className="w-full py-2.5 px-2 border-b-2 border-gray-200 focus:border-amber-500 outline-none bg-transparent text-base placeholder-mainGray placeholder:text-13 transition-colors appearance-none rounded-none"
           value={searchText}
           onChange={(e) => handleChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleSubmit();
-            }
-          }}
+          onKeyDown={handleKeyDown}
         />
 
         <div className="flex justify-end gap-[7px] absolute top-2.5 right-0">
