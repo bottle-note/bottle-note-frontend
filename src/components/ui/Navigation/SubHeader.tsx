@@ -17,20 +17,13 @@ import Menu from 'public/icon/menu-subcoral.svg';
 interface HeaderLeftProps {
   children?: ReactNode;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
-  showLogo?: boolean;
 }
 
-const HeaderLeft = ({
-  children,
-  onClick,
-  showLogo = false,
-}: HeaderLeftProps) => {
-  if (showLogo) {
-    return (
-      <Link href={ROUTES.HOME}>
-        <Image src={Logo} alt="Logo" priority />
-      </Link>
-    );
+const HeaderLeft = ({ children, onClick }: HeaderLeftProps) => {
+  if (!children) return null;
+
+  if (!onClick) {
+    return <div>{children}</div>;
   }
 
   return (
@@ -71,15 +64,14 @@ const HeaderCenter = ({
 interface HeaderRightProps {
   children?: ReactNode;
   onClick?: (e: MouseEvent<HTMLDivElement>) => void;
-  showSideMenu?: boolean;
 }
 
-const HeaderRight = ({
-  children,
-  onClick,
-  showSideMenu = false,
-}: HeaderRightProps) => {
-  const { isLoggedIn } = useAuth();
+const HeaderRight = ({ children, onClick }: HeaderRightProps) => {
+  if (!children) return null;
+
+  if (!onClick) {
+    return <div>{children}</div>;
+  }
 
   return (
     <div
@@ -89,15 +81,33 @@ const HeaderRight = ({
           onClick?.(e as unknown as MouseEvent<HTMLDivElement>);
         }
       }}
+      role="button"
+      tabIndex={0}
+      className="cursor-pointer"
     >
       {children}
-      <div className="pt-2">
-        {showSideMenu && isLoggedIn ? (
-          <Link href={ROUTES.SETTINGS.BASE}>
-            <Image src={Menu} alt="Settings" />
-          </Link>
-        ) : null}
-      </div>
+    </div>
+  );
+};
+
+const HeaderLogo = () => {
+  return (
+    <Link href={ROUTES.HOME}>
+      <Image src={Logo} alt="Logo" priority />
+    </Link>
+  );
+};
+
+const HeaderMenu = () => {
+  const { isLoggedIn } = useAuth();
+
+  if (!isLoggedIn) return null;
+
+  return (
+    <div className="pt-2">
+      <Link href={ROUTES.SETTINGS.BASE}>
+        <Image src={Menu} alt="Settings" />
+      </Link>
     </div>
   );
 };
@@ -145,4 +155,6 @@ export const SubHeader = Object.assign(SubHeaderMain, {
   Left: HeaderLeft,
   Center: HeaderCenter,
   Right: HeaderRight,
+  Logo: HeaderLogo,
+  Menu: HeaderMenu,
 });

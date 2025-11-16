@@ -15,12 +15,19 @@ import ReviewInteractionBar from './ReviewInteractionBar';
 
 interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;
+  alcoholId: number;
   handleLogin: () => void;
   onRefresh: () => void;
   textareaRef?: React.MutableRefObject<HTMLTextAreaElement | null>;
 }
 
-function ReviewDetails({ data, handleLogin, onRefresh, textareaRef }: Props) {
+function ReviewDetails({
+  data,
+  alcoholId,
+  handleLogin,
+  onRefresh,
+  textareaRef,
+}: Props) {
   const { user: userData } = useAuth();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(data?.reviewInfo?.isLikedByMe);
@@ -103,7 +110,7 @@ function ReviewDetails({ data, handleLogin, onRefresh, textareaRef }: Props) {
         reviewId={String(data.reviewInfo?.reviewId)}
         userId={String(data.reviewInfo?.userInfo?.userId)}
         userNickname={data.reviewInfo?.userInfo?.nickName}
-        onRefresh={onRefresh}
+        alcoholId={alcoholId}
       />
     </>
   );

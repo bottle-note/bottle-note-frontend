@@ -187,6 +187,7 @@ export default function ReviewDetail() {
             </div>
             <ReviewDetails
               data={reviewDetails}
+              alcoholId={alcoholInfo.alcoholId}
               handleLogin={handleLogin}
               onRefresh={fetchReviewDetails}
               textareaRef={textareaRef}

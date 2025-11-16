@@ -134,6 +134,21 @@ const AccordionItemContent = ({
   ${IconComponent ? 'justify-between w-full' : 'justify-center'}
 `;
 
+  const renderTitle = () => {
+    if (title.includes('/')) {
+      const slashIndex = title.indexOf('/');
+      const firstPart = title.substring(0, slashIndex + 1);
+      const secondPart = title.substring(slashIndex + 1);
+      return (
+        <span className="flex flex-col items-center leading-tight">
+          <span>{firstPart}</span>
+          <span>{secondPart}</span>
+        </span>
+      );
+    }
+    return <span>{title}</span>;
+  };
+
   return (
     <div
       className={baseStyles}
@@ -154,10 +169,10 @@ const AccordionItemContent = ({
             {IconComponent && (
               <IconComponent color={isSelected ? '#FFFFFF' : '#BFBFBF'} />
             )}
-            <span>{title}</span>
+            {renderTitle()}
           </div>
         )}
-        {!IconComponent && <span>{title}</span>}
+        {!IconComponent && renderTitle()}
         {isSelected && <Image src={CheckedIcon} alt="CheckedIcon" />}
       </div>
     </div>

@@ -7,7 +7,7 @@ import { useDebouncedToggle } from '@/hooks/useDebouncedToggle';
 
 interface Props {
   isPicked: boolean;
-  handleUpdatePicked: () => void;
+  handleUpdatePicked?: () => void;
   onApiSuccess?: () => void;
   onApiError?: () => void;
   handleNotLogin: () => void;
@@ -44,6 +44,10 @@ const AlcoholPickButton = ({
   const handleClick = async () => {
     if (!isLoggedIn) {
       handleNotLogin();
+      return;
+    }
+
+    if (!handleUpdatePicked) {
       return;
     }
 

@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { subMonths } from 'date-fns';
 import type {
   FilterState,
   ReviewFilterType,
@@ -17,16 +16,6 @@ interface HistoryFilterStore {
   getQueryParams: () => URLSearchParams;
 }
 
-// 기본 날짜 설정 함수
-const getDefaultDates = () => {
-  const today = new Date();
-  const monthAgo = subMonths(today, 1);
-  return {
-    startDate: monthAgo,
-    endDate: today,
-  };
-};
-
 // 서버에서 param으로 요청하는 날짜 포맷으로 변경
 const formatToNanoISOString = (isoString: string): string => {
   const formattedDate = isoString.replace('Z', '');
@@ -40,7 +29,7 @@ const initialState: FilterState = {
   ratingPoint: [],
   historyReviewFilterType: [],
   picksStatus: [],
-  date: getDefaultDates(),
+  date: { startDate: null, endDate: null },
   keyword: '',
 };
 
