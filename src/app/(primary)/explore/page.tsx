@@ -47,8 +47,12 @@ export default function ExplorePage() {
     <Suspense>
       <div className="fixed top-0 left-0 right-0 bg-white z-10">
         <SubHeader>
-          <SubHeader.Left showLogo />
-          <SubHeader.Right showSideMenu />
+          <SubHeader.Left>
+            <SubHeader.Logo />
+          </SubHeader.Left>
+          <SubHeader.Right>
+            <SubHeader.Menu />
+          </SubHeader.Right>
         </SubHeader>
         <Tab
           variant="bookmark"

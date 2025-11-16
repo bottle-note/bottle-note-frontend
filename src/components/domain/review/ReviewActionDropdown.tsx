@@ -3,7 +3,7 @@ import OptionDropdown from '@/components/ui/Modal/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 import useRelationshipsStore from '@/store/relationshipsStore';
 import { useBlockActions } from '@/hooks/useBlockActions';
-import { deleteReview } from '@/lib/Review';
+import { ReviewApi } from '@/app/api/ReviewApi';
 import { ROUTES } from '@/constants/routes';
 
 interface ReviewActionDropdownProps {
@@ -13,6 +13,7 @@ interface ReviewActionDropdownProps {
   reviewId: string;
   userId: string;
   userNickname: string;
+  alcoholId: string | number;
   onRefresh?: () => void;
 }
 
@@ -23,6 +24,7 @@ const ReviewActionDropdown = ({
   reviewId,
   userId,
   userNickname,
+  alcoholId,
   onRefresh,
 }: ReviewActionDropdownProps) => {
   const router = useRouter();
@@ -30,20 +32,30 @@ const ReviewActionDropdown = ({
   const { isUserBlocked } = useRelationshipsStore();
   const { handleBlockUser } = useBlockActions();
 
-  const handleCloseOption = () => {
-    handleModalState({
-      isShowModal: true,
-      mainText: '성공적으로 삭제되었습니다.',
-      handleConfirm: () => {
-        onClose();
-        handleCloseModal();
-        if (onRefresh) {
-          onRefresh();
-        } else {
-          router.back();
-        }
-      },
-    });
+  const deleteReview = async (reviewId: string | number) => {
+    if (!reviewId) return;
+
+    try {
+      const result = await ReviewApi.deleteReview(reviewId.toString());
+      if (result) {
+        handleModalState({
+          isShowModal: true,
+          type: 'ALERT',
+          mainText: '성공적으로 삭제되었습니다.',
+          handleConfirm: () => {
+            onClose();
+            handleCloseModal();
+            if (onRefresh) {
+              onRefresh();
+            } else {
+              router.push(ROUTES.SEARCH.ALL(alcoholId));
+            }
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Failed to delete review:', error);
+    }
   };
 
   const handleOptionSelect = (option: { name: string; type: string }) => {
@@ -53,7 +65,7 @@ const ReviewActionDropdown = ({
         mainText: '정말 삭제하시겠습니까?',
         type: 'CONFIRM',
         handleConfirm: () => {
-          deleteReview(reviewId, handleCloseOption);
+          deleteReview(reviewId);
         },
       });
     } else if (option.type === 'MODIFY') {

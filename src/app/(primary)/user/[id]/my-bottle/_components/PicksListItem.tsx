@@ -13,9 +13,10 @@ import { LABEL_NAMES } from '@/constants/common';
 
 interface Props {
   data: PickMyBottleListResponse['myBottleList'][number];
+  isMyPage?: boolean;
 }
 
-export const PicksListItem = ({ data }: Props) => {
+export const PicksListItem = ({ data, isMyPage }: Props) => {
   const {
     baseMyBottleInfo: {
       alcoholId,
@@ -65,12 +66,15 @@ export const PicksListItem = ({ data }: Props) => {
 
       {/* my rating point */}
       <div className="ml-auto pr-1 flex flex-col items-end">
-        {/* FIXME: api 에서 정보를 주면 노출 조건 변경 */}
-        <p className="text-10 text-mainGray font-bold">통했찜</p>
+        {!isMyPage && initialIsPicked && (
+          <p className="text-10 text-mainGray font-bold">통했찜</p>
+        )}
         <AlcoholPickButton
           isPicked={isPicked}
           alcoholId={alcoholId}
-          handleUpdatePicked={() => setIsPicked((prev) => !prev)}
+          handleUpdatePicked={
+            isMyPage ? () => setIsPicked((prev) => !prev) : undefined
+          }
           onApiError={() => setIsPicked(initialIsPicked)}
           size={25}
           iconColor="subcoral"

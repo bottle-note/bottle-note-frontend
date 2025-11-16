@@ -31,7 +31,7 @@ export default function AddressForm() {
   }, [currentLocationName]);
 
   const ExtraButtons = (
-    <div className="flex gap-1 text-12">
+    <div className="flex gap-1">
       <a
         href={watch('mapUrl') || '#'}
         onClick={(e) => {
@@ -64,12 +64,12 @@ export default function AddressForm() {
           }
         }}
       >
-        <p className="text-12 text-mainGray">주소삭제</p>
+        <p className="text-mainGray">주소삭제</p>
         <Image
           src="/icon/reset-mainGray.svg"
           alt="resetIcon"
-          width={13}
-          height={13}
+          width={16}
+          height={16}
         />
       </button>
     </div>
@@ -84,7 +84,7 @@ export default function AddressForm() {
         subTitle={currentLocationName ? '' : '(선택)'}
         forceOpen={searchModal}
       >
-        <article className="ml-7">
+        <article className="ml-7 text-14">
           {!watch('address') ? (
             <button
               className="w-full border-subCoral border rounded-lg py-2"
@@ -92,22 +92,20 @@ export default function AddressForm() {
                 setSearchModal(true);
               }}
             >
-              <p className="text-subCoral font-14 text-14">장소 검색</p>
+              <p className="text-subCoral">장소 검색</p>
             </button>
           ) : (
             <div className="w-full space-y-1">
               <div className="pb-1">{watch('mapUrl') && ExtraButtons}</div>
-              <p className="text-10 text-mainDarkGray">{watch('address')}</p>
-              <div className="flex items-center justify-between">
-                <div className="w-60 h-5 border-b border-subCoral flex items-center">
-                  <input
-                    type="text"
-                    placeholder="상세 주소를 입력하세요."
-                    className="text-10 font-[#BFBFBF] w-full text-mainDarkGray"
-                    maxLength={30}
-                    {...register('detailAddress')}
-                  />
-                </div>
+              <p className="text-mainDarkGray">{watch('address')}</p>
+              <div className="border-b border-subCoral">
+                <input
+                  type="text"
+                  placeholder="상세 주소를 입력하세요."
+                  className="w-full h-5 text-mainDarkGray bg-transparent border-none focus:outline-none placeholder:text-[#BFBFBF]"
+                  maxLength={30}
+                  {...register('detailAddress')}
+                />
               </div>
             </div>
           )}

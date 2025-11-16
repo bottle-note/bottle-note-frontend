@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { ROUTES } from '@/constants/routes';
 import { Review as ReviewType } from '@/types/Review';
 import ReviewListUserInfo from '@/app/(primary)/search/[category]/[id]/_components/ReviewListUserInfo';
@@ -21,6 +22,7 @@ interface Props {
 }
 
 function ReviewListItem({ data, onRefresh }: Props) {
+  const { id: alcoholId } = useParams();
   const { user: userData, isLoggedIn } = useAuth();
   const { isLikedByMe } = data;
   const { handleLoginModal } = useModalStore();
@@ -159,6 +161,7 @@ function ReviewListItem({ data, onRefresh }: Props) {
         reviewId={String(data.reviewId)}
         userId={String(data.userInfo.userId)}
         userNickname={data.userInfo.nickName}
+        alcoholId={alcoholId as string}
         onRefresh={onRefresh}
       />
     </>
