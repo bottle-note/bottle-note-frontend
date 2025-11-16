@@ -86,7 +86,7 @@ export default function Inquire() {
         <div ref={targetRef} />
       </section>
       <section>
-        <section className="px-5 fixed bottom-7 left-0 right-0">
+        <section className="px-5 fixed-container bottom-7">
           <Button
             onClick={() => {
               if (!isLoggedIn) {

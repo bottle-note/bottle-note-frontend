@@ -104,7 +104,18 @@ const config: Config = {
       },
     },
   },
-  plugins: [require('tailwind-scrollbar-hide'), require('tailwindcss-animate')],
+  plugins: [
+    require('tailwind-scrollbar-hide'),
+    require('tailwindcss-animate'),
+    // 커스텀 유틸리티 추가
+    function ({ addUtilities }: any) {
+      addUtilities({
+        '.fixed-container': {
+          '@apply fixed left-0 right-0 max-w-[430px] mx-auto': {},
+        },
+      });
+    },
+  ],
 };
 
 export default config;
