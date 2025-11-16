@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { v4 as uuid } from 'uuid';
 import { ExploreReview } from '@/types/Explore';
@@ -11,9 +12,37 @@ import { SearchBar, type SearchKeyword } from './SearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
 
 export const ReviewExplorerList = () => {
-  const [keywords, setKeywords] = useState<SearchKeyword[]>([]);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // URL에서 키워드 읽기 (초기값)
+  const keywordsFromUrl = searchParams.get('keywords');
+  const initialKeywords: SearchKeyword[] = keywordsFromUrl
+    ? keywordsFromUrl.split(',').map((value) => ({
+        label: value,
+        value: value,
+      }))
+    : [];
+
+  const [keywords, setKeywords] = useState<SearchKeyword[]>(initialKeywords);
 
   const keywordValues = keywords.map((keyword) => keyword.value);
+
+  // keywords가 변경될 때 URL 업데이트
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (keywords.length > 0) {
+      const keywordString = keywords.map((k) => k.value).join(',');
+      params.set('keywords', keywordString);
+    } else {
+      params.delete('keywords');
+    }
+
+    const newUrl = `${pathname}?${params.toString()}`;
+    router.replace(newUrl, { scroll: false });
+  }, [keywords, pathname, router, searchParams]);
 
   const {
     data: reviewList,
