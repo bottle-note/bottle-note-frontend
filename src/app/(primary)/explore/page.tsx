@@ -11,11 +11,11 @@ import { WhiskeyExplorerList } from './_components/WhiskeyExploreList';
 export default function ExplorePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const tabFromUrl = searchParams.get('tab') || 'EXPLORER_WHISKEY';
+  const tabFromUrl = searchParams.get('tab') || 'REVIEW_WHISKEY';
 
   const tabList = [
-    { name: '위스키 둘러보기', id: 'EXPLORER_WHISKEY' },
     { name: '리뷰 둘러보기', id: 'REVIEW_WHISKEY' },
+    { name: '위스키 둘러보기', id: 'EXPLORER_WHISKEY' },
   ];
 
   const initialTab = tabList.find((tab) => tab.id === tabFromUrl) || tabList[0];
