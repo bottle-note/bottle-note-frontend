@@ -1,4 +1,4 @@
-import { subMonths, subYears, isAfter, isBefore } from 'date-fns';
+import { subYears, isAfter, isBefore } from 'date-fns';
 import DateRangePicker from '@/components/ui/Form/DateRangePicker';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
 
@@ -6,15 +6,6 @@ const MAX_YEARS = 2;
 
 export default function HistoryFilterDateRange() {
   const { state: filterState, setDate } = useHistoryFilterStore();
-
-  const getDefaultDates = () => {
-    const today = new Date();
-    const monthAgo = subMonths(today, 1);
-    return {
-      startDate: monthAgo,
-      endDate: today,
-    };
-  };
 
   const getDateLimits = () => {
     const today = new Date();
@@ -34,26 +25,22 @@ export default function HistoryFilterDateRange() {
     let fixedStartDate = startDate;
     let fixedEndDate = endDate;
 
-    if (!fixedEndDate) {
-      fixedEndDate = today;
-    }
-
-    if (isAfter(fixedEndDate, today)) {
-      fixedEndDate = today;
-    }
-
-    if (!fixedStartDate) {
-      fixedStartDate = subMonths(fixedEndDate, 1);
-    }
-
-    if (isBefore(fixedStartDate, minDate)) {
-      fixedStartDate = minDate;
-    }
-
+    // 날짜가 모두 null이면 그대로 유지 (필터 없음)
     if (!startDate && !endDate) {
-      const defaultDates = getDefaultDates();
-      fixedStartDate = defaultDates.startDate;
-      fixedEndDate = defaultDates.endDate;
+      return {
+        startDate: null,
+        endDate: null,
+      };
+    }
+
+    // 종료일이 오늘보다 미래면 오늘로 설정
+    if (fixedEndDate && isAfter(fixedEndDate, today)) {
+      fixedEndDate = today;
+    }
+
+    // 시작일이 최소 날짜보다 이전이면 최소 날짜로 설정
+    if (fixedStartDate && isBefore(fixedStartDate, minDate)) {
+      fixedStartDate = minDate;
     }
 
     return {
@@ -74,8 +61,8 @@ export default function HistoryFilterDateRange() {
 
   return (
     <DateRangePicker
-      startDate={filterState.date.startDate || getDefaultDates().startDate}
-      endDate={filterState.date.endDate || getDefaultDates().endDate}
+      startDate={filterState.date.startDate}
+      endDate={filterState.date.endDate}
       onChange={handleDate}
       minDate={getDateLimits().minDate}
       maxDate={getDateLimits().maxDate}

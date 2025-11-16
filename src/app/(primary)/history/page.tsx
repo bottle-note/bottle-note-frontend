@@ -14,7 +14,7 @@ import { UserApi } from '@/app/api/UserApi';
 import { HistoryListApi, HistoryListQueryParams } from '@/types/History';
 import { RATING_NUM_VALUES, PICKS_STATUS } from '@/constants/history';
 import { CurrentUserInfoApi } from '@/types/User';
-import Timeline from '@/components/domain/history/Timeline';
+import TimelineFull from '@/components/domain/history/TimelineFull';
 import HistoryFilterModal from './_components/filter/HistoryFilterModal';
 
 export default function History() {
@@ -146,7 +146,9 @@ export default function History() {
           />
         </SubHeader.Left>
         <SubHeader.Center>나의 히스토리</SubHeader.Center>
-        <SubHeader.Right showSideMenu />
+        <SubHeader.Right>
+          <SubHeader.Menu />
+        </SubHeader.Right>
       </SubHeader>
       <main>
         <SearchContainer
@@ -154,12 +156,10 @@ export default function History() {
           handleSearchCallback={handleSearchCallback}
           styleProps="px-5"
         />
-        <Timeline
-          variant="full"
+        <TimelineFull
           data={accumulatedHistories}
           isLastPage={
-            historyData &&
-            !historyData[historyData.length - 1].meta.pageable?.hasNext
+            !!(historyData && !historyData.at(-1)?.meta.pageable?.hasNext)
           }
           currentUserInfo={currentUserInfo}
           handleOpenFilterModal={() => setIsOpen(true)}

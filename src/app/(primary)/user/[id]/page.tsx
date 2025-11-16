@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { UserInfoApi } from '@/types/User';
 import { UserApi } from '@/app/api/UserApi';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
-import Timeline from '@/components/domain/history/Timeline';
+import TimelinePreview from '@/components/domain/history/TimelinePreview';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import useModalStore from '@/store/modalStore';
 import { useAuth } from '@/hooks/auth/useAuth';
@@ -67,12 +67,25 @@ export default function User({ params: { id } }: { params: { id: string } }) {
     })();
   }, [id]);
 
+  const isMyPage = loginUserData?.userId === Number(id);
+  const nickName = userData?.nickName;
+
+  const historyTitle = (() => {
+    if (isMyPage) return '나의 보틀 여정 히스토리';
+    if (nickName) return `${nickName}의 보틀 여정 히스토리`;
+    return '';
+  })();
+
   return (
     <NavLayout>
       <main className="text-mainBlack mb-24">
         <SubHeader>
-          <SubHeader.Left showLogo />
-          <SubHeader.Right showSideMenu />
+          <SubHeader.Left>
+            <SubHeader.Logo />
+          </SubHeader.Left>
+          <SubHeader.Right>
+            <SubHeader.Menu />
+          </SubHeader.Right>
         </SubHeader>
         <section className="bg-white px-5">
           <section className="border-t border-subCoral">
@@ -96,14 +109,13 @@ export default function User({ params: { id } }: { params: { id: string } }) {
           <article>
             <div className="mb-[26px]">
               <div className="font-semibold">
-                <p className="text-15 text-subCoral">나의 보틀 여정 히스토리</p>
+                <p className="text-15 text-subCoral">{historyTitle}</p>
                 <p className="text-10 text-brightGray">
                   별점, 평가, 찜하기 활동내역을 살펴볼 수 있어요.
                 </p>
               </div>
 
-              <Timeline
-                variant="preview"
+              <TimelinePreview
                 data={historyData}
                 limit={7}
                 showGradient={true}

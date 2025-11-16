@@ -25,7 +25,6 @@ export const ReviewListItem = ({ data }: Props) => {
       isHot,
     },
     reviewId,
-    isMyReview,
     reviewModifyAt,
     reviewContent,
     reviewTastingTags,
@@ -84,7 +83,7 @@ export const ReviewListItem = ({ data }: Props) => {
         )}
 
         <p className="text-10 text-mainGray">
-          {format(new Date(reviewModifyAt), 'yyyy.dd.MM')}
+          {format(new Date(reviewModifyAt), 'yyyy.MM.dd')}
         </p>
       </Link>
     </section>

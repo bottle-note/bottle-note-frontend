@@ -160,6 +160,7 @@ const ReviewListItem = ({ content }: Props) => {
         reviewId={String(content.reviewId)}
         userId={String(content.userInfo.userId)}
         userNickname={content.userInfo.nickName}
+        alcoholId={content.alcoholId}
       />
     </>
   );
