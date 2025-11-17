@@ -229,7 +229,7 @@ function Reviews() {
           )}
         </div>
       </section>
-      <section className="px-5  bottom-6  fixed-container">
+      <section className="px-5  bottom-6  fixed-content">
         <Button
           onClick={() => handleReviewWrite(alcoholId)}
           btnName="리뷰 작성"

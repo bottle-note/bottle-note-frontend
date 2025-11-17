@@ -75,7 +75,7 @@ function SearchContainer({
       </div>
 
       {isOnSearch && showRecentSearch && (
-        <div className="w-full fixed-container bottom-0 top-[115px] z-40 bg-white p-3 overflow-y-auto">
+        <div className="w-full fixed-content bottom-0 top-[115px] z-40 bg-white p-3 overflow-y-auto">
           <RecentSearch handleSearch={onSearch} />
         </div>
       )}

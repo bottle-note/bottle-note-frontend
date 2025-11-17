@@ -97,7 +97,7 @@ export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
 
   return (
     <div
-      className={`fixed-container  w-full max-w-2xl px-4 z-10 transition-all duration-500 ease-out ${
+      className={`fixed-content  w-full max-w-2xl px-4 z-10 transition-all duration-500 ease-out ${
         isVisible ? 'bottom-[6.7rem]' : 'bottom-8'
       }`}
     >

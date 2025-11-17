@@ -33,7 +33,7 @@ export default function RootLayout({
                   gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}
                 />
               )}
-            <div className="max-w-[430px] justify-center items-center mx-auto">
+            <div className="max-w-content justify-center items-center mx-auto">
               {children}
             </div>
 

@@ -45,7 +45,7 @@ export default function ExplorePage() {
 
   return (
     <Suspense>
-      <div className="fixed top-0 left-0 right-0 bg-white z-10 max-w-[430px] justify-center items-center mx-auto">
+      <div className="fixed-content top-0 bg-white z-10 justify-center items-center">
         <SubHeader>
           <SubHeader.Left>
             <SubHeader.Logo />

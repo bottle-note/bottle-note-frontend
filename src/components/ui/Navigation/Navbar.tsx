@@ -8,6 +8,7 @@ import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { useScrollState } from '@/hooks/useScrollState';
+import { cn } from '@/lib/utils';
 
 export interface NavItem {
   name: string;
@@ -109,9 +110,12 @@ function Navbar({ maxWidth }: { maxWidth: string }) {
 
   return (
     <nav
-      className={`fixed bottom-6 left-0 right-0 mx-auto w-full max-w-[${maxWidth}] px-4 z-10 transition-transform duration-300 ease-in-out ${
-        isVisible ? 'translate-y-0' : 'translate-y-[calc(100%+24px)]'
-      }`}
+      className={cn(
+        `fixed bottom-6 left-0 right-0 mx-auto w-full  px-4 z-10 transition-transform duration-300 ease-in-out
+      `,
+        isVisible ? 'translate-y-0' : 'translate-y-[calc(100%+24px)]',
+        maxWidth ? `max-w-[${maxWidth}]` : 'max-w-content',
+      )}
     >
       <section className="h-[4.4rem] flex justify-between bg-[#F6F6F6] py-4 px-[26px] rounded-[0.8rem] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
         {navItems.map((menu, index) => (
