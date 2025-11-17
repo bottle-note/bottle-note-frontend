@@ -14,7 +14,7 @@ const FloatingReviewButton = ({ alcoholId }: { alcoholId: string }) => {
 
   const getPositionClass = () => {
     const basePosition = isVisible ? 'bottom-[115px]' : 'bottom-[14px]';
-    return `${basePosition} right-[max(16px,calc((100vw-430px)/2+16px))]`;
+    return `${basePosition} right-[max(16px,calc((100vw-468px)/2+16px))]`;
   };
 
   return (

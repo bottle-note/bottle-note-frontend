@@ -17,7 +17,7 @@ export interface NavItem {
   requiresAuth?: boolean;
 }
 
-function Navbar({ maxWidth }: { maxWidth: string }) {
+function Navbar({ maxWidth }: { maxWidth?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const { user: userData, isLoggedIn } = useAuth();

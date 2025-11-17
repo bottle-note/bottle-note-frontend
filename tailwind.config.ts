@@ -24,7 +24,7 @@ const config: Config = {
   theme: {
     extend: {
       maxWidth: {
-        content: '430px',
+        content: '468px',
       },
       colors: {
         background: 'hsl(var(--background))',
