@@ -12,7 +12,7 @@ export default function Layout({
   const router = useRouter();
 
   return (
-    <main className="bg-white flex flex-col w-full mx-auto max-w-[430px] min-h-screen">
+    <main className="bg-white flex flex-col content-container min-h-screen">
       <SubHeader>
         <SubHeader.Left onClick={() => router.back()}>
           <Image

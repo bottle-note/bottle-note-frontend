@@ -178,30 +178,26 @@ export default function Settings() {
 
   return (
     <main>
-      <div className="relative z-20">
-        <SubHeader>
-          <SubHeader.Left onClick={getHeaderLeftOnClick()}>
-            <Image
-              src="/icon/arrow-left-subcoral.svg"
-              alt="arrowIcon"
-              width={23}
-              height={23}
-            />
-          </SubHeader.Left>
-          <SubHeader.Center>{getHeaderTitle()}</SubHeader.Center>
-        </SubHeader>
-      </div>
-
-      <div className=" bg-white fixed inset-0 flex flex-col pt-[104px]">
-        {currentScreen === 'main' ? (
-          <SettingsMainScreen menuCategories={menuCategories} />
-        ) : (
-          <SettingsSubScreen
-            screenType={currentScreen as Exclude<ScreenType, 'main'>}
-            config={screenConfigs[currentScreen as Exclude<ScreenType, 'main'>]}
+      <SubHeader>
+        <SubHeader.Left onClick={getHeaderLeftOnClick()}>
+          <Image
+            src="/icon/arrow-left-subcoral.svg"
+            alt="arrowIcon"
+            width={23}
+            height={23}
           />
-        )}
-      </div>
+        </SubHeader.Left>
+        <SubHeader.Center>{getHeaderTitle()}</SubHeader.Center>
+      </SubHeader>
+
+      {currentScreen === 'main' ? (
+        <SettingsMainScreen menuCategories={menuCategories} />
+      ) : (
+        <SettingsSubScreen
+          screenType={currentScreen as Exclude<ScreenType, 'main'>}
+          config={screenConfigs[currentScreen as Exclude<ScreenType, 'main'>]}
+        />
+      )}
     </main>
   );
 }
