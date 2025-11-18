@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { ApiResponse } from '@/types/common';
 import { ExploreReview } from '@/types/Explore';
+import { BASE_URL } from '@/constants/common';
 
 const SITEMAP_CONFIG = {
   PAGE_SIZE: 1000,
@@ -127,27 +128,21 @@ function generateUserPages(
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://bottle-note.com'; // 환경변수 추가 후 삭제 예정
-
-  if (!baseUrl) {
-    return [];
-  }
-
   const staticPages: MetadataRoute.Sitemap = [
     {
-      url: baseUrl,
+      url: BASE_URL,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/search`,
+      url: `${BASE_URL}/search`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1,
     },
     {
-      url: `${baseUrl}/announcement`,
+      url: `${BASE_URL}/announcement`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.3,
@@ -157,13 +152,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const exploreTabs: MetadataRoute.Sitemap = [
       {
-        url: `${baseUrl}/explore?tab=EXPLORER_WHISKEY`,
+        url: `${BASE_URL}/explore?tab=EXPLORER_WHISKEY`,
         lastModified: new Date(),
         changeFrequency: 'hourly',
         priority: 0.8,
       },
       {
-        url: `${baseUrl}/explore?tab=REVIEW_WHISKEY`,
+        url: `${BASE_URL}/explore?tab=REVIEW_WHISKEY`,
         lastModified: new Date(),
         changeFrequency: 'hourly',
         priority: 0.9,
@@ -172,11 +167,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const [alcoholPages, { pages: reviewPages, reviewItems }] =
       await Promise.all([
-        fetchAlcoholPages(baseUrl),
-        fetchReviewPages(baseUrl),
+        fetchAlcoholPages(BASE_URL),
+        fetchReviewPages(BASE_URL),
       ]);
 
-    const userPages = generateUserPages(baseUrl, reviewItems);
+    const userPages = generateUserPages(BASE_URL, reviewItems);
 
     return [
       ...staticPages,

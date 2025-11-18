@@ -1,8 +1,7 @@
 import { MetadataRoute } from 'next';
+import { BASE_URL } from '@/constants/common';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-
   return {
     rules: [
       {
@@ -21,6 +20,6 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${BASE_URL}/sitemap.xml`,
   };
 }
