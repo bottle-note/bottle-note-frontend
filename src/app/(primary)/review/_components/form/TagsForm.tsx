@@ -50,7 +50,7 @@ export default function TagsForm() {
   };
 
   const ExtraButtons = (
-    <div className="flex gap-1 text-13 text-mainDarkGray">
+    <div className="flex gap-1 text-13 text-mainDarkGray ">
       <HoverTouchBox
         id="flavor-tooltip"
         tooltipContent={
