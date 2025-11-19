@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import JsonLd from '@/components/seo/JsonLd';
+import { generateAlcoholSchema } from '@/utils/seo/generateAlcoholSchema';
 import Star from '@/components/ui/Display/Star';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import ReviewListItem from '@/app/(primary)/search/[category]/[id]/_components/ReviewListItem';
@@ -169,8 +171,13 @@ export default function SearchAlcohol() {
     fetchAlcoholDetails(alcoholId.toString());
   }, [alcoholId]);
 
+  const alcoholSchema = useMemo(() => {
+    return data?.alcohols ? generateAlcoholSchema(data.alcohols) : null;
+  }, [data?.alcohols]);
+
   return (
     <>
+      {alcoholSchema && <JsonLd data={alcoholSchema} />}
       <NavLayout>
         {!data || !data.alcohols ? (
           <AlcoholDetailsSkeleton />

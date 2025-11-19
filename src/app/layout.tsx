@@ -2,10 +2,77 @@ import type { Metadata, Viewport } from 'next';
 import '@/style/globals.css';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Providers } from '@/lib/Providers';
+import { BASE_URL } from '@/constants/common';
 
 export const metadata: Metadata = {
-  title: 'Bottle Note',
-  description: '위스키 라이프를 기록하다, 보틀 노트.',
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: 'Bottle Note - 위스키 라이프를 기록하다',
+    template: '%s | Bottle Note',
+  },
+  description:
+    '위스키 라이프를 기록하다, 보틀 노트. 위스키 리뷰, 테이스팅 노트, 평점을 기록하고 공유하세요. 다양한 위스키 정보와 커뮤니티를 만나보세요.',
+  keywords: [
+    '위스키',
+    '위스키 리뷰',
+    '테이스팅 노트',
+    '위스키 평점',
+    '보틀노트',
+    'Bottle Note',
+    '추천 위스키',
+    '위스키 후기',
+    '싱글몰트 위스키',
+    '버번 위스키',
+  ],
+  authors: [{ name: 'Bottle Note Team' }],
+  creator: 'Bottle Note',
+  publisher: 'Bottle Note',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'ko_KR',
+    url: '/',
+    siteName: 'Bottle Note',
+    title: 'Bottle Note - 위스키 라이프를 기록하다',
+    description:
+      '위스키 리뷰, 테이스팅 노트, 평점을 기록하고 공유하세요. 다양한 위스키 정보와 커뮤니티를 만나보세요.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Bottle Note',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Bottle Note - 위스키 라이프를 기록하다',
+    description:
+      '위스키 리뷰, 테이스팅 노트, 평점을 기록하고 공유하세요. 다양한 위스키 정보와 커뮤니티를 만나보세요.',
+    images: ['/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'jDr8C5vmXK2uiW-5H8XZWL3M0UeNXZHXrHPm4o0zguo',
+    other: {
+      'naver-site-verification': 'dc80d9fa4f1a60c4b1da445bf258a1b3ccaeaadc',
+    },
+  },
 };
 
 export const viewport: Viewport = {
@@ -23,7 +90,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="touch-manipulation">
+    <html lang="ko" className="touch-manipulation">
       <body suppressHydrationWarning>
         <Providers>
           <div className="relative w-full bg-bgGray">

@@ -184,3 +184,5 @@ export const LABEL_NAMES = {
   REVIEW_AUTHOR: '리뷰 작성자',
   MY_RATING: '나의 별점',
 } as const;
+
+export const BASE_URL = 'https://bottle-note.com';
