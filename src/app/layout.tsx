@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: 'Aw5JaUjinrdn-5oVS1O99Jo27vOQshpscvHtWA6b-MA', // 개인 아이디으로 진행 추후 수정 예정
+    google: 'jDr8C5vmXK2uiW-5H8XZWL3M0UeNXZHXrHPm4o0zguo',
     other: {
       'naver-site-verification': 'dc80d9fa4f1a60c4b1da445bf258a1b3ccaeaadc',
     },
