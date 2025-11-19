@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+} from 'react';
 import Image from 'next/image';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import * as yup from 'yup';
@@ -15,6 +21,8 @@ import { FormValues } from '@/types/Reply';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { ReviewApi } from '@/app/api/ReviewApi';
 import { ReplyApi } from '@/app/api/ReplyApi';
+import JsonLd from '@/components/seo/JsonLd';
+import { generateReviewSchema } from '@/utils/seo/generateReviewSchema';
 import NavLayout from '@/components/ui/Layout/NavLayout';
 // import { shareOrCopy } from '@/utils/shareOrCopy';
 import type {
@@ -149,8 +157,15 @@ export default function ReviewDetail() {
     };
   }, []);
 
+  const reviewSchema = useMemo(() => {
+    return alcoholInfo && reviewDetails?.reviewInfo
+      ? generateReviewSchema(alcoholInfo, reviewDetails.reviewInfo)
+      : null;
+  }, [alcoholInfo, reviewDetails?.reviewInfo]);
+
   return (
     <FormProvider {...formMethods}>
+      {reviewSchema && <JsonLd data={reviewSchema} />}
       {alcoholInfo && reviewDetails ? (
         <>
           <NavLayout>

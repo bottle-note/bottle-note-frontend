@@ -1,5 +1,6 @@
 'use client';
 
+import { v4 as uuid } from 'uuid';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/ui/Navigation/Tab';
 import HomeCarousel from '@/components/feature/home/HomeCarousel';
@@ -8,6 +9,8 @@ import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import CategoryList from '@/components/feature/home/CategoryList';
 import DynamicAlcoholList from '@/components/feature/home/DynamicAlcoholList';
 import NavLayout from '@/components/ui/Layout/NavLayout';
+import JsonLd from '@/components/seo/JsonLd';
+import { generateWebSiteSchema } from '@/utils/seo/generateWebSiteSchema';
 
 export default function Home() {
   const {
@@ -55,43 +58,50 @@ export default function Home() {
     }
   };
 
+  const webSiteSchemas = generateWebSiteSchema();
+
   return (
-    <NavLayout>
-      <SubHeader>
-        <SubHeader.Left>
-          <SubHeader.Logo />
-        </SubHeader.Left>
-        <SubHeader.Right>
-          <SubHeader.Menu />
-        </SubHeader.Right>
-      </SubHeader>
-      <HomeCarousel images={BANNER_IMAGES} />
-      <div className="pt-[22px] space-y-1 relative">
-        <section className="pb-20">
-          <article className="space-y-[30px]">
-            <Tab
-              variant="bookmark"
-              tabList={firstMenuList}
-              handleTab={handelFirstMenu}
-              currentTab={firstMenuSelectedTab}
-              scrollContainerRef={firstMenuScrollContainerRef}
-              registerTab={firstMenuRegisterTab}
-            />
-            <div className="pb-[59px] pl-[25px]">{renderTopContent()}</div>
-          </article>
-          <article className="space-y-[30px]">
-            <Tab
-              variant="bookmark"
-              tabList={secondMenuList}
-              handleTab={handleSecondMenu}
-              currentTab={secondMenuSelectedTab}
-              scrollContainerRef={secondMenuScrollContainerRef}
-              registerTab={secondMenuRegisterTab}
-            />
-            {renderCategoryContent()}
-          </article>
-        </section>
-      </div>
-    </NavLayout>
+    <>
+      {webSiteSchemas.map((schema) => (
+        <JsonLd key={uuid()} data={schema} />
+      ))}
+      <NavLayout>
+        <SubHeader>
+          <SubHeader.Left>
+            <SubHeader.Logo />
+          </SubHeader.Left>
+          <SubHeader.Right>
+            <SubHeader.Menu />
+          </SubHeader.Right>
+        </SubHeader>
+        <HomeCarousel images={BANNER_IMAGES} />
+        <div className="pt-[22px] space-y-1 relative">
+          <section className="pb-20">
+            <article className="space-y-[30px]">
+              <Tab
+                variant="bookmark"
+                tabList={firstMenuList}
+                handleTab={handelFirstMenu}
+                currentTab={firstMenuSelectedTab}
+                scrollContainerRef={firstMenuScrollContainerRef}
+                registerTab={firstMenuRegisterTab}
+              />
+              <div className="pb-[59px] pl-[25px]">{renderTopContent()}</div>
+            </article>
+            <article className="space-y-[30px]">
+              <Tab
+                variant="bookmark"
+                tabList={secondMenuList}
+                handleTab={handleSecondMenu}
+                currentTab={secondMenuSelectedTab}
+                scrollContainerRef={secondMenuScrollContainerRef}
+                registerTab={secondMenuRegisterTab}
+              />
+              {renderCategoryContent()}
+            </article>
+          </section>
+        </div>
+      </NavLayout>
+    </>
   );
 }
