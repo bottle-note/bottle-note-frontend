@@ -1,6 +1,5 @@
 'use client';
 
-import { v4 as uuid } from 'uuid';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/ui/Navigation/Tab';
 import HomeCarousel from '@/components/feature/home/HomeCarousel';
@@ -63,7 +62,7 @@ export default function Home() {
   return (
     <>
       {webSiteSchemas.map((schema) => (
-        <JsonLd key={uuid()} data={schema} />
+        <JsonLd key={schema['@type']} data={schema} />
       ))}
       <NavLayout>
         <SubHeader>
