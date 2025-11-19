@@ -26,7 +26,7 @@ export default function RecentSearch({ handleSearch, keyValue }: Props) {
   };
 
   return (
-    <section className=" bg-white w-full h-full">
+    <section className="bg-white content-container h-full px-5">
       <h2 className="text-sm font-bold text-subCoral">최근 검색어</h2>
       <article className="text-xs my-3 border-t border-subCoral">
         {list.map((text, idx) => (

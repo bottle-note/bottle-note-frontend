@@ -10,7 +10,7 @@ export default function NavLayout({ showNavbar = true, children }: Props) {
   return (
     <>
       <main>{children}</main>
-      {showNavbar && <Navbar maxWidth="430px" />}
+      {showNavbar && <Navbar />}
     </>
   );
 }
