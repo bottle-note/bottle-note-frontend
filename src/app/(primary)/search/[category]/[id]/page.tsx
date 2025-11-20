@@ -172,8 +172,10 @@ export default function SearchAlcohol() {
   }, [alcoholId]);
 
   const alcoholSchema = useMemo(() => {
-    return data?.alcohols ? generateAlcoholSchema(data.alcohols) : null;
-  }, [data?.alcohols]);
+    return data?.alcohols
+      ? generateAlcoholSchema(data.alcohols, data.reviewInfo?.reviewList)
+      : null;
+  }, [data?.alcohols, data?.reviewInfo?.reviewList]);
 
   return (
     <>
