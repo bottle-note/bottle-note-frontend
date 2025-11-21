@@ -42,7 +42,7 @@ export const metadata: Metadata = {
       '위스키 리뷰, 테이스팅 노트, 평점을 기록하고 공유하세요. 다양한 위스키 정보와 커뮤니티를 만나보세요.',
     images: [
       {
-        url: '/og-image.png',
+        url: '/bottle_note_meta.png',
         width: 1200,
         height: 630,
         alt: 'Bottle Note',
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     title: '보틀노트(Bottle Note) - 위스키 라이프를 기록하다',
     description:
       '위스키 리뷰, 테이스팅 노트, 평점을 기록하고 공유하세요. 다양한 위스키 정보와 커뮤니티를 만나보세요.',
-    images: ['/og-image.png'],
+    images: ['/bottle_note_meta.png'],
   },
   robots: {
     index: true,
