@@ -61,8 +61,8 @@ export async function generateMetadata({
           ? [
               {
                 url: alcohols.alcoholUrlImg,
-                width: 800,
-                height: 600,
+                width: 600,
+                height: 400,
                 alt: alcohols.korName || alcohols.engName,
               },
             ]
