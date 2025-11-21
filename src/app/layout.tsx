@@ -7,11 +7,11 @@ import { BASE_URL } from '@/constants/common';
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'Bottle Note - 위스키 라이프를 기록하다',
+    default: '보틀노트(Bottle Note) - 위스키 라이프를 기록하다',
     template: '%s | Bottle Note',
   },
   description:
-    '위스키 라이프를 기록하다, 보틀 노트. 위스키 리뷰, 테이스팅 노트, 평점을 기록하고 공유하세요. 다양한 위스키 정보와 커뮤니티를 만나보세요.',
+    '위스키 라이프를 기록하다. 위스키 리뷰, 시음 후기, 평점을 기록하고 공유하세요. 위스키 추천과 테이스팅 노트, 다양한 정보를 보틀노트에서 만나보세요.',
   keywords: [
     '위스키',
     '위스키 리뷰',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     locale: 'ko_KR',
     url: '/',
     siteName: 'Bottle Note',
-    title: 'Bottle Note - 위스키 라이프를 기록하다',
+    title: '보틀노트(Bottle Note) - 위스키 라이프를 기록하다',
     description:
       '위스키 리뷰, 테이스팅 노트, 평점을 기록하고 공유하세요. 다양한 위스키 정보와 커뮤니티를 만나보세요.',
     images: [
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Bottle Note - 위스키 라이프를 기록하다',
+    title: '보틀노트(Bottle Note) - 위스키 라이프를 기록하다',
     description:
       '위스키 리뷰, 테이스팅 노트, 평점을 기록하고 공유하세요. 다양한 위스키 정보와 커뮤니티를 만나보세요.',
     images: ['/og-image.png'],
