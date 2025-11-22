@@ -23,6 +23,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      maxWidth: {
+        content: '468px',
+      },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
@@ -104,7 +107,21 @@ const config: Config = {
       },
     },
   },
-  plugins: [require('tailwind-scrollbar-hide'), require('tailwindcss-animate')],
+  plugins: [
+    require('tailwind-scrollbar-hide'),
+    require('tailwindcss-animate'),
+    // 커스텀 유틸리티 추가
+    function ({ addUtilities }: any) {
+      addUtilities({
+        '.fixed-content': {
+          '@apply fixed left-0 right-0 max-w-content mx-auto': {},
+        },
+        '.content-container': {
+          '@apply max-w-content mx-auto w-full': {},
+        },
+      });
+    },
+  ],
 };
 
 export default config;
