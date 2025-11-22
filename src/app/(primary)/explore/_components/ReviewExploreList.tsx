@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { v4 as uuid } from 'uuid';
 import { ExploreReview } from '@/types/Explore';
@@ -8,49 +6,15 @@ import { ExploreApi } from '@/app/api/ExploreApi';
 import List from '@/components/feature/List/List';
 import Label from '@/components/ui/Display/Label';
 import ReviewCard from './ReviewListItem';
-import { SearchBar, type SearchKeyword } from './SearchBar';
+import { SearchBar } from './SearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
-import { buildKeywordsFromParams } from './keywordUtils';
+import { useExploreKeywords } from '../_hooks/useExploreKeywords';
 
 const REVIEW_TAB_ID = 'REVIEW_WHISKEY';
 
 export const ReviewExplorerList = () => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  // URL에서 키워드 읽기 (초기값)
-  const initialKeywords: SearchKeyword[] = buildKeywordsFromParams(searchParams);
-
-  const [keywords, setKeywords] = useState<SearchKeyword[]>(initialKeywords);
-
-  const keywordValues = keywords.map((keyword) => keyword.value);
-
-  useEffect(() => {
-    const nextKeywords = buildKeywordsFromParams(searchParams);
-    setKeywords((prev) => {
-      if (
-        prev.length === nextKeywords.length &&
-        prev.every((keyword, index) => keyword.value === nextKeywords[index].value)
-      ) {
-        return prev;
-      }
-      return nextKeywords;
-    });
-  }, [searchParams]);
-
-  // keywords가 변경될 때 URL 업데이트
-  useEffect(() => {
-    const params = new URLSearchParams();
-    params.set('tab', REVIEW_TAB_ID);
-
-    keywords.forEach((keyword) => {
-      params.append('keywords', keyword.value);
-    });
-
-    const newUrl = `${pathname}?${params.toString()}`;
-    router.replace(newUrl, { scroll: false });
-  }, [keywords, pathname, router]);
+  const { keywords, keywordValues, handleAddKeyword, handleRemoveKeyword } =
+    useExploreKeywords({ tabId: REVIEW_TAB_ID });
 
   const {
     data: reviewList,
@@ -73,22 +37,6 @@ export const ReviewExplorerList = () => {
       });
     },
   });
-
-  const handleAddKeyword = (newKeyword: SearchKeyword) => {
-    setKeywords((prev) => {
-      if (prev.some((keyword) => keyword.value === newKeyword.value)) {
-        return prev;
-      }
-
-      return [...prev, newKeyword];
-    });
-  };
-
-  const handleRemoveKeyword = (keywordValueToRemove: string) => {
-    setKeywords((prev) =>
-      prev.filter((keyword) => keyword.value !== keywordValueToRemove),
-    );
-  };
 
   return (
     <section className="pb-20">
