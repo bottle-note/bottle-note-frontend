@@ -10,6 +10,9 @@ import Label from '@/components/ui/Display/Label';
 import WhiskeyListItem from './WhiskeyListItem';
 import { SearchBar, type SearchKeyword } from './SearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
+import { buildKeywordsFromParams } from './keywordUtils';
+
+const WHISKEY_TAB_ID = 'EXPLORER_WHISKEY';
 
 export const WhiskeyExplorerList = () => {
   const router = useRouter();
@@ -17,30 +20,36 @@ export const WhiskeyExplorerList = () => {
   const searchParams = useSearchParams();
 
   // URL에서 키워드 읽기 (초기값)
-  const keywordsArray = searchParams.getAll('keywords');
-  const initialKeywords: SearchKeyword[] = keywordsArray.map((value) => ({
-    label: value,
-    value: value,
-  }));
+  const initialKeywords: SearchKeyword[] = buildKeywordsFromParams(searchParams);
 
   const [keywords, setKeywords] = useState<SearchKeyword[]>(initialKeywords);
   const keywordValues = keywords.map((keyword) => keyword.value);
 
+  useEffect(() => {
+    const nextKeywords = buildKeywordsFromParams(searchParams);
+    setKeywords((prev) => {
+      if (
+        prev.length === nextKeywords.length &&
+        prev.every((keyword, index) => keyword.value === nextKeywords[index].value)
+      ) {
+        return prev;
+      }
+      return nextKeywords;
+    });
+  }, [searchParams]);
+
   // keywords가 변경될 때 URL 업데이트
   useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams();
+    params.set('tab', WHISKEY_TAB_ID);
 
-    // 기존 keywords 파라미터 모두 제거
-    params.delete('keywords');
-
-    // 각 키워드를 개별 파라미터로 추가
     keywords.forEach((keyword) => {
       params.append('keywords', keyword.value);
     });
 
     const newUrl = `${pathname}?${params.toString()}`;
     router.replace(newUrl, { scroll: false });
-  }, [keywords, pathname, router, searchParams]);
+  }, [keywords, pathname, router]);
 
   const {
     data: alcoholList,
