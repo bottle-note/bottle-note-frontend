@@ -2,14 +2,11 @@ import type { ReadonlyURLSearchParams } from 'next/navigation';
 import { CATEGORY_MENUS_LIST } from '@/constants/common';
 import type { SearchKeyword } from './SearchBar';
 
-const CATEGORY_LABEL_MAP = CATEGORY_MENUS_LIST.reduce<Record<string, string>>(
-  (acc, category) => {
-    if (category.id) {
-      acc[String(category.id)] = category.name;
-    }
-    return acc;
-  },
-  {},
+const CATEGORY_LABEL_MAP = Object.fromEntries(
+  CATEGORY_MENUS_LIST.filter((category) => category.id).map((category) => [
+    String(category.id),
+    category.name,
+  ]),
 );
 
 export const getKeywordLabel = (value: string) => {
