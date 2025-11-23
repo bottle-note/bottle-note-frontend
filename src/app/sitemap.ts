@@ -8,6 +8,12 @@ const SITEMAP_CONFIG = {
   CACHE_POLICY: 'no-store' as const,
 };
 
+function parseDate(dateString: string | undefined | null): Date {
+  if (!dateString) return new Date();
+  const date = new Date(dateString);
+  return isNaN(date.getTime()) ? new Date() : date;
+}
+
 async function fetchFromAPI<T>(endpoint: string): Promise<T> {
   const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
@@ -53,13 +59,13 @@ async function fetchAlcoholPages(
 ): Promise<MetadataRoute.Sitemap> {
   try {
     const response = await fetchFromAPI<ApiResponse<AlcoholResponse>>(
-      `/alcohols/search?keyword=&category=&regionId=&sortType=RANDOM&sortOrder=DESC&cursor=0&pageSize=${SITEMAP_CONFIG.PAGE_SIZE}`,
+      `/alcohols/search?sortType=POPULAR&sortOrder=DESC&cursor=0&pageSize=${SITEMAP_CONFIG.PAGE_SIZE}`,
     );
 
     if (response.errors.length === 0 && response.data.alcohols) {
       return response.data.alcohols.map((alcohol) => ({
         url: `${baseUrl}/search/${alcohol.engCategoryName}/${alcohol.alcoholId}`,
-        lastModified: new Date(alcohol.modifyDate || alcohol.createDate),
+        lastModified: parseDate(alcohol.modifyDate || alcohol.createDate),
         changeFrequency: 'weekly' as const,
         priority: 0.8,
       }));
@@ -83,7 +89,7 @@ async function fetchReviewPages(
       const reviewItems = response.data.items;
       const pages = reviewItems.map((review) => ({
         url: `${baseUrl}/review/${review.reviewId}`,
-        lastModified: new Date(review.modifiedAt || review.createAt),
+        lastModified: parseDate(review.modifiedAt || review.createAt),
         changeFrequency: 'daily' as const,
         priority: 1,
       }));
