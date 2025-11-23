@@ -57,7 +57,7 @@ function AlcoholInfo({ data, handleLogin }: Props) {
                 {data?.korName}
               </h1>
               <p className="text-12 whitespace-normal break-words font-normal">
-                {data?.engName.toUpperCase()}
+                {data?.engName?.toUpperCase()}
               </p>
             </Link>
           </div>
