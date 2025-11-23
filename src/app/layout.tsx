@@ -3,6 +3,7 @@ import '@/style/globals.css';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Providers } from '@/lib/Providers';
 import { BASE_URL } from '@/constants/common';
+import { WebVitalsReporter } from '@/components/WebVitalsReporter';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -92,14 +93,14 @@ export default function RootLayout({
   return (
     <html lang="ko" className="touch-manipulation">
       <body suppressHydrationWarning>
+        <WebVitalsReporter />
         <Providers>
           <div className="relative w-full bg-bgGray">
-            {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID &&
-              process.env.NODE_ENV === 'production' && (
-                <GoogleAnalytics
-                  gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}
-                />
-              )}
+            {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID && (
+              <GoogleAnalytics
+                gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}
+              />
+            )}
             <div className="max-w-content justify-center items-center mx-auto">
               {children}
             </div>
