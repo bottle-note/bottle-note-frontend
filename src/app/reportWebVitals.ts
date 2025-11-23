@@ -10,6 +10,8 @@ const METRIC_ALLOWLIST: ReadonlySet<NextWebVitalsMetric['name']> = new Set([
 ]);
 
 export function reportWebVitals(metric: NextWebVitalsMetric) {
+  if (typeof window === 'undefined' || !window.gtag) return;
+
   const value = Math.round(
     metric.name === 'CLS' ? metric.value * 1000 : metric.value,
   );
