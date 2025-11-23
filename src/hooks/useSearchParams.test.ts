@@ -1,5 +1,6 @@
-import { renderHook, act } from '@testing-library/react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { renderHook, act } from '@testing-library/react';
 import useSearchParam from './useSearchParams';
 
 // Next.js navigation hooks를 mock
@@ -87,7 +88,7 @@ describe('useSearchParam 훅', () => {
     it('다른 쿼리 파라미터는 유지하면서 특정 파라미터만 변경할 수 있다', () => {
       // Given: URL에 여러 파라미터가 있을 때
       const mockSearchParams = new URLSearchParams(
-        'category=whisky&sort=recent&page=2'
+        'category=whisky&sort=recent&page=2',
       );
       (useSearchParams as jest.Mock).mockReturnValue(mockSearchParams);
 
@@ -101,7 +102,7 @@ describe('useSearchParam 훅', () => {
 
       // Then: 다른 파라미터는 유지된 채로 해당 파라미터만 변경된다
       expect(mockReplace).toHaveBeenCalledWith(
-        '/search?category=bourbon&sort=recent&page=2'
+        '/search?category=bourbon&sort=recent&page=2',
       );
     });
   });
@@ -127,7 +128,7 @@ describe('useSearchParam 훅', () => {
     it('다른 쿼리 파라미터는 유지하면서 특정 파라미터만 삭제할 수 있다', () => {
       // Given: URL에 여러 파라미터가 있을 때
       const mockSearchParams = new URLSearchParams(
-        'category=whisky&sort=recent&page=2'
+        'category=whisky&sort=recent&page=2',
       );
       (useSearchParams as jest.Mock).mockReturnValue(mockSearchParams);
 
@@ -181,4 +182,3 @@ describe('useSearchParam 훅', () => {
     });
   });
 });
-
