@@ -2,7 +2,9 @@
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
-export default function useSearchParam<T extends string | null>(key: string) {
+export default function useStatefulSearchParams<T extends string | null>(
+  key: string,
+) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

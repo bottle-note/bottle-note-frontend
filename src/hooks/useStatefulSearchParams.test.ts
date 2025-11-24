@@ -1,7 +1,7 @@
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { renderHook, act } from '@testing-library/react';
-import useSearchParam from './useSearchParams';
+import useSearchParam from './useStatefulSearchParams';
 
 // Next.js navigation hooks를 mock
 jest.mock('next/navigation', () => ({

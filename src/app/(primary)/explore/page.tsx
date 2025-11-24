@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/ui/Navigation/Tab';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
-import useSearchParam from '@/hooks/useSearchParams';
+import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
 import { ReviewExplorerList } from './_components/ReviewExploreList';
 import { WhiskeyExplorerList } from './_components/WhiskeyExploreList';
 
@@ -14,7 +14,7 @@ type TabId = 'REVIEW_WHISKEY' | 'EXPLORER_WHISKEY';
 export default function ExplorePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [tabParam, setTabParam] = useSearchParam<TabId>('tab');
+  const [tabParam, setTabParam] = useStatefulSearchParams<TabId>('tab');
   const tabFromUrl = (tabParam as TabId | null) || 'REVIEW_WHISKEY';
 
   const tabList = [
