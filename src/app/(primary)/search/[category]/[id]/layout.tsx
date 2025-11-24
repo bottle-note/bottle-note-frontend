@@ -1,6 +1,5 @@
 import React from 'react';
 import { Metadata } from 'next';
-import { BASE_URL } from '@/constants/common';
 
 export async function generateMetadata({
   params,
@@ -52,10 +51,13 @@ export async function generateMetadata({
         '위스키',
         '위스키 리뷰',
       ].filter(Boolean) as string[],
+      alternates: {
+        canonical: `/search/${params.category}/${params.id}`,
+      },
       openGraph: {
         title,
         description,
-        url: `${BASE_URL}/search/${params.category}/${params.id}`,
+        url: `/search/${params.category}/${params.id}`,
         type: 'website',
         images: alcohols.alcoholUrlImg
           ? [

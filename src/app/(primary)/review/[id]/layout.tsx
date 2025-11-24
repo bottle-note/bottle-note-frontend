@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { BASE_URL } from '@/constants/common';
 
 interface Props {
   params: { id: string };
@@ -53,10 +52,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         alcoholInfo.korCategoryName,
         '보틀노트',
       ].filter(Boolean) as string[],
+      alternates: {
+        canonical: `/review/${id}`,
+      },
       openGraph: {
         title,
         description,
-        url: `${BASE_URL}/review/${id}`,
+        url: `/review/${id}`,
         type: 'article',
         publishedTime: reviewInfo.createAt,
         authors: [reviewInfo.userInfo.nickName],
