@@ -1,5 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
+import { ROUTES } from '@/constants/routes';
 
 export async function generateMetadata({
   params,
@@ -36,6 +37,11 @@ export async function generateMetadata({
     const title = `${alcohols.korName || alcohols.engName} - 위스키 상세`;
     const description = `${alcohols.engDistillery || alcohols.korDistillery || ''} ${alcohols.engCategory || ''} 위스키. 평균 별점: ${alcohols.rating || 'N/A'}점. 테이스팅 노트와 리뷰를 확인하세요.`;
 
+    const canonicalUrl = ROUTES.SEARCH.CATEGORY.BASE(
+      params.category,
+      params.id,
+    );
+
     return {
       title,
       description,
@@ -52,12 +58,12 @@ export async function generateMetadata({
         '위스키 리뷰',
       ].filter(Boolean) as string[],
       alternates: {
-        canonical: `/search/${params.category}/${params.id}`,
+        canonical: canonicalUrl,
       },
       openGraph: {
         title,
         description,
-        url: `/search/${params.category}/${params.id}`,
+        url: canonicalUrl,
         type: 'website',
         images: alcohols.alcoholUrlImg
           ? [

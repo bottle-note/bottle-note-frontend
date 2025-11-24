@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { ROUTES } from '@/constants/routes';
 
 interface Props {
   params: { id: string };
@@ -36,6 +37,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const imageUrl = reviewImageList?.[0]?.viewUrl || alcoholInfo.imageUrl;
 
+    const canonicalUrl = ROUTES.REVIEW.DETAIL(id);
+
     return {
       title,
       description,
@@ -53,12 +56,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         '보틀노트',
       ].filter(Boolean) as string[],
       alternates: {
-        canonical: `/review/${id}`,
+        canonical: canonicalUrl,
       },
       openGraph: {
         title,
         description,
-        url: `/review/${id}`,
+        url: canonicalUrl,
         type: 'article',
         publishedTime: reviewInfo.createAt,
         authors: [reviewInfo.userInfo.nickName],
