@@ -8,6 +8,12 @@ const SITEMAP_CONFIG = {
   CACHE_POLICY: 'no-store' as const,
 };
 
+function parseDate(dateString: string | undefined | null): Date {
+  if (!dateString) return new Date();
+  const date = new Date(dateString);
+  return isNaN(date.getTime()) ? new Date() : date;
+}
+
 async function fetchFromAPI<T>(endpoint: string): Promise<T> {
   const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
@@ -53,13 +59,13 @@ async function fetchAlcoholPages(
 ): Promise<MetadataRoute.Sitemap> {
   try {
     const response = await fetchFromAPI<ApiResponse<AlcoholResponse>>(
-      `/alcohols/search?keyword=&category=&regionId=&sortType=RANDOM&sortOrder=DESC&cursor=0&pageSize=${SITEMAP_CONFIG.PAGE_SIZE}`,
+      `/alcohols/search?sortType=POPULAR&sortOrder=DESC&cursor=0&pageSize=${SITEMAP_CONFIG.PAGE_SIZE}`,
     );
 
     if (response.errors.length === 0 && response.data.alcohols) {
       return response.data.alcohols.map((alcohol) => ({
         url: `${baseUrl}/search/${alcohol.engCategoryName}/${alcohol.alcoholId}`,
-        lastModified: new Date(alcohol.modifyDate || alcohol.createDate),
+        lastModified: parseDate(alcohol.modifyDate || alcohol.createDate),
         changeFrequency: 'weekly' as const,
         priority: 0.8,
       }));
@@ -83,7 +89,7 @@ async function fetchReviewPages(
       const reviewItems = response.data.items;
       const pages = reviewItems.map((review) => ({
         url: `${baseUrl}/review/${review.reviewId}`,
-        lastModified: new Date(review.modifiedAt || review.createAt),
+        lastModified: parseDate(review.modifiedAt || review.createAt),
         changeFrequency: 'daily' as const,
         priority: 1,
       }));
@@ -95,36 +101,6 @@ async function fetchReviewPages(
   }
 
   return { pages: [], reviewItems: [] };
-}
-
-/**
- * 사용자 페이지 목록 생성 (리뷰 작성자 기반)
- */
-function generateUserPages(
-  baseUrl: string,
-  reviewItems: ExploreReview[],
-): MetadataRoute.Sitemap {
-  try {
-    if (reviewItems.length === 0) {
-      return [];
-    }
-
-    // 중복 제거: userId 기준으로 고유한 사용자만 추출
-    const uniqueUsers = Array.from(
-      new Map(
-        reviewItems.map((review) => [review.userInfo.userId, review.userInfo]),
-      ).values(),
-    );
-
-    return uniqueUsers.map((user) => ({
-      url: `${baseUrl}/user/${user.userId}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.6,
-    }));
-  } catch (error) {
-    return [];
-  }
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -165,21 +141,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
     ];
 
-    const [alcoholPages, { pages: reviewPages, reviewItems }] =
-      await Promise.all([
-        fetchAlcoholPages(BASE_URL),
-        fetchReviewPages(BASE_URL),
-      ]);
+    const [alcoholPages, { pages: reviewPages }] = await Promise.all([
+      fetchAlcoholPages(BASE_URL),
+      fetchReviewPages(BASE_URL),
+    ]);
 
-    const userPages = generateUserPages(BASE_URL, reviewItems);
-
-    return [
-      ...staticPages,
-      ...exploreTabs,
-      ...alcoholPages,
-      ...reviewPages,
-      ...userPages,
-    ];
+    return [...staticPages, ...exploreTabs, ...alcoholPages, ...reviewPages];
   } catch (error) {
     return staticPages;
   }

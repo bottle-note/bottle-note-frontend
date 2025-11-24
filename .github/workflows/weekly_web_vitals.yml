@@ -1,0 +1,32 @@
+name: Weekly Web Vitals Check
+
+on:
+  schedule:
+    # 매주 일요일 오전 10시 (KST) = UTC 01:00
+    # 설명: 0분, 1시, 매일, 매월, 0(일요일)
+    - cron: '0 1 * * 0'
+
+  # 2. 수동 실행 버튼
+  workflow_dispatch:
+
+jobs:
+  run-audit:
+    name: Measure Performance
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Performance Script
+        run: node scripts/check-performance.js
+        env:
+          PSI_API_KEY: ${{ secrets.PSI_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          # 측정할 주소
+          CLIENT_URL: 'https://bottle-note.com'

@@ -1,5 +1,10 @@
 declare global {
   interface Window {
+    gtag: (
+      command: 'event' | 'config' | 'set',
+      targetId: string,
+      params?: Record<string, unknown>,
+    ) => void;
     kakao: any;
     Kakao: any;
     FlutterMessageQueue: {
