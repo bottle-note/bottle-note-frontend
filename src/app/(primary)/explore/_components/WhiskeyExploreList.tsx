@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import Image from 'next/image';
 import { v4 as uuid } from 'uuid';
 import { ExploreApi } from '@/app/api/ExploreApi';
@@ -7,12 +6,15 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import List from '@/components/feature/List/List';
 import Label from '@/components/ui/Display/Label';
 import WhiskeyListItem from './WhiskeyListItem';
-import { SearchBar, type SearchKeyword } from './SearchBar';
+import { SearchBar } from './SearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
+import { useExploreKeywords } from '../_hooks/useExploreKeywords';
+
+const WHISKEY_TAB_ID = 'EXPLORER_WHISKEY';
 
 export const WhiskeyExplorerList = () => {
-  const [keywords, setKeywords] = useState<SearchKeyword[]>([]);
-  const keywordValues = keywords.map((keyword) => keyword.value);
+  const { keywords, keywordValues, handleAddKeyword, handleRemoveKeyword } =
+    useExploreKeywords({ tabId: WHISKEY_TAB_ID });
 
   const {
     data: alcoholList,
@@ -37,30 +39,10 @@ export const WhiskeyExplorerList = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  const handleSearch = () => {
-    refetch();
-  };
-
-  const handleAddKeyword = (newKeyword: SearchKeyword) => {
-    setKeywords((prev) => {
-      if (prev.some((keyword) => keyword.value === newKeyword.value)) {
-        return prev;
-      }
-
-      return [...prev, newKeyword];
-    });
-  };
-
-  const handleRemoveKeyword = (keywordValueToRemove: string) => {
-    setKeywords((prev) =>
-      prev.filter((keyword) => keyword.value !== keywordValueToRemove),
-    );
-  };
-
   return (
     <section>
       <SearchBar
-        handleSearch={handleSearch}
+        handleSearch={refetch}
         handleAddKeyword={handleAddKeyword}
         handleRemoveKeyword={handleRemoveKeyword}
         description={`이름이나 플레이버 태그를 추가하여 검색해보세요.`}
