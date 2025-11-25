@@ -25,7 +25,7 @@ export const useSearchPageState = () => {
   const urlSortType = searchParams.get('sortType') as SORT_TYPE;
   const urlSortOrder = searchParams.get('sortOrder') as SORT_ORDER;
 
-  const isEmptySearch = !urlCategory && !urlKeyword;
+  const isEmptySearch = !searchParams.has('category') && !urlKeyword;
 
   const initialState: FilterState = {
     category: getDefaultValue(urlCategory, ''),
