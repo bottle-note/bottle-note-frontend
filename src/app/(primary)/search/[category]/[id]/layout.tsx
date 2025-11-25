@@ -35,7 +35,7 @@ export async function generateMetadata({
 
     const { alcohols } = alcoholData;
     const title = `${alcohols.korName || alcohols.engName} - 위스키 상세`;
-    const description = `${alcohols.engDistillery || alcohols.korDistillery || ''} ${alcohols.engCategory || ''} 위스키. 평균 별점: ${alcohols.rating || 'N/A'}점. 테이스팅 노트와 리뷰를 확인하세요.`;
+    const description = `${alcohols.korDistillery || alcohols.engDistillery || ''} ${alcohols.korCategory || alcohols.engCategory || ''} 위스키. 평균 별점: ${alcohols.rating || 'N/A'}점. 테이스팅 노트와 리뷰를 확인하세요.`;
 
     const canonicalUrl =
       params.category === 'all'

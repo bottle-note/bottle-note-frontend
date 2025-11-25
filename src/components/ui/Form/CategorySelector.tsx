@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import clsx from 'clsx';
 import { Category } from '@/types/common';
 import { useTab } from '@/hooks/useTab';
 import { CATEGORY_MENUS_LIST } from '@/constants/common';
@@ -11,6 +12,11 @@ interface Props {
 function CategorySelector({ handleCategoryCallback }: Props) {
   const searchParams = useSearchParams();
   const currCategory = searchParams.get('category') as Category;
+  const hasCategoryParam = searchParams.has('category');
+
+  const initialTab = hasCategoryParam
+    ? CATEGORY_MENUS_LIST.find((cat) => cat.id === currCategory)
+    : undefined;
 
   const {
     currentTab,
@@ -18,7 +24,12 @@ function CategorySelector({ handleCategoryCallback }: Props) {
     registerTab,
     tabList: categoryList,
     refs: { scrollContainerRef },
-  } = useTab({ tabList: CATEGORY_MENUS_LIST, scroll: true, align: 'left' });
+  } = useTab({
+    tabList: CATEGORY_MENUS_LIST,
+    scroll: true,
+    align: 'left',
+    initialTab,
+  });
 
   const handleCategory = (v: (typeof CATEGORY_MENUS_LIST)[number]) => {
     handleCategoryCallback(v.id);
@@ -26,7 +37,7 @@ function CategorySelector({ handleCategoryCallback }: Props) {
   };
 
   useEffect(() => {
-    if (currCategory) {
+    if (hasCategoryParam && currCategory) {
       const selectedCategory = CATEGORY_MENUS_LIST.find(
         (category) => category.id === currCategory,
       );
@@ -35,7 +46,7 @@ function CategorySelector({ handleCategoryCallback }: Props) {
         handleTab(selectedCategory.id);
       }
     }
-  }, [currCategory]);
+  }, [currCategory, hasCategoryParam]);
 
   return (
     <article
@@ -43,11 +54,15 @@ function CategorySelector({ handleCategoryCallback }: Props) {
       ref={scrollContainerRef}
     >
       {categoryList.map((category) => {
+        const isSelected = hasCategoryParam && category.id === currentTab.id;
         return (
           <button
             ref={registerTab(category.id)}
             key={category.id}
-            className={`${category.id === currentTab.id ? 'label-selected' : 'label-default'} px-2.5 py-1`}
+            className={clsx(
+              'px-2.5 py-1',
+              isSelected ? 'label-selected' : 'label-default',
+            )}
             onClick={() => handleCategory(category)}
           >
             <span className="text-sm font-light">{category.name}</span>

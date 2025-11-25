@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import Image from 'next/image';
 import { v4 as uuid } from 'uuid';
 import { ExploreReview } from '@/types/Explore';
@@ -7,13 +6,15 @@ import { ExploreApi } from '@/app/api/ExploreApi';
 import List from '@/components/feature/List/List';
 import Label from '@/components/ui/Display/Label';
 import ReviewCard from './ReviewListItem';
-import { SearchBar, type SearchKeyword } from './SearchBar';
+import { SearchBar } from './SearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
+import { useExploreKeywords } from '../_hooks/useExploreKeywords';
+
+const REVIEW_TAB_ID = 'REVIEW_WHISKEY';
 
 export const ReviewExplorerList = () => {
-  const [keywords, setKeywords] = useState<SearchKeyword[]>([]);
-
-  const keywordValues = keywords.map((keyword) => keyword.value);
+  const { keywords, keywordValues, handleAddKeyword, handleRemoveKeyword } =
+    useExploreKeywords({ tabId: REVIEW_TAB_ID });
 
   const {
     data: reviewList,
@@ -36,22 +37,6 @@ export const ReviewExplorerList = () => {
       });
     },
   });
-
-  const handleAddKeyword = (newKeyword: SearchKeyword) => {
-    setKeywords((prev) => {
-      if (prev.some((keyword) => keyword.value === newKeyword.value)) {
-        return prev;
-      }
-
-      return [...prev, newKeyword];
-    });
-  };
-
-  const handleRemoveKeyword = (keywordValueToRemove: string) => {
-    setKeywords((prev) =>
-      prev.filter((keyword) => keyword.value !== keywordValueToRemove),
-    );
-  };
 
   return (
     <section className="pb-20">

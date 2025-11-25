@@ -1,21 +1,25 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/ui/Navigation/Tab';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
 import { ReviewExplorerList } from './_components/ReviewExploreList';
 import { WhiskeyExplorerList } from './_components/WhiskeyExploreList';
+
+type TabId = 'REVIEW_WHISKEY' | 'EXPLORER_WHISKEY';
 
 export default function ExplorePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const tabFromUrl = searchParams.get('tab') || 'EXPLORER_WHISKEY';
+  const [tabParam, setTabParam] = useStatefulSearchParams<TabId>('tab');
+  const tabFromUrl = (tabParam as TabId | null) || 'REVIEW_WHISKEY';
 
   const tabList = [
-    { name: '위스키 둘러보기', id: 'EXPLORER_WHISKEY' },
     { name: '리뷰 둘러보기', id: 'REVIEW_WHISKEY' },
+    { name: '위스키 둘러보기', id: 'EXPLORER_WHISKEY' },
   ];
 
   const initialTab = tabList.find((tab) => tab.id === tabFromUrl) || tabList[0];
@@ -26,15 +30,36 @@ export default function ExplorePage() {
     initialTab,
   });
 
+  const hasSyncedInitialTabRef = useRef(false);
+  const previousTabIdRef = useRef<TabId>(currentTab.id as TabId);
+
   useEffect(() => {
-    const currentParams = new URLSearchParams(searchParams.toString());
-    if (currentParams.get('tab') !== currentTab.id) {
-      currentParams.set('tab', currentTab.id);
-      router.replace(`/explore?${currentParams.toString()}`, {
-        scroll: false,
-      });
+    const prevTabId = previousTabIdRef.current;
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (!hasSyncedInitialTabRef.current) {
+      hasSyncedInitialTabRef.current = true;
+      previousTabIdRef.current = currentTab.id as TabId;
+
+      if (params.get('tab') !== currentTab.id) {
+        setTabParam(currentTab.id as TabId);
+      }
+
+      return;
     }
-  }, [currentTab.id, router, searchParams]);
+
+    if (prevTabId === currentTab.id) {
+      return;
+    }
+
+    previousTabIdRef.current = currentTab.id as TabId;
+    params.delete('keywords');
+    params.set('tab', currentTab.id);
+
+    router.replace(`/explore?${params.toString()}`, {
+      scroll: false,
+    });
+  }, [currentTab.id, router, searchParams, setTabParam]);
 
   useEffect(() => {
     window.scrollTo({
