@@ -20,7 +20,7 @@ import { ROUTES } from '@/constants/routes';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
 import SearchContainer from '@/components/feature/Search/SearchContainer';
-import { useSearchPageState } from '@/hooks/useSearchPageState';
+import { useSearchPageState } from '@/app/(primary)/search/hook/useSearchPageState';
 
 const SORT_OPTIONS = [
   { name: '인기도순', type: SORT_TYPE.POPULAR },
@@ -57,6 +57,7 @@ export default function Search() {
     queryFn: ({ pageParam }) => {
       return AlcoholsApi.getList({
         ...filterState,
+        category: filterState.category === 'ALL' ? '' : filterState.category,
         regionId:
           filterState.regionId === '' ? '' : Number(filterState.regionId),
         ...{
