@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import clsx from 'clsx';
 import { Category } from '@/types/common';
 import { useTab } from '@/hooks/useTab';
 import { CATEGORY_MENUS_LIST } from '@/constants/common';
@@ -58,7 +59,10 @@ function CategorySelector({ handleCategoryCallback }: Props) {
           <button
             ref={registerTab(category.id)}
             key={category.id}
-            className={`${isSelected ? 'label-selected' : 'label-default'} px-2.5 py-1`}
+            className={clsx(
+              'px-2.5 py-1',
+              isSelected ? 'label-selected' : 'label-default',
+            )}
             onClick={() => handleCategory(category)}
           >
             <span className="text-sm font-light">{category.name}</span>
