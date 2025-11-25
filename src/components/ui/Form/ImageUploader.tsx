@@ -6,6 +6,8 @@ import { useFormContext } from 'react-hook-form';
 import { SaveImages } from '@/types/Image';
 import { useWebViewInit } from '@/hooks/useWebViewInit';
 import { useWebviewCamera } from '@/hooks/useWebviewCamera';
+import OptionDropdown from '@/components/ui/Modal/OptionDropdown';
+import useModalStore from '@/store/modalStore';
 
 interface ImageUploaderProps {
   onForceOpen?: (value: boolean) => void;
@@ -22,8 +24,10 @@ export default function ImageUploader({
   const imageRefModify = useRef<HTMLInputElement>(null);
   const { setValue, watch } = useFormContext();
   const { isMobile } = useWebViewInit();
+  const { handleModalState, handleCloseModal } = useModalStore();
   const [previewImages, setPreviewImages] = useState<SaveImages[]>([]);
   const [savedImages, setSavedImages] = useState<SaveImages[]>([]);
+  const [isOptionShow, setIsOptionShow] = useState(false);
 
   const onUploadPreview = (imgData: File) => {
     const newFiles = [imgData];
@@ -113,13 +117,47 @@ export default function ImageUploader({
     setPreviewImages(updatedPreviews);
   };
 
-  const { handleOpenAlbumMultiple } = useWebviewCamera({
+  const { handleOpenCamera, handleOpenAlbumMultiple } = useWebviewCamera({
     handleImg: onUploadPreview,
     handleMultipleImgs: onUploadMultiplePreview,
   });
 
+  const SELECT_OPTIONS = [
+    { type: 'camera', name: '카메라' },
+    { type: 'album', name: '앨범에서 선택' },
+  ];
+
+  const handleOptionSelect = ({ type }: { type: string }) => {
+    if (type === 'camera') {
+      return handleOpenCamera();
+    }
+
+    if (type === 'album') {
+      if (isMobile) return handleOpenAlbumMultiple();
+      return imageRef.current?.click();
+    }
+
+    setIsOptionShow(false);
+  };
+
   const onClickAddImage = () => {
-    if (isMobile) return handleOpenAlbumMultiple();
+    // 5장 제한 체크
+    if (previewImages.length >= 5) {
+      handleModalState({
+        isShowModal: true,
+        mainText: '이미지는 최대 5장까지 등록할 수 있습니다.',
+        handleConfirm: handleCloseModal,
+      });
+      return;
+    }
+
+    // 모바일에서는 카메라/앨범 선택 옵션 표시
+    if (isMobile) {
+      setIsOptionShow(true);
+      return;
+    }
+
+    // 웹에서는 기존처럼 파일 선택
     return imageRef.current?.click();
   };
 
@@ -206,38 +244,45 @@ export default function ImageUploader({
           </figure>
         ))}
 
-        {previewImages?.length < 5 && (
-          <button
-            onClick={onClickAddImage}
-            className="h-[3.8rem] w-[3.8rem] border border-subCoral flex flex-col justify-center items-center"
-          >
-            <Image
-              src="/icon/plus-subcoral.svg"
-              width={20}
-              height={20}
-              alt="plus"
-            />
-            <input
-              type="file"
-              accept="image/*"
-              hidden
-              ref={imageRef}
-              onChange={(event) => {
-                const fileInput = event.target;
-                const files = fileInput.files;
+        <button
+          onClick={onClickAddImage}
+          className="h-[3.8rem] w-[3.8rem] border border-subCoral flex flex-col justify-center items-center"
+        >
+          <Image
+            src="/icon/plus-subcoral.svg"
+            width={20}
+            height={20}
+            alt="plus"
+          />
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            ref={imageRef}
+            onChange={(event) => {
+              const fileInput = event.target;
+              const files = fileInput.files;
 
-                if (files && files.length > 0) {
-                  const filesArray = Array.from(files);
-                  onUploadMultiplePreview(filesArray);
-                  fileInput.value = '';
-                }
-                onForceOpen?.(true);
-              }}
-              multiple
-            />
-          </button>
-        )}
+              if (files && files.length > 0) {
+                const filesArray = Array.from(files);
+                onUploadMultiplePreview(filesArray);
+                fileInput.value = '';
+              }
+              onForceOpen?.(true);
+            }}
+            multiple
+          />
+        </button>
       </div>
+
+      {isOptionShow && (
+        <OptionDropdown
+          title="이미지 추가"
+          options={SELECT_OPTIONS}
+          handleOptionSelect={handleOptionSelect}
+          handleClose={() => setIsOptionShow(false)}
+        />
+      )}
     </>
   );
 }

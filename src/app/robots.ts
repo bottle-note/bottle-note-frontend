@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         disallow: [
-          '/user/*/edit',
+          '/user',
           '/review/modify',
           '/review/register',
           '/history',
