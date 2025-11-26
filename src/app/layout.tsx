@@ -5,7 +5,7 @@ import { Providers } from '@/lib/Providers';
 import { BASE_URL } from '@/constants/common';
 import { WebVitalsReporter } from '@/components/WebVitalsReporter';
 
-const isProd = process.env.VERCEL_ENV === 'production';
+const isProd = process.env.NODE_ENV === 'production';
 
 export const metadata: Metadata = {
   metadataBase: new URL(
