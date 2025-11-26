@@ -5,8 +5,12 @@ import { Providers } from '@/lib/Providers';
 import { BASE_URL } from '@/constants/common';
 import { WebVitalsReporter } from '@/components/WebVitalsReporter';
 
+const isProd = process.env.VERCEL_ENV === 'production';
+
 export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
+  metadataBase: new URL(
+    isProd ? BASE_URL : 'https://development.bottle-note.com',
+  ),
   title: {
     default: '보틀노트(Bottle Note) - 위스키 라이프를 기록하다',
     template: '%s | Bottle Note',
@@ -57,17 +61,26 @@ export const metadata: Metadata = {
       '위스키 리뷰, 테이스팅 노트, 평점을 기록하고 공유하세요. 다양한 위스키 정보와 커뮤니티를 만나보세요.',
     images: ['/bottle_note_meta.png'],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
+  robots: isProd
+    ? {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'large',
+          'max-snippet': -1,
+        },
+      }
+    : {
+        index: false,
+        follow: false,
+        googleBot: {
+          index: false,
+          follow: false,
+        },
+      },
   verification: {
     google: 'jDr8C5vmXK2uiW-5H8XZWL3M0UeNXZHXrHPm4o0zguo',
     other: {
