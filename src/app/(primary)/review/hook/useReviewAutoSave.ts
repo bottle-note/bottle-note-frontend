@@ -4,7 +4,7 @@ import { useEffect, useCallback, useRef } from 'react';
 import { Storage } from '@/lib/Storage';
 import { ReviewTempData } from '@/types/Review';
 import useModalStore from '@/store/modalStore';
-import { useToast } from './useToast';
+import { useToast } from '../../../../hooks/useToast';
 
 interface Props {
   alcoholId: string;
