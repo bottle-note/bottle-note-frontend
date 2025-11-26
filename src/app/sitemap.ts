@@ -104,7 +104,7 @@ async function fetchReviewPages(
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  if (process.env.VERCEL_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production') {
     return [];
   }
 
