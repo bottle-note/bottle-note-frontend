@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 
-export const useNavigateReview = () => {
+export const useNavigateReviewWrite = () => {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
   const { handleLoginModal } = useModalStore();
