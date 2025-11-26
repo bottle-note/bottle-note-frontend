@@ -100,7 +100,7 @@ export default function ImageUploader({
         className={`flex justify-start items-center h-[3.8rem] space-x-2 ${useMarginLeft ? 'ml-7' : ''}`}
       >
         {previewImages?.map((data) => (
-          <figure key={data?.order} className="relative h-full">
+          <figure key={data?.image} className="relative h-full">
             <Image
               src={data?.image}
               alt="이미지"
@@ -110,7 +110,7 @@ export default function ImageUploader({
               className="h-full"
             />
             <button
-              onClick={() => removeImage(data?.image, data?.order)}
+              onClick={() => removeImage(data?.image)}
               className="absolute top-0 right-0 bg-black"
             >
               <Image

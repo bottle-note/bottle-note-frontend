@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ImageUploader from '@/components/ui/Form/ImageUploader';
 import OptionsContainer from '../OptionsContainer';
 
@@ -20,9 +20,9 @@ export default function ImagesForm() {
     }
   }, [forceOpen]);
 
-  const handleImageCountChange = (count: number, max: number) => {
+  const handleImageCountChange = useCallback((count: number, max: number) => {
     setImageCount({ current: count, max });
-  };
+  }, []);
 
   const ImageCounter = imageCount.current > 0 && (
     <span className="text-subCoral text-12 font-medium">

@@ -1,133 +1,140 @@
-import { useState, useEffect } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useState, useEffect, useRef } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { SaveImages } from '@/types/Image';
 
 export const useImageUploader = () => {
-  const { setValue, watch } = useFormContext();
+  const { setValue, getValues, control } = useFormContext();
   const [previewImages, setPreviewImages] = useState<SaveImages[]>([]);
   const [savedImages, setSavedImages] = useState<SaveImages[]>([]);
 
+  const isInitializedRef = useRef(false);
+  const blobUrlToFileMapRef = useRef<Map<string, File>>(new Map());
+
   const MAX_IMAGES = 5;
 
-  // 다음 Order 계산
+  // form에서 데이터가 로드될 때까지 기다림
+  const imageUrlList = useWatch({ name: 'imageUrlList', control });
+
   const getNextOrder = (images: SaveImages[]): number => {
     return images.length > 0
       ? Math.max(...images.map((img) => img.order)) + 1
       : 1;
   };
 
-  // 남은 슬롯 계산
-  const getAvailableSlots = (): number => {
-    return MAX_IMAGES - previewImages.length;
+  const reorderImages = (images: SaveImages[]): SaveImages[] => {
+    return images.map((img, index) => ({
+      ...img,
+      order: index + 1,
+    }));
   };
 
-  // 이미지 업로드 제한 검증
   const validateLimit = (): boolean => {
     return previewImages.length < MAX_IMAGES;
   };
 
-  // 단일 이미지 업로드
-  const uploadSingleImage = (imgData: File) => {
-    const newFiles = [imgData];
-
-    if (newFiles && newFiles.length > 0) {
-      const maxOrderId = getNextOrder(previewImages) - 1;
-      const availableSlots = getAvailableSlots();
-
-      // 이미지 미리보기용
-      const imgForPreview = Array.from(newFiles)
-        .slice(0, availableSlots)
-        .map((file, index) => ({
-          order: maxOrderId + index + 1,
-          image: URL.createObjectURL(file),
-        }));
-      setPreviewImages([...previewImages, ...imgForPreview]);
-
-      // S3 업로드용
-      const addedNewImages = watch('images') ?? [];
-      const imgForS3 = Array.from(newFiles)
-        .slice(0, availableSlots)
-        .map((file, index) => ({
-          order: maxOrderId + index + 1,
-          image: file,
-        }));
-      setValue('images', [...addedNewImages, ...imgForS3]);
-    }
-  };
-
-  // 다중 이미지 업로드
-  const uploadMultipleImages = (imgDataList: File[]) => {
-    if (imgDataList && imgDataList.length > 0) {
-      const maxOrderId = getNextOrder(previewImages) - 1;
-      const availableSlots = getAvailableSlots();
-
-      // 이미지 미리보기용
-      const imgForPreview = Array.from(imgDataList)
-        .slice(0, availableSlots)
-        .map((file, index) => ({
-          order: maxOrderId + index + 1,
-          image: URL.createObjectURL(file),
-        }));
-      setPreviewImages([...previewImages, ...imgForPreview]);
-
-      // S3 업로드용
-      const addedNewImages = watch('images') ?? [];
-      const imgForS3 = Array.from(imgDataList)
-        .slice(0, availableSlots)
-        .map((file, index) => ({
-          order: maxOrderId + index + 1,
-          image: file,
-        }));
-      setValue('images', [...addedNewImages, ...imgForS3]);
-    }
-  };
-
-  // 이미지 제거
-  const removeImage = (image: string, order: number) => {
-    let updatedPreviews;
-    let updatedFiles;
-
-    const existingImages: string[] = savedImages.map((file) => file.image);
-
-    // 기존 이미지 삭제
-    if (existingImages.includes(image)) {
-      updatedPreviews = previewImages.filter((file) => file.image !== image);
-      const DBImages = savedImages
-        .filter((file) => file.order !== order)
-        .map((file) => ({
-          order: file.order,
-          viewUrl: file.image,
-        }));
-      setValue('imageUrlList', DBImages);
-      setSavedImages(savedImages.filter((file) => file.order !== order));
-    } else {
-      // 새로 업로드된 이미지 삭제
-      const images = watch('images');
-      updatedFiles = images?.filter((file: SaveImages) => file.order !== order);
-      updatedPreviews = previewImages.filter(
-        (file: SaveImages) => file.order !== order,
-      );
-    }
-
-    setValue('images', updatedFiles);
-    setPreviewImages(updatedPreviews);
-  };
-
-  // 초기 이미지 로드 (수정 모드)
+  // 사진 수정: 초기 이미지 로드
   useEffect(() => {
-    if (watch('imageUrlList')) {
-      const urlData = watch('imageUrlList').map(
-        (data: { order: number; viewUrl: string }) => {
-          return {
-            order: data.order,
-            image: data.viewUrl,
-          };
-        },
-      );
-      setSavedImages(urlData);
-      setPreviewImages(urlData);
+    if (isInitializedRef.current || !imageUrlList?.length) return;
+
+    const urlData = imageUrlList.map(
+      (data: { order: number; viewUrl: string }) => ({
+        order: data.order,
+        image: data.viewUrl,
+      }),
+    );
+    setSavedImages(urlData);
+    setPreviewImages(urlData);
+    isInitializedRef.current = true;
+  }, [imageUrlList]);
+
+  const _uploadImages = (files: File[]) => {
+    if (files && files.length > 0) {
+      setPreviewImages((currentPreviews) => {
+        const maxOrderId = getNextOrder(currentPreviews) - 1;
+        const availableSlots = MAX_IMAGES - currentPreviews.length;
+
+        // 이미지 미리보기용
+        const imgForPreview = Array.from(files)
+          .slice(0, availableSlots)
+          .map((file, index) => {
+            const blobUrl = URL.createObjectURL(file);
+            // Blob URL과 File 매핑 저장
+            blobUrlToFileMapRef.current.set(blobUrl, file);
+            return {
+              order: maxOrderId + index + 1,
+              image: blobUrl,
+            };
+          });
+
+        // S3 업로드용
+        const addedNewImages = getValues('images') ?? [];
+        const imgForS3 = Array.from(files)
+          .slice(0, availableSlots)
+          .map((file, index) => ({
+            order: maxOrderId + index + 1,
+            image: file,
+          }));
+        setValue('images', [...addedNewImages, ...imgForS3]);
+
+        return [...currentPreviews, ...imgForPreview];
+      });
     }
-  }, []);
+  };
+
+  const uploadSingleImage = (imgData: File) => {
+    _uploadImages([imgData]);
+  };
+
+  const uploadMultipleImages = (imgDataList: File[]) => {
+    _uploadImages(imgDataList);
+  };
+
+  const removeImage = (image: string) => {
+    const isSavedImage = savedImages.some((file) => file.image === image);
+
+    // 미리보기에서 제거 및 재정렬
+    setPreviewImages((currentPreviews) => {
+      const filtered = currentPreviews.filter((file) => file.image !== image);
+      const reordered = reorderImages(filtered);
+
+      const updatedSaved: SaveImages[] = [];
+      const updatedNew: { order: number; image: File }[] = [];
+
+      reordered.forEach((preview) => {
+        const isSaved = savedImages.some((s) => s.image === preview.image);
+
+        if (isSaved) {
+          updatedSaved.push(preview);
+        } else {
+          const file = blobUrlToFileMapRef.current.get(preview.image);
+          if (file) {
+            updatedNew.push({
+              order: preview.order,
+              image: file,
+            });
+          }
+        }
+      });
+
+      setSavedImages(updatedSaved);
+      setValue(
+        'imageUrlList',
+        updatedSaved.map((img) => ({
+          order: img.order,
+          viewUrl: img.image,
+        })),
+      );
+
+      setValue('images', updatedNew);
+
+      if (!isSavedImage) {
+        blobUrlToFileMapRef.current.delete(image);
+        URL.revokeObjectURL(image);
+      }
+
+      return reordered;
+    });
+  };
 
   return {
     previewImages,
