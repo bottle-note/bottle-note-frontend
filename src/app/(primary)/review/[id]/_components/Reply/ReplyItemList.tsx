@@ -4,7 +4,7 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ReplyApi } from '@/app/api/ReplyApi';
 import List from '@/components/feature/List/List';
 import EmptyView from '@/components/ui/Display/EmptyView';
-import { sortReplies } from '@/utils/sortReplies';
+import { sortReplies } from '@/app/(primary)/review/utils/sortReplies';
 import ReplyItem from './ReplyItem';
 
 const RootReplyItemMemo = memo(

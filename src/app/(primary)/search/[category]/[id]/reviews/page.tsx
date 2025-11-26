@@ -13,7 +13,7 @@ import List from '@/components/feature/List/List';
 import { SORT_TYPE, SORT_ORDER } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
-import { useReviewWrite } from '@/hooks/useReviewWrite';
+import { useNavigateReview } from '@/hooks/useNavigateReview';
 import ReviewItemSkeleton from '@/components/ui/Loading/Skeletons/ReviewItemSkeleton';
 
 const SORT_OPTIONS = [
@@ -34,7 +34,7 @@ function Reviews() {
   const searchParams = useSearchParams();
   const alcoholId = params?.id as string;
   const alcoholKorName = searchParams.get('name');
-  const { handleReviewWrite } = useReviewWrite();
+  const { handleReviewWrite } = useNavigateReview();
   const [activeTab, setActiveTab] = useState('tab1');
 
   const handleTabClick = (tab: string) => {

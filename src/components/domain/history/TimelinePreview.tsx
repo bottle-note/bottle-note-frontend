@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { groupHistoryByDate } from '@/utils/historyUtils';
+import { groupHistoryByDate } from '@/app/(primary)/history/utils/historyUtils';
 import { History as HistoryType } from '@/types/History';
 import { ApiResponse } from '@/types/common';
 import { TimelineSkeleton } from '@/components/ui/Loading/Skeletons/custom/TimelineSkeleton';

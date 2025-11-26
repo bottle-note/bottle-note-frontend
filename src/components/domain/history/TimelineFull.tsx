@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { isWithinInterval, parseISO } from 'date-fns';
 import List from '@/components/feature/List/List';
-import { groupHistoryByDate } from '@/utils/historyUtils';
+import { groupHistoryByDate } from '@/app/(primary)/history/utils/historyUtils';
 import { HistoryListApi, History as HistoryType } from '@/types/History';
 import { CurrentUserInfoApi } from '@/types/User';
 import { TimelineSkeleton } from '@/components/ui/Loading/Skeletons/custom/TimelineSkeleton';
