@@ -47,17 +47,14 @@ export function generateAlcoholSchema(
         value: alcohol.korDistillery || alcohol.engDistillery || '-',
       },
     ].filter((prop) => prop.value !== '-'),
-  };
-
-  if (alcohol.totalRatingsCount > 0) {
-    schema.aggregateRating = {
+    aggregateRating: {
       '@type': 'AggregateRating',
-      ratingValue: alcohol.rating.toFixed(1),
-      ratingCount: alcohol.totalRatingsCount,
+      ratingValue: alcohol.rating?.toFixed(1) || '0.0',
+      ratingCount: alcohol.totalRatingsCount || 0,
       bestRating: 5,
       worstRating: 0,
-    };
-  }
+    },
+  };
 
   if (reviews && reviews.length > 0) {
     schema.review = reviews.slice(0, 3).map((review) => ({
