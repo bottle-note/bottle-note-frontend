@@ -2,11 +2,11 @@
 
 import Image from 'next/image';
 import { useScrollState } from '@/hooks/useScrollState';
-import { useReviewWrite } from '@/hooks/useReviewWrite';
+import { useNavigateReviewWrite } from '@/hooks/useNavigateReviewWrite';
 
 const FloatingReviewButton = ({ alcoholId }: { alcoholId: string }) => {
   const { isAtTop, isVisible } = useScrollState();
-  const { handleReviewWrite } = useReviewWrite();
+  const { handleReviewWrite } = useNavigateReviewWrite();
 
   const handleClick = () => {
     handleReviewWrite(alcoholId);
