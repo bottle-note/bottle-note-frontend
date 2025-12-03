@@ -45,6 +45,9 @@ export default function Search() {
   const { filterState, handleFilter, isEmptySearch, urlKeyword } =
     useSearchPageState();
 
+  const isCurationSearch =
+    filterState.keyword && isCurationKeyword(filterState.keyword);
+
   const {
     data: alcoholList,
     isLoading: isFirstLoading,
@@ -64,8 +67,7 @@ export default function Search() {
       filterState.keyword,
     ],
     queryFn: async ({ pageParam }) => {
-      // 큐레이션 키워드인 경우 CurationApi 사용
-      if (filterState.keyword && isCurationKeyword(filterState.keyword)) {
+      if (isCurationSearch) {
         const curationsResult = await CurationApi.getCurations({
           keyword: filterState.keyword,
           cursor: 0,
@@ -237,28 +239,34 @@ export default function Search() {
                 <List.Total
                   total={alcoholList ? alcoholList[0].data.totalCount : 0}
                 />
-                <List.SortOrderSwitch
-                  type={filterState.sortOrder}
-                  handleSortOrder={(value) => handleFilter('sortOrder', value)}
-                />
-                <List.OptionSelect
-                  options={SORT_OPTIONS}
-                  currentValue={filterState.sortType}
-                  handleOptionCallback={(value) =>
-                    handleFilter('sortType', value)
-                  }
-                />
-                <List.OptionSelect
-                  options={REGIONS.map((region) => ({
-                    type: String(region.regionId),
-                    name: region.korName,
-                  }))}
-                  currentValue={filterState.regionId}
-                  handleOptionCallback={(value) =>
-                    handleFilter('regionId', value)
-                  }
-                  title="국가"
-                />
+                {!isCurationSearch && (
+                  <>
+                    <List.SortOrderSwitch
+                      type={filterState.sortOrder}
+                      handleSortOrder={(value) =>
+                        handleFilter('sortOrder', value)
+                      }
+                    />
+                    <List.OptionSelect
+                      options={SORT_OPTIONS}
+                      currentValue={filterState.sortType}
+                      handleOptionCallback={(value) =>
+                        handleFilter('sortType', value)
+                      }
+                    />
+                    <List.OptionSelect
+                      options={REGIONS.map((region) => ({
+                        type: String(region.regionId),
+                        name: region.korName,
+                      }))}
+                      currentValue={filterState.regionId}
+                      handleOptionCallback={(value) =>
+                        handleFilter('regionId', value)
+                      }
+                      title="국가"
+                    />
+                  </>
+                )}
 
                 {alcoholList &&
                   [...alcoholList.map((list) => list.data.alcohols)]
