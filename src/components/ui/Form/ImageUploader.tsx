@@ -2,130 +2,46 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { useFormContext } from 'react-hook-form';
-import { SaveImages } from '@/types/Image';
 import { useWebViewInit } from '@/hooks/useWebViewInit';
 import { useWebviewCamera } from '@/hooks/useWebviewCamera';
+import { useImageUploader } from '@/hooks/useImageUploader';
 import OptionDropdown from '@/components/ui/Modal/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 
+const SELECT_OPTIONS = [
+  { type: 'camera', name: '카메라' },
+  { type: 'album', name: '앨범에서 선택' },
+];
+
 interface ImageUploaderProps {
   onForceOpen?: (value: boolean) => void;
-  onExtraButtonsChange?: (extraButtons: React.ReactNode) => void;
+  onImageCountChange?: (count: number, maxCount: number) => void;
   useMarginLeft?: boolean;
 }
 
 export default function ImageUploader({
   onForceOpen,
-  onExtraButtonsChange,
+  onImageCountChange,
   useMarginLeft = true,
 }: ImageUploaderProps) {
   const imageRef = useRef<HTMLInputElement>(null);
-  const imageRefModify = useRef<HTMLInputElement>(null);
-  const { setValue, watch } = useFormContext();
   const { isMobile } = useWebViewInit();
   const { handleModalState, handleCloseModal } = useModalStore();
-  const [previewImages, setPreviewImages] = useState<SaveImages[]>([]);
-  const [savedImages, setSavedImages] = useState<SaveImages[]>([]);
   const [isOptionShow, setIsOptionShow] = useState(false);
 
-  const onUploadPreview = (imgData: File) => {
-    const newFiles = [imgData];
-
-    if (newFiles && newFiles.length > 0) {
-      // 이미지 미리보기용
-      const previewImgCount = previewImages.length ?? 0;
-      const maxOrderId =
-        previewImages.length > 0
-          ? Math.max(...previewImages.map((img) => img.order))
-          : 0;
-      const imgForPreview = Array.from(newFiles)
-        .slice(0, 5 - previewImgCount)
-        .map((file, index) => ({
-          order: maxOrderId + index + 1,
-          image: URL.createObjectURL(file),
-        }));
-      setPreviewImages([...previewImages, ...imgForPreview]);
-
-      // S3 업로드용
-      const addedNewImages = watch('images') ?? [];
-      const imgForS3 = Array.from(newFiles)
-        .slice(0, 5 - previewImgCount)
-        .map((file, index) => ({
-          order: maxOrderId + index + 1,
-          image: file,
-        }));
-      setValue('images', [...addedNewImages, ...imgForS3]);
-    }
-  };
-
-  const onUploadMultiplePreview = (imgDataList: File[]) => {
-    if (imgDataList && imgDataList.length > 0) {
-      // 이미지 미리보기용
-      const previewImgCount = previewImages.length ?? 0;
-      const maxOrderId =
-        previewImages.length > 0
-          ? Math.max(...previewImages.map((img) => img.order))
-          : 0;
-      const imgForPreview = Array.from(imgDataList)
-        .slice(0, 5 - previewImgCount)
-        .map((file, index) => ({
-          order: maxOrderId + index + 1,
-          image: URL.createObjectURL(file),
-        }));
-      setPreviewImages([...previewImages, ...imgForPreview]);
-
-      // S3 업로드용
-      const addedNewImages = watch('images') ?? [];
-      const imgForS3 = Array.from(imgDataList)
-        .slice(0, 5 - previewImgCount)
-        .map((file, index) => ({
-          order: maxOrderId + index + 1,
-          image: file,
-        }));
-      setValue('images', [...addedNewImages, ...imgForS3]);
-    }
-  };
-
-  const removeImage = (image: string, order: number) => {
-    let updatedPreviews;
-    let updatedFiles;
-
-    const existingImages: string[] = savedImages.map((file) => file.image);
-
-    // 기존 이미지 삭제
-    if (existingImages.includes(image)) {
-      updatedPreviews = previewImages.filter((file) => file.image !== image);
-      const DBImages = savedImages
-        .filter((file) => file.order !== order)
-        .map((file) => ({
-          order: file.order,
-          viewUrl: file.image,
-        }));
-      setValue('imageUrlList', DBImages);
-      setSavedImages(savedImages.filter((file) => file.order !== order));
-    } else {
-      // 새로 업로드된 이미지 삭제
-      const images = watch('images');
-      updatedFiles = images?.filter((file: SaveImages) => file.order !== order);
-      updatedPreviews = previewImages.filter(
-        (file: SaveImages) => file.order !== order,
-      );
-    }
-
-    setValue('images', updatedFiles);
-    setPreviewImages(updatedPreviews);
-  };
+  const {
+    previewImages,
+    uploadSingleImage,
+    uploadMultipleImages,
+    removeImage,
+    validateLimit,
+    MAX_IMAGES,
+  } = useImageUploader();
 
   const { handleOpenCamera, handleOpenAlbumMultiple } = useWebviewCamera({
-    handleImg: onUploadPreview,
-    handleMultipleImgs: onUploadMultiplePreview,
+    handleImg: uploadSingleImage,
+    handleMultipleImgs: uploadMultipleImages,
   });
-
-  const SELECT_OPTIONS = [
-    { type: 'camera', name: '카메라' },
-    { type: 'album', name: '앨범에서 선택' },
-  ];
 
   const handleOptionSelect = ({ type }: { type: string }) => {
     if (type === 'camera') {
@@ -141,11 +57,10 @@ export default function ImageUploader({
   };
 
   const onClickAddImage = () => {
-    // 5장 제한 체크
-    if (previewImages.length >= 5) {
+    if (!validateLimit()) {
       handleModalState({
         isShowModal: true,
-        mainText: '이미지는 최대 5장까지 등록할 수 있습니다.',
+        mainText: `이미지는 최대 ${MAX_IMAGES}장까지 등록할 수 있습니다.`,
         handleConfirm: handleCloseModal,
       });
       return;
@@ -161,67 +76,31 @@ export default function ImageUploader({
     return imageRef.current?.click();
   };
 
-  useEffect(() => {
-    if (watch('imageUrlList')) {
-      const urlData = watch('imageUrlList').map(
-        (data: { order: number; viewUrl: string }) => {
-          return {
-            order: data.order,
-            image: data.viewUrl,
-          };
-        },
-      );
-      setSavedImages(urlData);
-      setPreviewImages(urlData);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const fileInput = event.target;
+    const files = fileInput.files;
+
+    if (files && files.length > 0) {
+      const filesArray = Array.from(files);
+      uploadMultipleImages(filesArray);
+      fileInput.value = '';
     }
-  }, []);
-
-  const ExtraButtons = (
-    <div className="flex items-center">
-      <button
-        onClick={() => {
-          imageRefModify.current?.click();
-        }}
-        className="text-subCoral text-12"
-      >
-        이미지 수정
-        <input
-          type="file"
-          accept="image/*"
-          hidden
-          ref={imageRefModify}
-          onChange={(event) => {
-            const fileInput = event.target;
-            const files = fileInput.files;
-
-            if (files && files.length > 0) {
-              const filesArray = Array.from(files);
-              onUploadMultiplePreview(filesArray);
-              fileInput.value = '';
-            }
-            onForceOpen?.(true);
-          }}
-          multiple
-        />
-      </button>
-    </div>
-  );
+    onForceOpen?.(true);
+  };
 
   useEffect(() => {
-    if (onExtraButtonsChange) {
-      const shouldShowExtraButtons =
-        previewImages?.length !== 0 && previewImages?.length !== 5;
-      onExtraButtonsChange(shouldShowExtraButtons ? ExtraButtons : null);
+    if (onImageCountChange) {
+      onImageCountChange(previewImages.length, MAX_IMAGES);
     }
-  }, [previewImages, onExtraButtonsChange]);
+  }, [previewImages.length, MAX_IMAGES, onImageCountChange]);
 
   return (
     <>
       <div
         className={`flex justify-start items-center h-[3.8rem] space-x-2 ${useMarginLeft ? 'ml-7' : ''}`}
       >
-        {previewImages?.map((data: SaveImages) => (
-          <figure key={data?.order} className="relative h-full">
+        {previewImages?.map((data) => (
+          <figure key={data?.image} className="relative h-full">
             <Image
               src={data?.image}
               alt="이미지"
@@ -231,7 +110,7 @@ export default function ImageUploader({
               className="h-full"
             />
             <button
-              onClick={() => removeImage(data?.image, data?.order)}
+              onClick={() => removeImage(data?.image)}
               className="absolute top-0 right-0 bg-black"
             >
               <Image
@@ -259,17 +138,7 @@ export default function ImageUploader({
             accept="image/*"
             hidden
             ref={imageRef}
-            onChange={(event) => {
-              const fileInput = event.target;
-              const files = fileInput.files;
-
-              if (files && files.length > 0) {
-                const filesArray = Array.from(files);
-                onUploadMultiplePreview(filesArray);
-                fileInput.value = '';
-              }
-              onForceOpen?.(true);
-            }}
+            onChange={handleFileChange}
             multiple
           />
         </button>

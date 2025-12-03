@@ -1,7 +1,7 @@
 import React from 'react';
 import Label from '@/components/ui/Display/Label';
 import TimeLineItem from '@/components/domain/history/TimeLineItem';
-import { shouldShowDivider } from '@/utils/historyUtils';
+import { shouldShowDivider } from '@/app/(primary)/history/utils/historyUtils';
 import { History as HistoryType } from '@/types/History';
 
 interface TimelineMonthGroupProps {

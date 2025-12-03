@@ -5,7 +5,7 @@ import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import Star from '@/components/ui/Display/Star';
 import useModalStore from '@/store/modalStore';
 import { AlcoholInfo } from '@/types/Alcohol';
-import { useReviewWrite } from '@/hooks/useReviewWrite';
+import { useNavigateReviewWrite } from '@/hooks/useNavigateReviewWrite';
 
 interface Props {
   data: AlcoholInfo;
@@ -15,7 +15,7 @@ interface Props {
 
 function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
   const { handleLoginModal } = useModalStore();
-  const { handleReviewWrite } = useReviewWrite();
+  const { handleReviewWrite } = useNavigateReviewWrite();
 
   return (
     <section className="relative z-20 flex px-5 pb-[23px] space-x-5">
