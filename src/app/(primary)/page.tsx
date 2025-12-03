@@ -1,17 +1,47 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/ui/Navigation/Tab';
 import HomeCarousel from '@/components/feature/home/HomeCarousel';
-import { BANNER_IMAGES, TOP_MENU_ITEMS, MENU_CATEGORY } from '@/constants/home';
+import { TOP_MENU_ITEMS, MENU_CATEGORY } from '@/constants/home';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import CategoryList from '@/components/feature/home/CategoryList';
 import DynamicAlcoholList from '@/components/feature/home/DynamicAlcoholList';
 import NavLayout from '@/components/ui/Layout/NavLayout';
 import JsonLd from '@/components/seo/JsonLd';
 import { generateWebSiteSchema } from '@/utils/seo/generateWebSiteSchema';
+import { CurationApi } from '@/app/api/CurationApi';
 
 export default function Home() {
+  useEffect(() => {
+    const fetchWinterCuration = async () => {
+      try {
+        const result = await CurationApi.getCurations({
+          keyword: '겨울 추천 위스키',
+        });
+
+        // 첫 번째 큐레이션의 id로 위스키 목록 조회
+        const curation = result.data.items[0];
+        if (curation) {
+          try {
+            const alcoholsResult = await CurationApi.getAlcoholsByCurationId(
+              curation.id,
+            );
+          } catch (error) {
+            console.error(
+              `   큐레이션 ${curation.id}의 위스키 목록 조회 실패:`,
+              error,
+            );
+          }
+        }
+      } catch (error) {
+        console.error('겨울 큐레이션 조회 실패:', error);
+      }
+    };
+
+    fetchWinterCuration();
+  }, []);
   const {
     currentTab: firstMenuSelectedTab,
     handleTab: handelFirstMenu,
@@ -73,7 +103,7 @@ export default function Home() {
             <SubHeader.Menu />
           </SubHeader.Right>
         </SubHeader>
-        <HomeCarousel images={BANNER_IMAGES} />
+        <HomeCarousel />
         <div className="pt-[22px] space-y-1 relative">
           <section className="pb-20">
             <article className="space-y-[30px]">
