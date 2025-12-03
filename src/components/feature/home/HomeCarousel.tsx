@@ -69,11 +69,11 @@ const overlayConfigs: Record<string, OverlayConfig> = {
         보틀노트가 추천하는
       </>
     ),
-    topSubText: '장마철 피트 위스키',
+    topSubText: '비 오는 날 추천 위스키 >',
     bottomSubText: '',
     styles: {
       mainTextColor: 'text-white',
-      topSubTextColor: 'text-white font-extrabold',
+      topSubTextColor: 'text-white font-thin',
       bottomSubTextColor: '',
       containerClass: 'top-[121px] pl-6',
     },

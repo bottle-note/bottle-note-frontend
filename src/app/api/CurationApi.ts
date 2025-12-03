@@ -13,11 +13,12 @@ export const CurationApi = {
   ): Promise<ApiResponse<CurationListData>> {
     const { keyword, alcoholId, cursor = 0, pageSize = 10 } = params;
 
-    const searchParams = new URLSearchParams();
-    if (keyword) searchParams.append('keyword', keyword);
-    if (alcoholId) searchParams.append('alcoholId', alcoholId.toString());
-    searchParams.append('cursor', cursor.toString());
-    searchParams.append('pageSize', pageSize.toString());
+    const searchParams = new URLSearchParams({
+      cursor: cursor.toString(),
+      pageSize: pageSize.toString(),
+      ...(keyword && { keyword }),
+      ...(alcoholId && { alcoholId: alcoholId.toString() }),
+    });
 
     const response = await apiClient.get<ApiResponse<CurationListData>>(
       `/curations?${searchParams.toString()}`,
@@ -39,9 +40,10 @@ export const CurationApi = {
   ): Promise<ApiResponse<CurationAlcoholsData>> {
     const { cursor = 0, pageSize = 10 } = params;
 
-    const searchParams = new URLSearchParams();
-    searchParams.append('cursor', cursor.toString());
-    searchParams.append('pageSize', pageSize.toString());
+    const searchParams = new URLSearchParams({
+      cursor: cursor.toString(),
+      pageSize: pageSize.toString(),
+    });
 
     const response = await apiClient.get<ApiResponse<CurationAlcoholsData>>(
       `/curations/${curationId}/alcohols?${searchParams.toString()}`,

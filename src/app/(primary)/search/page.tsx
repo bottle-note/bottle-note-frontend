@@ -84,16 +84,16 @@ export default function Search() {
 
           // CurationAlcoholItem을 AlcoholAPI로 변환
           const alcohols: AlcoholAPI[] = alcoholsResult.data.items.map(
-            (item) => ({
-              alcoholId: item.alcoholId,
-              korName: item.korName,
-              engName: item.engName,
-              rating: item.rating,
-              ratingCount: item.ratingCount,
-              korCategory: item.korCategoryName,
-              engCategory: item.engCategoryName,
-              imageUrl: item.imageUrl,
-              isPicked: item.isPicked,
+            ({
+              korCategoryName,
+              engCategoryName,
+              reviewCount,
+              pickCount,
+              ...rest
+            }) => ({
+              ...rest,
+              korCategory: korCategoryName,
+              engCategory: engCategoryName,
               popularScore: 0,
             }),
           );
