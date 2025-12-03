@@ -10,6 +10,7 @@ import { Category, SORT_TYPE } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { AlcoholAPI } from '@/types/Alcohol';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import { CurationApi } from '@/app/api/CurationApi';
 import { REGIONS } from '@/constants/common';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import useModalStore from '@/store/modalStore';
@@ -29,12 +30,23 @@ const SORT_OPTIONS = [
   { name: '댓글순', type: SORT_TYPE.REVIEW },
 ];
 
+const CURATION_KEYWORDS = ['겨울 추천 위스키', '비 오는 날 추천 위스키'];
+
+const isCurationKeyword = (keyword: string) => {
+  return CURATION_KEYWORDS.some((curationKeyword) =>
+    keyword.includes(curationKeyword),
+  );
+};
+
 export default function Search() {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
   const { popularList, isLoading: isPopularLoading } = usePopularList();
   const { filterState, handleFilter, isEmptySearch, urlKeyword } =
     useSearchPageState();
+
+  const isCurationSearch =
+    filterState.keyword && isCurationKeyword(filterState.keyword);
 
   const {
     data: alcoholList,
@@ -54,7 +66,54 @@ export default function Search() {
       filterState.sortOrder,
       filterState.keyword,
     ],
-    queryFn: ({ pageParam }) => {
+    queryFn: async ({ pageParam }) => {
+      if (isCurationSearch) {
+        const curationsResult = await CurationApi.getCurations({
+          keyword: filterState.keyword,
+          cursor: 0,
+          pageSize: 1,
+        });
+
+        if (curationsResult.data.items.length > 0) {
+          const curationId = curationsResult.data.items[0].id;
+          const alcoholsResult = await CurationApi.getAlcoholsByCurationId(
+            curationId,
+            {
+              cursor: pageParam,
+              pageSize: 10,
+            },
+          );
+
+          // CurationAlcoholItem을 AlcoholAPI로 변환
+          const alcohols: AlcoholAPI[] = alcoholsResult.data.items.map(
+            ({
+              korCategoryName,
+              engCategoryName,
+              reviewCount,
+              pickCount,
+              ...rest
+            }) => ({
+              ...rest,
+              korCategory: korCategoryName,
+              engCategory: engCategoryName,
+              popularScore: 0,
+            }),
+          );
+
+          return {
+            data: {
+              alcohols,
+              totalCount: alcoholsResult.data.items.length,
+            },
+            errors: [],
+            success: true,
+            code: 200,
+            meta: alcoholsResult.meta,
+          };
+        }
+      }
+
+      // 일반 검색인 경우 기존 API 사용
       return AlcoholsApi.getList({
         ...filterState,
         category: filterState.category === 'ALL' ? '' : filterState.category,
@@ -180,28 +239,34 @@ export default function Search() {
                 <List.Total
                   total={alcoholList ? alcoholList[0].data.totalCount : 0}
                 />
-                <List.SortOrderSwitch
-                  type={filterState.sortOrder}
-                  handleSortOrder={(value) => handleFilter('sortOrder', value)}
-                />
-                <List.OptionSelect
-                  options={SORT_OPTIONS}
-                  currentValue={filterState.sortType}
-                  handleOptionCallback={(value) =>
-                    handleFilter('sortType', value)
-                  }
-                />
-                <List.OptionSelect
-                  options={REGIONS.map((region) => ({
-                    type: String(region.regionId),
-                    name: region.korName,
-                  }))}
-                  currentValue={filterState.regionId}
-                  handleOptionCallback={(value) =>
-                    handleFilter('regionId', value)
-                  }
-                  title="국가"
-                />
+                {!isCurationSearch && (
+                  <>
+                    <List.SortOrderSwitch
+                      type={filterState.sortOrder}
+                      handleSortOrder={(value) =>
+                        handleFilter('sortOrder', value)
+                      }
+                    />
+                    <List.OptionSelect
+                      options={SORT_OPTIONS}
+                      currentValue={filterState.sortType}
+                      handleOptionCallback={(value) =>
+                        handleFilter('sortType', value)
+                      }
+                    />
+                    <List.OptionSelect
+                      options={REGIONS.map((region) => ({
+                        type: String(region.regionId),
+                        name: region.korName,
+                      }))}
+                      currentValue={filterState.regionId}
+                      handleOptionCallback={(value) =>
+                        handleFilter('regionId', value)
+                      }
+                      title="국가"
+                    />
+                  </>
+                )}
 
                 {alcoholList &&
                   [...alcoholList.map((list) => list.data.alcohols)]

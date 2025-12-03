@@ -8,6 +8,8 @@ import {
   CarouselApi,
 } from '@/components/ui/Display/carousel';
 import { ROUTES } from '@/constants/routes';
+import { BANNER_IMAGES } from '@/constants/home';
+
 interface OverlayConfig {
   link: string;
   mainText: React.ReactNode;
@@ -22,6 +24,24 @@ interface OverlayConfig {
 }
 
 const overlayConfigs: Record<string, OverlayConfig> = {
+  winterRecommend: {
+    link: ROUTES.SEARCH.SEARCH('겨울 추천 위스키'),
+    mainText: (
+      <>
+        차가운 겨울밤,
+        <br />
+        가장 따뜻한 한 모금
+      </>
+    ),
+    topSubText: '',
+    bottomSubText: '겨울 추천 위스키 >',
+    styles: {
+      mainTextColor: 'text-white',
+      topSubTextColor: '',
+      bottomSubTextColor: 'text-white font-thin',
+      containerClass: 'top-11 pl-7',
+    },
+  },
   bottleNote: {
     link: ROUTES.EXPLORE.BASE,
     mainText: (
@@ -49,11 +69,11 @@ const overlayConfigs: Record<string, OverlayConfig> = {
         보틀노트가 추천하는
       </>
     ),
-    topSubText: '장마철 피트 위스키',
+    topSubText: '비 오는 날 추천 위스키 >',
     bottomSubText: '',
     styles: {
       mainTextColor: 'text-white',
-      topSubTextColor: 'text-white font-extrabold',
+      topSubTextColor: 'text-white font-thin',
       bottomSubTextColor: '',
       containerClass: 'top-[121px] pl-6',
     },
@@ -98,16 +118,10 @@ function textOverlay(id: string | number) {
   return <OverlayContent config={config} />;
 }
 
-export interface ProductImage {
-  id: string | number;
-  src: string;
-  alt: string;
-}
-
-export default function HomeCarousel({ images }: { images: ProductImage[] }) {
+export default function HomeCarousel() {
   const [api, setApi] = useState<CarouselApi | null>(null);
 
-  if (!images || images.length === 0) {
+  if (!BANNER_IMAGES || BANNER_IMAGES.length === 0) {
     return <></>;
   }
 
@@ -121,7 +135,7 @@ export default function HomeCarousel({ images }: { images: ProductImage[] }) {
       className="w-full bg-white"
     >
       <CarouselContent className="!ml-0">
-        {images.map((image) => (
+        {BANNER_IMAGES.map((image) => (
           <CarouselItem key={image.id} className="!pl-0">
             <div className="relative w-full h-[227px] overflow-hidden flex items-center justify-center">
               <Image
