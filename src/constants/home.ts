@@ -1,6 +1,15 @@
-import { ProductImage } from '@/components/feature/home/HomeCarousel';
+export interface ProductImage {
+  id: string | number;
+  src: string;
+  alt: string;
+}
 
 export const BANNER_IMAGES: ProductImage[] = [
+  {
+    id: 'winterRecommend',
+    src: '/bannerImg/winter-banner.webp',
+    alt: '겨울 추천 위스키 배너',
+  },
   {
     id: 'bottleNote',
     src: '/bannerImg/bottleNote-banner.png',

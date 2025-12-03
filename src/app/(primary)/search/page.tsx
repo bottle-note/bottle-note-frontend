@@ -10,6 +10,7 @@ import { Category, SORT_TYPE } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { AlcoholAPI } from '@/types/Alcohol';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import { CurationApi } from '@/app/api/CurationApi';
 import { REGIONS } from '@/constants/common';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import useModalStore from '@/store/modalStore';
@@ -28,6 +29,14 @@ const SORT_OPTIONS = [
   { name: '찜하기순', type: SORT_TYPE.PICK },
   { name: '댓글순', type: SORT_TYPE.REVIEW },
 ];
+
+const CURATION_KEYWORDS = ['겨울 추천 위스키', '비 오는 날 추천 위스키'];
+
+const isCurationKeyword = (keyword: string) => {
+  return CURATION_KEYWORDS.some((curationKeyword) =>
+    keyword.includes(curationKeyword),
+  );
+};
 
 export default function Search() {
   const router = useRouter();
@@ -54,7 +63,55 @@ export default function Search() {
       filterState.sortOrder,
       filterState.keyword,
     ],
-    queryFn: ({ pageParam }) => {
+    queryFn: async ({ pageParam }) => {
+      // 큐레이션 키워드인 경우 CurationApi 사용
+      if (filterState.keyword && isCurationKeyword(filterState.keyword)) {
+        const curationsResult = await CurationApi.getCurations({
+          keyword: filterState.keyword,
+          cursor: 0,
+          pageSize: 1,
+        });
+
+        if (curationsResult.data.items.length > 0) {
+          const curationId = curationsResult.data.items[0].id;
+          const alcoholsResult = await CurationApi.getAlcoholsByCurationId(
+            curationId,
+            {
+              cursor: pageParam,
+              pageSize: 10,
+            },
+          );
+
+          // CurationAlcoholItem을 AlcoholAPI로 변환
+          const alcohols: AlcoholAPI[] = alcoholsResult.data.items.map(
+            (item) => ({
+              alcoholId: item.alcoholId,
+              korName: item.korName,
+              engName: item.engName,
+              rating: item.rating,
+              ratingCount: item.ratingCount,
+              korCategory: item.korCategoryName,
+              engCategory: item.engCategoryName,
+              imageUrl: item.imageUrl,
+              isPicked: item.isPicked,
+              popularScore: 0,
+            }),
+          );
+
+          return {
+            data: {
+              alcohols,
+              totalCount: alcoholsResult.data.items.length,
+            },
+            errors: [],
+            success: true,
+            code: 200,
+            meta: alcoholsResult.meta,
+          };
+        }
+      }
+
+      // 일반 검색인 경우 기존 API 사용
       return AlcoholsApi.getList({
         ...filterState,
         category: filterState.category === 'ALL' ? '' : filterState.category,

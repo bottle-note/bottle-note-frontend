@@ -24,6 +24,24 @@ interface OverlayConfig {
 }
 
 const overlayConfigs: Record<string, OverlayConfig> = {
+  winterRecommend: {
+    link: ROUTES.SEARCH.SEARCH('겨울 추천 위스키'),
+    mainText: (
+      <>
+        차가운 겨울밤,
+        <br />
+        가장 따뜻한 한 모금
+      </>
+    ),
+    topSubText: '',
+    bottomSubText: '겨울 추천 위스키 >',
+    styles: {
+      mainTextColor: 'text-white',
+      topSubTextColor: '',
+      bottomSubTextColor: 'text-white font-thin',
+      containerClass: 'top-11 pl-7',
+    },
+  },
   bottleNote: {
     link: ROUTES.EXPLORE.BASE,
     mainText: (
