@@ -5,6 +5,7 @@ import {
   CurationListData,
   CurationAlcoholsParams,
   CurationAlcoholsData,
+  BannerListData,
 } from '@/types/Curation';
 
 export const CurationApi = {
@@ -54,6 +55,21 @@ export const CurationApi = {
 
     if (response.errors.length !== 0) {
       throw new Error(`Failed to fetch alcohols for curation ${curationId}`);
+    }
+
+    return response;
+  },
+
+  async getBanners(limit: number = 5): Promise<ApiResponse<BannerListData>> {
+    const response = await apiClient.get<ApiResponse<BannerListData>>(
+      `/banners?limit=${limit}`,
+      {
+        authRequired: false,
+      },
+    );
+
+    if (response.errors.length !== 0) {
+      throw new Error('Failed to fetch banners');
     }
 
     return response;
