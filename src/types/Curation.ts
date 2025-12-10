@@ -49,3 +49,22 @@ export interface CurationAlcoholsData {
   items: CurationAlcoholItem[];
   pageable: CurationPageable;
 }
+
+export interface BannerItem {
+  id: number;
+  name: string;
+  nameFontColor: string;
+  descriptionA: string;
+  descriptionB: string;
+  descriptionFontColor: string;
+  imageUrl: string;
+  textPosition: 'LT' | 'LB' | 'RT' | 'RB' | 'CENTER';
+  targetUrl: string;
+  isExternalUrl: boolean;
+  bannerType: string;
+  sortOrder: number;
+  startDate: number[] | null;
+  endDate: number[] | null;
+}
+
+export type BannerListData = BannerItem[];
