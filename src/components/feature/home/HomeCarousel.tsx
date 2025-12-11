@@ -12,15 +12,14 @@ import { BANNER_IMAGES } from '@/constants/home';
 import { BannerItem } from '@/types/Curation';
 import { CurationApi } from '@/app/api/CurationApi';
 
-// imgur URL을 실제 이미지 URL로 변환
 function normalizeImageUrl(url: string): string {
   // imgur.com을 i.imgur.com으로 변환
   if (url.includes('imgur.com') && !url.includes('i.imgur.com')) {
     const imgurId = url.split('/').pop()?.split('?')[0];
     if (imgurId) {
-      // 확장자가 없으면 .png 추가
+      // 확장자가 없으면 .jpg 추가 (imgur의 기본 형식)
       const hasExtension = /\.(jpg|jpeg|png|gif|webp)$/i.test(imgurId);
-      return `https://i.imgur.com/${imgurId}${hasExtension ? '' : '.png'}`;
+      return `https://i.imgur.com/${imgurId}${hasExtension ? '' : '.jpg'}`;
     }
   }
   return url;
@@ -184,10 +183,17 @@ export default function HomeCarousel() {
     >
       <CarouselContent className="!ml-0">
         {displayBanners.map((banner) => {
-          // BannerItem 타입인 경우와 BANNER_IMAGES 타입 구분
           const isBannerItem = 'imageUrl' in banner;
-          const imageUrl = isBannerItem ? banner.imageUrl : banner.src;
-          const altText = isBannerItem ? banner.name : banner.alt;
+          const imageUrl = isBannerItem
+            ? banner.imageUrl
+            : (banner as any).imagePath || (banner as any).src || '';
+          const altText = isBannerItem
+            ? banner.name
+            : (banner as any).alt || '';
+
+          if (!imageUrl) {
+            return null;
+          }
 
           return (
             <CarouselItem key={banner.id} className="!pl-0">
@@ -198,6 +204,7 @@ export default function HomeCarousel() {
                   fill
                   style={{ objectFit: 'cover' }}
                   className="w-full h-full object-cover"
+                  unoptimized={imageUrl.includes('imgur.com')}
                 />
                 {isBannerItem && <OverlayContent banner={banner} />}
                 <button
