@@ -1,23 +1,23 @@
 export interface ProductImage {
   id: string | number;
-  src: string;
+  // src: string;
   alt: string;
 }
 
 export const BANNER_IMAGES: ProductImage[] = [
   {
     id: 'winterRecommend',
-    src: '/bannerImg/winter-banner.webp',
+    // src: '/bannerImg/winter-banner.webp',
     alt: '겨울 추천 위스키 배너',
   },
   {
     id: 'bottleNote',
-    src: '/bannerImg/bottleNote-banner.png',
+    // src: '/bannerImg/bottleNote-banner.png',
     alt: 'bottleNote 배너',
   },
   {
     id: 'rainDayRecommend',
-    src: '/bannerImg/rain-banner.png',
+    // src: '/bannerImg/rain-banner.png',
     alt: '비오는 날 추천 위스키 배너',
   },
 ];
