@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Button from '@/components/ui/Button/Button';
 import { ROUTES } from '@/constants/routes';
 import BackDrop from '@/components/ui/Modal/BackDrop';
@@ -13,6 +13,14 @@ interface Props {
 
 function LoginModal({ handleClose }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
+
+  const handleLoginClick = () => {
+    handleClose();
+    const returnTo = encodeURIComponent(pathname);
+    router.push(`${ROUTES.LOGIN}?returnTo=${returnTo}`);
+  };
+
   return (
     <BackDrop isShow>
       <div className="w-full h-full flex flex-col justify-end items-center px-4 gap-3 pb-7 content-container">
@@ -31,13 +39,7 @@ function LoginModal({ handleClose }: Props) {
             <p className="modal-mainText">로그인이 필요한 서비스입니다.</p>
             <p className="modal-subText">로그인 하시겠습니까?</p>
           </article>
-          <Button
-            btnName="로그인"
-            onClick={() => {
-              handleClose();
-              router.push(ROUTES.LOGIN);
-            }}
-          />
+          <Button btnName="로그인" onClick={handleLoginClick} />
           <button className="text-10 text-mainGray pb-3" onClick={handleClose}>
             다음에 할게요
           </button>

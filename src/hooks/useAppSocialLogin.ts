@@ -3,6 +3,14 @@ import { sendLogToFlutter } from '@/utils/flutterUtil';
 import useModalStore from '@/store/modalStore';
 import { useAuth } from './auth/useAuth';
 
+const RETURN_TO_KEY = 'login_return_to';
+
+const getReturnToUrl = () => {
+  const returnTo = sessionStorage.getItem(RETURN_TO_KEY) || '/';
+  sessionStorage.removeItem(RETURN_TO_KEY);
+  return returnTo;
+};
+
 export const useAppSocialLogin = () => {
   const router = useRouter();
   const { handleModalState } = useModalStore();
@@ -27,7 +35,7 @@ export const useAppSocialLogin = () => {
           accessToken: payload,
         });
       }
-      router.replace('/');
+      router.replace(getReturnToUrl());
     } catch (e) {
       onKakaoLoginError((e as Error).message);
     }
@@ -57,7 +65,7 @@ export const useAppSocialLogin = () => {
         false,
       );
 
-      router.replace('/');
+      router.replace(getReturnToUrl());
     } catch (e) {
       sendLogToFlutter(`onAppleLoginError:${(e as Error).message}`);
       onAppleLoginError((e as Error).message);

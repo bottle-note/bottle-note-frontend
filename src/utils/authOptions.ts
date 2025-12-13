@@ -83,7 +83,16 @@ export const authOptions: NextAuthOptions = {
 
       return newSession;
     },
-    async redirect({ baseUrl }) {
+    async redirect({ url, baseUrl }) {
+      // callbackUrl이 상대 경로인 경우 baseUrl과 결합
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`;
+      }
+      // callbackUrl이 동일 호스트의 절대 경로인 경우 그대로 사용
+      if (url.startsWith(baseUrl)) {
+        return url;
+      }
+      // 그 외의 경우 baseUrl로 리다이렉트
       return baseUrl;
     },
   },

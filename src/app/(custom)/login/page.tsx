@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
@@ -12,8 +12,11 @@ import { useAuth } from '@/hooks/auth/useAuth';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
+const RETURN_TO_KEY = 'login_return_to';
+
 export default function Login() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     handleSendDeviceInfo,
     handleInitKakaoSdkLogin,
@@ -22,13 +25,23 @@ export default function Login() {
   } = useLogin();
   const { isLoggedIn } = useAuth();
 
+  // returnTo 파라미터를 sessionStorage에 저장
+  useEffect(() => {
+    const returnTo = searchParams.get('returnTo');
+    if (returnTo) {
+      sessionStorage.setItem(RETURN_TO_KEY, returnTo);
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     handleSendDeviceInfo();
   }, []);
 
   useEffect(() => {
     if (isLoggedIn) {
-      router.replace('/');
+      const returnTo = sessionStorage.getItem(RETURN_TO_KEY);
+      sessionStorage.removeItem(RETURN_TO_KEY);
+      router.replace(returnTo || '/');
     }
   }, [isLoggedIn]);
 
