@@ -2,13 +2,14 @@
 
 import { useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
 import { useLogin } from '@/hooks/useLogin';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/auth/useAuth';
+import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
@@ -16,7 +17,7 @@ const RETURN_TO_KEY = 'login_return_to';
 
 export default function Login() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [returnToParam] = useStatefulSearchParams<string | null>('returnTo');
   const {
     handleSendDeviceInfo,
     handleInitKakaoSdkLogin,
@@ -27,11 +28,10 @@ export default function Login() {
 
   // returnTo 파라미터를 sessionStorage에 저장
   useEffect(() => {
-    const returnTo = searchParams.get('returnTo');
-    if (returnTo) {
-      sessionStorage.setItem(RETURN_TO_KEY, returnTo);
+    if (returnToParam) {
+      sessionStorage.setItem(RETURN_TO_KEY, returnToParam);
     }
-  }, [searchParams]);
+  }, [returnToParam]);
 
   useEffect(() => {
     handleSendDeviceInfo();
