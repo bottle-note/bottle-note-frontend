@@ -13,7 +13,7 @@ ARG ENV_FILE
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-COPY ${ENV_FILE} .env
+COPY ${ENV_FILE}* .env
 RUN pnpm build
 
 FROM node:22-alpine AS runner
