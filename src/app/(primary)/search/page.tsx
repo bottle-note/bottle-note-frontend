@@ -240,32 +240,34 @@ export default function Search() {
                   total={alcoholList ? alcoholList[0].data.totalCount : 0}
                 />
                 {!isCurationSearch && (
-                  <>
-                    <List.SortOrderSwitch
-                      type={filterState.sortOrder}
-                      handleSortOrder={(value) =>
-                        handleFilter('sortOrder', value)
-                      }
-                    />
-                    <List.OptionSelect
-                      options={SORT_OPTIONS}
-                      currentValue={filterState.sortType}
-                      handleOptionCallback={(value) =>
-                        handleFilter('sortType', value)
-                      }
-                    />
-                    <List.OptionSelect
-                      options={REGIONS.map((region) => ({
-                        type: String(region.regionId),
-                        name: region.korName,
-                      }))}
-                      currentValue={filterState.regionId}
-                      handleOptionCallback={(value) =>
-                        handleFilter('regionId', value)
-                      }
-                      title="국가"
-                    />
-                  </>
+                  <List.SortOrderSwitch
+                    type={filterState.sortOrder}
+                    handleSortOrder={(value) =>
+                      handleFilter('sortOrder', value)
+                    }
+                  />
+                )}
+                {!isCurationSearch && (
+                  <List.OptionSelect
+                    options={SORT_OPTIONS}
+                    currentValue={filterState.sortType}
+                    handleOptionCallback={(value) =>
+                      handleFilter('sortType', value)
+                    }
+                  />
+                )}
+                {!isCurationSearch && (
+                  <List.OptionSelect
+                    options={REGIONS.map((region) => ({
+                      type: String(region.regionId),
+                      name: region.korName,
+                    }))}
+                    currentValue={filterState.regionId}
+                    handleOptionCallback={(value) =>
+                      handleFilter('regionId', value)
+                    }
+                    title="국가"
+                  />
                 )}
 
                 {alcoholList &&
