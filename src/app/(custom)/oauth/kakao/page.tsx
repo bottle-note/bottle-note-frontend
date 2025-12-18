@@ -5,8 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Loading from '@/components/ui/Loading/Loading';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/auth/useAuth';
-
-const RETURN_TO_KEY = 'login_return_to';
+import { getReturnToUrl } from '@/utils/loginRedirect';
 
 export default function OauthKakaoCallbackPage() {
   const router = useRouter();
@@ -16,8 +15,7 @@ export default function OauthKakaoCallbackPage() {
 
   const loginHandler = async (code: string | string[]) => {
     try {
-      const returnTo = sessionStorage.getItem(RETURN_TO_KEY) || '/';
-      sessionStorage.removeItem(RETURN_TO_KEY);
+      const returnTo = getReturnToUrl();
 
       await login(
         'kakao-login',

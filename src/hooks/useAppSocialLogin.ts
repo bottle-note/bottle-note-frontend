@@ -1,15 +1,8 @@
 import { useRouter } from 'next/navigation';
 import { sendLogToFlutter } from '@/utils/flutterUtil';
 import useModalStore from '@/store/modalStore';
+import { getReturnToUrl } from '@/utils/loginRedirect';
 import { useAuth } from './auth/useAuth';
-
-const RETURN_TO_KEY = 'login_return_to';
-
-const getReturnToUrl = () => {
-  const returnTo = sessionStorage.getItem(RETURN_TO_KEY) || '/';
-  sessionStorage.removeItem(RETURN_TO_KEY);
-  return returnTo;
-};
 
 export const useAppSocialLogin = () => {
   const router = useRouter();

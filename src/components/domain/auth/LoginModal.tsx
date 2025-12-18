@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Button from '@/components/ui/Button/Button';
 import { ROUTES } from '@/constants/routes';
 import BackDrop from '@/components/ui/Modal/BackDrop';
+import { setReturnToUrl } from '@/utils/loginRedirect';
 
 interface Props {
   handleClose: () => void;
@@ -17,8 +18,8 @@ function LoginModal({ handleClose }: Props) {
 
   const handleLoginClick = () => {
     handleClose();
-    const returnTo = encodeURIComponent(pathname);
-    router.push(`${ROUTES.LOGIN}?returnTo=${returnTo}`);
+    setReturnToUrl(pathname);
+    router.push(ROUTES.LOGIN);
   };
 
   return (

@@ -7,9 +7,8 @@ import { AuthApi } from '@/app/api/AuthApi';
 import { ApiError } from '@/utils/ApiError';
 import { UserApi } from '@/app/api/UserApi';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
+import { getReturnToUrl } from '@/utils/loginRedirect';
 import { useAuth } from './auth/useAuth';
-
-const RETURN_TO_KEY = 'login_return_to';
 
 export type LoginFormValues = {
   email: string;
@@ -39,12 +38,6 @@ export const useLogin = () => {
 
   const handleSendDeviceInfo = async () => {
     try {
-      const getReturnToUrl = () => {
-        const returnTo = sessionStorage.getItem(RETURN_TO_KEY) || '/';
-        sessionStorage.removeItem(RETURN_TO_KEY);
-        return returnTo;
-      };
-
       if (isInApp && isLoggedIn) {
         const result = await UserApi.sendDeviceInfo(
           DeviceService.deviceToken || '',

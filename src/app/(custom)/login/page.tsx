@@ -10,10 +10,13 @@ import { useLogin } from '@/hooks/useLogin';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/auth/useAuth';
 import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
+import {
+  setReturnToUrl,
+  getReturnToUrl,
+  isValidReturnUrl,
+} from '@/utils/loginRedirect';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
-
-const RETURN_TO_KEY = 'login_return_to';
 
 export default function Login() {
   const router = useRouter();
@@ -26,10 +29,10 @@ export default function Login() {
   } = useLogin();
   const { isLoggedIn } = useAuth();
 
-  // returnTo 파라미터를 sessionStorage에 저장
+  // returnTo 파라미터를 sessionStorage에 저장 (Open Redirect 방지 검증 포함)
   useEffect(() => {
-    if (returnToParam) {
-      sessionStorage.setItem(RETURN_TO_KEY, returnToParam);
+    if (returnToParam && isValidReturnUrl(returnToParam)) {
+      setReturnToUrl(returnToParam);
     }
   }, [returnToParam]);
 
@@ -39,9 +42,7 @@ export default function Login() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      const returnTo = sessionStorage.getItem(RETURN_TO_KEY);
-      sessionStorage.removeItem(RETURN_TO_KEY);
-      router.replace(returnTo || '/');
+      router.replace(getReturnToUrl());
     }
   }, [isLoggedIn]);
 
