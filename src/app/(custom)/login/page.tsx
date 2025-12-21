@@ -29,7 +29,6 @@ export default function Login() {
   } = useLogin();
   const { isLoggedIn } = useAuth();
 
-  // returnTo 파라미터를 sessionStorage에 저장 (Open Redirect 방지 검증 포함)
   useEffect(() => {
     if (returnToParam && isValidReturnUrl(returnToParam)) {
       setReturnToUrl(returnToParam);
