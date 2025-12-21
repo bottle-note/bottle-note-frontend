@@ -52,6 +52,45 @@ describe('loginRedirect 유틸리티', () => {
         expect(isValidReturnUrl('data:text/html,<script>alert(1)</script>')).toBe(false);
       });
 
+      it('vbscript: 프로토콜은 차단한다', () => {
+        expect(isValidReturnUrl('vbscript:msgbox(1)')).toBe(false);
+      });
+
+      it('blob: 프로토콜은 차단한다', () => {
+        expect(isValidReturnUrl('blob:https://evil.com/uuid')).toBe(false);
+      });
+
+      // Oralyzer 기반 우회 케이스
+      it('백슬래시 우회를 차단한다', () => {
+        expect(isValidReturnUrl('/\\evil.com')).toBe(false);
+        expect(isValidReturnUrl('/\\/evil.com')).toBe(false);
+        expect(isValidReturnUrl('/\\/\\evil.com')).toBe(false);
+      });
+
+      it('URL 인코딩된 슬래시 우회를 차단한다', () => {
+        expect(isValidReturnUrl('/%2fevil.com')).toBe(false);
+        expect(isValidReturnUrl('/%2Fevil.com')).toBe(false);
+        expect(isValidReturnUrl('/%2f%2fevil.com')).toBe(false);
+      });
+
+      it('탭/개행 문자 삽입 우회를 차단한다', () => {
+        expect(isValidReturnUrl('/\t/evil.com')).toBe(false);
+        expect(isValidReturnUrl('/\n/evil.com')).toBe(false);
+        expect(isValidReturnUrl('/\r/evil.com')).toBe(false);
+        expect(isValidReturnUrl('/ /evil.com')).toBe(false);
+      });
+
+      it('대소문자 혼합 프로토콜을 차단한다', () => {
+        expect(isValidReturnUrl('JAVASCRIPT:alert(1)')).toBe(false);
+        expect(isValidReturnUrl('JavaScript:alert(1)')).toBe(false);
+        expect(isValidReturnUrl('DATA:text/html')).toBe(false);
+      });
+
+      it('다중 슬래시 우회를 차단한다', () => {
+        expect(isValidReturnUrl('///evil.com')).toBe(false);
+        expect(isValidReturnUrl('////evil.com')).toBe(false);
+      });
+
       it('로그인 관련 경로는 차단한다 (무한 루프 방지)', () => {
         expect(isValidReturnUrl('/login')).toBe(false);
         expect(isValidReturnUrl('/login?returnTo=/home')).toBe(false);
