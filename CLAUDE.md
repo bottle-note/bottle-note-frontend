@@ -86,3 +86,133 @@ pnpm run setenv:dev    # .env.development 설정
 ### 전역 상태 관리 시
 1. Zustand 스토어 사용 (`src/store/`)
 2. 서버 상태는 TanStack Query로 관리
+
+---
+
+## 코드 패턴 예시
+
+### 커스텀 훅 패턴
+```tsx
+// src/hooks/useXxx.ts
+import { useState, useCallback, useRef } from 'react';
+
+interface Options {
+  // 옵션 타입 정의
+}
+
+export const useXxx = (options?: Options) => {
+  const [state, setState] = useState<Type>(initialValue);
+  const ref = useRef<NodeJS.Timeout | null>(null);
+
+  const action = useCallback((params: ParamType) => {
+    // 로직 구현
+  }, []);
+
+  return { state, action };
+};
+```
+
+### Zustand 스토어 패턴
+```tsx
+// src/store/xxxStore.ts
+import { create } from 'zustand';
+
+interface XxxState {
+  value: string;
+  isOpen: boolean;
+}
+
+interface XxxStore {
+  state: XxxState;
+  handleState: (newState: Partial<XxxState>) => void;
+  handleReset: () => void;
+}
+
+const initialState: XxxState = {
+  value: '',
+  isOpen: false,
+};
+
+const useXxxStore = create<XxxStore>((set) => ({
+  state: initialState,
+  handleState: (newState) =>
+    set((prev) => ({
+      state: { ...prev.state, ...newState },
+    })),
+  handleReset: () => set({ state: initialState }),
+}));
+
+export default useXxxStore;
+```
+
+### 컴포넌트 패턴
+```tsx
+// src/components/Xxx.tsx 또는 _components/Xxx.tsx
+interface Props {
+  title: string;
+  onClick?: () => void;
+  children?: React.ReactNode;
+}
+
+export function Xxx({ title, onClick, children }: Props) {
+  return (
+    <div className="flex items-center gap-2">
+      <h2 className="text-lg font-bold">{title}</h2>
+      {children}
+      {onClick && (
+        <button onClick={onClick} className="px-4 py-2 bg-primary rounded">
+          Click
+        </button>
+      )}
+    </div>
+  );
+}
+```
+
+### 무한 스크롤 패턴
+```tsx
+// IntersectionObserver 기반
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+
+function List() {
+  const { data, fetchNextPage } = useInfiniteQuery(...);
+  const { targetRef } = useInfiniteScroll({ fetchNextPage });
+
+  return (
+    <div>
+      {data?.pages.map((page) =>
+        page.items.map((item) => <Item key={item.id} {...item} />)
+      )}
+      <div ref={targetRef} /> {/* 스크롤 감지 타겟 */}
+    </div>
+  );
+}
+```
+
+### 모달 사용 패턴
+```tsx
+import useModalStore from '@/store/modalStore';
+
+function Component() {
+  const { handleModalState } = useModalStore();
+
+  const showAlert = () => {
+    handleModalState({
+      isShowModal: true,
+      type: 'ALERT',
+      mainText: '알림 메시지',
+      subText: '상세 설명',
+    });
+  };
+
+  const showConfirm = () => {
+    handleModalState({
+      isShowModal: true,
+      type: 'CONFIRM',
+      mainText: '확인하시겠습니까?',
+      handleConfirm: () => { /* 확인 시 동작 */ },
+      handleCancel: () => { /* 취소 시 동작 */ },
+    });
+  };
+}
+```
