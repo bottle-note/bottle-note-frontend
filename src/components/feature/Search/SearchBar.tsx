@@ -13,6 +13,9 @@ interface Props {
   setUpdateSearchText?: Dispatch<
     SetStateAction<((text: string) => void) | null>
   >;
+  readOnly?: boolean;
+  value?: string;
+  onDelete?: () => void;
 }
 
 const SearchButton = () => (
@@ -26,6 +29,9 @@ export default function SearchBar({
   handleFocus,
   placeholder = '어떤 술을 찾고 계신가요?',
   setUpdateSearchText,
+  readOnly = false,
+  value,
+  onDelete,
 }: Props) {
   const {
     searchText,
@@ -42,10 +48,17 @@ export default function SearchBar({
     syncWithUrlParams: true,
   });
 
+  const displayValue = value !== undefined ? value : searchText;
+
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    handleClear();
+
+    if (onDelete) {
+      onDelete();
+    } else {
+      handleClear();
+    }
   };
 
   const inputProps = {
@@ -70,13 +83,14 @@ export default function SearchBar({
       <input
         ref={inputRef}
         {...inputProps}
-        value={searchText}
-        onChange={(e) => handleChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onFocus={() => handleFocusChange(true)}
-        onBlur={() => handleFocusChange(false)}
+        value={displayValue}
+        onChange={(e) => !readOnly && handleChange(e.target.value)}
+        onKeyDown={readOnly ? undefined : handleKeyDown}
+        onFocus={() => !readOnly && handleFocusChange(true)}
+        onBlur={() => !readOnly && handleFocusChange(false)}
+        readOnly={readOnly}
       />
-      {searchText?.length > 0 && (
+      {displayValue?.length > 0 && (
         <button
           type="button"
           onClick={handleDelete}

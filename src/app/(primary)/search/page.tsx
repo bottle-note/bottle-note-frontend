@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { v4 as uuid } from 'uuid';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
 import List from '@/components/feature/List/List';
@@ -20,7 +21,7 @@ import Tab from '@/components/ui/Navigation/Tab';
 import { ROUTES } from '@/constants/routes';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
-import SearchContainer from '@/components/feature/Search/SearchContainer';
+import SearchBar from '@/components/feature/Search/SearchBar';
 import { useSearchPageState } from '@/app/(primary)/search/hook/useSearchPageState';
 
 const SORT_OPTIONS = [
@@ -149,10 +150,6 @@ export default function Search() {
     });
   };
 
-  const handleSearchCallback = (searchedKeyword: string) => {
-    handleFilter('keyword', searchedKeyword);
-  };
-
   const handleCategoryCallback = (selectedCategory: Category) => {
     handleFilter('category', selectedCategory);
   };
@@ -184,11 +181,41 @@ export default function Search() {
 
   return (
     <Suspense>
-      <main className="mb-24 w-full h-full">
-        <SearchContainer
-          handleSearchCallback={handleSearchCallback}
-          styleProps="px-5 pt-[70px]"
-        />
+      <motion.main
+        className="mb-24 w-full h-full"
+        initial={{ x: '-20%', opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: '-20%', opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      >
+        <div
+          className="px-5 pt-[70px] cursor-pointer"
+          onClick={() => {
+            const targetUrl = urlKeyword
+              ? `/search/input?keyword=${encodeURIComponent(urlKeyword)}`
+              : '/search/input';
+            router.push(targetUrl);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              const targetUrl = urlKeyword
+                ? `/search/input?keyword=${encodeURIComponent(urlKeyword)}`
+                : '/search/input';
+              router.push(targetUrl);
+            }
+          }}
+          role="button"
+        >
+          <SearchBar
+            placeholder="어떤 술을 찾고 계신가요?"
+            readOnly={true}
+            value={urlKeyword || ''}
+            onDelete={() => {
+              router.replace('/search/input');
+            }}
+          />
+        </div>
 
         <section className="flex flex-col gap-7 pt-[11px] pb-5">
           <article className="space-y-4">
@@ -299,7 +326,7 @@ export default function Search() {
             </div>
           )}
         </section>
-      </main>
+      </motion.main>
     </Suspense>
   );
 }

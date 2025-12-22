@@ -10,9 +10,8 @@ export default function Layout({
 }>) {
   const pathname = usePathname();
 
-  return (
-    <NavLayout showNavbar={!pathname.includes('/reviews')}>
-      {children}
-    </NavLayout>
-  );
+  const shouldHideNavbar =
+    pathname.includes('/reviews') || pathname.includes('/input');
+
+  return <NavLayout showNavbar={!shouldHideNavbar}>{children}</NavLayout>;
 }
