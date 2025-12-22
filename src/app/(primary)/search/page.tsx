@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { v4 as uuid } from 'uuid';
@@ -45,6 +45,7 @@ export default function Search() {
   const { popularList, isLoading: isPopularLoading } = usePopularList();
   const { filterState, handleFilter, isEmptySearch, urlKeyword } =
     useSearchPageState();
+  const [showTab, setShowTab] = useState(true);
 
   const isCurationSearch =
     filterState.keyword && isCurationKeyword(filterState.keyword);
@@ -179,6 +180,19 @@ export default function Search() {
     }
   }, [urlKeyword]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setShowTab(false);
+      } else {
+        setShowTab(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <Suspense>
       <motion.main
@@ -188,49 +202,63 @@ export default function Search() {
         exit={{ x: '-20%', opacity: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       >
-        <div
-          className="px-5 pt-[70px] cursor-pointer"
-          onClick={() => {
-            const targetUrl = urlKeyword
-              ? `/search/input?keyword=${encodeURIComponent(urlKeyword)}`
-              : '/search/input';
-            router.push(targetUrl);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
+        {/* 고정 영역: SearchBar + (스크롤 시) CategorySelector */}
+        <div className="fixed-content top-0 bg-white z-10">
+          <div
+            className="px-5 pt-[70px] cursor-pointer"
+            onClick={() => {
               const targetUrl = urlKeyword
                 ? `/search/input?keyword=${encodeURIComponent(urlKeyword)}`
                 : '/search/input';
               router.push(targetUrl);
-            }
-          }}
-          role="button"
-        >
-          <SearchBar
-            placeholder="어떤 술을 찾고 계신가요?"
-            readOnly={true}
-            value={urlKeyword || ''}
-            onDelete={() => {
-              router.replace('/search/input');
             }}
-          />
-        </div>
-
-        <section className="flex flex-col gap-7 pt-[11px] pb-5">
-          <article className="space-y-4">
-            <Tab
-              variant="bookmark"
-              tabList={categoryList}
-              handleTab={handelCategory}
-              currentTab={categorySelectedTab}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const targetUrl = urlKeyword
+                  ? `/search/input?keyword=${encodeURIComponent(urlKeyword)}`
+                  : '/search/input';
+                router.push(targetUrl);
+              }
+            }}
+            role="button"
+          >
+            <SearchBar
+              placeholder="어떤 술을 찾고 계신가요?"
+              readOnly={true}
+              value={urlKeyword || ''}
+              onDelete={() => {
+                router.replace('/search/input');
+              }}
             />
-            <div className="pl-5">
+          </div>
+
+          {!showTab && (
+            <div className="px-5 pt-3 pb-3">
               <CategorySelector
                 handleCategoryCallback={handleCategoryCallback}
               />
             </div>
-          </article>
+          )}
+        </div>
+
+        {/* 스크롤 영역 */}
+        <section className="flex flex-col gap-7 pt-[140px] pb-5">
+          {showTab && (
+            <article className="space-y-4">
+              <Tab
+                variant="bookmark"
+                tabList={categoryList}
+                handleTab={handelCategory}
+                currentTab={categorySelectedTab}
+              />
+              <div className="pl-5">
+                <CategorySelector
+                  handleCategoryCallback={handleCategoryCallback}
+                />
+              </div>
+            </article>
+          )}
 
           {isEmptySearch ? (
             <>
