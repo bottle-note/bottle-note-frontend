@@ -7,11 +7,18 @@ import { useWebviewCamera } from '@/hooks/useWebviewCamera';
 import { useImageUploader } from '@/hooks/useImageUploader';
 import OptionDropdown from '@/components/ui/Modal/OptionDropdown';
 import useModalStore from '@/store/modalStore';
+import { DeviceService } from '@/lib/DeviceService';
 
-const SELECT_OPTIONS = [
-  { type: 'camera', name: '카메라' },
-  { type: 'album', name: '앨범에서 선택' },
-];
+const getSelectOptions = () => {
+  // Android에서는 카메라 옵션 제외
+  if (DeviceService.platform === 'android') {
+    return [{ type: 'album', name: '앨범에서 선택' }];
+  }
+  return [
+    { type: 'camera', name: '카메라' },
+    { type: 'album', name: '앨범에서 선택' },
+  ];
+};
 
 interface ImageUploaderProps {
   onForceOpen?: (value: boolean) => void;
@@ -147,7 +154,7 @@ export default function ImageUploader({
       {isOptionShow && (
         <OptionDropdown
           title="이미지 추가"
-          options={SELECT_OPTIONS}
+          options={getSelectOptions()}
           handleOptionSelect={handleOptionSelect}
           handleClose={() => setIsOptionShow(false)}
         />
