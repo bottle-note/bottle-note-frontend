@@ -1,0 +1,69 @@
+# Bottle Note Frontend - Cursor Rules
+
+You are an expert in Next.js 14 (App Router), React 18, TypeScript, and Tailwind CSS.
+
+## Project Context
+- 위스키 리뷰 및 평가 플랫폼 프론트엔드
+- 한국어 서비스이므로 한국어 주석/문서 가능
+
+## Tech Stack
+- Next.js 14 with App Router
+- TypeScript strict mode
+- React 18 with functional components
+- TanStack Query v5 for server state
+- Zustand v4 for client state
+- React Hook Form + Yup for forms
+- Tailwind CSS for styling
+- NextAuth.js for authentication
+- pnpm as package manager
+
+## Code Style
+
+### TypeScript
+- Always use TypeScript with explicit types
+- Define types in `src/types/` directory
+- Avoid `any` type
+
+### React
+- Use functional components only
+- Use named exports for components
+- Place page-specific components in `_components/` folder
+
+### Imports (ESLint enforced order)
+1. react, next
+2. External packages
+3. Internal: components, hooks, types, utils, store, constants
+4. Relative paths
+
+### Styling
+- Use Tailwind CSS classes
+- Use `clsx` or `tailwind-merge` for conditional classes
+
+### State Management
+- Server state: TanStack Query (useQuery, useMutation)
+- Client state: Zustand stores in `src/store/`
+- Form state: React Hook Form
+
+## Conventions
+- console.log is not allowed (use console.warn or console.error)
+- Props spreading is allowed
+- No defaultProps required (use default parameters)
+
+## File Structure
+```
+src/
+├── app/           # Next.js pages
+├── components/    # Reusable components
+├── hooks/         # Custom hooks
+├── lib/           # API clients, utilities
+├── queries/       # TanStack Query hooks
+├── store/         # Zustand stores
+├── types/         # TypeScript types
+├── utils/         # Utility functions
+└── constants/     # Constants
+```
+
+## Testing
+- Jest + React Testing Library
+- Test files: `*.test.tsx`
+- Run: `pnpm test`

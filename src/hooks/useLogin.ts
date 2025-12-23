@@ -7,6 +7,7 @@ import { AuthApi } from '@/app/api/AuthApi';
 import { ApiError } from '@/utils/ApiError';
 import { UserApi } from '@/app/api/UserApi';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
+import { getReturnToUrl } from '@/utils/loginRedirect';
 import { useAuth } from './auth/useAuth';
 
 export type LoginFormValues = {
@@ -46,12 +47,12 @@ export const useLogin = () => {
         window.sendLogToFlutter(
           `${result.data.message} / ${result.data.deviceToken} / ${result.data.platform}`,
         );
-        router.replace('/');
+        router.replace(getReturnToUrl());
         return;
       }
 
       if (!isInApp && isLoggedIn) {
-        router.replace('/');
+        router.replace(getReturnToUrl());
       }
     } catch (e) {
       window.sendLogToFlutter((e as Error).message);
