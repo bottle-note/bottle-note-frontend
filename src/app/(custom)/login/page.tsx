@@ -9,11 +9,18 @@ import { DeviceService } from '@/lib/DeviceService';
 import { useLogin } from '@/hooks/useLogin';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/auth/useAuth';
+import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
+import {
+  setReturnToUrl,
+  getReturnToUrl,
+  isValidReturnUrl,
+} from '@/utils/loginRedirect';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
 export default function Login() {
   const router = useRouter();
+  const [returnToParam] = useStatefulSearchParams<string | null>('returnTo');
   const {
     handleSendDeviceInfo,
     handleInitKakaoSdkLogin,
@@ -23,12 +30,18 @@ export default function Login() {
   const { isLoggedIn } = useAuth();
 
   useEffect(() => {
+    if (returnToParam && isValidReturnUrl(returnToParam)) {
+      setReturnToUrl(returnToParam);
+    }
+  }, [returnToParam]);
+
+  useEffect(() => {
     handleSendDeviceInfo();
   }, []);
 
   useEffect(() => {
     if (isLoggedIn) {
-      router.replace('/');
+      router.replace(getReturnToUrl());
     }
   }, [isLoggedIn]);
 

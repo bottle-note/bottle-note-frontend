@@ -87,10 +87,7 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
     }));
 
     if (menu.requiresAuth && !isLoggedIn) {
-      if (menu.link === ROUTES.HISTORY.BASE) {
-        return handleLoginModal();
-      }
-      return router.push(ROUTES.LOGIN);
+      return handleLoginModal();
     }
 
     router.push(menu.link);
