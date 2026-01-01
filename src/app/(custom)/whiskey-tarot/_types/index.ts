@@ -38,12 +38,7 @@ export interface RecommendResponse {
 }
 
 // 퀴즈 상태 타입
-export type QuizStep =
-  | 'intro'
-  | 'selecting'
-  | 'slides'
-  | 'result'
-  | 'share';
+export type QuizStep = 'intro' | 'selecting' | 'slides' | 'result' | 'share';
 
 export interface QuizState {
   step: QuizStep;

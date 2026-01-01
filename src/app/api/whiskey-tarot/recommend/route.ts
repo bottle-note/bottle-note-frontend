@@ -186,7 +186,10 @@ function findDominantFlavor(score: Record<FlavorTag, number>): FlavorTag {
 }
 
 // 매칭 이유 생성 함수
-function generateMatchReason(cards: TarotCard[], whisky: WhiskyRecommend): string {
+function generateMatchReason(
+  cards: TarotCard[],
+  whisky: WhiskyRecommend,
+): string {
   const cardNames = cards.map((c) => c.nameKo).join(', ');
 
   if (whisky.category === 'Balance') {
@@ -212,7 +215,7 @@ export async function POST(request: NextRequest) {
     if (!selectedCardIds || selectedCardIds.length !== 3) {
       return NextResponse.json(
         { error: '3장의 카드를 선택해주세요.' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -224,7 +227,7 @@ export async function POST(request: NextRequest) {
     if (selectedCards.length !== 3) {
       return NextResponse.json(
         { error: '유효하지 않은 카드 ID입니다.' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -251,7 +254,7 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: '요청 처리 중 오류가 발생했습니다.' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

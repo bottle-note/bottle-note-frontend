@@ -47,12 +47,12 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
         {/* 타이틀 */}
         <div className="mb-4">
           <span className="text-mainCoral text-sm tracking-[0.3em] uppercase">
-            2025 Whiskey Tarot
+            2026 Whiskey Tarot
           </span>
         </div>
 
         <h1 className="text-3xl font-bold text-white mb-2 leading-tight">
-          당신의 2025년을
+          당신의 2026년을
           <br />
           위로할 위스키는?
         </h1>
@@ -114,9 +114,7 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
       </div>
 
       {/* 하단 안내 */}
-      <p className="absolute bottom-8 text-gray-500 text-xs">
-        Bottle Note
-      </p>
+      <p className="absolute bottom-8 text-gray-500 text-xs">Bottle Note</p>
     </div>
   );
 }

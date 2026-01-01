@@ -1,10 +1,5 @@
 import { useState, useCallback } from 'react';
-import {
-  QuizState,
-  QuizStep,
-  TarotCard,
-  WhiskyRecommend,
-} from '../_types';
+import { QuizState, QuizStep, TarotCard, WhiskyRecommend } from '../_types';
 
 const initialState: QuizState = {
   step: 'intro',

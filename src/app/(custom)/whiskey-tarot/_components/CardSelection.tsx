@@ -20,8 +20,6 @@ interface ShuffleStepPosition {
 }
 
 interface CardItemProps {
-  card: TarotCard;
-  index: number;
   selected: boolean;
   disabled: boolean;
   selectedIndex: number;
@@ -31,8 +29,6 @@ interface CardItemProps {
 }
 
 function CardItem({
-  card,
-  index,
   selected,
   disabled,
   selectedIndex,
@@ -55,7 +51,10 @@ function CardItem({
       style={{
         transform: `translate(${shufflePosition.x}px, ${shufflePosition.y}px) rotate(${shufflePosition.rotation}deg) scale(${shufflePosition.scale})`,
         opacity: shuffleStep === 0 ? 0 : 1,
-        transition: shuffleStep === 0 ? 'none' : 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        transition:
+          shuffleStep === 0
+            ? 'none'
+            : 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
       }}
     >
       {/* 카드 테두리 (빈티지 타로 스타일) */}
@@ -78,7 +77,9 @@ function CardItem({
       {/* 선택 표시 */}
       {selected && selectedIndex >= 0 && (
         <div className="absolute -top-2 -right-2 w-7 h-7 sm:w-8 sm:h-8 bg-mainCoral rounded-full flex items-center justify-center shadow-lg z-20 border-2 border-white">
-          <span className="text-white text-xs sm:text-sm font-bold">{selectedIndex + 1}</span>
+          <span className="text-white text-xs sm:text-sm font-bold">
+            {selectedIndex + 1}
+          </span>
         </div>
       )}
     </button>
@@ -155,8 +156,8 @@ export default function CardSelection({
   useEffect(() => {
     const timers = [
       setTimeout(() => setShowTitle(true), 100),
-      setTimeout(() => setShuffleStep(1), 200),  // 중앙에 모임
-      setTimeout(() => setShuffleStep(2), 700),  // 첫 번째 섞기
+      setTimeout(() => setShuffleStep(1), 200), // 중앙에 모임
+      setTimeout(() => setShuffleStep(2), 700), // 첫 번째 섞기
       setTimeout(() => setShuffleStep(3), 1200), // 두 번째 섞기
       setTimeout(() => setShuffleStep(4), 1700), // 원래 위치로
     ];
@@ -195,8 +196,16 @@ export default function CardSelection({
         scale: 0.7,
       };
     }
-    const stepKey = `step${shuffleStep}` as keyof typeof shufflePositions[number];
-    return shufflePositions[index]?.[stepKey] || { x: 0, y: 0, rotation: 0, scale: 1 };
+    const stepKey =
+      `step${shuffleStep}` as keyof (typeof shufflePositions)[number];
+    return (
+      shufflePositions[index]?.[stepKey] || {
+        x: 0,
+        y: 0,
+        rotation: 0,
+        scale: 1,
+      }
+    );
   };
 
   return (
@@ -227,8 +236,6 @@ export default function CardSelection({
             {cards.slice(0, 4).map((card, index) => (
               <CardItem
                 key={card.id}
-                card={card}
-                index={index}
                 selected={isSelected(card.id)}
                 disabled={!canSelectMore}
                 selectedIndex={selectedCards.findIndex((c) => c.id === card.id)}
@@ -243,8 +250,6 @@ export default function CardSelection({
             {cards.slice(4, 7).map((card, index) => (
               <CardItem
                 key={card.id}
-                card={card}
-                index={index + 4}
                 selected={isSelected(card.id)}
                 disabled={!canSelectMore}
                 selectedIndex={selectedCards.findIndex((c) => c.id === card.id)}
@@ -259,8 +264,6 @@ export default function CardSelection({
             {cards.slice(7, 10).map((card, index) => (
               <CardItem
                 key={card.id}
-                card={card}
-                index={index + 7}
                 selected={isSelected(card.id)}
                 disabled={!canSelectMore}
                 selectedIndex={selectedCards.findIndex((c) => c.id === card.id)}

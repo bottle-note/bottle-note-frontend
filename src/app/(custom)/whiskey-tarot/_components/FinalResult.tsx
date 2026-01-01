@@ -60,10 +60,7 @@ export default function FinalResult({
         {/* 선택한 카드들 */}
         <div className="flex justify-center gap-3 mb-6">
           {selectedCards.map((card) => (
-            <div
-              key={card.id}
-              className="flex flex-col items-center"
-            >
+            <div key={card.id} className="flex flex-col items-center">
               <div className="relative w-16 h-24 rounded-lg overflow-hidden shadow-lg">
                 <Image
                   src={card.image}

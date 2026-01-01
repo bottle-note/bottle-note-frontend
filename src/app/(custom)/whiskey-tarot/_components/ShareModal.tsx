@@ -33,7 +33,7 @@ export default function ShareModal({
         await navigator.share(shareData);
       } else {
         await navigator.clipboard.writeText(
-          `${shareData.text}\n${shareData.url}`
+          `${shareData.text}\n${shareData.url}`,
         );
         alert('링크가 복사되었습니다!');
       }
@@ -82,7 +82,10 @@ export default function ShareModal({
         >
           <div className="flex items-center gap-2 mb-3">
             {selectedCards.map((card) => (
-              <div key={card.id} className="relative w-12 h-18 rounded-md overflow-hidden">
+              <div
+                key={card.id}
+                className="relative w-12 h-18 rounded-md overflow-hidden"
+              >
                 <Image
                   src={card.image}
                   alt={card.nameKo}
