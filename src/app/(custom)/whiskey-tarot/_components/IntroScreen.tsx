@@ -47,20 +47,18 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
         {/* 타이틀 */}
         <div className="mb-4">
           <span className="text-mainCoral text-sm tracking-[0.3em] uppercase">
-            2026 Whiskey Tarot
+            2026 Spirits & Spirit
           </span>
         </div>
 
-        <h1 className="text-3xl font-bold text-white mb-2 leading-tight">
-          당신의 2026년을
-          <br />
-          위로할 위스키는?
+        <h1 className="text-2xl font-bold text-white mb-2 leading-tight">
+          위스키와 함께하는 2026 타로점
         </h1>
 
         <p className="text-white/70 text-sm mb-12 max-w-[280px]">
           타로 카드를 뽑아
           <br />
-          올해의 위스키를 추천받아 보세요
+          올해의 추천 위스키를 점쳐보세요.
         </p>
 
         {/* 카드 미리보기 이미지 */}
