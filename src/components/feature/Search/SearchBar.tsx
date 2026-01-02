@@ -16,6 +16,7 @@ interface Props {
   readOnly?: boolean;
   value?: string;
   onDelete?: () => void;
+  initialValue?: string;
 }
 
 const SearchButton = () => (
@@ -32,6 +33,7 @@ export default function SearchBar({
   readOnly = false,
   value,
   onDelete,
+  initialValue,
 }: Props) {
   const {
     searchText,
@@ -46,6 +48,7 @@ export default function SearchBar({
     onSearch: handleSearch,
     onFocusChange: handleFocus,
     syncWithUrlParams: true,
+    initialValue,
   });
 
   const displayValue = value !== undefined ? value : searchText;
