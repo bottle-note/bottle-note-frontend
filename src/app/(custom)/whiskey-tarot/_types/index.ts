@@ -19,6 +19,8 @@ export interface WhiskyRecommend {
   nameKo: string; // "글렌모렌지 오리지널"
   description: string; // 위스키 설명
   emoji: string; // 이모지 (임시 이미지 대용)
+  whiskyCategory: string; // URL 카테고리 (Single%20Malt, all 등)
+  whiskyId: number; // Bottle Note 위스키 ID
 }
 
 // API 응답 타입

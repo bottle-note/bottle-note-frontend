@@ -119,6 +119,8 @@ const WHISKY_BY_CATEGORY: Record<FlavorTag, WhiskyRecommend> = {
     nameKo: '글렌모렌지 오리지널',
     description: '시트러스한 향기가 기분을 밝게 해줍니다.',
     emoji: '🍋',
+    whiskyCategory: 'Single%20Malt',
+    whiskyId: 209,
   },
   Sweet: {
     category: 'Sweet',
@@ -126,6 +128,8 @@ const WHISKY_BY_CATEGORY: Record<FlavorTag, WhiskyRecommend> = {
     nameKo: '발베니 12년',
     description: '꿀처럼 달콤하고 부드러운 위로가 됩니다.',
     emoji: '🍯',
+    whiskyCategory: 'Single%20Malt',
+    whiskyId: 326,
   },
   Peat: {
     category: 'Peat',
@@ -133,6 +137,8 @@ const WHISKY_BY_CATEGORY: Record<FlavorTag, WhiskyRecommend> = {
     nameKo: '아드벡 10년',
     description: '깊고 스모키한 향이 고독을 즐기게 해줍니다.',
     emoji: '🔥',
+    whiskyCategory: 'all',
+    whiskyId: 6157,
   },
   Strong: {
     category: 'Strong',
@@ -140,6 +146,8 @@ const WHISKY_BY_CATEGORY: Record<FlavorTag, WhiskyRecommend> = {
     nameKo: '와일드 터키 101',
     description: '타협하지 않는 강렬한 타격감을 선사합니다.',
     emoji: '💪',
+    whiskyCategory: 'all',
+    whiskyId: 86,
   },
   Balance: {
     category: 'Balance',
@@ -147,6 +155,8 @@ const WHISKY_BY_CATEGORY: Record<FlavorTag, WhiskyRecommend> = {
     nameKo: '조니워커 블랙',
     description: '복잡한 마음을 조화롭게 감싸주는 완벽한 밸런스입니다.',
     emoji: '⚖️',
+    whiskyCategory: 'all',
+    whiskyId: 7872,
   },
 };
 

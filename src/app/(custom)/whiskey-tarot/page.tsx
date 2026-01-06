@@ -7,7 +7,6 @@ import DealingPhase from './_components/DealingPhase';
 import CardSelection from './_components/CardSelection';
 import ResultSlides from './_components/ResultSlides';
 import FinalResult from './_components/FinalResult';
-import ShareModal from './_components/ShareModal';
 
 interface AnimatedPageProps {
   children: ReactNode;
@@ -79,8 +78,6 @@ export default function WhiskeyTarotPage() {
     reset,
   } = useTarotQuiz();
 
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-
   const handleStart = () => {
     fetchCards();
   };
@@ -91,10 +88,6 @@ export default function WhiskeyTarotPage() {
 
   const handleSlidesComplete = () => {
     goToResult();
-  };
-
-  const handleShare = () => {
-    setIsShareModalOpen(true);
   };
 
   const handleRetry = () => {
@@ -139,21 +132,10 @@ export default function WhiskeyTarotPage() {
             selectedCards={state.selectedCards}
             whisky={state.recommendedWhisky}
             matchReason={state.matchReason}
-            onShare={handleShare}
             onRetry={handleRetry}
           />
         )}
       </AnimatedPage>
-
-      {/* 공유 모달 */}
-      {state.recommendedWhisky && (
-        <ShareModal
-          isOpen={isShareModalOpen}
-          onClose={() => setIsShareModalOpen(false)}
-          selectedCards={state.selectedCards}
-          whisky={state.recommendedWhisky}
-        />
-      )}
     </div>
   );
 }

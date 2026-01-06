@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { TarotCard, WhiskyRecommend } from '../_types';
 
 interface FinalResultProps {
   selectedCards: TarotCard[];
   whisky: WhiskyRecommend;
   matchReason: string;
-  onShare: () => void;
   onRetry: () => void;
 }
 
@@ -24,15 +24,19 @@ export default function FinalResult({
   selectedCards,
   whisky,
   matchReason,
-  onShare,
   onRetry,
 }: FinalResultProps) {
+  const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleGoToWhisky = () => {
+    router.push(`/search/${whisky.whiskyCategory}/${whisky.whiskyId}`);
+  };
 
   return (
     <div className="relative flex flex-col min-h-screen overflow-hidden">
@@ -110,10 +114,10 @@ export default function FinalResult({
         {/* 하단 버튼 */}
         <div className="flex flex-col gap-3 mt-6">
           <button
-            onClick={onShare}
+            onClick={handleGoToWhisky}
             className="w-full py-4 bg-gradient-to-r from-mainCoral to-subCoral text-white font-semibold rounded-full shadow-lg shadow-mainCoral/30"
           >
-            결과 공유하기
+            이 위스키 보러가기
           </button>
           <button
             onClick={onRetry}
