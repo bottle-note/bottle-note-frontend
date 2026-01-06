@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { TarotCard } from '../_types';
 
@@ -12,49 +12,40 @@ interface CardSelectionProps {
   isLoading: boolean;
 }
 
-interface ShuffleStepPosition {
-  x: number;
-  y: number;
-  rotation: number;
-  scale: number;
-}
-
 interface CardItemProps {
+  index: number;
   selected: boolean;
   disabled: boolean;
   selectedIndex: number;
   onClick: () => void;
-  shuffleStep: number;
-  shufflePosition: ShuffleStepPosition;
+  isVisible: boolean;
 }
 
 function CardItem({
+  index,
   selected,
   disabled,
   selectedIndex,
   onClick,
-  shuffleStep,
-  shufflePosition,
+  isVisible,
 }: CardItemProps) {
-  const isShuffling = shuffleStep < 4;
-
   return (
     <button
       onClick={onClick}
-      disabled={disabled || selected || isShuffling}
+      disabled={disabled || selected || !isVisible}
       className={`
-        relative w-20 h-28 sm:w-24 sm:h-36 transition-all duration-400 ease-out
-        ${disabled && !isShuffling ? 'opacity-40 cursor-not-allowed' : ''}
+        relative w-20 h-28 sm:w-24 sm:h-36 transition-all duration-500 ease-out
+        ${disabled && isVisible ? 'opacity-40 cursor-not-allowed' : ''}
         ${selected ? 'scale-105 z-10 cursor-default' : 'hover:scale-105 active:scale-95'}
-        ${isShuffling ? 'z-20' : ''}
       `}
       style={{
-        transform: `translate(${shufflePosition.x}px, ${shufflePosition.y}px) rotate(${shufflePosition.rotation}deg) scale(${shufflePosition.scale})`,
-        opacity: shuffleStep === 0 ? 0 : 1,
-        transition:
-          shuffleStep === 0
-            ? 'none'
-            : 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible
+          ? selected
+            ? 'scale(1.05)'
+            : 'scale(1)'
+          : 'scale(0.8) translateY(20px)',
+        transitionDelay: `${index * 50}ms`,
       }}
     >
       {/* 카드 테두리 (빈티지 타로 스타일) */}
@@ -86,13 +77,6 @@ function CardItem({
   );
 }
 
-// 그리드 위치 계산 (4+3+3 배치)
-const getGridPosition = (index: number) => {
-  if (index < 4) return { row: 0, col: index, rowOffset: 0 };
-  if (index < 7) return { row: 1, col: index - 4, rowOffset: 0.5 }; // 3장이므로 0.5 오프셋
-  return { row: 2, col: index - 7, rowOffset: 0.5 };
-};
-
 export default function CardSelection({
   cards,
   selectedCards,
@@ -100,69 +84,18 @@ export default function CardSelection({
   onConfirm,
   isLoading,
 }: CardSelectionProps) {
-  const [shuffleStep, setShuffleStep] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
   const [showTitle, setShowTitle] = useState(false);
 
-  // 셔플 위치 미리 생성 (step 1~4)
-  const shufflePositions = useMemo(() => {
-    const cardWidth = 88; // 카드 너비 + gap
-    const cardHeight = 124; // 카드 높이 + gap
-
-    return cards.map((_, index) => {
-      const gridPos = getGridPosition(index);
-
-      // 중앙 기준점
-      const centerCol = 1.5;
-      const centerRow = 1;
-
-      // 중앙까지 거리
-      const offsetX = (centerCol - gridPos.col - gridPos.rowOffset) * cardWidth;
-      const offsetY = (centerRow - gridPos.row) * cardHeight;
-
-      return {
-        // Step 1: 중앙에 모임 (카드 덱처럼)
-        step1: {
-          x: offsetX + (index - 5) * 3,
-          y: offsetY + (index - 5) * 2,
-          rotation: (Math.random() - 0.5) * 15,
-          scale: 0.85,
-        },
-        // Step 2: 첫 번째 섞기 - 카드들이 흩어지면서 교차
-        step2: {
-          x: offsetX * 0.4 + (Math.random() - 0.5) * 120,
-          y: offsetY * 0.4 + (Math.random() - 0.5) * 80,
-          rotation: (Math.random() - 0.5) * 25,
-          scale: 0.9,
-        },
-        // Step 3: 두 번째 섞기 - 반대 방향으로 이동
-        step3: {
-          x: (Math.random() - 0.5) * 80,
-          y: (Math.random() - 0.5) * 50,
-          rotation: (Math.random() - 0.5) * 15,
-          scale: 0.95,
-        },
-        // Step 4: 원래 위치로 정착
-        step4: {
-          x: 0,
-          y: 0,
-          rotation: 0,
-          scale: 1,
-        },
-      };
-    });
-  }, [cards]);
-
-  // 셔플 시퀀스
+  // 진입 애니메이션
   useEffect(() => {
-    const timers = [
-      setTimeout(() => setShowTitle(true), 100),
-      setTimeout(() => setShuffleStep(1), 200), // 중앙에 모임
-      setTimeout(() => setShuffleStep(2), 700), // 첫 번째 섞기
-      setTimeout(() => setShuffleStep(3), 1200), // 두 번째 섞기
-      setTimeout(() => setShuffleStep(4), 1700), // 원래 위치로
-    ];
+    const titleTimer = setTimeout(() => setShowTitle(true), 100);
+    const cardsTimer = setTimeout(() => setIsVisible(true), 300);
 
-    return () => timers.forEach(clearTimeout);
+    return () => {
+      clearTimeout(titleTimer);
+      clearTimeout(cardsTimer);
+    };
   }, []);
 
   const handleCardClick = (card: TarotCard) => {
@@ -179,34 +112,6 @@ export default function CardSelection({
     selectedCards.some((c) => c.id === cardId);
 
   const canSelectMore = selectedCards.length < 3;
-
-  // 현재 스텝에 맞는 위치 반환
-  const getShufflePosition = (index: number): ShuffleStepPosition => {
-    if (shuffleStep === 0) {
-      // 초기 상태 (아직 안 보임)
-      const gridPos = getGridPosition(index);
-      const cardWidth = 88;
-      const cardHeight = 124;
-      const centerCol = 1.5;
-      const centerRow = 1;
-      return {
-        x: (centerCol - gridPos.col - gridPos.rowOffset) * cardWidth,
-        y: (centerRow - gridPos.row) * cardHeight,
-        rotation: 0,
-        scale: 0.7,
-      };
-    }
-    const stepKey =
-      `step${shuffleStep}` as keyof (typeof shufflePositions)[number];
-    return (
-      shufflePositions[index]?.[stepKey] || {
-        x: 0,
-        y: 0,
-        rotation: 0,
-        scale: 1,
-      }
-    );
-  };
 
   return (
     <div className="relative flex flex-col min-h-screen px-4 py-8">
@@ -236,12 +141,12 @@ export default function CardSelection({
             {cards.slice(0, 4).map((card, index) => (
               <CardItem
                 key={card.id}
+                index={index}
                 selected={isSelected(card.id)}
                 disabled={!canSelectMore}
                 selectedIndex={selectedCards.findIndex((c) => c.id === card.id)}
                 onClick={() => handleCardClick(card)}
-                shuffleStep={shuffleStep}
-                shufflePosition={getShufflePosition(index)}
+                isVisible={isVisible}
               />
             ))}
           </div>
@@ -250,12 +155,12 @@ export default function CardSelection({
             {cards.slice(4, 7).map((card, index) => (
               <CardItem
                 key={card.id}
+                index={index + 4}
                 selected={isSelected(card.id)}
                 disabled={!canSelectMore}
                 selectedIndex={selectedCards.findIndex((c) => c.id === card.id)}
                 onClick={() => handleCardClick(card)}
-                shuffleStep={shuffleStep}
-                shufflePosition={getShufflePosition(index + 4)}
+                isVisible={isVisible}
               />
             ))}
           </div>
@@ -264,12 +169,12 @@ export default function CardSelection({
             {cards.slice(7, 10).map((card, index) => (
               <CardItem
                 key={card.id}
+                index={index + 7}
                 selected={isSelected(card.id)}
                 disabled={!canSelectMore}
                 selectedIndex={selectedCards.findIndex((c) => c.id === card.id)}
                 onClick={() => handleCardClick(card)}
-                shuffleStep={shuffleStep}
-                shufflePosition={getShufflePosition(index + 7)}
+                isVisible={isVisible}
               />
             ))}
           </div>

@@ -23,7 +23,7 @@ export const useTarotQuiz = () => {
       setState((prev) => ({
         ...prev,
         cards: data.cards,
-        step: 'selecting',
+        step: 'dealing', // 덱에서 카드 뽑기 화면으로
       }));
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -31,6 +31,11 @@ export const useTarotQuiz = () => {
     } finally {
       setIsLoading(false);
     }
+  }, []);
+
+  // dealing 완료 후 selecting으로 이동
+  const goToSelecting = useCallback(() => {
+    setState((prev) => ({ ...prev, step: 'selecting' }));
   }, []);
 
   // 카드 선택/해제
@@ -128,6 +133,7 @@ export const useTarotQuiz = () => {
     state,
     isLoading,
     fetchCards,
+    goToSelecting,
     toggleCardSelection,
     getRecommendation,
     setStep,

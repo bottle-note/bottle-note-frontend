@@ -3,6 +3,7 @@
 import { useState, useEffect, ReactNode } from 'react';
 import { useTarotQuiz } from './_hooks/useTarotQuiz';
 import IntroScreen from './_components/IntroScreen';
+import DealingPhase from './_components/DealingPhase';
 import CardSelection from './_components/CardSelection';
 import ResultSlides from './_components/ResultSlides';
 import FinalResult from './_components/FinalResult';
@@ -71,6 +72,7 @@ export default function WhiskeyTarotPage() {
     state,
     isLoading,
     fetchCards,
+    goToSelecting,
     toggleCardSelection,
     getRecommendation,
     goToResult,
@@ -104,6 +106,11 @@ export default function WhiskeyTarotPage() {
       {/* 인트로 화면 */}
       <AnimatedPage isActive={state.step === 'intro'} direction="fade">
         <IntroScreen onStart={handleStart} />
+      </AnimatedPage>
+
+      {/* 카드 딜링 화면 (78장 덱에서 10장 뽑기) */}
+      <AnimatedPage isActive={state.step === 'dealing'} direction="up">
+        <DealingPhase cards={state.cards} onComplete={goToSelecting} />
       </AnimatedPage>
 
       {/* 카드 선택 화면 */}
