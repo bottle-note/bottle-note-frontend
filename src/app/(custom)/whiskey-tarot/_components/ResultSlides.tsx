@@ -149,8 +149,8 @@ function SingleCardSlide({
           `}
         >
           {/* 카드 이름 */}
-          <h2 className="text-white text-2xl font-bold mb-1">{card.nameKo}</h2>
-          <p className="text-white/60 text-sm mb-4">{card.name}</p>
+          <h2 className="text-white text-xl font-bold mb-1">{card.nameKo}</h2>
+          <p className="text-white/60 text-xs mb-3">{card.name}</p>
 
           {/* Flavor 태그 */}
           <div className="mb-4">
@@ -160,7 +160,7 @@ function SingleCardSlide({
           </div>
 
           {/* 리딩 텍스트 */}
-          <p className="text-white text-lg leading-relaxed whitespace-pre-line">
+          <p className="text-white text-sm leading-relaxed whitespace-pre-line">
             {card.readingText}
           </p>
         </div>
