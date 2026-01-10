@@ -21,7 +21,7 @@ import Tab from '@/components/ui/Navigation/Tab';
 import { ROUTES } from '@/constants/routes';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
-import SearchBar from '@/components/feature/Search/SearchBar';
+import SearchBarLink from '@/components/feature/Search/SearchBarLink';
 import { useSearchPageState } from '@/app/(primary)/search/hook/useSearchPageState';
 
 const SORT_OPTIONS = [
@@ -204,34 +204,12 @@ export default function Search() {
       >
         {/* 고정 영역: SearchBar + (스크롤 시) CategorySelector */}
         <div className="fixed-content top-0 bg-white z-10">
-          <div
-            className="px-5 pt-[70px] cursor-pointer"
-            onClick={() => {
-              const targetUrl = urlKeyword
-                ? `/search/input?keyword=${encodeURIComponent(urlKeyword)}`
-                : '/search/input';
-              router.push(targetUrl);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                const targetUrl = urlKeyword
-                  ? `/search/input?keyword=${encodeURIComponent(urlKeyword)}`
-                  : '/search/input';
-                router.push(targetUrl);
-              }
-            }}
-            role="button"
-          >
-            <SearchBar
-              placeholder="어떤 술을 찾고 계신가요?"
-              readOnly={true}
-              value={urlKeyword || ''}
-              onDelete={() => {
-                router.replace('/search/input');
-              }}
-            />
-          </div>
+          <SearchBarLink
+            className="px-5 pt-[70px]"
+            placeholder="어떤 술을 찾고 계신가요?"
+            keyword={urlKeyword || undefined}
+            onClear={() => router.replace('/search/input')}
+          />
 
           {!showTab && (
             <div className="px-5 pt-3 pb-3">

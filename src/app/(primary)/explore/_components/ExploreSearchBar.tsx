@@ -22,7 +22,7 @@ interface Props {
   activeKeywords?: SearchKeyword[];
 }
 
-export const SearchBar = ({
+export const ExploreSearchBar = ({
   handleSearch,
   handleAddKeyword,
   handleRemoveKeyword,

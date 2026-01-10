@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import NavLayout from '@/components/ui/Layout/NavLayout';
-import SearchBar from '@/components/feature/Search/SearchBar';
+import SearchBarLink from '@/components/feature/Search/SearchBarLink';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { HistoryApi } from '@/app/api/HistoryApi';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
@@ -153,38 +153,13 @@ export default function History() {
         </SubHeader.Right>
       </SubHeader>
       <main>
-        <div
-          className="px-5 cursor-pointer"
-          onClick={() => {
-            const currentUrl = urlKeyword
-              ? `/history?keyword=${encodeURIComponent(urlKeyword)}`
-              : '/history';
-            router.push(
-              `/search/input?returnUrl=${encodeURIComponent(currentUrl)}`,
-            );
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              const currentUrl = urlKeyword
-                ? `/history?keyword=${encodeURIComponent(urlKeyword)}`
-                : '/history';
-              router.push(
-                `/search/input?returnUrl=${encodeURIComponent(currentUrl)}`,
-              );
-            }
-          }}
-          role="button"
-        >
-          <SearchBar
-            placeholder="위스키 이름 검색"
-            readOnly={true}
-            value={urlKeyword}
-            onDelete={() => {
-              router.replace('/history');
-            }}
-          />
-        </div>
+        <SearchBarLink
+          className="px-5"
+          placeholder="위스키 이름 검색"
+          keyword={urlKeyword}
+          returnUrl={urlKeyword ? `/history?keyword=${urlKeyword}` : '/history'}
+          onClear={() => router.replace('/history')}
+        />
         <TimelineFull
           data={accumulatedHistories}
           isLastPage={

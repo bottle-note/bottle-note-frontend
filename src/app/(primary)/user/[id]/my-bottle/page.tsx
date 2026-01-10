@@ -12,7 +12,7 @@ import Tab from '@/components/ui/Navigation/Tab';
 import { REGIONS } from '@/constants/common';
 import { useTab } from '@/hooks/useTab';
 import { RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
-import SearchBar from '@/components/feature/Search/SearchBar';
+import SearchBarLink from '@/components/feature/Search/SearchBarLink';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
 import {
@@ -151,36 +151,17 @@ export default function MyBottle({
           <SubHeader.Center>{headerTitle}</SubHeader.Center>
         </SubHeader>
 
-        <div
-          className="p-5 cursor-pointer"
-          onClick={() => {
-            const currentUrl = `/user/${userId}/my-bottle?type=${currentTab.id}${urlKeyword ? `&keyword=${encodeURIComponent(urlKeyword)}` : ''}`;
-            router.push(
-              `/search/input?returnUrl=${encodeURIComponent(currentUrl)}`,
-            );
+        <SearchBarLink
+          className="p-5"
+          placeholder="찾으시는 술이 있으신가요?"
+          keyword={urlKeyword}
+          returnUrl={`/user/${userId}/my-bottle?type=${currentTab.id}${urlKeyword ? `&keyword=${urlKeyword}` : ''}`}
+          onClear={() => {
+            const params = new URLSearchParams();
+            params.set('type', currentTab.id);
+            router.replace(`?${params.toString()}`);
           }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              const currentUrl = `/user/${userId}/my-bottle?type=${currentTab.id}${urlKeyword ? `&keyword=${encodeURIComponent(urlKeyword)}` : ''}`;
-              router.push(
-                `/search/input?returnUrl=${encodeURIComponent(currentUrl)}`,
-              );
-            }
-          }}
-          role="button"
-        >
-          <SearchBar
-            placeholder="찾으시는 술이 있으신가요?"
-            readOnly={true}
-            value={urlKeyword}
-            onDelete={() => {
-              const params = new URLSearchParams();
-              params.set('type', currentTab.id);
-              router.replace(`?${params.toString()}`);
-            }}
-          />
-        </div>
+        />
 
         <section className="pt-5 px-5 space-y-7.5">
           <Tab
