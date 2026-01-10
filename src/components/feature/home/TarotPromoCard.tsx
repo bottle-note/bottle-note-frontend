@@ -20,14 +20,17 @@ export function TarotPromoCard({ onClose }: TarotPromoCardProps) {
   const handleClose = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onClose();
+    setIsVisible(false);
+    setTimeout(() => {
+      onClose();
+    }, 500);
   };
 
   return (
     <div
       className={`
-        mx-4 mt-0 mb-[15px] overflow-hidden transition-all duration-500 ease-out
-        ${isVisible ? 'max-h-24 opacity-100' : 'max-h-0 opacity-0'}
+        mx-4 mt-0 overflow-hidden transition-all duration-500 ease-out
+        ${isVisible ? 'max-h-24 opacity-100 mb-[15px]' : 'max-h-0 opacity-0 mb-0'}
       `}
     >
       <Link
