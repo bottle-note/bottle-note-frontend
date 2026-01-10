@@ -42,6 +42,7 @@ export interface RecommendResponse {
 // 퀴즈 상태 타입
 export type QuizStep =
   | 'intro'
+  | 'questioning'
   | 'dealing'
   | 'selecting'
   | 'slides'

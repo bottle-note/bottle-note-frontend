@@ -3,10 +3,13 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { TarotCard, WhiskyRecommend } from '../_types';
+
+import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import { AlcoholInfo } from '@/types/Alcohol';
+
+import { WhiskyRecommend } from '../_types';
 
 interface FinalResultProps {
-  selectedCards: TarotCard[];
   whisky: WhiskyRecommend;
   matchReason: string;
   onRetry: () => void;
@@ -21,18 +24,40 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 export default function FinalResult({
-  selectedCards,
   whisky,
   matchReason,
   onRetry,
 }: FinalResultProps) {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
+  const [whiskyDetail, setWhiskyDetail] = useState<AlcoholInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const fetchWhiskyDetail = async () => {
+      try {
+        const result = await AlcoholsApi.getAlcoholDetails(
+          String(whisky.whiskyId),
+        );
+        if (result?.alcohols) {
+          setWhiskyDetail(result.alcohols);
+        }
+      } catch (error) {
+        console.error('위스키 상세 정보 로딩 실패:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (whisky.whiskyId) {
+      fetchWhiskyDetail();
+    }
+  }, [whisky.whiskyId]);
 
   const handleGoToWhisky = () => {
     router.push(`/search/${whisky.whiskyCategory}/${whisky.whiskyId}`);
@@ -61,29 +86,24 @@ export default function FinalResult({
           </h1>
         </div>
 
-        {/* 선택한 카드들 */}
-        <div className="flex justify-center gap-3 mb-6">
-          {selectedCards.map((card) => (
-            <div key={card.id} className="flex flex-col items-center">
-              <div className="relative w-16 h-24 rounded-lg overflow-hidden shadow-lg">
-                <Image
-                  src={card.image}
-                  alt={card.nameKo}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <span className="text-white/60 text-xs mt-1">{card.nameKo}</span>
-            </div>
-          ))}
-        </div>
-
         {/* 위스키 카드 */}
         <div className="flex-1 flex flex-col items-center justify-center">
           <div className="w-full max-w-[320px] bg-gradient-to-b from-white/10 to-white/5 rounded-2xl p-6 border border-white/10">
             {/* 위스키 이미지 영역 */}
-            <div className="w-full aspect-square bg-gradient-to-br from-mainCoral/20 to-subCoral/10 rounded-xl mb-4 flex items-center justify-center">
-              <span className="text-8xl">{whisky.emoji}</span>
+            <div className="w-full aspect-square bg-gradient-to-br from-mainCoral/20 to-subCoral/10 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
+              {isLoading ? (
+                <div className="w-12 h-12 border-2 border-mainCoral/30 border-t-mainCoral rounded-full animate-spin" />
+              ) : whiskyDetail?.alcoholUrlImg ? (
+                <Image
+                  src={whiskyDetail.alcoholUrlImg}
+                  alt={whiskyDetail.korName || whisky.nameKo}
+                  width={200}
+                  height={200}
+                  className="object-contain max-h-full"
+                />
+              ) : (
+                <div className="text-white/40 text-sm">이미지 없음</div>
+              )}
             </div>
 
             {/* 위스키 정보 */}
@@ -92,21 +112,21 @@ export default function FinalResult({
                 {CATEGORY_LABELS[whisky.category] || whisky.category}
               </p>
               <h2 className="text-white text-xl font-bold mb-1">
-                {whisky.nameKo}
+                {whiskyDetail?.korName || whisky.nameKo}
               </h2>
-              <p className="text-white/60 text-sm mb-4">{whisky.name}</p>
+              <p className="text-white/60 text-sm mb-4">
+                {whiskyDetail?.engName || whisky.name}
+              </p>
 
-              {/* 매칭 이유 */}
-              <div className="bg-white/5 rounded-lg p-4 mb-4">
+              {/* 매칭 이유 + 위스키 설명 */}
+              <div className="bg-white/5 rounded-lg p-4">
                 <p className="text-white/80 text-sm leading-relaxed whitespace-pre-line">
                   {matchReason}
                 </p>
+                <p className="text-white/60 text-sm leading-relaxed mt-3">
+                  {whisky.description}
+                </p>
               </div>
-
-              {/* 위스키 설명 */}
-              <p className="text-white/60 text-sm leading-relaxed">
-                {whisky.description}
-              </p>
             </div>
           </div>
         </div>

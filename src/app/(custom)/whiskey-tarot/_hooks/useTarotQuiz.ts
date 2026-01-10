@@ -14,6 +14,11 @@ export const useTarotQuiz = () => {
   const [state, setState] = useState<QuizState>(initialState);
   const [isLoading, setIsLoading] = useState(false);
 
+  // 질문 생각 화면으로 이동
+  const goToQuestioning = useCallback(() => {
+    setState((prev) => ({ ...prev, step: 'questioning' }));
+  }, []);
+
   // 카드 목록 불러오기
   const fetchCards = useCallback(async () => {
     setIsLoading(true);
@@ -132,6 +137,7 @@ export const useTarotQuiz = () => {
   return {
     state,
     isLoading,
+    goToQuestioning,
     fetchCards,
     goToSelecting,
     toggleCardSelection,

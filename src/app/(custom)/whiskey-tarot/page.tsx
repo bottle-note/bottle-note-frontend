@@ -3,6 +3,7 @@
 import { useState, useEffect, ReactNode } from 'react';
 import { useTarotQuiz } from './_hooks/useTarotQuiz';
 import IntroScreen from './_components/IntroScreen';
+import QuestioningScreen from './_components/QuestioningScreen';
 import DealingPhase from './_components/DealingPhase';
 import CardSelection from './_components/CardSelection';
 import ResultSlides from './_components/ResultSlides';
@@ -70,6 +71,7 @@ export default function WhiskeyTarotPage() {
   const {
     state,
     isLoading,
+    goToQuestioning,
     fetchCards,
     goToSelecting,
     toggleCardSelection,
@@ -79,6 +81,10 @@ export default function WhiskeyTarotPage() {
   } = useTarotQuiz();
 
   const handleStart = () => {
+    goToQuestioning();
+  };
+
+  const handleQuestioningComplete = () => {
     fetchCards();
   };
 
@@ -99,6 +105,11 @@ export default function WhiskeyTarotPage() {
       {/* 인트로 화면 */}
       <AnimatedPage isActive={state.step === 'intro'} direction="fade">
         <IntroScreen onStart={handleStart} />
+      </AnimatedPage>
+
+      {/* 질문 생각 화면 */}
+      <AnimatedPage isActive={state.step === 'questioning'} direction="fade">
+        <QuestioningScreen onReady={handleQuestioningComplete} />
       </AnimatedPage>
 
       {/* 카드 딜링 화면 (78장 덱에서 10장 뽑기) */}
@@ -129,7 +140,6 @@ export default function WhiskeyTarotPage() {
       <AnimatedPage isActive={state.step === 'result'} direction="up">
         {state.recommendedWhisky && (
           <FinalResult
-            selectedCards={state.selectedCards}
             whisky={state.recommendedWhisky}
             matchReason={state.matchReason}
             onRetry={handleRetry}
