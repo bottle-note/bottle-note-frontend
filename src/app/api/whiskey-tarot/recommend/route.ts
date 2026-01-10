@@ -54,19 +54,15 @@ function generateMatchReason(
 ): string {
   const cardNames = cards.map((c) => c.nameKo).join(', ');
 
-  if (whisky.category === 'Balance') {
-    return `${cardNames} 카드가 이끈 당신의 복잡한 마음에\n완벽한 조화를 선사하는 ${whisky.nameKo}를 추천합니다.`;
-  }
-
   const flavorDescriptions: Record<FlavorTag, string> = {
-    Fresh: '상큼하고 가벼운 시작',
-    Sweet: '달콤하고 풍요로운 휴식',
-    Peat: '깊고 스모키한 고독',
-    Strong: '강렬하고 단단한 의지',
-    Balance: '완벽한 조화',
+    Fresh: '상큼하고 가벼운 시작을',
+    Sweet: '달콤하고 풍요로운 휴식을',
+    Peat: '깊고 스모키한 고독을',
+    Strong: '강렬하고 단단한 의지를',
+    Balance: '완벽한 조화를',
   };
 
-  return `${flavorDescriptions[whisky.category]}을 원하는 당신에게\n${whisky.nameKo}를 추천합니다.`;
+  return `${flavorDescriptions[whisky.category]}원하는 당신에게 추천합니다.`;
 }
 
 export async function POST(request: NextRequest) {
