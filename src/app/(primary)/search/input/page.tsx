@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
 import SearchBar from '@/components/feature/Search/SearchBar';
 import RecentSearch from '@/components/feature/Search/RecentSearch';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
@@ -50,13 +49,7 @@ export default function SearchInput() {
   };
 
   return (
-    <motion.main
-      className="w-full pt-[70px] min-h-screen bg-white"
-      initial={{ x: '100%' }}
-      animate={{ x: 0 }}
-      exit={{ x: '100%' }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-    >
+    <main className="w-full pt-[70px] min-h-screen bg-white">
       <div className="flex items-center gap-3 px-5">
         <button
           onClick={() => router.back()}
@@ -82,6 +75,6 @@ export default function SearchInput() {
       <div className="mt-5">
         <RecentSearch handleSearch={onSearch} />
       </div>
-    </motion.main>
+    </main>
   );
 }

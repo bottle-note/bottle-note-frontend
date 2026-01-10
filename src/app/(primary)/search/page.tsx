@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { v4 as uuid } from 'uuid';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
 import List from '@/components/feature/List/List';
@@ -195,13 +194,7 @@ export default function Search() {
 
   return (
     <Suspense>
-      <motion.main
-        className="mb-24 w-full h-full"
-        initial={{ x: '-20%', opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: '-20%', opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      >
+      <main className="mb-24 w-full h-full">
         {/* 고정 영역: SearchBar + (스크롤 시) CategorySelector */}
         <div className="fixed-content top-0 bg-white z-10">
           <SearchBarLink
@@ -332,7 +325,7 @@ export default function Search() {
             </div>
           )}
         </section>
-      </motion.main>
+      </main>
     </Suspense>
   );
 }
