@@ -6,7 +6,7 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import List from '@/components/feature/List/List';
 import Label from '@/components/ui/Display/Label';
 import WhiskeyListItem from './WhiskeyListItem';
-import { SearchBar } from './SearchBar';
+import { ExploreSearchBar } from './ExploreSearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
 import { useExploreKeywords } from '../_hooks/useExploreKeywords';
 
@@ -41,7 +41,7 @@ export const WhiskeyExplorerList = () => {
 
   return (
     <section>
-      <SearchBar
+      <ExploreSearchBar
         handleSearch={refetch}
         handleAddKeyword={handleAddKeyword}
         handleRemoveKeyword={handleRemoveKeyword}
