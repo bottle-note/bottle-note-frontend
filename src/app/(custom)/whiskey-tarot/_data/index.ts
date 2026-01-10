@@ -1,6 +1,5 @@
 import { TarotCard, WhiskyRecommend, FlavorTag } from '../_types';
 
-// 10장의 타로 카드 데이터
 export const TAROT_CARDS: TarotCard[] = [
   {
     id: 0,
@@ -108,47 +107,52 @@ export const TAROT_CARDS: TarotCard[] = [
 export const WHISKY_BY_CATEGORY: Record<FlavorTag, WhiskyRecommend> = {
   Fresh: {
     category: 'Fresh',
-    name: 'Glenmorangie Original',
-    nameKo: '글렌모렌지 오리지널',
-    description: '시트러스한 향기가 기분을 밝게 해줍니다.',
+    name: 'AnCnoc 12',
+    nameKo: '아녹 12년',
+    description:
+      "하이랜드의 '녹두(Knockdhu)' 증류소에서 만든 숨겨진 물건이에요. 갓 베어낸 풀내음이랑 레몬 향이 확 퍼져서 정말 산뜻해요. 마니아들 사이에선 '모닝 위스키로 이만한 게 없다'고 할 정도로 기분 전환에 딱입니다.",
     emoji: '🍋',
-    whiskyCategory: 'Single%20Malt',
-    whiskyId: 209,
+    whiskyCategory: 'all',
+    whiskyId: 444,
   },
   Sweet: {
     category: 'Sweet',
-    name: 'The Balvenie 12',
-    nameKo: '발베니 12년',
-    description: '꿀처럼 달콤하고 부드러운 위로가 됩니다.',
+    name: 'GlenAllachie 15',
+    nameKo: '글렌알라키 15년',
+    description:
+      "위스키계의 살아있는 전설, '빌리 워커' 할아버지가 작정하고 만든 역작이에요. 색소 한 방울 안 넣었는데도 쉐리 오크통 숙성만으로 진한 마호가니 빛이 나요. 입안에 넣으면 꾸덕한 초콜릿이랑 건포도 맛이 꽉 차는, 솔직히 이 정도 풍요로움을 주는 술은 찾기 힘들죠.",
     emoji: '🍯',
-    whiskyCategory: 'Single%20Malt',
-    whiskyId: 326,
+    whiskyCategory: 'all',
+    whiskyId: 276,
   },
   Peat: {
     category: 'Peat',
-    name: 'Ardbeg 10',
-    nameKo: '아드벡 10년',
-    description: '깊고 스모키한 향이 고독을 즐기게 해줍니다.',
+    name: 'Ledaig 10',
+    nameKo: '레칙 10년',
+    description:
+      '보통 피트 위스키 하면 아일라 섬을 찾는데, 얘는 뮬(Mull) 섬의 토버모리 증류소에서 온 녀석이라 결이 좀 달라요. 소독약 냄새보다는 비에 젖은 흙이나 오래된 가죽 같은 거칠고 투박한 냄새가 매력이죠. 혼자 조용히 생각 정리하고 싶을 때 바텐더들이 몰래 꺼내주는 술입니다.',
     emoji: '🔥',
     whiskyCategory: 'all',
-    whiskyId: 6157,
+    whiskyId: 5867,
   },
   Strong: {
     category: 'Strong',
-    name: 'Wild Turkey 101',
-    nameKo: '와일드 터키 101',
-    description: '타협하지 않는 강렬한 타격감을 선사합니다.',
+    name: 'Ardbeg Uigeadail',
+    nameKo: '아드벡 우거다일',
+    description:
+      "이름부터가 '어둡고 신비한 곳'이라는 뜻이에요. 도수가 54.2도나 되는데, 마셔보면 그냥 독하기만 한 게 아닙니다. 아드벡 특유의 매캐한 연기 냄새랑 쉐리 캐스크의 끈적한 단맛이 입안에서 '꽝!' 하고 부딪히는 느낌이거든요. 자극이 필요하거나 마음을 다잡고 싶은 날엔 무조건 이거예요.",
     emoji: '💪',
     whiskyCategory: 'all',
-    whiskyId: 86,
+    whiskyId: 466,
   },
   Balance: {
     category: 'Balance',
-    name: 'Johnnie Walker Black',
-    nameKo: '조니워커 블랙',
-    description: '복잡한 마음을 조화롭게 감싸주는 완벽한 밸런스입니다.',
+    name: 'Highland Park 12',
+    nameKo: '하이랜드 파크 12년',
+    description:
+      "스코틀랜드 가장 북쪽, 바람 거친 오크니 섬에서 온 '바이킹의 후예'입니다. 재밌는 게, 여기 피트(Peat)에는 꽃이 섞여 있어서 스모키한데도 은근히 꿀처럼 달콤한 꽃향기가 나요. 너무 튀지도 않고 심심하지도 않고... 바텐더들이 '실패 없는 육각형 위스키' 찾을 때 제일 먼저 권해주는 친구입니다.",
     emoji: '⚖️',
     whiskyCategory: 'all',
-    whiskyId: 7872,
+    whiskyId: 179,
   },
 };
