@@ -49,7 +49,9 @@ function CategorySelector({ handleCategoryCallback, selectedCategory }: Props) {
 
   useEffect(() => {
     if (hasCategoryParam && currCategory) {
-      const category = CATEGORY_MENUS_LIST.find((cat) => cat.id === currCategory);
+      const category = CATEGORY_MENUS_LIST.find(
+        (cat) => cat.id === currCategory,
+      );
 
       if (category) {
         handleTab(category.id);
