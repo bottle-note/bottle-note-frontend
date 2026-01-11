@@ -127,14 +127,23 @@ export const AlcoholsApi = {
     cursor,
     pageSize,
   }: ListQueryParams) {
+    // URLSearchParams를 사용하여 안전하게 쿼리 구성
+    const params = new URLSearchParams();
+
+    if (keyword) params.set('keyword', keyword);
+    if (category && category !== 'ALL') params.set('category', category);
+    if (regionId !== undefined && regionId !== '')
+      params.set('regionId', String(regionId));
+    if (sortType) params.set('sortType', sortType);
+    if (sortOrder) params.set('sortOrder', sortOrder);
+    if (cursor !== undefined) params.set('cursor', String(cursor));
+    if (pageSize !== undefined) params.set('pageSize', String(pageSize));
+
     const response = await apiClient.get<
       ApiResponse<{ alcohols: any[]; totalCount: number }>
-    >(
-      `/alcohols/search?keyword=${decodeURI(keyword ?? '')}&category=${category}&regionId=${regionId || ''}&sortType=${sortType}&sortOrder=${sortOrder}&cursor=${cursor}&pageSize=${pageSize}`,
-      {
-        authRequired: false,
-      },
-    );
+    >(`/alcohols/search?${params.toString()}`, {
+      authRequired: false,
+    });
 
     if (response.errors.length !== 0) {
       throw new Error('Failed to fetch data');

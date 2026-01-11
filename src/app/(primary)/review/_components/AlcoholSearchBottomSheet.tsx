@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import BackDrop from '@/components/ui/Modal/BackDrop';
 import SearchBar from '@/components/feature/Search/SearchBar';
@@ -10,7 +9,6 @@ import { AlcoholAPI } from '@/types/Alcohol';
 import { SORT_TYPE, SORT_ORDER } from '@/types/common';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import SelectableAlcoholItem from './SelectableAlcoholItem';
-import CloseGrayIcon from 'public/icon/close-gray.svg';
 
 interface Props {
   isOpen: boolean;
@@ -40,8 +38,6 @@ export default function AlcoholSearchBottomSheet({
     try {
       const response = await AlcoholsApi.getList({
         keyword,
-        category: 'All',
-        regionId: undefined,
         sortType: SORT_TYPE.POPULAR,
         sortOrder: SORT_ORDER.DESC,
         cursor: 0,
@@ -86,14 +82,6 @@ export default function AlcoholSearchBottomSheet({
             variants={modalVariants}
             onClick={(e) => e.stopPropagation()}
           >
-            <header className="flex items-center justify-between border-b border-brightGray py-4 px-5">
-              <div className="w-6" />
-              <h3 className="text-16 font-semibold">위스키 검색</h3>
-              <button type="button" onClick={handleClose}>
-                <Image src={CloseGrayIcon} alt="닫기" width={24} height={24} />
-              </button>
-            </header>
-
             <div className="px-5 py-4">
               <SearchBar
                 handleSearch={handleSearch}
