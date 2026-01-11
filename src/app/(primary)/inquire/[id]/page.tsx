@@ -172,7 +172,7 @@ export default function Inquire() {
                 )}
               </div>
               {inquireDetails.adminId && (
-                <div className="pt-5 text-10 break-words leading-none text-mainDarkGray">
+                <div className="pt-5 text-12 break-words text-mainDarkGray">
                   {inquireDetails.responseContent}
                 </div>
               )}

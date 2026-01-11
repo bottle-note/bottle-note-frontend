@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/ui/Navigation/Tab';
 import HomeCarousel from '@/components/feature/home/HomeCarousel';
@@ -10,8 +12,15 @@ import DynamicAlcoholList from '@/components/feature/home/DynamicAlcoholList';
 import NavLayout from '@/components/ui/Layout/NavLayout';
 import JsonLd from '@/components/seo/JsonLd';
 import { generateWebSiteSchema } from '@/utils/seo/generateWebSiteSchema';
+import { TarotPromoCard } from '@/components/feature/home/TarotPromoCard';
 
 export default function Home() {
+  const [showTarotPromo, setShowTarotPromo] = useState(true);
+
+  const handleCloseTarotPromo = () => {
+    setShowTarotPromo(false);
+  };
+
   const {
     currentTab: firstMenuSelectedTab,
     handleTab: handelFirstMenu,
@@ -73,6 +82,7 @@ export default function Home() {
             <SubHeader.Menu />
           </SubHeader.Right>
         </SubHeader>
+        {showTarotPromo && <TarotPromoCard onClose={handleCloseTarotPromo} />}
         <HomeCarousel />
         <div className="pt-[22px] space-y-1 relative">
           <section className="pb-20">

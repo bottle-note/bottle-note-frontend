@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { v4 as uuid } from 'uuid';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
@@ -20,7 +20,7 @@ import Tab from '@/components/ui/Navigation/Tab';
 import { ROUTES } from '@/constants/routes';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
-import SearchContainer from '@/components/feature/Search/SearchContainer';
+import SearchBarLink from '@/components/feature/Search/SearchBarLink';
 import { useSearchPageState } from '@/app/(primary)/search/hook/useSearchPageState';
 
 const SORT_OPTIONS = [
@@ -44,6 +44,7 @@ export default function Search() {
   const { popularList, isLoading: isPopularLoading } = usePopularList();
   const { filterState, handleFilter, isEmptySearch, urlKeyword } =
     useSearchPageState();
+  const [showTab, setShowTab] = useState(true);
 
   const isCurationSearch =
     filterState.keyword && isCurationKeyword(filterState.keyword);
@@ -149,10 +150,6 @@ export default function Search() {
     });
   };
 
-  const handleSearchCallback = (searchedKeyword: string) => {
-    handleFilter('keyword', searchedKeyword);
-  };
-
   const handleCategoryCallback = (selectedCategory: Category) => {
     handleFilter('category', selectedCategory);
   };
@@ -182,28 +179,57 @@ export default function Search() {
     }
   }, [urlKeyword]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setShowTab(false);
+      } else {
+        setShowTab(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <Suspense>
       <main className="mb-24 w-full h-full">
-        <SearchContainer
-          handleSearchCallback={handleSearchCallback}
-          styleProps="px-5 pt-[70px]"
-        />
+        {/* 고정 영역: SearchBar + (스크롤 시) CategorySelector */}
+        <div className="fixed-content top-0 bg-white z-10">
+          <SearchBarLink
+            className="px-5 pt-[70px]"
+            placeholder="어떤 술을 찾고 계신가요?"
+            keyword={urlKeyword || undefined}
+            onClear={() => router.replace('/search/input')}
+          />
 
-        <section className="flex flex-col gap-7 pt-[11px] pb-5">
-          <article className="space-y-4">
-            <Tab
-              variant="bookmark"
-              tabList={categoryList}
-              handleTab={handelCategory}
-              currentTab={categorySelectedTab}
-            />
-            <div className="pl-5">
+          {!showTab && (
+            <div className="px-5 pt-3 pb-3">
               <CategorySelector
                 handleCategoryCallback={handleCategoryCallback}
               />
             </div>
-          </article>
+          )}
+        </div>
+
+        {/* 스크롤 영역 */}
+        <section className="flex flex-col gap-7 pt-[140px] pb-5">
+          {showTab && (
+            <article className="space-y-4">
+              <Tab
+                variant="bookmark"
+                tabList={categoryList}
+                handleTab={handelCategory}
+                currentTab={categorySelectedTab}
+              />
+              <div className="pl-5">
+                <CategorySelector
+                  handleCategoryCallback={handleCategoryCallback}
+                />
+              </div>
+            </article>
+          )}
 
           {isEmptySearch ? (
             <>
@@ -240,32 +266,34 @@ export default function Search() {
                   total={alcoholList ? alcoholList[0].data.totalCount : 0}
                 />
                 {!isCurationSearch && (
-                  <>
-                    <List.SortOrderSwitch
-                      type={filterState.sortOrder}
-                      handleSortOrder={(value) =>
-                        handleFilter('sortOrder', value)
-                      }
-                    />
-                    <List.OptionSelect
-                      options={SORT_OPTIONS}
-                      currentValue={filterState.sortType}
-                      handleOptionCallback={(value) =>
-                        handleFilter('sortType', value)
-                      }
-                    />
-                    <List.OptionSelect
-                      options={REGIONS.map((region) => ({
-                        type: String(region.regionId),
-                        name: region.korName,
-                      }))}
-                      currentValue={filterState.regionId}
-                      handleOptionCallback={(value) =>
-                        handleFilter('regionId', value)
-                      }
-                      title="국가"
-                    />
-                  </>
+                  <List.SortOrderSwitch
+                    type={filterState.sortOrder}
+                    handleSortOrder={(value) =>
+                      handleFilter('sortOrder', value)
+                    }
+                  />
+                )}
+                {!isCurationSearch && (
+                  <List.OptionSelect
+                    options={SORT_OPTIONS}
+                    currentValue={filterState.sortType}
+                    handleOptionCallback={(value) =>
+                      handleFilter('sortType', value)
+                    }
+                  />
+                )}
+                {!isCurationSearch && (
+                  <List.OptionSelect
+                    options={REGIONS.map((region) => ({
+                      type: String(region.regionId),
+                      name: region.korName,
+                    }))}
+                    currentValue={filterState.regionId}
+                    handleOptionCallback={(value) =>
+                      handleFilter('regionId', value)
+                    }
+                    title="국가"
+                  />
                 )}
 
                 {alcoholList &&

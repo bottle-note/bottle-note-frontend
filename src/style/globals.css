@@ -45,6 +45,7 @@
   body {
     font-family: 'suit', sans-serif;
     font-weight: 400; /* Default weight */
+    overflow-x: hidden; /* Prevent horizontal scroll during page transitions */
   }
 
   /* Prevent text selection and dragging */
@@ -173,6 +174,15 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Safe area padding for mobile browsers */
+  .pb-safe {
+    padding-bottom: max(2rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .pb-safe-lg {
+    padding-bottom: max(4rem, calc(env(safe-area-inset-bottom, 0px) + 2rem));
   }
 }
 

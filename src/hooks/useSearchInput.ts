@@ -16,19 +16,23 @@ export const useSearchInput = ({
 }: UseSearchInputOptions = {}) => {
   const searchParams = useSearchParams();
   const urlQuery = syncWithUrlParams ? searchParams.get('query') : null;
+  const urlKeyword = syncWithUrlParams ? searchParams.get('keyword') : null;
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [searchText, setSearchText] = useState<string>(
-    urlQuery ?? initialValue,
+    urlKeyword ?? urlQuery ?? initialValue,
   );
   const [isFocused, setIsFocused] = useState(false);
 
   // URL 파라미터와 동기화
   useEffect(() => {
-    if (syncWithUrlParams && urlQuery !== null) {
-      setSearchText(urlQuery);
+    if (syncWithUrlParams) {
+      const newValue = urlKeyword ?? urlQuery;
+      if (newValue !== null) {
+        setSearchText(newValue);
+      }
     }
-  }, [urlQuery, syncWithUrlParams]);
+  }, [urlKeyword, urlQuery, syncWithUrlParams]);
 
   // 검색 실행 (엔터 또는 버튼 클릭)
   const handleSubmit = useCallback(() => {
