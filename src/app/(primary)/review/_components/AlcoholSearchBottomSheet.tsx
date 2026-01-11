@@ -1,11 +1,14 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import BottomSheet from '@/components/ui/Modal/BottomSheet';
 import SearchBar from '@/components/feature/Search/SearchBar';
+import CategorySelector from '@/components/ui/Form/CategorySelector';
+import Tab from '@/components/ui/Navigation/Tab';
+import { useTab } from '@/hooks/useTab';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
 import { AlcoholAPI } from '@/types/Alcohol';
-import { SORT_TYPE, SORT_ORDER } from '@/types/common';
+import { Category, SORT_TYPE, SORT_ORDER } from '@/types/common';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import SelectableAlcoholItem from './SelectableAlcoholItem';
 
@@ -23,33 +26,59 @@ export default function AlcoholSearchBottomSheet({
   const [searchResults, setSearchResults] = useState<AlcoholAPI[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<
+    Category | undefined
+  >(undefined);
+  const lastKeywordRef = useRef<string>('');
 
-  const handleSearch = useCallback(async (keyword: string) => {
-    if (!keyword.trim()) {
-      setSearchResults([]);
-      setHasSearched(false);
-      return;
+  const {
+    currentTab: categorySelectedTab,
+    handleTab: handleCategoryTab,
+    tabList: categoryTabList,
+  } = useTab({
+    tabList: [{ id: 'category', name: '카테고리' }],
+    scroll: true,
+  });
+
+  const fetchAlcohols = useCallback(
+    async (keyword?: string, category?: Category) => {
+      setIsLoading(true);
+      setHasSearched(true);
+
+      try {
+        const response = await AlcoholsApi.getList({
+          keyword: keyword || undefined,
+          category,
+          sortType: SORT_TYPE.POPULAR,
+          sortOrder: SORT_ORDER.DESC,
+          cursor: 0,
+          pageSize: 20,
+        });
+
+        setSearchResults(response.data.alcohols);
+      } catch {
+        setSearchResults([]);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [],
+  );
+
+  const handleSearch = useCallback(
+    async (keyword: string) => {
+      lastKeywordRef.current = keyword;
+      await fetchAlcohols(keyword, selectedCategory);
+    },
+    [selectedCategory, fetchAlcohols],
+  );
+
+  // 바텀시트가 열릴 때 초기 데이터 로드
+  useEffect(() => {
+    if (isOpen && !hasSearched) {
+      fetchAlcohols(undefined, undefined);
     }
-
-    setIsLoading(true);
-    setHasSearched(true);
-
-    try {
-      const response = await AlcoholsApi.getList({
-        keyword,
-        sortType: SORT_TYPE.POPULAR,
-        sortOrder: SORT_ORDER.DESC,
-        cursor: 0,
-        pageSize: 20,
-      });
-
-      setSearchResults(response.data.alcohols);
-    } catch {
-      setSearchResults([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  }, [isOpen, hasSearched, fetchAlcohols]);
 
   const handleSelect = (alcoholId: string) => {
     onSelectAlcohol(alcoholId);
@@ -57,20 +86,46 @@ export default function AlcoholSearchBottomSheet({
     setHasSearched(false);
   };
 
+  const handleCategoryChange = useCallback(
+    (category: Category) => {
+      setSelectedCategory(category);
+      // 카테고리 변경 시 현재 검색어로 재검색
+      fetchAlcohols(lastKeywordRef.current || undefined, category);
+    },
+    [fetchAlcohols],
+  );
+
   const handleClose = () => {
     setSearchResults([]);
     setHasSearched(false);
+    setSelectedCategory(undefined);
+    lastKeywordRef.current = '';
     onClose();
   };
 
   return (
     <BottomSheet isOpen={isOpen} onClose={handleClose} height={85}>
-      <div className="px-5 pt-4 pb-6">
+      <div className="px-5 pt-4 pb-3">
         <SearchBar
           handleSearch={handleSearch}
           placeholder="찾으시는 술이 있으신가요?"
         />
       </div>
+
+      <article className="space-y-4 pb-3">
+        <Tab
+          variant="bookmark"
+          tabList={categoryTabList}
+          handleTab={handleCategoryTab}
+          currentTab={categorySelectedTab}
+        />
+        <div className="pl-5">
+          <CategorySelector
+            handleCategoryCallback={handleCategoryChange}
+            selectedCategory={selectedCategory}
+          />
+        </div>
+      </article>
 
       <div className="flex-1 overflow-y-auto px-5 pb-safe">
         {isLoading ? (
