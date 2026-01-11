@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -18,18 +18,24 @@ import useModalStore from '@/store/modalStore';
 import Toast from '@/components/ui/Interactive/Toast';
 import ReviewForm from '../_components/form/ReviewForm';
 import ReviewHeaderLayout from '../_components/ReviewHeaderLayout';
+import AlcoholSearchBottomSheet from '../_components/AlcoholSearchBottomSheet';
 
 function ReviewRegister() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { handleModalState } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
-  const alcoholId = searchParams.get('alcoholId') || '';
+
+  const initialAlcoholId = searchParams.get('alcoholId') || '';
+  const [selectedAlcoholId, setSelectedAlcoholId] =
+    useState<string>(initialAlcoholId);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
   const {
     alcoholData,
     userRating,
     isLoading: isAlcoholLoading,
-  } = useAlcoholDetails(alcoholId);
+  } = useAlcoholDetails(selectedAlcoholId);
 
   const defaultFormData: ReviewTempData['content'] = {
     review: '',
@@ -94,7 +100,7 @@ function ReviewRegister() {
 
   const { removeSavedReview, isToastVisible, toastMessage } = useReviewAutoSave(
     {
-      alcoholId,
+      alcoholId: selectedAlcoholId,
       onLoad: handleLoad,
       getCurrentData,
       shouldSave: (data) => data !== null,
@@ -102,7 +108,7 @@ function ReviewRegister() {
   );
 
   const { submitReview } = useReviewSubmission({
-    alcoholId,
+    alcoholId: selectedAlcoholId,
     initialRating: userRating,
     removeSavedReview,
   });
@@ -126,7 +132,18 @@ function ReviewRegister() {
     showErrorModal(['review', 'price_type']);
   }, [errors]);
 
+  const handleSelectAlcohol = (alcoholId: string) => {
+    setSelectedAlcoholId(alcoholId);
+    setIsSearchOpen(false);
+    router.replace(`/review/register?alcoholId=${alcoholId}`);
+  };
+
   const handleBack = () => {
+    if (!selectedAlcoholId) {
+      router.back();
+      return;
+    }
+
     if (isDirty) {
       handleModalState({
         isShowModal: true,
@@ -143,21 +160,46 @@ function ReviewRegister() {
     }
   };
 
+  const hasSelectedAlcohol = selectedAlcoholId && alcoholData;
+  const isEmptyState = !selectedAlcoholId;
+
   return (
     <FormProvider {...formMethods}>
       <ReviewHeaderLayout
         alcoholData={alcoholData}
         onBack={handleBack}
         headerTitle="리뷰 작성"
+        isEmptyState={isEmptyState}
+        onSelectAlcohol={() => setIsSearchOpen(true)}
       />
-      <ReviewForm />
-      <article className="sticky bottom-5 px-5 z-10 flex justify-center">
-        <Button
-          onClick={handleSubmit(onSave)}
-          btnName="리뷰 등록"
-          disabled={isProcessing}
-        />
-      </article>
+
+      {hasSelectedAlcohol ? (
+        <>
+          <ReviewForm />
+          <article className="sticky bottom-5 px-5 z-10 flex justify-center">
+            <Button
+              onClick={handleSubmit(onSave)}
+              btnName="리뷰 등록"
+              disabled={isProcessing}
+            />
+          </article>
+        </>
+      ) : (
+        <section className="flex flex-col items-center justify-center py-20 text-mainGray">
+          <p className="text-14 text-center">
+            위스키를 선택하면
+            <br />
+            리뷰를 작성할 수 있어요!
+          </p>
+        </section>
+      )}
+
+      <AlcoholSearchBottomSheet
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onSelectAlcohol={handleSelectAlcohol}
+      />
+
       {isToastVisible && <Toast message={toastMessage} />}
       {isProcessing && <Loading />}
     </FormProvider>
