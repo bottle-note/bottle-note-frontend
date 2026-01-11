@@ -86,12 +86,9 @@ export default function FinalResult({
           </h1>
         </div>
 
-        {/* 위스키 카드 - 클릭 가능 */}
+        {/* 위스키 카드 */}
         <div className="flex flex-col items-center">
-          <button
-            onClick={handleGoToWhisky}
-            className="w-full max-w-[320px] bg-gradient-to-b from-white/10 to-white/5 rounded-2xl p-4 border border-white/10 transition-all duration-300 active:scale-[0.98] hover:border-mainCoral/30"
-          >
+          <div className="w-full max-w-[320px] bg-gradient-to-b from-white/10 to-white/5 rounded-2xl p-4 border border-white/10">
             {/* 위스키 이미지 영역 */}
             <div className="w-full flex items-center justify-center overflow-hidden py-6">
               {isLoading ? (
@@ -140,26 +137,31 @@ export default function FinalResult({
                   {whisky.description}
                 </p>
               </div>
-            </div>
-          </button>
 
-          {/* 힌트 텍스트 */}
-          <p className="text-white/40 text-xs mt-4 flex items-center gap-1">
-            탭하여 자세히 보기
-            <svg
-              className="w-3 h-3"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </p>
+              {/* CTA 버튼 */}
+              <button
+                onClick={handleGoToWhisky}
+                className="group mt-4 w-full py-3 bg-mainCoral/20 rounded-full flex items-center justify-center gap-2 hover:bg-mainCoral/30 active:scale-[0.98] transition-all"
+              >
+                <span className="text-mainCoral text-sm font-medium">
+                  위스키 마시고 리뷰 남기러 가기
+                </span>
+                <svg
+                  className="w-4 h-4 text-mainCoral group-hover:translate-x-1 transition-transform"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
