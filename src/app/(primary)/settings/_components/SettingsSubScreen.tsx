@@ -9,41 +9,43 @@ interface SettingsSubScreenProps {
   config: ScreenConfig;
 }
 
-const itemVariants = {
-  hidden: { opacity: 0, x: 50 },
-  visible: (i: number) => ({
+const containerVariants = {
+  hidden: { opacity: 0, x: 30 },
+  visible: {
     opacity: 1,
     x: 0,
     transition: {
-      delay: i * 0.1,
-      type: 'spring',
-      stiffness: 100,
+      duration: 0.5,
+      ease: 'easeOut',
     },
-  }),
+  },
 };
 
 export const SettingsSubScreen = ({ config }: SettingsSubScreenProps) => {
   if (config.component) {
     const Component = config.component;
     return (
-      <section className="flex-1 overflow-y-auto">
+      <motion.section
+        className="flex-1 overflow-y-auto"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         <Component />
-      </section>
+      </motion.section>
     );
   }
 
   return (
-    <section className="flex-1 overflow-y-auto px-6">
+    <motion.section
+      className="flex-1 overflow-y-auto px-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
       <div className="space-y-0 py-[22px] text-15 font-medium text-mainBlack border-b border-brightGray">
         {config.items?.map((item, index) => (
-          <motion.div
-            key={item.text}
-            className={index === 0 ? '' : 'pt-[25px]'}
-            variants={itemVariants}
-            initial="hidden"
-            animate="visible"
-            custom={index}
-          >
+          <div key={item.text} className={index === 0 ? '' : 'pt-[25px]'}>
             {item.action && (
               <button onClick={item.action} className="w-full text-left">
                 {item.text}
@@ -59,9 +61,9 @@ export const SettingsSubScreen = ({ config }: SettingsSubScreenProps) => {
                 {item.text}
               </Link>
             )}
-          </motion.div>
+          </div>
         ))}
       </div>
-    </section>
+    </motion.section>
   );
 };
