@@ -130,8 +130,8 @@ export default function AlcoholSearchBottomSheet({
       <div className="flex-1 overflow-y-auto px-5 pb-safe">
         {isLoading ? (
           <div className="space-y-2">
-            {[...Array(5)].map((_, i) => (
-              <ListItemSkeleton key={`skeleton-${i}`} />
+            {['a', 'b', 'c', 'd', 'e'].map((id) => (
+              <ListItemSkeleton key={`skeleton-${id}`} />
             ))}
           </div>
         ) : searchResults.length > 0 ? (
