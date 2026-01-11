@@ -142,7 +142,7 @@ export default function WhiskeyTarotPage() {
           <FinalResult
             whisky={state.recommendedWhisky}
             matchReason={state.matchReason}
-            onRetry={handleRetry}
+            selectedCards={state.selectedCards.map((card) => card.nameKo)}
           />
         )}
       </AnimatedPage>
