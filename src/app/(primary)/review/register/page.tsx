@@ -160,8 +160,19 @@ function ReviewRegister() {
     }
   };
 
-  const hasSelectedAlcohol = selectedAlcoholId && alcoholData;
   const isEmptyState = !selectedAlcoholId;
+
+  const handleSubmitClick = () => {
+    if (!selectedAlcoholId) {
+      handleModalState({
+        isShowModal: true,
+        type: 'ALERT',
+        mainText: '위스키를 먼저 선택해주세요.',
+      });
+      return;
+    }
+    handleSubmit(onSave)();
+  };
 
   return (
     <FormProvider {...formMethods}>
@@ -173,26 +184,14 @@ function ReviewRegister() {
         onSelectAlcohol={() => setIsSearchOpen(true)}
       />
 
-      {hasSelectedAlcohol ? (
-        <>
-          <ReviewForm />
-          <article className="sticky bottom-5 px-5 z-10 flex justify-center">
-            <Button
-              onClick={handleSubmit(onSave)}
-              btnName="리뷰 등록"
-              disabled={isProcessing}
-            />
-          </article>
-        </>
-      ) : (
-        <section className="flex flex-col items-center justify-center py-20 text-mainGray">
-          <p className="text-14 text-center">
-            위스키를 선택하면
-            <br />
-            리뷰를 작성할 수 있어요!
-          </p>
-        </section>
-      )}
+      <ReviewForm />
+      <article className="sticky bottom-5 px-5 z-10 flex justify-center">
+        <Button
+          onClick={handleSubmitClick}
+          btnName="리뷰 등록"
+          disabled={isProcessing}
+        />
+      </article>
 
       <AlcoholSearchBottomSheet
         isOpen={isSearchOpen}
