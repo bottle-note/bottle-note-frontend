@@ -8,7 +8,7 @@ export const ROUTES = {
   SEARCH: {
     BASE: '/search',
     ALL: (id: string | number) => `/search/all/${id}`,
-    SEARCH: (keyword: string) => `/search?query=${keyword}`,
+    SEARCH: (keyword: string) => `/search?keyword=${keyword}`,
     CATEGORY: {
       BASE: (category: string, id: string | number) =>
         `/search/${category}/${id}`,

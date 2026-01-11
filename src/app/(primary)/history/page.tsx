@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import NavLayout from '@/components/ui/Layout/NavLayout';
-import SearchContainer from '@/components/feature/Search/SearchContainer';
+import SearchBarLink from '@/components/feature/Search/SearchBarLink';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { HistoryApi } from '@/app/api/HistoryApi';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
@@ -20,6 +20,8 @@ import HistoryFilterModal from './_components/filter/HistoryFilterModal';
 export default function History() {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlKeyword = searchParams.get('keyword') || '';
   const [isOpen, setIsOpen] = useState(false);
   const [currentParams, setCurrentParams] = useState('');
   const [shouldReset, setShouldReset] = useState(false);
@@ -99,11 +101,6 @@ export default function History() {
     await handleFilterChange();
   };
 
-  const handleSearchCallback = async (keyword: string) => {
-    setKeyword(keyword);
-    await handleFilterChange();
-  };
-
   useEffect(() => {
     const fetchUserInfo = async () => {
       const userInfo = await UserApi.getCurUserInfo();
@@ -112,6 +109,11 @@ export default function History() {
 
     fetchUserInfo();
   }, []);
+
+  useEffect(() => {
+    setKeyword(urlKeyword);
+    handleFilterChange();
+  }, [urlKeyword]);
 
   const handleReset = () => {
     resetFilter();
@@ -151,10 +153,12 @@ export default function History() {
         </SubHeader.Right>
       </SubHeader>
       <main>
-        <SearchContainer
+        <SearchBarLink
+          className="px-5"
           placeholder="위스키 이름 검색"
-          handleSearchCallback={handleSearchCallback}
-          styleProps="px-5"
+          keyword={urlKeyword}
+          returnUrl={urlKeyword ? `/history?keyword=${urlKeyword}` : '/history'}
+          onClear={() => router.replace('/history')}
         />
         <TimelineFull
           data={accumulatedHistories}

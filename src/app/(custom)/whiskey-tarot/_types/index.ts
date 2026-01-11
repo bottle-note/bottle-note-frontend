@@ -8,6 +8,7 @@ export interface TarotCard {
   nameKo: string; // "바보"
   flavorTag: FlavorTag; // "Fresh", "Sweet", "Peat", "Strong"
   readingText: string; // 리딩 멘트
+  history: string; // 카드의 역사/배경
   image: string; // 카드 이미지 경로
   color: string; // 슬라이드 배경 그라데이션 색상
 }

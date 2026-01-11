@@ -15,7 +15,7 @@ export default function QuestioningScreen({ onReady }: QuestioningScreenProps) {
   }, []);
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen px-6 overflow-hidden">
+    <div className="relative flex flex-col items-center justify-center min-h-screen px-6 pb-safe-lg overflow-hidden">
       {/* 배경 그라데이션 */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#1a1a2e] to-[#0a0a0f]" />
 

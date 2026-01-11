@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useCallback, useEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
@@ -12,7 +12,7 @@ import Tab from '@/components/ui/Navigation/Tab';
 import { REGIONS } from '@/constants/common';
 import { useTab } from '@/hooks/useTab';
 import { RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
-import SearchContainer from '@/components/feature/Search/SearchContainer';
+import SearchBarLink from '@/components/feature/Search/SearchBarLink';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
 import {
@@ -41,7 +41,9 @@ export default function MyBottle({
   params: { id: string };
 }) {
   const router = useRouter();
-  const myBottleType = useSearchParams().get('type') as MyBottleTabType;
+  const searchParams = useSearchParams();
+  const myBottleType = searchParams.get('type') as MyBottleTabType;
+  const urlKeyword = searchParams.get('keyword') || '';
   const { currentTab, handleTab, tabList } = useTab<{
     id: MyBottleTabType;
     name: string;
@@ -54,7 +56,7 @@ export default function MyBottle({
   });
 
   const initialState: InitialState = {
-    keyword: '',
+    keyword: urlKeyword,
     regionId: '',
     sortType: SORT_TYPE.LATEST,
     sortOrder: SORT_ORDER.DESC,
@@ -98,17 +100,22 @@ export default function MyBottle({
     staleTime: Infinity,
   });
 
-  const handleSearchCallback = useCallback((searchedKeyword: string) => {
-    handleFilter('keyword', searchedKeyword);
-  }, []);
-
   useEffect(() => {
-    router.replace(`?type=${currentTab.id}`);
+    const params = new URLSearchParams();
+    params.set('type', currentTab.id);
+    if (urlKeyword) {
+      params.set('keyword', urlKeyword);
+    }
+    router.replace(`?${params.toString()}`);
   }, [currentTab]);
 
   useEffect(() => {
     handleTab(myBottleType);
   }, []);
+
+  useEffect(() => {
+    handleFilter('keyword', urlKeyword);
+  }, [urlKeyword]);
 
   const isMyPage = alcoholList?.[0]?.data.isMyPage;
   const nickName = userInfo?.nickName;
@@ -144,10 +151,16 @@ export default function MyBottle({
           <SubHeader.Center>{headerTitle}</SubHeader.Center>
         </SubHeader>
 
-        <SearchContainer
-          handleSearchCallback={handleSearchCallback}
+        <SearchBarLink
+          className="p-5"
           placeholder="찾으시는 술이 있으신가요?"
-          styleProps="p-5"
+          keyword={urlKeyword}
+          returnUrl={`/user/${userId}/my-bottle?type=${currentTab.id}${urlKeyword ? `&keyword=${urlKeyword}` : ''}`}
+          onClear={() => {
+            const params = new URLSearchParams();
+            params.set('type', currentTab.id);
+            router.replace(`?${params.toString()}`);
+          }}
         />
 
         <section className="pt-5 px-5 space-y-7.5">
