@@ -48,12 +48,7 @@ function findDominantFlavor(score: Record<FlavorTag, number>): FlavorTag {
 }
 
 // 매칭 이유 생성 함수
-function generateMatchReason(
-  cards: TarotCard[],
-  whisky: WhiskyRecommend,
-): string {
-  const cardNames = cards.map((c) => c.nameKo).join(', ');
-
+function generateMatchReason(whisky: WhiskyRecommend): string {
   const flavorDescriptions: Record<FlavorTag, string> = {
     Fresh: '상큼하고 가벼운 시작을',
     Sweet: '달콤하고 풍요로운 휴식을',
@@ -62,7 +57,7 @@ function generateMatchReason(
     Balance: '완벽한 조화를',
   };
 
-  return `${flavorDescriptions[whisky.category]}원하는 당신에게 추천합니다.`;
+  return `${flavorDescriptions[whisky.category]} 담은 위스키.`;
 }
 
 export async function POST(request: NextRequest) {
@@ -99,7 +94,7 @@ export async function POST(request: NextRequest) {
     const recommendedWhisky = WHISKY_BY_CATEGORY[dominantFlavor];
 
     // 매칭 이유 생성
-    const matchReason = generateMatchReason(selectedCards, recommendedWhisky);
+    const matchReason = generateMatchReason(recommendedWhisky);
 
     const response: RecommendResponse = {
       selectedCards,

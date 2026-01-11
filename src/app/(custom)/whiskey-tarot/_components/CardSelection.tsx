@@ -214,7 +214,7 @@ export default function CardSelection({
       </div>
 
       {/* 확인 버튼 */}
-      <div className="relative z-10 px-4">
+      <div className="relative z-10 px-4 pb-safe-lg">
         <button
           onClick={onConfirm}
           disabled={selectedCards.length !== 3 || isLoading}

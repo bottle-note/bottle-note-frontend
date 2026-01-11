@@ -12,7 +12,7 @@ import { WhiskyRecommend } from '../_types';
 interface FinalResultProps {
   whisky: WhiskyRecommend;
   matchReason: string;
-  onRetry: () => void;
+  selectedCards: string[];
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -26,7 +26,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 export default function FinalResult({
   whisky,
   matchReason,
-  onRetry,
+  selectedCards,
 }: FinalResultProps) {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
@@ -64,14 +64,14 @@ export default function FinalResult({
   };
 
   return (
-    <div className="relative flex flex-col min-h-screen overflow-hidden">
+    <div className="relative flex flex-col h-screen overflow-hidden">
       {/* 배경 그라데이션 */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#1a0a0a] via-[#2a1515] to-[#0a0a0f]" />
 
-      {/* 메인 콘텐츠 */}
+      {/* 메인 콘텐츠 - 스크롤 가능 영역 */}
       <div
         className={`
-          relative z-10 flex-1 flex flex-col px-6 py-8
+          relative z-10 flex-1 overflow-y-auto px-6 pt-8 pb-safe-lg
           transition-all duration-700
           ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
         `}
@@ -86,11 +86,14 @@ export default function FinalResult({
           </h1>
         </div>
 
-        {/* 위스키 카드 */}
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <div className="w-full max-w-[320px] bg-gradient-to-b from-white/10 to-white/5 rounded-2xl p-6 border border-white/10">
+        {/* 위스키 카드 - 클릭 가능 */}
+        <div className="flex flex-col items-center">
+          <button
+            onClick={handleGoToWhisky}
+            className="w-full max-w-[320px] bg-gradient-to-b from-white/10 to-white/5 rounded-2xl p-4 border border-white/10 transition-all duration-300 active:scale-[0.98] hover:border-mainCoral/30"
+          >
             {/* 위스키 이미지 영역 */}
-            <div className="w-full aspect-square bg-gradient-to-br from-mainCoral/20 to-subCoral/10 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
+            <div className="w-full flex items-center justify-center overflow-hidden py-6">
               {isLoading ? (
                 <div className="w-12 h-12 border-2 border-mainCoral/30 border-t-mainCoral rounded-full animate-spin" />
               ) : whiskyDetail?.alcoholUrlImg ? (
@@ -99,7 +102,7 @@ export default function FinalResult({
                   alt={whiskyDetail.korName || whisky.nameKo}
                   width={200}
                   height={200}
-                  className="object-contain max-h-full"
+                  className="object-contain max-h-full rounded-md"
                 />
               ) : (
                 <div className="text-white/40 text-sm">이미지 없음</div>
@@ -120,7 +123,17 @@ export default function FinalResult({
 
               {/* 매칭 이유 + 위스키 설명 */}
               <div className="bg-white/5 rounded-lg p-4">
-                <p className="text-white/80 text-sm leading-relaxed whitespace-pre-line">
+                <div>
+                  {selectedCards.map((cardName, index) => (
+                    <span
+                      key={index}
+                      className="inline-block bg-white/10 text-white/80 text-xs px-2 py-1 rounded-full mr-2 mb-2"
+                    >
+                      {cardName}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-white/80 leading-relaxed whitespace-pre-line pt-1">
                   {matchReason}
                 </p>
                 <p className="text-white/60 text-sm leading-relaxed mt-3">
@@ -128,29 +141,26 @@ export default function FinalResult({
                 </p>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* 하단 버튼 */}
-        <div className="flex flex-col gap-3 mt-6">
-          <button
-            onClick={handleGoToWhisky}
-            className="w-full py-4 bg-gradient-to-r from-mainCoral to-subCoral text-white font-semibold rounded-full shadow-lg shadow-mainCoral/30"
-          >
-            이 위스키 보러가기
           </button>
-          <button
-            onClick={onRetry}
-            className="w-full py-4 bg-white/10 text-white font-medium rounded-full border border-white/20"
-          >
-            다시 뽑기
-          </button>
-        </div>
 
-        {/* 하단 안내 */}
-        <p className="text-center text-gray-500 text-xs mt-6">
-          Bottle Note | Whiskey Tarot
-        </p>
+          {/* 힌트 텍스트 */}
+          <p className="text-white/40 text-xs mt-4 flex items-center gap-1">
+            탭하여 자세히 보기
+            <svg
+              className="w-3 h-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </p>
+        </div>
       </div>
     </div>
   );

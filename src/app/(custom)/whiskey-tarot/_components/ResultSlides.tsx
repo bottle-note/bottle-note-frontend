@@ -169,7 +169,7 @@ function SingleCardSlide({
       {/* 하단 버튼 */}
       <div
         className={`
-          relative z-10 px-6 pb-8 transition-all duration-500
+          relative z-10 px-6 pb-safe-lg transition-all duration-500
           ${showContent ? 'opacity-100' : 'opacity-0'}
         `}
       >
