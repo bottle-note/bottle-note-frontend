@@ -112,7 +112,9 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
       </div>
 
       {/* 하단 안내 */}
-      <p className="absolute bottom-8 text-gray-500 text-xs">Bottle Note</p>
+      <p className="absolute bottom-0 pb-safe-lg text-gray-500 text-xs">
+        Bottle Note
+      </p>
     </div>
   );
 }
