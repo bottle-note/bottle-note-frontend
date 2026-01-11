@@ -97,8 +97,8 @@ function SingleCardSlide({
         </span>
       </div>
 
-      {/* 메인 콘텐츠 */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
+      {/* 메인 콘텐츠 - 스크롤 가능 */}
+      <div className="relative z-10 flex-1 flex flex-col items-center px-6 py-4 overflow-y-auto">
         {/* 카드 뒤집기 애니메이션 */}
         <div
           className="relative w-48 h-72 mb-8"
@@ -163,6 +163,17 @@ function SingleCardSlide({
           <p className="text-white text-sm leading-relaxed whitespace-pre-line">
             {card.readingText}
           </p>
+
+          {/* 구분선 */}
+          <div className="w-12 h-px bg-white/20 mx-auto my-4" />
+
+          {/* 카드의 역사 */}
+          <div className="text-left">
+            <p className="text-white/40 text-xs mb-2">카드의 역사</p>
+            <p className="text-white/60 text-xs leading-relaxed">
+              {card.history}
+            </p>
+          </div>
         </div>
       </div>
 
