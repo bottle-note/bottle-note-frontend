@@ -7,6 +7,7 @@ import CategorySelector from '@/components/ui/Form/CategorySelector';
 import Tab from '@/components/ui/Navigation/Tab';
 import { useTab } from '@/hooks/useTab';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { AlcoholAPI } from '@/types/Alcohol';
 import { Category, SORT_TYPE, SORT_ORDER } from '@/types/common';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
@@ -18,6 +19,8 @@ interface Props {
   onSelectAlcohol: (alcoholId: string) => void;
 }
 
+const PAGE_SIZE = 20;
+
 export default function AlcoholSearchBottomSheet({
   isOpen,
   onClose,
@@ -25,11 +28,15 @@ export default function AlcoholSearchBottomSheet({
 }: Props) {
   const [searchResults, setSearchResults] = useState<AlcoholAPI[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [hasNext, setHasNext] = useState(false);
+  const [cursor, setCursor] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState<
     Category | undefined
   >(undefined);
   const lastKeywordRef = useRef<string>('');
+  const lastCategoryRef = useRef<Category | undefined>(undefined);
 
   const {
     currentTab: categorySelectedTab,
@@ -42,8 +49,12 @@ export default function AlcoholSearchBottomSheet({
 
   const fetchAlcohols = useCallback(
     async (keyword?: string, category?: Category) => {
+      // ref 업데이트하여 현재 검색 조건 추적
+      lastCategoryRef.current = category;
+
       setIsLoading(true);
       setHasSearched(true);
+      setCursor(0);
 
       try {
         const response = await AlcoholsApi.getList({
@@ -52,18 +63,67 @@ export default function AlcoholSearchBottomSheet({
           sortType: SORT_TYPE.POPULAR,
           sortOrder: SORT_ORDER.DESC,
           cursor: 0,
-          pageSize: 20,
+          pageSize: PAGE_SIZE,
         });
 
         setSearchResults(response.data.alcohols);
+        setHasNext(response.meta.pageable?.hasNext ?? false);
+        setCursor(response.meta.pageable?.currentCursor ?? 0);
       } catch {
         setSearchResults([]);
+        setHasNext(false);
       } finally {
         setIsLoading(false);
       }
     },
     [],
   );
+
+  const fetchMore = useCallback(async () => {
+    if (isFetchingMore || !hasNext) return;
+
+    // 요청 시점의 검색 조건 캡처
+    const requestKeyword = lastKeywordRef.current;
+    const requestCategory = lastCategoryRef.current;
+
+    setIsFetchingMore(true);
+
+    try {
+      const nextCursor = cursor + PAGE_SIZE;
+      const response = await AlcoholsApi.getList({
+        keyword: requestKeyword || undefined,
+        category: requestCategory,
+        sortType: SORT_TYPE.POPULAR,
+        sortOrder: SORT_ORDER.DESC,
+        cursor: nextCursor,
+        pageSize: PAGE_SIZE,
+      });
+
+      // 응답 시점에 검색 조건이 변경되었으면 결과 무시
+      if (
+        lastKeywordRef.current !== requestKeyword ||
+        lastCategoryRef.current !== requestCategory
+      ) {
+        return;
+      }
+
+      setSearchResults((prev) => [...prev, ...response.data.alcohols]);
+      setHasNext(response.meta.pageable?.hasNext ?? false);
+      setCursor(response.meta.pageable?.currentCursor ?? nextCursor);
+    } catch {
+      // 에러 시 상태 유지
+    } finally {
+      setIsFetchingMore(false);
+    }
+  }, [isFetchingMore, hasNext, cursor]);
+
+  const { targetRef } = useInfiniteScroll({
+    fetchNextPage: fetchMore,
+    options: {
+      rootMargin: '300px',
+      threshold: 0,
+    },
+  });
 
   const handleSearch = useCallback(
     async (keyword: string) => {
@@ -84,6 +144,8 @@ export default function AlcoholSearchBottomSheet({
     onSelectAlcohol(alcoholId);
     setSearchResults([]);
     setHasSearched(false);
+    setHasNext(false);
+    setCursor(0);
   };
 
   const handleCategoryChange = useCallback(
@@ -98,6 +160,8 @@ export default function AlcoholSearchBottomSheet({
   const handleClose = () => {
     setSearchResults([]);
     setHasSearched(false);
+    setHasNext(false);
+    setCursor(0);
     setSelectedCategory(undefined);
     lastKeywordRef.current = '';
     onClose();
@@ -143,6 +207,13 @@ export default function AlcoholSearchBottomSheet({
                 onSelect={handleSelect}
               />
             ))}
+            {isFetchingMore && (
+              <div className="space-y-2 py-2">
+                <ListItemSkeleton />
+                <ListItemSkeleton />
+              </div>
+            )}
+            <div ref={targetRef} className="h-1" />
           </div>
         ) : hasSearched ? (
           <div className="flex flex-col items-center justify-center h-full text-mainGray">
