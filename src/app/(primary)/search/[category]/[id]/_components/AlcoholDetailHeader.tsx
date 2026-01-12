@@ -25,6 +25,7 @@ function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
         outerWidthClass="w-[140px]"
         innerHeightClass="h-[200px]"
         innerWidthClass="w-[100px]"
+        priority
         enableModal={true}
       />
       <article className="flex-1 py-3 text-white overflow-x-hidden">
