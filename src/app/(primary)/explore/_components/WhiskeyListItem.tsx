@@ -13,9 +13,10 @@ import Label from '@/components/ui/Display/Label';
 
 interface Props {
   content: ExploreAlcohol;
+  priority?: boolean;
 }
 
-const WhiskeyListItem = ({ content }: Props) => {
+const WhiskeyListItem = ({ content, priority = false }: Props) => {
   const sectionRef = useRef<HTMLElement>(null);
   const [visibleTags, setVisibleTags] = useState<string[]>(
     content.alcoholsTastingTags,
@@ -68,6 +69,7 @@ const WhiskeyListItem = ({ content }: Props) => {
           src={content.alcoholUrlImg}
           alt="image"
           className="w-[95px] h-[128px]"
+          priority={priority}
         />
       </Link>
 
