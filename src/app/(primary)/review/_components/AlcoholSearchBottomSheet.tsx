@@ -36,6 +36,7 @@ export default function AlcoholSearchBottomSheet({
     Category | undefined
   >(undefined);
   const lastKeywordRef = useRef<string>('');
+  const lastCategoryRef = useRef<Category | undefined>(undefined);
 
   const {
     currentTab: categorySelectedTab,
@@ -48,6 +49,9 @@ export default function AlcoholSearchBottomSheet({
 
   const fetchAlcohols = useCallback(
     async (keyword?: string, category?: Category) => {
+      // ref 업데이트하여 현재 검색 조건 추적
+      lastCategoryRef.current = category;
+
       setIsLoading(true);
       setHasSearched(true);
       setCursor(0);
@@ -78,18 +82,30 @@ export default function AlcoholSearchBottomSheet({
   const fetchMore = useCallback(async () => {
     if (isFetchingMore || !hasNext) return;
 
+    // 요청 시점의 검색 조건 캡처
+    const requestKeyword = lastKeywordRef.current;
+    const requestCategory = lastCategoryRef.current;
+
     setIsFetchingMore(true);
 
     try {
       const nextCursor = cursor + PAGE_SIZE;
       const response = await AlcoholsApi.getList({
-        keyword: lastKeywordRef.current || undefined,
-        category: selectedCategory,
+        keyword: requestKeyword || undefined,
+        category: requestCategory,
         sortType: SORT_TYPE.POPULAR,
         sortOrder: SORT_ORDER.DESC,
         cursor: nextCursor,
         pageSize: PAGE_SIZE,
       });
+
+      // 응답 시점에 검색 조건이 변경되었으면 결과 무시
+      if (
+        lastKeywordRef.current !== requestKeyword ||
+        lastCategoryRef.current !== requestCategory
+      ) {
+        return;
+      }
 
       setSearchResults((prev) => [...prev, ...response.data.alcohols]);
       setHasNext(response.meta.pageable?.hasNext ?? false);
@@ -99,7 +115,7 @@ export default function AlcoholSearchBottomSheet({
     } finally {
       setIsFetchingMore(false);
     }
-  }, [isFetchingMore, hasNext, cursor, selectedCategory]);
+  }, [isFetchingMore, hasNext, cursor]);
 
   const { targetRef } = useInfiniteScroll({
     fetchNextPage: fetchMore,
