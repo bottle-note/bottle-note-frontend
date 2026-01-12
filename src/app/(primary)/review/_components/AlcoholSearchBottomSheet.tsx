@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import BottomSheet from '@/components/ui/Modal/BottomSheet';
 import SearchBar from '@/components/feature/Search/SearchBar';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
 import Tab from '@/components/ui/Navigation/Tab';
 import { useTab } from '@/hooks/useTab';
 import { AlcoholsApi } from '@/app/api/AlcholsApi';
-import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
-import { AlcoholAPI } from '@/types/Alcohol';
+import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { Category, SORT_TYPE, SORT_ORDER } from '@/types/common';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import SelectableAlcoholItem from './SelectableAlcoholItem';
@@ -26,17 +25,10 @@ export default function AlcoholSearchBottomSheet({
   onClose,
   onSelectAlcohol,
 }: Props) {
-  const [searchResults, setSearchResults] = useState<AlcoholAPI[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFetchingMore, setIsFetchingMore] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [hasNext, setHasNext] = useState(false);
-  const [cursor, setCursor] = useState(0);
+  const [keyword, setKeyword] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<
     Category | undefined
   >(undefined);
-  const lastKeywordRef = useRef<string>('');
-  const lastCategoryRef = useRef<Category | undefined>(undefined);
 
   const {
     currentTab: categorySelectedTab,
@@ -47,123 +39,42 @@ export default function AlcoholSearchBottomSheet({
     scroll: true,
   });
 
-  const fetchAlcohols = useCallback(
-    async (keyword?: string, category?: Category) => {
-      // ref 업데이트하여 현재 검색 조건 추적
-      lastCategoryRef.current = category;
-
-      setIsLoading(true);
-      setHasSearched(true);
-      setCursor(0);
-
-      try {
-        const response = await AlcoholsApi.getList({
-          keyword: keyword || undefined,
-          category,
-          sortType: SORT_TYPE.POPULAR,
-          sortOrder: SORT_ORDER.DESC,
-          cursor: 0,
-          pageSize: PAGE_SIZE,
-        });
-
-        setSearchResults(response.data.alcohols);
-        setHasNext(response.meta.pageable?.hasNext ?? false);
-        setCursor(response.meta.pageable?.currentCursor ?? 0);
-      } catch {
-        setSearchResults([]);
-        setHasNext(false);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [],
-  );
-
-  const fetchMore = useCallback(async () => {
-    if (isFetchingMore || !hasNext) return;
-
-    // 요청 시점의 검색 조건 캡처
-    const requestKeyword = lastKeywordRef.current;
-    const requestCategory = lastCategoryRef.current;
-
-    setIsFetchingMore(true);
-
-    try {
-      const nextCursor = cursor + PAGE_SIZE;
-      const response = await AlcoholsApi.getList({
-        keyword: requestKeyword || undefined,
-        category: requestCategory,
+  const { data, isLoading, isFetching, targetRef } = usePaginatedQuery({
+    queryKey: ['alcoholSearch', keyword, selectedCategory],
+    queryFn: async ({ pageParam = 0 }) => {
+      return AlcoholsApi.getList({
+        keyword: keyword || undefined,
+        category: selectedCategory,
         sortType: SORT_TYPE.POPULAR,
         sortOrder: SORT_ORDER.DESC,
-        cursor: nextCursor,
+        cursor: pageParam,
         pageSize: PAGE_SIZE,
       });
-
-      // 응답 시점에 검색 조건이 변경되었으면 결과 무시
-      if (
-        lastKeywordRef.current !== requestKeyword ||
-        lastCategoryRef.current !== requestCategory
-      ) {
-        return;
-      }
-
-      setSearchResults((prev) => [...prev, ...response.data.alcohols]);
-      setHasNext(response.meta.pageable?.hasNext ?? false);
-      setCursor(response.meta.pageable?.currentCursor ?? nextCursor);
-    } catch {
-      // 에러 시 상태 유지
-    } finally {
-      setIsFetchingMore(false);
-    }
-  }, [isFetchingMore, hasNext, cursor]);
-
-  const { targetRef } = useInfiniteScroll({
-    fetchNextPage: fetchMore,
-    options: {
-      rootMargin: '300px',
-      threshold: 0,
     },
+    pageSize: PAGE_SIZE,
+    enabled: isOpen,
+    staleTime: 1000 * 60 * 5,
   });
 
-  const handleSearch = useCallback(
-    async (keyword: string) => {
-      lastKeywordRef.current = keyword;
-      await fetchAlcohols(keyword, selectedCategory);
-    },
-    [selectedCategory, fetchAlcohols],
-  );
+  const searchResults = data?.flatMap((page) => page.data.alcohols) ?? [];
+  const isFetchingMore = isFetching && !isLoading;
+  const hasSearched = data !== undefined;
 
-  // 바텀시트가 열릴 때 초기 데이터 로드
-  useEffect(() => {
-    if (isOpen && !hasSearched) {
-      fetchAlcohols(undefined, undefined);
-    }
-  }, [isOpen, hasSearched, fetchAlcohols]);
+  const handleSearch = useCallback((newKeyword: string) => {
+    setKeyword(newKeyword);
+  }, []);
 
   const handleSelect = (alcoholId: string) => {
     onSelectAlcohol(alcoholId);
-    setSearchResults([]);
-    setHasSearched(false);
-    setHasNext(false);
-    setCursor(0);
   };
 
-  const handleCategoryChange = useCallback(
-    (category: Category) => {
-      setSelectedCategory(category);
-      // 카테고리 변경 시 현재 검색어로 재검색
-      fetchAlcohols(lastKeywordRef.current || undefined, category);
-    },
-    [fetchAlcohols],
-  );
+  const handleCategoryChange = useCallback((category: Category) => {
+    setSelectedCategory(category);
+  }, []);
 
   const handleClose = () => {
-    setSearchResults([]);
-    setHasSearched(false);
-    setHasNext(false);
-    setCursor(0);
+    setKeyword('');
     setSelectedCategory(undefined);
-    lastKeywordRef.current = '';
     onClose();
   };
 
