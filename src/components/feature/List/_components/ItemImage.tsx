@@ -6,9 +6,10 @@ interface Props {
   src: string;
   alt: string;
   className?: string;
+  priority?: boolean;
 }
 
-const ItemImage = ({ src, alt, className }: Props) => {
+const ItemImage = ({ src, alt, className, priority = false }: Props) => {
   return (
     <div
       className={`w-[89px] h-[89px] flex shrink-0 p-2 justify-center items-center ${className}`}
@@ -17,7 +18,7 @@ const ItemImage = ({ src, alt, className }: Props) => {
         <BaseImage
           src={src}
           alt={alt}
-          priority
+          priority={priority}
           className="object-contain w-auto h-auto"
           fill
           sizes="85px"

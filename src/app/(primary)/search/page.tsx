@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { v4 as uuid } from 'uuid';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
 import List from '@/components/feature/List/List';
 import { usePopularList } from '@/hooks/usePopularList';
@@ -242,8 +241,8 @@ export default function Search() {
               <section className="px-5">
                 {isPopularLoading ? (
                   <div className="flex flex-col gap-2">
-                    {Array.from({ length: 5 }).map(() => (
-                      <ListItemSkeleton key={uuid()} />
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <ListItemSkeleton key={index} />
                     ))}
                   </div>
                 ) : (
@@ -300,7 +299,7 @@ export default function Search() {
                   [...alcoholList.map((list) => list.data.alcohols)]
                     .flat()
                     .map((item: AlcoholAPI) => (
-                      <List.Item key={uuid()} data={item} />
+                      <List.Item key={item.alcoholId} data={item} />
                     ))}
               </List>
 
