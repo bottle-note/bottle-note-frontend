@@ -46,8 +46,8 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
       icon: '/icon/navbar/explorer.svg',
     },
     {
-      name: '리뷰',
-      link: ROUTES.REVIEW.REGISTER_BASE,
+      name: '기록',
+      link: ROUTES.HISTORY.BASE,
       icon: '/icon/navbar/history.svg',
       requiresAuth: true,
     },

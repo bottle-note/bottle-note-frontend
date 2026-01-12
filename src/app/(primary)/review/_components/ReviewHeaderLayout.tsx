@@ -12,8 +12,6 @@ interface ReviewHeaderLayoutProps {
   onBack: () => void;
   headerTitle: string;
   headerTextColor?: string;
-  onSelectAlcohol?: () => void;
-  isEmptyState?: boolean;
 }
 
 export default function ReviewHeaderLayout({
@@ -21,8 +19,6 @@ export default function ReviewHeaderLayout({
   onBack,
   headerTitle,
   headerTextColor = 'text-white',
-  onSelectAlcohol,
-  isEmptyState = false,
 }: ReviewHeaderLayoutProps) {
   const { handleLoginModal } = useModalStore();
   const [isPicked, setIsPicked] = useState<boolean>(false);
@@ -33,16 +29,8 @@ export default function ReviewHeaderLayout({
     }
   }, [alcoholData?.isPicked]);
 
-  // 데이터 로딩 중 (빈 상태가 아닌데 데이터가 없는 경우)
-  if (!isEmptyState && !alcoholData) {
-    return <SkeletonBase height={330} className="w-full" />;
-  }
-
-  const showPickButton = alcoholData && !isEmptyState;
-
-  return (
+  return alcoholData ? (
     <div className="relative">
-      {/* 배경 이미지 (데이터가 있을 때만) */}
       {alcoholData?.alcoholUrlImg && (
         <div
           className="absolute inset-0 bg-cover bg-center z-0"
@@ -51,9 +39,7 @@ export default function ReviewHeaderLayout({
           }}
         />
       )}
-      {/* 오버레이 */}
       <div className="absolute inset-0 bg-mainCoral bg-opacity-90 z-10" />
-
       <div className="relative z-20">
         <SubHeader bgColor="bg-transparent">
           <SubHeader.Left onClick={onBack}>
@@ -68,22 +54,20 @@ export default function ReviewHeaderLayout({
             {headerTitle}
           </SubHeader.Center>
           <SubHeader.Right>
-            {showPickButton && (
-              <AlcoholPickButton
-                size={19}
-                isPicked={isPicked}
-                alcoholId={alcoholData.alcoholId}
-                handleUpdatePicked={() => setIsPicked((prev) => !prev)}
-                onApiError={() => setIsPicked(alcoholData.isPicked)}
-                handleNotLogin={handleLoginModal}
-              />
-            )}
+            <AlcoholPickButton
+              size={19}
+              isPicked={isPicked}
+              alcoholId={alcoholData.alcoholId}
+              handleUpdatePicked={() => setIsPicked((prev) => !prev)}
+              onApiError={() => setIsPicked(alcoholData.isPicked)}
+              handleNotLogin={handleLoginModal}
+            />
           </SubHeader.Right>
         </SubHeader>
-
-        {/* AlcoholInfo: 데이터 유무에 따라 자동으로 빈 상태/정상 상태 렌더링 */}
-        <AlcoholInfo data={alcoholData} onSelectAlcohol={onSelectAlcohol} />
+        <AlcoholInfo data={alcoholData} />
       </div>
     </div>
+  ) : (
+    <SkeletonBase height={330} className="w-full" />
   );
 }
