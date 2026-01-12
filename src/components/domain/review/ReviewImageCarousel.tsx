@@ -62,14 +62,16 @@ export const ReviewImageCarousel = ({ images }: { images: ProductImage[] }) => {
       className="w-full bg-white"
     >
       <CarouselContent>
-        {images.map((image) => (
+        {images.map((image, index) => (
           <CarouselItem key={image.id}>
             <div className="aspect-square bg-gray-100 rounded-md overflow-hidden border">
               <Image
                 src={image.src}
                 alt={image.alt}
                 width={600}
-                height={800}
+                height={600}
+                sizes="(max-width: 768px) 100vw, 600px"
+                priority={index === 0}
                 className="object-cover w-full h-full"
               />
             </div>

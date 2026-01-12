@@ -135,13 +135,15 @@ export default function HomeCarousel() {
       className="w-full bg-white"
     >
       <CarouselContent className="!ml-0">
-        {BANNER_IMAGES.map((image) => (
+        {BANNER_IMAGES.map((image, index) => (
           <CarouselItem key={image.id} className="!pl-0">
             <div className="relative w-full h-[227px] overflow-hidden flex items-center justify-center">
               <Image
                 src={image.src}
                 alt={image.alt}
                 fill
+                priority={index === 0}
+                sizes="100vw"
                 style={{ objectFit: 'cover' }}
                 className="w-full h-full object-cover"
               />

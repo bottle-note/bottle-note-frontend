@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import { v4 as uuid } from 'uuid';
 import { ExploreApi } from '@/app/api/ExploreApi';
 import { ExploreAlcohol } from '@/types/Explore';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
@@ -82,10 +81,16 @@ export const WhiskeyExplorerList = () => {
       >
         <List.Section className="divide-y-[1px]">
           {alcoholList &&
-            [...alcoholList].map((listdata) =>
+            [...alcoholList].map((listdata, pageIndex) =>
               listdata.data.items
                 .flat()
-                .map((data) => <WhiskeyListItem key={uuid()} content={data} />),
+                .map((data, itemIndex) => (
+                  <WhiskeyListItem
+                    key={data.alcoholId}
+                    content={data}
+                    priority={pageIndex === 0 && itemIndex < 4}
+                  />
+                )),
             )}
         </List.Section>
       </List>

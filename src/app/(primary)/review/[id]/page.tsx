@@ -171,11 +171,13 @@ export default function ReviewDetail() {
           <NavLayout>
             <div className="relative">
               {alcoholInfo.imageUrl && (
-                <div
-                  className="absolute inset-0 bg-cover bg-center"
-                  style={{
-                    backgroundImage: `url(${alcoholInfo.imageUrl})`,
-                  }}
+                <Image
+                  src={alcoholInfo.imageUrl}
+                  alt="배경 이미지"
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="object-cover"
                 />
               )}
               <div
