@@ -24,7 +24,6 @@ export const ROUTES = {
   },
   REVIEW: {
     BASE: '/review',
-    REGISTER_BASE: '/review/register',
     DETAIL: (id: string | number) => `/review/${id}`,
     REGISTER: (id: string | number) => `/review/register?alcoholId=${id}`,
     MODIFY: (reviewId: string | number) =>

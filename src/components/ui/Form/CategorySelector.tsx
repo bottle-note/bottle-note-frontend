@@ -7,23 +7,12 @@ import { CATEGORY_MENUS_LIST } from '@/constants/common';
 
 interface Props {
   handleCategoryCallback: (value: Category) => void;
-  selectedCategory?: Category; // 제어 모드용 (optional)
 }
 
-function CategorySelector({ handleCategoryCallback, selectedCategory }: Props) {
+function CategorySelector({ handleCategoryCallback }: Props) {
   const searchParams = useSearchParams();
-
-  // 제어 모드 여부 확인
-  const isControlled = selectedCategory !== undefined;
-
-  // 제어 모드: selectedCategory prop 사용
-  // 비제어 모드: URL params 사용
-  const currCategory = isControlled
-    ? selectedCategory
-    : (searchParams.get('category') as Category);
-  const hasCategoryParam = isControlled
-    ? !!selectedCategory
-    : searchParams.has('category');
+  const currCategory = searchParams.get('category') as Category;
+  const hasCategoryParam = searchParams.has('category');
 
   const initialTab = hasCategoryParam
     ? CATEGORY_MENUS_LIST.find((cat) => cat.id === currCategory)
@@ -49,12 +38,12 @@ function CategorySelector({ handleCategoryCallback, selectedCategory }: Props) {
 
   useEffect(() => {
     if (hasCategoryParam && currCategory) {
-      const category = CATEGORY_MENUS_LIST.find(
-        (cat) => cat.id === currCategory,
+      const selectedCategory = CATEGORY_MENUS_LIST.find(
+        (category) => category.id === currCategory,
       );
 
-      if (category) {
-        handleTab(category.id);
+      if (selectedCategory) {
+        handleTab(selectedCategory.id);
       }
     }
   }, [currCategory, hasCategoryParam]);

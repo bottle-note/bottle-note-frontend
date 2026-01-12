@@ -116,10 +116,13 @@ export default function Search() {
       // 일반 검색인 경우 기존 API 사용
       return AlcoholsApi.getList({
         ...filterState,
+        category: filterState.category === 'ALL' ? '' : filterState.category,
         regionId:
           filterState.regionId === '' ? '' : Number(filterState.regionId),
-        cursor: pageParam,
-        pageSize: 10,
+        ...{
+          cursor: pageParam,
+          pageSize: 10,
+        },
       });
     },
     staleTime: 0,
