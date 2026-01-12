@@ -145,6 +145,7 @@ export default function HomeCarousel() {
                 priority={index === 0}
                 sizes="(max-width: 430px) 430px, (max-width: 768px) 768px, 100vw"
                 quality={75}
+                unoptimized={image.animated}
                 style={{ objectFit: 'cover' }}
                 className="w-full h-full object-cover"
               />

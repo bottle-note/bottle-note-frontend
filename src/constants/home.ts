@@ -2,6 +2,7 @@ export interface ProductImage {
   id: string | number;
   src: string;
   alt: string;
+  animated?: boolean;
 }
 
 export const BANNER_IMAGES: ProductImage[] = [
@@ -9,6 +10,7 @@ export const BANNER_IMAGES: ProductImage[] = [
     id: 'winterRecommend',
     src: '/bannerImg/winter-banner.webp',
     alt: '겨울 추천 위스키 배너',
+    animated: true,
   },
   {
     id: 'bottleNote',
