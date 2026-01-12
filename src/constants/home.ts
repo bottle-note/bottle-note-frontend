@@ -12,12 +12,12 @@ export const BANNER_IMAGES: ProductImage[] = [
   },
   {
     id: 'bottleNote',
-    src: '/bannerImg/bottleNote-banner.png',
+    src: '/bannerImg/bottleNote-banner.webp',
     alt: 'bottleNote 배너',
   },
   {
     id: 'rainDayRecommend',
-    src: '/bannerImg/rain-banner.png',
+    src: '/bannerImg/rain-banner.webp',
     alt: '비오는 날 추천 위스키 배너',
   },
 ];

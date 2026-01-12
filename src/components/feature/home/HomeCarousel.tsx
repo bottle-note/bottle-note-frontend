@@ -143,7 +143,8 @@ export default function HomeCarousel() {
                 alt={image.alt}
                 fill
                 priority={index === 0}
-                sizes="100vw"
+                sizes="(max-width: 430px) 430px, (max-width: 768px) 768px, 100vw"
+                quality={75}
                 style={{ objectFit: 'cover' }}
                 className="w-full h-full object-cover"
               />

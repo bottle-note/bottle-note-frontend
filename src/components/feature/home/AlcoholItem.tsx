@@ -44,6 +44,7 @@ const AlcoholImage: React.FC<AlcoholImageProps> = ({
         alt=""
         width={width}
         height={height}
+        sizes={`${width}px`}
         className={`${innerHeightClass} ${innerWidthClass} object-contain ${blendMode}`}
       />
     </div>
