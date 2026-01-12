@@ -27,7 +27,14 @@ function PrimaryLinkButton({
     >
       {listType === 'Full' && (
         <>
-          <div className="absolute w-full h-full rounded-xl bg-[url('/bg_category.jpg')] bg-cover bg-center" />
+          <Image
+            src="/bg_category.jpg"
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 400px"
+            quality={60}
+            className="rounded-xl object-cover"
+          />
           <div className="absolute w-full h-full rounded-xl bg-mainCoral bg-opacity-90" />
         </>
       )}

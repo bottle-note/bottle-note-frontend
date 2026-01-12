@@ -26,8 +26,8 @@ function ProfileImage({
         src={profileImgSrc ?? ProfileDefaultImg}
         alt="프로필 이미지"
         fill
+        sizes={`${size}px`}
         className={`rounded-full ${borderClass} ${opacityClass} object-cover`}
-        priority
       />
     </div>
   );
