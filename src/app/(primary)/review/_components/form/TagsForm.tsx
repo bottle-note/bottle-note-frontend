@@ -111,7 +111,7 @@ export default function TagsForm() {
               }}
             />
             <button
-              className={`text-15 px-2 py-1 rounded-md border w-24 ${watchTags?.length < TAGS_LIMIT ? 'border-subCoral text-white bg-subCoral' : 'border-brightGray text-bgGray'}`}
+              className={`text-15 px-2 py-1 rounded-md border w-24 shrink-0 ${watchTags?.length < TAGS_LIMIT ? 'border-subCoral text-white bg-subCoral' : 'border-brightGray text-bgGray'}`}
               disabled={watchTags?.length === TAGS_LIMIT}
               onClick={handleAddTag}
             >
