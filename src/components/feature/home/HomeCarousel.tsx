@@ -111,7 +111,8 @@ function CarouselImage({ image, isPriority }: CarouselImageProps) {
         src={lightSrc}
         alt={image.alt}
         fill
-        priority={isPriority}
+        sizes="100vw"
+        priority={isPriority && !hasPlaceholder}
         quality={75}
         unoptimized={hasPlaceholder}
         onLoad={!hasPlaceholder ? onHeavyLoad : undefined}
@@ -123,8 +124,10 @@ function CarouselImage({ image, isPriority }: CarouselImageProps) {
       {hasPlaceholder && (
         <Image
           src={heavySrc}
-          alt={image.alt}
+          alt=""
+          aria-hidden="true"
           fill
+          sizes="100vw"
           loading="lazy"
           unoptimized
           onLoad={onHeavyLoad}
