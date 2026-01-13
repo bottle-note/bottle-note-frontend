@@ -6,7 +6,6 @@ import { LABEL_NAMES } from '@/constants/common';
 import { ExploreAlcohol } from '@/types/Explore';
 import ItemImage from '@/components/feature/List/_components/ItemImage';
 import ItemInfo from '@/components/feature/List/_components/ItemInfo';
-import { addNewLine } from '@/utils/addNewLine';
 import Star from '@/components/ui/Display/Star';
 import { ItemStats } from '@/components/feature/List/_components/ItemStats';
 import Label from '@/components/ui/Display/Label';
@@ -80,7 +79,7 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
       >
         <div className="space-y-2">
           <ItemInfo
-            korName={addNewLine(content.korName)}
+            korName={content.korName}
             engName={content.engName}
             length={50}
           />

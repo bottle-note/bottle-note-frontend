@@ -55,7 +55,7 @@ const OptionSelect = ({
         className="label-default flex items-center gap-1 px-2.5 py-1 rounded-md text-10"
         onClick={handleSortOptionsShow}
       >
-        <span>{selectedOption}</span>
+        <span className="whitespace-nowrap">{selectedOption}</span>
         <Image src={ArrowDownIcon} alt="정렬" />
       </button>
 
