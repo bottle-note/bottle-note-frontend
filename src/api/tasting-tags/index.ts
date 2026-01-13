@@ -11,6 +11,7 @@ export const TastingTagsApi = {
   async extractTags(text: string): Promise<ExtractTagsResponse> {
     const response = await apiClient.get<ApiResponse<ExtractTagsResponse>>(
       `/tasting-tags/extract?text=${encodeURIComponent(text)}`,
+      { authRequired: true },
     );
 
     if (response.errors.length !== 0) {

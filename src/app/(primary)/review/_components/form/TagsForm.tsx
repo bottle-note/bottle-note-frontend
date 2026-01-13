@@ -5,14 +5,8 @@ import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import useModalStore from '@/store/modalStore';
 import HoverTouchBox from '@/components/ui/Interactive/HoverTouchBox';
+import { TAGS_LIMIT, validateTagText } from '@/constants/review';
 import OptionsContainer from '../OptionsContainer';
-
-function validateText(text: string) {
-  const regex = /^[a-zA-Z가-힣\s]+$/;
-  return regex.test(text);
-}
-
-const TAGS_LIMIT = 15;
 
 export default function TagsForm() {
   const { handleModalState } = useModalStore();
@@ -32,7 +26,7 @@ export default function TagsForm() {
         isShowModal: true,
         mainText: '이미 동일한 태그가 있습니다.',
       });
-    } else if (!validateText(tagValue)) {
+    } else if (!validateTagText(tagValue)) {
       handleModalState({
         isShowModal: true,
         mainText: '태그에 숫자와 특수문자는 추가할 수 없습니다.',

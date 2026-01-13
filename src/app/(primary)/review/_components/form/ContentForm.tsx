@@ -4,8 +4,11 @@ import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { TastingTagsApi } from '@/api/tasting-tags';
 import useModalStore from '@/store/modalStore';
-
-const TAGS_LIMIT = 15;
+import {
+  TAGS_LIMIT,
+  TAG_MAX_LENGTH,
+  validateTagText,
+} from '@/constants/review';
 
 export default function ContentForm() {
   const { register, watch, setValue } = useFormContext();
@@ -29,8 +32,13 @@ export default function ContentForm() {
     try {
       const extractedTags = await TastingTagsApi.extractTags(review);
 
+      // 추출된 태그 검증: 숫자/특수문자 제외, 길이 제한
+      const validTags = extractedTags.filter(
+        (tag) => validateTagText(tag) && tag.length <= TAG_MAX_LENGTH,
+      );
+
       // 기존 태그와 병합, 중복 제거, 최대 15개 제한
-      const mergedTags = [...new Set([...currentTags, ...extractedTags])].slice(
+      const mergedTags = [...new Set([...currentTags, ...validTags])].slice(
         0,
         TAGS_LIMIT,
       );
@@ -41,6 +49,12 @@ export default function ContentForm() {
         handleModalState({
           isShowModal: true,
           mainText: '추출된 태그가 없습니다.',
+        });
+      } else if (validTags.length < extractedTags.length) {
+        handleModalState({
+          isShowModal: true,
+          mainText: `${validTags.length}개의 태그가 추가되었습니다.`,
+          subText: '일부 태그는 형식에 맞지 않아 제외되었습니다.',
         });
       }
     } catch {
