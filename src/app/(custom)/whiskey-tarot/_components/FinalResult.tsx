@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
-import { AlcoholInfo } from '@/types/Alcohol';
+import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
+import { AlcoholDetailsResponse } from '@/api/alcohol/types';
 
 import { WhiskyRecommend } from '../_types';
 
@@ -30,7 +30,9 @@ export default function FinalResult({
 }: FinalResultProps) {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
-  const [whiskyDetail, setWhiskyDetail] = useState<AlcoholInfo | null>(null);
+  const [whiskyDetail, setWhiskyDetail] = useState<
+    AlcoholDetailsResponse['alcohols'] | null
+  >(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -44,8 +46,8 @@ export default function FinalResult({
         const result = await AlcoholsApi.getAlcoholDetails(
           String(whisky.whiskyId),
         );
-        if (result?.alcohols) {
-          setWhiskyDetail(result.alcohols);
+        if (result?.data?.alcohols) {
+          setWhiskyDetail(result.data.alcohols);
         }
       } catch (error) {
         console.error('위스키 상세 정보 로딩 실패:', error);

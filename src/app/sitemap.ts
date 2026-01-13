@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { ApiResponse } from '@/types/common';
+import { ApiResponse } from '@/api/_shared/types';
 import { ExploreReview } from '@/types/Explore';
 import { BASE_URL } from '@/constants/common';
 

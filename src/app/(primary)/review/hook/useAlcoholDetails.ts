@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { AlcoholInfo as AlcoholDetails } from '@/types/Alcohol';
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
-import { RateApi } from '@/app/api/RateApi';
+import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
+import type { AlcoholDetailsResponse } from '@/api/alcohol/types';
+import { RateApi } from '@/api/rate/rate.api';
 
 export const useAlcoholDetails = (
   alcoholId: string | number,
   type = 'register',
 ) => {
-  const [alcoholData, setAlcoholData] = useState<AlcoholDetails>();
+  const [alcoholData, setAlcoholData] =
+    useState<AlcoholDetailsResponse['alcohols']>();
   const [userRating, setUserRating] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -20,13 +21,13 @@ export const useAlcoholDetails = (
         const alcoholResult = await AlcoholsApi.getAlcoholDetails(
           alcoholId.toString(),
         );
-        setAlcoholData(alcoholResult.alcohols);
+        setAlcoholData(alcoholResult.data.alcohols);
 
         if (type === 'register') {
           const ratingResult = await RateApi.getUserRating(
             alcoholId.toString(),
           );
-          setUserRating(ratingResult.rating);
+          setUserRating(ratingResult.data.rating);
         }
       } catch (err) {
         console.error('Failed to fetch alcohol details:', err);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ReviewApi } from '@/app/api/ReviewApi';
+import { ReviewApi } from '@/api/review/review.api';
 import useModalStore from '@/store/modalStore';
 import { useAuth } from '@/hooks/auth/useAuth';
 import Toggle from '@/components/ui/Form/Toggle';
@@ -28,10 +28,10 @@ const VisibilityToggle = ({
       handleNotLogin();
     } else {
       try {
-        const response = await ReviewApi.putVisibility(
-          reviewId,
-          !isActive ? 'PUBLIC' : 'PRIVATE',
-        );
+        const response = await ReviewApi.putVisibility({
+          reviewId: String(reviewId),
+          status: !isActive ? 'PUBLIC' : 'PRIVATE',
+        });
 
         if (response) {
           handleModalState({

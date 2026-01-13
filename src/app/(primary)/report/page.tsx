@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { ReportApi } from '@/app/api/ReportApi';
+import { ReportApi } from '@/api/report/report.api';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import Button from '@/components/ui/Button/Button';
 import { FormValues, ReportTypeMap } from '@/types/Report';

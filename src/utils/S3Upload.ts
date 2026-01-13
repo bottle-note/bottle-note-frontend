@@ -1,4 +1,4 @@
-import { CommonApi } from '@/app/api/CommonApi';
+import { S3Api } from '@/api/s3/s3.api';
 import { S3_URL_PATH } from '@/constants/common';
 
 export async function uploadImages(
@@ -8,7 +8,8 @@ export async function uploadImages(
   const imageArray = Array.isArray(images) ? images : [images];
 
   // GET preSignedURL
-  const preSignedData = await CommonApi.getUploadUrl(type, imageArray);
+  const response = await S3Api.getUploadUrl(type, imageArray);
+  const preSignedData = response.data;
 
   // Upload images
   const uploadPromises = imageArray.map((image, index) => {

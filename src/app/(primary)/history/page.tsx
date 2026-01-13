@@ -8,12 +8,15 @@ import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import NavLayout from '@/components/ui/Layout/NavLayout';
 import SearchBarLink from '@/components/feature/Search/SearchBarLink';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import { HistoryApi } from '@/app/api/HistoryApi';
+import { HistoryApi } from '@/api/history/history.api';
+import type {
+  HistoryListQueryParams,
+  HistoryListResponse,
+} from '@/api/history/types';
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
-import { UserApi } from '@/app/api/UserApi';
-import { HistoryListApi, HistoryListQueryParams } from '@/types/History';
+import { UserApi } from '@/api/user/user.api';
+import type { CurrentUserInfo } from '@/api/user/types';
 import { RATING_NUM_VALUES, PICKS_STATUS } from '@/constants/history';
-import { CurrentUserInfoApi } from '@/types/User';
 import TimelineFull from '@/components/domain/history/TimelineFull';
 import HistoryFilterModal from './_components/filter/HistoryFilterModal';
 
@@ -26,7 +29,7 @@ export default function History() {
   const [currentParams, setCurrentParams] = useState('');
   const [shouldReset, setShouldReset] = useState(false);
   const [currentUserInfo, setCurrentUserInfo] =
-    useState<CurrentUserInfoApi | null>(null);
+    useState<CurrentUserInfo | null>(null);
 
   const { getQueryParams, setKeyword, resetFilter } = useHistoryFilterStore();
 
@@ -37,7 +40,7 @@ export default function History() {
     isFetching,
     targetRef,
     refetch,
-  } = usePaginatedQuery<HistoryListApi>({
+  } = usePaginatedQuery<HistoryListResponse>({
     queryKey: ['history', currentUserInfo?.id, currentParams],
     queryFn: async ({ pageParam }) => {
       const queryParams: HistoryListQueryParams = {
@@ -85,7 +88,7 @@ export default function History() {
         ...page.data.userHistories,
       ],
     }),
-    {} as HistoryListApi,
+    {} as HistoryListResponse,
   );
 
   const handleFilterChange = async () => {
@@ -103,8 +106,8 @@ export default function History() {
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      const userInfo = await UserApi.getCurUserInfo();
-      setCurrentUserInfo(userInfo);
+      const response = await UserApi.getCurUserInfo();
+      setCurrentUserInfo(response.data);
     };
 
     fetchUserInfo();

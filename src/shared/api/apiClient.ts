@@ -1,7 +1,12 @@
 import { getSession, signOut } from 'next-auth/react';
-import { AuthApi } from '@/app/api/AuthApi';
 import useModalStore from '@/store/modalStore';
 import { ApiError } from '@/utils/ApiError';
+
+// 순환 참조 방지를 위한 lazy import
+async function getAuthApi() {
+  const { AuthApi } = await import('@/api/auth/auth.api');
+  return AuthApi;
+}
 
 interface ApiClientOptions extends RequestInit {
   authRequired?: boolean; // 인증 토큰 사용 여부 (기본: true)
@@ -80,6 +85,7 @@ class ApiClient {
         if (result?.code === 403 && retryCount < 1 && authRequired && session) {
           try {
             // /api/token/renew 가 next-auth 세션까지 갱신해 줄 것임
+            const AuthApi = await getAuthApi();
             await AuthApi.client.renewToken(session.user.refreshToken);
 
             // 새 토큰으로 재시도

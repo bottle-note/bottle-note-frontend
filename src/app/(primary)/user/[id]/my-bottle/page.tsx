@@ -5,13 +5,14 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
-import { UserApi } from '@/app/api/UserApi';
-import { MyBottleApi } from '@/app/api/MyBottleApi';
+import { UserApi } from '@/api/user/user.api';
+import { MyBottleApi } from '@/api/my-bottle/my-bottle.api';
 import List from '@/components/feature/List/List';
 import Tab from '@/components/ui/Navigation/Tab';
 import { REGIONS } from '@/constants/common';
 import { useTab } from '@/hooks/useTab';
-import { RegionId, SORT_ORDER, SORT_TYPE } from '@/types/common';
+import { SORT_ORDER, SORT_TYPE } from '@/api/_shared/types';
+import { RegionId } from '@/types/common';
 import SearchBarLink from '@/components/feature/Search/SearchBarLink';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
@@ -118,7 +119,7 @@ export default function MyBottle({
   }, [urlKeyword]);
 
   const isMyPage = alcoholList?.[0]?.data.isMyPage;
-  const nickName = userInfo?.nickName;
+  const nickName = userInfo?.data.nickName;
 
   const headerTitle = (() => {
     if (isMyPage) return '마이보틀';

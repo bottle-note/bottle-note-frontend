@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { groupHistoryByDate } from '@/app/(primary)/history/utils/historyUtils';
 import { History as HistoryType } from '@/types/History';
-import { ApiResponse } from '@/types/common';
+import { ApiResponse } from '@/api/_shared/types';
 import { TimelineSkeleton } from '@/components/ui/Loading/Skeletons/custom/TimelineSkeleton';
 import { HistoryEmptyState } from '@/app/(primary)/history/_components/HistoryEmptyState';
 import TimelineMonthGroup from '@/components/domain/history/TimelineMonthGroup';

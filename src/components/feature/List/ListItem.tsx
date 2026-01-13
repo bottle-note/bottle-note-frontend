@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Star from '@/components/ui/Display/Star';
 import AlcoholPickButton from '@/components/domain/alcohol/AlcoholPickButton';
-import { AlcoholAPI } from '@/types/Alcohol';
+import { Alcohol } from '@/api/alcohol/types';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import ItemImage from './_components/ItemImage';
@@ -11,7 +11,7 @@ import ItemInfo from './_components/ItemInfo';
 import RatingCountIcon from 'public/icon/rating-count-black.svg';
 
 interface Props {
-  data: AlcoholAPI & { hasReviewByMe?: boolean; isMyPage?: boolean };
+  data: Alcohol & { hasReviewByMe?: boolean; isMyPage?: boolean };
 }
 
 const ListItem = ({ data }: Props) => {

@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { useDebouncedToggle } from '@/hooks/useDebouncedToggle';
 
@@ -34,7 +34,9 @@ const AlcoholPickButton = ({
 
   const { handleToggle } = useDebouncedToggle({
     isToggled: isPicked,
-    apiCall: AlcoholsApi.putPick,
+    apiCall: async ({ id, state }) => {
+      await AlcoholsApi.putPick({ alcoholId: id, isPicked: state });
+    },
     id: alcoholId,
     onApiSuccess,
     onApiError,

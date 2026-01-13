@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useBlockActions } from '@/hooks/useBlockActions';
-import { BlockApi } from '@/app/api/BlockApi';
+import { BlockApi } from '@/api/block/block.api';
 import ProfileImage from '@/components/domain/user/ProfileImage';
 import { BlockListApi } from '@/types/Settings';
 import List from '@/components/feature/List/List';
