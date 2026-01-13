@@ -143,15 +143,15 @@
 }
 @layer components {
   .label-default {
-    @apply bg-white text-subCoral border border-subCoral rounded-md py-1 px-3;
+    @apply bg-white text-subCoral border border-solid border-subCoral rounded-md py-1 px-3;
   }
 
   .label-selected {
-    @apply bg-subCoral text-white border border-subCoral rounded-md py-1 px-3;
+    @apply bg-subCoral text-white border border-solid border-subCoral rounded-md py-1 px-3;
   }
 
   .label-disabled {
-    @apply bg-bgGray text-white border border-bgGray rounded-md py-1 px-3;
+    @apply bg-bgGray text-white border border-solid border-bgGray rounded-md py-1 px-3;
   }
 
   .tab-default {
