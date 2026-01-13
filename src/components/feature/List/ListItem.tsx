@@ -3,7 +3,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Star from '@/components/ui/Display/Star';
 import AlcoholPickButton from '@/components/domain/alcohol/AlcoholPickButton';
-import { addNewLine } from '@/utils/addNewLine';
 import { AlcoholAPI } from '@/types/Alcohol';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
@@ -44,7 +43,7 @@ const ListItem = ({ data }: Props) => {
         className="flex-1 flex flex-col items-start justify-center space-y-1.5 pr-2"
       >
         <ItemInfo
-          korName={addNewLine(korName)}
+          korName={korName}
           engName={engName}
           korCategory={korCategory}
         />
