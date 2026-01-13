@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import { ExploreApi } from '@/app/api/ExploreApi';
-import { ExploreAlcohol } from '@/types/Explore';
+import { ExploreApi } from '@/api/explore/explore.api';
+import { ExploreAlcohol } from '@/api/explore/types';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import List from '@/components/feature/List/List';
 import Label from '@/components/ui/Display/Label';

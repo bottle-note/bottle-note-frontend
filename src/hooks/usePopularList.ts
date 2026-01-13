@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
-import { AlcoholAPI } from '@/types/Alcohol';
+import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
+import { Alcohol } from '@/api/alcohol/types';
 import { PopularType } from '@/types/Popular';
 
 interface Props {
@@ -9,23 +9,29 @@ interface Props {
 
 export const usePopularList = ({ type = 'week' }: Props = {}) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [popular, setPopular] = useState<(AlcoholAPI & { path: string })[]>([]);
+  const [popular, setPopular] = useState<(Alcohol & { path: string })[]>([]);
 
   useEffect(() => {
     (async () => {
       setIsLoading(true);
       try {
-        let result: (AlcoholAPI & { path: string })[];
+        let result: (Alcohol & { path: string })[];
         switch (type) {
-          case 'week':
-            result = await AlcoholsApi.getWeeklyPopular();
+          case 'week': {
+            const response = await AlcoholsApi.getWeeklyPopular();
+            result = response.data.alcohols as (Alcohol & { path: string })[];
             break;
-          case 'spring':
-            result = await AlcoholsApi.getSpringPopular();
+          }
+          case 'spring': {
+            const response = await AlcoholsApi.getSpringPopular();
+            result = response.data as (Alcohol & { path: string })[];
             break;
-          case 'recent':
-            result = await AlcoholsApi.getHistory();
+          }
+          case 'recent': {
+            const response = await AlcoholsApi.getHistory();
+            result = response.data.items as (Alcohol & { path: string })[];
             break;
+          }
           default:
             result = [];
         }

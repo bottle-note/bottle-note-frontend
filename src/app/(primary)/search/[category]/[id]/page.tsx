@@ -17,11 +17,11 @@ import EmptyView from '@/components/ui/Display/EmptyView';
 import { truncStr } from '@/utils/truncStr';
 // import { shareOrCopy } from '@/utils/shareOrCopy';
 import { useAuth } from '@/hooks/auth/useAuth';
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
-import { UserApi } from '@/app/api/UserApi';
-import { RateApi } from '@/app/api/RateApi';
+import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
+import { AlcoholDetailsResponse } from '@/api/alcohol/types';
+import { UserApi } from '@/api/user/user.api';
+import { RateApi } from '@/api/rate/rate.api';
 import useModalStore from '@/store/modalStore';
-import { AlcoholDetails } from '@/types/Alcohol';
 import { ROUTES } from '@/constants/routes';
 import AlcoholDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/AlcoholDetailsSkeleton';
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
@@ -44,7 +44,7 @@ export default function SearchAlcohol() {
   const { handleModalState, handleLoginModal } = useModalStore();
   const { debounce } = useDebounceAction(DEBOUNCE_DELAY);
 
-  const [data, setData] = useState<AlcoholDetails | null>(null);
+  const [data, setData] = useState<AlcoholDetailsResponse | null>(null);
   const [alcoholDetails, setAlcoholDetails] = useState<DetailItem[]>([]);
   const [isPicked, setIsPicked] = useState<boolean>(false);
   const [rate, setRate] = useState(0);
@@ -53,10 +53,10 @@ export default function SearchAlcohol() {
 
   const fetchAlcoholDetails = async (id: string) => {
     try {
-      const result = await AlcoholsApi.getAlcoholDetails(id);
-      if (result) {
-        const { alcohols } = result;
-        setData(result);
+      const response = await AlcoholsApi.getAlcoholDetails(id);
+      if (response) {
+        const { alcohols } = response.data;
+        setData(response.data);
         setIsPicked(alcohols.isPicked);
         const formatContent = (content: string | undefined) =>
           content?.replace('/', '/\n') || '-';
@@ -79,9 +79,9 @@ export default function SearchAlcohol() {
 
   const getCurrentUserInfo = async () => {
     try {
-      const result = await UserApi.getCurUserInfo();
-      if (result) {
-        setUserNickName(result.nickname);
+      const response = await UserApi.getCurUserInfo();
+      if (response) {
+        setUserNickName(response.data.nickname);
       }
     } catch (error) {
       console.error('Failed to fetch current user info:', error);
@@ -91,7 +91,7 @@ export default function SearchAlcohol() {
   const fetchUserRating = async (alcohol: string) => {
     try {
       const ratingResult = await RateApi.getUserRating(alcohol);
-      setRate(ratingResult.rating);
+      setRate(ratingResult.data.rating);
     } catch (error) {
       console.error('Failed to fetch user rating:', error);
     }
@@ -121,15 +121,17 @@ export default function SearchAlcohol() {
 
       setRate(selectedRate);
 
-      debounce(() =>
-        RateApi.postRating({
-          alcoholId: String(alcoholId),
-          rating: selectedRate,
-        }).catch((error) => {
+      debounce(async () => {
+        try {
+          await RateApi.postRating({
+            alcoholId: String(alcoholId),
+            rating: selectedRate,
+          });
+        } catch (error) {
           fetchUserRating(alcoholId.toString());
           console.error(error);
-        }),
-      );
+        }
+      });
     },
     [isLoggedIn, alcoholId, debounce],
   );

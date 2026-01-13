@@ -6,9 +6,10 @@ import SearchBar from '@/components/feature/Search/SearchBar';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
 import Tab from '@/components/ui/Navigation/Tab';
 import { useTab } from '@/hooks/useTab';
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import { Category, SORT_TYPE, SORT_ORDER } from '@/types/common';
+import { Category } from '@/types/common';
+import { SORT_TYPE, SORT_ORDER } from '@/api/_shared/types';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import SelectableAlcoholItem from './SelectableAlcoholItem';
 

@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import * as yup from 'yup';
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { InquireApi } from '@/app/api/InquireApi';
+import { InquireApi } from '@/api/inquire/inquire.api';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import Button from '@/components/ui/Button/Button';
 import { uploadImages } from '@/utils/S3Upload';

@@ -4,13 +4,13 @@ import React, { useState, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
-import { ReviewApi } from '@/app/api/ReviewApi';
+import { ReviewApi } from '@/api/review/review.api';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
-import { Review as ReviewType } from '@/types/Review';
+import { ReviewInDetails } from '@/api/alcohol/types';
 import ReviewListItem from '@/app/(primary)/search/[category]/[id]/_components/ReviewListItem';
 import Button from '@/components/ui/Button/Button';
 import List from '@/components/feature/List/List';
-import { SORT_TYPE, SORT_ORDER } from '@/types/common';
+import { SORT_TYPE, SORT_ORDER } from '@/api/_shared/types';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
 import { useNavigateReviewWrite } from '@/hooks/useNavigateReviewWrite';
@@ -55,7 +55,7 @@ function Reviews() {
     targetRef,
     refetch: refetchReview,
   } = usePaginatedQuery<{
-    reviewList: ReviewType[];
+    reviewList: ReviewInDetails[];
     totalCount: number;
   }>({
     queryKey: ['review', filterState, alcoholId],
@@ -79,7 +79,7 @@ function Reviews() {
     targetRef: myReviewTargetRef,
     refetch: refetchMyReview,
   } = usePaginatedQuery<{
-    reviewList: ReviewType[];
+    reviewList: ReviewInDetails[];
     totalCount: number;
   }>({
     queryKey: ['myReview', filterMyState],
@@ -163,7 +163,7 @@ function Reviews() {
                   {reviewList ? (
                     [...reviewList.map((list) => list.data.reviewList)]
                       .flat()
-                      .map((item: ReviewType) => (
+                      .map((item: ReviewInDetails) => (
                         <ReviewListItem
                           data={item}
                           key={uuidv4()}
@@ -208,7 +208,7 @@ function Reviews() {
                   {myReviewList ? (
                     [...myReviewList.map((list) => list.data.reviewList)]
                       .flat()
-                      .map((item: ReviewType) => (
+                      .map((item: ReviewInDetails) => (
                         <ReviewListItem
                           data={item}
                           key={uuidv4()}

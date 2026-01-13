@@ -19,8 +19,8 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FormValues } from '@/types/Reply';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
-import { ReviewApi } from '@/app/api/ReviewApi';
-import { ReplyApi } from '@/app/api/ReplyApi';
+import { ReviewApi } from '@/api/review/review.api';
+import { ReplyApi } from '@/api/reply/reply.api';
 import JsonLd from '@/components/seo/JsonLd';
 import { generateReviewSchema } from '@/utils/seo/generateReviewSchema';
 import NavLayout from '@/components/ui/Layout/NavLayout';
@@ -114,9 +114,9 @@ export default function ReviewDetail() {
   const fetchReviewDetails = useCallback(async () => {
     if (!reviewId) return;
     try {
-      const result = await ReviewApi.getReviewDetails(reviewId);
-      const { alcoholInfo: response, ...restData } = result;
-      setAlcoholInfo(response);
+      const response = await ReviewApi.getReviewDetails(reviewId);
+      const { alcoholInfo, ...restData } = response.data;
+      setAlcoholInfo(alcoholInfo);
       setReviewDetails(restData);
     } catch (error) {
       console.error('Failed to fetch review details:', error);

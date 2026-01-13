@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
+import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { useDebouncedToggle } from '@/hooks/useDebouncedToggle';
 
@@ -32,9 +32,13 @@ const AlcoholPickButton = ({
 }: Props) => {
   const { isLoggedIn } = useAuth();
 
+  const pickApiCall = async (id: number, state: boolean): Promise<void> => {
+    await AlcoholsApi.putPick({ alcoholId: id, isPicked: state });
+  };
+
   const { handleToggle } = useDebouncedToggle({
     isToggled: isPicked,
-    apiCall: AlcoholsApi.putPick,
+    apiCall: pickApiCall,
     id: alcoholId,
     onApiSuccess,
     onApiError,

@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { RateAPI } from '@/types/Rate';
+import { RateApi } from '@/api/rate/rate.api';
+import { RateAlcohol } from '@/api/rate/types';
 import AlcoholPickButton from '@/components/domain/alcohol/AlcoholPickButton';
-import { RateApi } from '@/app/api/RateApi';
 import useModalStore from '@/store/modalStore';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { ROUTES } from '@/constants/routes';
@@ -13,12 +13,12 @@ import ItemImage from './_components/ItemImage';
 import ItemInfo from './_components/ItemInfo';
 
 interface Props {
-  data: RateAPI;
+  data: RateAlcohol;
 }
 
 const ListItemRating = ({ data }: Props) => {
   const {
-    korCategoryName,
+    korCategory,
     korName,
     engName,
     imageUrl,
@@ -53,7 +53,7 @@ const ListItemRating = ({ data }: Props) => {
           <ItemInfo
             korName={korName}
             engName={engName}
-            korCategory={korCategoryName}
+            korCategory={korCategory}
           />
         </Link>
 

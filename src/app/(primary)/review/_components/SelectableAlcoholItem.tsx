@@ -2,13 +2,13 @@
 
 import Image from 'next/image';
 import Star from '@/components/ui/Display/Star';
-import { AlcoholAPI } from '@/types/Alcohol';
+import { Alcohol } from '@/api/alcohol/types';
 import ItemImage from '@/components/feature/List/_components/ItemImage';
 import ItemInfo from '@/components/feature/List/_components/ItemInfo';
 import RatingCountIcon from 'public/icon/rating-count-black.svg';
 
 interface Props {
-  data: AlcoholAPI;
+  data: Alcohol;
   onSelect: (alcoholId: string) => void;
 }
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { RelationInfo } from '@/types/User';
-import { FollowApi } from '@/app/api/FollowApi';
+import { FollowApi } from '@/api/follow/follow.api';
+import { RelationInfo } from '@/api/follow/types';
 
 interface Props {
   isFollowing: boolean;

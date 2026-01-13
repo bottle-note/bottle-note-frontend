@@ -3,9 +3,9 @@
 import { useRouter } from 'next/navigation';
 import { DeviceService } from '@/lib/DeviceService';
 import useModalStore from '@/store/modalStore';
-import { AuthApi } from '@/app/api/AuthApi';
+import { AuthApi } from '@/api/auth/auth.api';
 import { ApiError } from '@/utils/ApiError';
-import { UserApi } from '@/app/api/UserApi';
+import { UserApi } from '@/api/user/user.api';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { getReturnToUrl } from '@/utils/loginRedirect';
 import { useAuth } from './auth/useAuth';
@@ -39,10 +39,10 @@ export const useLogin = () => {
   const handleSendDeviceInfo = async () => {
     try {
       if (isInApp && isLoggedIn) {
-        const result = await UserApi.sendDeviceInfo(
-          DeviceService.deviceToken || '',
-          DeviceService.platform || '',
-        );
+        const result = await UserApi.sendDeviceInfo({
+          deviceToken: DeviceService.deviceToken || '',
+          platform: DeviceService.platform || '',
+        });
 
         window.sendLogToFlutter(
           `${result.data.message} / ${result.data.deviceToken} / ${result.data.platform}`,

@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
 import List from '@/components/feature/List/List';
 import { usePopularList } from '@/hooks/usePopularList';
-import { Category, SORT_TYPE } from '@/types/common';
+import { SORT_TYPE } from '@/api/_shared/types';
+import { Category } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import { AlcoholAPI } from '@/types/Alcohol';
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
-import { CurationApi } from '@/app/api/CurationApi';
+import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
+import { Alcohol } from '@/api/alcohol/types';
+import { CurationApi } from '@/api/curation/curation.api';
 import { REGIONS } from '@/constants/common';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import useModalStore from '@/store/modalStore';
@@ -55,7 +56,7 @@ export default function Search() {
     targetRef,
     error,
   } = usePaginatedQuery<{
-    alcohols: AlcoholAPI[];
+    alcohols: Alcohol[];
     totalCount: number;
   }>({
     queryKey: [
@@ -84,8 +85,8 @@ export default function Search() {
             },
           );
 
-          // CurationAlcoholItem을 AlcoholAPI로 변환
-          const alcohols: AlcoholAPI[] = alcoholsResult.data.items.map(
+          // CurationAlcoholItem을 Alcohol로 변환
+          const alcohols: Alcohol[] = alcoholsResult.data.items.map(
             ({
               korCategoryName,
               engCategoryName,
@@ -244,7 +245,7 @@ export default function Search() {
                   </div>
                 ) : (
                   <List>
-                    {popularList.map((item: AlcoholAPI) => (
+                    {popularList.map((item: Alcohol) => (
                       <List.Item key={item.alcoholId} data={item} />
                     ))}
                   </List>
@@ -295,7 +296,7 @@ export default function Search() {
                 {alcoholList &&
                   [...alcoholList.map((list) => list.data.alcohols)]
                     .flat()
-                    .map((item: AlcoholAPI) => (
+                    .map((item: Alcohol) => (
                       <List.Item key={item.alcoholId} data={item} />
                     ))}
               </List>

@@ -1,6 +1,6 @@
 import { User } from 'next-auth';
-import { AuthApi } from '@/app/api/AuthApi';
-import { SOCIAL_TYPE, TokenData } from '@/types/Auth';
+import { AuthApi } from '@/api/auth/auth.api';
+import { SOCIAL_TYPE, TokenData } from '@/api/auth/types';
 
 async function handleAppleLogin(user: User): Promise<TokenData | null> {
   if (!user.idToken || !user.nonce) return null;
