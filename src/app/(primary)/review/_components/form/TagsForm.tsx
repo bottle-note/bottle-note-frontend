@@ -105,7 +105,7 @@ export default function TagsForm() {
               }}
             />
             <button
-              className={`text-15 px-2 py-1 rounded-md border w-24 shrink-0 ${watchTags?.length < TAGS_LIMIT ? 'border-subCoral text-white bg-subCoral' : 'border-brightGray text-bgGray'}`}
+              className={`text-15 px-2 py-1 rounded-md border border-solid w-24 shrink-0 ${watchTags?.length < TAGS_LIMIT ? 'border-subCoral text-white bg-subCoral' : 'border-brightGray text-bgGray'}`}
               disabled={watchTags?.length === TAGS_LIMIT}
               onClick={handleAddTag}
             >
@@ -116,7 +116,7 @@ export default function TagsForm() {
             <div className="flex flex-wrap gap-1 pt-2">
               {watchTags.map((tag: string) => (
                 <div key={tag} className="overflow-hidden flex-shrink-0">
-                  <div className="inline-block text-13 bg-white text-subCoral border border-subCoral px-2 py-1 rounded-md">
+                  <div className="inline-block text-13 bg-white text-subCoral border border-solid border-subCoral px-2 py-1 rounded-md">
                     <div className="flex items-center justify-center space-x-1">
                       <p>{tag}</p>
                       <span

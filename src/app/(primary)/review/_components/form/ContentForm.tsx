@@ -82,7 +82,7 @@ export default function ContentForm() {
           type="button"
           onClick={handleExtractTags}
           disabled={isExtracting}
-          className={`text-15 px-2 py-1 rounded-md border w-24 shrink-0 ${isExtracting ? 'border-brightGray text-bgGray' : 'border-subCoral text-white bg-subCoral'}`}
+          className={`text-15 px-2 py-1 rounded-md border border-solid w-24 shrink-0 ${isExtracting ? 'border-brightGray text-bgGray' : 'border-subCoral text-white bg-subCoral'}`}
         >
           {isExtracting ? '추출 중...' : '태그 추출'}
         </button>
