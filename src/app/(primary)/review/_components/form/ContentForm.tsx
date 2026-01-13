@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { TastingTagsApi } from '@/app/api/TastingTagsApi';
+import { TastingTagsApi } from '@/api/tasting-tags';
 import useModalStore from '@/store/modalStore';
 
 const TAGS_LIMIT = 15;
