@@ -41,7 +41,7 @@ const ListItem = ({ data }: Props) => {
       {/* info */}
       <Link
         href={ROUTES.SEARCH.ALL(alcoholId)}
-        className="flex flex-col items-start justify-center space-y-1.5"
+        className="flex-1 flex flex-col items-start justify-center space-y-1.5 pr-2"
       >
         <ItemInfo
           korName={addNewLine(korName)}
