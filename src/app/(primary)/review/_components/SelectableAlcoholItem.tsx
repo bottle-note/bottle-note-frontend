@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Star from '@/components/ui/Display/Star';
-import { addNewLine } from '@/utils/addNewLine';
 import { AlcoholAPI } from '@/types/Alcohol';
 import ItemImage from '@/components/feature/List/_components/ItemImage';
 import ItemInfo from '@/components/feature/List/_components/ItemInfo';
@@ -38,7 +37,7 @@ export default function SelectableAlcoholItem({ data, onSelect }: Props) {
 
       <div className="flex flex-col items-start justify-center space-y-1.5">
         <ItemInfo
-          korName={addNewLine(korName)}
+          korName={korName}
           engName={engName}
           korCategory={korCategory}
         />
