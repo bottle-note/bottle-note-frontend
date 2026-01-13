@@ -32,13 +32,11 @@ const AlcoholPickButton = ({
 }: Props) => {
   const { isLoggedIn } = useAuth();
 
-  const pickApiCall = async (id: number, state: boolean): Promise<void> => {
-    await AlcoholsApi.putPick({ alcoholId: id, isPicked: state });
-  };
-
   const { handleToggle } = useDebouncedToggle({
     isToggled: isPicked,
-    apiCall: pickApiCall,
+    apiCall: async ({ id, state }) => {
+      await AlcoholsApi.putPick({ alcoholId: id, isPicked: state });
+    },
     id: alcoholId,
     onApiSuccess,
     onApiError,

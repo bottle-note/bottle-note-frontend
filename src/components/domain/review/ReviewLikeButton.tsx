@@ -32,16 +32,11 @@ const ReviewLikeButton = ({
 }: Props) => {
   const { isLoggedIn } = useAuth();
 
-  const likeApiCall = async (
-    id: string | number,
-    state: boolean,
-  ): Promise<void> => {
-    await ReviewApi.putLike({ reviewId: String(id), isLiked: state });
-  };
-
   const { handleToggle } = useDebouncedToggle({
     isToggled: isLiked,
-    apiCall: likeApiCall,
+    apiCall: async ({ id, state }) => {
+      await ReviewApi.putLike({ reviewId: String(id), isLiked: state });
+    },
     id: reviewId,
     onApiSuccess,
     onApiError,

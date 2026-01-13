@@ -199,7 +199,10 @@ export const AuthApi = {
         throw new Error(ERROR_MESSAGES.AUTH_REQUIRED);
       }
 
-      return response as unknown as ApiResponse<string>;
+      return {
+        ...response,
+        data: response.data.data,
+      };
     },
 
     /**
