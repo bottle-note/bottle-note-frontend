@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import ProfileImage from '@/components/domain/user/ProfileImage';
 import OptionDropdown from '@/components/ui/Modal/OptionDropdown';
-import { UserApi } from '@/app/api/UserApi';
+import { UserApi } from '@/api/user/user.api';
 import useModalStore from '@/store/modalStore';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { uploadImages } from '@/utils/S3Upload';
@@ -32,8 +32,8 @@ export default function UserEditPage({
 
   useEffect(() => {
     (async () => {
-      const userInfo = await UserApi.getUserInfo({ userId: id });
-      setProfileImg(userInfo.imageUrl);
+      const response = await UserApi.getUserInfo({ userId: id });
+      setProfileImg(response.data.imageUrl);
     })();
   }, [id]);
 

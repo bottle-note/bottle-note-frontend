@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import BaseImage from '@/components/ui/Display/BaseImage';
-import { InquireApi } from '@/app/api/InquireApi';
+import { InquireApi } from '@/api/inquire/inquire.api';
 import { formatDate } from '@/utils/formatDate';
 import {
   ServiceInquireDetailsApi,
@@ -59,7 +59,7 @@ export default function Inquire() {
     async function fetchInquireDetails() {
       if (!helpId) return;
       try {
-        const result =
+        const response =
           paramsType === 'business'
             ? await InquireApi.getBusinessInquireDetails(helpId)
             : await InquireApi.getInquireDetails(helpId);
@@ -67,11 +67,11 @@ export default function Inquire() {
         const adaptedResult =
           paramsType === 'business'
             ? createBusinessAdapter(
-                result as BusinessInquireDetailsApi,
+                response.data as BusinessInquireDetailsApi,
                 typeList,
               )
             : createServiceAdapter(
-                result as ServiceInquireDetailsApi,
+                response.data as ServiceInquireDetailsApi,
                 typeList,
               );
 

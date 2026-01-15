@@ -1,5 +1,4 @@
-import { AlcoholInfo } from '@/types/Alcohol';
-import { Review } from '@/types/Review';
+import { AlcoholInfo, ReviewInDetails } from '@/api/alcohol/types';
 import { BASE_URL } from '@/constants/common';
 
 /**
@@ -10,7 +9,7 @@ import { BASE_URL } from '@/constants/common';
  */
 export function generateAlcoholSchema(
   alcohol: AlcoholInfo,
-  reviews?: Review[],
+  reviews?: ReviewInDetails[],
 ) {
   const schema: Record<string, any> = {
     '@context': 'https://schema.org',

@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { ReviewApi } from '@/app/api/ReviewApi';
+import { ReviewApi } from '@/api/review/review.api';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { useDebouncedToggle } from '@/hooks/useDebouncedToggle';
 
@@ -34,7 +34,9 @@ const ReviewLikeButton = ({
 
   const { handleToggle } = useDebouncedToggle({
     isToggled: isLiked,
-    apiCall: ReviewApi.putLike,
+    apiCall: async ({ id, state }) => {
+      await ReviewApi.putLike({ reviewId: String(id), isLiked: state });
+    },
     id: reviewId,
     onApiSuccess,
     onApiError,

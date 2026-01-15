@@ -2,13 +2,13 @@
 
 import Image from 'next/image';
 import Star from '@/components/ui/Display/Star';
-import { AlcoholAPI } from '@/types/Alcohol';
+import { Alcohol } from '@/api/alcohol/types';
 import ItemImage from '@/components/feature/List/_components/ItemImage';
 import ItemInfo from '@/components/feature/List/_components/ItemInfo';
 import RatingCountIcon from 'public/icon/rating-count-black.svg';
 
 interface Props {
-  data: AlcoholAPI;
+  data: Alcohol;
   onSelect: (alcoholId: string) => void;
 }
 
@@ -31,7 +31,7 @@ export default function SelectableAlcoholItem({ data, onSelect }: Props) {
     <button
       type="button"
       onClick={handleClick}
-      className="flex items-center text-mainBlack border-brightGray border-b py-1 w-full text-left hover:bg-gray-50 active:bg-gray-100 transition-colors"
+      className="flex items-center text-mainBlack border-brightGray border-b border-solid py-1 w-full text-left hover:bg-gray-50 active:bg-gray-100 transition-colors"
     >
       <ItemImage src={imageUrl} alt="image" />
 

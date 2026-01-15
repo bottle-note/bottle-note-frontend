@@ -7,10 +7,10 @@ import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { useTab } from '@/hooks/useTab';
 import List from '@/components/feature/List/List';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import { RelationInfo } from '@/types/User';
+import { FollowApi } from '@/api/follow/follow.api';
+import { RelationInfo } from '@/api/follow/types';
 import ListSection from '@/components/feature/List/ListSection';
 import Tab from '@/components/ui/Navigation/Tab';
-import { FollowApi } from '@/app/api/FollowApi';
 import { FollowerListItem } from '../_components/FollowerListItem';
 
 export default function UserFollowPage({

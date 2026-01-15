@@ -11,7 +11,7 @@ import {
   LoadingStateSkeleton,
 } from '@/components/ui/Loading/Skeletons/custom/PopularSkeleton';
 import { PopularType } from '@/types/Popular';
-import { UserApi } from '@/app/api/UserApi';
+import { UserApi } from '@/api/user/user.api';
 import { ROUTES } from '@/constants/routes';
 
 interface Props {
@@ -59,7 +59,7 @@ const Description = ({
 
   useEffect(() => {
     if (type === 'recent' && !isLoading) {
-      UserApi.getCurUserInfo().then(setUserInfo);
+      UserApi.getCurUserInfo().then((res) => setUserInfo(res.data));
     }
   }, [type, isLoading]);
 

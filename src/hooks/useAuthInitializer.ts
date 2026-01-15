@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks/auth/useAuth';
 import useRelationshipsStore from '@/store/relationshipsStore';
-import { BlockApi } from '@/app/api/BlockApi';
+import { BlockApi } from '@/api/block/block.api';
 
 export const useAuthInitializer = () => {
   const { isLoggedIn, isLoading } = useAuth();

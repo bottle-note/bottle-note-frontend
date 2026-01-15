@@ -5,14 +5,8 @@ import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import useModalStore from '@/store/modalStore';
 import HoverTouchBox from '@/components/ui/Interactive/HoverTouchBox';
+import { TAGS_LIMIT, validateTagText } from '@/constants/review';
 import OptionsContainer from '../OptionsContainer';
-
-function validateText(text: string) {
-  const regex = /^[a-zA-Z가-힣\s]+$/;
-  return regex.test(text);
-}
-
-const TAGS_LIMIT = 15;
 
 export default function TagsForm() {
   const { handleModalState } = useModalStore();
@@ -32,7 +26,7 @@ export default function TagsForm() {
         isShowModal: true,
         mainText: '이미 동일한 태그가 있습니다.',
       });
-    } else if (!validateText(tagValue)) {
+    } else if (!validateTagText(tagValue)) {
       handleModalState({
         isShowModal: true,
         mainText: '태그에 숫자와 특수문자는 추가할 수 없습니다.',
@@ -111,7 +105,7 @@ export default function TagsForm() {
               }}
             />
             <button
-              className={`text-15 px-2 py-1 rounded-md border w-24 ${watchTags?.length < TAGS_LIMIT ? 'border-subCoral text-white bg-subCoral' : 'border-brightGray text-bgGray'}`}
+              className={`text-15 px-2 py-1 rounded-md border border-solid w-24 shrink-0 ${watchTags?.length < TAGS_LIMIT ? 'border-subCoral text-white bg-subCoral' : 'border-brightGray text-bgGray'}`}
               disabled={watchTags?.length === TAGS_LIMIT}
               onClick={handleAddTag}
             >
@@ -122,7 +116,7 @@ export default function TagsForm() {
             <div className="flex flex-wrap gap-1 pt-2">
               {watchTags.map((tag: string) => (
                 <div key={tag} className="overflow-hidden flex-shrink-0">
-                  <div className="inline-block text-13 bg-white text-subCoral border border-subCoral px-2 py-1 rounded-md">
+                  <div className="inline-block text-13 bg-white text-subCoral border border-solid border-subCoral px-2 py-1 rounded-md">
                     <div className="flex items-center justify-center space-x-1">
                       <p>{tag}</p>
                       <span

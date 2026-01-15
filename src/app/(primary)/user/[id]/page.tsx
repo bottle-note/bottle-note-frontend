@@ -2,16 +2,16 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { UserInfoApi } from '@/types/User';
-import { UserApi } from '@/app/api/UserApi';
+import { UserApi } from '@/api/user/user.api';
+import { UserInfo as UserInfoType } from '@/api/user/types';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import TimelinePreview from '@/components/domain/history/TimelinePreview';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import useModalStore from '@/store/modalStore';
 import { useAuth } from '@/hooks/auth/useAuth';
-import { History } from '@/types/History';
+import { HistoryApi } from '@/api/history/history.api';
+import { History } from '@/api/history/types';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import { HistoryApi } from '@/app/api/HistoryApi';
 import { ROUTES } from '@/constants/routes';
 import NavLayout from '@/components/ui/Layout/NavLayout';
 import UserInfo from './_components/UserInfo';
@@ -21,7 +21,7 @@ export default function User({ params: { id } }: { params: { id: string } }) {
   const router = useRouter();
   const { handleModalState, handleLoginModal } = useModalStore();
   const { user: loginUserData, isLoggedIn } = useAuth();
-  const [userData, setUserData] = useState<UserInfoApi | null>(null);
+  const [userData, setUserData] = useState<UserInfoType | null>(null);
 
   const handleConfirmUser = () => {
     if (!isLoggedIn) {
@@ -63,7 +63,7 @@ export default function User({ params: { id } }: { params: { id: string } }) {
   useEffect(() => {
     (async () => {
       const res = await UserApi.getUserInfo({ userId: id });
-      setUserData(res);
+      setUserData(res.data);
     })();
   }, [id]);
 

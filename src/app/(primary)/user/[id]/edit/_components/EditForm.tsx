@@ -2,10 +2,10 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { UserApi } from '@/app/api/UserApi';
+import { UserApi } from '@/api/user/user.api';
 import { validate } from '@/utils/validate';
 import useModalStore from '@/store/modalStore';
-import { ApiResponse } from '@/types/common';
+import { ApiResponse } from '@/api/_shared/types';
 import CloseIconGray from 'public/icon/close-brightgray.svg';
 
 interface Props {
@@ -21,7 +21,7 @@ function EditForm({ userId }: Props) {
     (async () => {
       if (userId) {
         const res = await UserApi.getUserInfo({ userId });
-        setNickName(res.nickName ?? '');
+        setNickName(res.data.nickName ?? '');
       }
     })();
   }, [userId]);

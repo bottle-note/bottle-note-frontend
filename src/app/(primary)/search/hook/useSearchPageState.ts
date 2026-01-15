@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useFilter } from '@/hooks/useFilter';
-import { Category, SORT_ORDER, SORT_TYPE } from '@/types/common';
+import { SORT_ORDER, SORT_TYPE } from '@/api/_shared/types';
+import { Category } from '@/types/common';
 
 interface FilterState {
   keyword: string;

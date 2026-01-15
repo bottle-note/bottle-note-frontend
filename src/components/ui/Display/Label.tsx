@@ -55,7 +55,7 @@ function Label({
       return `${baseStyle} ${buttonStyles}`;
     }
 
-    return `border ${baseStyle} ${styleClass}`;
+    return `border border-solid ${baseStyle} ${styleClass}`;
   };
 
   return (
