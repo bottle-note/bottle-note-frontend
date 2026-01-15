@@ -7,13 +7,8 @@ import { useWebviewCamera } from '@/hooks/useWebviewCamera';
 import { useImageUploader } from '@/hooks/useImageUploader';
 import OptionDropdown from '@/components/ui/Modal/OptionDropdown';
 import useModalStore from '@/store/modalStore';
-import { DeviceService } from '@/lib/DeviceService';
 
 const getSelectOptions = () => {
-  // Android에서는 카메라 옵션 제외
-  if (DeviceService.platform === 'android') {
-    return [{ type: 'album', name: '앨범에서 선택' }];
-  }
   return [
     { type: 'camera', name: '카메라' },
     { type: 'album', name: '앨범에서 선택' },
