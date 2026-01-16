@@ -6,6 +6,7 @@ import { useCurrentUserQuery } from '@/queries/useCurrentUserQuery';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { LoadingStateSkeleton } from '@/components/ui/Loading/Skeletons/custom/PopularSkeleton';
 import type { HomeFeaturedType } from '@/types/HomeFeatured';
+import { HOME_FEATURED_CONFIG } from '@/constants/home';
 
 import { HomeFeaturedDescription } from './_components/HomeFeaturedDescription';
 import { HomeFeaturedItemList } from './_components/HomeFeaturedItemList';
@@ -19,7 +20,7 @@ interface Props {
 
 function HomeFeaturedList({ type = 'week' }: Props) {
   const { isLoggedIn } = useAuth();
-  const requiresAuth = type === 'recent';
+  const { requiresAuth } = HOME_FEATURED_CONFIG[type];
 
   // 로그인이 필요한 타입인데 로그인하지 않은 경우 쿼리 비활성화
   const shouldFetchData = !requiresAuth || isLoggedIn;
@@ -34,9 +35,9 @@ function HomeFeaturedList({ type = 'week' }: Props) {
     enabled: shouldFetchData,
   });
 
-  // 'recent' 타입일 때만 유저 정보 조회
+  // 로그인 필요 타입일 때만 유저 정보 조회
   const { data: currentUser } = useCurrentUserQuery({
-    enabled: type === 'recent' && isLoggedIn && !isLoading,
+    enabled: requiresAuth && isLoggedIn && !isLoading,
   });
 
   // 로그인 필요 상태
