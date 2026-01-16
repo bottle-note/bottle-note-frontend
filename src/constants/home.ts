@@ -25,14 +25,9 @@ export const BANNER_IMAGES: ProductImage[] = [
   },
 ];
 
-export const TOP_MENU_ITEMS = [
-  { id: 'view-week', name: '주간 조회수 TOP 5' },
-  { id: 'recent', name: '최근에 본 위스키' },
-];
-
 export const MENU_CATEGORY = [{ id: 'category', name: '카테고리' }];
 
-// 홈 피처드 목록 타입별 설정
+// HomeFeaturedConfig 타입 먼저 정의 (순서 의존성)
 export const HOME_FEATURED_CONFIG = {
   'view-week': {
     titleLabel: '주간 조회수 TOP 5',

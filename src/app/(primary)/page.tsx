@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/ui/Navigation/Tab';
 import HomeCarousel from '@/components/feature/home/HomeCarousel';
-import { TOP_MENU_ITEMS, MENU_CATEGORY } from '@/constants/home';
+import { HomeFeaturedConfigKey, MENU_CATEGORY } from '@/constants/home';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import CategoryList from '@/components/feature/home/CategoryList';
 import DynamicAlcoholList from '@/components/feature/home/DynamicAlcoholList';
@@ -13,6 +13,16 @@ import NavLayout from '@/components/ui/Layout/NavLayout';
 import JsonLd from '@/components/seo/JsonLd';
 import { generateWebSiteSchema } from '@/utils/seo/generateWebSiteSchema';
 import { TarotPromoCard } from '@/components/feature/home/TarotPromoCard';
+
+interface TopMenuItem {
+  id: HomeFeaturedConfigKey;
+  name: string;
+}
+
+export const TOP_MENU_ITEMS: TopMenuItem[] = [
+  { id: 'view-week', name: '주간 TOP 5' },
+  { id: 'recent', name: '최근에 본 위스키' },
+];
 
 export default function Home() {
   const [showTarotPromo, setShowTarotPromo] = useState(true);
@@ -44,7 +54,7 @@ export default function Home() {
 
   const renderTopContent = () => {
     switch (firstMenuSelectedTab.id) {
-      case 'week':
+      case 'view-week':
       case 'recent':
         return (
           <DynamicAlcoholList
