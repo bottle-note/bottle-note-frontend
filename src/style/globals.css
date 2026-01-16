@@ -115,6 +115,10 @@
       var(--header-height) + var(--safe-area-top)
     );
 
+    /* Component heights */
+    --search-bar-height: 56px;
+    --tab-height: 81px;
+
     /* Navbar (px 단위 통일) */
     --navbar-height: 70px;
     --navbar-margin-bottom: max(24px, calc(var(--safe-area-bottom) + 8px));
