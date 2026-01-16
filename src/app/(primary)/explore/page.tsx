@@ -90,7 +90,9 @@ export default function ExplorePage() {
       </div>
       <section
         className="w-full h-full p-4"
-        style={{ marginTop: 'calc(var(--header-height-with-safe) + 81px)' }}
+        style={{
+          marginTop: 'calc(var(--header-height-with-safe) + var(--tab-height))',
+        }}
       >
         {currentTab.id === 'EXPLORER_WHISKEY' && <WhiskeyExplorerList />}
         {currentTab.id === 'REVIEW_WHISKEY' && <ReviewExplorerList />}
