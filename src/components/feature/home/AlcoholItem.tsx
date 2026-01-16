@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Star from '@/components/ui/Display/Star';
 import { truncStr } from '@/utils/truncStr';
-import { AlcoholAPI } from '@/types/Alcohol';
+import type { Alcohol } from '@/api/alcohol/types';
 import Fallback from 'public/bottle.svg';
 
 type AlcoholImageProps = {
@@ -52,15 +52,16 @@ const AlcoholImage: React.FC<AlcoholImageProps> = ({
 };
 
 interface Props {
-  data: AlcoholAPI & { path: string };
+  data: Alcohol;
 }
 
 export default function AlcoholItem({ data }: Props) {
-  const { korName, rating, engCategory, imageUrl, path } = data;
+  const { korName, rating, engCategory, imageUrl, path, alcoholId } = data;
+  const href = path ?? `/search/${engCategory}/${alcoholId}`;
 
   return (
     <div className="w-[145px] overflow-hidden rounded-lg">
-      <Link href={path} className="block">
+      <Link href={href} className="block">
         <div className="w-full h-[145px] bg-sectionWhite relative flex shrink-0 items-center justify-center">
           <AlcoholImage
             imageUrl={imageUrl}
