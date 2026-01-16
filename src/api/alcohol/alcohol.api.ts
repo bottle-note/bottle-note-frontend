@@ -44,6 +44,32 @@ export const AlcoholsApi = {
   },
 
   /**
+   * 주간 조회수 기반 인기 위스키 목록을 조회합니다.
+   */
+  async getWeeklyViewPopular(
+    top = 5,
+  ): Promise<ApiResponse<{ totalCount: number; alcohols: Alcohol[] }>> {
+    const response = await apiClient.get<
+      ApiResponse<{ totalCount: number; alcohols: AlcoholApiRaw[] }>
+    >(`/popular/view/week?top=${top}`, {
+      authRequired: false,
+      cache: 'force-cache',
+    });
+
+    if (response.errors.length !== 0) {
+      throw new Error(ERROR_MESSAGES.ALCOHOL_LIST_FETCH_FAILED);
+    }
+
+    return {
+      ...response,
+      data: {
+        totalCount: response.data.totalCount,
+        alcohols: transformAlcoholList(response.data.alcohols),
+      },
+    };
+  },
+
+  /**
    * 봄 시즌 인기 위스키 목록을 조회합니다.
    */
   async getSpringPopular(): Promise<ApiResponse<Alcohol[]>> {

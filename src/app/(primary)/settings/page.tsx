@@ -177,7 +177,7 @@ export default function Settings() {
   };
 
   return (
-    <main>
+    <main className="flex-1 flex flex-col">
       <SubHeader>
         <SubHeader.Left onClick={getHeaderLeftOnClick()}>
           <Image

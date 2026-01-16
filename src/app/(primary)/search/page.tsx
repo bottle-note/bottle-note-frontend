@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
 import List from '@/components/feature/List/List';
-import { usePopularList } from '@/hooks/usePopularList';
+import { useHomeFeaturedQuery } from '@/queries/useHomeFeaturedQuery';
 import { SORT_TYPE } from '@/api/_shared/types';
 import { Category } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
@@ -41,7 +41,8 @@ const isCurationKeyword = (keyword: string) => {
 export default function Search() {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
-  const { popularList, isLoading: isPopularLoading } = usePopularList();
+  const { data: featuredList = [], isLoading: isFeaturedLoading } =
+    useHomeFeaturedQuery({ type: 'week' });
   const { filterState, handleFilter, isEmptySearch, urlKeyword } =
     useSearchPageState();
   const [showTab, setShowTab] = useState(true);
@@ -195,7 +196,7 @@ export default function Search() {
         {/* 고정 영역: SearchBar + (스크롤 시) CategorySelector */}
         <div className="fixed-content top-0 bg-white z-10">
           <SearchBarLink
-            className="px-5 pt-[70px]"
+            className="px-5 pt-safe-header"
             placeholder="어떤 술을 찾고 계신가요?"
             keyword={urlKeyword || undefined}
             onClear={() => router.replace('/search/input')}
@@ -211,7 +212,13 @@ export default function Search() {
         </div>
 
         {/* 스크롤 영역 */}
-        <section className="flex flex-col gap-7 pt-[140px] pb-5">
+        <section
+          className="flex flex-col gap-7 pb-5"
+          style={{
+            paddingTop:
+              'calc(var(--header-height-with-safe) + var(--search-fixed-area-height))',
+          }}
+        >
           {showTab && (
             <article className="space-y-4">
               <Tab
@@ -237,7 +244,7 @@ export default function Search() {
                 currentTab={popularSelectedTab}
               />
               <section className="px-5">
-                {isPopularLoading ? (
+                {isFeaturedLoading ? (
                   <div className="flex flex-col gap-2">
                     {Array.from({ length: 5 }).map((_, index) => (
                       <ListItemSkeleton key={index} />
@@ -245,7 +252,7 @@ export default function Search() {
                   </div>
                 ) : (
                   <List>
-                    {popularList.map((item: Alcohol) => (
+                    {featuredList.map((item: Alcohol) => (
                       <List.Item key={item.alcoholId} data={item} />
                     ))}
                   </List>

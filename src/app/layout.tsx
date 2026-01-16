@@ -94,7 +94,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  // iOS specific
+  // iOS specific - cover로 설정하면 safe area까지 확장, CSS env()로 처리
   viewportFit: 'cover',
 };
 
@@ -108,7 +108,7 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <WebVitalsReporter />
         <Providers>
-          <div className="relative w-full bg-bgGray">
+          <div className="relative w-full bg-bgGray min-h-safe-screen">
             {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID && (
               <GoogleAnalytics
                 gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}

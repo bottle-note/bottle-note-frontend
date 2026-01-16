@@ -49,7 +49,7 @@ export default function SearchInput() {
   };
 
   return (
-    <main className="w-full pt-[70px] min-h-screen bg-white">
+    <main className="w-full pt-safe-header min-h-safe-screen bg-white">
       <div className="flex items-center gap-3 px-5">
         <button
           onClick={() => router.back()}
