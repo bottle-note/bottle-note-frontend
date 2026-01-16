@@ -138,7 +138,7 @@ function SubHeaderMain({ children, bgColor = 'bg-white' }: SubHeaderMainProps) {
 
   return (
     <div
-      className={`${bgColor} flex items-center w-full px-[17px] pb-[15px] pt-[74px]`}
+      className={`${bgColor} flex items-center w-full px-[17px] pb-[15px] pt-safe-header`}
     >
       <div className="flex-1 flex items-center min-w-0">{leftComponent}</div>
       <div className="flex-1 flex justify-center items-center min-w-0">
