@@ -17,7 +17,7 @@ interface Props {
   type?: HomeFeaturedType;
 }
 
-function DynamicAlcoholList({ type = 'week' }: Props) {
+function HomeFeaturedList({ type = 'week' }: Props) {
   const { isLoggedIn } = useAuth();
   const requiresAuth = type === 'recent';
 
@@ -84,4 +84,4 @@ function DynamicAlcoholList({ type = 'week' }: Props) {
   );
 }
 
-export default DynamicAlcoholList;
+export default HomeFeaturedList;

@@ -8,7 +8,7 @@ import HomeCarousel from '@/components/feature/home/HomeCarousel';
 import { HomeFeaturedConfigKey, MENU_CATEGORY } from '@/constants/home';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import CategoryList from '@/components/feature/home/CategoryList';
-import DynamicAlcoholList from '@/components/feature/home/DynamicAlcoholList';
+import HomeFeaturedList from '@/components/feature/home/HomeFeaturedList';
 import NavLayout from '@/components/ui/Layout/NavLayout';
 import JsonLd from '@/components/seo/JsonLd';
 import { generateWebSiteSchema } from '@/utils/seo/generateWebSiteSchema';
@@ -19,7 +19,7 @@ interface TopMenuItem {
   name: string;
 }
 
-export const TOP_MENU_ITEMS: TopMenuItem[] = [
+const TOP_MENU_ITEMS: TopMenuItem[] = [
   { id: 'view-week', name: '주간 TOP 5' },
   { id: 'recent', name: '최근에 본 위스키' },
 ];
@@ -57,7 +57,7 @@ export default function Home() {
       case 'view-week':
       case 'recent':
         return (
-          <DynamicAlcoholList
+          <HomeFeaturedList
             key={firstMenuSelectedTab.id}
             type={firstMenuSelectedTab.id}
           />
