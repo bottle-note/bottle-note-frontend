@@ -88,7 +88,10 @@ export default function ExplorePage() {
           registerTab={registerTab}
         />
       </div>
-      <section className="w-full h-full p-4 mt-[140px]">
+      <section
+        className="w-full h-full p-4"
+        style={{ marginTop: 'calc(var(--header-height-with-safe) + 81px)' }}
+      >
         {currentTab.id === 'EXPLORER_WHISKEY' && <WhiskeyExplorerList />}
         {currentTab.id === 'REVIEW_WHISKEY' && <ReviewExplorerList />}
       </section>

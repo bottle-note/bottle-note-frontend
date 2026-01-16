@@ -94,7 +94,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  // iOS specific
+  // iOS specific - cover로 설정하면 safe area까지 확장, CSS env()로 처리
   viewportFit: 'cover',
 };
 

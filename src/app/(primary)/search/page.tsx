@@ -196,7 +196,7 @@ export default function Search() {
         {/* 고정 영역: SearchBar + (스크롤 시) CategorySelector */}
         <div className="fixed-content top-0 bg-white z-10">
           <SearchBarLink
-            className="px-5 pt-[70px]"
+            className="px-5 pt-safe-header"
             placeholder="어떤 술을 찾고 계신가요?"
             keyword={urlKeyword || undefined}
             onClear={() => router.replace('/search/input')}
@@ -212,7 +212,10 @@ export default function Search() {
         </div>
 
         {/* 스크롤 영역 */}
-        <section className="flex flex-col gap-7 pt-[140px] pb-5">
+        <section
+          className="flex flex-col gap-7 pb-5"
+          style={{ paddingTop: 'calc(var(--header-height-with-safe) + 70px)' }}
+        >
           {showTab && (
             <article className="space-y-4">
               <Tab

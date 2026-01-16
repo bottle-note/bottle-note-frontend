@@ -75,7 +75,10 @@ function SearchContainer({
       </div>
 
       {isOnSearch && showRecentSearch && (
-        <div className="w-full fixed-content bottom-0 top-[115px] z-40 bg-white p-3 overflow-y-auto">
+        <div
+          className="w-full fixed-content bottom-0 z-40 bg-white p-3 overflow-y-auto"
+          style={{ top: 'calc(var(--header-height-with-safe) + 56px)' }}
+        >
           <RecentSearch handleSearch={onSearch} />
         </div>
       )}
