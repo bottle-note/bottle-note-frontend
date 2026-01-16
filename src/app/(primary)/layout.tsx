@@ -18,8 +18,8 @@ export default function Layout({
   }, [isMobile]);
 
   return (
-    <div className="bg-white flex flex-col w-full mx-auto min-h-safe-screen pb-navbar">
-      <main className="flex-1 overflow-y-auto">{children}</main>
+    <div className="bg-white flex flex-col w-full mx-auto min-h-safe-screen">
+      <main>{children}</main>
       {loginState.isShowLoginModal && (
         <LoginModal handleClose={handleLoginModal} />
       )}

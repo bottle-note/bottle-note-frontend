@@ -221,7 +221,6 @@
 
   .min-h-safe-screen {
     min-height: 100dvh;
-    min-height: -webkit-fill-available;
   }
 }
 

@@ -108,7 +108,7 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <WebVitalsReporter />
         <Providers>
-          <div className="relative w-full bg-bgGray">
+          <div className="relative w-full bg-bgGray min-h-safe-screen">
             {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID && (
               <GoogleAnalytics
                 gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}
