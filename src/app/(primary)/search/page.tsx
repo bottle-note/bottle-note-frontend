@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
 import List from '@/components/feature/List/List';
-import { usePopularList } from '@/hooks/usePopularList';
+import { useHomeFeaturedQuery } from '@/queries/useHomeFeaturedQuery';
 import { SORT_TYPE } from '@/api/_shared/types';
 import { Category } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
@@ -41,7 +41,8 @@ const isCurationKeyword = (keyword: string) => {
 export default function Search() {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
-  const { popularList, isLoading: isPopularLoading } = usePopularList();
+  const { data: featuredList = [], isLoading: isFeaturedLoading } =
+    useHomeFeaturedQuery({ type: 'week' });
   const { filterState, handleFilter, isEmptySearch, urlKeyword } =
     useSearchPageState();
   const [showTab, setShowTab] = useState(true);
@@ -237,7 +238,7 @@ export default function Search() {
                 currentTab={popularSelectedTab}
               />
               <section className="px-5">
-                {isPopularLoading ? (
+                {isFeaturedLoading ? (
                   <div className="flex flex-col gap-2">
                     {Array.from({ length: 5 }).map((_, index) => (
                       <ListItemSkeleton key={index} />
@@ -245,7 +246,7 @@ export default function Search() {
                   </div>
                 ) : (
                   <List>
-                    {popularList.map((item: Alcohol) => (
+                    {featuredList.map((item: Alcohol) => (
                       <List.Item key={item.alcoholId} data={item} />
                     ))}
                   </List>
