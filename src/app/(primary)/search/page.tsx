@@ -214,7 +214,10 @@ export default function Search() {
         {/* 스크롤 영역 */}
         <section
           className="flex flex-col gap-7 pb-5"
-          style={{ paddingTop: 'calc(var(--header-height-with-safe) + 70px)' }}
+          style={{
+            paddingTop:
+              'calc(var(--header-height-with-safe) + var(--search-fixed-area-height))',
+          }}
         >
           {showTab && (
             <article className="space-y-4">

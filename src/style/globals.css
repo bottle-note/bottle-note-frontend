@@ -117,6 +117,7 @@
 
     /* Component heights */
     --search-bar-height: 56px;
+    --search-fixed-area-height: 70px;
     --tab-height: 81px;
 
     /* Navbar (px 단위 통일) */
