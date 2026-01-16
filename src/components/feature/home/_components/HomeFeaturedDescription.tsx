@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { HOME_FEATURED_CONTENT, HomeFeaturedType } from '@/types/HomeFeatured';
+import type { HomeFeaturedType } from '@/types/HomeFeatured';
+import { HOME_FEATURED_CONFIG } from '@/constants/home';
 
 interface Props {
   type: HomeFeaturedType;
@@ -9,17 +10,17 @@ interface Props {
 }
 
 export function HomeFeaturedDescription({ type, nickname }: Props) {
-  const content = HOME_FEATURED_CONTENT[type];
-  const line1 = type === 'recent' ? `${nickname ?? ''} 님이` : content.line1;
+  const config = HOME_FEATURED_CONFIG[type];
+  const line1 = config.titleText[0].replace('{nickname}', nickname ?? '');
 
   return (
     <>
       <p className="pb-[10px] text-13 font-extrabold text-mainCoral">
-        {content.title}
+        {config.titleLabel}
       </p>
       <div className="text-20 font-bold space-y-[2px] pb-5">
         <p>{line1}</p>
-        <p>{content.line2}</p>
+        <p>{config.titleText[1]}</p>
       </div>
     </>
   );
