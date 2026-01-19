@@ -106,8 +106,19 @@
     --radius: 0.5rem;
 
     /* Safe area insets */
-    --safe-area-top: env(safe-area-inset-top, 0px);
-    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    /* Android WebView fallback (JS에서 감지 시 설정됨) */
+    --android-safe-area-top: 0px;
+    --android-safe-area-bottom: 0px;
+
+    /* iOS env() 우선, Android fallback 적용 */
+    --safe-area-top: max(
+      env(safe-area-inset-top, 0px),
+      var(--android-safe-area-top)
+    );
+    --safe-area-bottom: max(
+      env(safe-area-inset-bottom, 0px),
+      var(--android-safe-area-bottom)
+    );
 
     /* Header heights */
     --header-height: 20px;

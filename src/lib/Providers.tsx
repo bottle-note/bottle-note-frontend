@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthInitializer } from '@/hooks/useAuthInitializer';
 import Modal from '@/components/ui/Modal/Modal';
 import { FocusScrollProvider } from './FocusScrollProvider';
+import { SafeAreaProvider } from './SafeAreaProvider';
 
 interface Props {
   children: ReactNode;
@@ -33,12 +34,14 @@ export const Providers = ({ children }: Props) => {
   return (
     <SessionProvider>
       <QueryClientProvider client={queryClient}>
-        <FocusScrollProvider>
-          <AuthInitializer />
-          {children}
-          <Modal />
-          {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
-        </FocusScrollProvider>
+        <SafeAreaProvider>
+          <FocusScrollProvider>
+            <AuthInitializer />
+            {children}
+            <Modal />
+            {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
+          </FocusScrollProvider>
+        </SafeAreaProvider>
       </QueryClientProvider>
     </SessionProvider>
   );
