@@ -1,13 +1,11 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { DeviceService } from '@/lib/DeviceService';
 import useModalStore from '@/store/modalStore';
 import { AuthApi } from '@/api/auth/auth.api';
 import { ApiError } from '@/utils/ApiError';
 import { UserApi } from '@/api/user/user.api';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
-import { getReturnToUrl } from '@/utils/loginRedirect';
 import { useAuth } from './auth/useAuth';
 
 export type LoginFormValues = {
@@ -16,7 +14,6 @@ export type LoginFormValues = {
 };
 
 export const useLogin = () => {
-  const router = useRouter();
   const { isLoggedIn } = useAuth();
   const { isInApp } = DeviceService;
   const { handleModalState } = useModalStore();
@@ -37,23 +34,19 @@ export const useLogin = () => {
   };
 
   const handleSendDeviceInfo = async () => {
+    // 인앱 환경에서 로그인된 경우에만 디바이스 정보 전송
+    // 리다이렉트는 호출하는 쪽에서 처리 (중복 리다이렉트 방지)
+    if (!isInApp || !isLoggedIn) return;
+
     try {
-      if (isInApp && isLoggedIn) {
-        const result = await UserApi.sendDeviceInfo({
-          deviceToken: DeviceService.deviceToken || '',
-          platform: DeviceService.platform || '',
-        });
+      const result = await UserApi.sendDeviceInfo({
+        deviceToken: DeviceService.deviceToken || '',
+        platform: DeviceService.platform || '',
+      });
 
-        window.sendLogToFlutter(
-          `${result.data.message} / ${result.data.deviceToken} / ${result.data.platform}`,
-        );
-        router.replace(getReturnToUrl());
-        return;
-      }
-
-      if (!isInApp && isLoggedIn) {
-        router.replace(getReturnToUrl());
-      }
+      window.sendLogToFlutter(
+        `${result.data.message} / ${result.data.deviceToken} / ${result.data.platform}`,
+      );
     } catch (e) {
       window.sendLogToFlutter((e as Error).message);
     }
