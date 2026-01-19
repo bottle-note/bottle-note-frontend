@@ -11,8 +11,13 @@ const ANDROID_NAV_BAR_HEIGHT = 24;
 
 /**
  * env(safe-area-inset-*)가 실제로 동작하는지 테스트
+ * @returns 'supported' - env() 지원되고 값이 있음, 'unsupported' - env() 미지원, 'zero' - env() 지원되지만 값이 0
  */
-function testEnvSafeAreaSupport(): boolean {
+function testEnvSafeAreaSupport(): 'supported' | 'unsupported' | 'zero' {
+  if (typeof document === 'undefined' || !document.body) {
+    return 'unsupported';
+  }
+
   const testEl = document.createElement('div');
   testEl.style.paddingTop = 'env(safe-area-inset-top, -9999px)';
   document.body.appendChild(testEl);
@@ -21,8 +26,16 @@ function testEnvSafeAreaSupport(): boolean {
   document.body.removeChild(testEl);
 
   // -9999px가 반환되면 env()가 지원되지 않음
+  if (computed === '-9999px') {
+    return 'unsupported';
+  }
+
   // 0px가 반환되면 지원되지만 값이 없는 것 (Android WebView에서 흔함)
-  return computed !== '-9999px' && computed !== '0px';
+  if (computed === '0px') {
+    return 'zero';
+  }
+
+  return 'supported';
 }
 
 /**
@@ -53,6 +66,10 @@ function hasAndroidNotch(): boolean {
  * Android safe area fallback 값 설정
  */
 function applyAndroidSafeAreaFallback(): void {
+  if (typeof document === 'undefined' || !document.documentElement) {
+    return;
+  }
+
   const hasNotch = hasAndroidNotch();
 
   // 상단: 상태바 + 노치 (있는 경우)
@@ -83,12 +100,21 @@ export function SafeAreaProvider({ children }: { children: React.ReactNode }) {
     if (!isAndroidDevice()) return;
 
     // env() 지원 테스트
-    const envSupported = testEnvSafeAreaSupport();
+    const envStatus = testEnvSafeAreaSupport();
 
-    // env()가 동작하지 않거나 0을 반환하면 fallback 적용
-    if (!envSupported) {
+    // env()가 미지원이면 fallback 적용
+    if (envStatus === 'unsupported') {
+      applyAndroidSafeAreaFallback();
+      return;
+    }
+
+    // env()가 지원되지만 0을 반환하는 경우 (Android WebView 이슈)
+    // CSS max()가 있으므로 fallback을 적용해도 안전함
+    if (envStatus === 'zero') {
       applyAndroidSafeAreaFallback();
     }
+
+    // 'supported'인 경우 env() 값을 그대로 사용
   }, []);
 
   return <>{children}</>;
