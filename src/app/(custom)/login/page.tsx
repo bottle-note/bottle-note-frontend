@@ -61,7 +61,7 @@ export default function Login() {
 
   return (
     <>
-      <main className="w-full h-full flex flex-1 flex-col justify-end items-center bg-subCoral pb-5">
+      <main className="w-full flex flex-1 flex-col justify-end items-center bg-subCoral pb-5">
         <section className="w-full">
           <SubHeader bgColor="bg-subCoral">
             <SubHeader.Left
