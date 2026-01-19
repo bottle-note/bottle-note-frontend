@@ -41,8 +41,10 @@ export default function Login() {
 
     if (isLoggedIn) {
       // 디바이스 정보 전송 후 리다이렉트
-      handleSendDeviceInfo();
-      router.replace(getReturnToUrl());
+      (async () => {
+        await handleSendDeviceInfo();
+        router.replace(getReturnToUrl());
+      })();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- handleSendDeviceInfo는 isLoggedIn에 의존하므로 별도 추가 불필요
   }, [isLoggedIn, isLoading, router]);
