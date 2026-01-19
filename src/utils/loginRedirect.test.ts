@@ -49,7 +49,9 @@ describe('loginRedirect 유틸리티', () => {
       });
 
       it('data: 프로토콜은 차단한다', () => {
-        expect(isValidReturnUrl('data:text/html,<script>alert(1)</script>')).toBe(false);
+        expect(
+          isValidReturnUrl('data:text/html,<script>alert(1)</script>'),
+        ).toBe(false);
       });
 
       it('vbscript: 프로토콜은 차단한다', () => {
@@ -105,7 +107,9 @@ describe('loginRedirect 유틸리티', () => {
     it('유효한 URL을 sessionStorage에 저장한다', () => {
       setReturnToUrl('/search/whisky/123');
 
-      expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe('/search/whisky/123');
+      expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(
+        '/search/whisky/123',
+      );
     });
 
     it('유효하지 않은 URL은 저장하지 않는다', () => {
@@ -177,6 +181,29 @@ describe('loginRedirect 유틸리티', () => {
       // 3. 한 번 사용 후 다시 호출하면 루트 반환 (일회용)
       const secondCall = getReturnToUrl();
       expect(secondCall).toBe('/');
+    });
+
+    it('getReturnToUrl은 한 번만 호출해야 함 (중복 호출 시 두 번째는 루트 반환)', () => {
+      // 이 테스트는 race condition 방지를 위해 getReturnToUrl()이
+      // 반드시 한 곳에서만 호출되어야 함을 문서화
+      //
+      // 잘못된 예: 두 개의 useEffect에서 각각 getReturnToUrl() 호출
+      // - useEffect A: router.replace(getReturnToUrl()) → '/search' 반환
+      // - useEffect B: router.replace(getReturnToUrl()) → '/' 반환 (이미 삭제됨)
+      // 결과: 예측 불가능한 리다이렉트 발생
+
+      setReturnToUrl('/search');
+
+      // 첫 번째 호출: 정상적으로 저장된 URL 반환
+      const firstCall = getReturnToUrl();
+      expect(firstCall).toBe('/search');
+
+      // 두 번째 호출: sessionStorage가 비어있으므로 루트 반환
+      const secondCall = getReturnToUrl();
+      expect(secondCall).toBe('/');
+
+      // 해결책: 리다이렉트 로직을 한 곳으로 통합하고
+      // isLoading 상태를 확인하여 session 로딩 완료 후 한 번만 실행
     });
   });
 });
