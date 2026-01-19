@@ -96,12 +96,8 @@ export default function WhiskeyTarotPage() {
     goToResult();
   };
 
-  const handleRetry = () => {
-    reset();
-  };
-
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden pt-safe">
       {/* 인트로 화면 */}
       <AnimatedPage isActive={state.step === 'intro'} direction="fade">
         <IntroScreen onStart={handleStart} />
