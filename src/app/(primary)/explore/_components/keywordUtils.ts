@@ -1,6 +1,6 @@
 import type { ReadonlyURLSearchParams } from 'next/navigation';
 import { CATEGORY_MENUS_LIST } from '@/constants/common';
-import type { SearchKeyword } from './SearchBar';
+import type { SearchKeyword } from './ExploreSearchBar';
 
 const CATEGORY_LABEL_MAP = Object.fromEntries(
   CATEGORY_MENUS_LIST.filter((category) => category.id).map((category) => [

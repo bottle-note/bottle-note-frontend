@@ -16,7 +16,7 @@ export default function RootLayout({
   }, [isMobile]);
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-subCoral">
+    <div className="flex flex-col w-full min-h-safe-screen bg-subCoral">
       <main className="flex flex-col flex-grow overflow-y-auto">
         {children}
       </main>

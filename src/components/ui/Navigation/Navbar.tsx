@@ -46,8 +46,8 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
       icon: '/icon/navbar/explorer.svg',
     },
     {
-      name: '기록',
-      link: ROUTES.HISTORY.BASE,
+      name: '리뷰',
+      link: ROUTES.REVIEW.REGISTER_BASE,
       icon: '/icon/navbar/history.svg',
       requiresAuth: true,
     },
@@ -87,10 +87,7 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
     }));
 
     if (menu.requiresAuth && !isLoggedIn) {
-      if (menu.link === ROUTES.HISTORY.BASE) {
-        return handleLoginModal();
-      }
-      return router.push(ROUTES.LOGIN);
+      return handleLoginModal();
     }
 
     router.push(menu.link);
@@ -111,13 +108,13 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
   return (
     <nav
       className={cn(
-        `fixed bottom-6 left-0 right-0 mx-auto w-full  px-4 z-10 transition-transform duration-300 ease-in-out
-      `,
+        `fixed left-0 right-0 mx-auto w-full px-4 z-10 transition-transform duration-300 ease-in-out`,
         isVisible ? 'translate-y-0' : 'translate-y-[calc(100%+24px)]',
         maxWidth ? `max-w-[${maxWidth}]` : 'max-w-content',
       )}
+      style={{ bottom: 'var(--navbar-margin-bottom)' }}
     >
-      <section className="h-[4.4rem] flex justify-between bg-[#F6F6F6] py-4 px-[26px] rounded-[0.8rem] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
+      <section className="h-[70px] flex justify-between bg-[#F6F6F6] py-4 px-[26px] rounded-[13px] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
         {navItems.map((menu, index) => (
           <React.Fragment key={menu.link}>
             <button

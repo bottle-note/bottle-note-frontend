@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useFilter } from '@/hooks/useFilter';
-import { Category, SORT_ORDER, SORT_TYPE } from '@/types/common';
+import { SORT_ORDER, SORT_TYPE } from '@/api/_shared/types';
+import { Category } from '@/types/common';
 
 interface FilterState {
   keyword: string;
@@ -20,7 +21,7 @@ export const useSearchPageState = () => {
   const searchParams = useSearchParams();
 
   const urlCategory = searchParams.get('category') as Category;
-  const urlKeyword = searchParams.get('query');
+  const urlKeyword = searchParams.get('keyword');
   const urlRegionId = searchParams.get('regionId');
   const urlSortType = searchParams.get('sortType') as SORT_TYPE;
   const urlSortOrder = searchParams.get('sortOrder') as SORT_ORDER;
@@ -59,7 +60,7 @@ export const useSearchPageState = () => {
     const { category, keyword, regionId, sortType, sortOrder } = filterState;
 
     if (category) params.set('category', category);
-    if (keyword) params.set('query', keyword);
+    if (keyword) params.set('keyword', keyword);
     if (regionId) params.set('regionId', regionId);
     if (sortType) params.set('sortType', sortType);
     if (sortOrder) params.set('sortOrder', sortOrder);

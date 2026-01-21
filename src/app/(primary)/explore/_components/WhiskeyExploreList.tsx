@@ -1,12 +1,11 @@
 import Image from 'next/image';
-import { v4 as uuid } from 'uuid';
-import { ExploreApi } from '@/app/api/ExploreApi';
-import { ExploreAlcohol } from '@/types/Explore';
+import { ExploreApi } from '@/api/explore/explore.api';
+import { ExploreAlcohol } from '@/api/explore/types';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import List from '@/components/feature/List/List';
 import Label from '@/components/ui/Display/Label';
 import WhiskeyListItem from './WhiskeyListItem';
-import { SearchBar } from './SearchBar';
+import { ExploreSearchBar } from './ExploreSearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
 import { useExploreKeywords } from '../_hooks/useExploreKeywords';
 
@@ -41,7 +40,7 @@ export const WhiskeyExplorerList = () => {
 
   return (
     <section>
-      <SearchBar
+      <ExploreSearchBar
         handleSearch={refetch}
         handleAddKeyword={handleAddKeyword}
         handleRemoveKeyword={handleRemoveKeyword}
@@ -82,10 +81,16 @@ export const WhiskeyExplorerList = () => {
       >
         <List.Section className="divide-y-[1px]">
           {alcoholList &&
-            [...alcoholList].map((listdata) =>
+            [...alcoholList].map((listdata, pageIndex) =>
               listdata.data.items
                 .flat()
-                .map((data) => <WhiskeyListItem key={uuid()} content={data} />),
+                .map((data, itemIndex) => (
+                  <WhiskeyListItem
+                    key={data.alcoholId}
+                    content={data}
+                    priority={pageIndex === 0 && itemIndex < 4}
+                  />
+                )),
             )}
         </List.Section>
       </List>

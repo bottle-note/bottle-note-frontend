@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, memo } from 'react';
 import { RootReply, SubReply } from '@/types/Reply';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import { ReplyApi } from '@/app/api/ReplyApi';
+import { ReplyApi } from '@/api/reply/reply.api';
 import List from '@/components/feature/List/List';
 import EmptyView from '@/components/ui/Display/EmptyView';
 import { sortReplies } from '@/app/(primary)/review/utils/sortReplies';
@@ -108,9 +108,9 @@ export default function ReplyItemList({
         rootReplyId: rootReplyId.toString(),
       });
 
-      if (result && result.totalCount > 0) {
+      if (result && result.data.totalCount > 0) {
         const replyFormattedList = sortReplies(
-          result.reviewReplies,
+          result.data.reviewReplies,
           rootReplyId,
         );
         setSubReplyMap((prev) => {

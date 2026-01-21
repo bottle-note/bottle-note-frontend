@@ -1,6 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { sendLogToFlutter } from '@/utils/flutterUtil';
 import useModalStore from '@/store/modalStore';
+import { getReturnToUrl } from '@/utils/loginRedirect';
 import { useAuth } from './auth/useAuth';
 
 export const useAppSocialLogin = () => {
@@ -27,7 +28,7 @@ export const useAppSocialLogin = () => {
           accessToken: payload,
         });
       }
-      router.replace('/');
+      router.replace(getReturnToUrl());
     } catch (e) {
       onKakaoLoginError((e as Error).message);
     }
@@ -57,7 +58,7 @@ export const useAppSocialLogin = () => {
         false,
       );
 
-      router.replace('/');
+      router.replace(getReturnToUrl());
     } catch (e) {
       sendLogToFlutter(`onAppleLoginError:${(e as Error).message}`);
       onAppleLoginError((e as Error).message);

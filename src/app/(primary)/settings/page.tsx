@@ -7,8 +7,8 @@ import { signOut, useSession } from 'next-auth/react';
 import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
 import { useSettingsStore } from '@/store/settingsStore';
-import { UserApi } from '@/app/api/UserApi';
-import { AdminApi } from '@/app/api/AdminApi';
+import { UserApi } from '@/api/user/user.api';
+import { AdminApi } from '@/api/admin/admin.api';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { ScreenType, ScreenConfig, MenuCategory } from '@/types/Settings';
@@ -29,8 +29,8 @@ export default function Settings() {
     const checkAdminPermissions = async () => {
       if (isLoggedIn) {
         try {
-          const hasPermission = await AdminApi.checkPermissions();
-          setIsAdmin(hasPermission);
+          const response = await AdminApi.checkPermissions();
+          setIsAdmin(response.data);
         } catch (error) {
           console.error('Admin permission check failed:', error);
           setIsAdmin(false);
@@ -177,7 +177,7 @@ export default function Settings() {
   };
 
   return (
-    <main>
+    <main className="flex-1 flex flex-col">
       <SubHeader>
         <SubHeader.Left onClick={getHeaderLeftOnClick()}>
           <Image

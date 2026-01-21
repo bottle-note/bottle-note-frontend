@@ -27,6 +27,6 @@ jobs:
         run: node scripts/check-performance.js
         env:
           PSI_API_KEY: ${{ secrets.PSI_API_KEY }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          CORE_VITAL_WEBHOOK_URL: ${{ secrets.CORE_VITAL_WEBHOOK_URL }}
           # 측정할 주소
           CLIENT_URL: 'https://bottle-note.com'

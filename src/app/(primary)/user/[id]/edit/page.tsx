@@ -6,13 +6,14 @@ import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import ProfileImage from '@/components/domain/user/ProfileImage';
 import OptionDropdown from '@/components/ui/Modal/OptionDropdown';
-import { UserApi } from '@/app/api/UserApi';
+import { UserApi } from '@/api/user/user.api';
 import useModalStore from '@/store/modalStore';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { uploadImages } from '@/utils/S3Upload';
 import { useWebviewCamera } from '@/hooks/useWebviewCamera';
 import { useWebViewInit } from '@/hooks/useWebViewInit';
 import { ROUTES } from '@/constants/routes';
+import { DeviceService } from '@/lib/DeviceService';
 import EditForm from './_components/EditForm';
 import ChangeProfile from 'public/change-profile.svg';
 
@@ -31,8 +32,8 @@ export default function UserEditPage({
 
   useEffect(() => {
     (async () => {
-      const userInfo = await UserApi.getUserInfo({ userId: id });
-      setProfileImg(userInfo.imageUrl);
+      const response = await UserApi.getUserInfo({ userId: id });
+      setProfileImg(response.data.imageUrl);
     })();
   }, [id]);
 
@@ -47,11 +48,18 @@ export default function UserEditPage({
     handleImg: handleUploadImg,
   });
 
-  const SELECT_OPTIONS = [
-    { type: 'camera', name: '카메라' },
-    { type: 'album', name: '앨범에서 선택' },
-    { type: 'delete', name: '현재 이미지 삭제하기' },
-  ];
+  // Android에서는 카메라 옵션 제외
+  const SELECT_OPTIONS =
+    DeviceService.platform === 'android'
+      ? [
+          { type: 'album', name: '앨범에서 선택' },
+          { type: 'delete', name: '현재 이미지 삭제하기' },
+        ]
+      : [
+          { type: 'camera', name: '카메라' },
+          { type: 'album', name: '앨범에서 선택' },
+          { type: 'delete', name: '현재 이미지 삭제하기' },
+        ];
 
   const handleOptionSelect = async ({ type }: { type: string }) => {
     if (type === 'camera') {

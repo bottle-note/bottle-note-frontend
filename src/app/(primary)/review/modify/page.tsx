@@ -6,7 +6,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FormValues } from '@/types/Review';
-import { ReviewApi } from '@/app/api/ReviewApi';
+import { ReviewApi } from '@/api/review/review.api';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import { useAlcoholDetails } from '@/app/(primary)/review/hook/useAlcoholDetails';
 import { useErrorModal } from '@/hooks/useErrorModal';
@@ -54,11 +54,11 @@ function ReviewModify() {
   useEffect(() => {
     const fetchReviewDetails = async () => {
       if (reviewId) {
-        const result = await ReviewApi.getReviewDetails(reviewId);
-        const { reviewInfo, reviewImageList } = result;
+        const response = await ReviewApi.getReviewDetails(reviewId);
+        const { reviewInfo, reviewImageList } = response.data;
         const locationInfo = reviewInfo.locationInfo || {};
 
-        setAlcoholId(result.alcoholInfo.alcoholId.toString());
+        setAlcoholId(response.data.alcoholInfo.alcoholId.toString());
         setInitialRating(reviewInfo.rating);
 
         reset({

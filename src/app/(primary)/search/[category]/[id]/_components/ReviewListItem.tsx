@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ROUTES } from '@/constants/routes';
-import { Review as ReviewType } from '@/types/Review';
+import { ReviewInDetails } from '@/api/alcohol/types';
 import ReviewListUserInfo from '@/app/(primary)/search/[category]/[id]/_components/ReviewListUserInfo';
 import { numberWithCommas } from '@/utils/formatNum';
 import { truncStr } from '@/utils/truncStr';
@@ -17,7 +17,7 @@ import ReviewActionDropdown from '@/components/domain/review/ReviewActionDropdow
 import { useBlockActions } from '@/hooks/useBlockActions';
 
 interface Props {
-  data: ReviewType;
+  data: ReviewInDetails;
   onRefresh: () => void;
 }
 

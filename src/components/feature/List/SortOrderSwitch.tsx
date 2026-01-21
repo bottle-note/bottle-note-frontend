@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { SORT_ORDER } from '@/types/common';
+import { SORT_ORDER } from '@/api/_shared/types';
 import DescendingIcon from 'public/icon/descending-subcoral.svg';
 import AscendingIcon from 'public/icon/ascending-subcoral.svg';
 

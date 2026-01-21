@@ -1,16 +1,16 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { v4 as uuid } from 'uuid';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
 import List from '@/components/feature/List/List';
-import { usePopularList } from '@/hooks/usePopularList';
-import { Category, SORT_TYPE } from '@/types/common';
+import { useHomeFeaturedQuery } from '@/queries/useHomeFeaturedQuery';
+import { SORT_TYPE } from '@/api/_shared/types';
+import { Category } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import { AlcoholAPI } from '@/types/Alcohol';
-import { AlcoholsApi } from '@/app/api/AlcholsApi';
-import { CurationApi } from '@/app/api/CurationApi';
+import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
+import { Alcohol } from '@/api/alcohol/types';
+import { CurationApi } from '@/api/curation/curation.api';
 import { REGIONS } from '@/constants/common';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import useModalStore from '@/store/modalStore';
@@ -20,7 +20,7 @@ import Tab from '@/components/ui/Navigation/Tab';
 import { ROUTES } from '@/constants/routes';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
-import SearchContainer from '@/components/feature/Search/SearchContainer';
+import SearchBarLink from '@/components/feature/Search/SearchBarLink';
 import { useSearchPageState } from '@/app/(primary)/search/hook/useSearchPageState';
 
 const SORT_OPTIONS = [
@@ -41,9 +41,11 @@ const isCurationKeyword = (keyword: string) => {
 export default function Search() {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
-  const { popularList, isLoading: isPopularLoading } = usePopularList();
+  const { data: featuredList = [], isLoading: isFeaturedLoading } =
+    useHomeFeaturedQuery({ type: 'week' });
   const { filterState, handleFilter, isEmptySearch, urlKeyword } =
     useSearchPageState();
+  const [showTab, setShowTab] = useState(true);
 
   const isCurationSearch =
     filterState.keyword && isCurationKeyword(filterState.keyword);
@@ -55,7 +57,7 @@ export default function Search() {
     targetRef,
     error,
   } = usePaginatedQuery<{
-    alcohols: AlcoholAPI[];
+    alcohols: Alcohol[];
     totalCount: number;
   }>({
     queryKey: [
@@ -84,8 +86,8 @@ export default function Search() {
             },
           );
 
-          // CurationAlcoholItem을 AlcoholAPI로 변환
-          const alcohols: AlcoholAPI[] = alcoholsResult.data.items.map(
+          // CurationAlcoholItem을 Alcohol로 변환
+          const alcohols: Alcohol[] = alcoholsResult.data.items.map(
             ({
               korCategoryName,
               engCategoryName,
@@ -116,13 +118,10 @@ export default function Search() {
       // 일반 검색인 경우 기존 API 사용
       return AlcoholsApi.getList({
         ...filterState,
-        category: filterState.category === 'ALL' ? '' : filterState.category,
         regionId:
           filterState.regionId === '' ? '' : Number(filterState.regionId),
-        ...{
-          cursor: pageParam,
-          pageSize: 10,
-        },
+        cursor: pageParam,
+        pageSize: 10,
       });
     },
     staleTime: 0,
@@ -147,10 +146,6 @@ export default function Search() {
         router.push(ROUTES.INQUIRE.REGISTER);
       },
     });
-  };
-
-  const handleSearchCallback = (searchedKeyword: string) => {
-    handleFilter('keyword', searchedKeyword);
   };
 
   const handleCategoryCallback = (selectedCategory: Category) => {
@@ -182,28 +177,63 @@ export default function Search() {
     }
   }, [urlKeyword]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setShowTab(false);
+      } else {
+        setShowTab(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <Suspense>
       <main className="mb-24 w-full h-full">
-        <SearchContainer
-          handleSearchCallback={handleSearchCallback}
-          styleProps="px-5 pt-[70px]"
-        />
+        {/* 고정 영역: SearchBar + (스크롤 시) CategorySelector */}
+        <div className="fixed-content top-0 bg-white z-10">
+          <SearchBarLink
+            className="px-5 pt-safe-header"
+            placeholder="어떤 술을 찾고 계신가요?"
+            keyword={urlKeyword || undefined}
+            onClear={() => router.replace('/search/input')}
+          />
 
-        <section className="flex flex-col gap-7 pt-[11px] pb-5">
-          <article className="space-y-4">
-            <Tab
-              variant="bookmark"
-              tabList={categoryList}
-              handleTab={handelCategory}
-              currentTab={categorySelectedTab}
-            />
-            <div className="pl-5">
+          {!showTab && (
+            <div className="px-5 pt-3 pb-3">
               <CategorySelector
                 handleCategoryCallback={handleCategoryCallback}
               />
             </div>
-          </article>
+          )}
+        </div>
+
+        {/* 스크롤 영역 */}
+        <section
+          className="flex flex-col gap-7 pb-5"
+          style={{
+            paddingTop:
+              'calc(var(--header-height-with-safe) + var(--search-fixed-area-height))',
+          }}
+        >
+          {showTab && (
+            <article className="space-y-4">
+              <Tab
+                variant="bookmark"
+                tabList={categoryList}
+                handleTab={handelCategory}
+                currentTab={categorySelectedTab}
+              />
+              <div className="pl-5">
+                <CategorySelector
+                  handleCategoryCallback={handleCategoryCallback}
+                />
+              </div>
+            </article>
+          )}
 
           {isEmptySearch ? (
             <>
@@ -214,15 +244,15 @@ export default function Search() {
                 currentTab={popularSelectedTab}
               />
               <section className="px-5">
-                {isPopularLoading ? (
+                {isFeaturedLoading ? (
                   <div className="flex flex-col gap-2">
-                    {Array.from({ length: 5 }).map(() => (
-                      <ListItemSkeleton key={uuid()} />
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <ListItemSkeleton key={index} />
                     ))}
                   </div>
                 ) : (
                   <List>
-                    {popularList.map((item: AlcoholAPI) => (
+                    {featuredList.map((item: Alcohol) => (
                       <List.Item key={item.alcoholId} data={item} />
                     ))}
                   </List>
@@ -240,39 +270,41 @@ export default function Search() {
                   total={alcoholList ? alcoholList[0].data.totalCount : 0}
                 />
                 {!isCurationSearch && (
-                  <>
-                    <List.SortOrderSwitch
-                      type={filterState.sortOrder}
-                      handleSortOrder={(value) =>
-                        handleFilter('sortOrder', value)
-                      }
-                    />
-                    <List.OptionSelect
-                      options={SORT_OPTIONS}
-                      currentValue={filterState.sortType}
-                      handleOptionCallback={(value) =>
-                        handleFilter('sortType', value)
-                      }
-                    />
-                    <List.OptionSelect
-                      options={REGIONS.map((region) => ({
-                        type: String(region.regionId),
-                        name: region.korName,
-                      }))}
-                      currentValue={filterState.regionId}
-                      handleOptionCallback={(value) =>
-                        handleFilter('regionId', value)
-                      }
-                      title="국가"
-                    />
-                  </>
+                  <List.SortOrderSwitch
+                    type={filterState.sortOrder}
+                    handleSortOrder={(value) =>
+                      handleFilter('sortOrder', value)
+                    }
+                  />
+                )}
+                {!isCurationSearch && (
+                  <List.OptionSelect
+                    options={SORT_OPTIONS}
+                    currentValue={filterState.sortType}
+                    handleOptionCallback={(value) =>
+                      handleFilter('sortType', value)
+                    }
+                  />
+                )}
+                {!isCurationSearch && (
+                  <List.OptionSelect
+                    options={REGIONS.map((region) => ({
+                      type: String(region.regionId),
+                      name: region.korName,
+                    }))}
+                    currentValue={filterState.regionId}
+                    handleOptionCallback={(value) =>
+                      handleFilter('regionId', value)
+                    }
+                    title="국가"
+                  />
                 )}
 
                 {alcoholList &&
                   [...alcoholList.map((list) => list.data.alcohols)]
                     .flat()
-                    .map((item: AlcoholAPI) => (
-                      <List.Item key={uuid()} data={item} />
+                    .map((item: Alcohol) => (
+                      <List.Item key={item.alcoholId} data={item} />
                     ))}
               </List>
 

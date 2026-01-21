@@ -45,6 +45,7 @@
   body {
     font-family: 'suit', sans-serif;
     font-weight: 400; /* Default weight */
+    overflow-x: hidden; /* Prevent horizontal scroll during page transitions */
   }
 
   /* Prevent text selection and dragging */
@@ -103,6 +104,28 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+
+    /* Safe area insets */
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+
+    /* Header heights */
+    --header-height: 20px;
+    --header-height-with-safe: calc(
+      var(--header-height) + var(--safe-area-top)
+    );
+
+    /* Component heights */
+    --search-bar-height: 56px;
+    --search-fixed-area-height: 70px;
+    --tab-height: 81px;
+
+    /* Navbar (px 단위 통일) */
+    --navbar-height: 70px;
+    --navbar-margin-bottom: max(24px, calc(var(--safe-area-bottom) + 8px));
+    --navbar-total-space: calc(
+      var(--navbar-height) + var(--navbar-margin-bottom)
+    );
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -142,15 +165,15 @@
 }
 @layer components {
   .label-default {
-    @apply bg-white text-subCoral border border-subCoral rounded-md py-1 px-3;
+    @apply bg-white text-subCoral border border-solid border-subCoral rounded-md py-1 px-3;
   }
 
   .label-selected {
-    @apply bg-subCoral text-white border border-subCoral rounded-md py-1 px-3;
+    @apply bg-subCoral text-white border border-solid border-subCoral rounded-md py-1 px-3;
   }
 
   .label-disabled {
-    @apply bg-bgGray text-white border border-bgGray rounded-md py-1 px-3;
+    @apply bg-bgGray text-white border border-solid border-bgGray rounded-md py-1 px-3;
   }
 
   .tab-default {
@@ -173,6 +196,31 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Safe area padding for mobile browsers (px 단위 통일) */
+  .pt-safe {
+    padding-top: var(--safe-area-top);
+  }
+
+  .pt-safe-header {
+    padding-top: var(--header-height-with-safe);
+  }
+
+  .pb-safe {
+    padding-bottom: max(32px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .pb-safe-lg {
+    padding-bottom: max(64px, calc(env(safe-area-inset-bottom, 0px) + 32px));
+  }
+
+  .pb-navbar {
+    padding-bottom: var(--navbar-total-space);
+  }
+
+  .min-h-safe-screen {
+    min-height: 100dvh;
   }
 }
 

@@ -5,7 +5,7 @@ import { DEBOUNCE_DELAY } from '@/constants/common';
 
 interface UseDebouncedToggleParams<T> {
   isToggled: boolean;
-  apiCall: (id: T, state: boolean) => Promise<void>;
+  apiCall: (params: { id: T; state: boolean }) => Promise<void>;
   id: T;
   onApiSuccess?: () => void;
   onApiError?: () => void;
@@ -43,7 +43,7 @@ export const useDebouncedToggle = <T extends string | number>({
       }
 
       try {
-        await apiCall(id, stateToSync);
+        await apiCall({ id, state: stateToSync });
         lastSyncedStateRef.current = stateToSync;
         pendingStateRef.current = null;
 

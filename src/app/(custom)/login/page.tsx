@@ -9,28 +9,45 @@ import { DeviceService } from '@/lib/DeviceService';
 import { useLogin } from '@/hooks/useLogin';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/auth/useAuth';
+import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
+import {
+  setReturnToUrl,
+  getReturnToUrl,
+  isValidReturnUrl,
+} from '@/utils/loginRedirect';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
 export default function Login() {
   const router = useRouter();
+  const [returnToParam] = useStatefulSearchParams<string | null>('returnTo');
   const {
     handleSendDeviceInfo,
     handleInitKakaoSdkLogin,
     handleKakaoLogin,
     handleAppleLogin,
   } = useLogin();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isLoading } = useAuth();
 
   useEffect(() => {
-    handleSendDeviceInfo();
-  }, []);
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      router.replace('/');
+    if (returnToParam && isValidReturnUrl(returnToParam)) {
+      setReturnToUrl(returnToParam);
     }
-  }, [isLoggedIn]);
+  }, [returnToParam]);
+
+  // 이미 로그인된 상태면 리다이렉트 (session 로딩 완료 후에만 실행)
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (isLoggedIn) {
+      // 디바이스 정보 전송 후 리다이렉트
+      (async () => {
+        await handleSendDeviceInfo();
+        router.replace(getReturnToUrl());
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleSendDeviceInfo는 isLoggedIn에 의존하므로 별도 추가 불필요
+  }, [isLoggedIn, isLoading, router]);
 
   // 인앱 환경에서 초기화
   useEffect(() => {
@@ -46,7 +63,7 @@ export default function Login() {
 
   return (
     <>
-      <main className="w-full h-[100vh] flex flex-col justify-end items-center bg-subCoral pb-5">
+      <main className="w-full flex flex-1 flex-col justify-end items-center bg-subCoral pb-5">
         <section className="w-full">
           <SubHeader bgColor="bg-subCoral">
             <SubHeader.Left
@@ -86,10 +103,10 @@ export default function Login() {
           </article>
         </section>
 
-        <footer className="w-full pt-2 flex flex-col gap-2 px-4">
+        <footer className="w-full pt-2 flex flex-col gap-2 px-5 pb-safe">
           <div className="w-full h-[1px] bg-white" />
           <p className="text-12 text-white text-center">
-            © Copyright 2024. Bottle Note. All rights reserved.
+            © Copyright 2026. Bottle Note. All rights reserved.
           </p>
         </footer>
       </main>

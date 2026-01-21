@@ -3,7 +3,7 @@ import OptionDropdown from '@/components/ui/Modal/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 import useRelationshipsStore from '@/store/relationshipsStore';
 import { useBlockActions } from '@/hooks/useBlockActions';
-import { ReviewApi } from '@/app/api/ReviewApi';
+import { ReviewApi } from '@/api/review/review.api';
 import { ROUTES } from '@/constants/routes';
 
 interface ReviewActionDropdownProps {

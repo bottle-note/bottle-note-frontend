@@ -8,10 +8,12 @@ import { useImageUploader } from '@/hooks/useImageUploader';
 import OptionDropdown from '@/components/ui/Modal/OptionDropdown';
 import useModalStore from '@/store/modalStore';
 
-const SELECT_OPTIONS = [
-  { type: 'camera', name: '카메라' },
-  { type: 'album', name: '앨범에서 선택' },
-];
+const getSelectOptions = () => {
+  return [
+    { type: 'camera', name: '카메라' },
+    { type: 'album', name: '앨범에서 선택' },
+  ];
+};
 
 interface ImageUploaderProps {
   onForceOpen?: (value: boolean) => void;
@@ -147,7 +149,7 @@ export default function ImageUploader({
       {isOptionShow && (
         <OptionDropdown
           title="이미지 추가"
-          options={SELECT_OPTIONS}
+          options={getSelectOptions()}
           handleOptionSelect={handleOptionSelect}
           handleClose={() => setIsOptionShow(false)}
         />

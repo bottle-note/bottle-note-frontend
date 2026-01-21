@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useFormContext } from 'react-hook-form';
-import { ReplyApi } from '@/app/api/ReplyApi';
+import { ReplyApi } from '@/api/reply/reply.api';
 import { useBlockActions } from '@/hooks/useBlockActions';
 import { truncStr } from '@/utils/truncStr';
 import { formatDate } from '@/utils/formatDate';

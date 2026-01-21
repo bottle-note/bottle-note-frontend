@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ProductImage, BANNER_IMAGES } from '@/constants/home';
 import {
   Carousel,
   CarouselContent,
@@ -8,7 +9,7 @@ import {
   CarouselApi,
 } from '@/components/ui/Display/carousel';
 import { ROUTES } from '@/constants/routes';
-import { BANNER_IMAGES } from '@/constants/home';
+import { useProgressiveImage } from '@/hooks/useProgressiveImage';
 
 interface OverlayConfig {
   link: string;
@@ -80,6 +81,66 @@ const overlayConfigs: Record<string, OverlayConfig> = {
   },
 } as const;
 
+interface CarouselImageProps {
+  image: ProductImage;
+  isPriority: boolean;
+}
+
+function CarouselImage({ image, isPriority }: CarouselImageProps) {
+  const {
+    isLoaded,
+    hasPlaceholder,
+    shouldShowSkeleton,
+    lightSrc,
+    heavySrc,
+    onHeavyLoad,
+  } = useProgressiveImage({
+    src: image.src,
+    placeholderSrc: image.placeholderSrc,
+  });
+
+  return (
+    <>
+      {/* 스켈레톤: placeholder 없고 아직 로드 안됨 */}
+      {shouldShowSkeleton && (
+        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+      )}
+
+      {/* 가벼운 이미지 (placeholder 또는 원본) */}
+      <Image
+        src={lightSrc}
+        alt={image.alt}
+        fill
+        sizes="100vw"
+        priority={isPriority && !hasPlaceholder}
+        quality={75}
+        unoptimized={hasPlaceholder}
+        onLoad={!hasPlaceholder ? onHeavyLoad : undefined}
+        style={{ objectFit: 'cover' }}
+        className="w-full h-full object-cover"
+      />
+
+      {/* 무거운 이미지: placeholder가 있을 때만 별도 로드 */}
+      {hasPlaceholder && (
+        <Image
+          src={heavySrc}
+          alt=""
+          aria-hidden="true"
+          fill
+          sizes="100vw"
+          loading="lazy"
+          unoptimized
+          onLoad={onHeavyLoad}
+          style={{ objectFit: 'cover' }}
+          className={`w-full h-full object-cover ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+      )}
+    </>
+  );
+}
+
 function OverlayContent({ config }: { config: OverlayConfig }) {
   return (
     <Link
@@ -135,16 +196,10 @@ export default function HomeCarousel() {
       className="w-full bg-white"
     >
       <CarouselContent className="!ml-0">
-        {BANNER_IMAGES.map((image) => (
+        {BANNER_IMAGES.map((image, index) => (
           <CarouselItem key={image.id} className="!pl-0">
             <div className="relative w-full h-[227px] overflow-hidden flex items-center justify-center">
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                style={{ objectFit: 'cover' }}
-                className="w-full h-full object-cover"
-              />
+              <CarouselImage image={image} isPriority={index === 0} />
               {textOverlay(image.id)}
               <button
                 type="button"

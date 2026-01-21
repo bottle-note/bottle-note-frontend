@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { uploadImages } from '@/utils/S3Upload';
-import { RateApi } from '@/app/api/RateApi';
-import { ReviewApi } from '@/app/api/ReviewApi';
+import { RateApi } from '@/api/rate/rate.api';
+import { ReviewApi } from '@/api/review/review.api';
 import useModalStore from '@/store/modalStore';
 import { FormValues } from '@/types/Review';
 import { ROUTES } from '@/constants/routes';
@@ -129,7 +129,9 @@ export const useReviewSubmission = ({
     if (reviewResult) {
       const hasRatingError = data.rating !== initialRating && !ratingResult;
       const resultReviewId =
-        'id' in reviewResult ? reviewResult.id : reviewResult.reviewId;
+        'id' in reviewResult.data
+          ? reviewResult.data.id
+          : reviewResult.data.reviewId;
       handleSuccess(resultReviewId.toString(), !reviewId, hasRatingError);
     } else if (data.rating !== initialRating && ratingResult) {
       router.back();
