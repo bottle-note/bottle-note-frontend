@@ -69,30 +69,31 @@
 
 ### 지원 도구
 
-| 도구 | 설정 파일 | 설명 |
-|------|----------|------|
+| 도구        | 설정 파일                        | 설명                               |
+| ----------- | -------------------------------- | ---------------------------------- |
 | Claude Code | `CLAUDE.md`, `.claude/commands/` | 프로젝트 컨텍스트 및 슬래시 커맨드 |
-| Cursor | `.cursorrules` | 코딩 규칙 및 스타일 가이드 |
+| Cursor      | `.cursorrules`                   | 코딩 규칙 및 스타일 가이드         |
 
 ### Claude Code 슬래시 커맨드
 
 프로젝트에서 Claude Code 실행 후 아래 커맨드를 사용할 수 있습니다:
 
-| 커맨드 | 설명 | 사용 예시 |
-|--------|------|----------|
-| `/review` | 코드 리뷰 | `/review src/hooks/useToast.ts` |
-| `/test` | 테스트 코드 작성 | `/test useModalStore` |
-| `/fix` | 버그 분석 및 수정 | `/fix TypeError: Cannot read...` |
-| `/refactor` | 코드 리팩토링 | `/refactor useAuth` |
-| `/component` | 컴포넌트 생성 | `/component ReviewCard` |
-| `/hook` | 커스텀 훅 생성 | `/hook useBookmark` |
-| `/store` | Zustand 스토어 생성 | `/store cart` |
-| `/api` | API + Query 훅 생성 | `/api review` |
-| `/page` | Next.js 페이지 생성 | `/page whiskey/[id]` |
+| 커맨드       | 설명                | 사용 예시                        |
+| ------------ | ------------------- | -------------------------------- |
+| `/review`    | 코드 리뷰           | `/review src/hooks/useToast.ts`  |
+| `/test`      | 테스트 코드 작성    | `/test useModalStore`            |
+| `/fix`       | 버그 분석 및 수정   | `/fix TypeError: Cannot read...` |
+| `/refactor`  | 코드 리팩토링       | `/refactor useAuth`              |
+| `/component` | 컴포넌트 생성       | `/component ReviewCard`          |
+| `/hook`      | 커스텀 훅 생성      | `/hook useBookmark`              |
+| `/store`     | Zustand 스토어 생성 | `/store cart`                    |
+| `/api`       | API + Query 훅 생성 | `/api review`                    |
+| `/page`      | Next.js 페이지 생성 | `/page whiskey/[id]`             |
 
 ### 사용 방법
 
 **Claude Code**
+
 ```bash
 # 프로젝트 폴더에서 Claude Code 실행
 claude
@@ -103,6 +104,7 @@ claude
 ```
 
 **Cursor**
+
 - 프로젝트를 열면 `.cursorrules`가 자동으로 적용됩니다
 - AI에게 코드 작성 요청 시 프로젝트 패턴에 맞는 코드가 생성됩니다
 
@@ -130,6 +132,7 @@ claude
 
 ```markdown
 <!-- .claude/commands/my-command.md -->
+
 $ARGUMENTS 에 대해 작업해주세요.
 
 작업 지시사항...
