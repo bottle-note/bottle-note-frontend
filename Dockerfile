@@ -26,7 +26,9 @@ COPY . .
 
 # BuildKit secret으로 age 키를 환경변수로 주입하여 복호화
 RUN --mount=type=secret,id=age_key,env=SOPS_AGE_KEY \
-    sops -d ${ENV_FILE} > .env
+    if [ -z "$SOPS_AGE_KEY" ]; then echo "Error: SOPS_AGE_KEY is required" && exit 1; fi && \
+    sops -d ${ENV_FILE} > .env && \
+    if [ ! -s .env ]; then echo "Error: .env decryption failed" && exit 1; fi
 
 RUN pnpm build
 
@@ -36,10 +38,10 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/static ./.next/static
-RUN chown -R nextjs:nodejs /app
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/.env ./.env
 USER nextjs
 EXPOSE 3000
 ENV HOSTNAME="0.0.0.0"
