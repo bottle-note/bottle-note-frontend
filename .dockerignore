@@ -17,14 +17,16 @@ node_modules
 .gitmodules
 .gitattributes
 
-# 환경 변수 파일들 (명시적으로 복사할 것만 복사)
+# 환경 변수 파일들 (복호화된 파일은 제외)
+.env
 .env.local
 .env.development
 .env.production
 .env.*.local
 
-# sops 암호화 파일은 빌드에 필요하므로 명시적으로 포함
-!*.sops.env
+# Git submodule (환경변수 암호화 파일)은 빌드에 필요하므로 명시적으로 포함
+!git.environment-variables/
+!git.environment-variables/**/*.sops.env
 
 # IDE/에디터 설정
 .idea
