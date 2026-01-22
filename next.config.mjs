@@ -8,8 +8,6 @@ const nextConfig = {
   reactStrictMode: false,
   experimental: {
     missingSuspenseWithCSRBailout: false,
-    // 심볼릭 링크 비활성화
-    outputFileTracingExcludes: ['**/*'],
   },
   async rewrites() {
     return [

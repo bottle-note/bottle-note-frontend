@@ -1,0 +1,55 @@
+# =============================================================================
+# .dockerignore
+# - Docker 빌드 컨텍스트에서 제외할 파일들
+# - COPY . . 할 때 이 파일들은 무시됨
+# - 빌드 속도 향상 + 불필요한 파일이 이미지에 포함되는 것 방지
+# =============================================================================
+
+# 의존성 (컨테이너 내에서 새로 설치함)
+node_modules
+
+# 빌드 결과물 (컨테이너 내에서 새로 빌드함)
+.next
+
+# Git 관련 (이미지에 필요 없음)
+.git
+.gitignore
+.gitmodules
+.gitattributes
+
+# 환경 변수 파일들 (명시적으로 복사할 것만 복사)
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# sops 암호화 파일은 빌드에 필요하므로 명시적으로 포함
+!*.sops.env
+
+# IDE/에디터 설정
+.idea
+.vscode
+*.swp
+*.swo
+
+# 테스트 관련
+coverage
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__
+
+# CI/CD 설정 (이미지에 필요 없음)
+.github
+
+# 문서
+README.md
+*.md
+
+# 기타
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -3,6 +3,7 @@ $ARGUMENTS 이름으로 Zustand 스토어를 생성해주세요.
 파일 위치: `src/store/`
 
 이 프로젝트의 스토어 패턴:
+
 ```tsx
 import { create } from 'zustand';
 
@@ -35,6 +36,7 @@ export default useXxxStore;
 ```
 
 규칙:
+
 - `use...Store` 네이밍 사용
 - State와 Store 인터페이스 분리
 - initialState 별도 정의
@@ -42,6 +44,7 @@ export default useXxxStore;
 - default export 사용
 
 사용 예시:
+
 - `/store filter` - filterStore 생성
 - `/store cart` - cartStore 생성 (장바구니)
 - `/store notification` - notificationStore 생성

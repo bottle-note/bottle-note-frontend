@@ -3,6 +3,7 @@ $ARGUMENTS 이름으로 커스텀 훅을 생성해주세요.
 파일 위치: `src/hooks/`
 
 이 프로젝트의 훅 패턴:
+
 ```tsx
 import { useState, useCallback, useRef } from 'react';
 
@@ -23,6 +24,7 @@ export const useXxx = (options?: Options) => {
 ```
 
 규칙:
+
 - `use` 접두사 사용
 - named export 사용 (`export const useXxx`)
 - useCallback으로 함수 메모이제이션
@@ -30,6 +32,7 @@ export const useXxx = (options?: Options) => {
 - cleanup 로직 포함 (필요시)
 
 사용 예시:
+
 - `/hook useBookmark` - 북마크 관련 훅 생성
 - `/hook useDebounce` - 디바운스 훅 생성
 - `/hook useLocalStorage` - 로컬스토리지 훅 생성
