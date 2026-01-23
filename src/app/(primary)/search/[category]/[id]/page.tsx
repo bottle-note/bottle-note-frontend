@@ -28,6 +28,7 @@ import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import useDebounceAction from '@/hooks/useDebounceAction';
 import FloatingReviewButton from './_components/FloatingReviewButton';
+import FloatingTastingButton from './_components/FloatingTastingButton';
 import AlcoholDetailHeader from './_components/AlcoholDetailHeader';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
@@ -365,7 +366,12 @@ export default function SearchAlcohol() {
           </>
         )}
         {data?.alcohols?.alcoholId && (
-          <FloatingReviewButton alcoholId={String(data.alcohols.alcoholId)} />
+          <>
+            <FloatingTastingButton
+              alcoholId={String(data.alcohols.alcoholId)}
+            />
+            <FloatingReviewButton alcoholId={String(data.alcohols.alcoholId)} />
+          </>
         )}
       </NavLayout>
     </>
