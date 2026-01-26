@@ -3,6 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useFilter } from '@/hooks/useFilter';
 import { SORT_ORDER, SORT_TYPE } from '@/api/_shared/types';
 import { Category } from '@/types/common';
+import { safeDecodeURIComponent } from '@/utils/safeDecodeURIComponent';
 
 interface FilterState {
   keyword: string;
@@ -22,7 +23,9 @@ export const useSearchPageState = () => {
 
   const urlCategory = searchParams.get('category') as Category;
   const rawUrlKeyword = searchParams.get('keyword');
-  const urlKeyword = rawUrlKeyword ? decodeURIComponent(rawUrlKeyword) : null;
+  const urlKeyword = rawUrlKeyword
+    ? safeDecodeURIComponent(rawUrlKeyword)
+    : null;
   const urlRegionId = searchParams.get('regionId');
   const urlSortType = searchParams.get('sortType') as SORT_TYPE;
   const urlSortOrder = searchParams.get('sortOrder') as SORT_ORDER;

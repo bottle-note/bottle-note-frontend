@@ -6,6 +6,7 @@ import SearchBar from '@/components/feature/Search/SearchBar';
 import RecentSearch from '@/components/feature/Search/RecentSearch';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
 import { ROUTES } from '@/constants/routes';
+import { safeDecodeURIComponent } from '@/utils/safeDecodeURIComponent';
 
 export default function SearchInput() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function SearchInput() {
   const rawKeyword = returnUrl
     ? new URL(returnUrl, window.location.origin).searchParams.get('keyword')
     : null;
-  const initialKeyword = rawKeyword ? decodeURIComponent(rawKeyword) : '';
+  const initialKeyword = rawKeyword ? safeDecodeURIComponent(rawKeyword) : '';
 
   const onSearch = (value: string) => {
     const trimmedValue = value.trim();
