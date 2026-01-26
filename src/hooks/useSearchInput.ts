@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { safeDecodeURIComponent } from '@/utils/safeDecodeURIComponent';
 
 interface UseSearchInputOptions {
   onSearch?: (value: string) => void;
@@ -15,8 +16,12 @@ export const useSearchInput = ({
   syncWithUrlParams = false,
 }: UseSearchInputOptions = {}) => {
   const searchParams = useSearchParams();
-  const urlQuery = syncWithUrlParams ? searchParams.get('query') : null;
-  const urlKeyword = syncWithUrlParams ? searchParams.get('keyword') : null;
+  const rawUrlQuery = syncWithUrlParams ? searchParams.get('query') : null;
+  const rawUrlKeyword = syncWithUrlParams ? searchParams.get('keyword') : null;
+  const urlQuery = rawUrlQuery ? safeDecodeURIComponent(rawUrlQuery) : null;
+  const urlKeyword = rawUrlKeyword
+    ? safeDecodeURIComponent(rawUrlKeyword)
+    : null;
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [searchText, setSearchText] = useState<string>(
