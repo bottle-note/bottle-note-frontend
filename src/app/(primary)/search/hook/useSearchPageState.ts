@@ -21,7 +21,8 @@ export const useSearchPageState = () => {
   const searchParams = useSearchParams();
 
   const urlCategory = searchParams.get('category') as Category;
-  const urlKeyword = searchParams.get('keyword');
+  const rawUrlKeyword = searchParams.get('keyword');
+  const urlKeyword = rawUrlKeyword ? decodeURIComponent(rawUrlKeyword) : null;
   const urlRegionId = searchParams.get('regionId');
   const urlSortType = searchParams.get('sortType') as SORT_TYPE;
   const urlSortOrder = searchParams.get('sortOrder') as SORT_ORDER;

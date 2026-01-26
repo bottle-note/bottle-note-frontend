@@ -14,10 +14,10 @@ export default function SearchInput() {
   const SearchHistory = new SearchHistoryService();
 
   // returnUrl에서 keyword 파라미터 추출
-  const initialKeyword = returnUrl
-    ? new URL(returnUrl, window.location.origin).searchParams.get('keyword') ||
-      ''
-    : '';
+  const rawKeyword = returnUrl
+    ? new URL(returnUrl, window.location.origin).searchParams.get('keyword')
+    : null;
+  const initialKeyword = rawKeyword ? decodeURIComponent(rawKeyword) : '';
 
   const onSearch = (value: string) => {
     const trimmedValue = value.trim();
