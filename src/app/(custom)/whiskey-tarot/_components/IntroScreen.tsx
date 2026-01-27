@@ -83,8 +83,8 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
                   src="/images/tarot/card-back.png"
                   alt="타로 카드"
                   fill
+                  sizes="142px"
                   className="object-cover"
-                  unoptimized
                 />
               </div>
             </div>
@@ -96,8 +96,8 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
                   src="/images/tarot/card-back.png"
                   alt="타로 카드"
                   fill
+                  sizes="142px"
                   className="object-cover"
-                  unoptimized
                 />
               </div>
             </div>
@@ -109,10 +109,10 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
                   src="/images/tarot/card-back.png"
                   alt="타로 카드"
                   fill
+                  sizes="142px"
                   className="object-cover"
                   onLoad={handleImageLoad}
                   priority
-                  unoptimized
                 />
               </div>
             </div>

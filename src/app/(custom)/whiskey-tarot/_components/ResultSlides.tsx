@@ -119,8 +119,8 @@ function SingleCardSlide({
                     src="/images/tarot/card-back.png"
                     alt="타로 카드"
                     fill
+                    sizes="192px"
                     className="object-cover"
-                    unoptimized
                   />
                 </div>
               </div>
@@ -134,8 +134,8 @@ function SingleCardSlide({
                     src={card.image}
                     alt={card.nameKo}
                     fill
+                    sizes="192px"
                     className="object-cover"
-                    unoptimized
                   />
                 </div>
               </div>

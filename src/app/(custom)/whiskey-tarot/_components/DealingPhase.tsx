@@ -131,8 +131,9 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
                     src="/images/tarot/card-back.png"
                     alt="카드 뒷면"
                     fill
+                    sizes="64px"
                     className="object-cover"
-                    unoptimized
+                    priority
                   />
                 </div>
               </div>
@@ -168,8 +169,9 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
                       src="/images/tarot/card-back.png"
                       alt="타로 카드"
                       fill
+                      sizes="56px"
                       className="object-cover"
-                      unoptimized
+                      priority
                     />
                   </div>
                 </div>

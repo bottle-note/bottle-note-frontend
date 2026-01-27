@@ -61,8 +61,8 @@ function CardItem({
             src="/images/tarot/card-back.png"
             alt="타로 카드"
             fill
+            sizes="80px"
             className="object-cover"
-            unoptimized
           />
         </div>
       </div>
@@ -215,8 +215,8 @@ export default function CardSelection({
                   src="/images/tarot/card-back.png"
                   alt="선택된 카드"
                   fill
+                  sizes="56px"
                   className="object-cover"
-                  unoptimized
                 />
               ) : (
                 <span className="text-gray-500 text-sm">{index + 1}</span>
