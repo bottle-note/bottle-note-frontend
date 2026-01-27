@@ -135,7 +135,7 @@ export default function CardSelection({
           </p>
         </div>
 
-        {/* 카드 그리드 - 4+3+3 배치 */}
+        {/* 카드 그리드 - 4+4+4 배치 */}
         <div className="flex flex-col items-center gap-3 sm:gap-4 px-2">
           {/* 1줄: 4장 */}
           <div className="flex gap-2 sm:gap-3 justify-center">
@@ -151,9 +151,9 @@ export default function CardSelection({
               />
             ))}
           </div>
-          {/* 2줄: 3장 */}
+          {/* 2줄: 4장 */}
           <div className="flex gap-2 sm:gap-3 justify-center">
-            {cards.slice(4, 7).map((card, index) => (
+            {cards.slice(4, 8).map((card, index) => (
               <CardItem
                 key={card.id}
                 index={index + 4}
@@ -165,12 +165,12 @@ export default function CardSelection({
               />
             ))}
           </div>
-          {/* 3줄: 3장 */}
+          {/* 3줄: 4장 */}
           <div className="flex gap-2 sm:gap-3 justify-center">
-            {cards.slice(7, 10).map((card, index) => (
+            {cards.slice(8, 12).map((card, index) => (
               <CardItem
                 key={card.id}
-                index={index + 7}
+                index={index + 8}
                 selected={isSelected(card.id)}
                 disabled={!canSelectMore}
                 selectedIndex={selectedCards.findIndex((c) => c.id === card.id)}
