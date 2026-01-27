@@ -65,7 +65,7 @@ export const TAROT_CARDS: TarotCard[] = [
     id: 5,
     name: 'The Hermit',
     nameKo: '은둔자',
-    flavorTag: 'Peat',
+    flavorTag: 'Fresh',
     readingText:
       '시끄러운 세상과 잠시 거리를 두고 나만의 동굴로 들어갈 시간입니다. 이건 외로움이 아니라, 더 깊어지기 위해 내면의 목소리를 듣는 귀한 시간입니다.',
     history:
@@ -120,6 +120,30 @@ export const TAROT_CARDS: TarotCard[] = [
       "성공, 승리, 생명력을 상징하는 가장 강력한 긍정의 카드입니다. 카드 속 어린아이는 '순수함'을 뜻하며, 가식 없는 진실이 승리한다는 낙천적인 세계관을 보여줍니다.",
     image: '/images/tarot/9-sun.png',
     color: '#c9a227',
+  },
+  {
+    id: 10,
+    name: 'The Star',
+    nameKo: '별',
+    flavorTag: 'Sweet',
+    readingText:
+      '폭풍이 지나간 뒤에 뜨는 별빛처럼, 지금 당신에게도 고요한 희망이 찾아오고 있습니다. 조급해하지 마세요. 천천히 상처를 치유하며 쉬어가도 괜찮습니다. 밤하늘의 별처럼 당신의 빛도 곧 되찾게 될 거예요.',
+    history:
+      "폭풍의 탑(The Tower) 다음에 오는 카드로, 파괴 이후의 치유와 재생을 상징합니다. 물가에서 물을 붓는 여인은 '생명의 물'을 나누어주는 모습이며, 밤하늘의 8개 별은 희망과 영감을 뜻합니다.",
+    image: '/images/tarot/10-star.png',
+    color: '#d4a574',
+  },
+  {
+    id: 11,
+    name: 'The Tower',
+    nameKo: '탑',
+    flavorTag: 'Peat',
+    readingText:
+      '쌓아올린 것들이 무너지는 순간입니다. 두렵겠지만, 이건 끝이 아니라 거짓된 안정에서 벗어나는 해방입니다. 번개처럼 내리친 진실이 당신을 더 단단한 땅 위에 세워줄 거예요.',
+    history:
+      "'신의 집(Maison Dieu)'이라고도 불리는 이 카드는 바벨탑 신화에서 유래했습니다. 인간이 쌓은 거짓된 질서와 오만함이 번개에 무너지는 모습은 충격적이지만, 그 안에서 진정한 깨달음과 새로운 시작이 피어납니다.",
+    image: '/images/tarot/11-tower.png',
+    color: '#4a2020',
   },
 ];
 
