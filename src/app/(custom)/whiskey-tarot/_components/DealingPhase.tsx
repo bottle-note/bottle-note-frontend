@@ -36,9 +36,17 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
   const [dealtCount, setDealtCount] = useState(0);
   const [showMessage, setShowMessage] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
-  // 카드 뽑기 애니메이션 시퀀스
+  // 이미지 로드 완료 핸들러
+  const handleImageLoad = () => {
+    setIsImageLoaded(true);
+  };
+
+  // 카드 뽑기 애니메이션 시퀀스 (이미지 로드 완료 후 시작)
   useEffect(() => {
+    if (!isImageLoaded) return;
+
     const dealTimers: NodeJS.Timeout[] = [];
 
     // 0.5초 후부터 카드 뽑기 시작
@@ -74,7 +82,7 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
       clearTimeout(messageTimer);
       clearTimeout(completeTimer);
     };
-  }, [cards, onComplete]);
+  }, [cards, onComplete, isImageLoaded]);
 
   // 미리 계산된 부채꼴 위치
   const fanPositions = useMemo(
@@ -106,7 +114,13 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
       </div>
 
       {/* 카드 영역 */}
-      <div className="relative z-10 w-full max-w-md h-[400px] flex items-center justify-center">
+      <div
+        className={`
+          relative z-10 w-full max-w-md h-[400px] flex items-center justify-center
+          transition-opacity duration-300
+          ${isImageLoaded ? 'opacity-100' : 'opacity-0'}
+        `}
+      >
         {/* 카드 덱 (남은 카드) */}
         <div
           className={`
@@ -134,6 +148,7 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
                     sizes="64px"
                     className="object-cover"
                     priority
+                    onLoad={index === 0 ? handleImageLoad : undefined}
                   />
                 </div>
               </div>
@@ -171,7 +186,6 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
                       fill
                       sizes="56px"
                       className="object-cover"
-                      priority
                     />
                   </div>
                 </div>

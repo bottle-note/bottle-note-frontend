@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { TarotCard } from '../_types';
-import { useImagePreload } from '../_hooks/useImagePreload';
 
 interface CardSelectionProps {
   cards: TarotCard[];
@@ -88,16 +87,6 @@ export default function CardSelection({
 }: CardSelectionProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [showTitle, setShowTitle] = useState(false);
-
-  // 카드 앞면 이미지 프리로드 (ResultSlides에서 사용)
-  useImagePreload(
-    cards.map((card) => card.image),
-    {
-      onComplete: () => {
-        // 이미지 프리로드 완료 (디버깅용 로그는 제거)
-      },
-    },
-  );
 
   // 진입 애니메이션
   useEffect(() => {
@@ -206,20 +195,24 @@ export default function CardSelection({
                 ${
                   selectedCards[index]
                     ? 'border-mainCoral bg-mainCoral/10'
-                    : 'border-gray-600 flex items-center justify-center'
+                    : 'border-gray-600'
                 }
               `}
             >
-              {selectedCards[index] ? (
-                <Image
-                  src="/images/tarot/card-back.png"
-                  alt="선택된 카드"
-                  fill
-                  sizes="56px"
-                  className="object-cover"
-                />
-              ) : (
-                <span className="text-gray-500 text-sm">{index + 1}</span>
+              {/* 이미지는 항상 렌더링하고 CSS로 보이기/숨기기 (클릭 시 재다운로드 방지) */}
+              <Image
+                src="/images/tarot/card-back.png"
+                alt="선택된 카드"
+                fill
+                sizes="56px"
+                className={`object-cover transition-opacity duration-300 ${
+                  selectedCards[index] ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+              {!selectedCards[index] && (
+                <span className="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
+                  {index + 1}
+                </span>
               )}
             </div>
           ))}
