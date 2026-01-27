@@ -38,12 +38,20 @@ function findDominantFlavor(score: Record<FlavorTag, number>): FlavorTag {
   // 최고 점수를 가진 태그들
   const topTags = relevantTags.filter((tag) => score[tag] === maxCount);
 
-  // 1:1:1 동점 (3장 모두 다른 태그) -> Balance
-  if (topTags.length >= 3 || (topTags.length === 2 && maxCount === 1)) {
-    return 'Balance';
+  // 3가지 이상 다른 태그 (1:1:1 분포): 30%만 Balance, 70%는 랜덤 태그
+  if (topTags.length >= 3) {
+    if (Math.random() < 0.3) {
+      return 'Balance';
+    }
+    return topTags[Math.floor(Math.random() * topTags.length)];
   }
 
-  // 2:1 또는 3:0 -> 최다 태그 반환
+  // 2:1 동점인 경우 랜덤으로 하나 선택
+  if (topTags.length === 2) {
+    return topTags[Math.floor(Math.random() * topTags.length)];
+  }
+
+  // 단일 우세 태그
   return topTags[0];
 }
 
