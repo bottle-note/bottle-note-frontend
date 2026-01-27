@@ -120,6 +120,7 @@ function SingleCardSlide({
                     alt="타로 카드"
                     fill
                     className="object-cover"
+                    unoptimized
                   />
                 </div>
               </div>
@@ -134,6 +135,7 @@ function SingleCardSlide({
                     alt={card.nameKo}
                     fill
                     className="object-cover"
+                    unoptimized
                   />
                 </div>
               </div>

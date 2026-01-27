@@ -9,6 +9,12 @@ interface IntroScreenProps {
 
 export default function IntroScreen({ onStart }: IntroScreenProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [isCardImageLoaded, setIsCardImageLoaded] = useState(false);
+
+  // 이미지 로드 완료 핸들러
+  const handleImageLoad = () => {
+    setIsCardImageLoaded(true);
+  };
 
   useEffect(() => {
     // 페이드인 애니메이션을 위한 딜레이
@@ -61,8 +67,14 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
           올해의 추천 위스키를 점쳐보세요.
         </p>
 
-        {/* 카드 미리보기 이미지 */}
-        <div className="relative w-40 h-56 mb-12">
+        {/* 카드 미리보기 이미지 - 로딩 완료 후 아래에서 올라오는 애니메이션 */}
+        <div
+          className={`relative w-40 h-56 mb-12 transition-all duration-700 ease-out ${
+            isCardImageLoaded
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-0 translate-y-12'
+          }`}
+        >
           {/* 카드 뒷면 스택 효과 (빈티지 타로 스타일) */}
           <div className="absolute inset-0 transform rotate-[-8deg] opacity-60">
             <div className="w-full h-full rounded-xl bg-[#f4e4c1] p-2 shadow-lg">
@@ -72,6 +84,7 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
                   alt="타로 카드"
                   fill
                   className="object-cover"
+                  unoptimized
                 />
               </div>
             </div>
@@ -84,6 +97,7 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
                   alt="타로 카드"
                   fill
                   className="object-cover"
+                  unoptimized
                 />
               </div>
             </div>
@@ -96,6 +110,9 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
                   alt="타로 카드"
                   fill
                   className="object-cover"
+                  onLoad={handleImageLoad}
+                  priority
+                  unoptimized
                 />
               </div>
             </div>

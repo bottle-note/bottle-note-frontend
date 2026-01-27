@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { TarotCard } from '../_types';
+import { useImagePreload } from '../_hooks/useImagePreload';
 
 interface CardSelectionProps {
   cards: TarotCard[];
@@ -61,6 +62,7 @@ function CardItem({
             alt="타로 카드"
             fill
             className="object-cover"
+            unoptimized
           />
         </div>
       </div>
@@ -86,6 +88,16 @@ export default function CardSelection({
 }: CardSelectionProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [showTitle, setShowTitle] = useState(false);
+
+  // 카드 앞면 이미지 프리로드 (ResultSlides에서 사용)
+  useImagePreload(
+    cards.map((card) => card.image),
+    {
+      onComplete: () => {
+        // 이미지 프리로드 완료 (디버깅용 로그는 제거)
+      },
+    },
+  );
 
   // 진입 애니메이션
   useEffect(() => {
@@ -204,6 +216,7 @@ export default function CardSelection({
                   alt="선택된 카드"
                   fill
                   className="object-cover"
+                  unoptimized
                 />
               ) : (
                 <span className="text-gray-500 text-sm">{index + 1}</span>

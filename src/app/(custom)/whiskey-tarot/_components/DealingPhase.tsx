@@ -132,6 +132,7 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
                     alt="카드 뒷면"
                     fill
                     className="object-cover"
+                    unoptimized
                   />
                 </div>
               </div>
@@ -168,6 +169,7 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
                       alt="타로 카드"
                       fill
                       className="object-cover"
+                      unoptimized
                     />
                   </div>
                 </div>
