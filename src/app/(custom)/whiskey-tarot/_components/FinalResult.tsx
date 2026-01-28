@@ -7,12 +7,14 @@ import { useRouter } from 'next/navigation';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { AlcoholDetailsResponse } from '@/api/alcohol/types';
 
+import ShareBottomSheet from './ShareBottomSheet';
 import { WhiskyRecommend } from '../_types';
 
 interface FinalResultProps {
   whisky: WhiskyRecommend;
   matchReason: string;
   selectedCards: string[];
+  prefetchedWhiskyDetail?: AlcoholDetailsResponse['alcohols'] | null;
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -27,6 +29,7 @@ export default function FinalResult({
   whisky,
   matchReason,
   selectedCards,
+  prefetchedWhiskyDetail,
 }: FinalResultProps) {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
@@ -34,6 +37,7 @@ export default function FinalResult({
     AlcoholDetailsResponse['alcohols'] | null
   >(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
@@ -41,6 +45,13 @@ export default function FinalResult({
   }, []);
 
   useEffect(() => {
+    // 프리페치된 데이터가 있으면 사용
+    if (prefetchedWhiskyDetail) {
+      setWhiskyDetail(prefetchedWhiskyDetail);
+      setIsLoading(false);
+      return;
+    }
+
     const fetchWhiskyDetail = async () => {
       try {
         const result = await AlcoholsApi.getAlcoholDetails(
@@ -59,10 +70,14 @@ export default function FinalResult({
     if (whisky.whiskyId) {
       fetchWhiskyDetail();
     }
-  }, [whisky.whiskyId]);
+  }, [whisky.whiskyId, prefetchedWhiskyDetail]);
 
   const handleGoToWhisky = () => {
     router.push(`/search/${whisky.whiskyCategory}/${whisky.whiskyId}`);
+  };
+
+  const handleShare = () => {
+    setIsShareSheetOpen(true);
   };
 
   return (
@@ -162,10 +177,37 @@ export default function FinalResult({
                   />
                 </svg>
               </button>
+
+              {/* 공유 버튼 */}
+              <button
+                onClick={handleShare}
+                className="mt-3 w-full py-3 bg-white/10 rounded-full flex items-center justify-center gap-2 hover:bg-white/15 active:scale-[0.98] transition-all"
+              >
+                <svg
+                  className="w-4 h-4 text-white/80"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                  />
+                </svg>
+                <span className="text-white/80 text-sm">친구에게 추천하기</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* 공유 바텀시트 - 1단계: 진입점 공유만 */}
+      <ShareBottomSheet
+        isOpen={isShareSheetOpen}
+        onClose={() => setIsShareSheetOpen(false)}
+      />
     </div>
   );
 }

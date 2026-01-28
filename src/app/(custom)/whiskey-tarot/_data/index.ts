@@ -181,13 +181,13 @@ export const WHISKY_BY_CATEGORY: Record<FlavorTag, WhiskyRecommend> = {
   },
   Strong: {
     category: 'Strong',
-    name: 'Ardbeg Uigeadail',
-    nameKo: '아드벡 우거다일',
+    name: 'Arran Machrie Moor Cask Strength',
+    nameKo: '아란 마크리무어 CS',
     description:
-      "이름부터가 '어둡고 신비한 곳'이라는 뜻이에요. 도수가 54.2도나 되는데, 마셔보면 그냥 독하기만 한 게 아닙니다. 아드벡 특유의 매캐한 연기 냄새랑 쉐리 캐스크의 끈적한 단맛이 입안에서 '꽝!' 하고 부딪히는 느낌이거든요. 자극이 필요하거나 마음을 다잡고 싶은 날엔 무조건 이거예요.",
+      "아란 섬 서쪽 해안의 신비로운 전설이 깃든 '마크리 무어' 평원의 거친 황무지와 그곳에 솟은 선돌(Standing Stone)을 모티브로 탄생했습니다. 거인 핑갈의 사냥개 '브란'이 묶여 있었다는 전설처럼, 길들여지지 않은 야생의 피트 향과 원액 그대로의 강인한 생명력을 역사 속에 품고 있습니다.",
     emoji: '💪',
     whiskyCategory: 'all',
-    whiskyId: 466,
+    whiskyId: 4960,
   },
   Balance: {
     category: 'Balance',
