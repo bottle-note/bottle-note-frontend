@@ -41,15 +41,15 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
     { name: '홈', link: ROUTES.HOME, icon: '/icon/navbar/home.svg' },
     { name: '검색', link: ROUTES.SEARCH.BASE, icon: '/icon/navbar/search.svg' },
     {
+      name: '리뷰',
+      link: ROUTES.REVIEW.REGISTER_BASE,
+      icon: '/icon/navbar/review.svg',
+      requiresAuth: true,
+    },
+    {
       name: '둘러보기',
       link: ROUTES.EXPLORE.BASE,
       icon: '/icon/navbar/explorer.svg',
-    },
-    {
-      name: '리뷰',
-      link: ROUTES.REVIEW.REGISTER_BASE,
-      icon: '/icon/navbar/history.svg',
-      requiresAuth: true,
     },
     {
       name: '마이',
