@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface IntroScreenProps {
   onStart: () => void;
 }
 
 export default function IntroScreen({ onStart }: IntroScreenProps) {
+  const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
   const [isCardImageLoaded, setIsCardImageLoaded] = useState(false);
 
@@ -24,6 +26,27 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen px-6 overflow-hidden">
+      {/* 닫기 버튼 */}
+      <button
+        onClick={() => router.back()}
+        className="absolute top-4 left-4 z-20 p-2 text-white/40 hover:text-white/60 transition-colors"
+        aria-label="닫기"
+      >
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+
       {/* 배경 그라데이션 */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#1a1a2e] to-[#0a0a0f]" />
 
