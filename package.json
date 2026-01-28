@@ -86,6 +86,9 @@
     "typescript": "^5.4.0"
   },
   "lint-staged": {
+    "package.json": [
+      "scripts/sync-lockfile.sh"
+    ],
     "*.{ts,tsx}": [
       "eslint --fix",
       "prettier --write"
