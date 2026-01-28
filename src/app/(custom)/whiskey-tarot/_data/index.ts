@@ -65,7 +65,7 @@ export const TAROT_CARDS: TarotCard[] = [
     id: 5,
     name: 'The Hermit',
     nameKo: '은둔자',
-    flavorTag: 'Peat',
+    flavorTag: 'Fresh',
     readingText:
       '시끄러운 세상과 잠시 거리를 두고 나만의 동굴로 들어갈 시간입니다. 이건 외로움이 아니라, 더 깊어지기 위해 내면의 목소리를 듣는 귀한 시간입니다.',
     history:
@@ -121,6 +121,30 @@ export const TAROT_CARDS: TarotCard[] = [
     image: '/images/tarot/9-sun.png',
     color: '#c9a227',
   },
+  {
+    id: 10,
+    name: 'The Star',
+    nameKo: '별',
+    flavorTag: 'Sweet',
+    readingText:
+      '폭풍이 지나간 뒤에 뜨는 별빛처럼, 지금 당신에게도 고요한 희망이 찾아오고 있습니다. 조급해하지 마세요. 천천히 상처를 치유하며 쉬어가도 괜찮습니다. 밤하늘의 별처럼 당신의 빛도 곧 되찾게 될 거예요.',
+    history:
+      "폭풍의 탑(The Tower) 다음에 오는 카드로, 파괴 이후의 치유와 재생을 상징합니다. 물가에서 물을 붓는 여인은 '생명의 물'을 나누어주는 모습이며, 밤하늘의 8개 별은 희망과 영감을 뜻합니다.",
+    image: '/images/tarot/10-star.png',
+    color: '#d4a574',
+  },
+  {
+    id: 11,
+    name: 'The Tower',
+    nameKo: '탑',
+    flavorTag: 'Peat',
+    readingText:
+      '쌓아올린 것들이 무너지는 순간입니다. 두렵겠지만, 이건 끝이 아니라 거짓된 안정에서 벗어나는 해방입니다. 번개처럼 내리친 진실이 당신을 더 단단한 땅 위에 세워줄 거예요.',
+    history:
+      "'신의 집(Maison Dieu)'이라고도 불리는 이 카드는 바벨탑 신화에서 유래했습니다. 인간이 쌓은 거짓된 질서와 오만함이 번개에 무너지는 모습은 충격적이지만, 그 안에서 진정한 깨달음과 새로운 시작이 피어납니다.",
+    image: '/images/tarot/11-tower.png',
+    color: '#4a2020',
+  },
 ];
 
 // 5개 위스키 카테고리
@@ -157,13 +181,13 @@ export const WHISKY_BY_CATEGORY: Record<FlavorTag, WhiskyRecommend> = {
   },
   Strong: {
     category: 'Strong',
-    name: 'Ardbeg Uigeadail',
-    nameKo: '아드벡 우거다일',
+    name: 'Arran Machrie Moor Cask Strength',
+    nameKo: '아란 마크리무어 CS',
     description:
-      "이름부터가 '어둡고 신비한 곳'이라는 뜻이에요. 도수가 54.2도나 되는데, 마셔보면 그냥 독하기만 한 게 아닙니다. 아드벡 특유의 매캐한 연기 냄새랑 쉐리 캐스크의 끈적한 단맛이 입안에서 '꽝!' 하고 부딪히는 느낌이거든요. 자극이 필요하거나 마음을 다잡고 싶은 날엔 무조건 이거예요.",
+      "아란 섬 서쪽 해안의 신비로운 전설이 깃든 '마크리 무어' 평원의 거친 황무지와 그곳에 솟은 선돌(Standing Stone)을 모티브로 탄생했습니다. 거인 핑갈의 사냥개 '브란'이 묶여 있었다는 전설처럼, 길들여지지 않은 야생의 피트 향과 원액 그대로의 강인한 생명력을 역사 속에 품고 있습니다.",
     emoji: '💪',
     whiskyCategory: 'all',
-    whiskyId: 466,
+    whiskyId: 4960,
   },
   Balance: {
     category: 'Balance',

@@ -36,15 +36,22 @@ function SingleCardSlide({
   const [isFlipped, setIsFlipped] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
+  // 이미지 로드 완료 핸들러
+  const handleImageLoad = () => {
+    setIsImageLoaded(true);
+  };
+
+  // 이미지 로드 완료 + isEntering일 때 카드 표시
   useEffect(() => {
-    // Entry animation
-    if (isEntering) {
+    if (isEntering && isImageLoaded) {
       const visibleTimer = setTimeout(() => setIsVisible(true), 50);
       return () => clearTimeout(visibleTimer);
     }
-  }, [isEntering]);
+  }, [isEntering, isImageLoaded]);
 
+  // 카드 표시 후 뒤집기 + 콘텐츠 표시 애니메이션
   useEffect(() => {
     if (!isVisible) return;
 
@@ -119,7 +126,10 @@ function SingleCardSlide({
                     src="/images/tarot/card-back.png"
                     alt="타로 카드"
                     fill
+                    sizes="192px"
                     className="object-cover"
+                    priority
+                    onLoad={handleImageLoad}
                   />
                 </div>
               </div>
@@ -133,6 +143,7 @@ function SingleCardSlide({
                     src={card.image}
                     alt={card.nameKo}
                     fill
+                    sizes="192px"
                     className="object-cover"
                   />
                 </div>

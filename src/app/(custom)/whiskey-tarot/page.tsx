@@ -15,6 +15,86 @@ interface AnimatedPageProps {
   direction?: 'up' | 'down' | 'left' | 'right' | 'fade';
 }
 
+export default function WhiskeyTarotPage() {
+  const {
+    state,
+    isLoading,
+    prefetchedWhiskyDetail,
+    goToQuestioning,
+    fetchCards,
+    goToSelecting,
+    toggleCardSelection,
+    getRecommendation,
+    goToResult,
+  } = useTarotQuiz();
+
+  const handleStart = () => {
+    goToQuestioning();
+  };
+
+  const handleQuestioningComplete = () => {
+    fetchCards();
+  };
+
+  const handleConfirmSelection = () => {
+    getRecommendation();
+  };
+
+  const handleSlidesComplete = () => {
+    goToResult();
+  };
+
+  return (
+    <div className="relative min-h-screen overflow-hidden">
+      {/* 인트로 화면 */}
+      <AnimatedPage isActive={state.step === 'intro'} direction="fade">
+        <IntroScreen onStart={handleStart} />
+      </AnimatedPage>
+
+      {/* 질문 생각 화면 */}
+      <AnimatedPage isActive={state.step === 'questioning'} direction="fade">
+        <QuestioningScreen onReady={handleQuestioningComplete} />
+      </AnimatedPage>
+
+      {/* 카드 딜링 화면 (78장 덱에서 10장 뽑기) */}
+      <AnimatedPage isActive={state.step === 'dealing'} direction="up">
+        <DealingPhase cards={state.cards} onComplete={goToSelecting} />
+      </AnimatedPage>
+
+      {/* 카드 선택 화면 */}
+      <AnimatedPage isActive={state.step === 'selecting'} direction="up">
+        <CardSelection
+          cards={state.cards}
+          selectedCards={state.selectedCards}
+          onSelectCard={toggleCardSelection}
+          onConfirm={handleConfirmSelection}
+          isLoading={isLoading}
+        />
+      </AnimatedPage>
+
+      {/* 결과 슬라이드 (Wrapped 스타일) */}
+      <AnimatedPage isActive={state.step === 'slides'} direction="left">
+        <ResultSlides
+          selectedCards={state.selectedCards}
+          onComplete={handleSlidesComplete}
+        />
+      </AnimatedPage>
+
+      {/* 최종 결과 화면 */}
+      <AnimatedPage isActive={state.step === 'result'} direction="up">
+        {state.recommendedWhisky && (
+          <FinalResult
+            whisky={state.recommendedWhisky}
+            matchReason={state.matchReason}
+            selectedCards={state.selectedCards.map((card) => card.nameKo)}
+            prefetchedWhiskyDetail={prefetchedWhiskyDetail}
+          />
+        )}
+      </AnimatedPage>
+    </div>
+  );
+}
+
 function AnimatedPage({
   children,
   isActive,
@@ -57,91 +137,12 @@ function AnimatedPage({
   return (
     <div
       className={`
-        absolute inset-0 transition-all duration-300 ease-out overflow-y-auto
+        absolute inset-0 transition-all duration-300 ease-out overflow-y-auto pt-safe
         ${isVisible ? 'opacity-100' : 'opacity-0'}
         ${getTransformClass()}
       `}
     >
       {children}
-    </div>
-  );
-}
-
-export default function WhiskeyTarotPage() {
-  const {
-    state,
-    isLoading,
-    goToQuestioning,
-    fetchCards,
-    goToSelecting,
-    toggleCardSelection,
-    getRecommendation,
-    goToResult,
-    reset,
-  } = useTarotQuiz();
-
-  const handleStart = () => {
-    goToQuestioning();
-  };
-
-  const handleQuestioningComplete = () => {
-    fetchCards();
-  };
-
-  const handleConfirmSelection = () => {
-    getRecommendation();
-  };
-
-  const handleSlidesComplete = () => {
-    goToResult();
-  };
-
-  return (
-    <div className="relative min-h-screen overflow-hidden pt-safe">
-      {/* 인트로 화면 */}
-      <AnimatedPage isActive={state.step === 'intro'} direction="fade">
-        <IntroScreen onStart={handleStart} />
-      </AnimatedPage>
-
-      {/* 질문 생각 화면 */}
-      <AnimatedPage isActive={state.step === 'questioning'} direction="fade">
-        <QuestioningScreen onReady={handleQuestioningComplete} />
-      </AnimatedPage>
-
-      {/* 카드 딜링 화면 (78장 덱에서 10장 뽑기) */}
-      <AnimatedPage isActive={state.step === 'dealing'} direction="up">
-        <DealingPhase cards={state.cards} onComplete={goToSelecting} />
-      </AnimatedPage>
-
-      {/* 카드 선택 화면 */}
-      <AnimatedPage isActive={state.step === 'selecting'} direction="up">
-        <CardSelection
-          cards={state.cards}
-          selectedCards={state.selectedCards}
-          onSelectCard={toggleCardSelection}
-          onConfirm={handleConfirmSelection}
-          isLoading={isLoading}
-        />
-      </AnimatedPage>
-
-      {/* 결과 슬라이드 (Wrapped 스타일) */}
-      <AnimatedPage isActive={state.step === 'slides'} direction="left">
-        <ResultSlides
-          selectedCards={state.selectedCards}
-          onComplete={handleSlidesComplete}
-        />
-      </AnimatedPage>
-
-      {/* 최종 결과 화면 */}
-      <AnimatedPage isActive={state.step === 'result'} direction="up">
-        {state.recommendedWhisky && (
-          <FinalResult
-            whisky={state.recommendedWhisky}
-            matchReason={state.matchReason}
-            selectedCards={state.selectedCards.map((card) => card.nameKo)}
-          />
-        )}
-      </AnimatedPage>
     </div>
   );
 }

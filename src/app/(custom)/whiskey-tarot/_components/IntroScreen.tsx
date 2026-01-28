@@ -2,13 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface IntroScreenProps {
   onStart: () => void;
 }
 
 export default function IntroScreen({ onStart }: IntroScreenProps) {
+  const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
+  const [isCardImageLoaded, setIsCardImageLoaded] = useState(false);
+
+  // 이미지 로드 완료 핸들러
+  const handleImageLoad = () => {
+    setIsCardImageLoaded(true);
+  };
 
   useEffect(() => {
     // 페이드인 애니메이션을 위한 딜레이
@@ -18,6 +26,27 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen px-6 overflow-hidden">
+      {/* 닫기 버튼 */}
+      <button
+        onClick={() => router.back()}
+        className="absolute top-4 left-4 z-20 p-2 text-white/40 hover:text-white/60 transition-colors"
+        aria-label="닫기"
+      >
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+
       {/* 배경 그라데이션 */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#1a1a2e] to-[#0a0a0f]" />
 
@@ -61,8 +90,14 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
           올해의 추천 위스키를 점쳐보세요.
         </p>
 
-        {/* 카드 미리보기 이미지 */}
-        <div className="relative w-40 h-56 mb-12">
+        {/* 카드 미리보기 이미지 - 로딩 완료 후 아래에서 올라오는 애니메이션 */}
+        <div
+          className={`relative w-40 h-56 mb-12 transition-all duration-700 ease-out ${
+            isCardImageLoaded
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-0 translate-y-12'
+          }`}
+        >
           {/* 카드 뒷면 스택 효과 (빈티지 타로 스타일) */}
           <div className="absolute inset-0 transform rotate-[-8deg] opacity-60">
             <div className="w-full h-full rounded-xl bg-[#f4e4c1] p-2 shadow-lg">
@@ -71,6 +106,7 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
                   src="/images/tarot/card-back.png"
                   alt="타로 카드"
                   fill
+                  sizes="142px"
                   className="object-cover"
                 />
               </div>
@@ -83,6 +119,7 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
                   src="/images/tarot/card-back.png"
                   alt="타로 카드"
                   fill
+                  sizes="142px"
                   className="object-cover"
                 />
               </div>
@@ -95,7 +132,10 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
                   src="/images/tarot/card-back.png"
                   alt="타로 카드"
                   fill
+                  sizes="142px"
                   className="object-cover"
+                  onLoad={handleImageLoad}
+                  priority
                 />
               </div>
             </div>

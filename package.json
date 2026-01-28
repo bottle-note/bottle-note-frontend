@@ -3,28 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "env:sync": "git submodule update --init --remote",
-    "env:local": "sops -d git.environment-variables/application.next-js/local.sops.env > .env.local",
-    "env:dev": "sops -d git.environment-variables/application.next-js/dev.sops.env > .env.development",
-    "env:prod": "sops -d git.environment-variables/application.next-js/prod.sops.env > .env.production",
-    "setup": "pnpm run env:sync && pnpm run env:local",
-    "dev": "pnpm run env:dev && cross-env npx env-cmd -f .env.development next dev",
-    "dev:local": "pnpm run env:local && cross-env npx env-cmd -f .env.local next dev",
-    "dev:prod": "pnpm run env:prod && cross-env npx env-cmd -f .env.production next dev",
-    "build:dev": "pnpm run env:dev && cross-env npx env-cmd -f .env.development next build",
-    "build:prod": "pnpm run env:prod && cross-env npx env-cmd -f .env.production next build",
-    "start:dev": "pnpm run env:dev && cross-env npx env-cmd -f .env.development next start",
-    "start:prod": "pnpm run env:prod && cross-env npx env-cmd -f .env.production next start",
-    "build": "next build",
+    "setup": "git submodule update --init --remote",
+    "dev": "./scripts/run.sh dev dev",
+    "dev:local": "./scripts/run.sh dev local",
+    "dev:prod": "./scripts/run.sh dev prod",
+    "build": "./scripts/run.sh build prod",
+    "build:dev": "./scripts/run.sh build dev",
     "start": "next start",
-    "ci:tsc": "tsc",
-    "ci:lint": "next lint",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "test": "jest",
     "test:watch": "jest --watch",
-    "prepare": "husky",
-    "optimize:banners": "node scripts/optimize-banner-images.mjs"
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
@@ -36,11 +26,11 @@
     "@testing-library/jest-dom": "^6.4.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cross-env": "^7.0.3",
     "crypto": "^1.0.1",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^11.1.7",
+    "html2canvas": "^1.4.1",
     "jose": "^5.9.3",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.511.0",
@@ -96,6 +86,9 @@
     "typescript": "^5.4.0"
   },
   "lint-staged": {
+    "package.json": [
+      "scripts/sync-lockfile.sh"
+    ],
     "*.{ts,tsx}": [
       "eslint --fix",
       "prettier --write"

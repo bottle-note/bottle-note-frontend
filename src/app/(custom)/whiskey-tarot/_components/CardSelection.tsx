@@ -60,6 +60,7 @@ function CardItem({
             src="/images/tarot/card-back.png"
             alt="타로 카드"
             fill
+            sizes="80px"
             className="object-cover"
           />
         </div>
@@ -134,7 +135,7 @@ export default function CardSelection({
           </p>
         </div>
 
-        {/* 카드 그리드 - 4+3+3 배치 */}
+        {/* 카드 그리드 - 4+4+4 배치 */}
         <div className="flex flex-col items-center gap-3 sm:gap-4 px-2">
           {/* 1줄: 4장 */}
           <div className="flex gap-2 sm:gap-3 justify-center">
@@ -150,9 +151,9 @@ export default function CardSelection({
               />
             ))}
           </div>
-          {/* 2줄: 3장 */}
+          {/* 2줄: 4장 */}
           <div className="flex gap-2 sm:gap-3 justify-center">
-            {cards.slice(4, 7).map((card, index) => (
+            {cards.slice(4, 8).map((card, index) => (
               <CardItem
                 key={card.id}
                 index={index + 4}
@@ -164,12 +165,12 @@ export default function CardSelection({
               />
             ))}
           </div>
-          {/* 3줄: 3장 */}
+          {/* 3줄: 4장 */}
           <div className="flex gap-2 sm:gap-3 justify-center">
-            {cards.slice(7, 10).map((card, index) => (
+            {cards.slice(8, 12).map((card, index) => (
               <CardItem
                 key={card.id}
-                index={index + 7}
+                index={index + 8}
                 selected={isSelected(card.id)}
                 disabled={!canSelectMore}
                 selectedIndex={selectedCards.findIndex((c) => c.id === card.id)}
@@ -194,19 +195,24 @@ export default function CardSelection({
                 ${
                   selectedCards[index]
                     ? 'border-mainCoral bg-mainCoral/10'
-                    : 'border-gray-600 flex items-center justify-center'
+                    : 'border-gray-600'
                 }
               `}
             >
-              {selectedCards[index] ? (
-                <Image
-                  src="/images/tarot/card-back.png"
-                  alt="선택된 카드"
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <span className="text-gray-500 text-sm">{index + 1}</span>
+              {/* 이미지는 항상 렌더링하고 CSS로 보이기/숨기기 (클릭 시 재다운로드 방지) */}
+              <Image
+                src="/images/tarot/card-back.png"
+                alt="선택된 카드"
+                fill
+                sizes="56px"
+                className={`object-cover transition-opacity duration-300 ${
+                  selectedCards[index] ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+              {!selectedCards[index] && (
+                <span className="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
+                  {index + 1}
+                </span>
               )}
             </div>
           ))}
