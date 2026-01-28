@@ -45,7 +45,7 @@ export default function WhiskeyTarotPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden pt-safe">
+    <div className="relative min-h-screen overflow-hidden">
       {/* 인트로 화면 */}
       <AnimatedPage isActive={state.step === 'intro'} direction="fade">
         <IntroScreen onStart={handleStart} />
@@ -137,7 +137,7 @@ function AnimatedPage({
   return (
     <div
       className={`
-        absolute inset-0 transition-all duration-300 ease-out overflow-y-auto
+        absolute inset-0 transition-all duration-300 ease-out overflow-y-auto pt-safe
         ${isVisible ? 'opacity-100' : 'opacity-0'}
         ${getTransformClass()}
       `}
