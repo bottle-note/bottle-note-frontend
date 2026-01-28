@@ -1,4 +1,6 @@
 import { useState, useCallback } from 'react';
+import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
+import { AlcoholDetailsResponse } from '@/api/alcohol/types';
 import { QuizState, QuizStep, TarotCard, WhiskyRecommend } from '../_types';
 
 const initialState: QuizState = {
@@ -13,6 +15,9 @@ const initialState: QuizState = {
 export const useTarotQuiz = () => {
   const [state, setState] = useState<QuizState>(initialState);
   const [isLoading, setIsLoading] = useState(false);
+  const [prefetchedWhiskyDetail, setPrefetchedWhiskyDetail] = useState<
+    AlcoholDetailsResponse['alcohols'] | null
+  >(null);
 
   // 질문 생각 화면으로 이동
   const goToQuestioning = useCallback(() => {
@@ -83,6 +88,19 @@ export const useTarotQuiz = () => {
 
       const data = await response.json();
 
+      // 위스키 상세 정보 프리페치 (이미지 로딩 속도 개선)
+      if (data.recommendedWhisky?.whiskyId) {
+        AlcoholsApi.getAlcoholDetails(String(data.recommendedWhisky.whiskyId))
+          .then((result) => {
+            if (result?.data?.alcohols) {
+              setPrefetchedWhiskyDetail(result.data.alcohols);
+            }
+          })
+          .catch(() => {
+            // 프리페치 실패해도 무시 (FinalResult에서 다시 시도)
+          });
+      }
+
       setState((prev) => ({
         ...prev,
         recommendedWhisky: data.recommendedWhisky,
@@ -137,6 +155,7 @@ export const useTarotQuiz = () => {
   return {
     state,
     isLoading,
+    prefetchedWhiskyDetail,
     goToQuestioning,
     fetchCards,
     goToSelecting,
