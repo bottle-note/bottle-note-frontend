@@ -50,7 +50,20 @@ function AlcoholInfo({ data, onSelectAlcohol }: AlcoholInfoProps) {
             />
           </button>
         ) : (
-          <AlcoholImage imageUrl={alcoholUrlImg} />
+          <div className="relative shrink-0">
+            <AlcoholImage imageUrl={alcoholUrlImg} />
+            {onSelectAlcohol && (
+              <button
+                type="button"
+                onClick={onSelectAlcohol}
+                className="absolute bottom-[9px] left-[9px] right-[9px] h-[19px] bg-mainCoral/65 rounded-[3px] flex items-center justify-center"
+              >
+                <span className="text-white text-[9px] font-normal">
+                  위스키 변경
+                </span>
+              </button>
+            )}
+          </div>
         )}
 
         {/* 텍스트 정보 영역 */}
