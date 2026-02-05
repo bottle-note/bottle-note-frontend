@@ -82,7 +82,7 @@ export default function ShareBottomSheet({
       onClose();
     };
 
-    const handleError = () => {
+    const handleError = (_error?: string) => {
       if (isResolved) return;
       isResolved = true;
       clearFallbackTimeout();
