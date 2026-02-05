@@ -10,12 +10,6 @@ import type { ShareConfig, ShareChannel } from '@/types/share';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { trackShareEvent, detectPlatform } from '@/utils/share/shareAnalytics';
 
-// 브릿지 지원 여부 체크 - window.FlutterMessageQueue.postMessage가 함수인지 확인
-const checkBridgeSupport = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  return typeof window.FlutterMessageQueue?.postMessage === 'function';
-};
-
 interface ShareBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
@@ -49,27 +43,13 @@ export default function ShareBottomSheet({
       return;
     }
 
-    // 브릿지 미지원 시 즉시 폴백
-    if (!checkBridgeSupport()) {
-      setShowFallback(true);
-      return;
-    }
-
-    let timeoutId: NodeJS.Timeout | null = null;
+    // 앱에서는 네이티브 콜백(success/error/cancel)을 신뢰
     let isResolved = false;
-
-    const clearFallbackTimeout = () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-        timeoutId = null;
-      }
-    };
 
     // Register callbacks
     const handleSuccess = () => {
       if (isResolved) return;
       isResolved = true;
-      clearFallbackTimeout();
 
       trackShareEvent({
         contentType: config.type,
@@ -85,7 +65,6 @@ export default function ShareBottomSheet({
     const handleError = (_error?: string) => {
       if (isResolved) return;
       isResolved = true;
-      clearFallbackTimeout();
 
       // Show fallback bottom sheet
       setShowFallback(true);
@@ -94,7 +73,6 @@ export default function ShareBottomSheet({
     const handleCancel = () => {
       if (isResolved) return;
       isResolved = true;
-      clearFallbackTimeout();
 
       // User cancelled, just close
       onClose();
@@ -114,16 +92,7 @@ export default function ShareBottomSheet({
       linkUrl: config.linkUrl,
     });
 
-    // 타임아웃: 1초 후에도 응답 없으면 폴백 표시
-    timeoutId = setTimeout(() => {
-      if (!isResolved) {
-        isResolved = true;
-        setShowFallback(true);
-      }
-    }, 1000);
-
     return () => {
-      clearFallbackTimeout();
       // Cleanup callbacks
       window.onShareSuccess = () => {};
       window.onShareError = () => {};
