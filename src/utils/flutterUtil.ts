@@ -54,6 +54,17 @@ type WebViewMessageType = {
     message: 'triggerHaptic';
     args?: { type: 'light' | 'medium' | 'heavy' | 'selection' | 'vibrate' };
   };
+  share: {
+    message: 'share';
+    args: {
+      type: 'review' | 'whisky' | 'event';
+      contentId: string;
+      title: string;
+      description: string;
+      imageUrl: string;
+      linkUrl: string;
+    };
+  };
 };
 
 type WebViewMessage = WebViewMessageType[keyof WebViewMessageType];

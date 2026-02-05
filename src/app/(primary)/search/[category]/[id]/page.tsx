@@ -27,6 +27,8 @@ import AlcoholDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/Alc
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import useDebounceAction from '@/hooks/useDebounceAction';
+import ShareBottomSheet from '@/components/share/ShareBottomSheet';
+import type { ShareConfig, ShareChannel } from '@/types/share';
 import FloatingReviewButton from './_components/FloatingReviewButton';
 import AlcoholDetailHeader from './_components/AlcoholDetailHeader';
 import ProfileDefaultImg from 'public/profile-default.svg';
@@ -50,6 +52,7 @@ export default function SearchAlcohol() {
   const [rate, setRate] = useState(0);
   const [userNickName, setUserNickName] = useState<string>('');
   const [isUnmounting, setIsUnmounting] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   const fetchAlcoholDetails = async (id: string) => {
     try {
@@ -179,6 +182,30 @@ export default function SearchAlcohol() {
       : null;
   }, [data?.alcohols, data?.reviewInfo?.reviewList]);
 
+  const shareConfig: ShareConfig | null = useMemo(() => {
+    if (!data?.alcohols) return null;
+
+    const alcohol = data.alcohols;
+    const linkUrl =
+      typeof window !== 'undefined'
+        ? window.location.href
+        : `https://bottle-note.com/search/${alcohol.engCategory}/${alcohol.alcoholId}`;
+
+    return {
+      type: 'whisky',
+      contentId: String(alcohol.alcoholId),
+      title: alcohol.korName || alcohol.engName,
+      description: `${alcohol.korCategory} | ${alcohol.engName}`,
+      imageUrl: alcohol.alcoholUrlImg || '/images/og-image.png',
+      linkUrl,
+      buttonTitle: '위스키 보기',
+    };
+  }, [data?.alcohols]);
+
+  const handleShare = (_channel: ShareChannel, _success: boolean) => {
+    // TODO: Analytics tracking
+  };
+
   return (
     <>
       {alcoholSchema && <JsonLd data={alcoholSchema} />}
@@ -220,15 +247,7 @@ export default function SearchAlcohol() {
                       height={23}
                     />
                   </SubHeader.Left>
-                  <SubHeader.Right
-                    onClick={() => {
-                      handleModalState({
-                        isShowModal: true,
-                        mainText:
-                          '아직 준비 중인 기능입니다. 조금만 기다려주세요!',
-                      });
-                    }}
-                  >
+                  <SubHeader.Right onClick={() => setIsShareOpen(true)}>
                     <Image
                       src="/icon/externallink-outlined-white.svg"
                       alt="linkIcon"
@@ -363,6 +382,14 @@ export default function SearchAlcohol() {
               )}
             </>
           </>
+        )}
+        {shareConfig && (
+          <ShareBottomSheet
+            isOpen={isShareOpen}
+            onClose={() => setIsShareOpen(false)}
+            config={shareConfig}
+            onShare={handleShare}
+          />
         )}
         {data?.alcohols?.alcoholId && (
           <FloatingReviewButton alcoholId={String(data.alcohols.alcoholId)} />
