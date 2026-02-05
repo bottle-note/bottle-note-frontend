@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, type MutableRefObject } from 'react';
 import Image from 'next/image';
 import ReviewLikeButton from '@/components/domain/review/ReviewLikeButton';
 import ShareBottomSheet from '@/components/share/ShareBottomSheet';
@@ -13,7 +13,7 @@ interface ReviewInteractionBarProps {
   onLikeUpdate: () => void;
   onLikeError: () => void;
   handleLogin: () => void;
-  textareaRef?: React.MutableRefObject<HTMLTextAreaElement | null>;
+  textareaRef?: MutableRefObject<HTMLTextAreaElement | null>;
 }
 
 export default function ReviewInteractionBar({

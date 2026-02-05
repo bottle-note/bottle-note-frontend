@@ -35,9 +35,8 @@ export default function TarotShareBottomSheet({
     imageUrl: ogImageUrl,
   };
 
-  const handleShare = (channel: ShareChannel, success: boolean) => {
+  const handleShare = (_channel: ShareChannel, _success: boolean) => {
     // Future: Add analytics tracking here
-    console.log(`[TarotShare] channel: ${channel}, success: ${success}`);
   };
 
   return (
