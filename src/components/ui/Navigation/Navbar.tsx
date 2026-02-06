@@ -114,7 +114,7 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
       )}
       style={{ bottom: 'var(--navbar-margin-bottom)' }}
     >
-      <section className="h-[70px] flex justify-between bg-[#F6F6F6] py-4 px-[26px] rounded-[13px] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
+      <section className="h-[70px] flex justify-between bg-white py-4 px-[26px] rounded-[13px] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
         {navItems.map((menu, index) => (
           <React.Fragment key={menu.link}>
             <button
