@@ -181,13 +181,15 @@ export default function ShareBottomSheet({
             공유하기
           </article>
 
-          <button
-            onClick={handleKakaoShare}
-            disabled={isKakaoLoading}
-            className="block w-full py-4 text-center text-subCoral disabled:opacity-50"
-          >
-            {isKakaoLoading ? '로딩 중...' : '카카오톡으로 공유'}
-          </button>
+          {!showFallback && (
+            <button
+              onClick={handleKakaoShare}
+              disabled={isKakaoLoading}
+              className="block w-full py-4 text-center text-subCoral disabled:opacity-50"
+            >
+              {isKakaoLoading ? '로딩 중...' : '카카오톡으로 공유'}
+            </button>
+          )}
 
           <button
             onClick={handleCopyLink}

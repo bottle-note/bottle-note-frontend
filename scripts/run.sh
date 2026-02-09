@@ -27,16 +27,24 @@ case $ENV in
     ;;
 esac
 
-# 서브모듈 초기화 (없으면)
-if [ ! -f "$SOPS_FILE" ]; then
-  echo "📦 Initializing git submodule..."
-  git submodule update --init --remote
+# local 환경에서만 서브모듈 초기화 및 환경변수 자동 세팅
+# dev/prod는 CI에서 별도로 env를 관리하므로 건너뜀
+if [ "$ENV" = "local" ]; then
+  if [ ! -f "$SOPS_FILE" ]; then
+    echo "📦 Initializing git submodule..."
+    git submodule update --init --remote
+  fi
+
+  if [ ! -f "$ENV_FILE" ] || [ "$SOPS_FILE" -nt "$ENV_FILE" ]; then
+    echo "🔐 Decrypting $ENV environment..."
+    sops -d "$SOPS_FILE" > "$ENV_FILE"
+  fi
 fi
 
-# 환경변수 복호화 (파일이 없거나 sops 파일이 더 최신이면)
-if [ ! -f "$ENV_FILE" ] || [ "$SOPS_FILE" -nt "$ENV_FILE" ]; then
-  echo "🔐 Decrypting $ENV environment..."
-  sops -d "$SOPS_FILE" > "$ENV_FILE"
+# env 파일 존재 확인
+if [ ! -f "$ENV_FILE" ]; then
+  echo "❌ $ENV_FILE not found. Set up environment variables first."
+  exit 1
 fi
 
 # Next.js 명령 실행
