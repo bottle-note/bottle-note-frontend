@@ -185,7 +185,10 @@ function ReviewRegister() {
       />
 
       <ReviewForm />
-      <article className="sticky bottom-5 px-5 z-10 flex justify-center">
+      <article
+        className="sticky px-5 z-10 flex justify-center"
+        style={{ bottom: 'var(--navbar-margin-bottom)' }}
+      >
         <Button
           onClick={handleSubmitClick}
           btnName="리뷰 등록"

@@ -97,9 +97,12 @@ export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
 
   return (
     <div
-      className={`fixed-content  w-full max-w-2xl px-4 z-10 transition-all duration-500 ease-out ${
-        isVisible ? 'bottom-[6.7rem]' : 'bottom-8'
-      }`}
+      className="fixed-content w-full max-w-2xl px-4 z-10 transition-all duration-500 ease-out"
+      style={{
+        bottom: isVisible
+          ? 'calc(var(--navbar-total-space) + 8px)'
+          : 'calc(var(--safe-area-bottom, 32px) + 8px)',
+      }}
     >
       <div className="bg-[#f6f6f6] py-2 px-3 rounded-lg shadow-md flex items-center">
         <div className="flex-grow flex items-center">
