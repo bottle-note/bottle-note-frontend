@@ -92,8 +92,16 @@ export default function ShareBottomSheet({
       linkUrl: config.linkUrl,
     });
 
+    // 네이티브 채널 미구현 시 폴백
+    const fallbackTimer = setTimeout(() => {
+      if (!isResolved) {
+        isResolved = true;
+        setShowFallback(true);
+      }
+    }, 500);
+
     return () => {
-      // Cleanup callbacks
+      clearTimeout(fallbackTimer);
       window.onShareSuccess = () => {};
       window.onShareError = () => {};
       window.onShareCancel = () => {};

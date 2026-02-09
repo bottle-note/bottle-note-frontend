@@ -24,18 +24,3 @@ export interface ShareConfig {
   /** 카카오톡 버튼 텍스트 (기본값: '자세히 보기') */
   buttonTitle?: string;
 }
-
-// 공유 결과
-export interface ShareResult {
-  success: boolean;
-  channel: ShareChannel;
-  error?: string;
-}
-
-// 공유 Analytics 이벤트
-export interface ShareAnalyticsEvent {
-  contentType: ShareContentType;
-  contentId: string;
-  channel: ShareChannel;
-  platform: SharePlatform;
-}
