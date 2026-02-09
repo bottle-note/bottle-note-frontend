@@ -175,7 +175,7 @@ export default function ShareBottomSheet({
 
   return (
     <BackDrop isShow={isOpen} onBackdropClick={onClose}>
-      <div className="content-container h-full flex flex-col justify-end items-center px-4 gap-3 pb-7">
+      <div className="content-container h-full flex flex-col justify-end items-center px-4 gap-3 pb-navbar">
         <section className="w-full bg-white rounded-xl divide-y overflow-hidden">
           <article className="py-4 text-center text-mainGray text-sm">
             공유하기
