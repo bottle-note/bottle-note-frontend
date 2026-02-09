@@ -51,6 +51,7 @@ export default function ShareBottomSheet({
       if (isResolved) return;
       isResolved = true;
 
+      setShowFallback(false);
       trackShareEvent({
         contentType: config.type,
         contentId: config.contentId,
@@ -74,7 +75,7 @@ export default function ShareBottomSheet({
       if (isResolved) return;
       isResolved = true;
 
-      // User cancelled, just close
+      setShowFallback(false);
       onClose();
     };
 
@@ -92,8 +93,15 @@ export default function ShareBottomSheet({
       linkUrl: config.linkUrl,
     });
 
+    // 네이티브 채널 미구현 시 폴백 (콜백이 오면 여전히 수용)
+    const fallbackTimer = setTimeout(() => {
+      if (!isResolved) {
+        setShowFallback(true);
+      }
+    }, 500);
+
     return () => {
-      // Cleanup callbacks
+      clearTimeout(fallbackTimer);
       window.onShareSuccess = () => {};
       window.onShareError = () => {};
       window.onShareCancel = () => {};

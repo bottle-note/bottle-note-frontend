@@ -37,22 +37,6 @@ export function trackShareEvent(params: ShareEventParams): void {
 }
 
 /**
- * 공유 링크 클릭 추적 (UTM 생성용)
- */
-export function createShareUrl(
-  baseUrl: string,
-  contentType: ShareContentType,
-  contentId: string,
-  channel: ShareChannel,
-): string {
-  const url = new URL(baseUrl);
-  url.searchParams.set('utm_source', 'share');
-  url.searchParams.set('utm_medium', channel);
-  url.searchParams.set('utm_content', `${contentType}_${contentId}`);
-  return url.toString();
-}
-
-/**
  * 플랫폼 감지
  */
 export function detectPlatform(): SharePlatform {
