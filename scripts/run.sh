@@ -41,10 +41,14 @@ if [ "$ENV" = "local" ]; then
   fi
 fi
 
-# env 파일 존재 확인
+# env 파일 존재 확인: 환경별 파일 → .env 폴백 (CI에서 .env로 생성하는 경우)
 if [ ! -f "$ENV_FILE" ]; then
-  echo "❌ $ENV_FILE not found. Set up environment variables first."
-  exit 1
+  if [ -f ".env" ]; then
+    ENV_FILE=".env"
+  else
+    echo "❌ $ENV_FILE not found. Set up environment variables first."
+    exit 1
+  fi
 fi
 
 # Next.js 명령 실행
