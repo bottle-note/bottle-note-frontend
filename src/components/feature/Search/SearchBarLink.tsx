@@ -22,8 +22,8 @@ export default function SearchBarLink({
 
   const handleNavigate = () => {
     const params = new URLSearchParams();
-    if (keyword) params.set('keyword', encodeURIComponent(keyword));
-    if (returnUrl) params.set('returnUrl', encodeURIComponent(returnUrl));
+    if (keyword) params.set('keyword', keyword);
+    if (returnUrl) params.set('returnUrl', returnUrl);
 
     const queryString = params.toString();
     const targetUrl = queryString
