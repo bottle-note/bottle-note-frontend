@@ -38,6 +38,7 @@ class ApiClient {
     } = options;
 
     const headers = new Headers(fetchOptions.headers);
+
     const session = await getSession();
 
     if (authRequired) {
