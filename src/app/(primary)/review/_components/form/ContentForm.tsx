@@ -72,8 +72,8 @@ export default function ContentForm() {
     <article>
       <textarea
         {...register('review')}
-        placeholder="이 위스키에 대한 리뷰를 작성해보세요. (최대 700자)"
-        className="text-16 w-full h-48"
+        placeholder={`위스키 리뷰를 작성해보세요. (작성 완료 후 공개/비공개 여부를 변경할 수 있습니다.)`}
+        className="text-16 w-full h-48 placeholder:text-14"
         maxLength={700}
       />
       <div className="flex justify-between items-center mt-1">

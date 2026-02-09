@@ -10,7 +10,7 @@ declare global {
     FlutterMessageQueue: {
       postMessage: (message: string, args?: any) => any;
     };
-     LogToFlutter: {
+    LogToFlutter: {
       postMessage: (payload: string) => any;
     };
     getDeviceToken: (
@@ -18,16 +18,19 @@ declare global {
       platform: string,
     ) => { deviceToken: string; platform: string };
     checkIsInApp: (status: string) => boolean;
-    checkPlatform: (platform:string) => string;
-    openAlbum:(imageDataBase64: string) => void; 
+    checkPlatform: (platform: string) => string;
+    openAlbum: (imageDataBase64: string) => void;
     sendLogToFlutter: (log: string) => void;
-    onKakaoLoginSuccess:(email: string) => Promise<void>;
-    onKakaoLoginError:(error: string) => void;
-    onAppleLoginSuccess:(data: string) => Promise<void>;
-    onAppleLoginError:(error: string) => void;
-    isInApp: boolean = false;
+    onKakaoLoginSuccess: (email: string) => Promise<void>;
+    onKakaoLoginError: (error: string) => void;
+    onAppleLoginSuccess: (data: string) => Promise<void>;
+    onAppleLoginError: (error: string) => void;
+    onShareSuccess: () => void;
+    onShareError: (error: string) => void;
+    onShareCancel: () => void;
+    isInApp: boolean;
     deviceToken: string;
-    platform: string
+    platform: string;
   }
 
   declare module '*.svg' {

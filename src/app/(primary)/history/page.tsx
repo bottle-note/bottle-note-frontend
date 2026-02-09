@@ -115,8 +115,10 @@ export default function History() {
 
   useEffect(() => {
     setKeyword(urlKeyword);
-    handleFilterChange();
-  }, [urlKeyword]);
+    if (currentUserInfo?.id) {
+      handleFilterChange();
+    }
+  }, [urlKeyword, currentUserInfo?.id]);
 
   const handleReset = () => {
     resetFilter();
