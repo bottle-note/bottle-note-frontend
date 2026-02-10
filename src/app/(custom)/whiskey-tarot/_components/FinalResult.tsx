@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { AlcoholDetailsResponse } from '@/api/alcohol/types';
 
-import ShareBottomSheet from './ShareBottomSheet';
+import TarotShareDropdown from './TarotShareDropdown';
 import { WhiskyRecommend } from '../_types';
 
 interface FinalResultProps {
@@ -204,7 +204,7 @@ export default function FinalResult({
       </div>
 
       {/* 공유 바텀시트 - 1단계: 진입점 공유만 */}
-      <ShareBottomSheet
+      <TarotShareDropdown
         isOpen={isShareSheetOpen}
         onClose={() => setIsShareSheetOpen(false)}
       />
