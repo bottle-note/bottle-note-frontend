@@ -1,0 +1,35 @@
+name: Claude 코드 리뷰
+
+on:
+  pull_request:
+    branches: [dev, develop, main, release]
+    types: [opened, synchronize]
+
+concurrency:
+  group: 'claude-review-${{ github.event.pull_request.number }}'
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: 코드 리뷰
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    timeout-minutes: 10
+
+    steps:
+      - name: 소스 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Claude 코드 리뷰 실행
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Review this PR following the instructions in .github/copilot-instructions.md.
+            Read that file first, then review only the changed files.
+            Do NOT review files in the IGNORE list.
+            Use the severity prefixes and comment format defined in the instructions.
+          claude_args: '--max-turns 5'
