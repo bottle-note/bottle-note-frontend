@@ -84,7 +84,15 @@ export default function ShareBottomSheet({
     window.onShareCancel = handleCancel;
 
     // Trigger native share
+    const MAX_DESCRIPTION_LENGTH = 80;
+    const description =
+      config.description.length > MAX_DESCRIPTION_LENGTH
+        ? `${config.description.slice(0, MAX_DESCRIPTION_LENGTH)}...`
+        : config.description;
+
     handleWebViewMessage('share', {
+      title: config.title,
+      description,
       linkUrl: config.linkUrl,
     });
 

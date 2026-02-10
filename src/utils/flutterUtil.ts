@@ -57,6 +57,8 @@ type WebViewMessageType = {
   share: {
     message: 'share';
     args: {
+      title: string;
+      description: string;
       linkUrl: string;
     };
   };
