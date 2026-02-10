@@ -57,11 +57,6 @@ type WebViewMessageType = {
   share: {
     message: 'share';
     args: {
-      type: 'review' | 'whisky' | 'event';
-      contentId: string;
-      title: string;
-      description: string;
-      imageUrl: string;
       linkUrl: string;
     };
   };

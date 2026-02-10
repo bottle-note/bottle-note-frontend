@@ -66,14 +66,7 @@ export async function generateMetadata({
         url: canonicalUrl,
         type: 'website',
         images: alcohols.alcoholUrlImg
-          ? [
-              {
-                url: alcohols.alcoholUrlImg,
-                width: 600,
-                height: 400,
-                alt: alcohols.korName || alcohols.engName,
-              },
-            ]
+          ? [{ url: alcohols.alcoholUrlImg }]
           : undefined,
       },
       twitter: {

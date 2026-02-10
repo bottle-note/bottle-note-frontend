@@ -65,14 +65,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         type: 'article',
         publishedTime: reviewInfo.createAt,
         authors: [reviewInfo.userInfo.nickName],
-        images: [
-          {
-            url: imageUrl,
-            width: 1200,
-            height: 630,
-            alt: `${alcoholInfo.korName} 리뷰 이미지`,
-          },
-        ],
+        images: [{ url: imageUrl }],
       },
       twitter: {
         card: 'summary_large_image',

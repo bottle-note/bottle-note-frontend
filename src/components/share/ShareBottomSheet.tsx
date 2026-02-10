@@ -85,11 +85,6 @@ export default function ShareBottomSheet({
 
     // Trigger native share
     handleWebViewMessage('share', {
-      type: config.type,
-      contentId: config.contentId,
-      title: config.title,
-      description: config.description,
-      imageUrl: config.imageUrl,
       linkUrl: config.linkUrl,
     });
 
