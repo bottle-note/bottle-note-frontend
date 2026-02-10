@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import BackDrop from '@/components/ui/Modal/BackDrop';
+import OptionDropdown from '@/components/ui/Modal/OptionDropdown';
 import { useKakaoShare } from '@/hooks/share/useKakaoShare';
 import { useLinkShare } from '@/hooks/share/useLinkShare';
 import useModalStore from '@/store/modalStore';
@@ -10,27 +10,25 @@ import type { ShareConfig, ShareChannel } from '@/types/share';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { trackShareEvent, detectPlatform } from '@/utils/share/shareAnalytics';
 
-interface ShareBottomSheetProps {
+interface ShareDropdownProps {
   isOpen: boolean;
   onClose: () => void;
   config: ShareConfig;
   onShare?: (channel: ShareChannel, success: boolean) => void;
 }
 
-export default function ShareBottomSheet({
+export default function ShareDropdown({
   isOpen,
   onClose,
   config,
   onShare,
-}: ShareBottomSheetProps) {
+}: ShareDropdownProps) {
   const { handleModalState } = useModalStore();
   const [showFallback, setShowFallback] = useState(false);
 
-  // Check if running in app
   const isInApp = typeof window !== 'undefined' && window.isInApp;
   const platform = detectPlatform();
 
-  // 모듈화된 공유 훅 사용
   const { shareToKakao, isLoading: isKakaoLoading } = useKakaoShare({
     preload: isOpen,
   });
@@ -43,10 +41,8 @@ export default function ShareBottomSheet({
       return;
     }
 
-    // 앱에서는 네이티브 콜백(success/error/cancel)을 신뢰
     let isResolved = false;
 
-    // Register callbacks
     const handleSuccess = () => {
       if (isResolved) return;
       isResolved = true;
@@ -67,7 +63,6 @@ export default function ShareBottomSheet({
       if (isResolved) return;
       isResolved = true;
 
-      // Show fallback bottom sheet
       setShowFallback(true);
     };
 
@@ -96,7 +91,7 @@ export default function ShareBottomSheet({
       linkUrl: config.linkUrl,
     });
 
-    // 네이티브 채널 미구현 시 폴백 (콜백이 오면 여전히 수용)
+    // 네이티브 채널 미구현 시 폴백
     const fallbackTimer = setTimeout(() => {
       if (!isResolved) {
         setShowFallback(true);
@@ -130,16 +125,14 @@ export default function ShareBottomSheet({
       success,
     });
 
-    if (success) {
-      onClose();
-    } else {
+    if (!success) {
       handleModalState({
         isShowModal: true,
         mainText: '카카오톡 공유에 실패했습니다.',
         subText: '링크 복사를 이용해주세요.',
       });
     }
-  }, [shareToKakao, config, platform, onClose, handleModalState, onShare]);
+  }, [shareToKakao, config, platform, handleModalState, onShare]);
 
   const handleCopyLink = useCallback(async () => {
     const success = await copyLink(config.linkUrl);
@@ -160,7 +153,6 @@ export default function ShareBottomSheet({
         mainText: '링크가 복사되었습니다.',
         subText: '친구에게 공유해보세요!',
       });
-      onClose();
     } else {
       handleModalState({
         isShowModal: true,
@@ -168,44 +160,45 @@ export default function ShareBottomSheet({
         subText: '',
       });
     }
-  }, [copyLink, config, platform, onClose, handleModalState, onShare]);
+  }, [copyLink, config, platform, handleModalState, onShare]);
+
+  const handleOptionSelect = useCallback(
+    (option: { type: string }) => {
+      if (option.type === 'kakao') {
+        handleKakaoShare();
+      } else if (option.type === 'link') {
+        handleCopyLink();
+      }
+    },
+    [handleKakaoShare, handleCopyLink],
+  );
+
+  const options = useMemo(() => {
+    const list: { type: string; name: string }[] = [];
+
+    if (!showFallback) {
+      list.push({
+        type: 'kakao',
+        name: isKakaoLoading ? '로딩 중...' : '카카오톡으로 공유',
+      });
+    }
+
+    list.push({ type: 'link', name: '링크 복사' });
+
+    return list;
+  }, [showFallback, isKakaoLoading]);
 
   // In app: don't show anything until fallback is needed
   if (isInApp && !showFallback) return null;
 
-  // Web or app fallback: show bottom sheet
   if (!isOpen) return null;
 
   return (
-    <BackDrop isShow={isOpen} onBackdropClick={onClose}>
-      <div className="content-container h-full flex flex-col justify-end items-center px-4 gap-3 pb-navbar">
-        <section className="w-full bg-white rounded-xl divide-y overflow-hidden">
-          <article className="py-4 text-center text-mainGray text-sm">
-            공유하기
-          </article>
-
-          {!showFallback && (
-            <button
-              onClick={handleKakaoShare}
-              disabled={isKakaoLoading}
-              className="block w-full py-4 text-center text-subCoral disabled:opacity-50"
-            >
-              {isKakaoLoading ? '로딩 중...' : '카카오톡으로 공유'}
-            </button>
-          )}
-
-          <button
-            onClick={handleCopyLink}
-            className="block w-full py-4 text-center text-subCoral"
-          >
-            링크 복사
-          </button>
-        </section>
-
-        <button className="w-full bg-white rounded-xl py-4" onClick={onClose}>
-          닫기
-        </button>
-      </div>
-    </BackDrop>
+    <OptionDropdown
+      handleClose={onClose}
+      options={options}
+      handleOptionSelect={handleOptionSelect}
+      title="공유하기"
+    />
   );
 }
