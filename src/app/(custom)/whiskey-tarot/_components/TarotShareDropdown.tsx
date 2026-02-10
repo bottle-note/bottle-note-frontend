@@ -1,9 +1,9 @@
 'use client';
 
-import ShareBottomSheet from '@/components/share/ShareBottomSheet';
+import ShareDropdown from '@/components/share/ShareDropdown';
 import type { ShareConfig, ShareChannel } from '@/types/share';
 
-interface TarotShareBottomSheetProps {
+interface TarotShareDropdownProps {
   isOpen: boolean;
   onClose: () => void;
 }
@@ -16,10 +16,10 @@ const SHARE_CONFIG: Omit<ShareConfig, 'linkUrl' | 'imageUrl'> = {
   buttonTitle: '타로 보러 가기',
 };
 
-export default function TarotShareBottomSheet({
+export default function TarotShareDropdown({
   isOpen,
   onClose,
-}: TarotShareBottomSheetProps) {
+}: TarotShareDropdownProps) {
   const shareUrl =
     typeof window !== 'undefined'
       ? `${window.location.origin}/whiskey-tarot`
@@ -40,7 +40,7 @@ export default function TarotShareBottomSheet({
   };
 
   return (
-    <ShareBottomSheet
+    <ShareDropdown
       isOpen={isOpen}
       onClose={onClose}
       config={config}
