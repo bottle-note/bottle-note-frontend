@@ -78,12 +78,16 @@ export default function ShareDropdown({
     window.onShareError = handleError;
     window.onShareCancel = handleCancel;
 
+    // Trigger native share
+    const MAX_DESCRIPTION_LENGTH = 80;
+    const description =
+      config.description.length > MAX_DESCRIPTION_LENGTH
+        ? `${config.description.slice(0, MAX_DESCRIPTION_LENGTH)}...`
+        : config.description;
+
     handleWebViewMessage('share', {
-      type: config.type,
-      contentId: config.contentId,
       title: config.title,
-      description: config.description,
-      imageUrl: config.imageUrl,
+      description,
       linkUrl: config.linkUrl,
     });
 
