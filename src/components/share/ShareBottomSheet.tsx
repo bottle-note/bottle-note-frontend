@@ -51,6 +51,7 @@ export default function ShareBottomSheet({
       if (isResolved) return;
       isResolved = true;
 
+      setShowFallback(false);
       trackShareEvent({
         contentType: config.type,
         contentId: config.contentId,
@@ -74,7 +75,7 @@ export default function ShareBottomSheet({
       if (isResolved) return;
       isResolved = true;
 
-      // User cancelled, just close
+      setShowFallback(false);
       onClose();
     };
 
@@ -92,8 +93,15 @@ export default function ShareBottomSheet({
       linkUrl: config.linkUrl,
     });
 
+    // 네이티브 채널 미구현 시 폴백 (콜백이 오면 여전히 수용)
+    const fallbackTimer = setTimeout(() => {
+      if (!isResolved) {
+        setShowFallback(true);
+      }
+    }, 500);
+
     return () => {
-      // Cleanup callbacks
+      clearTimeout(fallbackTimer);
       window.onShareSuccess = () => {};
       window.onShareError = () => {};
       window.onShareCancel = () => {};
@@ -167,19 +175,21 @@ export default function ShareBottomSheet({
 
   return (
     <BackDrop isShow={isOpen} onBackdropClick={onClose}>
-      <div className="content-container h-full flex flex-col justify-end items-center px-4 gap-3 pb-7">
+      <div className="content-container h-full flex flex-col justify-end items-center px-4 gap-3 pb-navbar">
         <section className="w-full bg-white rounded-xl divide-y overflow-hidden">
           <article className="py-4 text-center text-mainGray text-sm">
             공유하기
           </article>
 
-          <button
-            onClick={handleKakaoShare}
-            disabled={isKakaoLoading}
-            className="block w-full py-4 text-center text-subCoral disabled:opacity-50"
-          >
-            {isKakaoLoading ? '로딩 중...' : '카카오톡으로 공유'}
-          </button>
+          {!showFallback && (
+            <button
+              onClick={handleKakaoShare}
+              disabled={isKakaoLoading}
+              className="block w-full py-4 text-center text-subCoral disabled:opacity-50"
+            >
+              {isKakaoLoading ? '로딩 중...' : '카카오톡으로 공유'}
+            </button>
+          )}
 
           <button
             onClick={handleCopyLink}

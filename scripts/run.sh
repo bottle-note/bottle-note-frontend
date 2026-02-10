@@ -27,28 +27,50 @@ case $ENV in
     ;;
 esac
 
-# 서브모듈 초기화 (없으면)
-if [ ! -f "$SOPS_FILE" ]; then
-  echo "📦 Initializing git submodule..."
-  git submodule update --init --remote
+# local 환경에서만 서브모듈 초기화 및 환경변수 자동 세팅
+# dev/prod는 CI에서 별도로 env를 관리하므로 건너뜀
+if [ "$ENV" = "local" ]; then
+  if [ ! -f "$SOPS_FILE" ]; then
+    echo "📦 Initializing git submodule..."
+    git submodule update --init --remote
+  fi
+
+  if [ ! -f "$ENV_FILE" ] || [ "$SOPS_FILE" -nt "$ENV_FILE" ]; then
+    echo "🔐 Decrypting $ENV environment..."
+    sops -d "$SOPS_FILE" > "$ENV_FILE"
+  fi
 fi
 
-# 환경변수 복호화 (파일이 없거나 sops 파일이 더 최신이면)
-if [ ! -f "$ENV_FILE" ] || [ "$SOPS_FILE" -nt "$ENV_FILE" ]; then
-  echo "🔐 Decrypting $ENV environment..."
-  sops -d "$SOPS_FILE" > "$ENV_FILE"
+# env 파일 존재 확인: 환경별 파일 → .env 폴백 → 시스템 환경변수 폴백
+USE_ENV_CMD=true
+if [ ! -f "$ENV_FILE" ]; then
+  if [ -f ".env" ]; then
+    ENV_FILE=".env"
+  else
+    # CI 환경에서 시스템 환경변수가 이미 주입된 경우 env-cmd 없이 실행
+    echo "⚠️  $ENV_FILE not found. Using system environment variables."
+    USE_ENV_CMD=false
+  fi
 fi
 
 # Next.js 명령 실행
+run_next() {
+  if [ "$USE_ENV_CMD" = true ]; then
+    npx env-cmd -f "$ENV_FILE" next "$@"
+  else
+    npx next "$@"
+  fi
+}
+
 case $COMMAND in
   dev)
-    npx env-cmd -f "$ENV_FILE" next dev
+    run_next dev
     ;;
   build)
-    npx env-cmd -f "$ENV_FILE" next build
+    run_next build
     ;;
   start)
-    npx env-cmd -f "$ENV_FILE" next start
+    run_next start
     ;;
   *)
     echo "Unknown command: $COMMAND (use: dev, build, start)"
