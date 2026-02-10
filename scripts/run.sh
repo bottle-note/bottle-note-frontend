@@ -41,26 +41,36 @@ if [ "$ENV" = "local" ]; then
   fi
 fi
 
-# env 파일 존재 확인: 환경별 파일 → .env 폴백 (CI에서 .env로 생성하는 경우)
+# env 파일 존재 확인: 환경별 파일 → .env 폴백 → 시스템 환경변수 폴백
+USE_ENV_CMD=true
 if [ ! -f "$ENV_FILE" ]; then
   if [ -f ".env" ]; then
     ENV_FILE=".env"
   else
-    echo "❌ $ENV_FILE not found. Set up environment variables first."
-    exit 1
+    # CI 환경에서 시스템 환경변수가 이미 주입된 경우 env-cmd 없이 실행
+    echo "⚠️  $ENV_FILE not found. Using system environment variables."
+    USE_ENV_CMD=false
   fi
 fi
 
 # Next.js 명령 실행
+run_next() {
+  if [ "$USE_ENV_CMD" = true ]; then
+    npx env-cmd -f "$ENV_FILE" next "$@"
+  else
+    npx next "$@"
+  fi
+}
+
 case $COMMAND in
   dev)
-    npx env-cmd -f "$ENV_FILE" next dev
+    run_next dev
     ;;
   build)
-    npx env-cmd -f "$ENV_FILE" next build
+    run_next build
     ;;
   start)
-    npx env-cmd -f "$ENV_FILE" next start
+    run_next start
     ;;
   *)
     echo "Unknown command: $COMMAND (use: dev, build, start)"
