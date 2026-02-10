@@ -1,6 +1,6 @@
 'use client';
 
-import ShareBottomSheet from '@/components/share/ShareBottomSheet';
+import ShareDropdown from '@/components/share/ShareDropdown';
 import type { ShareConfig, ShareChannel } from '@/types/share';
 
 interface TarotShareBottomSheetProps {
@@ -40,7 +40,7 @@ export default function TarotShareBottomSheet({
   };
 
   return (
-    <ShareBottomSheet
+    <ShareDropdown
       isOpen={isOpen}
       onClose={onClose}
       config={config}
