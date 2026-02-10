@@ -27,7 +27,7 @@ import AlcoholDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/Alc
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import useDebounceAction from '@/hooks/useDebounceAction';
-import ShareBottomSheet from '@/components/share/ShareBottomSheet';
+import ShareDropdown from '@/components/share/ShareDropdown';
 import type { ShareConfig, ShareChannel } from '@/types/share';
 import FloatingReviewButton from './_components/FloatingReviewButton';
 import AlcoholDetailHeader from './_components/AlcoholDetailHeader';
@@ -384,7 +384,7 @@ export default function SearchAlcohol() {
           </>
         )}
         {shareConfig && (
-          <ShareBottomSheet
+          <ShareDropdown
             isOpen={isShareOpen}
             onClose={() => setIsShareOpen(false)}
             config={shareConfig}

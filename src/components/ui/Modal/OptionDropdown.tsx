@@ -14,8 +14,8 @@ export default function OptionDropdown({
   title = '정렬',
 }: Props) {
   return (
-    <BackDrop isShow>
-      <div className="content-container h-full flex flex-col justify-end items-center px-4 gap-3 pb-safe">
+    <BackDrop isShow onBackdropClick={handleClose}>
+      <div className="content-container absolute bottom-0 left-0 right-0 flex flex-col items-center px-4 gap-3 pb-safe">
         <section className="w-full bg-white rounded-xl divide-y max-h-[400px] overflow-y-scroll">
           <article className="py-4 text-center text-mainGray text-sm">
             {title}

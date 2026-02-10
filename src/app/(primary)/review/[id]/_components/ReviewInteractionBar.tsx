@@ -1,7 +1,7 @@
 import { useState, useMemo, type MutableRefObject } from 'react';
 import Image from 'next/image';
 import ReviewLikeButton from '@/components/domain/review/ReviewLikeButton';
-import ShareBottomSheet from '@/components/share/ShareBottomSheet';
+import ShareDropdown from '@/components/share/ShareDropdown';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { useAuth } from '@/hooks/auth/useAuth';
 import type { ShareConfig, ShareChannel } from '@/types/share';
@@ -122,8 +122,7 @@ export default function ReviewInteractionBar({
         <p className="text-mainGray font-bold text-13">공유</p>
       </button>
 
-      {/* ShareBottomSheet */}
-      <ShareBottomSheet
+      <ShareDropdown
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
         config={shareConfig}
