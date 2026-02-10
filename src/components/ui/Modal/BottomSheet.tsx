@@ -18,7 +18,11 @@ export default function BottomSheet({
   className = '',
 }: BottomSheetProps) {
   return (
-    <Drawer.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Drawer.Root
+      open={isOpen}
+      onOpenChange={(open) => !open && onClose()}
+      repositionInputs={false}
+    >
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 z-40 bg-black/60" />
         <Drawer.Content
