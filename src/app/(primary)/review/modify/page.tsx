@@ -1,20 +1,23 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FormValues } from '@/types/Review';
-import { ReviewApi } from '@/api/review/review.api';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import { useAlcoholDetails } from '@/app/(primary)/review/hook/useAlcoholDetails';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import { useReviewSubmission } from '@/app/(primary)/review/hook/useReviewSubmission';
 import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
+import { parseApiError } from '@/hooks/parseApiError';
+import { useReviewDetailQuery } from '@/queries/useReviewDetailQuery';
 import Button from '@/components/ui/Button/Button';
 import useModalStore from '@/store/modalStore';
 import Loading from '@/components/ui/Loading/Loading';
+import ReviewDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/ReviewDetailsSkeleton';
+import ErrorFallback from '@/components/ui/Display/ErrorFallback';
 import ReviewForm from '../_components/form/ReviewForm';
 import ReviewHeaderLayout from '../_components/ReviewHeaderLayout';
 
@@ -24,8 +27,19 @@ function ReviewModify() {
   const { isProcessing, executeApiCall } = useSingleApiCall();
   const searchParams = useSearchParams();
   const reviewId = searchParams.get('reviewId');
-  const [alcoholId, setAlcoholId] = useState<string>('');
-  const [initialRating, setInitialRating] = useState<number>(0);
+
+  const {
+    data: reviewData,
+    error,
+    isLoading,
+    refetch,
+  } = useReviewDetailQuery({ reviewId: reviewId ?? undefined });
+
+  const errorInfo = parseApiError(error);
+
+  const alcoholId = reviewData?.alcoholInfo.alcoholId.toString() ?? '';
+  const initialRating = reviewData?.reviewInfo.rating ?? 0;
+
   const { alcoholData } = useAlcoholDetails(alcoholId, 'modify');
 
   const formMethods = useForm<FormValues>({
@@ -51,35 +65,28 @@ function ReviewModify() {
     await executeApiCall(() => submitReview(data, originImgUrlList));
   };
 
+  // 리뷰 데이터로 폼 초기화
   useEffect(() => {
-    const fetchReviewDetails = async () => {
-      if (reviewId) {
-        const response = await ReviewApi.getReviewDetails(reviewId);
-        const { reviewInfo, reviewImageList } = response.data;
-        const locationInfo = reviewInfo.locationInfo || {};
+    if (!reviewData) return;
 
-        setAlcoholId(response.data.alcoholInfo.alcoholId.toString());
-        setInitialRating(reviewInfo.rating);
+    const { reviewInfo, reviewImageList } = reviewData;
+    const locationInfo = reviewInfo.locationInfo || {};
 
-        reset({
-          review: reviewInfo.reviewContent,
-          status: reviewInfo.status || 'PUBLIC',
-          price_type: reviewInfo.sizeType || null,
-          price: reviewInfo.price || null,
-          flavor_tags: reviewInfo.tastingTagList || [],
-          images: null,
-          imageUrlList: reviewImageList || [],
-          rating: reviewInfo.rating || 0,
-          locationName: locationInfo.name,
-          address: locationInfo.address,
-          detailAddress: locationInfo.detailAddress || null,
-          mapUrl: locationInfo.mapUrl || null,
-        });
-      }
-    };
-
-    fetchReviewDetails();
-  }, [reviewId, reset]);
+    reset({
+      review: reviewInfo.reviewContent,
+      status: reviewInfo.status || 'PUBLIC',
+      price_type: reviewInfo.sizeType || null,
+      price: reviewInfo.price || null,
+      flavor_tags: reviewInfo.tastingTagList || [],
+      images: null,
+      imageUrlList: reviewImageList || [],
+      rating: reviewInfo.rating || 0,
+      locationName: locationInfo.name,
+      address: locationInfo.address,
+      detailAddress: locationInfo.detailAddress || null,
+      mapUrl: locationInfo.mapUrl || null,
+    });
+  }, [reviewData, reset]);
 
   const { showErrorModal } = useErrorModal<FormValues>(errors);
 
@@ -103,6 +110,20 @@ function ReviewModify() {
       router.back();
     }
   };
+
+  if (isLoading) {
+    return <ReviewDetailsSkeleton />;
+  }
+
+  if (errorInfo) {
+    return (
+      <ErrorFallback
+        message="리뷰를 불러오는데 실패했습니다."
+        onBack={() => router.back()}
+        onRetry={errorInfo.status !== 404 ? () => refetch() : undefined}
+      />
+    );
+  }
 
   return (
     <FormProvider {...formMethods}>
