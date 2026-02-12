@@ -16,7 +16,7 @@ function ErrorFallback({
     <div className="h-[calc(100vh-120px)] flex flex-col justify-center items-center gap-5">
       <Image
         src="/icon/logo-subcoral.svg"
-        alt="bottle_logo"
+        alt=""
         width={50}
         height={60}
         style={{ width: 50, height: 60 }}
@@ -29,6 +29,7 @@ function ErrorFallback({
         <div className="flex gap-3 mt-2">
           {onBack && (
             <button
+              type="button"
               onClick={onBack}
               className="px-5 py-2 border border-mainGray text-mainGray rounded-lg text-13"
             >
@@ -37,6 +38,7 @@ function ErrorFallback({
           )}
           {onRetry && (
             <button
+              type="button"
               onClick={onRetry}
               className="px-5 py-2 bg-mainCoral text-white rounded-lg text-13"
             >

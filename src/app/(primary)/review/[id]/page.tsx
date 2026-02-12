@@ -19,7 +19,7 @@ import { generateReviewSchema } from '@/utils/seo/generateReviewSchema';
 import NavLayout from '@/components/ui/Layout/NavLayout';
 import useModalStore from '@/store/modalStore';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
-import { useApiError } from '@/hooks/useApiError';
+import { parseApiError } from '@/hooks/parseApiError';
 import { useReviewDetailQuery } from '@/queries/useReviewDetailQuery';
 import ErrorFallback from '@/components/ui/Display/ErrorFallback';
 import ReviewDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/ReviewDetailsSkeleton';
@@ -57,7 +57,7 @@ export default function ReviewDetail() {
       }
     : null;
 
-  const errorInfo = useApiError(error);
+  const errorInfo = parseApiError(error);
   const errorMessage =
     errorInfo?.status === 404
       ? '삭제되었거나 존재하지 않는 리뷰입니다.'

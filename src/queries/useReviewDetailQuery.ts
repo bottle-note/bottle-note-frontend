@@ -18,14 +18,18 @@ export const useReviewDetailQuery = ({
   reviewId,
 }: UseReviewDetailQueryOptions) => {
   const id = Array.isArray(reviewId) ? reviewId[0] : reviewId;
+  const hasId = typeof id === 'string' && id.length > 0;
 
   return useQuery({
-    queryKey: reviewDetailKeys.detail(id ?? ''),
+    queryKey: reviewDetailKeys.detail(hasId ? id : 'disabled'),
     queryFn: async (): Promise<ReviewDetailsResponse> => {
-      const response = await ReviewApi.getReviewDetails(id!);
+      if (!hasId) {
+        throw new Error('Cannot fetch review details: reviewId is missing.');
+      }
+      const response = await ReviewApi.getReviewDetails(id);
       return response.data;
     },
-    enabled: !!id,
+    enabled: hasId,
     retry: false,
     staleTime: 0,
   });

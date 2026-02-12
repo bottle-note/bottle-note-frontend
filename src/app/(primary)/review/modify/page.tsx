@@ -11,7 +11,7 @@ import { useAlcoholDetails } from '@/app/(primary)/review/hook/useAlcoholDetails
 import { useErrorModal } from '@/hooks/useErrorModal';
 import { useReviewSubmission } from '@/app/(primary)/review/hook/useReviewSubmission';
 import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
-import { useApiError } from '@/hooks/useApiError';
+import { parseApiError } from '@/hooks/parseApiError';
 import { useReviewDetailQuery } from '@/queries/useReviewDetailQuery';
 import Button from '@/components/ui/Button/Button';
 import useModalStore from '@/store/modalStore';
@@ -35,7 +35,7 @@ function ReviewModify() {
     refetch,
   } = useReviewDetailQuery({ reviewId: reviewId ?? undefined });
 
-  const errorInfo = useApiError(error);
+  const errorInfo = parseApiError(error);
 
   const alcoholId = reviewData?.alcoholInfo.alcoholId.toString() ?? '';
   const initialRating = reviewData?.reviewInfo.rating ?? 0;

@@ -8,11 +8,11 @@ interface ApiErrorInfo {
 }
 
 /**
- * API 에러 객체에서 HTTP 상태 코드와 메시지를 추출하는 훅
+ * API 에러 객체에서 HTTP 상태 코드와 메시지를 추출하는 유틸리티
  *
  * @example
  * const { data, error } = useQuery(...);
- * const errorInfo = useApiError(error);
+ * const errorInfo = parseApiError(error);
  *
  * if (errorInfo) {
  *   const isDeleted = errorInfo.status === 404;
@@ -20,7 +20,7 @@ interface ApiErrorInfo {
  *   // errorInfo.message -> 에러 메시지
  * }
  */
-export const useApiError = (
+export const parseApiError = (
   error: Error | null | undefined,
 ): ApiErrorInfo | null => {
   if (!error) return null;
