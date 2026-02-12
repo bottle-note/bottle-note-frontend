@@ -2,7 +2,7 @@ name: Claude 코드 리뷰
 
 on:
   pull_request:
-    branches: [dev, develop, main, release]
+    branches: [dev, develop]
     types: [opened, synchronize]
 
 concurrency:
