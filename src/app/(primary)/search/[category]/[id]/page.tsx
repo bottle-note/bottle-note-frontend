@@ -30,6 +30,7 @@ import useDebounceAction from '@/hooks/useDebounceAction';
 import ShareDropdown from '@/components/share/ShareDropdown';
 import type { ShareConfig, ShareChannel } from '@/types/share';
 import FloatingReviewButton from './_components/FloatingReviewButton';
+import FloatingTastingButton from './_components/FloatingTastingButton';
 import AlcoholDetailHeader from './_components/AlcoholDetailHeader';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
@@ -392,7 +393,12 @@ export default function SearchAlcohol() {
           />
         )}
         {data?.alcohols?.alcoholId && (
-          <FloatingReviewButton alcoholId={String(data.alcohols.alcoholId)} />
+          <>
+            <FloatingTastingButton
+              alcoholId={String(data.alcohols.alcoholId)}
+            />
+            <FloatingReviewButton alcoholId={String(data.alcohols.alcoholId)} />
+          </>
         )}
       </NavLayout>
     </>
