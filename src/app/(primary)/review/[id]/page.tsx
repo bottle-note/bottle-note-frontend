@@ -1,12 +1,6 @@
 'use client';
 
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  useMemo,
-} from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import * as yup from 'yup';
@@ -19,18 +13,15 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FormValues } from '@/types/Reply';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
-import { ReviewApi } from '@/api/review/review.api';
 import { ReplyApi } from '@/api/reply/reply.api';
 import JsonLd from '@/components/seo/JsonLd';
 import { generateReviewSchema } from '@/utils/seo/generateReviewSchema';
 import NavLayout from '@/components/ui/Layout/NavLayout';
-// import { shareOrCopy } from '@/utils/shareOrCopy';
-import type {
-  AlcoholInfo as AlcoholInfoType,
-  ReviewDetailsWithoutAlcoholInfo,
-} from '@/types/Review';
 import useModalStore from '@/store/modalStore';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
+import { parseApiError } from '@/hooks/parseApiError';
+import { useReviewDetailQuery } from '@/queries/useReviewDetailQuery';
+import ErrorFallback from '@/components/ui/Display/ErrorFallback';
 import ReviewDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/ReviewDetailsSkeleton';
 import ReplyForm from './_components/Reply/ReplyForm';
 import ReviewDetails from './_components/ReviewDetails';
@@ -45,14 +36,32 @@ export default function ReviewDetail() {
   const { executeApiCall } = useSingleApiCall();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const replyListRef = useRef<HTMLDivElement>(null);
-  const [alcoholInfo, setAlcoholInfo] = useState<AlcoholInfoType | null>(null);
-  const [reviewDetails, setReviewDetails] =
-    useState<ReviewDetailsWithoutAlcoholInfo | null>(null);
   const [isRefetch, setIsRefetch] = useState<boolean>(false);
   const [lastCreatedRootReplyId, setLastCreatedRootReplyId] = useState<
     number | null
   >(null);
   const [isUnmounting, setIsUnmounting] = useState(false);
+
+  const {
+    data: reviewData,
+    error,
+    isLoading,
+    refetch,
+  } = useReviewDetailQuery({ reviewId });
+
+  const alcoholInfo = reviewData?.alcoholInfo ?? null;
+  const reviewDetails = reviewData
+    ? {
+        reviewInfo: reviewData.reviewInfo,
+        reviewImageList: reviewData.reviewImageList,
+      }
+    : null;
+
+  const errorInfo = parseApiError(error);
+  const errorMessage =
+    errorInfo?.status === 404
+      ? '삭제되었거나 존재하지 않는 리뷰입니다.'
+      : '리뷰를 불러오는데 실패했습니다.';
 
   const schema = yup.object({
     content: yup.string().required('댓글 내용을 입력해주세요.'),
@@ -111,28 +120,15 @@ export default function ReviewDetail() {
     await executeApiCall(processSubmission);
   };
 
-  const fetchReviewDetails = useCallback(async () => {
-    if (!reviewId) return;
-    try {
-      const response = await ReviewApi.getReviewDetails(reviewId);
-      const { alcoholInfo, ...restData } = response.data;
-      setAlcoholInfo(alcoholInfo);
-      setReviewDetails(restData);
-    } catch (error) {
-      console.error('Failed to fetch review details:', error);
-    }
-  }, [reviewId]);
-
-  // 초기 데이터 로드
+  // 댓글 폼 초기화
   useEffect(() => {
-    fetchReviewDetails();
     reset({
       content: '',
       parentReplyId: null,
       replyToReplyUserName: null,
       rootReplyId: null,
     });
-  }, [reviewId, reset, fetchReviewDetails]);
+  }, [reviewId, reset]);
 
   useEffect(() => {
     const scrollTo = searchParams.get('scrollTo');
@@ -166,7 +162,26 @@ export default function ReviewDetail() {
   return (
     <FormProvider {...formMethods}>
       {reviewSchema && <JsonLd data={reviewSchema} />}
-      {alcoholInfo && reviewDetails ? (
+      {errorInfo ? (
+        <NavLayout>
+          <SubHeader>
+            <SubHeader.Left onClick={() => router.back()}>
+              <Image
+                src="/icon/arrow-left-subcoral.svg"
+                alt="arrowIcon"
+                width={23}
+                height={23}
+              />
+            </SubHeader.Left>
+            <SubHeader.Center>리뷰 상세보기</SubHeader.Center>
+          </SubHeader>
+          <ErrorFallback
+            message={errorMessage}
+            onBack={() => router.back()}
+            onRetry={errorInfo.status !== 404 ? () => refetch() : undefined}
+          />
+        </NavLayout>
+      ) : alcoholInfo && reviewDetails ? (
         <>
           <NavLayout>
             <div className="relative">
@@ -206,7 +221,7 @@ export default function ReviewDetail() {
               data={reviewDetails}
               alcoholId={alcoholInfo.alcoholId}
               handleLogin={handleLogin}
-              onRefresh={fetchReviewDetails}
+              onRefresh={() => refetch()}
               textareaRef={textareaRef}
             />
             <div ref={replyListRef}>
@@ -224,9 +239,9 @@ export default function ReviewDetail() {
             />
           </NavLayout>
         </>
-      ) : (
+      ) : isLoading ? (
         <ReviewDetailsSkeleton />
-      )}
+      ) : null}
     </FormProvider>
   );
 }
