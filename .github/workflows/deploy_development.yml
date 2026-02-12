@@ -32,7 +32,7 @@ jobs:
         run: |
           SHORT_SHA="${GITHUB_SHA::7}"
           echo "short-sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
-          echo "tag=dashboard_dev_${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "tag=frontend_dev_${SHORT_SHA}" >> $GITHUB_OUTPUT
 
       - name: build and push docker image
         uses: ./.github/actions/docker-build-push
@@ -40,10 +40,10 @@ jobs:
           registry-url: ${{ secrets.REGISTRY_ADDRESS }}
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-          image-name: bottlenote-admin-dashboard
+          image-name: bottlenote-frontend
           image-tag: ${{ steps.image-tag.outputs.tag }}
-          additional-tags: dashboard_dev_latest
-          cache-scope: dashboard-development
+          additional-tags: frontend_dev_latest
+          cache-scope: frontend-development
           sops-age-key: ${{ secrets.SOPS_AGE_SECRET_KEY }}
           env-file: git.environment-variables/application.next-js/dev.sops.env
           sign-image: 'true'
@@ -74,7 +74,7 @@ jobs:
 
           cd deploy/overlays/development
           kustomize edit set image \
-            bottlenote-admin-dashboard=${REGISTRY}/bottlenote-admin-dashboard:${IMAGE_TAG}
+            bottlenote-frontend=${REGISTRY}/bottlenote-frontend:${IMAGE_TAG}
 
       - name: commit and push
         env:
@@ -91,9 +91,9 @@ jobs:
             exit 0
           fi
 
-          git commit -m "chore(dev): update dashboard development image tag (${SHORT_SHA})
+          git commit -m "chore(dev): update frontend development image tag (${SHORT_SHA})
 
-          Dashboard: dashboard_dev_${SHORT_SHA}
+          Frontend: frontend_dev_${SHORT_SHA}
 
           Updated by GitHub Actions
           Commit: ${{ github.sha }}
