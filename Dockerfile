@@ -1,7 +1,7 @@
-ARG ENV_FILE=prod.sops.env
+ARG ENV_FILE=git.environment-variables/application.next-js/dev.sops.env
 FROM node:22-alpine AS base
 RUN apk add --no-cache libc6-compat gettext
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10 --activate
 WORKDIR /app
 
 FROM base AS deps
@@ -30,7 +30,7 @@ RUN --mount=type=secret,id=age_key,env=SOPS_AGE_KEY \
     sops -d ${ENV_FILE} > .env && \
     if [ ! -s .env ]; then echo "Error: .env decryption failed" && exit 1; fi
 
-RUN pnpm build
+RUN pnpm next build
 
 FROM node:22-alpine AS runner
 WORKDIR /app
