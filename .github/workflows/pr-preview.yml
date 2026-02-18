@@ -1,4 +1,4 @@
-name: Vercel Preview
+name: PR Preview
 
 on:
   pull_request:
