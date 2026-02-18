@@ -28,6 +28,13 @@ jobs:
       - name: Vercel 환경 가져오기
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
+      - name: Preview URL 환경변수 오버라이드
+        run: |
+          ALIAS_URL="https://bottle-note-pr-${{ github.event.pull_request.number }}.vercel.app"
+          echo "NEXTAUTH_URL=$ALIAS_URL" >> .vercel/.env.preview.local
+          echo "NEXT_PUBLIC_CLIENT_URL=$ALIAS_URL" >> .vercel/.env.preview.local
+          echo "CLIENT_URL=$ALIAS_URL" >> .vercel/.env.preview.local
+
       - name: 프로젝트 빌드
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
@@ -36,58 +43,45 @@ jobs:
         run: |
           URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} \
             --meta pr=${{ github.event.pull_request.number }})
+          echo "::add-mask::$URL"
           echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: PR 번호 기반 alias 설정
         run: |
+          ALIAS_URL="https://bottle-note-pr-${{ github.event.pull_request.number }}.vercel.app"
+          echo "::add-mask::$ALIAS_URL"
           vercel alias set ${{ steps.deploy.outputs.url }} \
             bottle-note-pr-${{ github.event.pull_request.number }}.vercel.app \
             --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
 
-      - name: PR에 Preview URL 코멘트
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const prNumber = context.payload.pull_request.number;
-            const aliasUrl = `https://bottle-note-pr-${prNumber}.vercel.app`;
-            const deployUrl = '${{ steps.deploy.outputs.url }}';
-            const marker = '<!-- vercel-preview-bot -->';
+      - name: Discord 배포 알림
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          AUTHOR="${{ github.event.pull_request.user.login }}"
+          ALIAS_URL="https://bottle-note-pr-${PR_NUMBER}.vercel.app"
 
-            const body = [
-              marker,
-              `### Vercel Preview`,
-              '',
-              `| Name | Link |`,
-              `|------|------|`,
-              `| **Preview** | ${aliasUrl} |`,
-              `| Deployment | ${deployUrl} |`,
-              '',
-              `> Updated: ${new Date().toISOString().slice(0, 19).replace('T', ' ')} UTC`,
-            ].join('\n');
-
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber,
-            });
-
-            const existing = comments.find(c => c.body.includes(marker));
-
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: prNumber,
-                body,
-              });
-            }
+          curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            --data-raw "$(jq -n \
+              --arg pr_text "#${PR_NUMBER} ${PR_TITLE}" \
+              --arg pr_url "$PR_URL" \
+              --arg preview_url "$ALIAS_URL" \
+              --arg author "$AUTHOR" \
+              '{
+                embeds: [{
+                  title: "✅ Vercel Preview 배포 완료",
+                  color: 5763719,
+                  fields: [
+                    {name: "PR", value: ("[" + $pr_text + "](" + $pr_url + ")"), inline: false},
+                    {name: "Preview URL", value: ("[" + $preview_url + "](" + $preview_url + ")"), inline: false},
+                    {name: "작성자", value: $author, inline: true}
+                  ]
+                }]
+              }')"
 
   cleanup:
     if: github.event.action == 'closed'
