@@ -42,7 +42,7 @@ jobs:
           echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .vercel/.env.preview.local
 
       - name: 프로젝트 빌드
-        run: vercel build --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Preview 배포
         id: deploy
