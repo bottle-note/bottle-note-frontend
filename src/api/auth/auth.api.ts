@@ -129,6 +129,30 @@ export const AuthApi = {
     },
 
     /**
+     * 기본 로그인 (이메일/비밀번호) - Preview 환경 전용
+     */
+    async basicLogin(body: BasicLoginParams): Promise<TokenData> {
+      const response = await fetch(
+        `${process.env.SERVER_URL}/oauth/basic/login`,
+        {
+          method: 'POST',
+          body: JSON.stringify(body),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      const refreshToken = extractRefreshToken(response);
+      const { data } = await response.json();
+
+      return {
+        accessToken: data.accessToken,
+        refreshToken,
+      };
+    },
+
+    /**
      * Kakao 사용자 정보를 가져옵니다.
      */
     async fetchKakaoUserInfo(accessToken: string) {
