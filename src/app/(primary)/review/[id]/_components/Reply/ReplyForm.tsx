@@ -123,7 +123,7 @@ export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
           />
         </div>
         <button
-          className={`ml-2 px-4 py-1 ${content.length !== 0 ? 'text-subCoral' : 'text-mainGray'}`}
+          className={`ml-2 px-4 py-1 ${content?.length !== 0 ? 'text-subCoral' : 'text-mainGray'}`}
           onClick={handleButtonClick}
         >
           등록
