@@ -42,3 +42,6 @@ next-env.d.ts
 
 # oh-my-claudecode
 .omc/
+
+# handoff docs
+HANDOFF.md

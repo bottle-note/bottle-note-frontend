@@ -2,6 +2,20 @@ import { User } from 'next-auth';
 import { AuthApi } from '@/api/auth/auth.api';
 import { SOCIAL_TYPE, TokenData } from '@/api/auth/types';
 
+async function handlePreviewLogin(_user: User): Promise<TokenData | null> {
+  const email = process.env.PREVIEW_TEST_EMAIL;
+  const password = process.env.PREVIEW_TEST_PASSWORD;
+
+  if (!email || !password) {
+    console.error(
+      'Preview login failed: PREVIEW_TEST_EMAIL or PREVIEW_TEST_PASSWORD not set',
+    );
+    return null;
+  }
+
+  return AuthApi.server.basicLogin({ email, password });
+}
+
 async function handleAppleLogin(user: User): Promise<TokenData | null> {
   if (!user.idToken || !user.nonce) return null;
 
@@ -91,4 +105,5 @@ export const providerHandlers: {
 } = {
   'apple-login': handleAppleLogin,
   'kakao-login': handleKakaoLogin,
+  'preview-login': handlePreviewLogin,
 };

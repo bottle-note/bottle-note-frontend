@@ -1,6 +1,15 @@
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { SOCIAL_TYPE } from '@/types/Auth';
 
+export const previewProvider = CredentialsProvider({
+  id: 'preview-login',
+  name: 'Preview Test Login',
+  credentials: {},
+  async authorize() {
+    return { id: 'preview-test' };
+  },
+});
+
 export const appleProvider = CredentialsProvider({
   id: 'apple-login',
   name: 'Apple Login',

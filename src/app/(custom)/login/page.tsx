@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
@@ -17,6 +18,8 @@ import {
 } from '@/utils/loginRedirect';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
+
+const IS_PREVIEW = process.env.NEXT_PUBLIC_IS_PREVIEW === 'true';
 
 export default function Login() {
   const router = useRouter();
@@ -99,6 +102,14 @@ export default function Login() {
             <SocialLoginBtn type="KAKAO" onClick={handleKakaoLogin} />
             {DeviceService.platform === 'ios' && (
               <SocialLoginBtn type="APPLE" onClick={handleAppleLogin} />
+            )}
+            {IS_PREVIEW && (
+              <button
+                onClick={() => signIn('preview-login', { redirect: false })}
+                className="w-full rounded-md py-2.5 bg-gray-700 text-white text-sm border border-gray-500"
+              >
+                [Preview] 테스트 계정으로 로그인
+              </button>
             )}
           </article>
         </section>

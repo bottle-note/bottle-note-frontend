@@ -1,12 +1,22 @@
 import { NextAuthOptions } from 'next-auth';
 import { decodeJwt } from 'jose';
 import { UserData } from '@/types/Auth';
-import { appleProvider, kakaoProvider } from '@/lib/auth/providers';
+import {
+  appleProvider,
+  kakaoProvider,
+  previewProvider,
+} from '@/lib/auth/providers';
 import { providerHandlers } from '@/lib/auth/handler';
+
+const isPreview = process.env.NEXT_PUBLIC_IS_PREVIEW === 'true';
 
 export const authOptions: NextAuthOptions = {
   debug: process.env.NODE_ENV === 'development',
-  providers: [appleProvider, kakaoProvider],
+  providers: [
+    appleProvider,
+    kakaoProvider,
+    ...(isPreview ? [previewProvider] : []),
+  ],
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
@@ -25,6 +35,10 @@ export const authOptions: NextAuthOptions = {
           credentials?.email ||
           credentials?.authorizationCode
         );
+      }
+
+      if (provider === 'preview-login') {
+        return isPreview;
       }
 
       return false;

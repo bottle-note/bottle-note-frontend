@@ -1,0 +1,119 @@
+name: Vercel Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [dev, develop, main, release]
+
+concurrency:
+  group: vercel-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  deploy:
+    if: github.event.action != 'closed'
+    name: Preview 배포
+    runs-on: ubuntu-latest
+    steps:
+      - name: 소스 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Vercel CLI 설치
+        run: npm i -g vercel
+
+      - name: Vercel 환경 가져오기
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: 프로젝트 빌드
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Preview 배포
+        id: deploy
+        run: |
+          URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} \
+            --meta pr=${{ github.event.pull_request.number }})
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: PR 번호 기반 alias 설정
+        run: |
+          vercel alias set ${{ steps.deploy.outputs.url }} \
+            bottle-note-pr-${{ github.event.pull_request.number }}.vercel.app \
+            --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+
+      - name: PR에 Preview URL 코멘트
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const aliasUrl = `https://bottle-note-pr-${prNumber}.vercel.app`;
+            const deployUrl = '${{ steps.deploy.outputs.url }}';
+            const marker = '<!-- vercel-preview-bot -->';
+
+            const body = [
+              marker,
+              `### Vercel Preview`,
+              '',
+              `| Name | Link |`,
+              `|------|------|`,
+              `| **Preview** | ${aliasUrl} |`,
+              `| Deployment | ${deployUrl} |`,
+              '',
+              `> Updated: ${new Date().toISOString().slice(0, 19).replace('T', ' ')} UTC`,
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const existing = comments.find(c => c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
+
+  cleanup:
+    if: github.event.action == 'closed'
+    name: Preview 정리
+    runs-on: ubuntu-latest
+    steps:
+      - name: Alias 제거 및 배포 삭제
+        run: |
+          npm i -g vercel
+
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          ALIAS="bottle-note-pr-${PR_NUMBER}.vercel.app"
+
+          echo "Alias 제거: $ALIAS"
+          vercel alias rm "$ALIAS" --yes \
+            --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }} || true
+
+          echo "PR #${PR_NUMBER} 관련 배포 삭제"
+          curl -s -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+            "https://api.vercel.com/v6/deployments?projectId=${{ secrets.VERCEL_PROJECT_ID }}&meta-pr=${PR_NUMBER}&limit=20" \
+            | jq -r '.deployments[].uid // empty' \
+            | while read -r uid; do
+                echo "  삭제: $uid"
+                curl -s -X DELETE \
+                  -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+                  "https://api.vercel.com/v13/deployments/$uid" || true
+              done
+
+          echo "정리 완료"
