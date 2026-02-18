@@ -15,7 +15,7 @@ export function FocusScrollProvider({
       ) {
         setTimeout(() => {
           target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 200);
+        }, 300);
       }
     }
     document.addEventListener('focusin', handleFocus);
