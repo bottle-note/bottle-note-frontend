@@ -14,7 +14,10 @@
     "lint:fix": "next lint --fix",
     "test": "jest",
     "test:watch": "jest --watch",
-    "prepare": "husky"
+    "prepare": "husky",
+    "setenv:local": "sops -d git.environment-variables/application.next-js/local.sops.env > .env.local",
+    "setenv:dev": "sops -d git.environment-variables/application.next-js/dev.sops.env > .env.development",
+    "setenv:prod": "sops -d git.environment-variables/application.next-js/prod.sops.env > .env.production"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
