@@ -5,6 +5,7 @@ import { ReviewApi } from '@/api/review/review.api';
 import useModalStore from '@/store/modalStore';
 import { FormValues } from '@/types/Review';
 import { ROUTES } from '@/constants/routes';
+import { captureTastingNote } from './useTastingNoteCapture';
 
 interface UseReviewSubmissionProps {
   alcoholId: string;
@@ -106,11 +107,16 @@ export const useReviewSubmission = ({
       viewUrl: string;
     }[] = [],
   ) => {
+    // 테이스팅 노트 차트 이미지 생성
+    const chartFile = await captureTastingNote(data.tastingNote);
+
+    // 유저 이미지 + 차트 이미지를 합산
+    const userImages = data.images?.map((file) => file.image) ?? [];
+    const allNewImages = chartFile ? [chartFile, ...userImages] : userImages;
+
     let newImgUrlList = null;
-    if (data.images?.length !== 0) {
-      newImgUrlList = await handleUploadImages(
-        data.images?.map((file) => file.image) ?? [],
-      );
+    if (allNewImages.length > 0) {
+      newImgUrlList = await handleUploadImages(allNewImages);
     }
 
     const finalImageUrlList =

@@ -1,4 +1,5 @@
 import { ReviewUserInfo } from './User';
+import type { TastingNoteValues } from '@/constants/tastingNote';
 
 export interface ReviewLocationInfo {
   name?: string;
@@ -67,6 +68,7 @@ export interface FormValues {
   mapUrl?: string | null;
   latitude?: string | null;
   longitude?: string | null;
+  tastingNote?: TastingNoteValues | null;
 }
 
 export interface ReviewTempData {
