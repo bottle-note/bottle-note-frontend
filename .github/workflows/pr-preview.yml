@@ -66,7 +66,6 @@ jobs:
           PR_NUMBER="${{ github.event.pull_request.number }}"
           PR_TITLE="${{ github.event.pull_request.title }}"
           PR_URL="${{ github.event.pull_request.html_url }}"
-          AUTHOR="${{ github.event.pull_request.user.login }}"
           ALIAS_URL="https://bottle-note-pr-${PR_NUMBER}.vercel.app"
 
           curl -s -X POST "$DISCORD_WEBHOOK_URL" \
@@ -75,15 +74,13 @@ jobs:
               --arg pr_text "#${PR_NUMBER} ${PR_TITLE}" \
               --arg pr_url "$PR_URL" \
               --arg preview_url "$ALIAS_URL" \
-              --arg author "$AUTHOR" \
               '{
                 embeds: [{
-                  title: "✅ Vercel Preview 배포 완료",
+                  title: "✅ Preview 배포 완료",
                   color: 5763719,
                   fields: [
                     {name: "PR", value: ("[" + $pr_text + "](" + $pr_url + ")"), inline: false},
-                    {name: "Preview URL", value: ("[" + $preview_url + "](" + $preview_url + ")"), inline: false},
-                    {name: "작성자", value: $author, inline: true}
+                    {name: "Preview URL", value: $preview_url, inline: false}
                   ]
                 }]
               }')"
