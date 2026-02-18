@@ -72,7 +72,7 @@ export default function ContentForm() {
     <article>
       <textarea
         {...register('review')}
-        placeholder={`위스키 리뷰를 작성해보세요. (작성 완료 후 공개/비공개 여부를 변경할 수 있습니다.)`}
+        placeholder={`위스키 리뷰를 작성해보세요.\n(작성 완료 후 공개/비공개 여부를 변경할 수 있습니다.)`}
         className="text-16 w-full h-48 placeholder:text-14"
         maxLength={700}
       />

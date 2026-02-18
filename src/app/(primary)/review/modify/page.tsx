@@ -7,6 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FormValues } from '@/types/Review';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
+import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import { useAlcoholDetails } from '@/app/(primary)/review/hook/useAlcoholDetails';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import { useReviewSubmission } from '@/app/(primary)/review/hook/useReviewSubmission';
@@ -25,6 +26,7 @@ function ReviewModify() {
   const router = useRouter();
   const { handleModalState } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
+  const isKeyboardVisible = useKeyboardVisible();
   const searchParams = useSearchParams();
   const reviewId = searchParams.get('reviewId');
 
@@ -134,7 +136,9 @@ function ReviewModify() {
       />
       <ReviewForm />
       <article
-        className="sticky px-5 z-10 flex justify-center"
+        className={`sticky px-5 z-10 flex justify-center transition-opacity duration-200 ${
+          isKeyboardVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        }`}
         style={{ bottom: 'var(--navbar-margin-bottom)' }}
       >
         <Button

@@ -137,6 +137,9 @@
     --navbar-total-space: calc(
       var(--navbar-height) + var(--navbar-margin-bottom)
     );
+
+    /* Sticky CTA 버튼 영역 확보용 (버튼 52px + bottom 여백 + 간격) */
+    --sticky-cta-space: calc(52px + var(--navbar-margin-bottom) + 16px);
   }
   .dark {
     --background: 0 0% 3.9%;

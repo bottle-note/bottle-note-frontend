@@ -10,6 +10,7 @@ import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
 import Button from '@/components/ui/Button/Button';
 import Loading from '@/components/ui/Loading/Loading';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
+import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import { useAlcoholDetails } from '@/app/(primary)/review/hook/useAlcoholDetails';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import { useReviewAutoSave } from '@/app/(primary)/review/hook/useReviewAutoSave';
@@ -25,6 +26,7 @@ function ReviewRegister() {
   const searchParams = useSearchParams();
   const { handleModalState } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
+  const isKeyboardVisible = useKeyboardVisible();
 
   const initialAlcoholId = searchParams.get('alcoholId') || '';
   const [selectedAlcoholId, setSelectedAlcoholId] =
@@ -186,7 +188,9 @@ function ReviewRegister() {
 
       <ReviewForm />
       <article
-        className="sticky px-5 z-10 flex justify-center"
+        className={`sticky px-5 z-10 flex justify-center transition-opacity duration-200 ${
+          isKeyboardVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        }`}
         style={{ bottom: 'var(--navbar-margin-bottom)' }}
       >
         <Button

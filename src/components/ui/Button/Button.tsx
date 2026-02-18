@@ -21,7 +21,7 @@ export function Button({
     <button
       type={type}
       onClick={onClick}
-      className={`flex justify-center items-center w-full h-[3.8rem] rounded-xl
+      className={`flex justify-center items-center w-full h-[52px] rounded-xl
         ${disabled ? 'bg-brightGray cursor-not-allowed' : btnStyles}`}
       disabled={disabled}
     >
