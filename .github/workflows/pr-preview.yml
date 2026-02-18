@@ -39,6 +39,7 @@ jobs:
           echo "NEXTAUTH_URL=$ALIAS_URL" >> .vercel/.env.preview.local
           echo "NEXT_PUBLIC_CLIENT_URL=$ALIAS_URL" >> .vercel/.env.preview.local
           echo "CLIENT_URL=$ALIAS_URL" >> .vercel/.env.preview.local
+          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .vercel/.env.preview.local
 
       - name: 프로젝트 빌드
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
