@@ -31,9 +31,7 @@ export default function ImagesForm() {
         component: ImageCounter,
       }}
     >
-      <ImageUploader
-        onImageCountChange={handleImageCountChange}
-      />
+      <ImageUploader onImageCountChange={handleImageCountChange} />
     </OptionsContainer>
   );
 }

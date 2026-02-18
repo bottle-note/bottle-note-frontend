@@ -18,7 +18,8 @@ export const useKeyboardVisible = (): boolean => {
     const initialHeight = window.innerHeight;
 
     const handleResize = () => {
-      const isKeyboard = viewport.height < initialHeight * VIEWPORT_RATIO_THRESHOLD;
+      const isKeyboard =
+        viewport.height < initialHeight * VIEWPORT_RATIO_THRESHOLD;
       setIsKeyboardVisible(isKeyboard);
     };
 
