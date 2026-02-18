@@ -45,3 +45,6 @@ next-env.d.ts
 
 # handoff docs
 HANDOFF.md
+
+# 회고문서
+.retro/*
