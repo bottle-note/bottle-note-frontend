@@ -55,40 +55,42 @@ export default function PriceForm() {
           ))}
         </div>
         {watch('price_type') && (
-          <div className="flex items-center justify-between">
-            <div className="h-7 w-60 border-b border-subCoral flex items-center">
-              <p className="text-subCoral text-15 w-10">
+          <div className="flex items-center gap-3">
+            <div className="h-7 flex-1 min-w-0 border-b border-subCoral flex items-center">
+              <span className="text-subCoral text-15 shrink-0 pr-1">
                 {getPriceTypeLabel(watch('price_type'))}
-              </p>
-              <input
-                type="number"
-                placeholder="얼마에 마셨는지 기록해보세요!"
-                className="text-15 w-full text-mainBlack text-right"
-                maxLength={10}
-                {...register('price', {
-                  setValueAs: (value) =>
-                    value === '' || value === 0 ? null : value,
-                })}
-              />{' '}
-              <p className="text-subCoral text-15">원</p>
+              </span>
+              <div className="flex-1 min-w-0 relative h-full">
+                <input
+                  type="number"
+                  className="absolute inset-0 w-full h-full text-15 text-mainBlack bg-transparent text-right pr-2 pb-[1.5px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  maxLength={10}
+                  {...register('price', {
+                    setValueAs: (value) =>
+                      value === '' || value === 0 ? null : value,
+                  })}
+                />
+                {!watch('price') && (
+                  <span className="absolute inset-0 flex items-center text-15 text-mainGray pointer-events-none truncate">
+                    얼마에 마셨는지 기록해보세요!
+                  </span>
+                )}
+              </div>
+              <span className="text-subCoral text-15 shrink-0">원</span>
             </div>
-            <div
-              className="flex items-center space-x-[2px]"
+            <button
+              type="button"
+              className="flex items-center gap-[2px] shrink-0"
               onClick={resetPrice}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  resetPrice();
-                }
-              }}
             >
-              <p className="text-14 text-mainGray">초기화</p>
+              <span className="text-14 text-mainGray">초기화</span>
               <Image
                 src="/icon/reset-mainGray.svg"
                 alt="resetIcon"
                 width={16}
                 height={16}
               />
-            </div>
+            </button>
           </div>
         )}
       </div>
