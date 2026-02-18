@@ -34,7 +34,7 @@ export default function PriceForm() {
       title="가격"
       subTitle="(선택)"
     >
-      <div className="w-full pl-7 space-y-4 pt-[13px]">
+      <div className="w-full pl-7 space-y-4 mt-[6px]">
         <div className="flex items-center space-x-3">
           {options.map((option) => (
             <label

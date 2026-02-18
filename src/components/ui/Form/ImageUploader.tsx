@@ -99,7 +99,7 @@ export default function ImageUploader({
   return (
     <>
       <div
-        className={`flex justify-start items-center h-[3.8rem] space-x-2 ${useMarginLeft ? 'ml-7' : ''}`}
+        className={`flex justify-start items-center h-[3.8rem] space-x-2 ${useMarginLeft ? 'ml-7 mt-[6px]' : ''}`}
       >
         {previewImages?.map((data) => (
           <figure key={data?.image} className="relative h-full">

@@ -24,7 +24,7 @@ const Section = ({ children }: { children: React.ReactNode }) => {
 
 function ReviewForm() {
   return (
-    <section className="px-5 pt-9 pb-[36px] relative">
+    <section className="px-5 pt-9 pb-[var(--sticky-cta-space)] relative">
       <Section>
         <RatingForm />
         <ContentForm />
