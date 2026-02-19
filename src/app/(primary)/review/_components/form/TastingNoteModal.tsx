@@ -119,18 +119,19 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
             </motion.div>
 
             {/* 슬라이더 컨트롤들 */}
-            <div className="flex flex-col gap-5 mt-2">
+            <div className="flex flex-col gap-2.5 mt-2">
               {TASTING_AXES.map((axis, i) => (
                 <motion.div
                   key={axis.key}
                   initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.25 + i * 0.05 }}
+                  transition={{ delay: 0.25 + i * 0.04 }}
                 >
                   <FlavorAxisControl
-                    label={axis.label}
-                    labelKo={axis.labelKo}
-                    guide={axis.guide}
+                    label={axis.labelKo}
+                    descriptor={axis.descriptor}
+                    minHint={axis.sliderHint[0]}
+                    maxHint={axis.sliderHint[1]}
                     value={tastingNote[axis.key]}
                     onChange={(v) => handleAxisChange(axis.key, v)}
                   />

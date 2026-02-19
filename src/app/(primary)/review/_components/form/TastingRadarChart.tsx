@@ -10,6 +10,7 @@ import {
 import {
   TASTING_AXES,
   TASTING_MAX_VALUE,
+  LEVEL_DESCRIPTIONS,
   type TastingNoteValues,
   type TastingAxisKey,
 } from '@/constants/tastingNote';
@@ -24,6 +25,7 @@ interface Props {
 
 const AXIS_COUNT = TASTING_AXES.length;
 const ANGLE_OFFSET = -Math.PI / 2;
+const MIN_DISPLAY_RATIO = 0.25;
 
 function polarToCartesian(
   cx: number,
@@ -52,10 +54,6 @@ function buildPolygonPoints(
     .join(' ');
 }
 
-/**
- * 터치/마우스 좌표 → 해당 축의 0~5 값으로 변환
- * 중심에서의 거리를 사용
- */
 function pointerToAxisValue(
   pointerX: number,
   pointerY: number,
@@ -66,14 +64,10 @@ function pointerToAxisValue(
   const dx = pointerX - cx;
   const dy = pointerY - cy;
   const dist = Math.sqrt(dx * dx + dy * dy);
-
   const ratio = Math.max(0, Math.min(1, dist / maxRadius));
   return Math.round(ratio * TASTING_MAX_VALUE);
 }
 
-/**
- * 포인터 위치에서 가장 가까운 축 인덱스를 반환
- */
 function findClosestAxis(
   pointerX: number,
   pointerY: number,
@@ -100,84 +94,55 @@ function findClosestAxis(
   return closestIndex;
 }
 
-/** 개별 꼭짓점: spring 애니메이션 (사이즈 고정) */
-function AnimatedVertex({
+/** 각 꼭짓점의 값 배지 */
+function ValueBadge({
   targetX,
   targetY,
+  value,
+  isActive,
 }: {
   targetX: number;
   targetY: number;
+  value: number;
+  isActive: boolean;
 }) {
   const springConfig = { stiffness: 300, damping: 25, mass: 0.8 };
-  const x = useSpring(useMotionValue(targetX), springConfig);
-  const y = useSpring(useMotionValue(targetY), springConfig);
+  const cx = useSpring(useMotionValue(targetX), springConfig);
+  const cy = useSpring(useMotionValue(targetY), springConfig);
 
   useEffect(() => {
-    x.set(targetX);
-    y.set(targetY);
-  }, [targetX, targetY, x, y]);
+    cx.set(targetX);
+    cy.set(targetY);
+  }, [targetX, targetY, cx, cy]);
+
+  const r = isActive ? 12 : 10;
+  const hasValue = value > 0;
 
   return (
-    <motion.circle
-      cx={x}
-      cy={y}
-      r={4}
-      fill="#E58257"
-      stroke="#fff"
-      strokeWidth={1.5}
-    />
-  );
-}
-
-/** 탭 피드백 툴팁 */
-function TapTooltip({
-  x,
-  y,
-  value,
-  axisIndex,
-  cx,
-  cy,
-}: {
-  x: number;
-  y: number;
-  value: number;
-  axisIndex: number;
-  cx: number;
-  cy: number;
-}) {
-  const angle = (2 * Math.PI * axisIndex) / AXIS_COUNT + ANGLE_OFFSET;
-  const offsetX = Math.cos(angle) * 16;
-  const offsetY = Math.sin(angle) * 16;
-  const dist = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
-  const dir = dist < 30 ? 1 : -0.5;
-
-  return (
-    <motion.g
-      initial={{ opacity: 0, scale: 0.6 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.6 }}
-      transition={{ duration: 0.15 }}
-    >
-      <rect
-        x={x + offsetX * dir - 12}
-        y={y + offsetY * dir - 10}
-        width={24}
-        height={20}
-        rx={4}
-        fill="#E58257"
+    <>
+      <motion.circle cx={cx} cy={cy} r={r + 3} fill="rgba(229,130,87,0.15)" />
+      <motion.circle
+        cx={cx}
+        cy={cy}
+        r={r}
+        fill={hasValue ? '#E58257' : '#CDCDC5'}
+        stroke="#fff"
+        strokeWidth={2.5}
       />
-      <text
-        x={x + offsetX * dir}
-        y={y + offsetY * dir + 1}
+      <motion.text
+        x={cx}
+        y={cy}
+        dy={0.5}
         textAnchor="middle"
         dominantBaseline="central"
         fill="#fff"
-        fontSize={11}
+        fontSize={isActive ? 12 : 10}
         fontWeight={700}
+        style={{ pointerEvents: 'none' }}
       >
         {value}
-      </text>
-    </motion.g>
+      </motion.text>
+    </>
   );
 }
 
@@ -191,8 +156,10 @@ export default function TastingRadarChart({
   const cy = size / 2;
   const maxRadius = size / 2 - 30;
   const svgRef = useRef<SVGSVGElement>(null);
-  const [tappedAxis, setTappedAxis] = useState<number | null>(null);
-  const tooltipTimer = useRef<NodeJS.Timeout | null>(null);
+  const [tapFeedback, setTapFeedback] = useState<{
+    level: number;
+  } | null>(null);
+  const feedbackTimer = useRef<NodeJS.Timeout | null>(null);
 
   const isInteractive = !!onAxisChange;
 
@@ -205,11 +172,20 @@ export default function TastingRadarChart({
     [values, cx, cy, maxRadius],
   );
 
+  const badgePoints = useMemo(
+    () =>
+      TASTING_AXES.map((axis, i) => {
+        const ratio = values[axis.key] / TASTING_MAX_VALUE;
+        const displayRatio = Math.max(MIN_DISPLAY_RATIO, ratio);
+        return polarToCartesian(cx, cy, maxRadius * displayRatio, i);
+      }),
+    [values, cx, cy, maxRadius],
+  );
+
   const valuePolygon = valuePoints.map((p) => `${p.x},${p.y}`).join(' ');
 
   const gridLevels = Array.from({ length: TASTING_MAX_VALUE }, (_, i) => i + 1);
 
-  /** SVG 좌표계로 변환 */
   const toSvgCoords = useCallback(
     (clientX: number, clientY: number) => {
       if (!svgRef.current) return { x: 0, y: 0 };
@@ -224,34 +200,28 @@ export default function TastingRadarChart({
     [size],
   );
 
-  /** 차트 탭: 가장 가까운 축을 찾아서 값 즉시 반영 */
   const handleChartTap = useCallback(
     (e: React.PointerEvent) => {
       if (!isInteractive) return;
-
       const { x, y } = toSvgCoords(e.clientX, e.clientY);
       const closestIdx = findClosestAxis(x, y, cx, cy);
       const newValue = pointerToAxisValue(x, y, cx, cy, maxRadius);
       const axisKey = TASTING_AXES[closestIdx].key;
-
       onAxisChange(axisKey, newValue);
 
-      // 툴팁 표시 후 자동 숨김
-      setTappedAxis(closestIdx);
-      if (tooltipTimer.current) clearTimeout(tooltipTimer.current);
-      tooltipTimer.current = setTimeout(() => setTappedAxis(null), 800);
+      // Layer 3: 탭 레벨 설명 피드백
+      setTapFeedback({ level: newValue });
+      if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
+      feedbackTimer.current = setTimeout(() => setTapFeedback(null), 800);
     },
     [isInteractive, toSvgCoords, cx, cy, maxRadius, onAxisChange],
   );
 
   useEffect(() => {
     return () => {
-      if (tooltipTimer.current) clearTimeout(tooltipTimer.current);
+      if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
     };
   }, []);
-
-  const currentActiveAxis =
-    tappedAxis !== null ? TASTING_AXES[tappedAxis].key : activeAxis;
 
   return (
     <svg
@@ -273,6 +243,35 @@ export default function TastingRadarChart({
             opacity={level === TASTING_MAX_VALUE ? 0.8 : 0.5}
           />
         );
+      })}
+
+      {/* 각 축의 격자 레벨 숫자 */}
+      {TASTING_AXES.map((_, axisIdx) => {
+        const angle = (2 * Math.PI * axisIdx) / AXIS_COUNT + ANGLE_OFFSET;
+        const perpAngle = angle + Math.PI / 2;
+        const offsetDist = 7;
+
+        return gridLevels.map((level) => {
+          const radius = (maxRadius * level) / TASTING_MAX_VALUE;
+          const px = cx + radius * Math.cos(angle);
+          const py = cy + radius * Math.sin(angle);
+
+          return (
+            <text
+              key={`grid-${axisIdx}-${level}`}
+              x={px + offsetDist * Math.cos(perpAngle)}
+              y={py + offsetDist * Math.sin(perpAngle)}
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="#C4C4BB"
+              fontSize={7}
+              fontWeight={400}
+              style={{ pointerEvents: 'none' }}
+            >
+              {level}
+            </text>
+          );
+        });
       })}
 
       {/* 축 선 */}
@@ -302,12 +301,7 @@ export default function TastingRadarChart({
         strokeWidth={2}
       />
 
-      {/* 꼭짓점 (애니메이션) */}
-      {valuePoints.map((p, i) => (
-        <AnimatedVertex key={TASTING_AXES[i].key} targetX={p.x} targetY={p.y} />
-      ))}
-
-      {/* 탭 히트 영역 (차트 전체) */}
+      {/* 탭 히트 영역 */}
       {isInteractive && (
         <circle
           cx={cx}
@@ -319,23 +313,20 @@ export default function TastingRadarChart({
         />
       )}
 
-      {/* 탭 피드백 툴팁 */}
-      <AnimatePresence>
-        {tappedAxis !== null && (
-          <TapTooltip
-            x={valuePoints[tappedAxis].x}
-            y={valuePoints[tappedAxis].y}
-            value={values[TASTING_AXES[tappedAxis].key]}
-            axisIndex={tappedAxis}
-            cx={cx}
-            cy={cy}
-          />
-        )}
-      </AnimatePresence>
+      {/* 값 배지 */}
+      {badgePoints.map((p, i) => (
+        <ValueBadge
+          key={TASTING_AXES[i].key}
+          targetX={p.x}
+          targetY={p.y}
+          value={values[TASTING_AXES[i].key]}
+          isActive={activeAxis === TASTING_AXES[i].key}
+        />
+      ))}
 
-      {/* 축 라벨 */}
+      {/* 축 라벨 (한글) */}
       {TASTING_AXES.map((axis, i) => {
-        const { x, y } = polarToCartesian(cx, cy, maxRadius + 18, i);
+        const { x, y } = polarToCartesian(cx, cy, maxRadius + 20, i);
         return (
           <text
             key={axis.key}
@@ -345,12 +336,34 @@ export default function TastingRadarChart({
             dominantBaseline="central"
             className="fill-mainDarkGray"
             fontSize={11}
-            fontWeight={currentActiveAxis === axis.key ? 700 : 500}
+            fontWeight={activeAxis === axis.key ? 700 : 600}
           >
-            {axis.label}
+            {axis.labelKo}
           </text>
         );
       })}
+
+      {/* Layer 3: 탭 레벨 설명 (차트 중앙에 잠깐 표시) */}
+      <AnimatePresence>
+        {tapFeedback && (
+          <motion.text
+            x={cx}
+            y={cy}
+            textAnchor="middle"
+            dominantBaseline="central"
+            fill="#E58257"
+            fontSize={13}
+            fontWeight={700}
+            style={{ pointerEvents: 'none' }}
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.7 }}
+            transition={{ duration: 0.15 }}
+          >
+            {LEVEL_DESCRIPTIONS[tapFeedback.level]}
+          </motion.text>
+        )}
+      </AnimatePresence>
     </svg>
   );
 }
