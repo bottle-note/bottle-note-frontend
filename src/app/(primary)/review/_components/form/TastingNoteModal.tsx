@@ -24,7 +24,6 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
     ...DEFAULT_TASTING_NOTE,
   };
 
-  // 현재 조작 중인 축 (pulse 효과용)
   const [activeAxis, setActiveAxis] = useState<string | null>(null);
 
   useEffect(() => {
@@ -98,7 +97,7 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
                 이 위스키에서 느낀 풍미를 기록해보세요
               </p>
               <p className="text-12 text-mainGray mt-1">
-                각 항목의 슬라이더를 조절하면 차트가 변합니다
+                차트를 탭하거나 슬라이더로 조절하세요
               </p>
             </motion.div>
 
@@ -114,6 +113,7 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
                   values={tastingNote}
                   size={280}
                   activeAxis={activeAxis}
+                  onAxisChange={handleAxisChange}
                 />
               </div>
             </motion.div>
