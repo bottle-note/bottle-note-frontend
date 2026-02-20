@@ -40,8 +40,9 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
   }, [isOpen]);
 
   const handleAxisChange = (key: keyof TastingNoteValues, value: number) => {
-    const hapticType =
-      tastingNote[key] !== value ? getTastingHapticType(value) : null;
+    if (tastingNote[key] === value) return;
+
+    const hapticType = getTastingHapticType(value);
     if (hapticType) {
       handleWebViewMessage('triggerHaptic', { type: hapticType });
     }
