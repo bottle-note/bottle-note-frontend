@@ -19,13 +19,14 @@ interface Props {
   values: TastingNoteValues;
   size?: number;
   activeAxis?: string | null;
-  /** 차트 탭으로 값 변경 */
+  /** 배지 드래그로 값 변경 */
   onAxisChange?: (key: TastingAxisKey, value: number) => void;
 }
 
 const AXIS_COUNT = TASTING_AXES.length;
 const ANGLE_OFFSET = -Math.PI / 2;
 const MIN_DISPLAY_RATIO = 0.25;
+const BADGE_HIT_RADIUS = 18;
 
 function polarToCartesian(
   cx: number,
@@ -54,20 +55,7 @@ function buildPolygonPoints(
     .join(' ');
 }
 
-function pointerToAxisValue(
-  pointerX: number,
-  pointerY: number,
-  cx: number,
-  cy: number,
-  maxRadius: number,
-): number {
-  const dx = pointerX - cx;
-  const dy = pointerY - cy;
-  const dist = Math.sqrt(dx * dx + dy * dy);
-  const ratio = Math.max(0, Math.min(1, dist / maxRadius));
-  return Math.round(ratio * TASTING_MAX_VALUE);
-}
-
+/** 포인터 위치에서 가장 가까운 축 인덱스 계산 (탭용) */
 function findClosestAxis(
   pointerX: number,
   pointerY: number,
@@ -94,51 +82,106 @@ function findClosestAxis(
   return closestIndex;
 }
 
-/** 각 꼭짓점의 값 배지 */
+/** 중심으로부터의 거리를 0~MAX_VALUE 값으로 변환 (탭용) */
+function pointerToAxisValue(
+  pointerX: number,
+  pointerY: number,
+  cx: number,
+  cy: number,
+  maxRadius: number,
+): number {
+  const dx = pointerX - cx;
+  const dy = pointerY - cy;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const ratio = Math.max(0, Math.min(1, dist / maxRadius));
+  return Math.round(ratio * TASTING_MAX_VALUE);
+}
+
+/** 포인터를 특정 축 방향으로 투영하여 0~MAX_VALUE 값 계산 (드래그용) */
+function projectOntoAxis(
+  pointerX: number,
+  pointerY: number,
+  cx: number,
+  cy: number,
+  axisIndex: number,
+  maxRadius: number,
+): number {
+  const angle = (2 * Math.PI * axisIndex) / AXIS_COUNT + ANGLE_OFFSET;
+  const dx = pointerX - cx;
+  const dy = pointerY - cy;
+  const projection = dx * Math.cos(angle) + dy * Math.sin(angle);
+  const ratio = Math.max(0, Math.min(1, projection / maxRadius));
+  return Math.round(ratio * TASTING_MAX_VALUE);
+}
+
+/** 드래그 가능한 값 배지 — 스냅포인트 핸들 */
 function ValueBadge({
   targetX,
   targetY,
   value,
   isActive,
+  isDragging,
 }: {
   targetX: number;
   targetY: number;
   value: number;
   isActive: boolean;
+  isDragging: boolean;
 }) {
   const springConfig = { stiffness: 300, damping: 25, mass: 0.8 };
-  const cx = useSpring(useMotionValue(targetX), springConfig);
-  const cy = useSpring(useMotionValue(targetY), springConfig);
+  const animX = useSpring(useMotionValue(targetX), springConfig);
+  const animY = useSpring(useMotionValue(targetY), springConfig);
 
   useEffect(() => {
-    cx.set(targetX);
-    cy.set(targetY);
-  }, [targetX, targetY, cx, cy]);
+    animX.set(targetX);
+    animY.set(targetY);
+  }, [targetX, targetY, animX, animY]);
 
-  const r = isActive ? 12 : 10;
   const hasValue = value > 0;
+  const r = isDragging ? 14 : isActive ? 12 : 11;
+  const glowR = isDragging ? 19 : 16;
+  const haloR = isDragging ? 24 : 20;
 
   return (
     <>
-      <motion.circle cx={cx} cy={cy} r={r + 3} fill="rgba(229,130,87,0.15)" />
+      {/* 외부 헤일로 — "잡을 수 있다"는 어포던스 */}
       <motion.circle
-        cx={cx}
-        cy={cy}
+        cx={animX}
+        cy={animY}
+        r={haloR}
+        fill={hasValue ? 'rgba(229,130,87,0.05)' : 'rgba(180,180,170,0.04)'}
+        stroke={hasValue ? 'rgba(229,130,87,0.2)' : 'rgba(180,180,170,0.15)'}
+        strokeWidth={isDragging ? 1.5 : 1}
+        strokeDasharray={isDragging ? 'none' : '3 2'}
+      />
+      {/* 글로우 링 */}
+      <motion.circle
+        cx={animX}
+        cy={animY}
+        r={glowR}
+        fill={hasValue ? 'rgba(229,130,87,0.1)' : 'rgba(180,180,170,0.06)'}
+      />
+      {/* 메인 원 */}
+      <motion.circle
+        cx={animX}
+        cy={animY}
         r={r}
         fill={hasValue ? '#E58257' : '#CDCDC5'}
         stroke="#fff"
-        strokeWidth={2.5}
+        strokeWidth={isDragging ? 3 : 2.5}
+        filter={isDragging ? 'url(#badge-glow)' : 'url(#badge-shadow)'}
       />
+      {/* 숫자 */}
       <motion.text
-        x={cx}
-        y={cy}
+        x={animX}
+        y={animY}
         dy={0.5}
         textAnchor="middle"
         dominantBaseline="central"
         fill="#fff"
-        fontSize={isActive ? 12 : 10}
+        fontSize={isDragging ? 13 : isActive ? 12 : 10}
         fontWeight={700}
-        style={{ pointerEvents: 'none' }}
+        style={{ pointerEvents: 'none', userSelect: 'none' }}
       >
         {value}
       </motion.text>
@@ -152,24 +195,35 @@ export default function TastingRadarChart({
   activeAxis = null,
   onAxisChange,
 }: Props) {
-  const cx = size / 2;
-  const cy = size / 2;
+  const ctrX = size / 2;
+  const ctrY = size / 2;
   const maxRadius = size / 2 - 30;
   const svgRef = useRef<SVGSVGElement>(null);
-  const [tapFeedback, setTapFeedback] = useState<{
-    level: number;
-  } | null>(null);
+  const draggingAxisRef = useRef<number | null>(null);
+  const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState<{ level: number } | null>(null);
   const feedbackTimer = useRef<NodeJS.Timeout | null>(null);
 
   const isInteractive = !!onAxisChange;
+
+  // 드래그 중 touchmove 스크롤 방지 (touch-action CSS fallback)
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg || !isInteractive) return;
+    const handler = (e: TouchEvent) => {
+      if (draggingAxisRef.current !== null) e.preventDefault();
+    };
+    svg.addEventListener('touchmove', handler, { passive: false });
+    return () => svg.removeEventListener('touchmove', handler);
+  }, [isInteractive]);
 
   const valuePoints = useMemo(
     () =>
       TASTING_AXES.map((axis, i) => {
         const ratio = values[axis.key] / TASTING_MAX_VALUE;
-        return polarToCartesian(cx, cy, maxRadius * ratio, i);
+        return polarToCartesian(ctrX, ctrY, maxRadius * ratio, i);
       }),
-    [values, cx, cy, maxRadius],
+    [values, ctrX, ctrY, maxRadius],
   );
 
   const badgePoints = useMemo(
@@ -177,9 +231,9 @@ export default function TastingRadarChart({
       TASTING_AXES.map((axis, i) => {
         const ratio = values[axis.key] / TASTING_MAX_VALUE;
         const displayRatio = Math.max(MIN_DISPLAY_RATIO, ratio);
-        return polarToCartesian(cx, cy, maxRadius * displayRatio, i);
+        return polarToCartesian(ctrX, ctrY, maxRadius * displayRatio, i);
       }),
-    [values, cx, cy, maxRadius],
+    [values, ctrX, ctrY, maxRadius],
   );
 
   const valuePolygon = valuePoints.map((p) => `${p.x},${p.y}`).join(' ');
@@ -190,31 +244,90 @@ export default function TastingRadarChart({
     (clientX: number, clientY: number) => {
       if (!svgRef.current) return { x: 0, y: 0 };
       const rect = svgRef.current.getBoundingClientRect();
-      const scaleX = size / rect.width;
-      const scaleY = size / rect.height;
       return {
-        x: (clientX - rect.left) * scaleX,
-        y: (clientY - rect.top) * scaleY,
+        x: (clientX - rect.left) * (size / rect.width),
+        y: (clientY - rect.top) * (size / rect.height),
       };
     },
     [size],
   );
 
+  const showFeedback = useCallback((level: number) => {
+    setFeedback({ level });
+    if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
+  }, []);
+
+  const endDrag = useCallback(() => {
+    if (draggingAxisRef.current === null) return;
+    draggingAxisRef.current = null;
+    setDraggingIdx(null);
+    feedbackTimer.current = setTimeout(() => setFeedback(null), 500);
+  }, []);
+
+  // 드래그 시작: 배지 pointerdown
+  const handleBadgePointerDown = useCallback(
+    (e: React.PointerEvent, axisIndex: number) => {
+      if (!isInteractive) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      // setPointerCapture → 드래그 중 이벤트를 SVG로 라우팅 + 스크롤 억제
+      svgRef.current?.setPointerCapture(e.pointerId);
+      draggingAxisRef.current = axisIndex;
+      setDraggingIdx(axisIndex);
+
+      // 초기 값 즉시 적용
+      const { x, y } = toSvgCoords(e.clientX, e.clientY);
+      const val = projectOntoAxis(x, y, ctrX, ctrY, axisIndex, maxRadius);
+      onAxisChange!(TASTING_AXES[axisIndex].key, val);
+      showFeedback(val);
+    },
+    [
+      isInteractive,
+      toSvgCoords,
+      ctrX,
+      ctrY,
+      maxRadius,
+      onAxisChange,
+      showFeedback,
+    ],
+  );
+
+  // 드래그 중: SVG pointermove
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      const idx = draggingAxisRef.current;
+      if (idx === null) return;
+      const { x, y } = toSvgCoords(e.clientX, e.clientY);
+      const val = projectOntoAxis(x, y, ctrX, ctrY, idx, maxRadius);
+      onAxisChange!(TASTING_AXES[idx].key, val);
+      showFeedback(val);
+    },
+    [toSvgCoords, ctrX, ctrY, maxRadius, onAxisChange, showFeedback],
+  );
+
+  // 빈 영역 탭: 가장 가까운 축에 값 설정 (onPointerUp → 스크롤과 자연 구분)
   const handleChartTap = useCallback(
     (e: React.PointerEvent) => {
-      if (!isInteractive) return;
+      if (!isInteractive || draggingAxisRef.current !== null) return;
       const { x, y } = toSvgCoords(e.clientX, e.clientY);
-      const closestIdx = findClosestAxis(x, y, cx, cy);
-      const newValue = pointerToAxisValue(x, y, cx, cy, maxRadius);
-      const axisKey = TASTING_AXES[closestIdx].key;
-      onAxisChange(axisKey, newValue);
+      const closestIdx = findClosestAxis(x, y, ctrX, ctrY);
+      const newValue = pointerToAxisValue(x, y, ctrX, ctrY, maxRadius);
+      onAxisChange!(TASTING_AXES[closestIdx].key, newValue);
 
-      // Layer 3: 탭 레벨 설명 피드백
-      setTapFeedback({ level: newValue });
+      showFeedback(newValue);
       if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
-      feedbackTimer.current = setTimeout(() => setTapFeedback(null), 800);
+      feedbackTimer.current = setTimeout(() => setFeedback(null), 800);
     },
-    [isInteractive, toSvgCoords, cx, cy, maxRadius, onAxisChange],
+    [
+      isInteractive,
+      toSvgCoords,
+      ctrX,
+      ctrY,
+      maxRadius,
+      onAxisChange,
+      showFeedback,
+    ],
   );
 
   useEffect(() => {
@@ -229,14 +342,40 @@ export default function TastingRadarChart({
       viewBox={`0 0 ${size} ${size}`}
       width="100%"
       height="100%"
+      onPointerMove={isInteractive ? handlePointerMove : undefined}
+      onPointerUp={isInteractive ? endDrag : undefined}
+      onPointerCancel={isInteractive ? endDrag : undefined}
+      onLostPointerCapture={isInteractive ? endDrag : undefined}
     >
+      {/* SVG 필터 정의 */}
+      <defs>
+        <filter id="badge-shadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow
+            dx="0"
+            dy="1"
+            stdDeviation="1.5"
+            floodColor="#000"
+            floodOpacity="0.1"
+          />
+        </filter>
+        <filter id="badge-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow
+            dx="0"
+            dy="1"
+            stdDeviation="3"
+            floodColor="#E58257"
+            floodOpacity="0.35"
+          />
+        </filter>
+      </defs>
+
       {/* 배경 격자 */}
       {gridLevels.map((level) => {
         const radius = (maxRadius * level) / TASTING_MAX_VALUE;
         return (
           <polygon
             key={level}
-            points={buildPolygonPoints(cx, cy, radius, AXIS_COUNT)}
+            points={buildPolygonPoints(ctrX, ctrY, radius, AXIS_COUNT)}
             fill="none"
             stroke="#E6E6DD"
             strokeWidth={level === TASTING_MAX_VALUE ? 1.5 : 0.8}
@@ -253,8 +392,8 @@ export default function TastingRadarChart({
 
         return gridLevels.map((level) => {
           const radius = (maxRadius * level) / TASTING_MAX_VALUE;
-          const px = cx + radius * Math.cos(angle);
-          const py = cy + radius * Math.sin(angle);
+          const px = ctrX + radius * Math.cos(angle);
+          const py = ctrY + radius * Math.sin(angle);
 
           return (
             <text
@@ -276,12 +415,12 @@ export default function TastingRadarChart({
 
       {/* 축 선 */}
       {TASTING_AXES.map((axis, i) => {
-        const { x, y } = polarToCartesian(cx, cy, maxRadius, i);
+        const { x, y } = polarToCartesian(ctrX, ctrY, maxRadius, i);
         return (
           <line
             key={`axis-${axis.key}`}
-            x1={cx}
-            y1={cy}
+            x1={ctrX}
+            y1={ctrY}
             x2={x}
             y2={y}
             stroke="#E6E6DD"
@@ -301,19 +440,7 @@ export default function TastingRadarChart({
         strokeWidth={2}
       />
 
-      {/* 탭 히트 영역 */}
-      {isInteractive && (
-        <circle
-          cx={cx}
-          cy={cy}
-          r={maxRadius + 10}
-          fill="transparent"
-          cursor="pointer"
-          onPointerUp={handleChartTap}
-        />
-      )}
-
-      {/* 값 배지 */}
+      {/* 값 배지 (시각적 레이어) */}
       {badgePoints.map((p, i) => (
         <ValueBadge
           key={TASTING_AXES[i].key}
@@ -321,12 +448,13 @@ export default function TastingRadarChart({
           targetY={p.y}
           value={values[TASTING_AXES[i].key]}
           isActive={activeAxis === TASTING_AXES[i].key}
+          isDragging={draggingIdx === i}
         />
       ))}
 
       {/* 축 라벨 (한글) */}
       {TASTING_AXES.map((axis, i) => {
-        const { x, y } = polarToCartesian(cx, cy, maxRadius + 20, i);
+        const { x, y } = polarToCartesian(ctrX, ctrY, maxRadius + 20, i);
         return (
           <text
             key={axis.key}
@@ -336,19 +464,49 @@ export default function TastingRadarChart({
             dominantBaseline="central"
             className="fill-mainDarkGray"
             fontSize={11}
-            fontWeight={activeAxis === axis.key ? 700 : 600}
+            fontWeight={
+              activeAxis === axis.key || draggingIdx === i ? 700 : 600
+            }
+            style={{ pointerEvents: 'none' }}
           >
             {axis.labelKo}
           </text>
         );
       })}
 
-      {/* Layer 3: 탭 레벨 설명 (차트 중앙에 잠깐 표시) */}
+      {/* 탭 히트 영역 — 빈 곳 터치 시 가장 가까운 축에 값 설정 */}
+      {isInteractive && (
+        <circle
+          cx={ctrX}
+          cy={ctrY}
+          r={maxRadius + 10}
+          fill="transparent"
+          cursor="pointer"
+          onPointerUp={handleChartTap}
+        />
+      )}
+
+      {/* 배지 히트 영역 (최상위 — touch-action: none으로 스크롤 방지) */}
+      {isInteractive &&
+        badgePoints.map((p, i) => (
+          <circle
+            key={`hit-${TASTING_AXES[i].key}`}
+            cx={p.x}
+            cy={p.y}
+            r={BADGE_HIT_RADIUS}
+            fill="transparent"
+            cursor="grab"
+            style={{ touchAction: 'none' }}
+            onPointerDown={(e) => handleBadgePointerDown(e, i)}
+          />
+        ))}
+
+      {/* 드래그 중 레벨 설명 (차트 중앙) */}
       <AnimatePresence>
-        {tapFeedback && (
+        {feedback && (
           <motion.text
-            x={cx}
-            y={cy}
+            x={ctrX}
+            y={ctrY}
             textAnchor="middle"
             dominantBaseline="central"
             fill="#E58257"
@@ -360,7 +518,7 @@ export default function TastingRadarChart({
             exit={{ opacity: 0, scale: 0.7 }}
             transition={{ duration: 0.15 }}
           >
-            {LEVEL_DESCRIPTIONS[tapFeedback.level]}
+            {LEVEL_DESCRIPTIONS[feedback.level]}
           </motion.text>
         )}
       </AnimatePresence>

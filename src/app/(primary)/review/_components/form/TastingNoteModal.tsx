@@ -97,7 +97,7 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
                 이 위스키에서 느낀 풍미를 기록해보세요
               </p>
               <p className="text-12 text-mainGray mt-1">
-                차트를 탭하거나 슬라이더로 조절하세요
+                차트를 터치하거나 원을 드래그해서 조절하세요
               </p>
             </motion.div>
 
