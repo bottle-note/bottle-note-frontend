@@ -110,9 +110,9 @@ export const useReviewSubmission = ({
     // 테이스팅 노트 차트 이미지 생성
     const chartFile = await captureTastingNote(data.tastingNote);
 
-    // 유저 이미지 + 차트 이미지를 합산
+    // 유저 이미지 + 차트 이미지를 합산 (대표 이미지는 유저 사진이 되도록 차트를 뒤에 배치)
     const userImages = data.images?.map((file) => file.image) ?? [];
-    const allNewImages = chartFile ? [chartFile, ...userImages] : userImages;
+    const allNewImages = chartFile ? [...userImages, chartFile] : userImages;
 
     let newImgUrlList = null;
     if (allNewImages.length > 0) {
