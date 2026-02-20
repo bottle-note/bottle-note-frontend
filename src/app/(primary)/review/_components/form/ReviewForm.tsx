@@ -5,6 +5,7 @@ import AddressForm from './AddressForm';
 import TagsForm from './TagsForm';
 import ContentForm from './ContentForm';
 import RatingForm from './RatingForm';
+import TastingNoteForm from './TastingNoteForm';
 
 const Section = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -29,6 +30,7 @@ function ReviewForm() {
         <RatingForm />
         <ContentForm />
         <TagsForm />
+        <TastingNoteForm />
         <AddressForm />
         <PriceForm />
         <ImagesForm />

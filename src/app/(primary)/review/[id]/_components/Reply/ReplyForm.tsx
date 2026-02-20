@@ -14,7 +14,7 @@ interface Props {
 export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
   const { isLoggedIn } = useAuth();
   const { register, watch, handleSubmit, setValue } = useFormContext();
-  const content = watch('content');
+  const content = watch('content') ?? '';
   const mentionName = watch('replyToReplyUserName');
   const newTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const { handleLoginModal } = useModalStore();
@@ -123,7 +123,7 @@ export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
           />
         </div>
         <button
-          className={`ml-2 px-4 py-1 ${content.length !== 0 ? 'text-subCoral' : 'text-mainGray'}`}
+          className={`ml-2 px-4 py-1 ${content?.length !== 0 ? 'text-subCoral' : 'text-mainGray'}`}
           onClick={handleButtonClick}
         >
           등록
