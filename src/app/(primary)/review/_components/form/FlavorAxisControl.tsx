@@ -27,7 +27,7 @@ export default function FlavorAxisControl({
         <span className="text-[10px] text-mainGray">{descriptor}</span>
       </div>
       <div className="flex items-center gap-1.5">
-        <span className="text-[9px] text-mainGray/60 whitespace-nowrap shrink-0">
+        <span className="text-[9px] text-mainGray/60 whitespace-nowrap shrink-0 w-[24px]">
           {minHint}
         </span>
         <input
