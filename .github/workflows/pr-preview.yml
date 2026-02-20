@@ -1,0 +1,116 @@
+name: PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed, labeled, unlabeled]
+    branches: [dev, develop, main, release]
+
+concurrency:
+  group: vercel-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  deploy:
+    if: github.event.action != 'closed' && contains(github.event.pull_request.labels.*.name, 'pr-preview')
+    name: Preview 배포
+    runs-on: ubuntu-latest
+    steps:
+      - name: 소스 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: pnpm 설치
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Vercel CLI 설치
+        run: npm i -g vercel
+
+      - name: Vercel 환경 가져오기
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Preview URL 환경변수 오버라이드
+        run: |
+          ALIAS_URL="https://bottle-note-pr-${{ github.event.pull_request.number }}.vercel.app"
+          echo "NEXTAUTH_URL=$ALIAS_URL" >> .vercel/.env.preview.local
+          echo "NEXT_PUBLIC_CLIENT_URL=$ALIAS_URL" >> .vercel/.env.preview.local
+          echo "CLIENT_URL=$ALIAS_URL" >> .vercel/.env.preview.local
+          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .vercel/.env.preview.local
+
+      - name: 프로젝트 빌드
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Preview 배포
+        id: deploy
+        run: |
+          URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} \
+            --meta pr=${{ github.event.pull_request.number }})
+          echo "::add-mask::$URL"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: PR 번호 기반 alias 설정
+        run: |
+          ALIAS_URL="https://bottle-note-pr-${{ github.event.pull_request.number }}.vercel.app"
+          echo "::add-mask::$ALIAS_URL"
+          vercel alias set ${{ steps.deploy.outputs.url }} \
+            bottle-note-pr-${{ github.event.pull_request.number }}.vercel.app \
+            --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Discord 배포 알림
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.PREVIEW_DEPLOY_WEBHOOK_URL }}
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          ALIAS_URL="https://bottle-note-pr-${PR_NUMBER}.vercel.app"
+
+          curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            --data-raw "$(jq -n \
+              --arg pr_text "#${PR_NUMBER} ${PR_TITLE}" \
+              --arg pr_url "$PR_URL" \
+              --arg preview_url "$ALIAS_URL" \
+              '{
+                embeds: [{
+                  title: "✅ Preview 배포 완료",
+                  color: 5763719,
+                  fields: [
+                    {name: "PR", value: ("[" + $pr_text + "](" + $pr_url + ")"), inline: false},
+                    {name: "Preview URL", value: $preview_url, inline: false}
+                  ]
+                }]
+              }')"
+
+  cleanup:
+    if: github.event.action == 'closed' || (github.event.action == 'unlabeled' && github.event.label.name == 'pr-preview')
+    name: Preview 정리
+    runs-on: ubuntu-latest
+    steps:
+      - name: Alias 제거 및 배포 삭제
+        run: |
+          npm i -g vercel
+
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          ALIAS="bottle-note-pr-${PR_NUMBER}.vercel.app"
+
+          echo "Alias 제거: $ALIAS"
+          vercel alias rm "$ALIAS" --yes \
+            --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }} || true
+
+          echo "PR #${PR_NUMBER} 관련 배포 삭제"
+          curl -s -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+            "https://api.vercel.com/v6/deployments?projectId=${{ secrets.VERCEL_PROJECT_ID }}&meta-pr=${PR_NUMBER}&limit=20" \
+            | jq -r '.deployments[].uid // empty' \
+            | while read -r uid; do
+                echo "  삭제: $uid"
+                curl -s -X DELETE \
+                  -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+                  "https://api.vercel.com/v13/deployments/$uid" || true
+              done
+
+          echo "정리 완료"

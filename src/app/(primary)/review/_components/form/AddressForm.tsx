@@ -84,7 +84,7 @@ export default function AddressForm() {
         subTitle={currentLocationName ? '' : '(선택)'}
         forceOpen={searchModal}
       >
-        <article className="ml-7 text-14">
+        <article className="ml-7 mt-[6px] text-14">
           {!watch('address') ? (
             <button
               className="w-full border-subCoral border rounded-lg py-2"
