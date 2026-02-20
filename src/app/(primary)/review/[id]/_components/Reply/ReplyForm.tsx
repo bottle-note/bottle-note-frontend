@@ -14,7 +14,7 @@ interface Props {
 export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
   const { isLoggedIn } = useAuth();
   const { register, watch, handleSubmit, setValue } = useFormContext();
-  const content = watch('content');
+  const content = watch('content') ?? '';
   const mentionName = watch('replyToReplyUserName');
   const newTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const { handleLoginModal } = useModalStore();
