@@ -7,9 +7,11 @@ import { useFormContext } from 'react-hook-form';
 import {
   TASTING_AXES,
   DEFAULT_TASTING_NOTE,
+  getTastingHapticType,
   type TastingNoteValues,
 } from '@/constants/tastingNote';
 import { FormValues } from '@/types/Review';
+import { handleWebViewMessage } from '@/utils/flutterUtil';
 import TastingRadarChart from './TastingRadarChart';
 import FlavorAxisControl from './FlavorAxisControl';
 
@@ -38,6 +40,11 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
   }, [isOpen]);
 
   const handleAxisChange = (key: keyof TastingNoteValues, value: number) => {
+    const hapticType =
+      tastingNote[key] !== value ? getTastingHapticType(value) : null;
+    if (hapticType) {
+      handleWebViewMessage('triggerHaptic', { type: hapticType });
+    }
     setActiveAxis(key);
     const updated = { ...tastingNote, [key]: value };
     setValue('tastingNote', updated, { shouldDirty: true });

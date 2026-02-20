@@ -74,6 +74,16 @@ export const LEVEL_DESCRIPTIONS = [
   '매우 강렬',
 ] as const;
 
+/** 테이스팅 노트 값(0~5)에 따른 햅틱 강도 매핑 */
+export function getTastingHapticType(
+  value: number,
+): 'light' | 'medium' | 'heavy' | null {
+  if (value <= 0) return null;
+  if (value >= 4) return 'heavy';
+  if (value >= 2) return 'medium';
+  return 'light';
+}
+
 export const isTastingNoteEmpty = (note: TastingNoteValues | null): boolean => {
   if (!note) return true;
   return Object.values(note).every((v) => v === 0);
