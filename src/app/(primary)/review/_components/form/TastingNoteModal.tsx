@@ -31,14 +31,18 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
+  const historyPushedRef = useRef(false);
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
 
       // 뒤로가기 시 모달 닫기 위한 history entry 추가
       window.history.pushState({ tastingNoteModal: true }, '');
+      historyPushedRef.current = true;
 
       const handlePopState = () => {
+        historyPushedRef.current = false;
         onCloseRef.current();
       };
 
@@ -47,6 +51,12 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
       return () => {
         window.removeEventListener('popstate', handlePopState);
         document.body.style.overflow = '';
+
+        // 모달이 열린 채 컴포넌트가 unmount되면 잔류 history entry 제거
+        if (historyPushedRef.current) {
+          historyPushedRef.current = false;
+          window.history.back();
+        }
       };
     }
     document.body.style.overflow = '';
