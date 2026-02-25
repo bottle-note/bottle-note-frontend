@@ -5,14 +5,16 @@ import type { Banner } from '@/api/banner/types';
 
 export const bannerKeys = {
   all: ['banners'] as const,
-  list: (limit?: number) => [...bannerKeys.all, { limit }] as const,
+  list: (limit: number) => [...bannerKeys.all, { limit }] as const,
 };
 
 export const useBannerQuery = (limit?: number) => {
+  const normalizedLimit = limit ?? 10;
+
   const query = useQuery({
-    queryKey: bannerKeys.list(limit),
+    queryKey: bannerKeys.list(normalizedLimit),
     queryFn: async (): Promise<Banner[]> => {
-      const response = await BannerApi.getBanners(limit);
+      const response = await BannerApi.getBanners(normalizedLimit);
       return response.data;
     },
     staleTime: 1000 * 60 * 5,
