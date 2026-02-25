@@ -79,7 +79,7 @@ function BannerOverlay({ banner }: { banner: Banner }) {
           style={{ color: banner.nameFontColor }}
         >
           {banner.name.split('\n').map((line, idx, arr) => (
-            <span key={line}>
+            <span key={`${idx}-${line}`}>
               {line}
               {idx < arr.length - 1 && <br />}
             </span>
