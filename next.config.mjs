@@ -3,8 +3,21 @@
 const BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 const BASE_URL_V2 = process.env.NEXT_PUBLIC_SERVER_URL_V2;
 
+const buildTime = new Date().toLocaleString('ko-KR', {
+  timeZone: 'Asia/Seoul',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+});
+
 const nextConfig = {
   output: 'standalone',
+  env: {
+    NEXT_PUBLIC_BUILD_TIME: buildTime,
+  },
   reactStrictMode: false,
   experimental: {
     missingSuspenseWithCSRBailout: false,
