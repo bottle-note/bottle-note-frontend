@@ -1,188 +1,134 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ProductImage, BANNER_IMAGES } from '@/constants/home';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselApi,
 } from '@/components/ui/Display/carousel';
-import { ROUTES } from '@/constants/routes';
-import { useProgressiveImage } from '@/hooks/useProgressiveImage';
+import { useBannerQuery } from '@/queries/useBannerQuery';
+import type { Banner, BannerTextPosition } from '@/api/banner/types';
 
-interface OverlayConfig {
-  link: string;
-  mainText: React.ReactNode;
-  topSubText: string;
-  bottomSubText: string;
-  styles: {
-    mainTextColor: string;
-    topSubTextColor: string;
-    bottomSubTextColor: string;
-    containerClass: string;
-  };
+/**
+ * textPosition에 따라 오버레이 컨테이너 스타일을 결정한다.
+ * 오버레이는 항상 inset-0 (전체 영역)이며, padding + flex로 텍스트 위치를 잡는다.
+ */
+function getPositionClass(position: BannerTextPosition): string {
+  switch (position) {
+    case 'LT':
+      return 'pt-2.5 pl-6 items-start justify-start';
+    case 'LB':
+      return 'pb-2.5 pl-6 items-start justify-end';
+    case 'RT':
+      return 'pt-2.5 pr-6 items-end justify-start';
+    case 'RB':
+      return 'pb-2.5 pr-6 items-end justify-end';
+    case 'CENTER':
+      return 'items-center justify-center';
+    default:
+      return 'pt-2.5 pl-6 items-start justify-start';
+  }
 }
 
-const overlayConfigs: Record<string, OverlayConfig> = {
-  winterRecommend: {
-    link: ROUTES.SEARCH.SEARCH('겨울 추천 위스키'),
-    mainText: (
-      <>
-        차가운 겨울밤,
-        <br />
-        가장 따뜻한 한 모금
-      </>
-    ),
-    topSubText: '',
-    bottomSubText: '겨울 추천 위스키 >',
-    styles: {
-      mainTextColor: 'text-white',
-      topSubTextColor: '',
-      bottomSubTextColor: 'text-white font-thin',
-      containerClass: 'top-11 pl-7',
-    },
-  },
-  bottleNote: {
-    link: ROUTES.EXPLORE.BASE,
-    mainText: (
-      <>
-        기억에 남는 첫 향,
-        <br />
-        보틀노트에서
-      </>
-    ),
-    topSubText: '',
-    bottomSubText: '둘러보기',
-    styles: {
-      mainTextColor: 'text-white',
-      topSubTextColor: '',
-      bottomSubTextColor: 'text-textGray',
-      containerClass: 'top-11 pl-7',
-    },
-  },
-  rainDayRecommend: {
-    link: ROUTES.SEARCH.SEARCH('비 오는 날 추천 위스키'),
-    mainText: (
-      <>
-        비오는 날은 피트!
-        <br />
-        보틀노트가 추천하는
-      </>
-    ),
-    topSubText: '비 오는 날 추천 위스키 >',
-    bottomSubText: '',
-    styles: {
-      mainTextColor: 'text-white',
-      topSubTextColor: 'text-white font-thin',
-      bottomSubTextColor: '',
-      containerClass: 'top-[121px] pl-6',
-    },
-  },
-} as const;
-
-interface CarouselImageProps {
-  image: ProductImage;
+interface BannerImageProps {
+  banner: Banner;
   isPriority: boolean;
 }
 
-function CarouselImage({ image, isPriority }: CarouselImageProps) {
-  const {
-    isLoaded,
-    hasPlaceholder,
-    shouldShowSkeleton,
-    lightSrc,
-    heavySrc,
-    onHeavyLoad,
-  } = useProgressiveImage({
-    src: image.src,
-    placeholderSrc: image.placeholderSrc,
-  });
+function BannerImage({ banner, isPriority }: BannerImageProps) {
+  const [isLoaded, setIsLoaded] = useState(false);
 
   return (
     <>
-      {/* 스켈레톤: placeholder 없고 아직 로드 안됨 */}
-      {shouldShowSkeleton && (
+      {!isLoaded && (
         <div className="absolute inset-0 bg-gray-200 animate-pulse" />
       )}
-
-      {/* 가벼운 이미지 (placeholder 또는 원본) */}
       <Image
-        src={lightSrc}
-        alt={image.alt}
+        src={banner.imageUrl}
+        alt={banner.name}
         fill
         sizes="100vw"
-        priority={isPriority && !hasPlaceholder}
+        priority={isPriority}
         quality={75}
-        unoptimized={hasPlaceholder}
-        onLoad={!hasPlaceholder ? onHeavyLoad : undefined}
+        unoptimized
+        onLoad={() => setIsLoaded(true)}
         style={{ objectFit: 'cover' }}
         className="w-full h-full object-cover"
       />
-
-      {/* 무거운 이미지: placeholder가 있을 때만 별도 로드 */}
-      {hasPlaceholder && (
-        <Image
-          src={heavySrc}
-          alt=""
-          aria-hidden="true"
-          fill
-          sizes="100vw"
-          loading="lazy"
-          unoptimized
-          onLoad={onHeavyLoad}
-          style={{ objectFit: 'cover' }}
-          className={`w-full h-full object-cover ${
-            isLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
-      )}
     </>
   );
 }
 
-function OverlayContent({ config }: { config: OverlayConfig }) {
-  return (
-    <Link
-      href={config.link}
-      className={`absolute left-0 ${config.styles.containerClass} w-full h-full flex flex-col z-10`}
-    >
-      {config.topSubText && (
+function BannerOverlay({ banner }: { banner: Banner }) {
+  const positionClass = getPositionClass(banner.textPosition);
+
+  const content = (
+    <>
+      {banner.descriptionA && (
         <div
-          className={`inline-flex items-center gap-1 mt-2 ${config.styles.topSubTextColor}`}
+          className="inline-flex items-center gap-1 mt-2 font-thin"
+          style={{ color: banner.descriptionFontColor }}
         >
-          {config.topSubText}
+          {banner.descriptionA}
         </div>
       )}
       <div>
         <span
-          className={`block ${config.styles.mainTextColor} text-24 font-semiBold leading-tight drop-shadow-md`}
+          className="block text-24 font-semiBold leading-tight drop-shadow-md"
+          style={{ color: banner.nameFontColor }}
         >
-          {config.mainText}
+          {banner.name.split('\n').map((line, idx, arr) => (
+            <span key={`${idx}-${line}`}>
+              {line}
+              {idx < arr.length - 1 && <br />}
+            </span>
+          ))}
         </span>
       </div>
-      {config.bottomSubText && (
+      {banner.descriptionB && (
         <div
-          className={`inline-flex items-center gap-1 mt-2 ${config.styles.bottomSubTextColor}`}
+          className="inline-flex items-center gap-1 mt-2 font-thin"
+          style={{ color: banner.descriptionFontColor }}
         >
-          {config.bottomSubText}
+          {banner.descriptionB}
         </div>
       )}
+    </>
+  );
+
+  if (banner.isExternalUrl) {
+    return (
+      <a
+        href={banner.targetUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`absolute inset-0 ${positionClass} flex flex-col z-10`}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link
+      href={banner.targetUrl}
+      className={`absolute inset-0 ${positionClass} flex flex-col z-10`}
+    >
+      {content}
     </Link>
   );
 }
 
-function textOverlay(id: string | number) {
-  const config = overlayConfigs[String(id)];
-  if (!config) return null;
-
-  return <OverlayContent config={config} />;
-}
-
 export default function HomeCarousel() {
   const [api, setApi] = useState<CarouselApi | null>(null);
+  const { data: banners, isLoading } = useBannerQuery();
 
-  if (!BANNER_IMAGES || BANNER_IMAGES.length === 0) {
+  if (isLoading) {
+    return <div className="w-full h-[227px] bg-gray-200 animate-pulse" />;
+  }
+
+  if (!banners || banners.length === 0) {
     return <></>;
   }
 
@@ -196,11 +142,11 @@ export default function HomeCarousel() {
       className="w-full bg-white"
     >
       <CarouselContent className="!ml-0">
-        {BANNER_IMAGES.map((image, index) => (
-          <CarouselItem key={image.id} className="!pl-0">
+        {banners.map((banner, index) => (
+          <CarouselItem key={banner.id} className="!pl-0">
             <div className="relative w-full h-[227px] overflow-hidden flex items-center justify-center">
-              <CarouselImage image={image} isPriority={index === 0} />
-              {textOverlay(image.id)}
+              <BannerImage banner={banner} isPriority={index === 0} />
+              <BannerOverlay banner={banner} />
               <button
                 type="button"
                 onClick={() => api && api.scrollPrev()}
