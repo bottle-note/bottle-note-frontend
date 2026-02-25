@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFormContext } from 'react-hook-form';
@@ -28,15 +28,39 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
 
   const [activeAxis, setActiveAxis] = useState<string | null>(null);
 
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  const historyPushedRef = useRef(false);
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+
+      // 뒤로가기 시 모달 닫기 위한 history entry 추가
+      window.history.pushState({ tastingNoteModal: true }, '');
+      historyPushedRef.current = true;
+
+      const handlePopState = () => {
+        historyPushedRef.current = false;
+        onCloseRef.current();
+      };
+
+      window.addEventListener('popstate', handlePopState);
+
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+        document.body.style.overflow = '';
+
+        // 모달이 열린 채 컴포넌트가 unmount되면 잔류 history entry 제거
+        if (historyPushedRef.current) {
+          historyPushedRef.current = false;
+          window.history.back();
+        }
+      };
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
+    document.body.style.overflow = '';
+    return undefined;
   }, [isOpen]);
 
   const handleAxisChange = (key: keyof TastingNoteValues, value: number) => {
@@ -49,6 +73,11 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
     setActiveAxis(key);
     const updated = { ...tastingNote, [key]: value };
     setValue('tastingNote', updated, { shouldDirty: true });
+  };
+
+  // 모달 닫기: pushState로 추가한 history entry를 제거 → popstate → onClose
+  const handleClose = () => {
+    window.history.back();
   };
 
   const handleReset = () => {
@@ -67,10 +96,10 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
         >
           {/* 헤더 */}
-          <header className="flex items-center justify-between px-5 py-3 border-b border-bgGray">
+          <header className="flex items-center justify-between px-5 py-3 border-b border-bgGray pt-safe-header">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="flex items-center gap-1 text-14 text-mainGray"
             >
               <Image
@@ -85,7 +114,7 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
             </h2>
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="text-14 font-bold text-subCoral"
             >
               완료
@@ -93,7 +122,7 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
           </header>
 
           {/* 콘텐츠 */}
-          <div className="flex-1 overflow-y-auto px-5 pb-8">
+          <div className="flex-1 overflow-y-auto px-5 pb-safe">
             {/* 안내 텍스트 */}
             <motion.div
               className="pt-5 pb-2 text-center"
