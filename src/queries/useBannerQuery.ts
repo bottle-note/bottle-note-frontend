@@ -23,9 +23,9 @@ export const useBannerQuery = (limit?: number) => {
   });
 
   const data = query.data
-    ? [...query.data, ...FALLBACK_BANNERS]
+    ? [...query.data, ...FALLBACK_BANNERS].slice(0, normalizedLimit)
     : query.isError
-      ? FALLBACK_BANNERS
+      ? FALLBACK_BANNERS.slice(0, normalizedLimit)
       : undefined;
 
   return {
