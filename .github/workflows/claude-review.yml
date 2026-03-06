@@ -26,8 +26,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          model: claude-opus-4-20250514
-          claude_args: '--max-turns 10'
+          claude_args: '--model claude-opus-4-20250514 --max-turns 10'
           prompt: |
             You are reviewing a **Next.js 14 (App Router) + TypeScript + TanStack Query v5 + Zustand** frontend project.
             The app is a whisky review platform. All pages are mobile-first (max-width: 468px).
