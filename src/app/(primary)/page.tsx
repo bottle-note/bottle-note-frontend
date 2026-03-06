@@ -94,7 +94,7 @@ export default function Home() {
         </SubHeader>
 
         {/* TODO: 프로모에 대해 별도 컴포넌트로 처리 (여러개 추가될 경우.) */}
-        {/* {showTarotPromo && <TarotPromoCard onClose={handleCloseTarotPromo} />} */}
+        {showTarotPromo && <TarotPromoCard onClose={handleCloseTarotPromo} />}
 
         <HomeCarousel />
 
