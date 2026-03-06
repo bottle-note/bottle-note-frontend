@@ -22,8 +22,14 @@ export const useBannerQuery = (limit?: number) => {
     retry: false,
   });
 
+  const data = query.data
+    ? [...query.data, ...FALLBACK_BANNERS].slice(0, normalizedLimit)
+    : query.isError
+      ? FALLBACK_BANNERS.slice(0, normalizedLimit)
+      : undefined;
+
   return {
     ...query,
-    data: query.data ?? (query.isError ? FALLBACK_BANNERS : undefined),
+    data,
   };
 };
