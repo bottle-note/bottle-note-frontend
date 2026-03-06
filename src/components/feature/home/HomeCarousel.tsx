@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Autoplay from 'embla-carousel-autoplay';
@@ -64,20 +64,22 @@ function BannerImage({ banner, isPriority }: BannerImageProps) {
 function BannerOverlay({ banner }: { banner: Banner }) {
   const positionClass = getPositionClass(banner.textPosition);
 
+  const textShadow = '0 1px 4px rgba(0, 0, 0, 0.6)';
+
   const content = (
     <>
       {banner.descriptionA && (
         <div
           className="inline-flex items-center gap-1 mt-2 font-thin"
-          style={{ color: banner.descriptionFontColor }}
+          style={{ color: banner.descriptionFontColor, textShadow }}
         >
           {banner.descriptionA}
         </div>
       )}
       <div>
         <span
-          className="block text-24 font-semiBold leading-tight drop-shadow-md"
-          style={{ color: banner.nameFontColor }}
+          className="block text-24 font-semiBold leading-tight"
+          style={{ color: banner.nameFontColor, textShadow }}
         >
           {banner.name.split('\n').map((line, idx, arr) => (
             <span key={`${idx}-${line}`}>
@@ -90,7 +92,7 @@ function BannerOverlay({ banner }: { banner: Banner }) {
       {banner.descriptionB && (
         <div
           className="inline-flex items-center gap-1 mt-2 font-thin"
-          style={{ color: banner.descriptionFontColor }}
+          style={{ color: banner.descriptionFontColor, textShadow }}
         >
           {banner.descriptionB}
         </div>
@@ -123,6 +125,13 @@ function BannerOverlay({ banner }: { banner: Banner }) {
 
 export default function HomeCarousel() {
   const [api, setApi] = useState<CarouselApi | null>(null);
+  const autoplayRef = useRef(
+    Autoplay({
+      delay: 3000,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+    }),
+  );
   const { data: banners, isLoading } = useBannerQuery();
 
   if (isLoading) {
@@ -139,13 +148,7 @@ export default function HomeCarousel() {
         align: 'start',
         loop: true,
       }}
-      plugins={[
-        Autoplay({
-          delay: 3000,
-          stopOnInteraction: false,
-          stopOnMouseEnter: true,
-        }),
-      ]}
+      plugins={[autoplayRef.current]}
       setApi={setApi}
       className="w-full bg-white"
     >
