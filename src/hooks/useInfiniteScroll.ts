@@ -14,12 +14,16 @@ interface Props {
 
 export const useInfiniteScroll = ({ fetchNextPage, options }: Props) => {
   const targetRef = useRef<HTMLDivElement | null>(null);
+  const fetchRef = useRef(fetchNextPage);
+  fetchRef.current = fetchNextPage;
 
-  const observerCallback: IntersectionObserverCallback = throttle((entries) => {
-    if (entries[0].isIntersecting) {
-      fetchNextPage();
-    }
-  });
+  const observerCallback = useRef(
+    throttle((entries: IntersectionObserverEntry[]) => {
+      if (entries[0].isIntersecting) {
+        fetchRef.current();
+      }
+    }),
+  ).current;
 
   useEffect(() => {
     const target = targetRef.current;

@@ -4,7 +4,11 @@
 
 // --------------- Request Types ---------------
 
-export type S3UploadPath = 'review' | 'userProfile' | 'inquire';
+export type S3UploadPath =
+  | 'review'
+  | 'userProfile'
+  | 'inquire'
+  | 'tastingGraph';
 
 // --------------- Response Types ---------------
 

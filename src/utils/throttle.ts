@@ -1,5 +1,5 @@
 export const throttle = (handler: (...args: any[]) => void, timeout = 300) => {
-  let lastInvokeTime: number;
+  let lastInvokeTime = 0;
   let timer: ReturnType<typeof setTimeout>;
 
   return function (this: any, ...args: any[]) {

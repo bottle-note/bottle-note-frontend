@@ -30,14 +30,6 @@ const SORT_OPTIONS = [
   { name: '댓글순', type: SORT_TYPE.REVIEW },
 ];
 
-const CURATION_KEYWORDS = ['겨울 추천 위스키', '비 오는 날 추천 위스키'];
-
-const isCurationKeyword = (keyword: string) => {
-  return CURATION_KEYWORDS.some((curationKeyword) =>
-    keyword.includes(curationKeyword),
-  );
-};
-
 export default function Search() {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
@@ -47,8 +39,9 @@ export default function Search() {
     useSearchPageState();
   const [showTab, setShowTab] = useState(true);
 
+  const curationIdNum = Number(filterState.curationId);
   const isCurationSearch =
-    filterState.keyword && isCurationKeyword(filterState.keyword);
+    !!filterState.curationId && !Number.isNaN(curationIdNum);
 
   const {
     data: alcoholList,
@@ -67,52 +60,44 @@ export default function Search() {
       filterState.sortType,
       filterState.sortOrder,
       filterState.keyword,
+      filterState.curationId,
     ],
     queryFn: async ({ pageParam }) => {
       if (isCurationSearch) {
-        const curationsResult = await CurationApi.getCurations({
-          keyword: filterState.keyword,
-          cursor: 0,
-          pageSize: 1,
-        });
+        const alcoholsResult = await CurationApi.getAlcoholsByCurationId(
+          curationIdNum,
+          {
+            cursor: pageParam,
+            pageSize: 10,
+          },
+        );
 
-        if (curationsResult.data.items.length > 0) {
-          const curationId = curationsResult.data.items[0].id;
-          const alcoholsResult = await CurationApi.getAlcoholsByCurationId(
-            curationId,
-            {
-              cursor: pageParam,
-              pageSize: 10,
-            },
-          );
+        // CurationAlcoholItem을 Alcohol로 변환
+        const alcohols: Alcohol[] = alcoholsResult.data.items.map(
+          ({
+            korCategoryName,
+            engCategoryName,
+            reviewCount,
+            pickCount,
+            ...rest
+          }) => ({
+            ...rest,
+            korCategory: korCategoryName,
+            engCategory: engCategoryName,
+            popularScore: 0,
+          }),
+        );
 
-          // CurationAlcoholItem을 Alcohol로 변환
-          const alcohols: Alcohol[] = alcoholsResult.data.items.map(
-            ({
-              korCategoryName,
-              engCategoryName,
-              reviewCount,
-              pickCount,
-              ...rest
-            }) => ({
-              ...rest,
-              korCategory: korCategoryName,
-              engCategory: engCategoryName,
-              popularScore: 0,
-            }),
-          );
-
-          return {
-            data: {
-              alcohols,
-              totalCount: alcoholsResult.data.items.length,
-            },
-            errors: [],
-            success: true,
-            code: 200,
-            meta: alcoholsResult.meta,
-          };
-        }
+        return {
+          data: {
+            alcohols,
+            totalCount: alcoholsResult.data.items.length,
+          },
+          errors: [],
+          success: true,
+          code: 200,
+          meta: alcoholsResult.meta,
+        };
       }
 
       // 일반 검색인 경우 기존 API 사용

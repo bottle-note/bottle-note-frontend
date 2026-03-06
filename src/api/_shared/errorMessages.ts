@@ -60,6 +60,9 @@ export const ERROR_MESSAGES = {
   // 신고
   REPORT_CREATE_FAILED: '신고에 실패했습니다.',
 
+  // 배너
+  BANNER_FETCH_FAILED: '배너를 불러오는데 실패했습니다.',
+
   // 큐레이션
   CURATION_FETCH_FAILED: '큐레이션을 불러오는데 실패했습니다.',
 

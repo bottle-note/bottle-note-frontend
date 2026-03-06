@@ -8,6 +8,7 @@ const S3_URL_PATH: Record<S3UploadPath, string> = {
   review: 'review',
   userProfile: 'user/profile',
   inquire: 'inquire',
+  tastingGraph: 'tasting-graph',
 } as const;
 
 export const S3Api = {

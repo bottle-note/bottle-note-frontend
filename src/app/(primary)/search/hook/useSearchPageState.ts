@@ -11,6 +11,7 @@ interface FilterState {
   regionId: string;
   sortType: SORT_TYPE;
   sortOrder: SORT_ORDER;
+  curationId: string;
 }
 
 const getDefaultValue = <T>(value: T | null, defaultValue: T): T => {
@@ -29,8 +30,10 @@ export const useSearchPageState = () => {
   const urlRegionId = searchParams.get('regionId');
   const urlSortType = searchParams.get('sortType') as SORT_TYPE;
   const urlSortOrder = searchParams.get('sortOrder') as SORT_ORDER;
+  const urlCurationId = searchParams.get('curationId');
 
-  const isEmptySearch = !searchParams.has('category') && !urlKeyword;
+  const isEmptySearch =
+    !searchParams.has('category') && !urlKeyword && !urlCurationId;
 
   const initialState: FilterState = {
     category: getDefaultValue(urlCategory, ''),
@@ -38,6 +41,7 @@ export const useSearchPageState = () => {
     regionId: getDefaultValue(urlRegionId, ''),
     sortType: getDefaultValue(urlSortType, SORT_TYPE.POPULAR),
     sortOrder: getDefaultValue(urlSortOrder, SORT_ORDER.DESC),
+    curationId: getDefaultValue(urlCurationId, ''),
   };
 
   const { state: filterState, handleFilter } = useFilter(initialState);
@@ -49,6 +53,7 @@ export const useSearchPageState = () => {
     const regionId = getDefaultValue(urlRegionId, '');
     const sortType = getDefaultValue(urlSortType, SORT_TYPE.POPULAR);
     const sortOrder = getDefaultValue(urlSortOrder, SORT_ORDER.DESC);
+    const curationId = getDefaultValue(urlCurationId, '');
 
     if (filterState.category !== category) handleFilter('category', category);
     if (filterState.keyword !== keyword) handleFilter('keyword', keyword);
@@ -56,18 +61,29 @@ export const useSearchPageState = () => {
     if (filterState.sortType !== sortType) handleFilter('sortType', sortType);
     if (filterState.sortOrder !== sortOrder)
       handleFilter('sortOrder', sortOrder);
-  }, [urlCategory, urlKeyword, urlRegionId, urlSortType, urlSortOrder]);
+    if (filterState.curationId !== curationId)
+      handleFilter('curationId', curationId);
+  }, [
+    urlCategory,
+    urlKeyword,
+    urlRegionId,
+    urlSortType,
+    urlSortOrder,
+    urlCurationId,
+  ]);
 
   // filterState가 변경되면 URL 동기화
   useEffect(() => {
     const params = new URLSearchParams();
-    const { category, keyword, regionId, sortType, sortOrder } = filterState;
+    const { category, keyword, regionId, sortType, sortOrder, curationId } =
+      filterState;
 
     if (category) params.set('category', category);
     if (keyword) params.set('keyword', keyword);
     if (regionId) params.set('regionId', regionId);
     if (sortType) params.set('sortType', sortType);
     if (sortOrder) params.set('sortOrder', sortOrder);
+    if (curationId) params.set('curationId', curationId);
 
     const newUrl = `/search?${params.toString()}`;
     if (window.location.pathname + window.location.search !== newUrl) {

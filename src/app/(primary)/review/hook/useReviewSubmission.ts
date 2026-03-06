@@ -5,6 +5,7 @@ import { ReviewApi } from '@/api/review/review.api';
 import useModalStore from '@/store/modalStore';
 import { FormValues } from '@/types/Review';
 import { ROUTES } from '@/constants/routes';
+import { captureTastingNote } from './useTastingNoteCapture';
 
 interface UseReviewSubmissionProps {
   alcoholId: string;
@@ -106,16 +107,34 @@ export const useReviewSubmission = ({
       viewUrl: string;
     }[] = [],
   ) => {
+    // 유저 이미지 업로드
+    const userImages = data.images?.map((file) => file.image) ?? [];
     let newImgUrlList = null;
-    if (data.images?.length !== 0) {
-      newImgUrlList = await handleUploadImages(
-        data.images?.map((file) => file.image) ?? [],
-      );
+    if (userImages.length > 0) {
+      newImgUrlList = await handleUploadImages(userImages);
     }
 
+    // 테이스팅 노트 차트 이미지 생성 → 별도 경로(tasting-graph)로 업로드
+    const chartFile = await captureTastingNote(data.tastingNote);
+    let chartImgUrlList = null;
+    if (chartFile) {
+      chartImgUrlList = await uploadImages('tastingGraph', [chartFile]);
+    }
+
+    // 새 차트가 생성된 경우에만 기존 차트 이미지 교체
+    const filteredOriginList = chartImgUrlList
+      ? originImgUrlList.filter((img) => !img.viewUrl.includes('tasting-graph'))
+      : originImgUrlList;
+
     const finalImageUrlList =
-      originImgUrlList?.length > 0 || (newImgUrlList?.length ?? 0) > 0
-        ? [...originImgUrlList, ...(newImgUrlList ?? [])]
+      filteredOriginList.length > 0 ||
+      (newImgUrlList?.length ?? 0) > 0 ||
+      (chartImgUrlList?.length ?? 0) > 0
+        ? [
+            ...filteredOriginList,
+            ...(newImgUrlList ?? []),
+            ...(chartImgUrlList ?? []),
+          ]
         : null;
 
     const reviewParams = createReviewParams(data, finalImageUrlList);

@@ -39,6 +39,7 @@ export const S3_URL_PATH = {
   review: 'review',
   userProfile: 'user/profile',
   inquire: 'inquire',
+  tastingGraph: 'tasting-graph',
 };
 
 export const REGIONS = [

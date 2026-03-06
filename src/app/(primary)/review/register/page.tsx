@@ -56,6 +56,7 @@ function ReviewRegister() {
     mapUrl: null,
     latitude: null,
     longitude: null,
+    tastingNote: null,
   };
 
   const formMethods = useForm<FormValues>({

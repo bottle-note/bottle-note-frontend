@@ -1,7 +1,9 @@
-# Code Review Instructions
+# Copilot Instructions
 
 You are reviewing a **Next.js 14 (App Router) + TypeScript + TanStack Query v5 + Zustand** frontend project.
 The app is a whisky review platform. All pages are mobile-first (max-width: 468px).
+
+Review only the changed files in this PR.
 
 ## Language
 
@@ -109,30 +111,6 @@ Prefix every comment with one of these:
 - Include `suggestion` block only for P0/P1 with an obvious fix.
 - Suggestion code must be under 5 lines.
 - Do NOT suggest architectural changes in a suggestion block.
-
-## Examples
-
-**Good P1 comment:**
-
-[P1] `alcoholId` 파라미터가 undefined일 때 API 호출이 발생합니다. 위스키 상세 페이지 진입 시 잠깐 동안 잘못된 요청이 전송됩니다.
-
-```suggestion
-const { data } = useQuery({
-  queryKey: alcoholKeys.detail(alcoholId),
-  queryFn: () => AlcoholsApi.getDetail(alcoholId!),
-  enabled: !!alcoholId,
-});
-```
-
-**Good P2 comment:**
-
-[P2] 배럴 파일 import 사용. `@/api/review/review.api`에서 직접 import 해주세요.
-
-**Bad comment (do NOT write like this):**
-
-~~[P1] 이 코드는 개선이 필요합니다. useEffect에서 cleanup을 하지 않고 있는데, 이는 React의 best practice에 위배됩니다. cleanup을 추가하면 메모리 누수를 방지할 수 있고, 컴포넌트가 unmount될 때...~~
-
-(Too long. No concrete reproduction scenario. "Best practice" is not a bug.)
 
 ## PR Overview Guidelines
 

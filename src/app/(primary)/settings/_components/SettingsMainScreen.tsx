@@ -64,7 +64,7 @@ export const SettingsMainScreen = ({
 
       <div className="py-[22px] border-t border-brightGray">
         <div className="flex justify-between items-center text-15 text-brightGray">
-          <span>앱 버전 1.1.4</span>
+          <span>빌드 {process.env.NEXT_PUBLIC_BUILD_TIME}</span>
         </div>
       </div>
     </motion.section>
