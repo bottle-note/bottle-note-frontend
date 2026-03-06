@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import Autoplay from 'embla-carousel-autoplay';
 import {
   Carousel,
   CarouselContent,
@@ -17,11 +18,11 @@ import type { Banner, BannerTextPosition } from '@/api/banner/types';
 function getPositionClass(position: BannerTextPosition): string {
   switch (position) {
     case 'LT':
-      return 'pt-2.5 pl-6 items-start justify-start';
+      return 'pt-10 pl-6 items-start justify-start';
     case 'LB':
       return 'pb-2.5 pl-6 items-start justify-end';
     case 'RT':
-      return 'pt-2.5 pr-6 items-end justify-start';
+      return 'pt-10 pr-6 items-end justify-start';
     case 'RB':
       return 'pb-2.5 pr-6 items-end justify-end';
     case 'CENTER':
@@ -138,6 +139,13 @@ export default function HomeCarousel() {
         align: 'start',
         loop: true,
       }}
+      plugins={[
+        Autoplay({
+          delay: 3000,
+          stopOnInteraction: false,
+          stopOnMouseEnter: true,
+        }),
+      ]}
       setApi={setApi}
       className="w-full bg-white"
     >
