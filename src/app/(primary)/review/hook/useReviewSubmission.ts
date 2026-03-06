@@ -107,21 +107,29 @@ export const useReviewSubmission = ({
       viewUrl: string;
     }[] = [],
   ) => {
-    // 테이스팅 노트 차트 이미지 생성
-    const chartFile = await captureTastingNote(data.tastingNote);
-
-    // 유저 이미지 + 차트 이미지를 합산 (대표 이미지는 유저 사진이 되도록 차트를 뒤에 배치)
+    // 유저 이미지 업로드
     const userImages = data.images?.map((file) => file.image) ?? [];
-    const allNewImages = chartFile ? [...userImages, chartFile] : userImages;
-
     let newImgUrlList = null;
-    if (allNewImages.length > 0) {
-      newImgUrlList = await handleUploadImages(allNewImages);
+    if (userImages.length > 0) {
+      newImgUrlList = await handleUploadImages(userImages);
+    }
+
+    // 테이스팅 노트 차트 이미지 생성 → 별도 경로(tasting-graph)로 업로드
+    const chartFile = await captureTastingNote(data.tastingNote);
+    let chartImgUrlList = null;
+    if (chartFile) {
+      chartImgUrlList = await uploadImages('tastingGraph', [chartFile]);
     }
 
     const finalImageUrlList =
-      originImgUrlList?.length > 0 || (newImgUrlList?.length ?? 0) > 0
-        ? [...originImgUrlList, ...(newImgUrlList ?? [])]
+      originImgUrlList?.length > 0 ||
+      (newImgUrlList?.length ?? 0) > 0 ||
+      (chartImgUrlList?.length ?? 0) > 0
+        ? [
+            ...originImgUrlList,
+            ...(newImgUrlList ?? []),
+            ...(chartImgUrlList ?? []),
+          ]
         : null;
 
     const reviewParams = createReviewParams(data, finalImageUrlList);
