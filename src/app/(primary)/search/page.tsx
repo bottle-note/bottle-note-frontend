@@ -39,7 +39,9 @@ export default function Search() {
     useSearchPageState();
   const [showTab, setShowTab] = useState(true);
 
-  const isCurationSearch = !!filterState.curationId;
+  const curationIdNum = Number(filterState.curationId);
+  const isCurationSearch =
+    !!filterState.curationId && !Number.isNaN(curationIdNum);
 
   const {
     data: alcoholList,
@@ -63,7 +65,7 @@ export default function Search() {
     queryFn: async ({ pageParam }) => {
       if (isCurationSearch) {
         const alcoholsResult = await CurationApi.getAlcoholsByCurationId(
-          Number(filterState.curationId),
+          curationIdNum,
           {
             cursor: pageParam,
             pageSize: 10,
