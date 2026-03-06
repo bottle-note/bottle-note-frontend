@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import { v4 as uuid } from 'uuid';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ExploreApi } from '@/api/explore/explore.api';
 import { ExploreReview } from '@/api/explore/types';
@@ -82,7 +81,9 @@ export const ReviewExplorerList = () => {
             [...reviewList].map((listData) =>
               listData.data.items
                 .flat()
-                .map((review) => <ReviewCard key={uuid()} content={review} />),
+                .map((review) => (
+                  <ReviewCard key={review.reviewId} content={review} />
+                )),
             )}
           <div ref={targetRef} className="h-10" />
         </List.Section>
