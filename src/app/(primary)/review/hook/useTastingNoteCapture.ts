@@ -67,11 +67,6 @@ function generateSvgString(values: TastingNoteValues): string {
     return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" fill="#252525" font-size="13" font-weight="600" font-family="system-ui, -apple-system, sans-serif">${axis.label}</text>`;
   }).join('');
 
-  const subLabels = TASTING_AXES.map((axis, i) => {
-    const { x, y } = polar(MAX_RADIUS + 42, i);
-    return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" fill="#666666" font-size="10" font-family="system-ui, -apple-system, sans-serif">${axis.labelKo}</text>`;
-  }).join('');
-
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${SVG_SIZE}" height="${SVG_SIZE}" viewBox="0 0 ${SVG_SIZE} ${SVG_SIZE}">
     <rect width="${SVG_SIZE}" height="${SVG_SIZE}" fill="white"/>
     ${gridLines}
@@ -79,7 +74,6 @@ function generateSvgString(values: TastingNoteValues): string {
     <polygon points="${valuePoly}" fill="#EF9A6E" fill-opacity="0.25" stroke="#E58257" stroke-width="2.5"/>
     ${dots}
     ${labels}
-    ${subLabels}
   </svg>`;
 }
 
