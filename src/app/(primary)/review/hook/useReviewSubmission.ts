@@ -121,12 +121,17 @@ export const useReviewSubmission = ({
       chartImgUrlList = await uploadImages('tastingGraph', [chartFile]);
     }
 
+    // 수정 시 기존 차트 이미지 제거 (새 차트로 교체)
+    const filteredOriginList = originImgUrlList.filter(
+      (img) => !img.viewUrl.includes('tasting-graph'),
+    );
+
     const finalImageUrlList =
-      originImgUrlList?.length > 0 ||
+      filteredOriginList.length > 0 ||
       (newImgUrlList?.length ?? 0) > 0 ||
       (chartImgUrlList?.length ?? 0) > 0
         ? [
-            ...originImgUrlList,
+            ...filteredOriginList,
             ...(newImgUrlList ?? []),
             ...(chartImgUrlList ?? []),
           ]
