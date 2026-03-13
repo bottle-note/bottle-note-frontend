@@ -49,14 +49,10 @@ export const useAppSocialLogin = () => {
         nonce: string;
       };
 
-      await login(
-        'apple-login',
-        {
-          idToken,
-          nonce,
-        },
-        false,
-      );
+      await login('apple-login', {
+        idToken,
+        nonce,
+      });
 
       router.replace(getReturnToUrl());
     } catch (e) {

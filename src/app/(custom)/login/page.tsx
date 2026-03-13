@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
@@ -30,7 +29,7 @@ export default function Login() {
     handleKakaoLogin,
     handleAppleLogin,
   } = useLogin();
-  const { isLoggedIn, isLoading } = useAuth();
+  const { isLoggedIn, isLoading, login } = useAuth();
 
   useEffect(() => {
     if (returnToParam && isValidReturnUrl(returnToParam)) {
@@ -105,7 +104,7 @@ export default function Login() {
             )}
             {IS_PREVIEW && (
               <button
-                onClick={() => signIn('preview-login', { redirect: false })}
+                onClick={() => login('preview-login', {})}
                 className="w-full rounded-md py-2.5 bg-gray-700 text-white text-sm border border-gray-500"
               >
                 [Preview] 테스트 계정으로 로그인

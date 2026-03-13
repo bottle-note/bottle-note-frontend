@@ -1,4 +1,3 @@
-import { signIn } from 'next-auth/react';
 import BackDrop from '@/components/ui/Modal/BackDrop';
 import SocialLoginBtn from './SocialLoginBtn';
 
@@ -15,8 +14,8 @@ function LoginOptionDropdown({ handleClose }: Props) {
             다른 소셜 계정으로 로그인
           </div>
           <div className="flex flex-col items-center justify-center gap-2 p-5">
-            <SocialLoginBtn type="NAVER" onClick={() => signIn('naver')} />
-            <SocialLoginBtn type="GOOGLE" onClick={() => signIn('google')} />
+            <SocialLoginBtn type="NAVER" onClick={handleClose} />
+            <SocialLoginBtn type="GOOGLE" onClick={handleClose} />
           </div>
         </article>
         <button

@@ -1,39 +1,37 @@
 'use client';
 
-import { useMemo } from 'react';
-import { useSession, signOut, signIn } from 'next-auth/react';
+import { useSyncExternalStore } from 'react';
 import { UserData } from '@/types/Auth';
+import {
+  getAuthSnapshot,
+  subscribeAuthSession,
+  loginAuthSession,
+  logoutAuthSession,
+  refreshAuthSession,
+} from '@/lib/auth/session-store';
 
 export const useAuth = () => {
-  const { data: session, status, update } = useSession();
+  const { status, session } = useSyncExternalStore(
+    subscribeAuthSession,
+    getAuthSnapshot,
+    getAuthSnapshot,
+  );
 
-  const user = useMemo((): UserData | null => {
-    if (session?.user) {
-      return {
-        userId: session.user.userId,
-        sub: session.user.email,
-        profile: session.user.profile,
-        roles: session.user.roles as 'ROLE_USER' | 'ROLE_ADMIN' | undefined,
-      };
-    }
-    return null;
-  }, [session]);
-
+  const user: UserData | null = session?.user ?? null;
   const isLoggedIn = status === 'authenticated';
   const isLoading = status === 'loading';
 
   const logout = () => {
-    signOut({ redirect: false });
+    return logoutAuthSession();
   };
 
   const login = async (
-    provider: 'kakao-login' | 'apple-login',
+    provider: 'kakao-login' | 'apple-login' | 'preview-login',
     credentials: Record<string, any>,
-    isRedirect = false,
   ) => {
-    await signIn(provider, {
+    await loginAuthSession({
+      provider,
       ...credentials,
-      redirect: isRedirect,
     });
   };
 
@@ -44,6 +42,6 @@ export const useAuth = () => {
     logout,
     login,
     session,
-    updateSession: update,
+    refreshSession: refreshAuthSession,
   };
 };
