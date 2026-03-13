@@ -101,7 +101,9 @@ async function loginWithPreview(): Promise<TokenData> {
   const password = process.env.PREVIEW_TEST_PASSWORD;
 
   if (!email || !password) {
-    throw new Error('Preview login credentials are not configured');
+    throw new Error(
+      `Preview login credentials are not configured (hasEmail=${Boolean(email)}, hasPassword=${Boolean(password)})`,
+    );
   }
 
   return AuthApi.server.basicLogin({ email, password });

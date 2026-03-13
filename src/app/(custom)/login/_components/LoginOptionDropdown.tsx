@@ -1,5 +1,4 @@
 import BackDrop from '@/components/ui/Modal/BackDrop';
-import SocialLoginBtn from './SocialLoginBtn';
 
 interface Props {
   handleClose: () => void;
@@ -13,9 +12,8 @@ function LoginOptionDropdown({ handleClose }: Props) {
           <div className="py-4 text-center text-mainGray text-sm">
             다른 소셜 계정으로 로그인
           </div>
-          <div className="flex flex-col items-center justify-center gap-2 p-5">
-            <SocialLoginBtn type="NAVER" onClick={handleClose} />
-            <SocialLoginBtn type="GOOGLE" onClick={handleClose} />
+          <div className="flex flex-col items-center justify-center gap-2 p-5 text-center text-sm text-mainGray">
+            현재 지원하지 않는 로그인 방식입니다.
           </div>
         </article>
         <button
