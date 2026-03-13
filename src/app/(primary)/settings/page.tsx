@@ -3,7 +3,6 @@
 import { useMemo, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { signOut, useSession } from 'next-auth/react';
 import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -19,7 +18,6 @@ import { createScreenConfigs, createMenuCategories } from './config';
 export default function Settings() {
   const route = useRouter();
   const { logout, user, isLoggedIn } = useAuth();
-  const { data: session } = useSession();
   const { handleModalState, handleCloseModal } = useModalStore();
   const { currentScreen, setCurrentScreen, resetToMain, clearStorage } =
     useSettingsStore();
@@ -74,14 +72,10 @@ export default function Settings() {
   };
 
   const signOutAndRedirect = async () => {
-    logout();
+    await logout();
     clearStorage();
     handleCloseModal();
-    if (session) {
-      await signOut({ callbackUrl: '/', redirect: true });
-    } else {
-      route.push('/');
-    }
+    route.push('/');
   };
 
   const handleLogout = async () => {

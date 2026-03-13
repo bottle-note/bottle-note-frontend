@@ -1,10 +1,10 @@
-import { signOut } from 'next-auth/react';
 import { apiClient } from '@/shared/api/apiClient';
 import { ApiResponse } from '@/api/_shared/types';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import { ApiError } from '@/utils/ApiError';
 import { extractRefreshToken } from '@/utils/cookieUtils';
 import useModalStore from '@/store/modalStore';
+import { clearAuthSession, refreshAuthSession } from '@/lib/auth/session-store';
 import type {
   LoginParams,
   AppleLoginParams,
@@ -172,23 +172,23 @@ export const AuthApi = {
     /**
      * 토큰을 갱신합니다 (클라이언트사이드).
      */
-    async renewToken(refreshToken: string): Promise<TokenData> {
+    async renewToken(): Promise<TokenData> {
       try {
-        const response = await apiClient.post<{ data: TokenData }>(
-          '/token/renew',
-          { refreshToken },
-          {
-            baseUrl: 'bottle-api/v2',
-            authRequired: false,
-          },
-        );
+        const session = await refreshAuthSession();
 
-        return response.data;
+        if (!session) {
+          throw new Error(ERROR_MESSAGES.TOKEN_EXPIRED);
+        }
+
+        return {
+          accessToken: session.accessToken,
+          refreshToken: '',
+        };
       } catch (e) {
         if (e instanceof ApiError) {
           if (e.response.status === 400) {
             console.warn('Refresh token expired or invalid');
-            signOut({ callbackUrl: '/login' });
+            clearAuthSession();
             const { handleLoginState } = useModalStore.getState();
             handleLoginState(true);
             throw new ApiError(ERROR_MESSAGES.TOKEN_EXPIRED, e.response);
@@ -202,6 +202,7 @@ export const AuthApi = {
 
         const error =
           e instanceof Error ? e : new Error('Unknown error occurred');
+        clearAuthSession();
         console.error(
           `토큰 업데이트 도중 에러가 발생했습니다. 사유: ${error.message}`,
         );
