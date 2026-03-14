@@ -17,16 +17,13 @@ export default function OauthKakaoCallbackPage() {
     try {
       const returnTo = getReturnToUrl();
 
-      await login(
-        'kakao-login',
-        {
-          authorizationCode: code,
-          callbackUrl: returnTo,
-        },
-        true,
-      );
+      await login('kakao-login', {
+        authorizationCode: code,
+      });
+
+      router.replace(returnTo);
     } catch (e) {
-      console.log(e);
+      console.error(e);
       router.push(ROUTES.ERROR);
     }
   };

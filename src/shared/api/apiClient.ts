@@ -1,6 +1,10 @@
-import { getSession, signOut } from 'next-auth/react';
 import useModalStore from '@/store/modalStore';
 import { ApiError } from '@/utils/ApiError';
+import {
+  clearAuthSession,
+  getAuthSnapshot,
+  restoreAuthSession,
+} from '@/lib/auth/session-store';
 
 // 순환 참조 방지를 위한 lazy import
 async function getAuthApi() {
@@ -39,19 +43,23 @@ class ApiClient {
 
     const headers = new Headers(fetchOptions.headers);
 
-    const session = await getSession();
+    let { status, session } = getAuthSnapshot();
+
+    if (authRequired && status === 'loading') {
+      session = await restoreAuthSession();
+      status = getAuthSnapshot().status;
+    }
 
     if (authRequired) {
-      if (!session) {
-        signOut({ callbackUrl: '/login' });
+      if (!session?.accessToken) {
         const { handleLoginState } = useModalStore.getState();
         handleLoginState(true);
         throw new Error('Authentication required');
       }
     }
 
-    if (session?.user?.accessToken) {
-      headers.set('Authorization', `Bearer ${session.user.accessToken}`);
+    if (session?.accessToken) {
+      headers.set('Authorization', `Bearer ${session.accessToken}`);
     }
 
     if (!headers.has('Content-Type')) {
@@ -85,15 +93,15 @@ class ApiClient {
       if (!response.ok) {
         if (result?.code === 403 && retryCount < 1 && authRequired && session) {
           try {
-            // /api/token/renew 가 next-auth 세션까지 갱신해 줄 것임
+            // 세션 갱신이 성공하면 메모리 세션도 함께 갱신된다.
             const AuthApi = await getAuthApi();
-            await AuthApi.client.renewToken(session.user.refreshToken);
+            await AuthApi.client.renewToken();
 
             // 새 토큰으로 재시도
             return this.request<T>(endpoint, options, retryCount + 1);
           } catch (refreshError) {
             console.error('Token refresh failed:', refreshError);
-            signOut({ callbackUrl: '/login' });
+            clearAuthSession();
             throw new ApiError(
               'Token refresh failed',
               (refreshError as ApiError)?.response || response,

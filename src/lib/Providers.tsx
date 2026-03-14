@@ -1,11 +1,11 @@
 'use client';
 
 import React, { ReactNode, useState } from 'react';
-import { SessionProvider } from 'next-auth/react';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthInitializer } from '@/hooks/useAuthInitializer';
 import Modal from '@/components/ui/Modal/Modal';
+import { AuthProvider } from '@/lib/auth/AuthProvider';
 import { FocusScrollProvider } from './FocusScrollProvider';
 import { SafeAreaProvider } from './SafeAreaProvider';
 
@@ -32,7 +32,7 @@ export const Providers = ({ children }: Props) => {
   );
 
   return (
-    <SessionProvider>
+    <AuthProvider>
       <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
           <FocusScrollProvider>
@@ -43,6 +43,6 @@ export const Providers = ({ children }: Props) => {
           </FocusScrollProvider>
         </SafeAreaProvider>
       </QueryClientProvider>
-    </SessionProvider>
+    </AuthProvider>
   );
 };

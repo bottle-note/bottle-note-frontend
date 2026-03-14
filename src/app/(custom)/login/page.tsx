@@ -3,13 +3,13 @@
 import { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
 import { useLogin } from '@/hooks/useLogin';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/auth/useAuth';
+import useModalStore from '@/store/modalStore';
 import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
 import {
   setReturnToUrl,
@@ -30,7 +30,20 @@ export default function Login() {
     handleKakaoLogin,
     handleAppleLogin,
   } = useLogin();
-  const { isLoggedIn, isLoading } = useAuth();
+  const { isLoggedIn, isLoading, login } = useAuth();
+  const { handleModalState } = useModalStore();
+
+  const handlePreviewLogin = async () => {
+    try {
+      await login('preview-login', {});
+    } catch (error) {
+      handleModalState({
+        isShowModal: true,
+        mainText: '프리뷰 로그인에 실패했습니다.',
+        subText: error instanceof Error ? error.message : '',
+      });
+    }
+  };
 
   useEffect(() => {
     if (returnToParam && isValidReturnUrl(returnToParam)) {
@@ -105,7 +118,9 @@ export default function Login() {
             )}
             {IS_PREVIEW && (
               <button
-                onClick={() => signIn('preview-login', { redirect: false })}
+                onClick={() => {
+                  void handlePreviewLogin();
+                }}
                 className="w-full rounded-md py-2.5 bg-gray-700 text-white text-sm border border-gray-500"
               >
                 [Preview] 테스트 계정으로 로그인
