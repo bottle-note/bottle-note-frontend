@@ -70,22 +70,25 @@ function BannerOverlay({ banner }: { banner: Banner }) {
     </span>
   );
 
-  const descriptionA = banner.descriptionA && (
-    <span
-      className="text-24 font-thin"
-      style={{ color: banner.descriptionFontColor, textShadow }}
-    >
-      {banner.descriptionA}
-    </span>
-  );
-
-  const descriptionB = banner.descriptionB && (
-    <span
-      className="text-24 font-thin"
-      style={{ color: banner.descriptionFontColor, textShadow }}
-    >
-      {banner.descriptionB}
-    </span>
+  const descriptionGroup = (banner.descriptionA || banner.descriptionB) && (
+    <div className="flex flex-col">
+      {banner.descriptionA && (
+        <span
+          className="text-24 font-thin"
+          style={{ color: banner.descriptionFontColor, textShadow }}
+        >
+          {banner.descriptionA}
+        </span>
+      )}
+      {banner.descriptionB && (
+        <span
+          className="text-24 font-thin"
+          style={{ color: banner.descriptionFontColor, textShadow }}
+        >
+          {banner.descriptionB}
+        </span>
+      )}
+    </div>
   );
 
   const content = (
@@ -93,13 +96,11 @@ function BannerOverlay({ banner }: { banner: Banner }) {
       {isBottom ? (
         <>
           {nameElement}
-          {descriptionA}
-          {descriptionB}
+          {descriptionGroup}
         </>
       ) : (
         <>
-          {descriptionA}
-          {descriptionB}
+          {descriptionGroup}
           {nameElement}
         </>
       )}
