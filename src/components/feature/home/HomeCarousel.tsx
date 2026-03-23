@@ -63,41 +63,62 @@ function BannerImage({ banner, isPriority }: BannerImageProps) {
 
 function BannerOverlay({ banner }: { banner: Banner }) {
   const positionClass = getPositionClass(banner.textPosition);
+  const isBottom = banner.textPosition === 'LB' || banner.textPosition === 'RB';
+  const isRight = banner.textPosition === 'RT' || banner.textPosition === 'RB';
 
   const textShadow = '0 1px 4px rgba(0, 0, 0, 0.6)';
 
-  const content = (
-    <>
+  const nameElement = (
+    <div>
+      <span
+        className="block text-16 font-semiBold leading-tight"
+        style={{ color: banner.nameFontColor, textShadow }}
+      >
+        {banner.name.split('\n').map((line, idx, arr) => (
+          <span key={`${idx}-${line}`}>
+            {line}
+            {idx < arr.length - 1 && <br />}
+          </span>
+        ))}
+      </span>
+    </div>
+  );
+
+  const descriptionElements = (
+    <div className="flex flex-col">
       {banner.descriptionA && (
         <div
-          className="inline-flex items-center gap-1 mt-2 font-thin"
+          className="inline-flex items-center gap-1 text-24 font-thin"
           style={{ color: banner.descriptionFontColor, textShadow }}
         >
           {banner.descriptionA}
         </div>
       )}
-      <div>
-        <span
-          className="block text-24 font-semiBold leading-tight"
-          style={{ color: banner.nameFontColor, textShadow }}
-        >
-          {banner.name.split('\n').map((line, idx, arr) => (
-            <span key={`${idx}-${line}`}>
-              {line}
-              {idx < arr.length - 1 && <br />}
-            </span>
-          ))}
-        </span>
+      <div className="flex flex-col">
+        {banner.descriptionB && (
+          <div
+            className="inline-flex items-center gap-1 text-24 font-thin"
+            style={{ color: banner.descriptionFontColor, textShadow }}
+          >
+            {banner.descriptionB}
+          </div>
+        )}
       </div>
-      {banner.descriptionB && (
-        <div
-          className="inline-flex items-center gap-1 mt-2 font-thin"
-          style={{ color: banner.descriptionFontColor, textShadow }}
-        >
-          {banner.descriptionB}
-        </div>
-      )}
-    </>
+    </div>
+  );
+
+  const alignClass = isRight ? 'items-end text-right' : 'items-start text-left';
+
+  const content = isBottom ? (
+    <div className={`flex flex-col gap-[12px] ${alignClass}`}>
+      {nameElement}
+      {descriptionElements}
+    </div>
+  ) : (
+    <div className={`flex flex-col gap-[12px] ${alignClass}`}>
+      {descriptionElements}
+      {nameElement}
+    </div>
   );
 
   if (banner.isExternalUrl) {
