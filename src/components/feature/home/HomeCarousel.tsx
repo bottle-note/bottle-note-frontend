@@ -11,26 +11,13 @@ import {
 import { useBannerQuery } from '@/queries/useBannerQuery';
 import type { Banner, BannerTextPosition } from '@/api/banner/types';
 
-/**
- * textPosition에 따라 오버레이 컨테이너 스타일을 결정한다.
- * 오버레이는 항상 inset-0 (전체 영역)이며, padding + flex로 텍스트 위치를 잡는다.
- */
-function getPositionClass(position: BannerTextPosition): string {
-  switch (position) {
-    case 'LT':
-      return 'pt-10 pl-6 items-start justify-start';
-    case 'LB':
-      return 'pb-2.5 pl-6 items-start justify-end';
-    case 'RT':
-      return 'pt-10 pr-6 items-end justify-start';
-    case 'RB':
-      return 'pb-2.5 pr-6 items-end justify-end';
-    case 'CENTER':
-      return 'items-center justify-center';
-    default:
-      return 'pt-2.5 pl-6 items-start justify-start';
-  }
-}
+const POSITION_CLASS: Record<BannerTextPosition, string> = {
+  LT: 'pt-10 pl-6 justify-start',
+  LB: 'pb-2.5 pl-6 justify-end',
+  RT: 'pt-10 pr-6 justify-start',
+  RB: 'pb-2.5 pr-6 justify-end',
+  CENTER: 'items-center justify-center',
+};
 
 interface BannerImageProps {
   banner: Banner;
@@ -62,43 +49,70 @@ function BannerImage({ banner, isPriority }: BannerImageProps) {
 }
 
 function BannerOverlay({ banner }: { banner: Banner }) {
-  const positionClass = getPositionClass(banner.textPosition);
+  const { textPosition } = banner;
+  const isBottom = textPosition === 'LB' || textPosition === 'RB';
+  const isRight = textPosition === 'RT' || textPosition === 'RB';
 
   const textShadow = '0 1px 4px rgba(0, 0, 0, 0.6)';
+  const isCenter = textPosition === 'CENTER';
+  const alignClass = isCenter
+    ? 'items-center text-center'
+    : isRight
+      ? 'items-end text-right'
+      : 'items-start text-left';
 
-  const content = (
-    <>
+  const nameElement = (
+    <span
+      className="block text-16 font-semiBold leading-tight"
+      style={{ color: banner.nameFontColor, textShadow }}
+    >
+      {banner.name.split('\n').map((line, idx, arr) => (
+        <span key={`${idx}-${line}`}>
+          {line}
+          {idx < arr.length - 1 && <br />}
+        </span>
+      ))}
+    </span>
+  );
+
+  const descriptionGroup = (banner.descriptionA || banner.descriptionB) && (
+    <div className="flex flex-col">
       {banner.descriptionA && (
-        <div
-          className="inline-flex items-center gap-1 mt-2 font-thin"
+        <span
+          className="text-24 font-thin"
           style={{ color: banner.descriptionFontColor, textShadow }}
         >
           {banner.descriptionA}
-        </div>
-      )}
-      <div>
-        <span
-          className="block text-24 font-semiBold leading-tight"
-          style={{ color: banner.nameFontColor, textShadow }}
-        >
-          {banner.name.split('\n').map((line, idx, arr) => (
-            <span key={`${idx}-${line}`}>
-              {line}
-              {idx < arr.length - 1 && <br />}
-            </span>
-          ))}
         </span>
-      </div>
+      )}
       {banner.descriptionB && (
-        <div
-          className="inline-flex items-center gap-1 mt-2 font-thin"
+        <span
+          className="text-24 font-thin"
           style={{ color: banner.descriptionFontColor, textShadow }}
         >
           {banner.descriptionB}
-        </div>
+        </span>
       )}
-    </>
+    </div>
   );
+
+  const content = (
+    <div className={`flex flex-col gap-[12px] ${alignClass}`}>
+      {isBottom ? (
+        <>
+          {nameElement}
+          {descriptionGroup}
+        </>
+      ) : (
+        <>
+          {descriptionGroup}
+          {nameElement}
+        </>
+      )}
+    </div>
+  );
+
+  const overlayClass = `absolute inset-0 ${POSITION_CLASS[textPosition]} flex flex-col z-10`;
 
   if (banner.isExternalUrl) {
     return (
@@ -106,7 +120,7 @@ function BannerOverlay({ banner }: { banner: Banner }) {
         href={banner.targetUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className={`absolute inset-0 ${positionClass} flex flex-col z-10`}
+        className={overlayClass}
       >
         {content}
       </a>
@@ -114,10 +128,7 @@ function BannerOverlay({ banner }: { banner: Banner }) {
   }
 
   return (
-    <Link
-      href={banner.targetUrl}
-      className={`absolute inset-0 ${positionClass} flex flex-col z-10`}
-    >
+    <Link href={banner.targetUrl} className={overlayClass}>
       {content}
     </Link>
   );
