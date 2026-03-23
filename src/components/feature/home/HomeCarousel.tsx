@@ -16,7 +16,7 @@ const POSITION_CLASS: Record<BannerTextPosition, string> = {
   LB: 'pb-2.5 pl-6 justify-end',
   RT: 'pt-10 pr-6 justify-start',
   RB: 'pb-2.5 pr-6 justify-end',
-  CENTER: 'justify-center',
+  CENTER: 'items-center justify-center',
 };
 
 interface BannerImageProps {
@@ -54,7 +54,12 @@ function BannerOverlay({ banner }: { banner: Banner }) {
   const isRight = textPosition === 'RT' || textPosition === 'RB';
 
   const textShadow = '0 1px 4px rgba(0, 0, 0, 0.6)';
-  const alignClass = isRight ? 'items-end text-right' : 'items-start text-left';
+  const isCenter = textPosition === 'CENTER';
+  const alignClass = isCenter
+    ? 'items-center text-center'
+    : isRight
+      ? 'items-end text-right'
+      : 'items-start text-left';
 
   const nameElement = (
     <span
