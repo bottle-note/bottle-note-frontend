@@ -3,11 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-interface TarotPromoCardProps {
-  onClose: () => void;
-}
-
-export function TarotPromoCard({ onClose }: TarotPromoCardProps) {
+export function TarotPromoCard() {
+  const [show, setShow] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -22,9 +19,11 @@ export function TarotPromoCard({ onClose }: TarotPromoCardProps) {
     e.stopPropagation();
     setIsVisible(false);
     setTimeout(() => {
-      onClose();
+      setShow(false);
     }, 500);
   };
+
+  if (!show) return null;
 
   return (
     <div

@@ -1,4 +1,6 @@
-import { useRef, useState } from 'react';
+'use client';
+
+import { useRef, useState, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Autoplay from 'embla-carousel-autoplay';
@@ -8,7 +10,6 @@ import {
   CarouselItem,
   CarouselApi,
 } from '@/components/ui/Display/carousel';
-import { useBannerQuery } from '@/queries/useBannerQuery';
 import type { Banner, BannerTextPosition } from '@/api/banner/types';
 
 const POSITION_CLASS: Record<BannerTextPosition, string> = {
@@ -24,8 +25,34 @@ interface BannerImageProps {
   isPriority: boolean;
 }
 
-function BannerImage({ banner, isPriority }: BannerImageProps) {
+function BannerImage({
+  banner,
+  isPriority,
+  onError,
+}: BannerImageProps & { onError?: () => void }) {
   const [isLoaded, setIsLoaded] = useState(false);
+
+  if (banner.mediaType === 'VIDEO') {
+    return (
+      <>
+        {!isLoaded && (
+          <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+        )}
+        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+        <video
+          src={banner.imageUrl}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload={isPriority ? 'auto' : 'none'}
+          onLoadedData={() => setIsLoaded(true)}
+          onError={onError}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -134,8 +161,15 @@ function BannerOverlay({ banner }: { banner: Banner }) {
   );
 }
 
-export default function HomeCarousel() {
+interface HomeCarouselProps {
+  banners: Banner[];
+}
+
+export default function HomeCarousel({ banners }: HomeCarouselProps) {
   const [api, setApi] = useState<CarouselApi | null>(null);
+  const [failedBannerIds, setFailedBannerIds] = useState<Set<number>>(
+    new Set(),
+  );
   const autoplayRef = useRef(
     Autoplay({
       delay: 3000,
@@ -143,14 +177,39 @@ export default function HomeCarousel() {
       stopOnMouseEnter: true,
     }),
   );
-  const { data: banners, isLoading } = useBannerQuery();
 
-  if (isLoading) {
-    return <div className="w-full h-[227px] bg-gray-200 animate-pulse" />;
+  const handleBannerError = useCallback(
+    (bannerId: number) => {
+      setFailedBannerIds((prev) => new Set(prev).add(bannerId));
+      api?.scrollNext();
+    },
+    [api],
+  );
+
+  useEffect(() => {
+    if (!api || failedBannerIds.size === 0) return;
+
+    const onSelect = () => {
+      const currentIndex = api.selectedScrollSnap();
+      const currentBanner = banners?.[currentIndex];
+      if (currentBanner && failedBannerIds.has(currentBanner.id)) {
+        api.scrollNext();
+      }
+    };
+
+    api.on('select', onSelect);
+    return () => {
+      api.off('select', onSelect);
+    };
+  }, [api, banners, failedBannerIds]);
+
+  if (banners.length === 0) {
+    return null;
   }
 
-  if (!banners || banners.length === 0) {
-    return <></>;
+  const allFailed = banners.every((banner) => failedBannerIds.has(banner.id));
+  if (allFailed) {
+    return null;
   }
 
   return (
@@ -166,8 +225,19 @@ export default function HomeCarousel() {
       <CarouselContent className="!ml-0">
         {banners.map((banner, index) => (
           <CarouselItem key={banner.id} className="!pl-0">
-            <div className="relative w-full h-[227px] overflow-hidden flex items-center justify-center">
-              <BannerImage banner={banner} isPriority={index === 0} />
+            <div
+              className="relative w-full h-[227px] overflow-hidden flex items-center justify-center"
+              style={
+                failedBannerIds.has(banner.id)
+                  ? { visibility: 'hidden', height: 0 }
+                  : undefined
+              }
+            >
+              <BannerImage
+                banner={banner}
+                isPriority={index === 0}
+                onError={() => handleBannerError(banner.id)}
+              />
               <BannerOverlay banner={banner} />
               <button
                 type="button"
