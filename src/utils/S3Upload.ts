@@ -1,4 +1,4 @@
-import { S3Api } from '@/api/s3/s3.api';
+import { S3Api, type AllowedContentType } from '@/api/s3/s3.api';
 import { S3_URL_PATH } from '@/constants/common';
 
 export async function uploadImages(
@@ -7,27 +7,22 @@ export async function uploadImages(
 ) {
   const imageArray = Array.isArray(images) ? images : [images];
 
-  // GET preSignedURL
-  const response = await S3Api.getUploadUrl(type, imageArray);
-  const preSignedData = response.data;
+  const results = await Promise.all(
+    imageArray.map(async (file) => {
+      const contentType = (file.type || 'image/jpeg') as AllowedContentType;
+      const response = await S3Api.getUploadUrl(type, 1, contentType);
+      const info = response.data.imageUploadInfo[0];
 
-  // Upload images
-  const uploadPromises = imageArray.map((image, index) => {
-    const url = preSignedData.imageUploadInfo[index].uploadUrl;
-    return fetch(url, {
-      method: 'PUT',
-      body: image,
-      headers: {
-        'Content-Type': image.type,
-      },
-    });
-  });
+      await fetch(info.uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': file.type },
+      });
 
-  await Promise.all(uploadPromises);
-
-  const PreSignedDBData = preSignedData.imageUploadInfo.map(
-    ({ uploadUrl, ...rest }) => rest,
+      const { uploadUrl, ...rest } = info;
+      return rest;
+    }),
   );
 
-  return PreSignedDBData;
+  return results;
 }
