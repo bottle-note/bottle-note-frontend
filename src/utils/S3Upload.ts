@@ -8,7 +8,7 @@ export async function uploadImages(
   const imageArray = Array.isArray(images) ? images : [images];
 
   const results = await Promise.all(
-    imageArray.map(async (file) => {
+    imageArray.map(async (file, index) => {
       const contentType = (file.type || 'image/jpeg') as AllowedContentType;
       const response = await S3Api.getUploadUrl(type, 1, contentType);
       const info = response.data.imageUploadInfo[0];
@@ -20,7 +20,7 @@ export async function uploadImages(
       });
 
       const { uploadUrl, ...rest } = info;
-      return rest;
+      return { ...rest, order: index + 1 };
     }),
   );
 
