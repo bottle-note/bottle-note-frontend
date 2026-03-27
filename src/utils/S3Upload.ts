@@ -16,7 +16,7 @@ export async function uploadImages(
       await fetch(info.uploadUrl, {
         method: 'PUT',
         body: file,
-        headers: { 'Content-Type': file.type },
+        headers: { 'Content-Type': contentType },
       });
 
       const { uploadUrl, ...rest } = info;
