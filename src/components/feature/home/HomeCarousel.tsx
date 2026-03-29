@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/Display/carousel';
 import type { Banner, BannerTextPosition } from '@/api/banner/types';
 
+const BANNER_VIDEO_POSTER = '/images/banner-placeholder.webp';
+
 const POSITION_CLASS: Record<BannerTextPosition, string> = {
   LT: 'pt-10 pl-6 justify-start',
   LB: 'pb-2.5 pl-6 justify-end',
@@ -41,6 +43,7 @@ function BannerImage({
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <video
           src={banner.imageUrl}
+          poster={BANNER_VIDEO_POSTER}
           autoPlay
           muted
           loop
