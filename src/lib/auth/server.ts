@@ -53,7 +53,18 @@ const applyAccessTokenCookie = (
       ? exp - Math.floor(Date.now() / 1000) - TOKEN_EXPIRY_BUFFER_SECONDS
       : DEFAULT_ACCESS_TOKEN_MAX_AGE;
 
-    if (maxAge <= 0) return;
+    if (maxAge <= 0) {
+      response.cookies.set({
+        name: ACCESS_TOKEN_COOKIE,
+        value: '',
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 0,
+      });
+      return;
+    }
 
     response.cookies.set({
       name: ACCESS_TOKEN_COOKIE,
