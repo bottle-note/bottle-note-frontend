@@ -5,33 +5,102 @@
 /* app/globals.css */
 @layer base {
   @font-face {
-    font-family: 'suit';
-    src: url('/fonts/SUIT-Regular.otf') format('opentype');
-    font-weight: 400; /* Regular */
+    font-family: 'Suit';
+    src:
+      local('SUIT Thin'),
+      local('SUIT-Thin'),
+      url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Thin.woff2')
+        format('woff2');
+    font-weight: 100;
+    font-display: swap;
   }
 
   @font-face {
-    font-family: 'suit';
-    src: url('/fonts/SUIT-Medium.otf') format('opentype');
+    font-family: 'Suit';
+    src:
+      local('SUIT ExtraLight'),
+      local('SUIT-ExtraLight'),
+      url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-ExtraLight.woff2')
+        format('woff2');
+    font-weight: 200;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Suit';
+    src:
+      local('SUIT Light'),
+      local('SUIT-Light'),
+      url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Light.woff2')
+        format('woff2');
+    font-weight: 300;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Suit';
+    src:
+      local('SUIT Regular'),
+      local('SUIT-Regular'),
+      url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2')
+        format('woff2');
+    font-weight: 400;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Suit';
+    src:
+      local('SUIT Medium'),
+      local('SUIT-Medium'),
+      url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Medium.woff2')
+        format('woff2');
     font-weight: 500;
+    font-display: swap;
   }
 
   @font-face {
-    font-family: 'suit';
-    src: url('/fonts/SUIT-SemiBold.otf') format('opentype');
+    font-family: 'Suit';
+    src:
+      local('SUIT SemiBold'),
+      local('SUIT-SemiBold'),
+      url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-SemiBold.woff2')
+        format('woff2');
     font-weight: 600;
+    font-display: swap;
   }
 
   @font-face {
-    font-family: 'suit';
-    src: url('/fonts/SUIT-Bold.otf') format('opentype');
+    font-family: 'Suit';
+    src:
+      local('SUIT Bold'),
+      local('SUIT-Bold'),
+      url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Bold.woff2')
+        format('woff2');
     font-weight: 700;
+    font-display: swap;
   }
 
   @font-face {
-    font-family: 'suit';
-    src: url('/fonts/SUIT-ExtraBold.otf') format('opentype');
+    font-family: 'Suit';
+    src:
+      local('SUIT ExtraBold'),
+      local('SUIT-ExtraBold'),
+      url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-ExtraBold.woff2')
+        format('woff2');
     font-weight: 800;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Suit';
+    src:
+      local('SUIT Heavy'),
+      local('SUIT-Heavy'),
+      url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Heavy.woff2')
+        format('woff2');
+    font-weight: 900;
+    font-display: swap;
   }
 
   * {
@@ -43,7 +112,7 @@
   }
 
   body {
-    font-family: 'suit', sans-serif;
+    font-family: 'Suit', sans-serif;
     font-weight: 400; /* Default weight */
     overflow-x: hidden; /* Prevent horizontal scroll during page transitions */
   }

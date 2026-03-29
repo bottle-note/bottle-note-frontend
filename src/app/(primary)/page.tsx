@@ -30,6 +30,12 @@ export default async function Home() {
 
   return (
     <>
+      <link
+        rel="preload"
+        href="/images/banner-placeholder.webp"
+        as="image"
+        type="image/webp"
+      />
       {webSiteSchemas.map((schema) => (
         <JsonLd key={schema['@type']} data={schema} />
       ))}
