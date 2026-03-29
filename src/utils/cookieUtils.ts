@@ -9,21 +9,7 @@ const REFRESH_TOKEN_COOKIE_NAMES = [
 ] as const;
 
 const getSetCookieHeaders = (response: Response): string[] => {
-  const headers = response.headers as Headers & {
-    getSetCookie?: () => string[];
-  };
-
-  if (typeof headers.getSetCookie === 'function') {
-    const setCookieHeaders = headers.getSetCookie();
-
-    if (setCookieHeaders.length > 0) {
-      return setCookieHeaders;
-    }
-  }
-
-  const setCookieHeader = response.headers.get('set-cookie');
-
-  return setCookieHeader ? [setCookieHeader] : [];
+  return response.headers.getSetCookie();
 };
 
 /**
