@@ -1,30 +1,33 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 
-interface TarotPromoCardProps {
-  onClose: () => void;
-}
-
-export function TarotPromoCard({ onClose }: TarotPromoCardProps) {
+export function TarotPromoCard() {
+  const [show, setShow] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 300);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
   }, []);
 
   const handleClose = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsVisible(false);
-    setTimeout(() => {
-      onClose();
+    closeTimerRef.current = setTimeout(() => {
+      setShow(false);
     }, 500);
   };
+
+  if (!show) return null;
 
   return (
     <div

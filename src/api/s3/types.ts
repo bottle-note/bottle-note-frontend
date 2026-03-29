@@ -10,6 +10,15 @@ export type S3UploadPath =
   | 'inquire'
   | 'tastingGraph';
 
+export type AllowedContentType =
+  | 'image/jpeg'
+  | 'image/png'
+  | 'image/webp'
+  | 'image/gif'
+  | 'image/svg+xml'
+  | 'video/mp4'
+  | 'application/pdf';
+
 // --------------- Response Types ---------------
 
 export interface ImageUploadInfo {
