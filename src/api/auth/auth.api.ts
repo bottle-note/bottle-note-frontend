@@ -88,23 +88,23 @@ export const AuthApi = {
      * 토큰을 갱신합니다 (서버사이드).
      */
     async renewToken(refreshToken: string): Promise<TokenData> {
-      const response = await fetch(
-        `${process.env.SERVER_URL}/oauth/token/renew`,
-        {
-          method: 'POST',
-          body: JSON.stringify({ refreshToken }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      const response = await fetch(`${process.env.SERVER_URL}/oauth/reissue`, {
+        method: 'POST',
+        headers: {
+          'refresh-token': refreshToken,
+          'Content-Type': 'application/json',
         },
-      );
+      });
 
       if (!response.ok) {
         throw new Error(ERROR_MESSAGES.TOKEN_REFRESH_FAILED);
       }
 
       const { data } = await response.json();
-      return data;
+      return {
+        accessToken: data.accessToken,
+        refreshToken: extractRefreshToken(response),
+      };
     },
 
     /**
