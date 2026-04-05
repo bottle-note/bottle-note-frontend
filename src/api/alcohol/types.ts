@@ -129,6 +129,7 @@ export interface RegionResponse {
   korName: string;
   engName: string;
   description: string;
+  parentId: number | null;
 }
 
 export interface CategoryResponse {

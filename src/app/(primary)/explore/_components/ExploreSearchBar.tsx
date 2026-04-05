@@ -3,7 +3,9 @@ import Image from 'next/image';
 import { LucideSearch } from 'lucide-react';
 import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
 import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
-import { CATEGORY_MENUS_LIST, REGIONS } from '@/constants/common';
+import { CATEGORY_MENUS_LIST } from '@/constants/common';
+import { useRegionsQuery } from '@/queries/useRegionsQuery';
+import type { RegionResponse } from '@/api/alcohol/types';
 import { useSearchInput } from '@/hooks/useSearchInput';
 import HelpIcon from 'public/icon/help-filled-subcoral.svg';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
@@ -45,13 +47,12 @@ export const ExploreSearchBar = ({
       onSearch: onAddKeyword,
     });
 
+  const { data: regions = [] } = useRegionsQuery();
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Set<string>>(
     new Set(),
   );
-  const [selectedRegion, setSelectedRegion] = useState<
-    Set<(typeof REGIONS)[number]['korName']>
-  >(new Set());
+  const [selectedRegion, setSelectedRegion] = useState<Set<string>>(new Set());
 
   const clearCategorySelections = () => {
     if (selectedCategory.size === 0) return;
@@ -104,9 +105,7 @@ export const ExploreSearchBar = ({
     });
   };
 
-  const toggleRegionFilterSelection = (
-    regionOption: (typeof REGIONS)[number],
-  ) => {
+  const toggleRegionFilterSelection = (regionOption: RegionResponse) => {
     const regionValue = regionOption.korName;
 
     if (!regionOption.regionId) {
@@ -206,13 +205,13 @@ export const ExploreSearchBar = ({
             <Accordion.Single>
               <Accordion.Content
                 title="전체"
-                value={REGIONS[0].regionId}
+                value=""
                 isSelected={selectedRegion.size === 0}
                 onClick={clearRegionSelections}
               />
             </Accordion.Single>
             <Accordion.Grid cols={2}>
-              {REGIONS.slice(1).map((region) => (
+              {regions.slice(1).map((region) => (
                 <Accordion.Content
                   title={region.korName}
                   value={region.korName}

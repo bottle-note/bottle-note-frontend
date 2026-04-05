@@ -9,7 +9,8 @@ import { UserApi } from '@/api/user/user.api';
 import { MyBottleApi } from '@/api/my-bottle/my-bottle.api';
 import List from '@/components/feature/List/List';
 import Tab from '@/components/ui/Navigation/Tab';
-import { REGIONS } from '@/constants/common';
+import { useRegionsQuery } from '@/queries/useRegionsQuery';
+import { toRegionOptions } from '@/api/alcohol/transformers';
 import { useTab } from '@/hooks/useTab';
 import { SORT_ORDER, SORT_TYPE } from '@/api/_shared/types';
 import { RegionId } from '@/types/common';
@@ -65,6 +66,7 @@ export default function MyBottle({
   };
 
   const { state: filterState, handleFilter } = useFilter(initialState);
+  const { data: regions = [] } = useRegionsQuery();
 
   const {
     data: alcoholList,
@@ -193,10 +195,7 @@ export default function MyBottle({
               handleOptionCallback={(value) => handleFilter('sortType', value)}
             />
             <List.OptionSelect
-              options={REGIONS.map((region) => ({
-                type: String(region.regionId),
-                name: region.korName,
-              }))}
+              options={toRegionOptions(regions)}
               handleOptionCallback={(value) => handleFilter('regionId', value)}
             />
 

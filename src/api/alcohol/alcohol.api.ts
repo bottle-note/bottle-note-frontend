@@ -117,7 +117,7 @@ export const AlcoholsApi = {
   /**
    * 지역 목록을 조회합니다.
    */
-  async getRegion(): Promise<ApiResponse<{ id: number; value: string }[]>> {
+  async getRegion(): Promise<ApiResponse<RegionResponse[]>> {
     const response = await apiClient.get<ApiResponse<RegionResponse[]>>(
       `/regions`,
       { authRequired: false },

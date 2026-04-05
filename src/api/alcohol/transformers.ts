@@ -2,7 +2,12 @@
 // Alcohol API - Data Transformers
 // ============================================
 
-import type { AlcoholApiRaw, Alcohol, CategoryResponse } from './types';
+import type {
+  AlcoholApiRaw,
+  Alcohol,
+  CategoryResponse,
+  RegionResponse,
+} from './types';
 
 /**
  * 위스키 API 응답의 카테고리명을 표준화하고 path를 생성합니다.
@@ -60,13 +65,29 @@ export function transformCategories(
 /**
  * 지역 목록에 '국가(전체)' 옵션을 추가합니다.
  */
-export function transformRegions(
-  regions: { regionId: number; korName: string }[],
-): { id: number; value: string }[] {
-  const transformed = regions.map((region) => ({
-    id: region.regionId,
-    value: region.korName,
-  }));
+export function transformRegions(regions: RegionResponse[]): RegionResponse[] {
+  const filtered = regions.filter((r) => !r.korName.includes('-'));
+  return [
+    {
+      regionId: 0,
+      korName: '국가(전체)',
+      engName: 'All',
+      description: '',
+      parentId: null,
+    },
+    ...filtered,
+  ];
+}
 
-  return [{ id: -1, value: '국가(전체)' }, ...transformed];
+/**
+ * RegionResponse[]를 OptionSelect 형태로 변환합니다.
+ * regionId 0 (전체)은 빈 문자열로 매핑합니다.
+ */
+export function toRegionOptions(
+  regions: RegionResponse[],
+): { type: string; name: string }[] {
+  return regions.map((r) => ({
+    type: r.regionId === 0 ? '' : String(r.regionId),
+    name: r.korName,
+  }));
 }
