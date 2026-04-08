@@ -19,15 +19,7 @@ export const regionKeys = {
 };
 
 function toRegions(data: RegionResponse[]): Region[] {
-  const filtered = data
-    .filter((r) => r.korName !== '-')
-    .map((r) => ({
-      regionId: r.regionId,
-      korName: r.korName,
-      engName: r.engName,
-    }));
-
-  return [ALL_REGION, ...filtered];
+  return [ALL_REGION, ...data.filter((r) => r.korName !== '-')];
 }
 
 function toRegionOptions(regions: Region[]): { type: string; name: string }[] {
