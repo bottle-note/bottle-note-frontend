@@ -2,11 +2,7 @@ import { apiClient } from '@/shared/api/apiClient';
 import { ApiResponse } from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
-import {
-  transformAlcoholList,
-  transformCategories,
-  transformRegions,
-} from './transformers';
+import { transformAlcoholList, transformCategories } from './transformers';
 import type {
   AlcoholListParams,
   AlcoholApiRaw,
@@ -117,7 +113,7 @@ export const AlcoholsApi = {
   /**
    * 지역 목록을 조회합니다.
    */
-  async getRegion(): Promise<ApiResponse<{ id: number; value: string }[]>> {
+  async getRegion(): Promise<ApiResponse<RegionResponse[]>> {
     const response = await apiClient.get<ApiResponse<RegionResponse[]>>(
       `/regions`,
       { authRequired: false },
@@ -127,10 +123,7 @@ export const AlcoholsApi = {
       throw new Error(ERROR_MESSAGES.ALCOHOL_FETCH_FAILED);
     }
 
-    return {
-      ...response,
-      data: transformRegions(response.data),
-    };
+    return response;
   },
 
   /**
