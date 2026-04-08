@@ -28,6 +28,7 @@ export interface PageableInfo {
   pageSize: number;
   hasNext: boolean;
   currentCursor: number;
+  cursor?: number;
 }
 
 // --------------- Query Parameter Types ---------------

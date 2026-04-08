@@ -12,6 +12,11 @@ interface Props<T> {
   gcTime?: number;
 }
 
+const SCROLL_OPTIONS = {
+  rootMargin: '300px',
+  threshold: 0,
+} as const;
+
 export const usePaginatedQuery = <T>({
   queryKey,
   queryFn,
@@ -33,8 +38,9 @@ export const usePaginatedQuery = <T>({
     queryKey,
     queryFn,
     getNextPageParam: (lastPage: ApiResponse<T>) => {
-      if (lastPage.meta.pageable?.hasNext) {
-        return lastPage.meta.pageable.currentCursor + pageSize;
+      const pageable = lastPage.meta.pageable;
+      if (pageable?.hasNext) {
+        return pageable.cursor ?? pageable.currentCursor + pageSize;
       }
       return null;
     },
@@ -53,10 +59,7 @@ export const usePaginatedQuery = <T>({
         fetchNextPage();
       }
     },
-    options: {
-      rootMargin: '300px',
-      threshold: 0,
-    },
+    options: SCROLL_OPTIONS,
   });
 
   return {
