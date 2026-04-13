@@ -22,6 +22,8 @@ import { AlcoholDetailsResponse } from '@/api/alcohol/types';
 import { UserApi } from '@/api/user/user.api';
 import { RateApi } from '@/api/rate/rate.api';
 import useModalStore from '@/store/modalStore';
+import { useLoginBridge } from '@/hooks/useLoginBridge';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 import { ROUTES } from '@/constants/routes';
 import AlcoholDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/AlcoholDetailsSkeleton';
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
@@ -43,7 +45,8 @@ export default function SearchAlcohol() {
   const params = useParams();
   const { isLoggedIn } = useAuth();
   const { id: alcoholId } = params;
-  const { handleModalState, handleLoginModal } = useModalStore();
+  const { handleModalState } = useModalStore();
+  const { bridgeToLogin } = useLoginBridge();
   const { debounce } = useDebounceAction(DEBOUNCE_DELAY);
 
   const [data, setData] = useState<AlcoholDetailsResponse | null>(null);
@@ -61,6 +64,12 @@ export default function SearchAlcohol() {
         const { alcohols } = response.data;
         setData(response.data);
         setIsPicked(alcohols.isPicked);
+
+        trackGA4Event('view_alcohol_detail', {
+          alcohol_id: id,
+          alcohol_name: alcohols.korName,
+        });
+
         const formatContent = (content: string | undefined) =>
           content?.replace('/', '/\n') || '-';
 
@@ -120,7 +129,7 @@ export default function SearchAlcohol() {
 
   const handleRate = useCallback(
     async (selectedRate: number) => {
-      if (!isLoggedIn) return handleLoginModal();
+      if (!isLoggedIn) return bridgeToLogin('rating');
 
       setRate(selectedRate);
 
@@ -129,6 +138,10 @@ export default function SearchAlcohol() {
           await RateApi.postRating({
             alcoholId: String(alcoholId),
             rating: selectedRate,
+          });
+          trackGA4Event('rate_alcohol', {
+            alcohol_id: String(alcoholId),
+            alcohol_name: data?.alcohols.korName ?? '',
           });
         } catch (error) {
           fetchUserRating(alcoholId.toString());
@@ -365,7 +378,7 @@ export default function SearchAlcohol() {
                         ) => {
                           if (!isLoggedIn) {
                             e.preventDefault();
-                            handleLoginModal();
+                            bridgeToLogin('comment');
                           }
                         },
                       }}

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { AlcoholDetailsResponse } from '@/api/alcohol/types';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 import { QuizState, QuizStep, TarotCard, WhiskyRecommend } from '../_types';
 
 const initialState: QuizState = {
@@ -21,6 +22,7 @@ export const useTarotQuiz = () => {
 
   // 질문 생각 화면으로 이동
   const goToQuestioning = useCallback(() => {
+    trackGA4Event('tarot_start');
     setState((prev) => ({ ...prev, step: 'questioning' }));
   }, []);
 
@@ -139,7 +141,14 @@ export const useTarotQuiz = () => {
 
   // 결과 화면으로 이동
   const goToResult = useCallback(() => {
-    setState((prev) => ({ ...prev, step: 'result' }));
+    setState((prev) => {
+      if (prev.recommendedWhisky?.whiskyId) {
+        trackGA4Event('tarot_complete', {
+          result_alcohol_id: String(prev.recommendedWhisky.whiskyId),
+        });
+      }
+      return { ...prev, step: 'result' };
+    });
   }, []);
 
   // 초기화 (다시하기)

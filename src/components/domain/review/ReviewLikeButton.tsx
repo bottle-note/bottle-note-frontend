@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { ReviewApi } from '@/api/review/review.api';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { useDebouncedToggle } from '@/hooks/useDebouncedToggle';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 
 interface Props {
   reviewId: string | number;
@@ -51,6 +52,10 @@ const ReviewLikeButton = ({
 
     handleUpdateLiked();
     const newLikeState = !isLiked;
+    trackGA4Event('like_review', {
+      review_id: String(reviewId),
+      action: newLikeState ? 'like' : 'unlike',
+    });
     handleToggle(newLikeState);
   };
 

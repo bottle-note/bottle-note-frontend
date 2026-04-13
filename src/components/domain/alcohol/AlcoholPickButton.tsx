@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { useDebouncedToggle } from '@/hooks/useDebouncedToggle';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 
 interface Props {
   isPicked: boolean;
@@ -15,6 +16,7 @@ interface Props {
   iconColor?: 'white' | 'subcoral';
   size?: number;
   alcoholId: number;
+  alcoholName?: string;
   fontSize?: string;
 }
 
@@ -25,6 +27,7 @@ const AlcoholPickButton = ({
   onApiError,
   handleNotLogin,
   alcoholId,
+  alcoholName = '',
   pickBtnName,
   iconColor = 'white',
   size = 18,
@@ -55,6 +58,11 @@ const AlcoholPickButton = ({
 
     handleUpdatePicked();
     const newPickState = !isPicked;
+    trackGA4Event('add_to_picks', {
+      alcohol_id: String(alcoholId),
+      alcohol_name: alcoholName,
+      action: newPickState ? 'add' : 'remove',
+    });
     handleToggle(newPickState);
   };
 
