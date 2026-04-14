@@ -44,7 +44,6 @@ export default function MyBottle({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { regionOptions } = useRegionsQuery();
   const myBottleType = searchParams.get('type') as MyBottleTabType;
   const urlKeyword = searchParams.get('keyword') || '';
   const { currentTab, handleTab, tabList } = useTab<{
