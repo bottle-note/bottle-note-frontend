@@ -2,11 +2,7 @@ import { apiClient } from '@/shared/api/apiClient';
 import { ApiResponse } from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
-import {
-  transformAlcoholList,
-  transformCategories,
-  transformRegions,
-} from './transformers';
+import { transformAlcoholList, transformCategories } from './transformers';
 import type {
   AlcoholListParams,
   AlcoholApiRaw,
@@ -127,10 +123,7 @@ export const AlcoholsApi = {
       throw new Error(ERROR_MESSAGES.ALCOHOL_FETCH_FAILED);
     }
 
-    return {
-      ...response,
-      data: transformRegions(response.data),
-    };
+    return response;
   },
 
   /**
