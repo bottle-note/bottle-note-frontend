@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -57,6 +63,8 @@ export default function SearchAlcohol() {
   const [isUnmounting, setIsUnmounting] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
 
+  const viewTrackedAlcoholIdRef = useRef<string | null>(null);
+
   const fetchAlcoholDetails = async (id: string) => {
     try {
       const response = await AlcoholsApi.getAlcoholDetails(id);
@@ -65,10 +73,13 @@ export default function SearchAlcohol() {
         setData(response.data);
         setIsPicked(alcohols.isPicked);
 
-        trackGA4Event('view_alcohol_detail', {
-          alcohol_id: id,
-          alcohol_name: alcohols.korName,
-        });
+        if (viewTrackedAlcoholIdRef.current !== id) {
+          viewTrackedAlcoholIdRef.current = id;
+          trackGA4Event('view_alcohol_detail', {
+            alcohol_id: id,
+            alcohol_name: alcohols.korName,
+          });
+        }
 
         const formatContent = (content: string | undefined) =>
           content?.replace('/', '/\n') || '-';
@@ -149,7 +160,7 @@ export default function SearchAlcohol() {
         }
       });
     },
-    [isLoggedIn, alcoholId, debounce],
+    [isLoggedIn, alcoholId, debounce, data],
   );
 
   const getRatingMessage = (myAvgRating: number, myRating: number) => {
