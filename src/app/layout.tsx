@@ -3,7 +3,6 @@ import '@/style/globals.css';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Providers } from '@/lib/Providers';
 import { BASE_URL } from '@/constants/common';
-import { WebVitalsReporter } from '@/components/WebVitalsReporter';
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -120,7 +119,6 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning>
-        <WebVitalsReporter />
         <Providers>
           <div className="relative w-full bg-bgGray min-h-safe-screen">
             {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID && (
