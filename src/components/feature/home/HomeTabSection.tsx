@@ -5,6 +5,7 @@ import { useTab } from '@/hooks/useTab';
 import { HomeFeaturedConfigKey, MENU_CATEGORY } from '@/constants/home';
 import CategoryList from '@/components/feature/home/CategoryList';
 import HomeFeaturedList from '@/components/feature/home/HomeFeaturedList';
+import RegionAccordionList from '@/components/feature/home/_components/RegionAccordionList';
 
 interface TopMenuItem {
   id: HomeFeaturedConfigKey;
@@ -53,10 +54,12 @@ export default function HomeTabSection() {
     }
   };
 
-  const renderCategoryContent = () => {
+  const renderSecondContent = () => {
     switch (secondMenuSelectedTab.id) {
       case 'category':
         return <CategoryList />;
+      case 'region':
+        return <RegionAccordionList />;
       default:
         return null;
     }
@@ -85,7 +88,7 @@ export default function HomeTabSection() {
             scrollContainerRef={secondMenuScrollContainerRef}
             registerTab={secondMenuRegisterTab}
           />
-          {renderCategoryContent()}
+          {renderSecondContent()}
         </article>
       </section>
     </div>
