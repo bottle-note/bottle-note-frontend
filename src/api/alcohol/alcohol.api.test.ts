@@ -15,7 +15,7 @@ describe('AlcoholsApi.getRegion', () => {
     mockGet.mockReset();
   });
 
-  it('GET /regions를 호출하고 transformRegions를 거쳐 반환한다', async () => {
+  it('GET /regions를 호출하고 원본 데이터를 그대로 반환한다', async () => {
     // Given
     const apiResponse = {
       success: true,
@@ -45,21 +45,12 @@ describe('AlcoholsApi.getRegion', () => {
     // Then: /regions 엔드포인트 호출 확인
     expect(mockGet).toHaveBeenCalledWith('/regions', { authRequired: false });
 
-    // Then: transformRegions가 "국가(전체)" 센티넬을 추가
-    expect(result.data[0]).toEqual({
-      regionId: 0,
-      korName: '국가(전체)',
-      engName: 'All',
-      description: '',
-      parentId: null,
-    });
-
-    // Then: 실제 데이터가 원본 형태로 유지됨
-    expect(result.data[1].regionId).toBe(1);
-    expect(result.data[1].korName).toBe('호주');
-    expect(result.data[2].regionId).toBe(7);
-    expect(result.data[2].korName).toBe('일본');
-    expect(result.data).toHaveLength(3);
+    // Then: API 응답 원본 그대로 반환 (변환은 useRegionsQuery에서 수행)
+    expect(result.data).toHaveLength(2);
+    expect(result.data[0].regionId).toBe(1);
+    expect(result.data[0].korName).toBe('호주');
+    expect(result.data[1].regionId).toBe(7);
+    expect(result.data[1].korName).toBe('일본');
   });
 
   it('API 에러 시 에러를 throw한다', async () => {
@@ -77,39 +68,7 @@ describe('AlcoholsApi.getRegion', () => {
     await expect(AlcoholsApi.getRegion()).rejects.toThrow();
   });
 
-  it("korName에 '-'가 포함된 지역은 결과에서 제외된다", async () => {
-    // Given
-    const apiResponse = {
-      success: true,
-      code: 200,
-      data: [
-        {
-          regionId: 14,
-          korName: '스코틀랜드-캠벨타운',
-          engName: 'Scotland-Campbeltown',
-          description: '',
-        },
-        {
-          regionId: 7,
-          korName: '일본',
-          engName: 'Japan',
-          description: '',
-        },
-      ],
-      errors: [],
-      meta: {},
-    };
-    mockGet.mockResolvedValueOnce(apiResponse);
-
-    // When
-    const result = await AlcoholsApi.getRegion();
-
-    // Then: 국가(전체) + 일본 = 2 (스코틀랜드-캠벨타운 제외)
-    expect(result.data).toHaveLength(2);
-    expect(result.data.map((r) => r.korName)).toEqual(['국가(전체)', '일본']);
-  });
-
-  it('빈 지역 목록이 와도 국가(전체) 센티넬은 포함된다', async () => {
+  it('빈 지역 목록이면 빈 배열을 반환한다', async () => {
     // Given
     const emptyResponse = {
       success: true,
@@ -124,13 +83,6 @@ describe('AlcoholsApi.getRegion', () => {
     const result = await AlcoholsApi.getRegion();
 
     // Then
-    expect(result.data).toHaveLength(1);
-    expect(result.data[0]).toEqual({
-      regionId: 0,
-      korName: '국가(전체)',
-      engName: 'All',
-      description: '',
-      parentId: null,
-    });
+    expect(result.data).toHaveLength(0);
   });
 });
