@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FollowApi } from '@/api/follow/follow.api';
 import { RelationInfo } from '@/api/follow/types';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 
 interface Props {
   isFollowing: boolean;
@@ -19,9 +20,14 @@ export const FollowButton = ({ isFollowing, followUserId }: Props) => {
   async function handleOnFollow() {
     try {
       const status = followingStatus ? 'FOLLOWING' : 'UNFOLLOW';
+      const newStatus = reverseFollowingStatus(status);
       await FollowApi.updateFollowingStatus({
         followUserId,
-        status: reverseFollowingStatus(status),
+        status: newStatus,
+      });
+      trackGA4Event('follow_user', {
+        follow_user_id: followUserId,
+        action: newStatus === 'FOLLOWING' ? 'follow' : 'unfollow',
       });
       setFollowingStatus((prev) => !prev);
     } catch (e) {

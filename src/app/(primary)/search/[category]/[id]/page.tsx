@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -22,6 +28,8 @@ import { AlcoholDetailsResponse } from '@/api/alcohol/types';
 import { UserApi } from '@/api/user/user.api';
 import { RateApi } from '@/api/rate/rate.api';
 import useModalStore from '@/store/modalStore';
+import { useLoginBridge } from '@/hooks/useLoginBridge';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 import { ROUTES } from '@/constants/routes';
 import AlcoholDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/AlcoholDetailsSkeleton';
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
@@ -43,7 +51,8 @@ export default function SearchAlcohol() {
   const params = useParams();
   const { isLoggedIn } = useAuth();
   const { id: alcoholId } = params;
-  const { handleModalState, handleLoginModal } = useModalStore();
+  const { handleModalState } = useModalStore();
+  const { bridgeToLogin } = useLoginBridge();
   const { debounce } = useDebounceAction(DEBOUNCE_DELAY);
 
   const [data, setData] = useState<AlcoholDetailsResponse | null>(null);
@@ -54,6 +63,8 @@ export default function SearchAlcohol() {
   const [isUnmounting, setIsUnmounting] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
 
+  const viewTrackedAlcoholIdRef = useRef<string | null>(null);
+
   const fetchAlcoholDetails = async (id: string) => {
     try {
       const response = await AlcoholsApi.getAlcoholDetails(id);
@@ -61,6 +72,15 @@ export default function SearchAlcohol() {
         const { alcohols } = response.data;
         setData(response.data);
         setIsPicked(alcohols.isPicked);
+
+        if (viewTrackedAlcoholIdRef.current !== id) {
+          viewTrackedAlcoholIdRef.current = id;
+          trackGA4Event('view_alcohol_detail', {
+            alcohol_id: id,
+            alcohol_name: alcohols.korName,
+          });
+        }
+
         const formatContent = (content: string | undefined) =>
           content?.replace('/', '/\n') || '-';
 
@@ -120,7 +140,7 @@ export default function SearchAlcohol() {
 
   const handleRate = useCallback(
     async (selectedRate: number) => {
-      if (!isLoggedIn) return handleLoginModal();
+      if (!isLoggedIn) return bridgeToLogin('rating');
 
       setRate(selectedRate);
 
@@ -130,13 +150,17 @@ export default function SearchAlcohol() {
             alcoholId: String(alcoholId),
             rating: selectedRate,
           });
+          trackGA4Event('rate_alcohol', {
+            alcohol_id: String(alcoholId),
+            alcohol_name: data?.alcohols.korName ?? '',
+          });
         } catch (error) {
           fetchUserRating(alcoholId.toString());
           console.error(error);
         }
       });
     },
-    [isLoggedIn, alcoholId, debounce],
+    [isLoggedIn, alcoholId, debounce, data],
   );
 
   const getRatingMessage = (myAvgRating: number, myRating: number) => {
@@ -365,7 +389,7 @@ export default function SearchAlcohol() {
                         ) => {
                           if (!isLoggedIn) {
                             e.preventDefault();
-                            handleLoginModal();
+                            bridgeToLogin('comment');
                           }
                         },
                       }}

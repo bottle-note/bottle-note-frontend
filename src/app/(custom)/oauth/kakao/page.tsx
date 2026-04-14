@@ -6,6 +6,8 @@ import Loading from '@/components/ui/Loading/Loading';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { getReturnToUrl } from '@/utils/loginRedirect';
+import { trackGA4Event } from '@/utils/analytics/ga4';
+import { consumeLoginTrigger } from '@/utils/loginTrigger';
 
 export default function OauthKakaoCallbackPage() {
   const router = useRouter();
@@ -20,6 +22,15 @@ export default function OauthKakaoCallbackPage() {
       await login('kakao-login', {
         authorizationCode: code,
       });
+
+      const trigger = consumeLoginTrigger();
+      trackGA4Event('login', {
+        method: 'kakao',
+        trigger: trigger ?? undefined,
+      });
+      if (trigger) {
+        trackGA4Event('login_prompt_converted', { trigger });
+      }
 
       router.replace(returnTo);
     } catch (e) {

@@ -2,6 +2,8 @@ import { useRouter } from 'next/navigation';
 import { sendLogToFlutter } from '@/utils/flutterUtil';
 import useModalStore from '@/store/modalStore';
 import { getReturnToUrl } from '@/utils/loginRedirect';
+import { trackGA4Event } from '@/utils/analytics/ga4';
+import { consumeLoginTrigger } from '@/utils/loginTrigger';
 import { useAuth } from './auth/useAuth';
 
 export const useAppSocialLogin = () => {
@@ -17,6 +19,14 @@ export const useAppSocialLogin = () => {
     });
   };
 
+  const fireLoginEvents = (method: 'kakao' | 'apple') => {
+    const trigger = consumeLoginTrigger();
+    trackGA4Event('login', { method, trigger: trigger ?? undefined });
+    if (trigger) {
+      trackGA4Event('login_prompt_converted', { trigger });
+    }
+  };
+
   const onKakaoLoginSuccess = async (payload: string) => {
     try {
       if (payload.includes('@')) {
@@ -28,6 +38,7 @@ export const useAppSocialLogin = () => {
           accessToken: payload,
         });
       }
+      fireLoginEvents('kakao');
       router.replace(getReturnToUrl());
     } catch (e) {
       onKakaoLoginError((e as Error).message);
@@ -54,6 +65,7 @@ export const useAppSocialLogin = () => {
         nonce,
       });
 
+      fireLoginEvents('apple');
       router.replace(getReturnToUrl());
     } catch (e) {
       sendLogToFlutter(`onAppleLoginError:${(e as Error).message}`);

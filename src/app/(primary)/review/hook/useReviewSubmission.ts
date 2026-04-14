@@ -5,6 +5,7 @@ import { ReviewApi } from '@/api/review/review.api';
 import useModalStore from '@/store/modalStore';
 import { FormValues } from '@/types/Review';
 import { ROUTES } from '@/constants/routes';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 import { captureTastingNote } from './useTastingNoteCapture';
 
 interface UseReviewSubmissionProps {
@@ -151,6 +152,11 @@ export const useReviewSubmission = ({
         'id' in reviewResult.data
           ? reviewResult.data.id
           : reviewResult.data.reviewId;
+
+      if (!reviewId) {
+        trackGA4Event('write_review_complete', { alcohol_id: alcoholId });
+      }
+
       handleSuccess(resultReviewId.toString(), !reviewId, hasRatingError);
     } else if (data.rating !== initialRating && ratingResult) {
       router.back();
