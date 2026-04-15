@@ -5,6 +5,8 @@ export interface RegionGroup {
   parent: Region;
   /** 그룹 표시 이름 (한글) */
   displayName: string;
+  /** 영문명 */
+  engName: string;
   /** 하위 지역 목록 */
   children: Region[];
 }
@@ -52,6 +54,7 @@ export function groupRegions(regions: Region[]): RegionGroup[] {
       groups.push({
         parent: region,
         displayName: region.korName,
+        engName: region.engName,
         children,
       });
       childrenByPrefix.delete(region.engName);
@@ -59,6 +62,7 @@ export function groupRegions(regions: Region[]): RegionGroup[] {
       standalones.push({
         parent: region,
         displayName: region.korName,
+        engName: region.engName,
         children: [],
       });
     }

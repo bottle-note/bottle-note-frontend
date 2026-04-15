@@ -31,11 +31,11 @@ function RegionRow({
   };
 
   return (
-    <div>
+    <li className="py-[14px] px-[10px] border border-bgGray rounded-xl flex flex-col gap-[10px]">
       <button
         type="button"
         onClick={handleClick}
-        className="flex w-full items-center justify-between px-5 py-[9px]"
+        className="flex w-full items-center justify-between"
       >
         <div className="flex items-center gap-[10px]">
           <Image
@@ -43,55 +43,63 @@ function RegionRow({
             alt={group.displayName}
             width={26}
             height={26}
-            className={`w-[26px] h-[26px] object-cover ${flagUrl ? 'rounded-full' : 'rounded-full bg-sectionWhite p-1'}`}
+            className={`w-[26px] h-[26px] object-cover ${flagUrl ? 'rounded-lg' : 'rounded-lg bg-sectionWhite p-1'}`}
           />
-          <span className="text-13 font-extrabold text-mainDarkGray">
-            {group.displayName}
-          </span>
+          <div className="gap-[4px] flex items-center">
+            <span className="text-13 font-extrabold text-mainDarkGray">
+              {group.displayName}
+            </span>
+            <span className="text-11  text-mainDarkGray">{group.engName}</span>
+          </div>
         </div>
         {hasChildren && (
-          <Image
-            src="/icon/arrow-right-subcoral.svg"
-            alt=""
-            width={22}
-            height={22}
-            className={`transition-transform duration-200 ${
-              isOpen ? 'rotate-90' : ''
-            }`}
-          />
+          <button className="p-1">
+            <Image
+              src="/icon/arrow-down-darkgray.svg"
+              alt=""
+              width={16}
+              height={16}
+              className={`transition-transform duration-200 ${
+                isOpen ? 'rotate-180' : ''
+              }`}
+            />
+          </button>
         )}
       </button>
 
       {isOpen && hasChildren && (
-        <div className="mx-5 ml-[61px] pb-2">
+        <div className="px-[8px] flex flex-col gap-[10px]">
           {/* /전체 항목 */}
           <Link
             href={`/search?regionId=${group.parent.regionId}`}
-            className="flex items-center justify-between py-[8px]"
+            className="flex items-center justify-between py-[8px] border-b border-bgGray border-dashed"
           >
             <span className="text-13 font-bold text-mainDarkGray">
               {group.parent.korName}
             </span>
           </Link>
-          <div className="border-b border-sectionWhite" />
 
           {/* 하위 지역들 */}
           {group.children.map((child) => (
             <div key={child.regionId}>
               <Link
                 href={`/search?regionId=${child.regionId}`}
-                className="flex items-center justify-between py-[8px]"
+                className="flex items-center justify-between py-[8px] border-b border-bgGray border-dashed"
               >
-                <span className="text-13 font-bold text-mainDarkGray">
-                  {child.korName}
-                </span>
+                <div className="gap-[4px] flex items-center">
+                  <span className="text-13 font-bold text-mainDarkGray">
+                    {child.korName}
+                  </span>
+                  <span className="text-11  text-mainDarkGray">
+                    {child.engName}
+                  </span>
+                </div>
               </Link>
-              <div className="border-b border-sectionWhite" />
             </div>
           ))}
         </div>
       )}
-    </div>
+    </li>
   );
 }
 
@@ -100,22 +108,13 @@ export default function RegionAccordionList() {
   const [openRegionId, setOpenRegionId] = useState<number | '' | null>(null);
 
   if (isLoading) {
-    return (
-      <div className="px-5 space-y-3">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-[44px] bg-sectionWhite rounded animate-pulse"
-          />
-        ))}
-      </div>
-    );
+    return <div className="min-h-[60vh]" />;
   }
 
   const regionGroups = groupRegions(regions);
 
   return (
-    <div>
+    <ul className="space-y-[8px]">
       {regionGroups.map((group) => (
         <RegionRow
           key={group.parent.regionId}
@@ -128,6 +127,6 @@ export default function RegionAccordionList() {
           }
         />
       ))}
-    </div>
+    </ul>
   );
 }

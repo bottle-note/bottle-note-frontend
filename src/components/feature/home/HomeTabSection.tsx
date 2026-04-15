@@ -88,7 +88,7 @@ export default function HomeTabSection() {
             scrollContainerRef={secondMenuScrollContainerRef}
             registerTab={secondMenuRegisterTab}
           />
-          {renderSecondContent()}
+          <div className="px-[25px]">{renderSecondContent()}</div>
         </article>
       </section>
     </div>
