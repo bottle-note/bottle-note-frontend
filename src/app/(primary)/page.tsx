@@ -4,7 +4,8 @@ import NavLayout from '@/components/ui/Layout/NavLayout';
 import JsonLd from '@/components/seo/JsonLd';
 import { generateWebSiteSchema } from '@/utils/seo/generateWebSiteSchema';
 import { TarotPromoCard } from '@/components/feature/home/TarotPromoCard';
-import HomeTabSection from '@/components/feature/home/HomeTabSection';
+import HomeFeaturedSection from '@/components/feature/home/HomeFeaturedSection';
+import HomeCategorySection from '@/components/feature/home/HomeCategorySection';
 import type { Banner } from '@/api/banner/types';
 import type { ApiResponse } from '@/api/_shared/types';
 
@@ -46,7 +47,10 @@ export default async function Home() {
 
         <HomeCarousel banners={banners} />
 
-        <HomeTabSection />
+        <div className="pt-[22px] pb-20">
+          <HomeFeaturedSection />
+          <HomeCategorySection />
+        </div>
       </NavLayout>
     </>
   );

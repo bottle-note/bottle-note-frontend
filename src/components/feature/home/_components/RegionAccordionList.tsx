@@ -8,6 +8,8 @@ import { useRegionsQuery } from '@/queries/useRegionsQuery';
 import { groupRegions } from '@/utils/regionGrouper';
 import { getRegionFlagUrl } from '@/constants/regionFlags';
 import type { RegionGroup } from '@/utils/regionGrouper';
+import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
+import SkeletonList from '@/components/ui/Loading/Skeletons/SkeletonList';
 
 function RegionRow({
   group,
@@ -108,7 +110,18 @@ export default function RegionAccordionList() {
   const [openRegionId, setOpenRegionId] = useState<number | '' | null>(null);
 
   if (isLoading) {
-    return <div className="min-h-[60vh]" />;
+    return (
+      <SkeletonList count={8} gap={8}>
+        <li className="py-[14px] px-[10px] border border-bgGray rounded-xl flex items-center justify-between">
+          <div className="flex items-center gap-[10px]">
+            <SkeletonBase width={26} height={26} borderRadius="8px" />
+            <div className="flex items-center gap-[4px]">
+              <SkeletonBase width={56} height={14} />
+            </div>
+          </div>
+        </li>
+      </SkeletonList>
+    );
   }
 
   const regionGroups = groupRegions(regions);

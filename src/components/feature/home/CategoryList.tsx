@@ -7,8 +7,8 @@ function CategoryList() {
   const menu: LinkData[] = generateMenu(categories);
 
   return (
-    <div className="space-y-[18px]">
-      <div className="grid grid-cols-2 gap-y-[18px] gap-x-[11.7px]">
+    <div className="flex flex-col gap-[18px]">
+      <div className="grid grid-cols-2 gap-y-[18px] gap-x-[12px]">
         {menu.map((data) => (
           <PrimaryLinkButton key={data.engName} data={data} />
         ))}

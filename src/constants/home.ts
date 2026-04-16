@@ -1,8 +1,3 @@
-export const MENU_CATEGORY = [
-  { id: 'category', name: '카테고리' },
-  { id: 'region', name: '국가별 보기' },
-];
-
 // HomeFeaturedConfig 타입 먼저 정의 (순서 의존성)
 export const HOME_FEATURED_CONFIG = {
   'view-week': {

@@ -2,95 +2,44 @@
 
 import Tab from '@/components/ui/Navigation/Tab';
 import { useTab } from '@/hooks/useTab';
-import { HomeFeaturedConfigKey, MENU_CATEGORY } from '@/constants/home';
-import CategoryList from '@/components/feature/home/CategoryList';
-import HomeFeaturedList from '@/components/feature/home/HomeFeaturedList';
-import RegionAccordionList from '@/components/feature/home/_components/RegionAccordionList';
 
-interface TopMenuItem {
-  id: HomeFeaturedConfigKey;
+interface TabItem {
+  id: string;
   name: string;
 }
 
-const TOP_MENU_ITEMS: TopMenuItem[] = [
-  { id: 'view-week', name: '주간 TOP 5' },
-  { id: 'recent', name: '최근에 본 위스키' },
-];
+interface Props<T extends TabItem> {
+  tabList: T[];
+  scroll?: boolean;
+  contentClassName?: string;
+  children: (currentTab: T) => React.ReactNode;
+}
 
-export default function HomeTabSection() {
+export default function HomeTabSection<T extends TabItem>({
+  tabList,
+  scroll = false,
+  contentClassName,
+  children,
+}: Props<T>) {
   const {
-    currentTab: firstMenuSelectedTab,
-    handleTab: handelFirstMenu,
-    tabList: firstMenuList,
-    refs: { scrollContainerRef: firstMenuScrollContainerRef },
-    registerTab: firstMenuRegisterTab,
-  } = useTab({
-    tabList: TOP_MENU_ITEMS,
-    scroll: true,
-  });
-
-  const {
-    currentTab: secondMenuSelectedTab,
-    handleTab: handleSecondMenu,
-    tabList: secondMenuList,
-    refs: { scrollContainerRef: secondMenuScrollContainerRef },
-    registerTab: secondMenuRegisterTab,
-  } = useTab({
-    tabList: MENU_CATEGORY,
-  });
-
-  const renderTopContent = () => {
-    switch (firstMenuSelectedTab.id) {
-      case 'view-week':
-      case 'recent':
-        return (
-          <HomeFeaturedList
-            key={firstMenuSelectedTab.id}
-            type={firstMenuSelectedTab.id}
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
-  const renderSecondContent = () => {
-    switch (secondMenuSelectedTab.id) {
-      case 'category':
-        return <CategoryList />;
-      case 'region':
-        return <RegionAccordionList />;
-      default:
-        return null;
-    }
-  };
+    currentTab,
+    handleTab,
+    tabList: tabs,
+    refs: { scrollContainerRef },
+    registerTab,
+  } = useTab({ tabList, scroll });
 
   return (
-    <div className="pt-[22px] space-y-1 relative">
-      <section className="pb-20">
-        <article className="space-y-[30px]">
-          <Tab
-            variant="bookmark"
-            tabList={firstMenuList}
-            handleTab={handelFirstMenu}
-            currentTab={firstMenuSelectedTab}
-            scrollContainerRef={firstMenuScrollContainerRef}
-            registerTab={firstMenuRegisterTab}
-          />
-          <div className="pb-[59px] pl-[25px]">{renderTopContent()}</div>
-        </article>
-        <article className="space-y-[30px]">
-          <Tab
-            variant="bookmark"
-            tabList={secondMenuList}
-            handleTab={handleSecondMenu}
-            currentTab={secondMenuSelectedTab}
-            scrollContainerRef={secondMenuScrollContainerRef}
-            registerTab={secondMenuRegisterTab}
-          />
-          <div className="px-[25px]">{renderSecondContent()}</div>
-        </article>
-      </section>
-    </div>
+    <article className="space-y-[30px]">
+      <Tab
+        variant="bookmark"
+        tabList={tabs}
+        handleTab={handleTab}
+        currentTab={currentTab}
+        scrollContainerRef={scrollContainerRef}
+        registerTab={registerTab}
+      />
+      <div className={contentClassName}>{children(currentTab)}</div>
+    </article>
   );
 }
