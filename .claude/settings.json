@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "figma-mcp-cached": {
+      "command": "npx",
+      "args": [
+        "@anthropic-ai/mcp-proxy",
+        "--",
+        "npx",
+        "@anthropic-ai/mcp-cache",
+        "--",
+        "npx",
+        "figma-developer-mcp",
+        "--stdio"
+      ],
+      "env": {
+        "FIGMA_API_KEY": ""
+      },
+      "description": "Figma MCP with cache proxy to reduce rate limit consumption"
+    },
+    "figma-bridge": {
+      "command": "npx",
+      "args": ["figma-mcp-bridge"],
+      "env": {
+        "WS_PORT": "3055"
+      },
+      "description": "Figma Plugin Bridge - WebSocket based, no rate limits"
+    }
+  }
+}
