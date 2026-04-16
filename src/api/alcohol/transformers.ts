@@ -56,17 +56,3 @@ export function transformCategories(
     ...transformed,
   ];
 }
-
-/**
- * 지역 목록에 '국가(전체)' 옵션을 추가합니다.
- */
-export function transformRegions(
-  regions: { regionId: number; korName: string }[],
-): { id: number; value: string }[] {
-  const transformed = regions.map((region) => ({
-    id: region.regionId,
-    value: region.korName,
-  }));
-
-  return [{ id: -1, value: '국가(전체)' }, ...transformed];
-}

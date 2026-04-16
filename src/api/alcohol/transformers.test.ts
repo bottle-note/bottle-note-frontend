@@ -2,7 +2,6 @@ import {
   transformAlcohol,
   transformAlcoholList,
   transformCategories,
-  transformRegions,
 } from './transformers';
 import type { AlcoholApiRaw, CategoryResponse } from './types';
 
@@ -166,33 +165,5 @@ describe('transformCategories', () => {
       categoryGroup: '',
     });
     expect(result).toHaveLength(2);
-  });
-});
-
-describe('transformRegions', () => {
-  it('국가(전체) 옵션을 맨 앞에 추가한다', () => {
-    // Given
-    const regions = [
-      { regionId: 1, korName: '스코틀랜드' },
-      { regionId: 2, korName: '아일랜드' },
-    ];
-
-    // When
-    const result = transformRegions(regions);
-
-    // Then
-    expect(result[0]).toEqual({ id: -1, value: '국가(전체)' });
-    expect(result).toHaveLength(3);
-  });
-
-  it('지역 목록을 id/value 형태로 변환한다', () => {
-    // Given
-    const regions = [{ regionId: 1, korName: '스코틀랜드' }];
-
-    // When
-    const result = transformRegions(regions);
-
-    // Then
-    expect(result[1]).toEqual({ id: 1, value: '스코틀랜드' });
   });
 });
