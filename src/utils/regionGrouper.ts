@@ -12,6 +12,13 @@ export interface RegionGroup {
 }
 
 /**
+ * BE가 부모 항목 `korName`에 붙여 보내는 `/전체` 접미사를 화면 표시용 이름에서 제거.
+ * 백엔드 이슈 bottle-note/workspace#230 해결 시 같이 정리.
+ */
+const stripParentTotalSuffix = (korName: string): string =>
+  korName.replace(/\/전체$/, '');
+
+/**
  * engName의 슬래시(/) 유무로 flat한 지역 목록을 그루핑합니다.
  *
  * - engName에 슬래시 없는 항목 중, 같은 이름을 접두사로 가진 하위 항목이 있으면 → 부모
@@ -53,7 +60,7 @@ export function groupRegions(regions: Region[]): RegionGroup[] {
     if (children) {
       groups.push({
         parent: region,
-        displayName: region.korName,
+        displayName: stripParentTotalSuffix(region.korName),
         engName: region.engName,
         children,
       });
@@ -61,7 +68,7 @@ export function groupRegions(regions: Region[]): RegionGroup[] {
     } else {
       standalones.push({
         parent: region,
-        displayName: region.korName,
+        displayName: stripParentTotalSuffix(region.korName),
         engName: region.engName,
         children: [],
       });

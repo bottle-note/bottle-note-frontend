@@ -10,6 +10,35 @@ import type { RegionGroup } from '@/utils/regionGrouper';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import SkeletonList from '@/components/ui/Loading/Skeletons/SkeletonList';
 
+const buildRegionHref = (regionId: number | '') =>
+  `/explore?regionIds=${regionId}&tab=EXPLORER_WHISKEY`;
+
+function RegionRowContent({
+  group,
+  flagUrl,
+}: {
+  group: RegionGroup;
+  flagUrl: string;
+}) {
+  return (
+    <div className="flex items-center gap-[10px]">
+      <Image
+        src={flagUrl || '/bottle.svg'}
+        alt={group.displayName}
+        width={26}
+        height={26}
+        className={`w-[26px] h-[26px] object-cover ${flagUrl ? 'rounded-lg' : 'rounded-lg bg-sectionWhite p-1'}`}
+      />
+      <div className="gap-[4px] flex items-center">
+        <span className="text-13 font-extrabold text-mainDarkGray">
+          {group.displayName}
+        </span>
+        <span className="text-11  text-mainDarkGray">{group.engName}</span>
+      </div>
+    </div>
+  );
+}
+
 function RegionRow({
   group,
   isOpen,
@@ -22,65 +51,59 @@ function RegionRow({
   const flagUrl = getRegionFlagUrl(group.parent.engName);
   const hasChildren = group.children.length > 0;
 
+  if (!hasChildren) {
+    return (
+      <li className="py-[14px] px-[10px] border border-bgGray rounded-xl">
+        <Link
+          href={buildRegionHref(group.parent.regionId)}
+          className="flex w-full items-center justify-between"
+        >
+          <RegionRowContent group={group} flagUrl={flagUrl} />
+        </Link>
+      </li>
+    );
+  }
+
   return (
     <li className="py-[14px] px-[10px] border border-bgGray rounded-xl flex flex-col gap-[10px]">
-      <div className="flex w-full items-center justify-between">
-        <Link
-          href={`/explore?regionIds=${group.parent.regionId}&tab=EXPLORER_WHISKEY`}
-          className="flex items-center gap-[10px] flex-1"
-        >
-          <Image
-            src={flagUrl || '/bottle.svg'}
-            alt={group.displayName}
-            width={26}
-            height={26}
-            className={`w-[26px] h-[26px] object-cover ${flagUrl ? 'rounded-lg' : 'rounded-lg bg-sectionWhite p-1'}`}
-          />
-          <div className="gap-[4px] flex items-center">
-            <span className="text-13 font-extrabold text-mainDarkGray">
-              {group.displayName}
-            </span>
-            <span className="text-11  text-mainDarkGray">{group.engName}</span>
-          </div>
-        </Link>
-        {hasChildren && (
-          <button
-            type="button"
-            onClick={onToggle}
-            aria-label={isOpen ? '하위 지역 접기' : '하위 지역 펼치기'}
-            aria-expanded={isOpen}
-            className="p-1"
-          >
-            <Image
-              src="/icon/arrow-down-darkgray.svg"
-              alt=""
-              width={16}
-              height={16}
-              className={`transition-transform duration-200 ${
-                isOpen ? 'rotate-180' : ''
-              }`}
-            />
-          </button>
-        )}
-      </div>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        aria-label={`${group.displayName} 하위 지역 ${isOpen ? '접기' : '펼치기'}`}
+        className="flex w-full items-center justify-between"
+      >
+        <RegionRowContent group={group} flagUrl={flagUrl} />
+        <Image
+          src="/icon/arrow-down-darkgray.svg"
+          alt=""
+          width={16}
+          height={16}
+          className={`p-1 transition-transform duration-200 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+        />
+      </button>
 
-      {isOpen && hasChildren && (
-        <div className="px-[8px] flex flex-col gap-[10px]">
+      {isOpen && (
+        <ul className="px-[8px] flex flex-col gap-[10px]">
           {/* /전체 항목 */}
-          <Link
-            href={`/explore?regionIds=${group.parent.regionId}&tab=EXPLORER_WHISKEY`}
-            className="flex items-center justify-between py-[8px] border-b border-bgGray border-dashed"
-          >
-            <span className="text-13 font-bold text-mainDarkGray">
-              {group.parent.korName}
-            </span>
-          </Link>
+          <li>
+            <Link
+              href={buildRegionHref(group.parent.regionId)}
+              className="flex items-center justify-between py-[8px] border-b border-bgGray border-dashed"
+            >
+              <span className="text-13 font-bold text-mainDarkGray">
+                {group.parent.korName}
+              </span>
+            </Link>
+          </li>
 
           {/* 하위 지역들 */}
           {group.children.map((child) => (
-            <div key={child.regionId}>
+            <li key={child.regionId}>
               <Link
-                href={`/explore?regionIds=${child.regionId}&tab=EXPLORER_WHISKEY`}
+                href={buildRegionHref(child.regionId)}
                 className="flex items-center justify-between py-[8px] border-b border-bgGray border-dashed"
               >
                 <div className="gap-[4px] flex items-center">
@@ -92,9 +115,9 @@ function RegionRow({
                   </span>
                 </div>
               </Link>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </li>
   );
