@@ -4,7 +4,7 @@
  */
 
 const REGION_FLAG_MAP: Record<string, string> = {
-  Australia: '/flags/Autstrailia.svg',
+  Australia: '/flags/Australia.svg',
   Finland: '/flags/Finland.svg',
   France: '/flags/France.svg',
   Taiwan: '/flags/Taiwan.svg',
