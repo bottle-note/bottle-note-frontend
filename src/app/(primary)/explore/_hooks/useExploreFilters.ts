@@ -16,7 +16,7 @@ export const useExploreFilters = () => {
       searchParams
         .getAll('regionIds')
         .map((v) => Number(v))
-        .filter((n) => Number.isFinite(n) && n > 0),
+        .filter((n) => Number.isFinite(n)),
     [searchParams],
   );
 
