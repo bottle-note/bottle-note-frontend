@@ -4,8 +4,22 @@
 
 // --------------- Request Types ---------------
 
+export type ExploreSortType =
+  | 'POPULAR'
+  | 'RATING'
+  | 'PICK'
+  | 'REVIEW'
+  | 'RANDOM';
+
+export type ExploreSortOrder = 'DESC' | 'ASC';
+
 export interface ExploreListParams {
   keywords: string[];
+  regionIds?: number[];
+  category?: string;
+  sortType?: ExploreSortType;
+  sortOrder?: ExploreSortOrder;
+  seed?: number;
   cursor?: number;
   pageSize?: number;
 }

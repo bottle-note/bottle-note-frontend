@@ -28,7 +28,9 @@ function RegionRow({
     if (hasChildren) {
       onToggle();
     } else {
-      router.push(`/search?regionId=${group.parent.regionId}`);
+      router.push(
+        `/explore?regionIds=${group.parent.regionId}&tab=EXPLORER_WHISKEY`,
+      );
     }
   };
 
@@ -73,7 +75,7 @@ function RegionRow({
         <div className="px-[8px] flex flex-col gap-[10px]">
           {/* /전체 항목 */}
           <Link
-            href={`/search?regionId=${group.parent.regionId}`}
+            href={`/explore?regionIds=${group.parent.regionId}&tab=EXPLORER_WHISKEY`}
             className="flex items-center justify-between py-[8px] border-b border-bgGray border-dashed"
           >
             <span className="text-13 font-bold text-mainDarkGray">
@@ -85,7 +87,7 @@ function RegionRow({
           {group.children.map((child) => (
             <div key={child.regionId}>
               <Link
-                href={`/search?regionId=${child.regionId}`}
+                href={`/explore?regionIds=${child.regionId}&tab=EXPLORER_WHISKEY`}
                 className="flex items-center justify-between py-[8px] border-b border-bgGray border-dashed"
               >
                 <div className="gap-[4px] flex items-center">
