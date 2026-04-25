@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useRegionsQuery } from '@/queries/useRegionsQuery';
 import { groupRegions } from '@/utils/regionGrouper';
 import { getRegionFlagUrl } from '@/constants/regionFlags';
@@ -20,28 +19,16 @@ function RegionRow({
   isOpen: boolean;
   onToggle: () => void;
 }) {
-  const router = useRouter();
   const flagUrl = getRegionFlagUrl(group.parent.engName);
   const hasChildren = group.children.length > 0;
 
-  const handleClick = () => {
-    if (hasChildren) {
-      onToggle();
-    } else {
-      router.push(
-        `/explore?regionIds=${group.parent.regionId}&tab=EXPLORER_WHISKEY`,
-      );
-    }
-  };
-
   return (
     <li className="py-[14px] px-[10px] border border-bgGray rounded-xl flex flex-col gap-[10px]">
-      <button
-        type="button"
-        onClick={handleClick}
-        className="flex w-full items-center justify-between"
-      >
-        <div className="flex items-center gap-[10px]">
+      <div className="flex w-full items-center justify-between">
+        <Link
+          href={`/explore?regionIds=${group.parent.regionId}&tab=EXPLORER_WHISKEY`}
+          className="flex items-center gap-[10px] flex-1"
+        >
           <Image
             src={flagUrl || '/bottle.svg'}
             alt={group.displayName}
@@ -55,9 +42,15 @@ function RegionRow({
             </span>
             <span className="text-11  text-mainDarkGray">{group.engName}</span>
           </div>
-        </div>
+        </Link>
         {hasChildren && (
-          <button className="p-1">
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-label={isOpen ? '하위 지역 접기' : '하위 지역 펼치기'}
+            aria-expanded={isOpen}
+            className="p-1"
+          >
             <Image
               src="/icon/arrow-down-darkgray.svg"
               alt=""
@@ -69,7 +62,7 @@ function RegionRow({
             />
           </button>
         )}
-      </button>
+      </div>
 
       {isOpen && hasChildren && (
         <div className="px-[8px] flex flex-col gap-[10px]">
