@@ -9,5 +9,7 @@
 - `/hook` - Hook 관련 작업
 - `/page` - 페이지 생성
 - `/refactor` - 리팩토링
+- `/review` - 코드 리뷰
+- `/spec` - 스펙 작성 (구현 전 요구사항 정의)
 - `/store` - Store 관련 작업
 - `/test` - 테스트 작성

@@ -33,18 +33,23 @@ export const useExploreKeywords = ({ tabId }: UseExploreKeywordsOptions) => {
     });
   }, [searchParams]);
 
-  // 키워드 변경시 URL 업데이트
+  // 키워드 변경시 URL 업데이트 (regionId 등 다른 파라미터는 보존)
   useEffect(() => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(searchParams.toString());
     params.set('tab', tabId);
+    params.delete('keywords');
 
     keywords.forEach((keyword) => {
       params.append('keywords', keyword.value);
     });
 
-    const newUrl = `${pathname}?${params.toString()}`;
-    router.replace(newUrl, { scroll: false });
-  }, [keywords, pathname, router, tabId]);
+    const nextQuery = params.toString();
+    if (nextQuery === searchParams.toString()) {
+      return;
+    }
+
+    router.replace(`${pathname}?${nextQuery}`, { scroll: false });
+  }, [keywords, pathname, router, tabId, searchParams]);
 
   const handleAddKeyword = useCallback((newKeyword: SearchKeyword) => {
     setKeywords((prev) => {

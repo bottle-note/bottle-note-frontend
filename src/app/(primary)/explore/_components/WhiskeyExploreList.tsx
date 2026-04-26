@@ -8,12 +8,14 @@ import WhiskeyListItem from './WhiskeyListItem';
 import { ExploreSearchBar } from './ExploreSearchBar';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
 import { useExploreKeywords } from '../_hooks/useExploreKeywords';
+import { useExploreFilters } from '../_hooks/useExploreFilters';
 
 const WHISKEY_TAB_ID = 'EXPLORER_WHISKEY';
 
 export const WhiskeyExplorerList = () => {
   const { keywords, keywordValues, handleAddKeyword, handleRemoveKeyword } =
     useExploreKeywords({ tabId: WHISKEY_TAB_ID });
+  const { regionIds, category } = useExploreFilters();
 
   const {
     data: alcoholList,
@@ -25,14 +27,21 @@ export const WhiskeyExplorerList = () => {
   } = usePaginatedQuery<{
     items: ExploreAlcohol[];
   }>({
-    queryKey: ['explore.alcohols', ...keywordValues],
+    queryKey: [
+      'explore.alcohols',
+      category || 'all',
+      regionIds.join(',') || 'all',
+      ...keywordValues,
+    ],
     queryFn: ({ pageParam }) => {
       return ExploreApi.getAlcohols({
         keywords: keywordValues,
-        ...{
-          cursor: pageParam,
-          pageSize: 10,
-        },
+        regionIds: regionIds.length > 0 ? regionIds : undefined,
+        category: category || undefined,
+        sortType: 'POPULAR',
+        sortOrder: 'DESC',
+        cursor: pageParam,
+        pageSize: 10,
       });
     },
     staleTime: 1000 * 60 * 5,
