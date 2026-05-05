@@ -3,6 +3,7 @@ import type {
   ShareChannel,
   SharePlatform,
 } from '@/types/share';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 
 interface ShareEventParams {
   contentType: ShareContentType;
@@ -25,9 +26,7 @@ interface ShareEventParams {
  * });
  */
 export function trackShareEvent(params: ShareEventParams): void {
-  if (typeof window === 'undefined' || !window.gtag) return;
-
-  window.gtag('event', 'share', {
+  trackGA4Event('share', {
     content_type: params.contentType,
     content_id: params.contentId,
     share_channel: params.channel,

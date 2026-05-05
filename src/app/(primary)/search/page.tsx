@@ -21,6 +21,7 @@ import { ROUTES } from '@/constants/routes';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
 import SearchBarLink from '@/components/feature/Search/SearchBarLink';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 import { useSearchPageState } from '@/app/(primary)/search/hook/useSearchPageState';
 
 const SORT_OPTIONS = [
@@ -162,6 +163,15 @@ export default function Search() {
       searchHistory.save(urlKeyword);
     }
   }, [urlKeyword]);
+
+  useEffect(() => {
+    if (urlKeyword && alcoholList && !isFirstLoading) {
+      trackGA4Event('search', {
+        search_term: urlKeyword,
+        result_count: alcoholList[0]?.data.totalCount ?? 0,
+      });
+    }
+  }, [urlKeyword, isFirstLoading]);
 
   useEffect(() => {
     const handleScroll = () => {
