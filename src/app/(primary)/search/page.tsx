@@ -11,7 +11,7 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { Alcohol } from '@/api/alcohol/types';
 import { CurationApi } from '@/api/curation/curation.api';
-import { REGIONS } from '@/constants/common';
+import { useRegionsQuery } from '@/queries/useRegionsQuery';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import useModalStore from '@/store/modalStore';
 import { useAuth } from '@/hooks/auth/useAuth';
@@ -38,6 +38,7 @@ export default function Search() {
     useHomeFeaturedQuery({ type: 'week' });
   const { filterState, handleFilter, isEmptySearch, urlKeyword } =
     useSearchPageState();
+  const { regionOptions } = useRegionsQuery();
   const [showTab, setShowTab] = useState(true);
 
   const curationIdNum = Number(filterState.curationId);
@@ -283,10 +284,7 @@ export default function Search() {
                 )}
                 {!isCurationSearch && (
                   <List.OptionSelect
-                    options={REGIONS.map((region) => ({
-                      type: String(region.regionId),
-                      name: region.korName,
-                    }))}
+                    options={regionOptions}
                     currentValue={filterState.regionId}
                     handleOptionCallback={(value) =>
                       handleFilter('regionId', value)

@@ -45,10 +45,24 @@ export const ExploreApi = {
   async getAlcohols(
     params: ExploreListParams,
   ): Promise<ApiResponse<ExploreAlcoholsResponse>> {
-    const { keywords, cursor, pageSize } = params;
+    const {
+      keywords,
+      regionIds,
+      category,
+      sortType,
+      sortOrder,
+      seed,
+      cursor,
+      pageSize,
+    } = params;
 
     const queryString = buildQueryParams({
       keywords,
+      regionIds,
+      category,
+      sortType,
+      sortOrder,
+      seed,
       cursor,
       size: pageSize,
     });

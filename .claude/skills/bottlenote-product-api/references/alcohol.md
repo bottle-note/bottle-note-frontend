@@ -142,11 +142,58 @@ Source: https://bottle-note.github.io/bottle-note-api-server/bottle-note/product
 
 ### 위스키 탐색
 
+> 검색(`/alcohols/search`)을 흡수한 메인 탐색 엔드포인트 (백엔드 PR #577, merged).
+> Source: `ExploreStandardRequest.java`, `AlcoholExploreController.java`, `SearchSortType.java`
+
 - **GET** `/api/v1/alcohols/explore/standard`
+- Query:
+  - `keywords?: string[]` — 다중 키워드. 키워드 간 **AND**, 각 키워드는 여러 필드와 OR 매칭
+  - `category?: AlcoholCategoryGroup`
+  - `regionIds?: number[]` — 컬렉션 내 OR (IN 절). search API의 단수 `regionId`와 다름
+  - `distilleryIds?: number[]` — 컬렉션 내 OR
+  - `curationId?: number`
+  - `sortType?: "POPULAR" | "RATING" | "PICK" | "REVIEW" | "RANDOM"` (default: `RANDOM`)
+  - `sortOrder?: "DESC" | "ASC"` (default: `DESC`)
+  - `seed?: number` (Long) — RANDOM 정렬 페이지 간 순서 일관성용. 미전송 시 서버가 생성하여 응답 `meta.seed`에 실어 내려줌. 다음 페이지 요청에 동일 seed 전달 필수. **비-RANDOM 정렬에서는 무시 (서비스가 0으로 채워 응답)**
+  - `cursor?: number` (default: 0, `>= 0`)
+  - `size?: number` (default: 20, `1 ~ 100`)
+- 서로 다른 필터 간 결합은 **AND**
+
+- Response (`GlobalResponse<CollectionResponse<AlcoholDetailItem>>`):
+
+```typescript
+{
+  success: boolean;
+  code: number;
+  data: {
+    totalCount: 0;  // ⚠️ 컨트롤러에서 항상 0으로 고정 전달 — 실제 총개수 제공 안 됨
+    items: AlcoholDetailItem[];  // reviewCount, pickCount 포함 (PR #577에서 추가)
+  };
+  meta: {
+    pageable: { currentCursor, cursor, pageSize, hasNext };
+    searchParameters: ExploreStandardRequest;  // 요청 그대로 echo
+    seed: number;  // RANDOM 정렬 시 사용된 seed (요청값 또는 서버 생성값), 비-RANDOM은 0
+  };
+}
+```
+
+- 인증: **선택적**. 컨트롤러는 `SecurityContextUtil.getUserIdByContext().orElse(-1L)`로 처리 — 비로그인은 `userId = -1`. Authorization 헤더 없어도 호출 가능, 단 `isPicked` 등 사용자 컨텍스트 필드는 로그인 시에만 의미 있는 값
 
 ### 리뷰 탐색
 
 - **GET** `/api/v1/reviews/explore/standard`
+- Query: `keywords?: string[]`, `cursor?: number`, `size?: number`
+- Response:
+
+```typescript
+{
+  totalCount: number;
+  items: ExploreReview[]; // userInfo, alcoholName, reviewContent, reviewRating, isLikedByMe 등
+}
+```
+
+- Meta: `meta.pageable` (cursor 기반)
+- 인증: **문서에 명시 없음** (`isMyReview`, `isLikedByMe`는 로그인 시 제공)
 
 ## 테이스팅 태그
 
