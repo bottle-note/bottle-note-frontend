@@ -17,22 +17,6 @@ export const useExploreKeywords = ({ tabId }: UseExploreKeywordsOptions) => {
   const [keywords, setKeywords] = useState<SearchKeyword[]>(initialKeywords);
   const keywordValues = keywords.map((keyword) => keyword.value);
 
-  // URL 파라미터 변경시 키워드 상태 동기화
-  useEffect(() => {
-    const nextKeywords = buildKeywordsFromParams(searchParams);
-    setKeywords((prev) => {
-      if (
-        prev.length === nextKeywords.length &&
-        prev.every(
-          (keyword, index) => keyword.value === nextKeywords[index].value,
-        )
-      ) {
-        return prev;
-      }
-      return nextKeywords;
-    });
-  }, [searchParams]);
-
   // 키워드 변경시 URL 업데이트 (regionId 등 다른 파라미터는 보존)
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
