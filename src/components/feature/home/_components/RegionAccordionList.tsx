@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useRegionsQuery } from '@/queries/useRegionsQuery';
 import { groupRegions } from '@/utils/regionGrouper';
 import { getRegionFlagUrl } from '@/constants/regionFlags';
@@ -65,7 +66,7 @@ function RegionRow({
   }
 
   return (
-    <li className="py-[14px] px-[10px] border border-bgGray rounded-xl flex flex-col gap-[10px]">
+    <li className="py-[14px] px-[10px] border border-bgGray rounded-xl flex flex-col">
       <button
         type="button"
         onClick={onToggle}
@@ -75,50 +76,59 @@ function RegionRow({
       >
         <RegionRowContent group={group} flagUrl={flagUrl} />
         <Image
-          src="/icon/arrow-down-darkgray.svg"
+          src="/icon/arrow-down-gray.svg"
           alt=""
-          width={16}
-          height={16}
-          className={`p-1 transition-transform duration-200 ${
+          width={22}
+          height={22}
+          className={`transition-transform duration-200 ${
             isOpen ? 'rotate-180' : ''
           }`}
         />
       </button>
 
-      {isOpen && (
-        <ul className="px-[8px] flex flex-col gap-[10px]">
-          {/* /전체 항목 */}
-          <li>
-            <Link
-              href={buildRegionHref(group.parent.regionId)}
-              className="flex items-center justify-between py-[8px] border-b border-bgGray border-dashed"
-            >
-              <span className="text-13 font-bold text-mainDarkGray">
-                {group.parent.korName}
-              </span>
-            </Link>
-          </li>
-
-          {/* 하위 지역들 */}
-          {group.children.map((child) => (
-            <li key={child.regionId}>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.ul
+            key="content"
+            initial={{ height: 0, marginTop: 0 }}
+            animate={{ height: 'auto', marginTop: 10 }}
+            exit={{ height: 0, marginTop: 0 }}
+            transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+            className="overflow-hidden px-[8px] flex flex-col gap-[10px]"
+          >
+            {/* /전체 항목 */}
+            <li>
               <Link
-                href={buildRegionHref(child.regionId)}
+                href={buildRegionHref(group.parent.regionId)}
                 className="flex items-center justify-between py-[8px] border-b border-bgGray border-dashed"
               >
-                <div className="gap-[4px] flex items-center">
-                  <span className="text-13 font-bold text-mainDarkGray">
-                    {child.korName}
-                  </span>
-                  <span className="text-11  text-mainDarkGray">
-                    {child.engName}
-                  </span>
-                </div>
+                <span className="text-13 font-bold text-mainDarkGray">
+                  {group.parent.korName}
+                </span>
               </Link>
             </li>
-          ))}
-        </ul>
-      )}
+
+            {/* 하위 지역들 */}
+            {group.children.map((child) => (
+              <li key={child.regionId}>
+                <Link
+                  href={buildRegionHref(child.regionId)}
+                  className="flex items-center justify-between py-[8px] border-b border-bgGray border-dashed"
+                >
+                  <div className="gap-[4px] flex items-center">
+                    <span className="text-13 font-bold text-mainDarkGray">
+                      {child.korName}
+                    </span>
+                    <span className="text-11  text-mainDarkGray">
+                      {child.engName}
+                    </span>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
     </li>
   );
 }
@@ -126,6 +136,20 @@ function RegionRow({
 export default function RegionAccordionList() {
   const { regions, isLoading } = useRegionsQuery();
   const [openRegionId, setOpenRegionId] = useState<number | '' | null>(null);
+  const initializedRef = useRef(false);
+
+  const regionGroups = useMemo(() => groupRegions(regions), [regions]);
+
+  useEffect(() => {
+    if (initializedRef.current) return;
+    if (regionGroups.length === 0) return;
+
+    const scotland = regionGroups.find((g) => g.parent.engName === 'Scotland');
+    if (scotland) {
+      setOpenRegionId(scotland.parent.regionId);
+      initializedRef.current = true;
+    }
+  }, [regionGroups]);
 
   if (isLoading) {
     return (
@@ -141,8 +165,6 @@ export default function RegionAccordionList() {
       </SkeletonList>
     );
   }
-
-  const regionGroups = groupRegions(regions);
 
   return (
     <ul className="space-y-[8px]">
