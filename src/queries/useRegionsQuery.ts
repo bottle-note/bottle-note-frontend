@@ -6,6 +6,8 @@ export interface Region {
   regionId: number | '';
   korName: string;
   engName: string;
+  parentId?: number | null;
+  sortOrder?: number;
 }
 
 const ALL_REGION: Region = {
@@ -19,7 +21,15 @@ export const regionKeys = {
 };
 
 function toRegions(data: RegionResponse[]): Region[] {
-  return [ALL_REGION, ...data.filter((r) => r.korName !== '-')];
+  const sorted = [...data]
+    .filter((r) => r.korName !== '-')
+    .sort((a, b) => {
+      const ao = a.sortOrder ?? 9999;
+      const bo = b.sortOrder ?? 9999;
+      if (ao !== bo) return ao - bo;
+      return a.regionId - b.regionId;
+    });
+  return [ALL_REGION, ...sorted];
 }
 
 function toRegionOptions(regions: Region[]): { type: string; name: string }[] {
