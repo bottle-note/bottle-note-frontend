@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import Image from 'next/image';
-import { LucideSearch } from 'lucide-react';
 import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
 import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
 import { CATEGORY_MENUS_LIST } from '@/constants/common';
@@ -77,20 +76,14 @@ export const ExploreSearchBar = ({
 
         <div className="flex justify-end gap-[7px] absolute top-2.5 right-0">
           <button
-            className="label-default text-13 text-nowrap"
-            onClick={handleSubmit}
-          >
-            + 추가
-          </button>
-          <button
+            type="button"
             className="label-selected text-13 text-nowrap flex items-center gap-[2px]"
             onClick={handleSubmit}
           >
-            <LucideSearch className="w-3.5 h-3.5" />
-            검색
+            <span>+ 검색어 추가</span>
           </button>
           {isFilter && (
-            <button onClick={() => setIsOpenSideFilter(true)}>
+            <button type="button" onClick={() => setIsOpenSideFilter(true)}>
               <Image src={FilterIcon} alt="필터메뉴" />
             </button>
           )}
