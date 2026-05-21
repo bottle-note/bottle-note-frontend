@@ -1,12 +1,10 @@
-import Image from 'next/image';
 import { ExploreApi } from '@/api/explore/explore.api';
 import { ExploreAlcohol } from '@/api/explore/types';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import List from '@/components/feature/List/List';
-import Label from '@/components/ui/Display/Label';
 import WhiskeyListItem from './WhiskeyListItem';
 import { ExploreSearchBar } from './ExploreSearchBar';
-import DeleteIcon from 'public/icon/reset-mainGray.svg';
+import { ExploreKeywordChip } from './ExploreKeywordChip';
 import { useExploreKeywords } from '../_hooks/useExploreKeywords';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
 
@@ -60,20 +58,9 @@ export const WhiskeyExplorerList = () => {
       <article className="flex gap-x-1 gap-y-1.5 flex-wrap border-b border-borderGray pb-6">
         {keywords.map((keyword) => (
           <div key={keyword.value} className="overflow-hidden flex-shrink-0">
-            <Label
-              name={keyword.label}
-              styleClass="label-default text-13"
-              position="after"
-              icon={
-                <button
-                  type="button"
-                  onMouseDown={() => handleRemoveKeyword(keyword.value)}
-                  className=""
-                  aria-label="검색어 지우기"
-                >
-                  <Image src={DeleteIcon} alt="delete" />
-                </button>
-              }
+            <ExploreKeywordChip
+              keyword={keyword}
+              onRemove={handleRemoveKeyword}
             />
           </div>
         ))}
