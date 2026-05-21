@@ -89,7 +89,7 @@ export default function ExplorePage() {
         />
       </div>
       <section
-        className="w-full h-full p-4"
+        className="w-full h-full px-4 pb-4 pt-0"
         style={{
           marginTop: 'calc(var(--header-height-with-safe) + var(--tab-height))',
         }}
