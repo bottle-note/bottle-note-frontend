@@ -1,6 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { ROUTES } from '@/constants/routes';
 import { LABEL_NAMES } from '@/constants/common';
 import { ExploreAlcohol } from '@/types/Explore';
@@ -16,54 +14,10 @@ interface Props {
 }
 
 const WhiskeyListItem = ({ content, priority = false }: Props) => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [visibleTags, setVisibleTags] = useState<string[]>(
-    content.alcoholsTastingTags,
-  );
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible: string[] = [];
-
-        entries.forEach((entry) => {
-          const tag = entry.target.getAttribute('data-tag');
-          if (entry.isIntersecting && tag) {
-            visible.push(tag);
-          }
-        });
-
-        const orderedVisible = content.alcoholsTastingTags.filter((tag) =>
-          visible.includes(tag),
-        );
-
-        setVisibleTags(orderedVisible);
-      },
-      {
-        root: section,
-        rootMargin: '0px -10% 0px 0px',
-        threshold: 1.0,
-      },
-    );
-
-    setTimeout(() => {
-      const tagElements = section.querySelectorAll('[data-tag]');
-      tagElements.forEach((el) => observer.observe(el));
-    }, 0);
-
-    return () => observer.disconnect();
-  }, [content.alcoholsTastingTags]);
-
   return (
-    <section
-      ref={sectionRef}
-      className="flex items-center text-mainBlack py-6 w-full overflow-hidden"
-    >
+    <section className="flex items-center text-mainBlack py-6 w-full overflow-hidden">
       {/* image */}
-      <Link href={ROUTES.SEARCH.ALL(content.alcoholId)}>
+      <Link href={ROUTES.SEARCH.ALL(content.alcoholId)} className="shrink-0">
         <ItemImage
           src={content.alcoholUrlImg}
           alt="image"
@@ -75,9 +29,9 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
       {/* info */}
       <Link
         href={ROUTES.SEARCH.ALL(content.alcoholId)}
-        className="flex flex-col items-start justify-center space-y-2"
+        className="flex min-w-0 flex-1 flex-col items-start justify-center space-y-2"
       >
-        <div className="space-y-2">
+        <div className="min-w-0 space-y-2">
           <ItemInfo
             korName={content.korName}
             engName={content.engName}
@@ -113,29 +67,15 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
         </div>
 
         {/*  태그 */}
-        <div className="flex gap-x-1 w-full overflow-hidden">
-          {visibleTags?.map((tag) => (
-            <div
-              key={tag}
-              data-tag={tag}
-              className="overflow-hidden flex-shrink-0"
-            >
+        <div className="flex w-full min-w-0 gap-x-1 overflow-x-auto scrollbar-hide">
+          {content.alcoholsTastingTags?.map((tag) => (
+            <div key={tag} className="overflow-hidden flex-shrink-0">
               <Label
                 name={tag}
                 styleClass="label-default border-mainGray text-mainGray px-2 py-1 text-11"
               />
             </div>
           ))}
-          {visibleTags?.length < content.alcoholsTastingTags?.length && (
-            <div className="flex items-center pt-1.5">
-              <Image
-                src={'/icon/ellipsis-vertical-mainGray.svg'}
-                alt="ellipsis"
-                width={9}
-                height={2}
-              />
-            </div>
-          )}
         </div>
       </Link>
     </section>
