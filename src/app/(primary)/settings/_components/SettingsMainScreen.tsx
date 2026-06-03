@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { MenuCategory } from '@/types/Settings';
+import { SettingsMiniEventList } from './SettingsMiniEventList';
 
 interface SettingsMainScreenProps {
   menuCategories: MenuCategory[];
@@ -30,6 +31,8 @@ export const SettingsMainScreen = ({
       initial="hidden"
       animate="visible"
     >
+      <SettingsMiniEventList />
+
       {menuCategories.map((category, categoryIndex) => (
         <div key={category.title}>
           {categoryIndex > 0 && <div className="border-t border-brightGray" />}
