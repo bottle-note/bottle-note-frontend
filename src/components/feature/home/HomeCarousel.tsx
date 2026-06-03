@@ -66,10 +66,9 @@ function BannerImage({
         src={banner.imageUrl}
         alt={banner.name}
         fill
-        sizes="100vw"
+        sizes="(max-width: 430px) 100vw, 430px"
         priority={isPriority}
         quality={75}
-        unoptimized
         onLoad={() => setIsLoaded(true)}
         style={{ objectFit: 'cover' }}
         className="w-full h-full object-cover"

@@ -20,9 +20,10 @@ import Label from '@/components/ui/Display/Label';
 
 interface Props {
   content: ExploreReview;
+  priority?: boolean;
 }
 
-const ReviewListItem = ({ content }: Props) => {
+const ReviewListItem = ({ content, priority = false }: Props) => {
   const { handleLoginModal } = useModalStore();
   const { isLoggedIn, user: userData } = useAuth();
   const [isLiked, setIsLiked] = useState(content.isLikedByMe);
@@ -87,7 +88,7 @@ const ReviewListItem = ({ content }: Props) => {
         {/* 리뷰 본문 */}
         <Link href={ROUTES.REVIEW.DETAIL(content.reviewId)}>
           <div className="flex flex-col gap-[14px]">
-            <ReviewImageCarousel images={productImages} />
+            <ReviewImageCarousel images={productImages} priority={priority} />
             <div
               className="text-15 text-mainDarkGray whitespace-pre-line break-words"
               dangerouslySetInnerHTML={{

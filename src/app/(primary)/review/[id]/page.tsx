@@ -185,18 +185,8 @@ export default function ReviewDetail() {
         <>
           <NavLayout>
             <div className="relative">
-              {alcoholInfo.imageUrl && (
-                <Image
-                  src={alcoholInfo.imageUrl}
-                  alt="배경 이미지"
-                  fill
-                  priority
-                  sizes="100vw"
-                  className="object-cover"
-                />
-              )}
               <div
-                className={`absolute inset-0 bg-mainCoral bg-opacity-90 ${isUnmounting ? 'hidden' : ''}`}
+                className={`absolute inset-0 bg-mainCoral ${isUnmounting ? 'hidden' : ''}`}
               />
               <div className="relative z-10">
                 <SubHeader bgColor="bg-none">

@@ -66,11 +66,15 @@ export const ReviewExplorerList = () => {
       >
         <List.Section className="space-y-[30px] divide-y-[1px]">
           {reviewList &&
-            [...reviewList].map((listData) =>
+            [...reviewList].map((listData, pageIndex) =>
               listData.data.items
                 .flat()
-                .map((review) => (
-                  <ReviewCard key={review.reviewId} content={review} />
+                .map((review, itemIndex) => (
+                  <ReviewCard
+                    key={review.reviewId}
+                    content={review}
+                    priority={pageIndex === 0 && itemIndex === 0}
+                  />
                 )),
             )}
           <div ref={targetRef} className="h-10" />
