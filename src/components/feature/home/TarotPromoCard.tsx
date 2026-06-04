@@ -2,16 +2,26 @@
 
 import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Storage } from '@/lib/Storage';
+import { ROUTES } from '@/constants/routes';
+
+export const TAROT_PROMO_CLOSED_KEY = 'homeTarotPromoClosed';
 
 export function TarotPromoCard() {
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    if (Storage.getItem<boolean>(TAROT_PROMO_CLOSED_KEY)) {
+      return undefined;
+    }
+
+    setShow(true);
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 300);
+
     return () => {
       clearTimeout(timer);
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
@@ -21,6 +31,7 @@ export function TarotPromoCard() {
   const handleClose = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    Storage.setItem(TAROT_PROMO_CLOSED_KEY, true);
     setIsVisible(false);
     closeTimerRef.current = setTimeout(() => {
       setShow(false);
@@ -37,7 +48,7 @@ export function TarotPromoCard() {
       `}
     >
       <Link
-        href="/whiskey-tarot"
+        href={ROUTES.WHISKEY_TAROT}
         className="block p-4 bg-mainCoral/10 rounded-xl relative"
       >
         <button
