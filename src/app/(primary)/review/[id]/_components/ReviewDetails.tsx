@@ -47,7 +47,7 @@ function ReviewDetails({
         <section className="mx-5 pb-5 border-b border-mainGray/30">
           {productImages?.length > 0 && (
             <div className="mb-[22px]">
-              <ReviewImageCarousel images={productImages} />
+              <ReviewImageCarousel images={productImages} priority />
             </div>
           )}
           <div
