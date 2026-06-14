@@ -26,9 +26,9 @@ jobs:
           node-version: '22'
 
       - name: pnpm 설치
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 9.15.9
           run_install: false
 
       - name: pnpm 캐시 활성화

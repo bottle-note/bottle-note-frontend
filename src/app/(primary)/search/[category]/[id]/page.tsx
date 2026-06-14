@@ -239,19 +239,8 @@ export default function SearchAlcohol() {
         ) : (
           <>
             <div className="relative">
-              {/* 배경 레이어들 */}
-              {data?.alcohols?.alcoholUrlImg && (
-                <Image
-                  src={data.alcohols.alcoholUrlImg}
-                  alt=""
-                  fill
-                  priority
-                  sizes="100vw"
-                  className="object-cover"
-                />
-              )}
               <div
-                className={`absolute inset-0 bg-mainCoral bg-opacity-90 ${
+                className={`absolute inset-0 bg-mainCoral ${
                   isUnmounting ? 'hidden' : ''
                 }`}
               />

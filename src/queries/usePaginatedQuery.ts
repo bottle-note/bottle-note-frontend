@@ -2,6 +2,11 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { ApiResponse } from '@/api/_shared/types';
 
+const DEFAULT_INTERSECTION_OPTIONS: IntersectionObserverInit = {
+  rootMargin: '800px',
+  threshold: 0,
+};
+
 interface Props<T> {
   queryKey: [string, ...Array<any>];
   queryFn: (params: any) => Promise<ApiResponse<T>>;
@@ -10,6 +15,8 @@ interface Props<T> {
   enabled?: boolean;
   refetchOnMount?: boolean;
   gcTime?: number;
+  intersectionOptions?: IntersectionObserverInit;
+  intersectionThrottleMs?: number;
 }
 
 export const usePaginatedQuery = <T>({
@@ -20,6 +27,8 @@ export const usePaginatedQuery = <T>({
   refetchOnMount = true,
   staleTime = 0,
   gcTime = 1000 * 60 * 10,
+  intersectionOptions = DEFAULT_INTERSECTION_OPTIONS,
+  intersectionThrottleMs,
 }: Props<T>) => {
   const {
     data,
@@ -28,6 +37,7 @@ export const usePaginatedQuery = <T>({
     fetchNextPage,
     hasNextPage,
     isFetching,
+    isFetchingNextPage,
     refetch,
   } = useInfiniteQuery({
     queryKey,
@@ -49,14 +59,12 @@ export const usePaginatedQuery = <T>({
 
   const { targetRef } = useInfiniteScroll({
     fetchNextPage: () => {
-      if (!isFetching && hasNextPage) {
+      if (!isFetchingNextPage && hasNextPage) {
         fetchNextPage();
       }
     },
-    options: {
-      rootMargin: '300px',
-      threshold: 0,
-    },
+    options: intersectionOptions,
+    throttleMs: intersectionThrottleMs,
   });
 
   return {
@@ -64,6 +72,7 @@ export const usePaginatedQuery = <T>({
     error,
     isLoading,
     isFetching,
+    isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
     targetRef,

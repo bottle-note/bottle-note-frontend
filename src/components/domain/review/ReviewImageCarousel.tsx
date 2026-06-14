@@ -32,7 +32,15 @@ export const convertImageUrlsToProductImageArray = (
 };
 
 // TODO: 이미지 여러장일 때 슬라이드 수정
-export const ReviewImageCarousel = ({ images }: { images: ProductImage[] }) => {
+interface ReviewImageCarouselProps {
+  images: ProductImage[];
+  priority?: boolean;
+}
+
+export const ReviewImageCarousel = ({
+  images,
+  priority = false,
+}: ReviewImageCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
@@ -71,7 +79,7 @@ export const ReviewImageCarousel = ({ images }: { images: ProductImage[] }) => {
                 width={600}
                 height={600}
                 sizes="(max-width: 768px) 100vw, 600px"
-                priority={index === 0}
+                priority={priority && index === 0}
                 className="object-cover w-full h-full"
               />
             </div>

@@ -2,6 +2,7 @@ export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
   SIGNUP: '/signup',
+  WHISKEY_TAROT: '/whiskey-tarot',
   OAUTH: {
     KAKAO: '/oauth/kakao',
   },
