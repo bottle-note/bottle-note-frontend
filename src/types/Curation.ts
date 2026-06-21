@@ -1,3 +1,5 @@
+import type { CursorPaginationParams, PageableInfo } from '@/api/_shared/types';
+
 export interface CurationItem {
   id: number;
   name: string;
@@ -7,28 +9,14 @@ export interface CurationItem {
   displayOrder: number;
 }
 
-export interface CurationListParams {
+export type CurationListParams = CursorPaginationParams & {
   keyword?: string;
   alcoholId?: number;
-  cursor?: number;
-  pageSize?: number;
-}
-
-export interface CurationPageable {
-  currentCursor: number;
-  cursor: number;
-  pageSize: number;
-  hasNext: boolean;
-}
+};
 
 export interface CurationListData {
   items: CurationItem[];
-  pageable: CurationPageable;
-}
-
-export interface CurationAlcoholsParams {
-  cursor?: number;
-  pageSize?: number;
+  pageable: PageableInfo;
 }
 
 export interface CurationAlcoholItem {
@@ -47,5 +35,5 @@ export interface CurationAlcoholItem {
 
 export interface CurationAlcoholsData {
   items: CurationAlcoholItem[];
-  pageable: CurationPageable;
+  pageable: PageableInfo;
 }

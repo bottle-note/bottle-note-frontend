@@ -1,8 +1,8 @@
 import { apiClient } from '@/shared/api/apiClient';
-import { ApiResponse } from '@/api/_shared/types';
+import { ApiResponse, CursorPaginationParams } from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
-import type { CurationV2FeedData, CurationV2FeedParams } from './types';
+import type { CurationV2FeedData } from './types';
 
 export const CurationV2Api = {
   /**
@@ -11,7 +11,7 @@ export const CurationV2Api = {
    * - payload는 responseSpec의 x-feed.enabled=true 필드만 포함합니다.
    */
   async getFeed(
-    params: CurationV2FeedParams = {},
+    params: CursorPaginationParams = {},
   ): Promise<ApiResponse<CurationV2FeedData>> {
     const { cursor = 0, pageSize = 10 } = params;
     const queryString = buildQueryParams({ cursor, pageSize });
@@ -28,5 +28,3 @@ export const CurationV2Api = {
     return response;
   },
 };
-
-export type { CurationV2FeedParams } from './types';

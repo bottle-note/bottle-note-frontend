@@ -2,19 +2,14 @@
 // Curation API - Request/Response Types
 // ============================================
 
+import type { CursorPaginationParams, PageableInfo } from '@/api/_shared/types';
+
 // --------------- Request Types ---------------
 
-export interface CurationListParams {
+export type CurationListParams = CursorPaginationParams & {
   keyword?: string;
   alcoholId?: number;
-  cursor?: number;
-  pageSize?: number;
-}
-
-export interface CurationAlcoholsParams {
-  cursor?: number;
-  pageSize?: number;
-}
+};
 
 // --------------- Response Types ---------------
 
@@ -27,16 +22,9 @@ export interface CurationItem {
   displayOrder: number;
 }
 
-export interface CurationPageable {
-  currentCursor: number;
-  cursor: number;
-  pageSize: number;
-  hasNext: boolean;
-}
-
 export interface CurationListData {
   items: CurationItem[];
-  pageable: CurationPageable;
+  pageable: PageableInfo;
 }
 
 export interface CurationAlcoholItem {
@@ -55,5 +43,5 @@ export interface CurationAlcoholItem {
 
 export interface CurationAlcoholsData {
   items: CurationAlcoholItem[];
-  pageable: CurationPageable;
+  pageable: PageableInfo;
 }

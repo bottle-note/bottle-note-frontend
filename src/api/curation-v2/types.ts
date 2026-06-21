@@ -2,17 +2,7 @@
 // Curation V2 API - Request/Response Types
 // ============================================
 
-export interface CurationV2FeedParams {
-  cursor?: number;
-  pageSize?: number;
-}
-
-export interface CurationV2Pageable {
-  currentCursor: number;
-  cursor: number;
-  pageSize: number;
-  hasNext: boolean;
-}
+import type { PageableInfo } from '@/api/_shared/types';
 
 export interface TastingEventPayload {
   capacity: number;
@@ -62,7 +52,7 @@ export interface CurationV2FeedItem {
 
 export interface CurationV2FeedData {
   items: CurationV2FeedItem[];
-  pageable: CurationV2Pageable;
+  pageable: PageableInfo;
 }
 
 export interface TastingEventFeedItem extends CurationV2FeedItem {
