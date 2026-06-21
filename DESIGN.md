@@ -169,6 +169,23 @@ Figma px → Tailwind 변환:
 
 새 CTA가 위 구조와 같으면 `Button` 또는 `DualButton` 재사용을 우선한다.
 
+버튼 네이밍은 색상과 위계를 고정해서 묶지 않고, 아래 세 축을 분리해서 판단한다.
+
+- `priority`: 화면 내 행동 위계. `primary` / `secondary` / `tertiary`를 기본으로 사용한다.
+- `appearance`: 시각적 표현. `solid` / `outline` / `ghost` / `text`를 기본으로 사용한다.
+  - `ghost`는 배경과 테두리를 최소화하고 hover/focus/active 상태에서만 영역감이 드러나는 버튼에 사용한다.
+- `tone`: 의미/색상 계열. `brand` / `neutral` / `danger`를 기본으로 사용한다.
+
+예시:
+
+```tsx
+<Button priority="secondary" appearance="ghost" tone="brand">
+  취소
+</Button>
+```
+
+단, 현재 구현처럼 API를 단순하게 유지하는 단계에서는 `variant`로 시작해도 된다. 이 경우에도 `ghost`, `outline`, `solid`, `text`처럼 표현 중심 이름을 우선하고, 색상 차이는 `tone` 또는 별도 prop으로 분리할 수 있을 때 분리한다.
+
 ### 4.2 Label / Chip
 
 파일: `src/components/ui/Display/Label.tsx`, global component classes
