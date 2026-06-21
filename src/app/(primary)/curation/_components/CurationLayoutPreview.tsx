@@ -3,8 +3,10 @@
 import Image from 'next/image';
 import { Search } from 'lucide-react';
 import { useTab } from '@/hooks/useTab';
+import { useTastingEventsQuery } from '@/queries/useTastingEventsQuery';
 import Tab from '@/components/ui/Navigation/Tab';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import type { TastingEventFeedItem } from '@/api/curation-v2/types';
 
 type CurationTabId = 'CURATION' | 'TASTING_EVENT';
 
@@ -20,6 +22,7 @@ const curationCards = [
     eyebrow: 'CURATION',
     imageUrl:
       'https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=900',
+    chips: ['향', '맛', '분위기'],
   },
   {
     title: '입문자를 위한 싱글 몰트',
@@ -27,23 +30,7 @@ const curationCards = [
     eyebrow: 'RECOMMENDED',
     imageUrl:
       'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=900',
-  },
-];
-
-const tastingEventCards = [
-  {
-    title: '6월의 시음회',
-    description: '새로운 위스키를 함께 경험하는 시음회',
-    eyebrow: 'TASTING',
-    imageUrl:
-      'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=900',
-  },
-  {
-    title: '도심 속 위스키 클래스',
-    description: '바에서 만나는 큐레이션 기반 시음 프로그램',
-    eyebrow: 'EVENT',
-    imageUrl:
-      'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=900',
+    chips: ['싱글 몰트', '입문', '추천'],
   },
 ];
 
@@ -64,6 +51,7 @@ function CurationSearchField() {
 }
 
 interface PreviewCardProps {
+  chips: string[];
   description: string;
   eyebrow: string;
   imageUrl: string;
@@ -71,6 +59,7 @@ interface PreviewCardProps {
 }
 
 function PreviewCard({
+  chips,
   description,
   eyebrow,
   imageUrl,
@@ -97,10 +86,10 @@ function PreviewCard({
           {description}
         </p>
         <div className="mt-4 grid grid-cols-3 gap-2">
-          {['향', '맛', '분위기'].map((label) => (
+          {chips.map((label) => (
             <span
               key={label}
-              className="rounded-full bg-sectionWhite px-2 py-1 text-center text-11 font-medium text-subCoral"
+              className="truncate rounded-full bg-sectionWhite px-2 py-1 text-center text-11 font-medium text-subCoral"
             >
               {label}
             </span>
@@ -111,12 +100,77 @@ function PreviewCard({
   );
 }
 
-function CurationCardList({ currentTab }: { currentTab: CurationTabId }) {
-  const cards = currentTab === 'CURATION' ? curationCards : tastingEventCards;
+function formatEntryFee(entryFee: number) {
+  if (entryFee === 0) {
+    return '무료';
+  }
+
+  return `${entryFee.toLocaleString('ko-KR')}원`;
+}
+
+function toTastingEventCard(event: TastingEventFeedItem): PreviewCardProps {
+  const { payload } = event;
+  const eventDateTime = [payload.eventDate, payload.eventTime]
+    .filter(Boolean)
+    .join(' ');
+
+  return {
+    title: event.name,
+    description: payload.guideText || event.description,
+    eyebrow: payload.isRecruiting ? '모집중' : '마감',
+    imageUrl: event.coverImageUrl,
+    chips: [
+      eventDateTime,
+      formatEntryFee(payload.entryFee),
+      payload.barAddress,
+    ],
+  };
+}
+
+function TastingEventCardList() {
+  const { data, isLoading, isError } = useTastingEventsQuery();
+
+  if (isLoading) {
+    return (
+      <div className="px-5 pb-navbar">
+        <div className="h-[390px] animate-pulse rounded-[10px] bg-sectionWhite" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <p className="px-5 pb-navbar text-13 font-medium text-mainGray">
+        시음회 정보를 불러오지 못했어요.
+      </p>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <p className="px-5 pb-navbar text-13 font-medium text-mainGray">
+        진행 중인 시음회가 없어요.
+      </p>
+    );
+  }
 
   return (
     <div className="space-y-[27px] px-5 pb-navbar">
-      {cards.map((card) => (
+      {data.map((event) => (
+        <PreviewCard key={event.id} {...toTastingEventCard(event)} />
+      ))}
+    </div>
+  );
+}
+
+function CurationCardList({ currentTab }: { currentTab: CurationTabId }) {
+  if (currentTab === 'TASTING_EVENT') {
+    return <TastingEventCardList />;
+  }
+
+  return (
+    <div className="space-y-[27px] px-5 pb-navbar">
+      {curationCards.map((card) => (
         <PreviewCard key={card.title} {...card} />
       ))}
     </div>
