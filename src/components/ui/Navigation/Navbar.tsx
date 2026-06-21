@@ -41,7 +41,7 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
     { name: '홈', link: ROUTES.HOME, icon: '/icon/navbar/home.svg' },
     { name: '검색', link: ROUTES.SEARCH.BASE, icon: '/icon/navbar/search.svg' },
     {
-      name: '큐레이션',
+      name: '시음회',
       link: ROUTES.CURATION.BASE,
       icon: '/icon/navbar/curation.svg',
     },

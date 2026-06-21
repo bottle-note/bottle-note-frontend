@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { CurationV2Api } from '@/api/curation-v2/curation-v2.api';
+import { tastingEventPayloadSchema } from '@/api/curation-v2/schema';
 import type {
   CurationV2FeedItem,
   TastingEventFeedItem,
-  TastingEventPayload,
 } from '@/api/curation-v2/types';
 
 export const curationV2Keys = {
@@ -14,24 +14,10 @@ export const curationV2Keys = {
     [...curationV2Keys.feed(pageSize), 'tasting-events'] as const,
 };
 
-const isTastingEventPayload = (
-  payload: CurationV2FeedItem['payload'],
-): payload is TastingEventPayload => {
-  if (!payload || Array.isArray(payload) || typeof payload !== 'object') {
-    return false;
-  }
-
-  return (
-    'eventDate' in payload &&
-    'eventTime' in payload &&
-    'barAddress' in payload &&
-    'isRecruiting' in payload
-  );
-};
-
 const isTastingEventFeedItem = (
   item: CurationV2FeedItem,
-): item is TastingEventFeedItem => isTastingEventPayload(item.payload);
+): item is TastingEventFeedItem =>
+  tastingEventPayloadSchema.safeParse(item.payload).success;
 
 export const useTastingEventsQuery = (pageSize = 10) => {
   return useQuery({

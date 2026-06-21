@@ -3,18 +3,9 @@
 // ============================================
 
 import type { PageableInfo } from '@/api/_shared/types';
+import type { TastingEventPayload } from './schema';
 
-export interface TastingEventPayload {
-  capacity: number;
-  entryFee: number;
-  eventDate: string;
-  eventTime: string;
-  guideText: string;
-  barAddress: string;
-  isRecruiting: boolean;
-  detailAddress: string;
-  applicationLink: string;
-}
+export type { TastingEventPayload } from './schema';
 
 export interface RecommendedWhiskyPayloadItem {
   alcohol?: {
