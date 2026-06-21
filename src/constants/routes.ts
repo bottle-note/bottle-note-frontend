@@ -20,6 +20,9 @@ export const ROUTES = {
   EXPLORE: {
     BASE: '/explore',
   },
+  CURATION: {
+    BASE: '/curation',
+  },
   HISTORY: {
     BASE: '/history',
   },
