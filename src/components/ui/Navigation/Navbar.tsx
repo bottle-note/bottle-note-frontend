@@ -39,16 +39,11 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
 
   const navItems: NavItem[] = [
     { name: '홈', link: ROUTES.HOME, icon: '/icon/navbar/home.svg' },
-    {
-      name: '리뷰',
-      link: ROUTES.REVIEW.REGISTER_BASE,
-      icon: '/icon/navbar/review.svg',
-      requiresAuth: true,
-    },
+    { name: '검색', link: ROUTES.SEARCH.BASE, icon: '/icon/navbar/search.svg' },
     {
       name: '큐레이션',
       link: ROUTES.CURATION.BASE,
-      icon: '/icon/navbar/star.svg',
+      icon: '/icon/navbar/curation.svg',
     },
     {
       name: '둘러보기',
@@ -112,26 +107,23 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
   return (
     <nav
       className={cn(
-        `fixed left-0 right-0 mx-auto w-full px-[11px] z-10 transition-transform duration-300 ease-in-out`,
+        `fixed left-0 right-0 mx-auto w-full px-4 z-10 transition-transform duration-300 ease-in-out`,
         isVisible ? 'translate-y-0' : 'translate-y-[calc(100%+24px)]',
         maxWidth ? `max-w-[${maxWidth}]` : 'max-w-content',
       )}
       style={{ bottom: 'var(--navbar-margin-bottom)' }}
     >
-      <section className="flex items-center justify-center gap-[18px] rounded-xl bg-sectionWhite px-[26px] py-3.5 shadow-[0_2px_10px_rgba(0,0,0,0.20)]">
+      <section className="h-[70px] flex justify-between bg-white py-4 px-[26px] rounded-[13px] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
         {navItems.map((menu, index) => (
           <React.Fragment key={menu.link}>
             <button
-              className={cn(
-                'flex w-[30px] flex-col items-center',
-                isMounted && !isActive(menu.link) ? 'opacity-40' : '',
-              )}
+              className={`flex flex-col items-center space-y-1 ${isMounted && !isActive(menu.link) ? 'opacity-40' : ''}`}
               onClick={() => handleNavigation(menu)}
               onTouchEnd={() =>
                 handleWebViewMessage('triggerHaptic', { type: 'light' })
               }
             >
-              <div className="flex flex-col items-center justify-center gap-0.5">
+              <div className="flex flex-col items-center justify-center space-y-[2px]">
                 <Image
                   src={menu.icon}
                   alt={menu.name}
@@ -139,13 +131,13 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
                   height={26}
                   style={{ width: 26, height: 26 }}
                 />
-                <span className="whitespace-nowrap text-10 font-medium text-subCoral">
+                <span className="text-10 font-medium text-subCoral">
                   {menu.name}
                 </span>
               </div>
             </button>
             {index !== navItems.length - 1 && (
-              <span className="h-[42px] border-l border-subCoral opacity-20" />
+              <span className="border-[0.01rem] border-subCoral opacity-40" />
             )}
           </React.Fragment>
         ))}
