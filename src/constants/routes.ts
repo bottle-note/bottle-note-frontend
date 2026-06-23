@@ -22,6 +22,7 @@ export const ROUTES = {
   },
   CURATION: {
     BASE: '/curation',
+    DETAIL: (id: string | number) => `/curation/${id}`,
   },
   HISTORY: {
     BASE: '/history',

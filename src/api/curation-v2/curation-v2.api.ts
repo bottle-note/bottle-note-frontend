@@ -2,7 +2,7 @@ import { apiClient } from '@/shared/api/apiClient';
 import { ApiResponse, CursorPaginationParams } from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
-import type { CurationV2FeedData } from './types';
+import type { CurationV2DetailItem, CurationV2FeedData } from './types';
 
 export const CurationV2Api = {
   /**
@@ -18,6 +18,21 @@ export const CurationV2Api = {
 
     const response = await apiClient.get<ApiResponse<CurationV2FeedData>>(
       `/curations/feed?${queryString}`,
+      { authRequired: false, baseUrl: 'bottle-api/v2' },
+    );
+
+    if (response.errors.length !== 0) {
+      throw new Error(ERROR_MESSAGES.CURATION_FETCH_FAILED);
+    }
+
+    return response;
+  },
+
+  async getDetail(
+    curationId: string | number,
+  ): Promise<ApiResponse<CurationV2DetailItem>> {
+    const response = await apiClient.get<ApiResponse<CurationV2DetailItem>>(
+      `/curations/${curationId}`,
       { authRequired: false, baseUrl: 'bottle-api/v2' },
     );
 

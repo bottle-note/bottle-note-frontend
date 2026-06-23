@@ -11,6 +11,8 @@ export const curationV2Keys = {
     [...curationV2Keys.feed(pageSize), 'curations'] as const,
   tastingEvents: (pageSize: number) =>
     [...curationV2Keys.feed(pageSize), 'tasting-events'] as const,
+  detail: (curationId: string | number) =>
+    [...curationV2Keys.all, 'detail', curationId] as const,
 };
 
 export const useTastingEventsQuery = (pageSize = 10) => {

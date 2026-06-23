@@ -4,13 +4,16 @@ import { CalendarDays, MapPin, Users } from 'lucide-react';
 import BaseImage from '@/components/ui/Display/BaseImage';
 import { isTastingEventFeedItem } from '@/api/curation-v2/guards';
 import type { CurationV2FeedItem } from '@/api/curation-v2/types';
+import { ROUTES } from '@/constants/routes';
+import {
+  formatEntryFee,
+  formatEventDate,
+} from '@/app/(primary)/curation/_utils/tastingEventFormat';
 
 interface Props {
   curation: CurationV2FeedItem;
   priority?: boolean;
 }
-
-const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
 const getCurationCardChips = (curation: CurationV2FeedItem) => {
   if (!Array.isArray(curation.payload)) {
@@ -31,28 +34,6 @@ const getCurationCardChips = (curation: CurationV2FeedItem) => {
   });
 
   return Array.from(new Set(chips)).slice(0, 3);
-};
-
-const formatEntryFee = (entryFee: number) => {
-  if (entryFee === 0) {
-    return '무료';
-  }
-
-  return `${entryFee.toLocaleString('ko-KR')}원`;
-};
-
-const formatEventDate = (eventDate: string) => {
-  const date = new Date(eventDate);
-
-  if (Number.isNaN(date.getTime())) {
-    return eventDate;
-  }
-
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const weekday = WEEKDAY_LABELS[date.getDay()];
-
-  return `${month}월 ${day}일 (${weekday})`;
 };
 
 const EventInfoRow = ({
@@ -82,10 +63,9 @@ const EventInfoRow = ({
 export function CurationCard({ curation, priority = false }: Props) {
   const chips = getCurationCardChips(curation);
   const isTastingEvent = isTastingEventFeedItem(curation);
-  const href =
-    isTastingEvent && curation.payload.applicationLink
-      ? curation.payload.applicationLink
-      : `/search?curationId=${curation.id}`;
+  const href = isTastingEvent
+    ? ROUTES.CURATION.DETAIL(curation.id)
+    : `/search?curationId=${curation.id}`;
   const tagLabel =
     isTastingEvent && curation.payload.isRecruiting
       ? '시음회'

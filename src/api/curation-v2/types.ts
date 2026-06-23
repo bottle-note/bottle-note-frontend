@@ -5,7 +5,7 @@
 import type { PageableInfo } from '@/api/_shared/types';
 import type { TastingEventPayload } from './schema';
 
-export type { TastingEventPayload } from './schema';
+export type { TastingEventAlcohol, TastingEventPayload } from './schema';
 
 export interface RecommendedWhiskyPayloadItem {
   alcohol?: {
@@ -46,6 +46,12 @@ export interface CurationV2FeedData {
   pageable: PageableInfo;
 }
 
+export type CurationV2DetailItem = CurationV2FeedItem;
+
 export interface TastingEventFeedItem extends CurationV2FeedItem {
+  payload: TastingEventPayload;
+}
+
+export interface TastingEventDetailItem extends CurationV2DetailItem {
   payload: TastingEventPayload;
 }
