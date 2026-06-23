@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { CalendarDays, MapPin, Star, Users } from 'lucide-react';
@@ -7,6 +8,12 @@ import { isTastingEventFeedItem } from '@/api/curation-v2/guards';
 import type { TastingEventDetailItem } from '@/api/curation-v2/types';
 import Button from '@/components/ui/Button/Button';
 import BaseImage from '@/components/ui/Display/BaseImage';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from '@/components/ui/Display/carousel';
 import ErrorFallback from '@/components/ui/Display/ErrorFallback';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { useCurationDetailQuery } from '@/queries/useCurationDetailQuery';
@@ -14,9 +21,13 @@ import { parseTastingEventPayload } from '@/app/(primary)/curation/_utils/parseT
 
 function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
   const router = useRouter();
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [currentSlide, setCurrentSlide] = useState(0);
   const { payload } = event;
   const tastingEvent = parseTastingEventPayload(payload);
-  const imageUrl = event.imageUrls.find((url) => url !== event.coverImageUrl);
+  const imageUrls = event.imageUrls.filter(
+    (url) => url !== event.coverImageUrl,
+  );
   const alcohols = payload.alcohols ?? [];
   const canApply = payload.isRecruiting && Boolean(payload.applicationLink);
   const applyButtonText = !payload.isRecruiting
@@ -24,6 +35,23 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
     : payload.applicationLink
       ? '시음회 신청하기'
       : '신청 준비 중';
+
+  useEffect(() => {
+    if (!carouselApi) {
+      return;
+    }
+
+    const handleSelect = () => {
+      setCurrentSlide(carouselApi.selectedScrollSnap());
+    };
+
+    handleSelect();
+    carouselApi.on('select', handleSelect);
+
+    return () => {
+      carouselApi.off('select', handleSelect);
+    };
+  }, [carouselApi]);
 
   return (
     <div className="min-h-safe-screen bg-white pb-28">
@@ -144,19 +172,47 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
         <p className="whitespace-pre-line text-13 font-medium text-mainDarkGray">
           {event.description}
         </p>
-
-        {imageUrl && (
-          <div className="mt-5 h-60 overflow-hidden rounded-xl bg-sectionWhite">
-            <BaseImage
-              src={imageUrl}
-              alt=""
-              fill
-              sizes="(max-width: 468px) calc(100vw - 40px), 428px"
-              className="object-cover"
-            />
-          </div>
-        )}
       </section>
+
+      {imageUrls.length > 0 && (
+        <section className="mt-5 w-full">
+          <Carousel
+            setApi={setCarouselApi}
+            opts={{ align: 'start', loop: imageUrls.length > 1 }}
+            className="w-full bg-sectionWhite"
+          >
+            <CarouselContent className="!ml-0">
+              {imageUrls.map((url, index) => (
+                <CarouselItem key={url} className="!pl-0">
+                  <div className="relative h-60 w-full overflow-hidden bg-sectionWhite">
+                    <BaseImage
+                      src={url}
+                      alt=""
+                      fill
+                      sizes="(max-width: 468px) 100vw, 468px"
+                      className="object-cover"
+                      priority={index === 0}
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+
+            {imageUrls.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+                {imageUrls.map((url, index) => (
+                  <span
+                    key={url}
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      currentSlide === index ? 'bg-white' : 'bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </Carousel>
+        </section>
+      )}
 
       {alcohols.length > 0 && (
         <section className="px-5 py-6">
