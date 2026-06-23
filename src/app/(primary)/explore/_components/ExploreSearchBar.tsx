@@ -2,25 +2,19 @@ import { useState } from 'react';
 import Image from 'next/image';
 import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
 import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
+import UnderlineSearchBar from '@/components/feature/Search/UnderlineSearchBar';
 import { CATEGORY_MENUS_LIST } from '@/constants/common';
 import { useRegionsQuery } from '@/queries/useRegionsQuery';
-import { useSearchInput } from '@/hooks/useSearchInput';
+import type { SearchKeyword } from './types';
 import HelpIcon from 'public/icon/help-filled-subcoral.svg';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
 
-export interface SearchKeyword {
-  label: string;
-  value: string;
-}
-
 interface Props {
   handleSearch: () => void;
   handleAddKeyword: (keyword: SearchKeyword) => void;
-  handleRemoveKeyword: (keywordValue: string) => void;
   description: string;
   isFilter?: boolean;
-  activeKeywords?: SearchKeyword[];
 }
 
 export const ExploreSearchBar = ({
@@ -40,11 +34,6 @@ export const ExploreSearchBar = ({
     handleSearch();
   };
 
-  const { searchText, inputRef, handleChange, handleSubmit, handleKeyDown } =
-    useSearchInput({
-      onSearch: onAddKeyword,
-    });
-
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const { regions } = useRegionsQuery();
   const {
@@ -63,31 +52,26 @@ export const ExploreSearchBar = ({
 
   return (
     <section className="pt-[5px]">
-      <article className="w-full relative ">
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder="입력..."
-          className="w-full py-2.5 px-2 border-b-2 border-gray-200 focus:border-amber-500 outline-none bg-transparent text-base placeholder-mainGray placeholder:text-13 transition-colors appearance-none rounded-none"
-          value={searchText}
-          onChange={(e) => handleChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-
-        <div className="flex justify-end gap-[7px] absolute top-2.5 right-0">
-          <button
-            type="button"
-            className="label-selected text-13 text-nowrap flex items-center gap-[2px]"
-            onClick={handleSubmit}
-          >
-            <span>+ 검색어 추가</span>
-          </button>
-          {isFilter && (
-            <button type="button" onClick={() => setIsOpenSideFilter(true)}>
-              <Image src={FilterIcon} alt="필터메뉴" />
-            </button>
+      <article className="relative w-full">
+        <UnderlineSearchBar
+          onSearch={onAddKeyword}
+          renderActions={({ submit }) => (
+            <>
+              <button
+                type="button"
+                className="label-selected text-13 text-nowrap flex items-center gap-[2px]"
+                onClick={submit}
+              >
+                <span>+ 검색어 추가</span>
+              </button>
+              {isFilter && (
+                <button type="button" onClick={() => setIsOpenSideFilter(true)}>
+                  <Image src={FilterIcon} alt="필터메뉴" />
+                </button>
+              )}
+            </>
           )}
-        </div>
+        />
 
         <div className="flex items-start gap-[2px] py-[10px]">
           <Image src={HelpIcon} alt="help" className="pt-[1px]" />

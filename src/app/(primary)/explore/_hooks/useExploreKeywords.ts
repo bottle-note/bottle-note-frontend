@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import type { SearchKeyword } from '../_components/ExploreSearchBar';
 import { buildKeywordsFromParams } from '../_components/keywordUtils';
+import type { SearchKeyword } from '../_components/types';
 
 interface UseExploreKeywordsOptions {
   tabId: string;

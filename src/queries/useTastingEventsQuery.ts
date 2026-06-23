@@ -1,23 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { CurationV2Api } from '@/api/curation-v2/curation-v2.api';
-import { tastingEventPayloadSchema } from '@/api/curation-v2/schema';
-import type {
-  CurationV2FeedItem,
-  TastingEventFeedItem,
-} from '@/api/curation-v2/types';
+import { isTastingEventFeedItem } from '@/api/curation-v2/guards';
+import type { TastingEventFeedItem } from '@/api/curation-v2/types';
 
 export const curationV2Keys = {
   all: ['curation-v2'] as const,
   feed: (pageSize: number) =>
     [...curationV2Keys.all, 'feed', { pageSize }] as const,
+  curations: (pageSize: number) =>
+    [...curationV2Keys.feed(pageSize), 'curations'] as const,
   tastingEvents: (pageSize: number) =>
     [...curationV2Keys.feed(pageSize), 'tasting-events'] as const,
 };
-
-const isTastingEventFeedItem = (
-  item: CurationV2FeedItem,
-): item is TastingEventFeedItem =>
-  tastingEventPayloadSchema.safeParse(item.payload).success;
 
 export const useTastingEventsQuery = (pageSize = 10) => {
   return useQuery({
