@@ -79,8 +79,8 @@ export default function CurationPage() {
                 className="label-selected inline-flex items-center gap-0.5 px-2.5 py-1 text-13 font-medium leading-none"
                 onClick={submit}
               >
-                <span>검색</span>
                 <Search size={12} aria-hidden />
+                <span>검색</span>
               </button>
             )}
           />

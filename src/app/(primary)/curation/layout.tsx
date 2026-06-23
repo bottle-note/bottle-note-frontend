@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import NavLayout from '@/components/ui/Layout/NavLayout';
+import { CurationNavLayout } from './_components/CurationNavLayout';
 
 export const metadata: Metadata = {
   title: '큐레이션',
@@ -18,5 +18,5 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <NavLayout showNavbar>{children}</NavLayout>;
+  return <CurationNavLayout>{children}</CurationNavLayout>;
 }
