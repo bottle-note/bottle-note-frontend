@@ -20,23 +20,6 @@ import Button from '@/components/ui/Button/Button';
 import BaseImage from '@/components/ui/Display/BaseImage';
 import ErrorFallback from '@/components/ui/Display/ErrorFallback';
 import { useCurationDetailQuery } from '@/queries/useCurationDetailQuery';
-import {
-  formatEntryFee,
-  formatEventDate,
-} from '@/app/(primary)/curation/_utils/tastingEventFormat';
-
-const formatEventTime = (eventTime: string) => {
-  const [hour, minute] = eventTime.split(':');
-
-  if (!hour || !minute) {
-    return eventTime;
-  }
-
-  return `${hour}:${minute}`;
-};
-
-const getMapSearchUrl = (address: string) =>
-  `https://map.naver.com/p/search/${encodeURIComponent(address)}`;
 
 function DetailHeader({
   title,
@@ -81,6 +64,12 @@ function DetailHeader({
 
 function HeroSection({ event }: { event: TastingEventDetailItem }) {
   const { payload } = event;
+  const eventDate = new Date(payload.eventDate);
+  const eventDateLabel = Number.isNaN(eventDate.getTime())
+    ? payload.eventDate
+    : `${eventDate.getMonth() + 1}월 ${eventDate.getDate()}일 (${
+        ['일', '월', '화', '수', '목', '금', '토'][eventDate.getDay()]
+      })`;
 
   return (
     <section className="relative h-60 w-full overflow-hidden bg-sectionWhite">
@@ -101,8 +90,7 @@ function HeroSection({ event }: { event: TastingEventDetailItem }) {
           {event.name}
         </h1>
         <p className="mt-2 line-clamp-1 text-12 font-semibold">
-          {formatEventDate(payload.eventDate)} ·{' '}
-          {payload.placeName ?? payload.barAddress} · 정원{' '}
+          {eventDateLabel} · {payload.placeName ?? payload.barAddress} · 정원{' '}
           {payload.capacity.toLocaleString('ko-KR')}명
         </p>
       </div>
@@ -148,6 +136,19 @@ function EventInfoCard({ event }: { event: TastingEventDetailItem }) {
   const fullAddress = [payload.barAddress, payload.detailAddress]
     .filter(Boolean)
     .join(' ');
+  const eventDate = new Date(payload.eventDate);
+  const eventDateLabel = Number.isNaN(eventDate.getTime())
+    ? payload.eventDate
+    : `${eventDate.getMonth() + 1}월 ${eventDate.getDate()}일 (${
+        ['일', '월', '화', '수', '목', '금', '토'][eventDate.getDay()]
+      })`;
+  const [hour, minute] = payload.eventTime.split(':');
+  const eventTimeLabel =
+    hour && minute ? `${hour}:${minute}` : payload.eventTime;
+  const entryFeeLabel =
+    payload.entryFee > 0
+      ? `${payload.entryFee.toLocaleString('ko-KR')}원`
+      : '무료';
 
   return (
     <section className="px-5 py-5">
@@ -159,9 +160,7 @@ function EventInfoCard({ event }: { event: TastingEventDetailItem }) {
         <div className="mt-5 flex flex-col gap-5">
           <InfoRow
             icon={<CalendarDays size={18} strokeWidth={2} />}
-            title={`${formatEventDate(payload.eventDate)} · ${formatEventTime(
-              payload.eventTime,
-            )}`}
+            title={`${eventDateLabel} · ${eventTimeLabel}`}
             description={payload.guideText}
           />
           <InfoRow
@@ -171,7 +170,9 @@ function EventInfoCard({ event }: { event: TastingEventDetailItem }) {
             action={
               fullAddress && (
                 <a
-                  href={getMapSearchUrl(fullAddress)}
+                  href={`https://map.naver.com/p/search/${encodeURIComponent(
+                    fullAddress,
+                  )}`}
                   target="_blank"
                   rel="noreferrer"
                   className="shrink-0 rounded-full bg-white px-2.5 py-1 text-10 font-bold text-mainDarkGray"
@@ -189,7 +190,7 @@ function EventInfoCard({ event }: { event: TastingEventDetailItem }) {
           <div className="flex items-end gap-2">
             <span className="text-11 font-bold text-mainDarkGray">참가비</span>
             <span className="text-20 font-black text-mainDarkGray">
-              {formatEntryFee(payload.entryFee)}
+              {entryFeeLabel}
             </span>
           </div>
         </div>
