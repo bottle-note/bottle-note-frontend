@@ -4,6 +4,7 @@ import BaseImage from '@/components/ui/Display/BaseImage';
 import { isTastingEventFeedItem } from '@/api/curation-v2/guards';
 import type { CurationV2FeedItem } from '@/api/curation-v2/types';
 import { ROUTES } from '@/constants/routes';
+import { parseTastingEventPayload } from '@/app/(primary)/curation/_utils/parseTastingEventPayload';
 
 interface Props {
   curation: CurationV2FeedItem;
@@ -31,27 +32,9 @@ export function CurationCard({ curation, priority = false }: Props) {
         ),
       ).slice(0, 3)
     : [];
-  const eventDateLabel = (() => {
-    if (!isTastingEvent) {
-      return '';
-    }
-
-    const date = new Date(curation.payload.eventDate);
-
-    if (Number.isNaN(date.getTime())) {
-      return curation.payload.eventDate;
-    }
-
-    const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-
-    return `${date.getMonth() + 1}월 ${date.getDate()}일 (${
-      weekdays[date.getDay()]
-    })`;
-  })();
-  const entryFeeLabel =
-    isTastingEvent && curation.payload.entryFee > 0
-      ? `${curation.payload.entryFee.toLocaleString('ko-KR')}원`
-      : '무료';
+  const tastingEvent = isTastingEvent
+    ? parseTastingEventPayload(curation.payload)
+    : null;
   const href = isTastingEvent
     ? ROUTES.CURATION.DETAIL(curation.id)
     : `/search?curationId=${curation.id}`;
@@ -98,7 +81,7 @@ export function CurationCard({ curation, priority = false }: Props) {
 
                 <div className="flex gap-1 flex-col">
                   <p className="text-13 font-bold text-mainDarkGray">
-                    {eventDateLabel} · {curation.payload.eventTime}
+                    {tastingEvent?.eventDateTimeLabel}
                   </p>
                   {curation.payload.guideText && (
                     <p className="truncate text-11 font-light text-mainGray">
@@ -130,7 +113,7 @@ export function CurationCard({ curation, priority = false }: Props) {
                 </span>
                 <div className="min-w-0">
                   <p className="text-12 font-bold text-mainDarkGray">
-                    {curation.payload.capacity.toLocaleString('ko-KR')}명 정원
+                    {tastingEvent?.capacityLabel}
                   </p>
                 </div>
               </div>
@@ -140,7 +123,7 @@ export function CurationCard({ curation, priority = false }: Props) {
                   참가비
                 </span>
                 <span className="text-20 font-black leading-none text-mainDarkGray">
-                  {entryFeeLabel}
+                  {tastingEvent?.entryFeeLabel}
                 </span>
               </div>
             </div>

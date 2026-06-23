@@ -10,22 +10,12 @@ import BaseImage from '@/components/ui/Display/BaseImage';
 import ErrorFallback from '@/components/ui/Display/ErrorFallback';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { useCurationDetailQuery } from '@/queries/useCurationDetailQuery';
+import { parseTastingEventPayload } from '@/app/(primary)/curation/_utils/parseTastingEventPayload';
 
 function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
   const router = useRouter();
   const { payload } = event;
-  const eventDate = new Date(payload.eventDate);
-  const eventDateLabel = Number.isNaN(eventDate.getTime())
-    ? payload.eventDate
-    : `${eventDate.getMonth() + 1}월 ${eventDate.getDate()}일 (${
-        ['일', '월', '화', '수', '목', '금', '토'][eventDate.getDay()]
-      })`;
-  const [hour, minute] = payload.eventTime.split(':');
-  const eventTimeLabel =
-    hour && minute ? `${hour}:${minute}` : payload.eventTime;
-  const fullAddress = [payload.barAddress, payload.detailAddress]
-    .filter(Boolean)
-    .join(' ');
+  const tastingEvent = parseTastingEventPayload(payload);
   const imageUrl = event.imageUrls.find((url) => url !== event.coverImageUrl);
   const alcohols = payload.alcohols ?? [];
   const canApply = payload.isRecruiting && Boolean(payload.applicationLink);
@@ -67,8 +57,8 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
             {event.name}
           </h1>
           <p className="mt-2 line-clamp-1 text-12 font-semibold">
-            {eventDateLabel} · {payload.placeName ?? payload.barAddress} · 정원{' '}
-            {payload.capacity.toLocaleString('ko-KR')}명
+            {tastingEvent.eventDateLabel} · {tastingEvent.placeLabel} ·{' '}
+            {tastingEvent.capacityLabel}
           </p>
         </div>
       </section>
@@ -86,7 +76,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
               </span>
               <div className="min-w-0 flex-1">
                 <p className="text-13 font-extrabold text-mainDarkGray">
-                  {eventDateLabel} · {eventTimeLabel}
+                  {tastingEvent.eventDateTimeLabel}
                 </p>
                 {payload.guideText && (
                   <p className="mt-1 text-11 font-medium text-mainGray">
@@ -103,13 +93,11 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
               <div className="min-w-0 flex-1">
                 <div className="flex min-w-0 items-center gap-2">
                   <p className="min-w-0 flex-1 text-13 font-extrabold text-mainDarkGray">
-                    {payload.placeName ?? payload.barAddress}
+                    {tastingEvent.placeLabel}
                   </p>
-                  {fullAddress && (
+                  {tastingEvent.mapSearchUrl && (
                     <a
-                      href={`https://map.naver.com/p/search/${encodeURIComponent(
-                        fullAddress,
-                      )}`}
+                      href={tastingEvent.mapSearchUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="shrink-0 rounded-full bg-white px-2.5 py-1 text-10 font-bold text-mainDarkGray"
@@ -118,9 +106,9 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
                     </a>
                   )}
                 </div>
-                {fullAddress && (
+                {tastingEvent.fullAddress && (
                   <p className="mt-1 text-11 font-medium text-mainGray">
-                    {fullAddress}
+                    {tastingEvent.fullAddress}
                   </p>
                 )}
               </div>
@@ -132,7 +120,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
               </span>
               <div className="min-w-0 flex-1">
                 <p className="text-13 font-extrabold text-mainDarkGray">
-                  {payload.capacity.toLocaleString('ko-KR')}명 정원
+                  {tastingEvent.capacityLabel}
                 </p>
                 <p className="mt-1 text-11 font-medium text-mainGray">
                   위스키 네비 멤버십 한정 신청 가능합니다.
@@ -145,9 +133,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
                 참가비
               </span>
               <span className="text-20 font-black text-mainDarkGray">
-                {payload.entryFee > 0
-                  ? `${payload.entryFee.toLocaleString('ko-KR')}원`
-                  : '무료'}
+                {tastingEvent.entryFeeLabel}
               </span>
             </div>
           </div>
