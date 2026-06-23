@@ -3,7 +3,7 @@ name: PR Preview
 on:
   pull_request:
     types: [opened, synchronize, reopened, closed, labeled, unlabeled]
-    branches: [dev, develop, main, release]
+    branches: [dev, develop, main]
 
 concurrency:
   group: vercel-preview-${{ github.event.pull_request.number }}
