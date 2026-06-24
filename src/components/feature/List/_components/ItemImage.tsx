@@ -1,6 +1,7 @@
 'use client';
 
 import BaseImage from '@/components/ui/Display/BaseImage';
+import { cn } from '@/lib/utils';
 
 interface Props {
   src: string;
@@ -12,7 +13,10 @@ interface Props {
 const ItemImage = ({ src, alt, className, priority = false }: Props) => {
   return (
     <div
-      className={`w-[89px] h-[89px] flex shrink-0 p-2 justify-center items-center ${className}`}
+      className={cn(
+        `w-[89px] h-[89px] flex shrink-0 p-2 justify-center items-center`,
+        className,
+      )}
     >
       <div className="w-full h-full relative">
         <BaseImage

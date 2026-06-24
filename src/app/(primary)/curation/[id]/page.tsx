@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { Star } from 'lucide-react';
 import { isTastingEventFeedItem } from '@/api/curation-v2/guards';
 import type { TastingEventDetailItem } from '@/api/curation-v2/types';
 import Button from '@/components/ui/Button/Button';
@@ -16,8 +15,10 @@ import {
 } from '@/components/ui/Display/carousel';
 import ErrorFallback from '@/components/ui/Display/ErrorFallback';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import List from '@/components/feature/List/List';
 import { useCurationDetailQuery } from '@/queries/useCurationDetailQuery';
 import { TastingEventInfoCard } from '@/app/(primary)/curation/_components/TastingEventInfoCard';
+import { TastingEventLineupItem } from '@/app/(primary)/curation/_components/TastingEventLineupItem';
 import { parseTastingEventPayload } from '@/app/(primary)/curation/_utils/parseTastingEventPayload';
 
 function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
@@ -152,86 +153,26 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
       )}
 
       {/* 시음회 라인업 */}
-      {/* TODO: 리스트 아이템 컴포넌트 기반으로 조합하여 리팩토링 */}
       {alcohols.length > 0 && (
         <section className="px-5 py-6">
           <h2 className="text-16 font-extrabold text-mainDarkGray">
             시음회 라인업
           </h2>
-          <div className="mt-4 divide-y divide-bgGray border-t border-bgGray">
-            {alcohols.map(({ alcohol, stats, comment, source }, index) => {
-              const chips = [
-                ...(alcohol.selectedTags ?? []),
-                alcohol.korCategory,
-                alcohol.regionName,
-              ].filter(Boolean);
-              const details = [
-                alcohol.abv && `${alcohol.abv}%`,
-                alcohol.korCategory,
-                alcohol.regionName,
-              ].filter(Boolean);
-
-              return (
-                <article
-                  key={source ?? alcohol.alcoholId ?? alcohol.korName}
-                  className="flex gap-3 py-5"
-                >
-                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mainDarkGray text-10 font-bold text-white">
-                    {index + 1}
-                  </div>
-
-                  <div className="h-24 w-14 shrink-0 overflow-hidden rounded-md bg-sectionWhite">
-                    <BaseImage
-                      src={alcohol.imageUrl ?? ''}
-                      alt={alcohol.korName}
-                      fill
-                      sizes="56px"
-                      className="object-contain"
-                    />
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <h3 className="line-clamp-2 text-13 font-extrabold text-mainDarkGray">
-                      {alcohol.korName}
-                    </h3>
-                    {alcohol.engName && (
-                      <p className="mt-1 line-clamp-1 text-10 font-medium text-mainGray">
-                        {alcohol.engName}
-                      </p>
-                    )}
-                    {details.length > 0 && (
-                      <p className="mt-2 text-10 font-semibold text-mainGray">
-                        {details.join(' · ')}
-                      </p>
-                    )}
-                    {typeof stats?.rating === 'number' && (
-                      <div className="mt-2 flex items-center gap-1 text-10 font-bold text-subCoral">
-                        <Star size={12} fill="currentColor" strokeWidth={0} />
-                        <span>{stats.rating.toFixed(1)}</span>
-                      </div>
-                    )}
-                    {chips.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-1.5">
-                        {chips.slice(0, 3).map((chip) => (
-                          <span
-                            key={chip}
-                            className="label-default px-2 py-1 text-9 font-medium"
-                          >
-                            {chip}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    {comment && (
-                      <p className="mt-3 line-clamp-3 text-12 font-medium text-mainDarkGray">
-                        {comment}
-                      </p>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+          <List>
+            <List.Section className="mt-4 divide-y divide-bgGray border-t border-bgGray">
+              {alcohols.map((item, index) => (
+                <TastingEventLineupItem
+                  key={
+                    item.source ??
+                    item.alcohol.alcoholId ??
+                    `${item.alcohol.korName}-${index}`
+                  }
+                  item={item}
+                  order={index + 1}
+                />
+              ))}
+            </List.Section>
+          </List>
         </section>
       )}
 
