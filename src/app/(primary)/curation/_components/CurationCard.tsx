@@ -1,10 +1,9 @@
 import Link from 'next/link';
-import { Calendar, MapPin, Users } from 'lucide-react';
 import BaseImage from '@/components/ui/Display/BaseImage';
 import { isTastingEventFeedItem } from '@/api/curation-v2/guards';
 import type { CurationV2FeedItem } from '@/api/curation-v2/types';
 import { ROUTES } from '@/constants/routes';
-import { parseTastingEventPayload } from '@/app/(primary)/curation/_utils/parseTastingEventPayload';
+import { TastingEventInfoCard } from '@/app/(primary)/curation/_components/TastingEventInfoCard';
 
 interface Props {
   curation: CurationV2FeedItem;
@@ -32,9 +31,6 @@ export function CurationCard({ curation, priority = false }: Props) {
         ),
       ).slice(0, 3)
     : [];
-  const tastingEvent = isTastingEvent
-    ? parseTastingEventPayload(curation.payload)
-    : null;
   const href = isTastingEvent
     ? ROUTES.CURATION.DETAIL(curation.id)
     : `/search?curationId=${curation.id}`;
@@ -42,6 +38,30 @@ export function CurationCard({ curation, priority = false }: Props) {
     isTastingEvent && curation.payload.isRecruiting
       ? '시음회'
       : curation.specName ?? '큐레이션';
+  const summaryContent = chips.length > 0 && (
+    <div className="mt-auto flex flex-wrap gap-2">
+      {chips.map((chip) => (
+        <span
+          key={chip}
+          className="label-default truncate px-2 py-1 text-11 font-medium"
+        >
+          {chip}
+        </span>
+      ))}
+    </div>
+  );
+  const infoCardContent = isTastingEvent ? (
+    <TastingEventInfoCard payload={curation.payload} />
+  ) : (
+    <div className="flex flex-col gap-2 rounded-2xl bg-white/80 px-4 py-4 backdrop-blur-sm">
+      <div className="flex h-full flex-col">
+        <p className="line-clamp-4 text-13 font-medium text-mainDarkGray">
+          {curation.description}
+        </p>
+        {summaryContent}
+      </div>
+    </div>
+  );
 
   const content = (
     <article className="relative isolate h-[390px] w-full overflow-hidden rounded-lg bg-sectionWhite">
@@ -71,82 +91,8 @@ export function CurationCard({ curation, priority = false }: Props) {
           </p>
         </div>
 
-        <div className="flex flex-col gap-2 rounded-2xl bg-white/80 px-4 py-4 backdrop-blur-sm">
-          {isTastingEvent ? (
-            <div className="flex h-full flex-col gap-4">
-              <div className="flex gap-2.5">
-                <span className="mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center text-mainDarkGray">
-                  <Calendar size={14} strokeWidth={2} />
-                </span>
-
-                <div className="flex gap-1 flex-col">
-                  <p className="text-13 font-bold text-mainDarkGray">
-                    {tastingEvent?.eventDateTimeLabel}
-                  </p>
-                  {curation.payload.guideText && (
-                    <p className="truncate text-11 font-light text-mainGray">
-                      {curation.payload.guideText}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <span className="mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center text-mainDarkGray">
-                  <MapPin size={14} strokeWidth={2} />
-                </span>
-                <div className="flex gap-1 flex-col">
-                  <p className="text-13 font-bold text-mainDarkGray">
-                    {curation.payload.barAddress}
-                  </p>
-                  {curation.payload.detailAddress && (
-                    <p className="truncate text-11 font-light text-mainGray">
-                      {curation.payload.detailAddress}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <span className="mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center text-mainDarkGray">
-                  <Users size={14} strokeWidth={2} />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-12 font-bold text-mainDarkGray">
-                    {tastingEvent?.capacityLabel}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-auto flex items-end gap-2">
-                <span className="text-10 font-bold leading-none text-mainDarkGray">
-                  참가비
-                </span>
-                <span className="text-20 font-black leading-none text-mainDarkGray">
-                  {tastingEvent?.entryFeeLabel}
-                </span>
-              </div>
-            </div>
-          ) : (
-            <div className="flex h-full flex-col">
-              <p className="line-clamp-4 text-13 font-medium text-mainDarkGray">
-                {curation.description}
-              </p>
-              {chips.length > 0 && (
-                <div className="mt-auto flex flex-wrap gap-2">
-                  {chips.map((chip) => (
-                    <span
-                      key={chip}
-                      className="label-default truncate px-2 py-1 text-11 font-medium"
-                    >
-                      {chip}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+        {/* 시음회 정보 카드 */}
+        {infoCardContent}
       </div>
     </article>
   );

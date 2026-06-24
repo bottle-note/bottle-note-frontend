@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { CalendarDays, MapPin, Star, Users } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { isTastingEventFeedItem } from '@/api/curation-v2/guards';
 import type { TastingEventDetailItem } from '@/api/curation-v2/types';
 import Button from '@/components/ui/Button/Button';
@@ -17,6 +17,7 @@ import {
 import ErrorFallback from '@/components/ui/Display/ErrorFallback';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { useCurationDetailQuery } from '@/queries/useCurationDetailQuery';
+import { TastingEventInfoCard } from '@/app/(primary)/curation/_components/TastingEventInfoCard';
 import { parseTastingEventPayload } from '@/app/(primary)/curation/_utils/parseTastingEventPayload';
 
 function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
@@ -67,6 +68,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
         <SubHeader.Center>시음회</SubHeader.Center>
       </SubHeader>
 
+      {/* 상단 */}
       <section className="relative h-60 w-full overflow-hidden bg-sectionWhite">
         <BaseImage
           src={event.coverImageUrl}
@@ -77,103 +79,38 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/10 to-black/70" />
-        <div className="absolute bottom-5 left-5 right-5 text-white">
-          <span className="inline-flex rounded-full bg-white/20 px-2.5 py-1 text-10 font-bold backdrop-blur-sm">
+        <div className="absolute bottom-5 left-5 right-5 text-black">
+          <span className="inline-flex rounded-full bg-white/70 px-2.5 py-1 text-10 font-bold backdrop-blur-sm">
             시음회
           </span>
-          <h1 className="mt-3 line-clamp-2 text-20 font-extrabold">
+          <h1 className="mt-3 line-clamp-2 text-20 font-extrabold text-white">
             {event.name}
           </h1>
-          <p className="mt-2 line-clamp-1 text-12 font-semibold">
+          <p className="mt-2 line-clamp-1 text-10 font-light text-white">
             {tastingEvent.eventDateLabel} · {tastingEvent.placeLabel} ·{' '}
             {tastingEvent.capacityLabel}
           </p>
         </div>
       </section>
 
+      {/* 시음회 정보 카드 */}
       <section className="px-5 py-5">
-        <div className="rounded-xl bg-sectionWhite px-4 py-5">
-          <span className="inline-flex rounded-full bg-mainCoral px-2.5 py-1 text-10 font-bold text-white">
-            시음회 정보
-          </span>
-
-          <div className="mt-5 flex flex-col gap-5">
-            <div className="flex gap-3">
-              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center text-mainDarkGray">
-                <CalendarDays size={18} strokeWidth={2} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-13 font-extrabold text-mainDarkGray">
-                  {tastingEvent.eventDateTimeLabel}
-                </p>
-                {payload.guideText && (
-                  <p className="mt-1 text-11 font-medium text-mainGray">
-                    {payload.guideText}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center text-mainDarkGray">
-                <MapPin size={18} strokeWidth={2} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="flex min-w-0 items-center gap-2">
-                  <p className="min-w-0 flex-1 text-13 font-extrabold text-mainDarkGray">
-                    {tastingEvent.placeLabel}
-                  </p>
-                  {tastingEvent.mapSearchUrl && (
-                    <a
-                      href={tastingEvent.mapSearchUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="shrink-0 rounded-full bg-white px-2.5 py-1 text-10 font-bold text-mainDarkGray"
-                    >
-                      지도 보기
-                    </a>
-                  )}
-                </div>
-                {tastingEvent.fullAddress && (
-                  <p className="mt-1 text-11 font-medium text-mainGray">
-                    {tastingEvent.fullAddress}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center text-mainDarkGray">
-                <Users size={18} strokeWidth={2} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-13 font-extrabold text-mainDarkGray">
-                  {tastingEvent.capacityLabel}
-                </p>
-                <p className="mt-1 text-11 font-medium text-mainGray">
-                  위스키 네비 멤버십 한정 신청 가능합니다.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-end gap-2">
-              <span className="text-11 font-bold text-mainDarkGray">
-                참가비
-              </span>
-              <span className="text-20 font-black text-mainDarkGray">
-                {tastingEvent.entryFeeLabel}
-              </span>
-            </div>
-          </div>
-        </div>
+        <TastingEventInfoCard
+          payload={payload}
+          label="시음회 정보"
+          showMapCta
+          className="bg-bgGray"
+        />
       </section>
 
+      {/* 시음회 설명 */}
       <section className="px-5">
         <p className="whitespace-pre-line text-13 font-medium text-mainDarkGray">
           {event.description}
         </p>
       </section>
 
+      {/* 이미지 캐러셀 */}
       {imageUrls.length > 0 && (
         <section className="mt-5 w-full">
           <Carousel
@@ -214,6 +151,8 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
         </section>
       )}
 
+      {/* 시음회 라인업 */}
+      {/* TODO: 리스트 아이템 컴포넌트 기반으로 조합하여 리팩토링 */}
       {alcohols.length > 0 && (
         <section className="px-5 py-6">
           <h2 className="text-16 font-extrabold text-mainDarkGray">
