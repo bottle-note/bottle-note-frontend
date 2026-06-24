@@ -25,3 +25,40 @@ export function formatDate(
       return `${year}.${month}.${day}`;
   }
 }
+
+export const getDateOnlyTime = (dateValue: string) => {
+  const [datePart] = dateValue.split('T');
+  const [year, month, date] = datePart.split('-').map(Number);
+
+  if (year && month && date) {
+    return new Date(year, month - 1, date).getTime();
+  }
+
+  const parsedDate = new Date(dateValue);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return null;
+  }
+
+  return new Date(
+    parsedDate.getFullYear(),
+    parsedDate.getMonth(),
+    parsedDate.getDate(),
+  ).getTime();
+};
+
+export const getTodayTime = () => {
+  const today = new Date();
+
+  return new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  ).getTime();
+};
+
+export const isBeforeToday = (dateValue: string) => {
+  const dateOnlyTime = getDateOnlyTime(dateValue);
+
+  return dateOnlyTime !== null && dateOnlyTime < getTodayTime();
+};

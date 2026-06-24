@@ -17,6 +17,7 @@ import ErrorFallback from '@/components/ui/Display/ErrorFallback';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import List from '@/components/feature/List/List';
 import { useCurationDetailQuery } from '@/queries/useCurationDetailQuery';
+import { isBeforeToday } from '@/utils/formatDate';
 import { TastingEventInfoCard } from '@/app/(primary)/curation/_components/TastingEventInfoCard';
 import { TastingEventLineupItem } from '@/app/(primary)/curation/_components/TastingEventLineupItem';
 import { parseTastingEventPayload } from '@/app/(primary)/curation/_utils/parseTastingEventPayload';
@@ -31,12 +32,10 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
     (url) => url !== event.coverImageUrl,
   );
   const alcohols = payload.alcohols ?? [];
-  const canApply = payload.isRecruiting && Boolean(payload.applicationLink);
-  const applyButtonText = !payload.isRecruiting
-    ? '모집 마감'
-    : payload.applicationLink
-      ? '시음회 신청하기'
-      : '신청 준비 중';
+  const applicationLink = payload.applicationLink.trim();
+  const isEventPast = isBeforeToday(payload.eventDate);
+  const shouldShowCta = Boolean(applicationLink);
+  const canApply = shouldShowCta && payload.isRecruiting && !isEventPast;
 
   useEffect(() => {
     if (!carouselApi) {
@@ -56,7 +55,9 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
   }, [carouselApi]);
 
   return (
-    <div className="min-h-safe-screen bg-white pb-28">
+    <div
+      className={`min-h-safe-screen bg-white ${shouldShowCta ? 'pb-28' : 'pb-8'}`}
+    >
       <SubHeader>
         <SubHeader.Left onClick={() => router.back()}>
           <Image
@@ -176,18 +177,29 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
         </section>
       )}
 
-      <div className="fixed-content bottom-7 z-20 px-5">
-        <Button
-          btnName={applyButtonText}
-          onClick={() => {
-            if (payload.applicationLink) {
-              window.open(payload.applicationLink, '_blank', 'noreferrer');
-            }
-          }}
-          btnStyles="bg-subCoral"
-          disabled={!canApply}
-        />
-      </div>
+      {shouldShowCta && (
+        <div className="fixed-content bottom-7 z-20 px-5">
+          {canApply ? (
+            <a
+              href={applicationLink}
+              target="_blank"
+              rel="noreferrer"
+              className="flex h-[52px] w-full items-center justify-center rounded-xl bg-subCoral"
+            >
+              <span className="text-15 font-bold text-white">
+                시음회 신청하기
+              </span>
+            </a>
+          ) : (
+            <Button
+              btnName="모집 마감"
+              onClick={() => undefined}
+              btnStyles="bg-subCoral"
+              disabled
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }
