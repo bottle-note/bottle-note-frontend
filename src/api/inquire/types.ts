@@ -18,11 +18,6 @@ export interface InquireQueryParams {
     | null;
 }
 
-export interface InquireListParams {
-  cursor?: number;
-  pageSize?: number;
-}
-
 // --------------- Response Types ---------------
 
 export type InquireStatus = 'WAITING' | 'SUCCESS' | 'REJECT' | 'DELETED';

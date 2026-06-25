@@ -28,24 +28,14 @@ export interface PageableInfo {
   pageSize: number;
   hasNext: boolean;
   currentCursor: number;
+  cursor?: number;
 }
 
 // --------------- Query Parameter Types ---------------
 
-export interface BaseListQueryParams {
-  keyword?: string;
+export interface CursorPaginationParams {
   cursor?: number;
   pageSize?: number;
-}
-
-export interface ListQueryParams extends BaseListQueryParams {
-  category?: string;
-  alcoholId?: string;
-  reviewId?: string;
-  rootReplyId?: string;
-  regionId?: number | '';
-  sortType?: SORT_TYPE;
-  sortOrder?: SORT_ORDER;
 }
 
 // --------------- Enums ---------------

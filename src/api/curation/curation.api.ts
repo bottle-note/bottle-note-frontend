@@ -1,11 +1,10 @@
 import { apiClient } from '@/shared/api/apiClient';
-import { ApiResponse } from '@/api/_shared/types';
+import { ApiResponse, CursorPaginationParams } from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import type {
   CurationListParams,
   CurationListData,
-  CurationAlcoholsParams,
   CurationAlcoholsData,
 } from './types';
 
@@ -47,7 +46,7 @@ export const CurationApi = {
    */
   async getAlcoholsByCurationId(
     curationId: number,
-    params: CurationAlcoholsParams = {},
+    params: CursorPaginationParams = {},
   ): Promise<ApiResponse<CurationAlcoholsData>> {
     const { cursor = 0, pageSize = 10 } = params;
 
@@ -69,4 +68,4 @@ export const CurationApi = {
   },
 };
 
-export type { CurationListParams, CurationAlcoholsParams } from './types';
+export type { CurationListParams } from './types';

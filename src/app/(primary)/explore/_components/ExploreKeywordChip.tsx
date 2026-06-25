@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import type { SearchKeyword } from './ExploreSearchBar';
+import type { SearchKeyword } from './types';
 import DeleteIcon from 'public/icon/reset-mainGray.svg';
 
 interface Props {

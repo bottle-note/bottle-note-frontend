@@ -1,4 +1,5 @@
 import { REVIEW_FILTER_TYPES, PICKS_STATUS } from '@/constants/history';
+import type { CursorPaginationParams } from '@/api/_shared/types';
 
 export interface Rate {
   currentValue: string;
@@ -38,11 +39,9 @@ export interface HistoryListApi {
   userHistories: History[];
 }
 
-export interface HistoryListQueryParams {
+export type HistoryListQueryParams = CursorPaginationParams & {
   userId: string;
-  cursor?: number;
-  pageSize?: number;
-}
+};
 
 // 필터 관련 타입
 export type ReviewFilterType = keyof typeof REVIEW_FILTER_TYPES;
