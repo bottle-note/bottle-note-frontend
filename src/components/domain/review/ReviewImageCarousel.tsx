@@ -9,6 +9,7 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from '@/components/ui/Display/carousel';
+import BaseImage from '@/components/ui/Display/BaseImage';
 
 export interface ProductImage {
   id: string | number;
@@ -73,14 +74,14 @@ export const ReviewImageCarousel = ({
         {images.map((image, index) => (
           <CarouselItem key={image.id}>
             <div className="aspect-square bg-gray-100 rounded-md overflow-hidden border">
-              <Image
+              <BaseImage
                 src={image.src}
                 alt={image.alt}
-                width={600}
-                height={600}
-                sizes="(max-width: 768px) 100vw, 600px"
+                fill
+                quality={80}
+                sizes="(max-width: 768px) calc(100vw - 40px), 600px"
                 priority={priority && index === 0}
-                className="object-cover w-full h-full"
+                className="object-cover"
               />
             </div>
           </CarouselItem>

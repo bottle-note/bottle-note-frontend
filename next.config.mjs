@@ -31,7 +31,7 @@ const nextConfig = {
   },
   images: {
     formats: ['image/webp'],
-    deviceSizes: [390, 430, 640, 750, 828, 1080],
+    deviceSizes: [390, 468],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
     minimumCacheTTL: 7776000, // 3개월
     remotePatterns: [
