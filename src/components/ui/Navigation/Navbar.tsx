@@ -39,7 +39,11 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
 
   const navItems: NavItem[] = [
     { name: '홈', link: ROUTES.HOME, icon: '/icon/navbar/home.svg' },
-    { name: '검색', link: ROUTES.SEARCH.BASE, icon: '/icon/navbar/search.svg' },
+    {
+      name: '리뷰',
+      link: ROUTES.REVIEW.REGISTER_BASE,
+      icon: '/icon/navbar/review.svg',
+    },
     {
       name: '시음회',
       link: ROUTES.CURATION.BASE,
