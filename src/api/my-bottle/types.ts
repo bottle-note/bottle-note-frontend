@@ -2,20 +2,22 @@
 // MyBottle API - Request/Response Types
 // ============================================
 
-import { SORT_TYPE, SORT_ORDER } from '@/api/_shared/types';
+import {
+  CursorPaginationParams,
+  SORT_TYPE,
+  SORT_ORDER,
+} from '@/api/_shared/types';
 
 // --------------- Request Types ---------------
 
 export type MyBottleTabType = 'ratings' | 'reviews' | 'picks';
 
-export interface MyBottleListParams {
+export type MyBottleListParams = CursorPaginationParams & {
   keyword?: string;
   regionId?: number | '';
   sortType?: SORT_TYPE;
   sortOrder?: SORT_ORDER;
-  cursor?: number;
-  pageSize?: number;
-}
+};
 
 // --------------- Response Types ---------------
 

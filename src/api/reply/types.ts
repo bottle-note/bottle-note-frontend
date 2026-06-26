@@ -2,13 +2,13 @@
 // Reply API - Request/Response Types
 // ============================================
 
+import type { CursorPaginationParams } from '@/api/_shared/types';
+
 // --------------- Request Types ---------------
 
-export interface RootReplyListParams {
+export type RootReplyListParams = CursorPaginationParams & {
   reviewId: string;
-  cursor?: number;
-  pageSize?: number;
-}
+};
 
 export interface SubReplyListParams {
   reviewId: string;

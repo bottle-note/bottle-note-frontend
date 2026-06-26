@@ -2,6 +2,8 @@
 // Explore API - Request/Response Types
 // ============================================
 
+import type { CursorPaginationParams } from '@/api/_shared/types';
+
 // --------------- Request Types ---------------
 
 export type ExploreSortType =
@@ -13,16 +15,14 @@ export type ExploreSortType =
 
 export type ExploreSortOrder = 'DESC' | 'ASC';
 
-export interface ExploreListParams {
+export type ExploreListParams = CursorPaginationParams & {
   keywords: string[];
   regionIds?: number[];
   category?: string;
   sortType?: ExploreSortType;
   sortOrder?: ExploreSortOrder;
   seed?: number;
-  cursor?: number;
-  pageSize?: number;
-}
+};
 
 // --------------- Response Types ---------------
 

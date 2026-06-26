@@ -2,13 +2,13 @@
 // History API - Request/Response Types
 // ============================================
 
+import type { CursorPaginationParams } from '@/api/_shared/types';
+
 // --------------- Request Types ---------------
 
-export interface HistoryListQueryParams {
+export type HistoryListQueryParams = CursorPaginationParams & {
   userId: string;
-  cursor?: number;
-  pageSize?: number;
-}
+};
 
 // --------------- Response Types ---------------
 

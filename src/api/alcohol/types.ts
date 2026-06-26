@@ -2,19 +2,21 @@
 // Alcohol API - Request/Response Types
 // ============================================
 
-import { SORT_TYPE, SORT_ORDER } from '@/api/_shared/types';
+import {
+  CursorPaginationParams,
+  SORT_TYPE,
+  SORT_ORDER,
+} from '@/api/_shared/types';
 
 // --------------- Request Types ---------------
 
-export interface AlcoholListParams {
+export type AlcoholListParams = CursorPaginationParams & {
   keyword?: string;
   category?: string;
   regionId?: number | '';
   sortType?: SORT_TYPE;
   sortOrder?: SORT_ORDER;
-  cursor?: number;
-  pageSize?: number;
-}
+};
 
 export interface PickParams {
   alcoholId: string | number;

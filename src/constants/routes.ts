@@ -20,6 +20,10 @@ export const ROUTES = {
   EXPLORE: {
     BASE: '/explore',
   },
+  CURATION: {
+    BASE: '/curation',
+    DETAIL: (id: string | number) => `/curation/${id}`,
+  },
   HISTORY: {
     BASE: '/history',
   },

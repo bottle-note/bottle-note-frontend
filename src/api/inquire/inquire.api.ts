@@ -1,10 +1,9 @@
 import { apiClient } from '@/shared/api/apiClient';
-import { ApiResponse } from '@/api/_shared/types';
+import { ApiResponse, CursorPaginationParams } from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import { transformServiceInquireList } from './transformers';
 import type {
-  InquireListParams,
   InquireQueryParams,
   InquirePostResponse,
   ServiceInquireListRaw,
@@ -21,7 +20,7 @@ export const InquireApi = {
    * @returns 문의 목록
    */
   async getInquireList(
-    params: InquireListParams,
+    params: CursorPaginationParams,
   ): Promise<ApiResponse<ServiceInquireListResponse>> {
     const { cursor, pageSize } = params;
 
@@ -94,7 +93,7 @@ export const InquireApi = {
    * @returns 문의 목록
    */
   async getBusinessInquireList(
-    params: InquireListParams,
+    params: CursorPaginationParams,
   ): Promise<ApiResponse<BusinessInquireListResponse>> {
     const { cursor, pageSize } = params;
 
@@ -155,4 +154,4 @@ export const InquireApi = {
   },
 };
 
-export type { InquireListParams, InquireQueryParams } from './types';
+export type { InquireQueryParams } from './types';

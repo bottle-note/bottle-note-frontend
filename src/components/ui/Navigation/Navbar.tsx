@@ -39,13 +39,22 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
 
   const navItems: NavItem[] = [
     { name: '홈', link: ROUTES.HOME, icon: '/icon/navbar/home.svg' },
-    { name: '검색', link: ROUTES.SEARCH.BASE, icon: '/icon/navbar/search.svg' },
     {
       name: '리뷰',
       link: ROUTES.REVIEW.REGISTER_BASE,
       icon: '/icon/navbar/review.svg',
-      requiresAuth: true,
     },
+    {
+      name: '검색',
+      link: ROUTES.SEARCH.BASE,
+      icon: '/icon/navbar/search.svg',
+    },
+    // TODO: 시음회 탭 노출 시 검색 탭과 교체 여부를 다시 결정한다.
+    // {
+    //   name: '시음회',
+    //   link: ROUTES.CURATION.BASE,
+    //   icon: '/icon/navbar/curation.svg',
+    // },
     {
       name: '둘러보기',
       link: ROUTES.EXPLORE.BASE,

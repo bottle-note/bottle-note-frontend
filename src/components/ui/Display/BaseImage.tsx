@@ -32,6 +32,7 @@ interface Props {
   width?: number;
   height?: number;
   rounded?: string;
+  quality?: number;
 }
 
 const BaseImage = ({
@@ -46,6 +47,7 @@ const BaseImage = ({
   width,
   height,
   rounded = '',
+  quality,
 }: Props) => {
   const [imgSrc, setImgSrc] = useState(src || Fallback);
   const [isLoading, setIsLoading] = useState(true);
@@ -80,6 +82,7 @@ const BaseImage = ({
             className={className}
             fill={fill}
             sizes={sizes}
+            quality={quality}
           />
         }
       >

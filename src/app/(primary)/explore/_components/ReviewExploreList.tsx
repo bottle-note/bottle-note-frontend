@@ -41,8 +41,6 @@ export const ReviewExplorerList = () => {
         handleSearch={refetch}
         handleAddKeyword={handleAddKeyword}
         description={`보고싶은 리뷰의 내용, 플레이버태그, 작성자, 위스키이름을\n 추가하여 검색해보세요.`}
-        handleRemoveKeyword={handleRemoveKeyword}
-        activeKeywords={keywords}
       />
       <article className="flex gap-x-1 gap-y-1.5 flex-wrap">
         {keywords.map((keyword) => (
