@@ -111,3 +111,30 @@ jobs:
             echo "Push failed, retry $i/5..."
             sleep $((i * 2))
           done
+
+  create-release-tag:
+    needs: [build-and-push, update-production]
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout release ref
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: create frontend release tag
+        env:
+          VERSION: ${{ needs.build-and-push.outputs.version }}
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          set -euo pipefail
+          TAG="frontend/v${VERSION}"
+          git fetch --tags origin
+          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            echo "Release tag already exists: ${TAG}"
+            exit 0
+          fi
+          git tag -a "${TAG}" "${MERGE_SHA}" -m "Release ${TAG}"
+          git push origin "refs/tags/${TAG}"
+          echo "Created release tag: ${TAG} -> ${MERGE_SHA}"
