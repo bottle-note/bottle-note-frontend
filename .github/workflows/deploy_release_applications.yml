@@ -28,7 +28,7 @@ jobs:
       tag-sha: ${{ steps.release.outputs.tag-sha }}
     steps:
       - name: checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -105,7 +105,7 @@ jobs:
       image-digest: ${{ steps.build.outputs.image-digest }}
     steps:
       - name: checkout release tag with submodules
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ needs.release-gate.outputs.release-tag }}
           submodules: true
@@ -135,13 +135,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout code with submodules
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: true
           token: ${{ secrets.GIT_ACCESS_TOKEN }}
 
       - name: setup kustomize
-        uses: imranismail/setup-kustomize@v2
+        uses: imranismail/setup-kustomize@v3
 
       - name: update production image tag
         env:

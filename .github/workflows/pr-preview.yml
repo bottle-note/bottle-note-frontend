@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 소스 코드 체크아웃
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: pnpm 설치
         uses: pnpm/action-setup@v4
@@ -63,10 +63,10 @@ jobs:
       - name: Discord 배포 알림
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.PREVIEW_DEPLOY_WEBHOOK_URL }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          PR_URL="${{ github.event.pull_request.html_url }}"
           ALIAS_URL="https://bottle-note-pr-${PR_NUMBER}.vercel.app"
 
           curl -s -X POST "$DISCORD_WEBHOOK_URL" \
