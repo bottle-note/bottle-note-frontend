@@ -99,7 +99,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
       <section className="px-5 py-5">
         <TastingEventInfoCard
           payload={payload}
-          label="시음회 정보"
+          label="정보"
           showMapCta
           className="bg-bgGray"
         />
