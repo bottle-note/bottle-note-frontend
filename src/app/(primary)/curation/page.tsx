@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { useTab } from '@/hooks/useTab';
 import { useCurationsQuery } from '@/queries/useCurationsQuery';
@@ -17,6 +18,7 @@ const tabList = [
 ] satisfies { name: string; id: CurationTabId }[];
 
 export default function CurationPage() {
+  const [searchKeyword, setSearchKeyword] = useState('');
   const { currentTab, handleTab, refs, registerTab } = useTab({
     tabList,
     scroll: true,
@@ -28,15 +30,30 @@ export default function CurationPage() {
   const data = isTastingEventTab
     ? tastingEventsQuery.data
     : curationsQuery.data;
+  const trimmedSearchKeyword = searchKeyword.trim();
+  const filteredData = useMemo(() => {
+    if (!data || trimmedSearchKeyword.length === 0) {
+      return data;
+    }
+
+    const normalizedKeyword = trimmedSearchKeyword.toLowerCase();
+
+    return data.filter((curation) =>
+      curation.name.toLowerCase().includes(normalizedKeyword),
+    );
+  }, [data, trimmedSearchKeyword]);
   const isLoading = isTastingEventTab
     ? tastingEventsQuery.isLoading
     : curationsQuery.isLoading;
   const isError = isTastingEventTab
     ? tastingEventsQuery.isError
     : curationsQuery.isError;
-  const emptyMessage = isTastingEventTab
-    ? '진행 중인 시음회가 없어요.'
-    : '등록된 큐레이션이 없어요.';
+  const emptyMessage =
+    trimmedSearchKeyword.length > 0
+      ? '검색 결과가 없어요.'
+      : isTastingEventTab
+        ? '진행 중인 시음회가 없어요.'
+        : '등록된 큐레이션이 없어요.';
   const errorMessage = isTastingEventTab
     ? '시음회 정보를 불러오지 못했어요.'
     : '큐레이션 정보를 불러오지 못했어요.';
@@ -70,6 +87,7 @@ export default function CurationPage() {
       >
         <div className="px-5 pb-7 pt-7">
           <UnderlineSearchBar
+            onSearch={setSearchKeyword}
             placeholder="키워드를 입력하세요"
             inputClassName="border-b border-subCoral pl-0 pr-20 pb-2 pt-0 text-13 font-medium placeholder-brightGray focus:border-subCoral"
             actionsClassName="-top-1"
@@ -99,15 +117,17 @@ export default function CurationPage() {
           </p>
         )}
 
-        {!isLoading && !isError && (!data || data.length === 0) && (
-          <p className="px-5 pb-navbar text-13 font-medium text-mainGray">
-            {emptyMessage}
-          </p>
-        )}
+        {!isLoading &&
+          !isError &&
+          (!filteredData || filteredData.length === 0) && (
+            <p className="px-5 pb-navbar text-13 font-medium text-mainGray">
+              {emptyMessage}
+            </p>
+          )}
 
-        {!isLoading && !isError && data && data.length > 0 && (
+        {!isLoading && !isError && filteredData && filteredData.length > 0 && (
           <div className="space-y-7 px-5 pb-navbar">
-            {data.map((curation, index) => (
+            {filteredData.map((curation, index) => (
               <CurationCard
                 key={curation.id}
                 curation={curation}

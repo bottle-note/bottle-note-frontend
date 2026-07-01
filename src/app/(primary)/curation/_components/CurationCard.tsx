@@ -34,10 +34,7 @@ export function CurationCard({ curation, priority = false }: Props) {
   const href = isTastingEvent
     ? ROUTES.CURATION.DETAIL(curation.id)
     : `/search?curationId=${curation.id}`;
-  const tagLabel =
-    isTastingEvent && curation.payload.isRecruiting
-      ? '시음회'
-      : curation.specName ?? '큐레이션';
+  const tagLabel = isTastingEvent ? '시음회' : curation.specName ?? '큐레이션';
   const summaryContent = chips.length > 0 && (
     <div className="mt-auto flex flex-wrap gap-2">
       {chips.map((chip) => (
@@ -80,7 +77,7 @@ export function CurationCard({ curation, priority = false }: Props) {
 
       <div className="relative z-10 flex h-full flex-col justify-between px-4 pb-5 pt-5">
         <div>
-          <span className="inline-flex rounded-full bg-white/30 px-2.5 py-1 text-10 font-bold text-white backdrop-blur-sm">
+          <span className="inline-flex rounded-full bg-white/30 px-2.5 py-1 text-12 font-bold text-white backdrop-blur-sm">
             {tagLabel}
           </span>
           <h2 className="mt-4 line-clamp-2 text-20 font-extrabold text-white truncate">

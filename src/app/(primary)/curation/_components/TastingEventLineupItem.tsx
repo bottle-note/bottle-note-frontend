@@ -39,7 +39,7 @@ export function TastingEventLineupItem({
           <ItemInfo
             korName={alcohol.korName}
             engName={alcohol.engName ?? ''}
-            length={50}
+            length={null}
           />
 
           {details.length > 0 && (
