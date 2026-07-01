@@ -55,7 +55,7 @@ export function TastingEventInfoCard({
       {label && (
         <span
           className={cn(
-            'inline-flex w-fit rounded-full bg-mainCoral px-2.5 py-1 text-12 font-bold text-white',
+            'inline-flex w-fit rounded-full bg-mainCoral px-2.5 py-1 text-[12px] font-bold text-white',
             labelClassName,
           )}
         >
@@ -96,10 +96,10 @@ export function TastingEventInfoCard({
         ))}
 
         <div className="mt-auto flex items-end gap-2">
-          <span className="text-10 font-bold leading-none text-mainDarkGray">
+          <span className="text-10 font-semibold leading-none text-mainDarkGray">
             참가비
           </span>
-          <span className="text-[19px] font-extrabold leading-none text-mainDarkGray">
+          <span className="text-[19px] font-bold leading-none text-mainDarkGray">
             {tastingEvent.entryFeeLabel}
           </span>
         </div>

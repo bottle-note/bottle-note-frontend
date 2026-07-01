@@ -185,10 +185,10 @@ function TastingEventPreviewInfoCard({
           ))}
 
           <div className="mt-auto flex items-end gap-2">
-            <span className="text-10 font-bold leading-none text-mainDarkGray">
+            <span className="text-10 font-semibold leading-none text-mainDarkGray">
               참가비
             </span>
-            <span className="text-20 font-black leading-none text-mainDarkGray">
+            <span className="text-20 font-bold leading-none text-mainDarkGray">
               {model.entryFeeLabel}
             </span>
           </div>
