@@ -83,7 +83,7 @@ export function CurationCard({ curation, priority = false }: Props) {
           <h2 className="mt-4 line-clamp-2 text-20 font-extrabold text-white">
             {curation.name}
           </h2>
-          <p className="mt-3.5 line-clamp-5 text-12 font-medium text-white">
+          <p className="mt-3.5 line-clamp-2 text-12 font-medium text-white">
             {curation.description}
           </p>
         </div>
