@@ -94,10 +94,10 @@ export default function CurationPage() {
             renderActions={({ submit }) => (
               <button
                 type="button"
-                className="label-selected inline-flex items-center gap-0.5 px-2.5 py-1 text-13 font-medium leading-none"
+                className="label-selected inline-flex h-7 items-center gap-1 text-13 font-medium leading-none"
                 onClick={submit}
               >
-                <Search size={12} aria-hidden />
+                <Search size={14} aria-hidden className="shrink-0" />
                 <span>검색</span>
               </button>
             )}
