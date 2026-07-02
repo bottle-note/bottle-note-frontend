@@ -80,10 +80,10 @@ export function CurationCard({ curation, priority = false }: Props) {
           <span className="inline-flex rounded-full bg-white/30 px-2.5 py-1 text-12 font-bold text-white backdrop-blur-sm">
             {tagLabel}
           </span>
-          <h2 className="mt-4 line-clamp-2 text-20 font-extrabold text-white truncate">
+          <h2 className="mt-4 line-clamp-2 text-20 font-extrabold text-white">
             {curation.name}
           </h2>
-          <p className="mt-3.5 line-clamp-3 text-12 font-medium text-white truncate">
+          <p className="mt-3.5 line-clamp-5 text-12 font-medium text-white">
             {curation.description}
           </p>
         </div>
