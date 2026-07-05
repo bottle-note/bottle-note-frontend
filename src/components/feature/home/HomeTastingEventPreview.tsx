@@ -56,7 +56,7 @@ export default function HomeTastingEventPreview() {
 
   return (
     <div className="h-[321px] overflow-x-auto scrollbar-hide">
-      <div className="flex gap-4 pr-[25px]">
+      <div className="flex gap-4">
         {tastingEvents && tastingEvents.length > 0 ? (
           tastingEvents.map((event, index) => (
             <div key={event.id} className="shrink-0">
@@ -72,7 +72,7 @@ export default function HomeTastingEventPreview() {
           </div>
         )}
 
-        <div className="shrink-0">
+        <div className="shrink-0 pr-[25px]">
           <HomeTastingEventMoreCard />
         </div>
       </div>
