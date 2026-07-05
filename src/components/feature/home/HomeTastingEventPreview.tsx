@@ -1,0 +1,81 @@
+'use client';
+
+import { CURATION_V2_SPEC_CODES } from '@/api/curation-v2/constants';
+import { useTastingEventsQuery } from '@/queries/useTastingEventsQuery';
+import { HomeFeaturedErrorState } from '@/components/feature/home/_components/HomeFeaturedErrorState';
+import {
+  HomeTastingEventMoreCard,
+  HomeTastingEventPreviewCard,
+} from '@/components/feature/home/_components/HomeTastingEventPreviewCard';
+
+function HomeTastingEventSkeleton() {
+  return (
+    <div className="flex h-[321px] gap-4 overflow-hidden">
+      <div className="h-[292px] w-[268px] shrink-0 animate-pulse rounded-lg bg-sectionWhite" />
+      <div className="h-[292px] w-[268px] shrink-0 animate-pulse rounded-lg bg-sectionWhite" />
+    </div>
+  );
+}
+
+function HomeTastingEventEmptyState() {
+  return (
+    <div className="flex h-[292px] w-[268px] flex-col justify-center rounded-lg bg-sectionWhite px-5">
+      <p className="text-15 font-bold text-mainDarkGray">
+        진행 중인 시음회가 없어요.
+      </p>
+      <p className="mt-2 text-12 font-medium leading-[18px] text-mainGray">
+        새로운 시음회가 등록되면 이곳에서 확인할 수 있어요.
+      </p>
+    </div>
+  );
+}
+
+export default function HomeTastingEventPreview() {
+  const {
+    data: tastingEvents,
+    isLoading,
+    error,
+    refetch,
+  } = useTastingEventsQuery(
+    3,
+    undefined,
+    CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT,
+  );
+
+  if (isLoading) {
+    return <HomeTastingEventSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="h-[321px] pr-[25px]">
+        <HomeFeaturedErrorState onRetry={() => refetch()} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-[321px] overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-hide">
+      <div className="flex gap-4 pr-[25px]">
+        {tastingEvents && tastingEvents.length > 0 ? (
+          tastingEvents.map((event, index) => (
+            <div key={event.id} className="shrink-0">
+              <HomeTastingEventPreviewCard
+                event={event}
+                priority={index === 0}
+              />
+            </div>
+          ))
+        ) : (
+          <div className="shrink-0">
+            <HomeTastingEventEmptyState />
+          </div>
+        )}
+
+        <div className="shrink-0">
+          <HomeTastingEventMoreCard />
+        </div>
+      </div>
+    </div>
+  );
+}
