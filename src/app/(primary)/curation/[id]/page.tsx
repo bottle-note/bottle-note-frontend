@@ -1,6 +1,6 @@
 'use client';
 
-import { type CSSProperties, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import {
@@ -12,6 +12,7 @@ import type {
   TastingEventDetailItem,
 } from '@/api/curation-v2/types';
 import Button from '@/components/ui/Button/Button';
+import AutoMarqueeText from '@/components/ui/Display/AutoMarqueeText';
 import BaseImage from '@/components/ui/Display/BaseImage';
 import {
   Carousel,
@@ -28,61 +29,6 @@ import { TastingEventLineupItem } from '@/app/(primary)/curation/_components/Tas
 import { parseTastingEventPayload } from '@/app/(primary)/curation/_utils/parseTastingEventPayload';
 
 const DETAIL_HEADER_HEIGHT = 'calc(var(--header-height-with-safe) + 38px)';
-
-function MarqueeHeaderTitle({ title }: { title: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLSpanElement>(null);
-  const [marqueeDistance, setMarqueeDistance] = useState(0);
-
-  useEffect(() => {
-    const measure = () => {
-      const container = containerRef.current;
-      const text = textRef.current;
-
-      if (!container || !text) {
-        return;
-      }
-
-      setMarqueeDistance(Math.max(0, text.scrollWidth - container.clientWidth));
-    };
-
-    measure();
-
-    const resizeObserver = new ResizeObserver(measure);
-
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
-    }
-
-    if (textRef.current) {
-      resizeObserver.observe(textRef.current);
-    }
-
-    return () => resizeObserver.disconnect();
-  }, [title]);
-
-  const shouldMarquee = marqueeDistance > 4;
-
-  return (
-    <div ref={containerRef} className="w-full min-w-0 overflow-hidden">
-      <span
-        ref={textRef}
-        className={`block whitespace-nowrap text-center text-16 font-bold text-subCoral ${
-          shouldMarquee ? 'curation-detail-title-marquee w-fit' : 'truncate'
-        }`}
-        style={
-          shouldMarquee
-            ? ({
-                '--curation-title-marquee-distance': `${marqueeDistance}px`,
-              } as CSSProperties)
-            : undefined
-        }
-      >
-        {title}
-      </span>
-    </div>
-  );
-}
 
 function CurationDetailHeader({
   title,
@@ -113,7 +59,10 @@ function CurationDetailHeader({
           )}
 
           <div className="min-w-0 flex-1 px-2">
-            <MarqueeHeaderTitle title={title} />
+            <AutoMarqueeText
+              text={title}
+              className="text-center text-16 font-bold text-subCoral"
+            />
           </div>
 
           <div className="w-11 shrink-0" />

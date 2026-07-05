@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Calendar, MapPin, Users } from 'lucide-react';
 import { CURATION_V2_SPEC_CODES } from '@/api/curation-v2/constants';
 import type { TastingEventFeedItem } from '@/api/curation-v2/types';
+import AutoMarqueeText from '@/components/ui/Display/AutoMarqueeText';
 import BaseImage from '@/components/ui/Display/BaseImage';
 import { ROUTES } from '@/constants/routes';
 import { parseTastingEventPayload } from '@/app/(primary)/curation/_utils/parseTastingEventPayload';
@@ -58,8 +59,11 @@ export function HomeTastingEventPreviewCard({
             시음회
           </span>
 
-          <h3 className="mt-3 line-clamp-2 text-16 font-extrabold leading-[21px] text-white">
-            {event.name}
+          <h3 className="mt-3">
+            <AutoMarqueeText
+              text={event.name}
+              className="text-16 font-extrabold leading-[21px] text-white"
+            />
           </h3>
 
           <p className="mt-2 line-clamp-2 text-11 font-light leading-[17px] text-white">

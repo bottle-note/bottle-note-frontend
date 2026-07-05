@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { TastingEventFeedItem } from '@/api/curation-v2/types';
+import AutoMarqueeText from '@/components/ui/Display/AutoMarqueeText';
 import BaseImage from '@/components/ui/Display/BaseImage';
 import { ROUTES } from '@/constants/routes';
 import { TastingEventInfoCard } from '@/app/(primary)/curation/_components/TastingEventInfoCard';
@@ -34,10 +35,13 @@ export function TastingEventFeedCard({
             <span className="inline-flex rounded-full bg-white/30 px-2.5 py-1 text-12 font-bold text-white backdrop-blur-sm">
               시음회
             </span>
-            <h2 className="mt-4 line-clamp-2 text-20 font-extrabold text-white">
-              {event.name}
+            <h2 className="mt-4">
+              <AutoMarqueeText
+                text={event.name}
+                className="text-20 font-extrabold text-white"
+              />
             </h2>
-            <p className="mt-3.5 line-clamp-3 text-12 font-light leading-[18px] text-white">
+            <p className="mt-3.5 line-clamp-2 text-12 font-light leading-[18px] text-white">
               {event.description}
             </p>
           </div>

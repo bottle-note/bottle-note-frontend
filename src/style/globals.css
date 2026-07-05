@@ -277,19 +277,19 @@
 }
 
 @layer utilities {
-  @keyframes curation-detail-title-marquee {
+  @keyframes auto-marquee-text {
     0%,
     15% {
       transform: translateX(0);
     }
     85%,
     100% {
-      transform: translateX(calc(-1 * var(--curation-title-marquee-distance)));
+      transform: translateX(calc(-1 * var(--auto-marquee-distance)));
     }
   }
 
-  .curation-detail-title-marquee {
-    animation: curation-detail-title-marquee 8s ease-in-out infinite alternate;
+  .auto-marquee-text {
+    animation: auto-marquee-text 500ms ease-in-out infinite alternate;
   }
 
   .text-balance {
