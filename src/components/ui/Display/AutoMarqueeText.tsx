@@ -48,6 +48,10 @@ export default function AutoMarqueeText({
   }, [text]);
 
   const shouldMarquee = marqueeDistance > 4;
+  const marqueeDurationMs = Math.min(
+    12000,
+    Math.max(6000, marqueeDistance * 45),
+  );
 
   return (
     <span
@@ -65,6 +69,7 @@ export default function AutoMarqueeText({
           shouldMarquee
             ? ({
                 '--auto-marquee-distance': `${marqueeDistance}px`,
+                '--auto-marquee-duration': `${marqueeDurationMs}ms`,
               } as CSSProperties)
             : undefined
         }

@@ -279,7 +279,7 @@
 @layer utilities {
   @keyframes auto-marquee-text {
     0%,
-    15% {
+    10% {
       transform: translateX(0);
     }
     85%,
@@ -289,7 +289,8 @@
   }
 
   .auto-marquee-text {
-    animation: auto-marquee-text 500ms ease-in-out infinite alternate;
+    animation: auto-marquee-text var(--auto-marquee-duration, 8000ms) linear
+      infinite;
   }
 
   .text-balance {
