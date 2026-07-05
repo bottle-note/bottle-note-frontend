@@ -3,28 +3,28 @@
 // ============================================
 
 import type { PageableInfo } from '@/api/_shared/types';
-import type { TastingEventPayload } from './schema';
+import type { RecommendedWhiskyPayload, TastingEventPayload } from './schema';
 
-export type { TastingEventAlcohol, TastingEventPayload } from './schema';
-
-export interface RecommendedWhiskyPayloadItem {
-  alcohol?: {
-    alcoholId: number | null;
-    korName: string;
-    engName?: string;
-    imageUrl?: string;
-    regionName?: string;
-    korCategory?: string;
-    selectedTags?: string[];
-  };
-  comment?: string;
-}
+export type {
+  CurationAlcohol,
+  RecommendedWhiskyPayload,
+  TastingEventAlcohol,
+  TastingEventPayload,
+} from './schema';
 
 export type CurationV2Payload =
-  | RecommendedWhiskyPayloadItem[]
+  | RecommendedWhiskyPayload
   | TastingEventPayload
   | Record<string, unknown>
   | null;
+
+export interface CurationV2Spec {
+  id: number;
+  code: string;
+  name: string;
+  container: string;
+  responseSpec: Record<string, unknown>;
+}
 
 export interface CurationV2FeedItem {
   id: number;
@@ -36,8 +36,6 @@ export interface CurationV2FeedItem {
   exposureEndDate: string | number[];
   displayOrder: number;
   createAt: string | number[];
-  specCode?: string;
-  specName?: string;
   payload: CurationV2Payload;
 }
 
@@ -46,7 +44,9 @@ export interface CurationV2FeedData {
   pageable: PageableInfo;
 }
 
-export type CurationV2DetailItem = CurationV2FeedItem;
+export interface CurationV2DetailItem extends CurationV2FeedItem {
+  spec?: CurationV2Spec;
+}
 
 export interface TastingEventFeedItem extends CurationV2FeedItem {
   payload: TastingEventPayload;
@@ -54,4 +54,12 @@ export interface TastingEventFeedItem extends CurationV2FeedItem {
 
 export interface TastingEventDetailItem extends CurationV2DetailItem {
   payload: TastingEventPayload;
+}
+
+export interface RecommendedWhiskyFeedItem extends CurationV2FeedItem {
+  payload: RecommendedWhiskyPayload;
+}
+
+export interface RecommendedWhiskyDetailItem extends CurationV2DetailItem {
+  payload: RecommendedWhiskyPayload;
 }

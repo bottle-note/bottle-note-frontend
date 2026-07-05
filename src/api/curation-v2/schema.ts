@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const tastingEventAlcoholSchema = z.object({
+const curationAlcoholSchema = z.object({
   stats: z
     .object({
       rating: z.number().nullable().optional(),
@@ -36,8 +36,14 @@ export const tastingEventPayloadSchema = z.object({
   isRecruiting: z.boolean(),
   detailAddress: z.string(),
   applicationLink: z.string(),
-  alcohols: z.array(tastingEventAlcoholSchema).optional(),
+  alcohols: z.array(curationAlcoholSchema).optional(),
 });
 
-export type TastingEventAlcohol = z.infer<typeof tastingEventAlcoholSchema>;
+export const recommendedWhiskyPayloadSchema = z.array(curationAlcoholSchema);
+
+export type CurationAlcohol = z.infer<typeof curationAlcoholSchema>;
+export type RecommendedWhiskyPayload = z.infer<
+  typeof recommendedWhiskyPayloadSchema
+>;
+export type TastingEventAlcohol = CurationAlcohol;
 export type TastingEventPayload = z.infer<typeof tastingEventPayloadSchema>;

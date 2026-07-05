@@ -44,17 +44,16 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
       link: ROUTES.REVIEW.REGISTER_BASE,
       icon: '/icon/navbar/review.svg',
     },
-    {
-      name: '검색',
-      link: ROUTES.SEARCH.BASE,
-      icon: '/icon/navbar/search.svg',
-    },
-    // TODO: 시음회 탭 노출 시 검색 탭과 교체 여부를 다시 결정한다.
     // {
-    //   name: '시음회',
-    //   link: ROUTES.CURATION.BASE,
-    //   icon: '/icon/navbar/curation.svg',
+    //   name: '검색',
+    //   link: ROUTES.SEARCH.BASE,
+    //   icon: '/icon/navbar/search.svg',
     // },
+    {
+      name: '시음회',
+      link: ROUTES.CURATION.BASE,
+      icon: '/icon/navbar/curation.svg',
+    },
     {
       name: '둘러보기',
       link: ROUTES.EXPLORE.BASE,
@@ -84,9 +83,6 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
         [menu.link]: currentTime,
       }));
 
-      if (menu.link === ROUTES.SEARCH.BASE) {
-        router.push(ROUTES.SEARCH.BASE);
-      }
       return;
     }
 

@@ -277,6 +277,21 @@
 }
 
 @layer utilities {
+  @keyframes curation-detail-title-marquee {
+    0%,
+    15% {
+      transform: translateX(0);
+    }
+    85%,
+    100% {
+      transform: translateX(calc(-1 * var(--curation-title-marquee-distance)));
+    }
+  }
+
+  .curation-detail-title-marquee {
+    animation: curation-detail-title-marquee 8s ease-in-out infinite alternate;
+  }
+
   .text-balance {
     text-wrap: balance;
   }
