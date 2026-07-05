@@ -66,7 +66,7 @@ export function HomeTastingEventPreviewCard({
             />
           </h3>
 
-          <p className="mt-2 line-clamp-2 text-11 font-light leading-[17px] text-white">
+          <p className="mt-2 line-clamp-2 whitespace-normal text-11 font-light leading-[17px] text-white">
             {event.description}
           </p>
 
@@ -123,7 +123,7 @@ export function HomeTastingEventMoreCard() {
             <br />
             시음회 보기
           </h3>
-          <p className="mt-3 text-11 font-medium leading-[17px] text-mainGray">
+          <p className="mt-3 whitespace-normal text-11 font-medium leading-[17px] text-mainGray">
             진행 중인 시음회를 한 번에 확인해보세요.
           </p>
         </div>

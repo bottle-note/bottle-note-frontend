@@ -41,7 +41,7 @@ export function TastingEventFeedCard({
                 className="text-20 font-extrabold text-white"
               />
             </h2>
-            <p className="mt-3.5 line-clamp-2 text-12 font-light leading-[18px] text-white">
+            <p className="mt-3.5 line-clamp-2 whitespace-normal text-12 font-light leading-[18px] text-white">
               {event.description}
             </p>
           </div>

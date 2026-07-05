@@ -55,7 +55,7 @@ export default function HomeTastingEventPreview() {
   }
 
   return (
-    <div className="h-[321px] overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-hide">
+    <div className="h-[321px] overflow-x-auto overflow-y-hidden scrollbar-hide">
       <div className="flex gap-4 pr-[25px]">
         {tastingEvents && tastingEvents.length > 0 ? (
           tastingEvents.map((event, index) => (
