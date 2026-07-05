@@ -2,7 +2,13 @@ import { apiClient } from '@/shared/api/apiClient';
 import { ApiResponse, CursorPaginationParams } from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
+import type { CurationV2SpecCode } from './constants';
 import type { CurationV2DetailItem, CurationV2FeedData } from './types';
+
+interface CurationV2FeedParams extends CursorPaginationParams {
+  keyword?: string;
+  code?: CurationV2SpecCode;
+}
 
 export const CurationV2Api = {
   /**
@@ -11,10 +17,15 @@ export const CurationV2Api = {
    * - payload는 responseSpec의 x-feed.enabled=true 필드만 포함합니다.
    */
   async getFeed(
-    params: CursorPaginationParams = {},
+    params: CurationV2FeedParams = {},
   ): Promise<ApiResponse<CurationV2FeedData>> {
-    const { cursor = 0, pageSize = 10 } = params;
-    const queryString = buildQueryParams({ cursor, pageSize });
+    const { cursor = 0, pageSize = 10, keyword, code } = params;
+    const queryString = buildQueryParams({
+      cursor,
+      size: pageSize,
+      keyword,
+      code,
+    });
 
     const response = await apiClient.get<ApiResponse<CurationV2FeedData>>(
       `/curations/feed?${queryString}`,

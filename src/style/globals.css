@@ -277,6 +277,22 @@
 }
 
 @layer utilities {
+  @keyframes auto-marquee-text {
+    0%,
+    10% {
+      transform: translateX(0);
+    }
+    85%,
+    100% {
+      transform: translateX(calc(-1 * var(--auto-marquee-distance)));
+    }
+  }
+
+  .auto-marquee-text {
+    animation: auto-marquee-text var(--auto-marquee-duration, 8000ms) linear
+      infinite;
+  }
+
   .text-balance {
     text-wrap: balance;
   }
