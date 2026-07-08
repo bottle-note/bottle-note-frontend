@@ -17,15 +17,8 @@ export function TastingEventLineupItem({
   order,
 }: TastingEventLineupItemProps) {
   const { alcohol, stats, comment } = item;
-  const details = [
-    alcohol.abv && `도수 ${alcohol.abv}%`,
-    alcohol.korCategory,
-  ].filter(isText);
-  const chips = [
-    ...(alcohol.selectedTags ?? []),
-    alcohol.korCategory,
-    alcohol.regionName,
-  ].filter(isText);
+  const details = [alcohol.abv && `도수 ${alcohol.abv}%`].filter(isText);
+  const chips = [...(alcohol.selectedTags ?? [])].filter(isText);
   const alcoholContent = (
     <>
       <ItemImage
