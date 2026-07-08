@@ -1,8 +1,10 @@
 'use client';
 
-import { Component, useState, type ReactNode } from 'react';
+import { Component, useEffect, useState, type ReactNode } from 'react';
 import Image from 'next/image';
 import Fallback from 'public/bottle.svg';
+
+const SKELETON_DELAY_MS = 100;
 
 class ImageErrorBoundary extends Component<
   { fallback: ReactNode; children: ReactNode },
@@ -51,6 +53,22 @@ const BaseImage = ({
 }: Props) => {
   const [imgSrc, setImgSrc] = useState(src || Fallback);
   const [isLoading, setIsLoading] = useState(true);
+  const [showSkeleton, setShowSkeleton] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setShowSkeleton(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setShowSkeleton(true);
+    }, SKELETON_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [isLoading]);
 
   const handleError = () => {
     setImgSrc(Fallback);
@@ -86,7 +104,7 @@ const BaseImage = ({
           />
         }
       >
-        {isLoading && (
+        {showSkeleton && (
           <div className="absolute inset-0 bg-gray-200 animate-pulse" />
         )}
         <Image
