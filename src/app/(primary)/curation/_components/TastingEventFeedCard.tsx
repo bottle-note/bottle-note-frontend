@@ -38,7 +38,7 @@ export function TastingEventFeedCard({
             <h2 className="mt-4">
               <AutoMarqueeText
                 text={event.name}
-                className="text-20 font-extrabold text-white"
+                className="text-[22px] font-extrabold leading-[26px] text-white"
               />
             </h2>
             <p className="mt-3.5 line-clamp-2 whitespace-normal text-12 font-light leading-[18px] text-white">

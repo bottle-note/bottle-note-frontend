@@ -129,7 +129,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
           <h1 className="mt-3 line-clamp-2 text-20 font-extrabold text-white">
             {event.name}
           </h1>
-          <p className="mt-2 line-clamp-1 text-10 font-light text-white">
+          <p className="mt-2 line-clamp-1 text-13 font-light text-white">
             {tastingEvent.eventDateLabel} · {tastingEvent.placeLabel} ·{' '}
             {tastingEvent.capacityLabel}
           </p>
@@ -142,6 +142,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
           payload={payload}
           label="정보"
           showMapCta
+          textBehavior="wrap"
           className="bg-bgGray"
         />
       </section>

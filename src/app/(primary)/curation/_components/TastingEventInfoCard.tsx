@@ -7,6 +7,7 @@ interface TastingEventInfoCardProps {
   payload: TastingEventPayload;
   label?: string;
   showMapCta?: boolean;
+  textBehavior?: 'truncate' | 'wrap';
   className?: string;
   labelClassName?: string;
 }
@@ -15,10 +16,12 @@ export function TastingEventInfoCard({
   payload,
   label,
   showMapCta = false,
+  textBehavior = 'truncate',
   className,
   labelClassName,
 }: TastingEventInfoCardProps) {
   const tastingEvent = parseTastingEventPayload(payload);
+  const shouldWrapText = textBehavior === 'wrap';
   const infoItems = [
     {
       key: 'date',
@@ -29,8 +32,8 @@ export function TastingEventInfoCard({
     {
       key: 'place',
       Icon: MapPin,
-      title: payload.barAddress,
-      description: payload.detailAddress,
+      title: tastingEvent.placeLabel,
+      description: tastingEvent.fullAddress,
       action: showMapCta
         ? {
             href: tastingEvent.mapSearchUrl,
@@ -56,6 +59,7 @@ export function TastingEventInfoCard({
         <span
           className={cn(
             'inline-flex w-fit rounded-full bg-mainCoral px-2.5 py-1 text-[12px] font-bold text-white',
+            shouldWrapText && 'text-13',
             labelClassName,
           )}
         >
@@ -72,7 +76,14 @@ export function TastingEventInfoCard({
 
             <div className="flex min-w-0 flex-col w-full gap-1">
               <div className="flex min-w-0 items-start justify-between w-full gap-2">
-                <p className="min-w-0 flex-1 truncate text-13 font-bold text-mainDarkGray">
+                <p
+                  className={cn(
+                    'min-w-0 flex-1 text-13 font-bold text-mainDarkGray',
+                    shouldWrapText
+                      ? 'whitespace-normal break-words text-14'
+                      : 'truncate',
+                  )}
+                >
                   {title}
                 </p>
                 {action?.href && (
@@ -87,7 +98,14 @@ export function TastingEventInfoCard({
                 )}
               </div>
               {description && (
-                <p className="truncate text-12 font-light text-mainGray">
+                <p
+                  className={cn(
+                    'text-12 font-light text-mainGray',
+                    shouldWrapText
+                      ? 'whitespace-normal break-words text-13'
+                      : 'truncate',
+                  )}
+                >
                   {description}
                 </p>
               )}
@@ -96,7 +114,12 @@ export function TastingEventInfoCard({
         ))}
 
         <div className="mt-auto flex items-end gap-2">
-          <span className="text-10 font-semibold leading-none text-mainDarkGray">
+          <span
+            className={cn(
+              'text-10 font-semibold leading-none text-mainDarkGray',
+              shouldWrapText && 'text-13',
+            )}
+          >
             참가비
           </span>
           <span className="text-[19px] font-bold leading-none text-mainDarkGray">
