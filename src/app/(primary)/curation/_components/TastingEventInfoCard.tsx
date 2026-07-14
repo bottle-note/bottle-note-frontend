@@ -58,7 +58,7 @@ export function TastingEventInfoCard({
       {label && (
         <span
           className={cn(
-            'inline-flex w-fit rounded-full bg-mainCoral px-2.5 py-1 text-[12px] font-bold text-white',
+            'inline-flex w-fit rounded-full bg-mainCoral px-2.5 py-1 text-[12px] leading-[16px] font-bold text-white',
             shouldWrapText && 'text-13',
             labelClassName,
           )}
@@ -78,7 +78,7 @@ export function TastingEventInfoCard({
               <div className="flex min-w-0 items-start justify-between w-full gap-2">
                 <p
                   className={cn(
-                    'min-w-0 flex-1 text-13 font-bold text-mainDarkGray',
+                    'min-w-0 flex-1 text-[12px] leading-[16px] font-bold text-mainDarkGray',
                     shouldWrapText
                       ? 'whitespace-normal break-words text-14'
                       : 'truncate',
@@ -100,7 +100,7 @@ export function TastingEventInfoCard({
               {description && (
                 <p
                   className={cn(
-                    'text-12 font-light text-mainGray',
+                    'text-[12px] leading-[16px] font-light text-mainGray',
                     shouldWrapText
                       ? 'whitespace-normal break-words text-13'
                       : 'truncate',
@@ -116,7 +116,7 @@ export function TastingEventInfoCard({
         <div className="mt-auto flex items-end gap-2">
           <span
             className={cn(
-              'text-10 font-semibold leading-none text-mainDarkGray',
+              'text-[10px] font-semibold leading-none text-mainDarkGray',
               shouldWrapText && 'text-13',
             )}
           >
