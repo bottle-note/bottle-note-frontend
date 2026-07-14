@@ -22,6 +22,15 @@ export function TastingEventInfoCard({
 }: TastingEventInfoCardProps) {
   const tastingEvent = parseTastingEventPayload(payload);
   const shouldWrapText = textBehavior === 'wrap';
+  const labelTextClassName = shouldWrapText
+    ? 'text-13 leading-[17px]'
+    : 'text-[12px] leading-[16px]';
+  const titleTextClassName = shouldWrapText
+    ? 'whitespace-normal break-words text-14 leading-[18px]'
+    : 'truncate text-[12px] leading-[16px]';
+  const descriptionTextClassName = shouldWrapText
+    ? 'whitespace-normal break-words text-13 leading-[17px]'
+    : 'truncate text-[12px] leading-[16px]';
   const infoItems = [
     {
       key: 'date',
@@ -58,8 +67,8 @@ export function TastingEventInfoCard({
       {label && (
         <span
           className={cn(
-            'inline-flex w-fit rounded-full bg-mainCoral px-2.5 py-1 text-[12px] leading-[16px] font-bold text-white',
-            shouldWrapText && 'text-13',
+            'inline-flex w-fit rounded-full bg-mainCoral px-2.5 py-1 font-bold text-white',
+            labelTextClassName,
             labelClassName,
           )}
         >
@@ -76,22 +85,27 @@ export function TastingEventInfoCard({
 
             <div className="flex min-w-0 flex-col w-full gap-1">
               <div className="flex min-w-0 items-start justify-between w-full gap-2">
-                <p
-                  className={cn(
-                    'min-w-0 flex-1 text-[12px] leading-[16px] font-bold text-mainDarkGray',
-                    shouldWrapText
-                      ? 'whitespace-normal break-words text-14'
-                      : 'truncate',
-                  )}
-                >
-                  {title}
-                </p>
+                {title && (
+                  <p
+                    className={cn(
+                      'min-w-0 flex-1 font-bold text-mainDarkGray',
+                      titleTextClassName,
+                    )}
+                  >
+                    {title}
+                  </p>
+                )}
                 {action?.href && (
                   <a
                     href={action.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="shrink-0 rounded-md bg-white px-3 py-1 text-12 font-bold leading-sm text-mainDarkGray"
+                    className={cn(
+                      'shrink-0 rounded-md bg-white px-3 py-1 font-bold text-mainDarkGray',
+                      shouldWrapText
+                        ? 'text-13 leading-[17px]'
+                        : 'text-12 leading-sm',
+                    )}
                   >
                     {action.label}
                   </a>
@@ -100,10 +114,8 @@ export function TastingEventInfoCard({
               {description && (
                 <p
                   className={cn(
-                    'text-[12px] leading-[16px] font-light text-mainGray',
-                    shouldWrapText
-                      ? 'whitespace-normal break-words text-13'
-                      : 'truncate',
+                    'font-light text-mainGray',
+                    descriptionTextClassName,
                   )}
                 >
                   {description}
@@ -117,7 +129,7 @@ export function TastingEventInfoCard({
           <span
             className={cn(
               'text-[10px] font-semibold leading-none text-mainDarkGray',
-              shouldWrapText && 'text-13',
+              shouldWrapText && 'text-13 leading-[17px]',
             )}
           >
             참가비

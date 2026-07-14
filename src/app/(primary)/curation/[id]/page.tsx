@@ -87,6 +87,11 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
   const isEventPast = isBeforeToday(payload.eventDate);
   const shouldShowCta = Boolean(applicationLink);
   const canApply = shouldShowCta && payload.isRecruiting && !isEventPast;
+  const summaryItems = [
+    tastingEvent.eventDateLabel,
+    tastingEvent.placeLabel,
+    tastingEvent.capacityLabel,
+  ].filter(Boolean);
 
   useEffect(() => {
     if (!carouselApi) {
@@ -130,8 +135,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
             {event.name}
           </h1>
           <p className="mt-2 line-clamp-1 text-13 font-light text-white">
-            {tastingEvent.eventDateLabel} · {tastingEvent.placeLabel} ·{' '}
-            {tastingEvent.capacityLabel}
+            {summaryItems.join(' · ')}
           </p>
         </div>
       </section>
