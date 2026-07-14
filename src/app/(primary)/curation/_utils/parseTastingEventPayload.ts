@@ -9,32 +9,17 @@ const splitDetailAddress = (
   const normalizedDetailAddress = detailAddress.trim();
   const normalizedPlaceName = placeName?.trim();
 
-  if (!normalizedDetailAddress) {
-    return { addressDetail: '', placeLabel: normalizedPlaceName ?? '' };
+  if (!normalizedPlaceName) {
+    return { addressDetail: normalizedDetailAddress, placeLabel: '' };
   }
 
-  if (normalizedPlaceName) {
-    return {
-      addressDetail: normalizedDetailAddress
-        .replace(normalizedPlaceName, '')
-        .replace(/\s{2,}/g, ' ')
-        .trim(),
-      placeLabel: normalizedPlaceName,
-    };
-  }
-
-  const detailWithPlace = normalizedDetailAddress.match(
-    /^(?<addressDetail>\S*(?:층|호))\s+(?<placeLabel>.+)$/,
-  );
-
-  if (detailWithPlace?.groups) {
-    return {
-      addressDetail: detailWithPlace.groups.addressDetail,
-      placeLabel: detailWithPlace.groups.placeLabel,
-    };
-  }
-
-  return { addressDetail: normalizedDetailAddress, placeLabel: '' };
+  return {
+    addressDetail: normalizedDetailAddress
+      .replace(normalizedPlaceName, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim(),
+    placeLabel: normalizedPlaceName,
+  };
 };
 
 export function parseTastingEventPayload(payload: TastingEventPayload) {
