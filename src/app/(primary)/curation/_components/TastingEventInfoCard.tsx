@@ -28,9 +28,17 @@ export function TastingEventInfoCard({
   const titleTextClassName = shouldWrapText
     ? 'whitespace-normal break-words text-14 leading-[18px]'
     : 'truncate text-[12px] leading-[16px]';
-  const descriptionTextClassName = shouldWrapText
-    ? 'whitespace-normal break-words text-13 leading-[17px]'
-    : 'truncate text-[12px] leading-[16px]';
+  const getDescriptionTextClassName = (key: string) => {
+    if (shouldWrapText) {
+      return 'whitespace-normal break-words text-13 leading-[17px]';
+    }
+
+    if (key === 'place') {
+      return 'line-clamp-2 whitespace-normal break-words text-[12px] leading-[16px]';
+    }
+
+    return 'truncate text-[12px] leading-[16px]';
+  };
   const infoItems = [
     {
       key: 'date',
@@ -115,7 +123,7 @@ export function TastingEventInfoCard({
                 <p
                   className={cn(
                     'font-light text-mainGray',
-                    descriptionTextClassName,
+                    getDescriptionTextClassName(key),
                   )}
                 >
                   {description}
