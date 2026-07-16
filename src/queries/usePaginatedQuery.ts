@@ -19,10 +19,17 @@ interface Props<T> {
   intersectionThrottleMs?: number;
 }
 
+export const getNextPageParam = <T>(lastPage: ApiResponse<T>) => {
+  const pageable = lastPage.meta.pageable;
+
+  if (!pageable?.hasNext) return undefined;
+
+  return pageable.cursor;
+};
+
 export const usePaginatedQuery = <T>({
   queryKey,
   queryFn,
-  pageSize = 10,
   enabled = true,
   refetchOnMount = true,
   staleTime = 0,
@@ -42,12 +49,7 @@ export const usePaginatedQuery = <T>({
   } = useInfiniteQuery({
     queryKey,
     queryFn,
-    getNextPageParam: (lastPage: ApiResponse<T>) => {
-      if (lastPage.meta.pageable?.hasNext) {
-        return lastPage.meta.pageable.currentCursor + pageSize;
-      }
-      return null;
-    },
+    getNextPageParam,
     initialPageParam: 0,
     refetchOnMount,
     refetchOnWindowFocus: false,
