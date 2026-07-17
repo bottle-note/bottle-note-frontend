@@ -24,9 +24,12 @@ export default function ReviewUserHeader({
   return (
     <section className="mx-5">
       <article className="flex items-center justify-between">
-        <Link href={ROUTES.USER.BASE(userData?.userId!)}>
+        <Link href={ROUTES.USER.BASE(data.reviewInfo.userInfo.userId)}>
           <div className="flex items-center space-x-[7px]">
-            <ProfileImage size={30} />
+            <ProfileImage
+              profileImgSrc={data.reviewInfo.userInfo.userProfileImage}
+              size={30}
+            />
             <p className="text-mainGray text-13">
               {data.reviewInfo?.userInfo?.nickName &&
                 truncStr(data.reviewInfo.userInfo.nickName, 12)}
