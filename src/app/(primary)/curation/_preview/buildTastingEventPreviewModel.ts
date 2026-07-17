@@ -4,6 +4,7 @@ import type {
   TastingEventPreviewModel,
   TastingEventPreviewPayload,
 } from './types';
+import { getTastingEventCapacityLabel } from '../_utils/parseTastingEventPayload';
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -113,7 +114,7 @@ export const buildTastingEventPreviewModel = (
     eventDateTimeLabel: `${eventDateLabel} · ${eventTimeLabel}`,
     placeLabel: payload.placeName ?? payload.barAddress,
     fullAddress,
-    capacityLabel: `${payload.capacity.toLocaleString('ko-KR')}명 정원`,
+    capacityLabel: getTastingEventCapacityLabel(payload.capacity),
     entryFeeLabel:
       payload.entryFee > 0
         ? `${payload.entryFee.toLocaleString('ko-KR')}원`
