@@ -102,11 +102,11 @@ function ReviewModify() {
         isShowModal: true,
         mainText: '작성 중인 내용이 있습니다.\n정말 뒤로 가시겠습니까?',
         type: 'CONFIRM',
-        handleConfirm: () => handleModalState({ isShowModal: false }),
-        handleCancel: () => {
+        handleConfirm: () => {
           handleModalState({ isShowModal: false });
           router.back();
         },
+        handleCancel: () => handleModalState({ isShowModal: false }),
       });
     } else {
       router.back();
