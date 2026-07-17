@@ -22,6 +22,11 @@ const splitDetailAddress = (
   };
 };
 
+export const getTastingEventCapacityLabel = (capacity: number) =>
+  capacity === 0
+    ? '모집 인원 미정'
+    : `${capacity.toLocaleString('ko-KR')}명 정원`;
+
 export function parseTastingEventPayload(payload: TastingEventPayload) {
   const eventDate = new Date(payload.eventDate);
   const eventDateLabel = Number.isNaN(eventDate.getTime())
@@ -47,7 +52,7 @@ export function parseTastingEventPayload(payload: TastingEventPayload) {
     eventDateTimeLabel: `${eventDateLabel} · ${eventTimeLabel}`,
     fullAddress,
     placeLabel,
-    capacityLabel: `${payload.capacity.toLocaleString('ko-KR')}명 정원`,
+    capacityLabel: getTastingEventCapacityLabel(payload.capacity),
     entryFeeLabel:
       payload.entryFee > 0
         ? `${payload.entryFee.toLocaleString('ko-KR')}원`

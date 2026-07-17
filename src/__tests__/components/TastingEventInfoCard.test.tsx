@@ -38,3 +38,12 @@ describe('TastingEventInfoCard 장소 정보', () => {
     expect(address).not.toHaveClass('line-clamp-2', 'truncate');
   });
 });
+
+describe('TastingEventInfoCard 모집 인원 정보', () => {
+  it('모집 인원이 0명이면 모집 인원 미정으로 렌더링한다', () => {
+    render(<TastingEventInfoCard payload={{ ...payload, capacity: 0 }} />);
+
+    expect(screen.getByText('모집 인원 미정')).toBeInTheDocument();
+    expect(screen.queryByText('0명 정원')).not.toBeInTheDocument();
+  });
+});
