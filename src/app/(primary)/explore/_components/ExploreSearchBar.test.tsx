@@ -2,6 +2,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ExploreSearchBar } from './ExploreSearchBar';
 
+const mockUseScrollState = jest.fn();
+
 jest.mock('next/image', () => ({
   __esModule: true,
   default: ({
@@ -19,6 +21,10 @@ jest.mock('@/queries/useRegionsQuery', () => ({
   }),
 }));
 
+jest.mock('@/hooks/useScrollState', () => ({
+  useScrollState: () => mockUseScrollState(),
+}));
+
 jest.mock('../_hooks/useExploreFilters', () => ({
   useExploreFilters: () => ({
     regionIds: [],
@@ -31,6 +37,10 @@ jest.mock('../_hooks/useExploreFilters', () => ({
 }));
 
 describe('ExploreSearchBar', () => {
+  beforeEach(() => {
+    mockUseScrollState.mockReturnValue({ isVisible: true, isAtTop: true });
+  });
+
   it('realtime 모드에서는 검색어 추가 버튼 없이 입력 변경을 전달한다', () => {
     const onValueChange = jest.fn();
 
@@ -57,6 +67,32 @@ describe('ExploreSearchBar', () => {
 
     fireEvent.change(input, { target: { value: 'macallan' } });
     expect(onValueChange).toHaveBeenCalledWith('macallan');
+
+    fireEvent.click(screen.getByRole('button', { name: '검색어 지우기' }));
+    expect(input).toHaveValue('');
+    expect(input).toHaveFocus();
+    expect(onValueChange).toHaveBeenLastCalledWith('');
+  });
+
+  it('스크롤 방향 상태에 따라 sticky 검색바를 숨기고 다시 노출한다', () => {
+    const props = {
+      mode: 'realtime' as const,
+      initialValue: '',
+      onValueChange: jest.fn(),
+      description: '검색어를 입력해보세요.',
+    };
+    const { rerender } = render(<ExploreSearchBar {...props} />);
+
+    const searchBar = screen.getByTestId('explore-search-bar');
+    expect(searchBar).toHaveClass('sticky', 'translate-y-0');
+    expect(searchBar).toHaveStyle({
+      top: 'calc(var(--header-height-with-safe) + var(--tab-height))',
+    });
+
+    mockUseScrollState.mockReturnValue({ isVisible: false, isAtTop: false });
+    rerender(<ExploreSearchBar {...props} />);
+
+    expect(searchBar).toHaveClass('-translate-y-full', 'pointer-events-none');
   });
 
   it('chip 모드에서는 기존 검색어 추가 동작을 유지한다', () => {

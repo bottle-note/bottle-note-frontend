@@ -4,6 +4,8 @@ import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
 import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
 import UnderlineSearchBar from '@/components/feature/Search/UnderlineSearchBar';
 import { CATEGORY_MENUS_LIST } from '@/constants/common';
+import { useScrollState } from '@/hooks/useScrollState';
+import { cn } from '@/lib/utils';
 import { useRegionsQuery } from '@/queries/useRegionsQuery';
 import type { SearchKeyword } from './types';
 import HelpIcon from 'public/icon/help-filled-subcoral.svg';
@@ -32,6 +34,7 @@ type Props = ChipSearchProps | RealtimeSearchProps;
 export const ExploreSearchBar = (props: Props) => {
   const { description, isFilter = false } = props;
   const isRealtime = props.mode === 'realtime';
+  const { isVisible } = useScrollState(100);
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const { regions } = useRegionsQuery();
   const {
@@ -62,12 +65,23 @@ export const ExploreSearchBar = (props: Props) => {
   };
 
   return (
-    <section className="pt-[5px]">
+    <section
+      data-testid="explore-search-bar"
+      className={cn(
+        'sticky z-[9] -mx-4 bg-white px-4 pt-[5px] transition-transform duration-300 ease-in-out',
+        isVisible ? 'translate-y-0' : 'pointer-events-none -translate-y-full',
+      )}
+      style={{
+        top: 'calc(var(--header-height-with-safe) + var(--tab-height))',
+      }}
+    >
       <article className="relative w-full">
         <UnderlineSearchBar
           onSearch={isRealtime ? undefined : onAddKeyword}
           onValueChange={isRealtime ? props.onValueChange : undefined}
           initialValue={isRealtime ? props.initialValue : undefined}
+          inputClassName={isRealtime ? 'pr-16' : 'pr-[140px]'}
+          clearable
           renderActions={
             !isRealtime || isFilter
               ? ({ submit }) => (
