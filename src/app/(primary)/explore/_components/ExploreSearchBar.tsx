@@ -68,8 +68,10 @@ export const ExploreSearchBar = (props: Props) => {
     <section
       data-testid="explore-search-bar"
       className={cn(
-        'sticky z-[9] -mx-4 bg-white px-4 pt-[5px] transition-transform duration-300 ease-in-out',
-        isVisible ? 'translate-y-0' : 'pointer-events-none -translate-y-full',
+        'sticky z-[9] -mx-4 bg-white px-4 pt-[5px]',
+        isVisible
+          ? 'translate-y-0 transition-transform duration-150 ease-out motion-reduce:transition-none'
+          : 'pointer-events-none -translate-y-full transition-none',
       )}
       style={{
         top: 'calc(var(--header-height-with-safe) + var(--tab-height))',

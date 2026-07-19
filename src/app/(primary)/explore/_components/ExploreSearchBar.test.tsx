@@ -84,7 +84,14 @@ describe('ExploreSearchBar', () => {
     const { rerender } = render(<ExploreSearchBar {...props} />);
 
     const searchBar = screen.getByTestId('explore-search-bar');
-    expect(searchBar).toHaveClass('sticky', 'translate-y-0');
+    expect(searchBar).toHaveClass(
+      'sticky',
+      'translate-y-0',
+      'transition-transform',
+      'duration-150',
+      'ease-out',
+      'motion-reduce:transition-none',
+    );
     expect(searchBar).toHaveStyle({
       top: 'calc(var(--header-height-with-safe) + var(--tab-height))',
     });
@@ -92,7 +99,12 @@ describe('ExploreSearchBar', () => {
     mockUseScrollState.mockReturnValue({ isVisible: false, isAtTop: false });
     rerender(<ExploreSearchBar {...props} />);
 
-    expect(searchBar).toHaveClass('-translate-y-full', 'pointer-events-none');
+    expect(searchBar).toHaveClass(
+      '-translate-y-full',
+      'pointer-events-none',
+      'transition-none',
+    );
+    expect(searchBar).not.toHaveClass('duration-150');
   });
 
   it('chip 모드에서는 기존 검색어 추가 동작을 유지한다', () => {
