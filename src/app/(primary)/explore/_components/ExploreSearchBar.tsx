@@ -25,7 +25,6 @@ interface RealtimeSearchProps extends BaseProps {
   mode: 'realtime';
   initialValue: string;
   onValueChange: (value: string) => void;
-  isSearching?: boolean;
 }
 
 type Props = ChipSearchProps | RealtimeSearchProps;
@@ -61,9 +60,6 @@ export const ExploreSearchBar = (props: Props) => {
     clearCategory();
     clearRegionIds();
   };
-
-  const helperText =
-    isRealtime && props.isSearching ? '검색 중...' : description;
 
   return (
     <section className="pt-[5px]">
@@ -102,11 +98,8 @@ export const ExploreSearchBar = (props: Props) => {
 
         <div className="flex items-start gap-[2px] py-[10px]">
           <Image src={HelpIcon} alt="help" className="pt-[1px]" />
-          <p
-            className="text-12 text-mainGray whitespace-pre-line"
-            aria-live="polite"
-          >
-            {helperText}
+          <p className="text-12 text-mainGray whitespace-pre-line">
+            {description}
           </p>
         </div>
       </article>

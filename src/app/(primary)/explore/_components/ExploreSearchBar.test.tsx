@@ -40,7 +40,6 @@ describe('ExploreSearchBar', () => {
         initialValue="mac"
         onValueChange={onValueChange}
         description="이름이나 플레이버 태그를 입력해 검색해보세요."
-        isSearching
         isFilter
       />,
     );
@@ -48,7 +47,10 @@ describe('ExploreSearchBar', () => {
     const input = screen.getByRole('textbox');
     expect(input).toHaveValue('mac');
     expect(screen.queryByText('+ 검색어 추가')).not.toBeInTheDocument();
-    expect(screen.getByText('검색 중...')).toBeInTheDocument();
+    expect(
+      screen.getByText('이름이나 플레이버 태그를 입력해 검색해보세요.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('검색 중...')).not.toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: '필터메뉴' }),
     ).toBeInTheDocument();
