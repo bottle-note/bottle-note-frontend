@@ -10,30 +10,29 @@ import HelpIcon from 'public/icon/help-filled-subcoral.svg';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
 
-interface Props {
-  handleSearch: () => void;
-  handleAddKeyword: (keyword: SearchKeyword) => void;
+interface BaseProps {
   description: string;
   isFilter?: boolean;
 }
 
-export const ExploreSearchBar = ({
-  handleSearch,
-  handleAddKeyword,
-  description,
-  isFilter = false,
-}: Props) => {
-  const onAddKeyword = (rawValue: string) => {
-    const trimmedValue = rawValue.trim();
-    if (!trimmedValue) return;
+interface ChipSearchProps extends BaseProps {
+  mode?: 'chip';
+  handleSearch: () => void;
+  handleAddKeyword: (keyword: SearchKeyword) => void;
+}
 
-    handleAddKeyword({
-      label: trimmedValue,
-      value: trimmedValue,
-    });
-    handleSearch();
-  };
+interface RealtimeSearchProps extends BaseProps {
+  mode: 'realtime';
+  initialValue: string;
+  onValueChange: (value: string) => void;
+  isSearching?: boolean;
+}
 
+type Props = ChipSearchProps | RealtimeSearchProps;
+
+export const ExploreSearchBar = (props: Props) => {
+  const { description, isFilter = false } = props;
+  const isRealtime = props.mode === 'realtime';
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const { regions } = useRegionsQuery();
   const {
@@ -45,38 +44,69 @@ export const ExploreSearchBar = ({
     clearCategory,
   } = useExploreFilters();
 
+  const onAddKeyword = (rawValue: string) => {
+    if (isRealtime) return;
+
+    const trimmedValue = rawValue.trim();
+    if (!trimmedValue) return;
+
+    props.handleAddKeyword({
+      label: trimmedValue,
+      value: trimmedValue,
+    });
+    props.handleSearch();
+  };
+
   const clearFilterSelections = () => {
     clearCategory();
     clearRegionIds();
   };
 
+  const helperText =
+    isRealtime && props.isSearching ? '검색 중...' : description;
+
   return (
     <section className="pt-[5px]">
       <article className="relative w-full">
         <UnderlineSearchBar
-          onSearch={onAddKeyword}
-          renderActions={({ submit }) => (
-            <>
-              <button
-                type="button"
-                className="label-selected text-13 text-nowrap flex items-center gap-[2px]"
-                onClick={submit}
-              >
-                <span>+ 검색어 추가</span>
-              </button>
-              {isFilter && (
-                <button type="button" onClick={() => setIsOpenSideFilter(true)}>
-                  <Image src={FilterIcon} alt="필터메뉴" />
-                </button>
-              )}
-            </>
-          )}
+          onSearch={isRealtime ? undefined : onAddKeyword}
+          onValueChange={isRealtime ? props.onValueChange : undefined}
+          initialValue={isRealtime ? props.initialValue : undefined}
+          renderActions={
+            !isRealtime || isFilter
+              ? ({ submit }) => (
+                  <>
+                    {!isRealtime && (
+                      <button
+                        type="button"
+                        className="label-selected text-13 text-nowrap flex items-center gap-[2px]"
+                        onClick={submit}
+                      >
+                        <span>+ 검색어 추가</span>
+                      </button>
+                    )}
+                    {isFilter && (
+                      <button
+                        type="button"
+                        aria-label="필터메뉴"
+                        onClick={() => setIsOpenSideFilter(true)}
+                      >
+                        <Image src={FilterIcon} alt="" />
+                      </button>
+                    )}
+                  </>
+                )
+              : undefined
+          }
         />
 
         <div className="flex items-start gap-[2px] py-[10px]">
           <Image src={HelpIcon} alt="help" className="pt-[1px]" />
-          <p className="text-12 text-mainGray whitespace-pre-line">
-            {description}
+          <p
+            className="text-12 text-mainGray whitespace-pre-line"
+            aria-live="polite"
+          >
+            {helperText}
           </p>
         </div>
       </article>

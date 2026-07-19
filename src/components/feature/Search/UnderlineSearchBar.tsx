@@ -11,6 +11,8 @@ interface UnderlineSearchBarActions {
 
 interface Props {
   onSearch?: (value: string) => void;
+  onValueChange?: (value: string) => void;
+  initialValue?: string;
   placeholder?: string;
   className?: string;
   inputClassName?: string;
@@ -20,6 +22,8 @@ interface Props {
 
 export default function UnderlineSearchBar({
   onSearch,
+  onValueChange,
+  initialValue = '',
   placeholder = '입력...',
   className = '',
   inputClassName = '',
@@ -29,6 +33,7 @@ export default function UnderlineSearchBar({
   const { searchText, inputRef, handleChange, handleSubmit, handleKeyDown } =
     useSearchInput({
       onSearch,
+      initialValue,
     });
 
   return (
@@ -42,7 +47,11 @@ export default function UnderlineSearchBar({
           inputClassName,
         )}
         value={searchText}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={(event) => {
+          const value = event.target.value;
+          handleChange(value);
+          onValueChange?.(value);
+        }}
         onKeyDown={handleKeyDown}
       />
 

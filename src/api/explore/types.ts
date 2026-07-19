@@ -22,6 +22,7 @@ export type ExploreListParams = CursorPaginationParams & {
   sortType?: ExploreSortType;
   sortOrder?: ExploreSortOrder;
   seed?: number;
+  signal?: AbortSignal;
 };
 
 // --------------- Response Types ---------------

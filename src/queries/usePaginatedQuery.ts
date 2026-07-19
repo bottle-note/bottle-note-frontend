@@ -1,4 +1,7 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import {
+  keepPreviousData as preservePreviousData,
+  useInfiniteQuery,
+} from '@tanstack/react-query';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { ApiResponse } from '@/api/_shared/types';
 
@@ -17,6 +20,7 @@ interface Props<T> {
   gcTime?: number;
   intersectionOptions?: IntersectionObserverInit;
   intersectionThrottleMs?: number;
+  keepPreviousData?: boolean;
 }
 
 export const getNextPageParam = <T>(lastPage: ApiResponse<T>) => {
@@ -36,6 +40,7 @@ export const usePaginatedQuery = <T>({
   gcTime = 1000 * 60 * 10,
   intersectionOptions = DEFAULT_INTERSECTION_OPTIONS,
   intersectionThrottleMs,
+  keepPreviousData = false,
 }: Props<T>) => {
   const {
     data,
@@ -45,6 +50,7 @@ export const usePaginatedQuery = <T>({
     hasNextPage,
     isFetching,
     isFetchingNextPage,
+    isPlaceholderData,
     refetch,
   } = useInfiniteQuery({
     queryKey,
@@ -57,11 +63,12 @@ export const usePaginatedQuery = <T>({
     staleTime,
     enabled,
     retry: false,
+    placeholderData: keepPreviousData ? preservePreviousData : undefined,
   });
 
   const { targetRef } = useInfiniteScroll({
     fetchNextPage: () => {
-      if (!isFetchingNextPage && hasNextPage) {
+      if (!isFetching && !isPlaceholderData && hasNextPage) {
         fetchNextPage();
       }
     },
@@ -75,6 +82,7 @@ export const usePaginatedQuery = <T>({
     isLoading,
     isFetching,
     isFetchingNextPage,
+    isPlaceholderData,
     fetchNextPage,
     hasNextPage,
     targetRef,
