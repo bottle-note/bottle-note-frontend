@@ -102,7 +102,10 @@ describe('ExploreSearchBar', () => {
     expect(searchBar).toHaveClass(
       '-translate-y-full',
       'pointer-events-none',
-      'transition-none',
+      'transition-transform',
+      '[transition-duration:120ms]',
+      'ease-in',
+      'motion-reduce:transition-none',
     );
     expect(searchBar).not.toHaveClass('duration-150');
   });

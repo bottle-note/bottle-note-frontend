@@ -71,7 +71,7 @@ export const ExploreSearchBar = (props: Props) => {
         'sticky z-[9] -mx-4 bg-white px-4 pt-[5px]',
         isVisible
           ? 'translate-y-0 transition-transform duration-150 ease-out motion-reduce:transition-none'
-          : 'pointer-events-none -translate-y-full transition-none',
+          : 'pointer-events-none -translate-y-full transition-transform [transition-duration:120ms] ease-in motion-reduce:transition-none',
       )}
       style={{
         top: 'var(--explore-fixed-header-height)',
