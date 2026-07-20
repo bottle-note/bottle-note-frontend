@@ -1,8 +1,10 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import Image from 'next/image';
 import { useSearchInput } from '@/hooks/useSearchInput';
 import { cn } from '@/lib/utils';
+import DeleteIcon from 'public/icon/reset-mainGray.svg';
 
 interface UnderlineSearchBarActions {
   searchText: string;
@@ -11,25 +13,43 @@ interface UnderlineSearchBarActions {
 
 interface Props {
   onSearch?: (value: string) => void;
+  onValueChange?: (value: string) => void;
+  initialValue?: string;
   placeholder?: string;
   className?: string;
   inputClassName?: string;
   actionsClassName?: string;
+  clearable?: boolean;
   renderActions?: (actions: UnderlineSearchBarActions) => ReactNode;
 }
 
 export default function UnderlineSearchBar({
   onSearch,
+  onValueChange,
+  initialValue = '',
   placeholder = '입력...',
   className = '',
   inputClassName = '',
   actionsClassName = '',
+  clearable = false,
   renderActions,
 }: Props) {
-  const { searchText, inputRef, handleChange, handleSubmit, handleKeyDown } =
-    useSearchInput({
-      onSearch,
-    });
+  const {
+    searchText,
+    inputRef,
+    handleChange,
+    handleSubmit,
+    handleClear,
+    handleKeyDown,
+  } = useSearchInput({
+    onSearch,
+    initialValue,
+  });
+
+  const clearSearchText = () => {
+    handleClear();
+    onValueChange?.('');
+  };
 
   return (
     <div className={cn('relative w-full', className)}>
@@ -42,20 +62,34 @@ export default function UnderlineSearchBar({
           inputClassName,
         )}
         value={searchText}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={(event) => {
+          const value = event.target.value;
+          handleChange(value);
+          onValueChange?.(value);
+        }}
         onKeyDown={handleKeyDown}
       />
 
-      {renderActions && (
+      {(clearable && searchText.length > 0) || renderActions ? (
         <div
           className={cn(
             'absolute right-0 top-2.5 flex justify-end gap-[7px]',
             actionsClassName,
           )}
         >
-          {renderActions({ searchText, submit: handleSubmit })}
+          {clearable && searchText.length > 0 && (
+            <button
+              type="button"
+              onClick={clearSearchText}
+              className="flex h-6 w-6 items-center justify-center"
+              aria-label="검색어 지우기"
+            >
+              <Image src={DeleteIcon} alt="" width={14} height={14} />
+            </button>
+          )}
+          {renderActions?.({ searchText, submit: handleSubmit })}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

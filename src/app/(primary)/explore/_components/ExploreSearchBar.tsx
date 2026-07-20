@@ -4,36 +4,37 @@ import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
 import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
 import UnderlineSearchBar from '@/components/feature/Search/UnderlineSearchBar';
 import { CATEGORY_MENUS_LIST } from '@/constants/common';
+import { useScrollState } from '@/hooks/useScrollState';
+import { cn } from '@/lib/utils';
 import { useRegionsQuery } from '@/queries/useRegionsQuery';
 import type { SearchKeyword } from './types';
 import HelpIcon from 'public/icon/help-filled-subcoral.svg';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
 
-interface Props {
-  handleSearch: () => void;
-  handleAddKeyword: (keyword: SearchKeyword) => void;
+interface BaseProps {
   description: string;
   isFilter?: boolean;
 }
 
-export const ExploreSearchBar = ({
-  handleSearch,
-  handleAddKeyword,
-  description,
-  isFilter = false,
-}: Props) => {
-  const onAddKeyword = (rawValue: string) => {
-    const trimmedValue = rawValue.trim();
-    if (!trimmedValue) return;
+interface ChipSearchProps extends BaseProps {
+  mode?: 'chip';
+  handleSearch: () => void;
+  handleAddKeyword: (keyword: SearchKeyword) => void;
+}
 
-    handleAddKeyword({
-      label: trimmedValue,
-      value: trimmedValue,
-    });
-    handleSearch();
-  };
+interface RealtimeSearchProps extends BaseProps {
+  mode: 'realtime';
+  initialValue: string;
+  onValueChange: (value: string) => void;
+}
 
+type Props = ChipSearchProps | RealtimeSearchProps;
+
+export const ExploreSearchBar = (props: Props) => {
+  const { description, isFilter = false } = props;
+  const isRealtime = props.mode === 'realtime';
+  const { isVisible } = useScrollState(100);
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const { regions } = useRegionsQuery();
   const {
@@ -45,32 +46,70 @@ export const ExploreSearchBar = ({
     clearCategory,
   } = useExploreFilters();
 
+  const onAddKeyword = (rawValue: string) => {
+    if (isRealtime) return;
+
+    const trimmedValue = rawValue.trim();
+    if (!trimmedValue) return;
+
+    props.handleAddKeyword({
+      label: trimmedValue,
+      value: trimmedValue,
+    });
+    props.handleSearch();
+  };
+
   const clearFilterSelections = () => {
     clearCategory();
     clearRegionIds();
   };
 
   return (
-    <section className="pt-[5px]">
+    <section
+      data-testid="explore-search-bar"
+      className={cn(
+        'sticky z-[9] -mx-4 bg-white px-4 pt-[5px]',
+        isVisible
+          ? 'translate-y-0 transition-transform duration-150 ease-out motion-reduce:transition-none'
+          : 'pointer-events-none -translate-y-full transition-transform [transition-duration:120ms] ease-in motion-reduce:transition-none',
+      )}
+      style={{
+        top: 'var(--explore-fixed-header-height)',
+      }}
+    >
       <article className="relative w-full">
         <UnderlineSearchBar
-          onSearch={onAddKeyword}
-          renderActions={({ submit }) => (
-            <>
-              <button
-                type="button"
-                className="label-selected text-13 text-nowrap flex items-center gap-[2px]"
-                onClick={submit}
-              >
-                <span>+ 검색어 추가</span>
-              </button>
-              {isFilter && (
-                <button type="button" onClick={() => setIsOpenSideFilter(true)}>
-                  <Image src={FilterIcon} alt="필터메뉴" />
-                </button>
-              )}
-            </>
-          )}
+          onSearch={isRealtime ? undefined : onAddKeyword}
+          onValueChange={isRealtime ? props.onValueChange : undefined}
+          initialValue={isRealtime ? props.initialValue : undefined}
+          inputClassName={isRealtime ? 'pr-16' : 'pr-[140px]'}
+          clearable
+          renderActions={
+            !isRealtime || isFilter
+              ? ({ submit }) => (
+                  <>
+                    {!isRealtime && (
+                      <button
+                        type="button"
+                        className="label-selected text-13 text-nowrap flex items-center gap-[2px]"
+                        onClick={submit}
+                      >
+                        <span>+ 검색어 추가</span>
+                      </button>
+                    )}
+                    {isFilter && (
+                      <button
+                        type="button"
+                        aria-label="필터메뉴"
+                        onClick={() => setIsOpenSideFilter(true)}
+                      >
+                        <Image src={FilterIcon} alt="" />
+                      </button>
+                    )}
+                  </>
+                )
+              : undefined
+          }
         />
 
         <div className="flex items-start gap-[2px] py-[10px]">

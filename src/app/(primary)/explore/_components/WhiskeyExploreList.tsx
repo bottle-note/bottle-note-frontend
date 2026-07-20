@@ -1,27 +1,25 @@
 import { ExploreApi } from '@/api/explore/explore.api';
-import { ExploreAlcohol } from '@/api/explore/types';
+import type { ExploreAlcohol } from '@/api/explore/types';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import List from '@/components/feature/List/List';
 import WhiskeyListItem from './WhiskeyListItem';
 import { ExploreSearchBar } from './ExploreSearchBar';
-import { ExploreKeywordChip } from './ExploreKeywordChip';
-import { useExploreKeywords } from '../_hooks/useExploreKeywords';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
-
-const WHISKEY_TAB_ID = 'EXPLORER_WHISKEY';
+import { useWhiskeyExploreSearch } from '../_hooks/useWhiskeyExploreSearch';
 
 export const WhiskeyExplorerList = () => {
-  const { keywords, keywordValues, handleAddKeyword, handleRemoveKeyword } =
-    useExploreKeywords({ tabId: WHISKEY_TAB_ID });
+  const { inputKeyword, debouncedKeyword, isTyping, setInputKeyword } =
+    useWhiskeyExploreSearch();
   const { regionIds, category } = useExploreFilters();
 
   const {
     data: alcoholList,
     isLoading: isFirstLoading,
     isFetching,
+    isFetchingNextPage,
+    isPlaceholderData,
     targetRef,
     error,
-    refetch,
   } = usePaginatedQuery<{
     items: ExploreAlcohol[];
   }>({
@@ -29,54 +27,53 @@ export const WhiskeyExplorerList = () => {
       'explore.alcohols',
       category || 'all',
       regionIds.join(',') || 'all',
-      ...keywordValues,
+      debouncedKeyword,
     ],
-    queryFn: ({ pageParam }) => {
+    queryFn: ({ pageParam, signal }) => {
       return ExploreApi.getAlcohols({
-        keywords: keywordValues,
+        keywords: debouncedKeyword ? [debouncedKeyword] : [],
         regionIds: regionIds.length > 0 ? regionIds : undefined,
         category: category || undefined,
         sortType: 'POPULAR',
         sortOrder: 'DESC',
         cursor: pageParam,
         pageSize: 10,
+        signal,
       });
     },
     staleTime: 1000 * 60 * 5,
+    keepPreviousData: true,
   });
+
+  const isSearching = isFetching && !isFetchingNextPage;
+  const isEmpty =
+    !isTyping &&
+    !isSearching &&
+    !isPlaceholderData &&
+    (!alcoholList || alcoholList[0]?.data.items.length === 0);
 
   return (
     <section>
       <ExploreSearchBar
-        handleSearch={refetch}
-        handleAddKeyword={handleAddKeyword}
-        description={`이름이나 플레이버 태그를 추가하여 검색해보세요.`}
+        mode="realtime"
+        initialValue={inputKeyword}
+        onValueChange={setInputKeyword}
+        description="이름이나 플레이버 태그를 입력해 검색해보세요."
         isFilter
       />
-      <article className="flex gap-x-1 gap-y-1.5 flex-wrap border-b border-borderGray pb-6">
-        {keywords.map((keyword) => (
-          <div key={keyword.value} className="overflow-hidden flex-shrink-0">
-            <ExploreKeywordChip
-              keyword={keyword}
-              onRemove={handleRemoveKeyword}
-            />
-          </div>
-        ))}
-      </article>
+      <div className="border-b border-borderGray" />
 
       <List
+        emptyViewText="조건에 맞는 위스키가 없어요."
         isListFirstLoading={isFirstLoading}
         isError={!!error}
-        isScrollLoading={isFetching}
-        isEmpty={
-          !isFirstLoading &&
-          (!alcoholList || alcoholList[0]?.data.items.length === 0)
-        }
+        isScrollLoading={isFetchingNextPage}
+        isEmpty={isEmpty}
       >
         <List.Section className="divide-y-[1px]">
           {alcoholList &&
-            [...alcoholList].map((listdata, pageIndex) =>
-              listdata.data.items
+            [...alcoholList].map((listData, pageIndex) =>
+              listData.data.items
                 .flat()
                 .map((data, itemIndex) => (
                   <WhiskeyListItem

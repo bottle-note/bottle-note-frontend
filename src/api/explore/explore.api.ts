@@ -54,6 +54,7 @@ export const ExploreApi = {
       seed,
       cursor,
       pageSize,
+      signal,
     } = params;
 
     const queryString = buildQueryParams({
@@ -69,7 +70,7 @@ export const ExploreApi = {
 
     const response = await apiClient.get<ApiResponse<ExploreAlcoholsResponse>>(
       `/alcohols/explore/standard?${queryString}`,
-      { authRequired: false },
+      { authRequired: false, signal },
     );
 
     if (response.errors.length !== 0) {

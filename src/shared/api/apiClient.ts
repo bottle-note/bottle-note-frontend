@@ -12,6 +12,12 @@ async function getAuthApi() {
   return AuthApi;
 }
 
+const isAbortError = (error: unknown) =>
+  typeof error === 'object' &&
+  error !== null &&
+  'name' in error &&
+  error.name === 'AbortError';
+
 interface ApiClientOptions extends RequestInit {
   authRequired?: boolean; // 인증 토큰 사용 여부 (기본: true)
   baseUrl?: 'bottle-api' | 'api' | 'bottle-api/v2'; // API 기본 경로 (기본: 'bottle-api')
@@ -118,6 +124,10 @@ class ApiClient {
 
       return result;
     } catch (error) {
+      if (isAbortError(error)) {
+        throw error;
+      }
+
       if (error instanceof ApiError) {
         throw error;
       }
