@@ -74,7 +74,7 @@ export const ExploreSearchBar = (props: Props) => {
           : 'pointer-events-none -translate-y-full transition-none',
       )}
       style={{
-        top: 'calc(var(--header-height-with-safe) + var(--tab-height))',
+        top: 'var(--explore-fixed-header-height)',
       }}
     >
       <article className="relative w-full">

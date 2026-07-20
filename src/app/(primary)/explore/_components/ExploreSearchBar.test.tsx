@@ -93,7 +93,7 @@ describe('ExploreSearchBar', () => {
       'motion-reduce:transition-none',
     );
     expect(searchBar).toHaveStyle({
-      top: 'calc(var(--header-height-with-safe) + var(--tab-height))',
+      top: 'var(--explore-fixed-header-height)',
     });
 
     mockUseScrollState.mockReturnValue({ isVisible: false, isAtTop: false });

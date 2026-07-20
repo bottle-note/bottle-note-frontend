@@ -70,7 +70,10 @@ export default function ExplorePage() {
 
   return (
     <Suspense>
-      <div className="fixed-content top-0 bg-white z-10 justify-center items-center">
+      <div
+        className="fixed-content top-0 bg-white z-10 justify-center items-center"
+        style={{ minHeight: 'var(--explore-fixed-header-height)' }}
+      >
         <SubHeader>
           <SubHeader.Left>
             <SubHeader.Logo />
@@ -91,7 +94,7 @@ export default function ExplorePage() {
       <section
         className="w-full h-full px-4 pb-4 pt-0"
         style={{
-          marginTop: 'calc(var(--header-height-with-safe) + var(--tab-height))',
+          marginTop: 'var(--explore-fixed-header-height)',
         }}
       >
         {currentTab.id === 'EXPLORER_WHISKEY' && <WhiskeyExplorerList />}

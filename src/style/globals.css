@@ -199,6 +199,7 @@
     --search-bar-height: 56px;
     --search-fixed-area-height: 70px;
     --tab-height: 81px;
+    --explore-fixed-header-height: calc(100px + var(--safe-area-top));
 
     /* Navbar (px 단위 통일) */
     --navbar-height: 70px;
