@@ -17,7 +17,12 @@ export interface NavItem {
   requiresAuth?: boolean;
 }
 
-function Navbar({ maxWidth }: { maxWidth?: string }) {
+interface NavbarProps {
+  maxWidth?: string;
+  isSuppressed?: boolean;
+}
+
+function Navbar({ maxWidth, isSuppressed = false }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user: userData, isLoggedIn } = useAuth();
@@ -25,6 +30,7 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
   const [isMounted, setIsMounted] = useState(false);
   const [lastTapTime, setLastTapTime] = useState<{ [key: string]: number }>({});
   const { isVisible } = useScrollState(100);
+  const shouldShowNavbar = isVisible && !isSuppressed;
 
   useEffect(() => {
     setIsMounted(true);
@@ -112,9 +118,12 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
 
   return (
     <nav
+      aria-hidden={!shouldShowNavbar}
       className={cn(
         `fixed left-0 right-0 mx-auto w-full px-4 z-10 transition-transform duration-300 ease-in-out`,
-        isVisible ? 'translate-y-0' : 'translate-y-[calc(100%+24px)]',
+        shouldShowNavbar
+          ? 'translate-y-0'
+          : 'pointer-events-none translate-y-[calc(100%+var(--navbar-margin-bottom))]',
         maxWidth ? `max-w-[${maxWidth}]` : 'max-w-content',
       )}
       style={{ bottom: 'var(--navbar-margin-bottom)' }}
@@ -124,6 +133,7 @@ function Navbar({ maxWidth }: { maxWidth?: string }) {
           <React.Fragment key={menu.link}>
             <button
               className={`flex flex-col items-center space-y-1 ${isMounted && !isActive(menu.link) ? 'opacity-40' : ''}`}
+              tabIndex={shouldShowNavbar ? undefined : -1}
               onClick={() => handleNavigation(menu)}
               onTouchEnd={() =>
                 handleWebViewMessage('triggerHaptic', { type: 'light' })

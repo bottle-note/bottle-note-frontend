@@ -27,6 +27,8 @@ interface RealtimeSearchProps extends BaseProps {
   mode: 'realtime';
   initialValue: string;
   onValueChange: (value: string) => void;
+  isSearchActive: boolean;
+  onSearchActiveChange: (active: boolean) => void;
 }
 
 type Props = ChipSearchProps | RealtimeSearchProps;
@@ -35,6 +37,8 @@ export const ExploreSearchBar = (props: Props) => {
   const { description, isFilter = false } = props;
   const isRealtime = props.mode === 'realtime';
   const { isVisible } = useScrollState(100);
+  const isSearchActive = isRealtime && props.isSearchActive;
+  const shouldShowSearchBar = isSearchActive || isVisible;
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const { regions } = useRegionsQuery();
   const {
@@ -69,19 +73,21 @@ export const ExploreSearchBar = (props: Props) => {
       data-testid="explore-search-bar"
       className={cn(
         'sticky z-[9] -mx-4 bg-white px-4 pt-[5px]',
-        isVisible
-          ? 'translate-y-0 transition-transform duration-150 ease-out motion-reduce:transition-none'
-          : 'pointer-events-none -translate-y-full transition-transform [transition-duration:120ms] ease-in motion-reduce:transition-none',
+        shouldShowSearchBar
+          ? 'pointer-events-auto translate-y-0 transition-[top,transform] duration-150 ease-out motion-reduce:transition-none'
+          : 'pointer-events-none -translate-y-full transition-[top,transform] [transition-duration:120ms] ease-in motion-reduce:transition-none',
       )}
       style={{
-        top: 'var(--explore-fixed-header-height)',
+        top: 'var(--explore-current-header-height)',
       }}
     >
       <article className="relative w-full">
         <UnderlineSearchBar
           onSearch={isRealtime ? undefined : onAddKeyword}
           onValueChange={isRealtime ? props.onValueChange : undefined}
+          onFocusChange={isRealtime ? props.onSearchActiveChange : undefined}
           initialValue={isRealtime ? props.initialValue : undefined}
+          ariaLabel={isRealtime ? '위스키 검색' : '검색어 입력'}
           inputClassName={isRealtime ? 'pr-16' : 'pr-[140px]'}
           clearable
           renderActions={
