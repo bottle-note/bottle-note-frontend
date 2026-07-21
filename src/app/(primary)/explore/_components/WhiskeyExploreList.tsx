@@ -7,7 +7,15 @@ import { ExploreSearchBar } from './ExploreSearchBar';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
 import { useWhiskeyExploreSearch } from '../_hooks/useWhiskeyExploreSearch';
 
-export const WhiskeyExplorerList = () => {
+interface WhiskeyExplorerListProps {
+  isSearchActive: boolean;
+  onSearchActiveChange: (active: boolean) => void;
+}
+
+export const WhiskeyExplorerList = ({
+  isSearchActive,
+  onSearchActiveChange,
+}: WhiskeyExplorerListProps) => {
   const { inputKeyword, debouncedKeyword, isTyping, setInputKeyword } =
     useWhiskeyExploreSearch();
   const { regionIds, category } = useExploreFilters();
@@ -58,6 +66,8 @@ export const WhiskeyExplorerList = () => {
         mode="realtime"
         initialValue={inputKeyword}
         onValueChange={setInputKeyword}
+        isSearchActive={isSearchActive}
+        onSearchActiveChange={onSearchActiveChange}
         description="이름이나 플레이버 태그를 입력해 검색해보세요."
         isFilter
       />

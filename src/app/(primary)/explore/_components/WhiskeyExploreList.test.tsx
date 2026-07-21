@@ -23,8 +23,19 @@ jest.mock('../_hooks/useWhiskeyExploreSearch', () => ({
 }));
 
 jest.mock('./ExploreSearchBar', () => ({
-  ExploreSearchBar: ({ mode }: { mode: string }) => (
-    <div data-testid="search-mode">{mode}</div>
+  ExploreSearchBar: ({
+    mode,
+    onSearchActiveChange,
+  }: {
+    mode: string;
+    onSearchActiveChange: (active: boolean) => void;
+  }) => (
+    <div>
+      <div data-testid="search-mode">{mode}</div>
+      <button type="button" onClick={() => onSearchActiveChange(true)}>
+        focus search
+      </button>
+    </div>
   ),
 }));
 
@@ -82,7 +93,13 @@ describe('WhiskeyExplorerList realtime search', () => {
   });
 
   it('단일 debounce 검색어와 필터를 query key 및 API 요청에 사용한다', async () => {
-    render(<WhiskeyExplorerList />);
+    const onSearchActiveChange = jest.fn();
+    render(
+      <WhiskeyExplorerList
+        isSearchActive={false}
+        onSearchActiveChange={onSearchActiveChange}
+      />,
+    );
 
     expect(screen.getByTestId('search-mode')).toHaveTextContent('realtime');
     expect(screen.getByTestId('whiskey-list')).toHaveAttribute(
@@ -90,6 +107,9 @@ describe('WhiskeyExplorerList realtime search', () => {
       '조건에 맞는 위스키가 없어요.',
     );
     expect(screen.queryByText('+ 검색어 추가')).not.toBeInTheDocument();
+
+    screen.getByRole('button', { name: 'focus search' }).click();
+    expect(onSearchActiveChange).toHaveBeenCalledWith(true);
 
     const [config] = mockUsePaginatedQuery.mock.calls[0];
     expect(config.queryKey).toEqual([

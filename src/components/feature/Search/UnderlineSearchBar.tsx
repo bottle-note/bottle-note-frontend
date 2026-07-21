@@ -14,8 +14,10 @@ interface UnderlineSearchBarActions {
 interface Props {
   onSearch?: (value: string) => void;
   onValueChange?: (value: string) => void;
+  onFocusChange?: (isFocused: boolean) => void;
   initialValue?: string;
   placeholder?: string;
+  ariaLabel?: string;
   className?: string;
   inputClassName?: string;
   actionsClassName?: string;
@@ -26,8 +28,10 @@ interface Props {
 export default function UnderlineSearchBar({
   onSearch,
   onValueChange,
+  onFocusChange,
   initialValue = '',
   placeholder = '입력...',
+  ariaLabel,
   className = '',
   inputClassName = '',
   actionsClassName = '',
@@ -40,9 +44,11 @@ export default function UnderlineSearchBar({
     handleChange,
     handleSubmit,
     handleClear,
+    handleFocusChange,
     handleKeyDown,
   } = useSearchInput({
     onSearch,
+    onFocusChange,
     initialValue,
   });
 
@@ -56,6 +62,7 @@ export default function UnderlineSearchBar({
       <input
         ref={inputRef}
         type="text"
+        aria-label={ariaLabel ?? placeholder}
         placeholder={placeholder}
         className={cn(
           'w-full appearance-none rounded-none border-b-2 border-gray-200 bg-transparent px-2 py-2.5 text-base outline-none transition-colors placeholder-mainGray placeholder:text-13 focus:border-amber-500',
@@ -68,6 +75,8 @@ export default function UnderlineSearchBar({
           onValueChange?.(value);
         }}
         onKeyDown={handleKeyDown}
+        onFocus={() => handleFocusChange(true)}
+        onBlur={() => handleFocusChange(false)}
       />
 
       {(clearable && searchText.length > 0) || renderActions ? (
@@ -80,6 +89,7 @@ export default function UnderlineSearchBar({
           {clearable && searchText.length > 0 && (
             <button
               type="button"
+              onMouseDown={(event) => event.preventDefault()}
               onClick={clearSearchText}
               className="flex h-6 w-6 items-center justify-center"
               aria-label="검색어 지우기"

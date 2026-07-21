@@ -43,18 +43,21 @@ describe('ExploreSearchBar', () => {
 
   it('realtime 모드에서는 검색어 추가 버튼 없이 입력 변경을 전달한다', () => {
     const onValueChange = jest.fn();
+    const onSearchActiveChange = jest.fn();
 
     render(
       <ExploreSearchBar
         mode="realtime"
         initialValue="mac"
         onValueChange={onValueChange}
+        isSearchActive={false}
+        onSearchActiveChange={onSearchActiveChange}
         description="이름이나 플레이버 태그를 입력해 검색해보세요."
         isFilter
       />,
     );
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByRole('textbox', { name: '위스키 검색' });
     expect(input).toHaveValue('mac');
     expect(screen.queryByText('+ 검색어 추가')).not.toBeInTheDocument();
     expect(
@@ -68,10 +71,17 @@ describe('ExploreSearchBar', () => {
     fireEvent.change(input, { target: { value: 'macallan' } });
     expect(onValueChange).toHaveBeenCalledWith('macallan');
 
+    fireEvent.focus(input);
+    expect(onSearchActiveChange).toHaveBeenLastCalledWith(true);
+
     fireEvent.click(screen.getByRole('button', { name: '검색어 지우기' }));
     expect(input).toHaveValue('');
     expect(input).toHaveFocus();
     expect(onValueChange).toHaveBeenLastCalledWith('');
+    expect(onSearchActiveChange).toHaveBeenLastCalledWith(true);
+
+    fireEvent.blur(input);
+    expect(onSearchActiveChange).toHaveBeenLastCalledWith(false);
   });
 
   it('스크롤 방향 상태에 따라 sticky 검색바를 숨기고 다시 노출한다', () => {
@@ -79,6 +89,8 @@ describe('ExploreSearchBar', () => {
       mode: 'realtime' as const,
       initialValue: '',
       onValueChange: jest.fn(),
+      isSearchActive: false,
+      onSearchActiveChange: jest.fn(),
       description: '검색어를 입력해보세요.',
     };
     const { rerender } = render(<ExploreSearchBar {...props} />);
@@ -87,13 +99,13 @@ describe('ExploreSearchBar', () => {
     expect(searchBar).toHaveClass(
       'sticky',
       'translate-y-0',
-      'transition-transform',
+      'transition-[top,transform]',
       'duration-150',
       'ease-out',
       'motion-reduce:transition-none',
     );
     expect(searchBar).toHaveStyle({
-      top: 'var(--explore-fixed-header-height)',
+      top: 'var(--explore-current-header-height)',
     });
 
     mockUseScrollState.mockReturnValue({ isVisible: false, isAtTop: false });
@@ -102,12 +114,17 @@ describe('ExploreSearchBar', () => {
     expect(searchBar).toHaveClass(
       '-translate-y-full',
       'pointer-events-none',
-      'transition-transform',
+      'transition-[top,transform]',
       '[transition-duration:120ms]',
       'ease-in',
       'motion-reduce:transition-none',
     );
     expect(searchBar).not.toHaveClass('duration-150');
+
+    rerender(<ExploreSearchBar {...props} isSearchActive />);
+
+    expect(searchBar).toHaveClass('translate-y-0', 'pointer-events-auto');
+    expect(searchBar).not.toHaveClass('-translate-y-full');
   });
 
   it('chip 모드에서는 기존 검색어 추가 동작을 유지한다', () => {

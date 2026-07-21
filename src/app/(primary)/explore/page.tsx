@@ -1,11 +1,14 @@
 'use client';
 
-import { Suspense, useEffect, useRef } from 'react';
+import type { CSSProperties } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/ui/Navigation/Tab';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
+import { cn } from '@/lib/utils';
 import { ReviewExplorerList } from './_components/ReviewExploreList';
 import { WhiskeyExplorerList } from './_components/WhiskeyExploreList';
 
@@ -14,6 +17,8 @@ type TabId = 'REVIEW_WHISKEY' | 'EXPLORER_WHISKEY';
 export default function ExplorePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { setNavbarSuppressed } = useNavLayout();
+  const [isSearchActive, setIsSearchActive] = useState(false);
   const [tabParam, setTabParam] = useStatefulSearchParams<TabId>('tab');
   const tabFromUrl = (tabParam as TabId | null) || 'REVIEW_WHISKEY';
 
@@ -32,6 +37,14 @@ export default function ExplorePage() {
 
   const hasSyncedInitialTabRef = useRef(false);
   const previousTabIdRef = useRef<TabId>(currentTab.id as TabId);
+
+  const handleSearchActiveChange = useCallback(
+    (active: boolean) => {
+      setIsSearchActive(active);
+      setNavbarSuppressed(active);
+    },
+    [setNavbarSuppressed],
+  );
 
   useEffect(() => {
     const prevTabId = previousTabIdRef.current;
@@ -68,38 +81,83 @@ export default function ExplorePage() {
     });
   }, [currentTab.id]);
 
+  useEffect(() => {
+    if (currentTab.id !== 'EXPLORER_WHISKEY') {
+      handleSearchActiveChange(false);
+    }
+  }, [currentTab.id, handleSearchActiveChange]);
+
+  useEffect(
+    () => () => {
+      setNavbarSuppressed(false);
+    },
+    [setNavbarSuppressed],
+  );
+
   return (
     <Suspense>
       <div
-        className="fixed-content top-0 bg-white z-10 justify-center items-center"
-        style={{ minHeight: 'var(--explore-fixed-header-height)' }}
+        data-testid="explore-page"
+        data-search-active={isSearchActive}
+        style={
+          {
+            '--explore-current-header-height': isSearchActive
+              ? 'var(--explore-search-active-header-height)'
+              : 'var(--explore-fixed-header-height)',
+          } as CSSProperties
+        }
       >
-        <SubHeader>
-          <SubHeader.Left>
-            <SubHeader.Logo />
-          </SubHeader.Left>
-          <SubHeader.Right>
-            <SubHeader.Menu />
-          </SubHeader.Right>
-        </SubHeader>
-        <Tab
-          variant="bookmark"
-          tabList={tabList}
-          handleTab={handleTab}
-          currentTab={currentTab}
-          scrollContainerRef={refs.scrollContainerRef}
-          registerTab={registerTab}
-        />
+        <div
+          data-testid="explore-fixed-header"
+          className="fixed-content top-0 z-10 overflow-hidden bg-white transition-[min-height] duration-150 ease-out motion-reduce:transition-none"
+          style={{ minHeight: 'var(--explore-current-header-height)' }}
+        >
+          <div
+            aria-hidden={isSearchActive}
+            className={cn(
+              'overflow-hidden transition-[height,opacity] duration-150 ease-out motion-reduce:transition-none',
+              isSearchActive ? 'pointer-events-none opacity-0' : 'opacity-100',
+            )}
+            style={{
+              height: 'calc(var(--explore-current-header-height) - 32px)',
+            }}
+          >
+            {!isSearchActive && (
+              <SubHeader>
+                <SubHeader.Left>
+                  <SubHeader.Logo />
+                </SubHeader.Left>
+                <SubHeader.Right>
+                  <SubHeader.Menu />
+                </SubHeader.Right>
+              </SubHeader>
+            )}
+          </div>
+          <Tab
+            variant="bookmark"
+            tabList={tabList}
+            handleTab={handleTab}
+            currentTab={currentTab}
+            scrollContainerRef={refs.scrollContainerRef}
+            registerTab={registerTab}
+          />
+        </div>
+        <section
+          data-testid="explore-content"
+          className="h-full w-full px-4 pb-4 pt-0 transition-[margin-top] duration-150 ease-out motion-reduce:transition-none"
+          style={{
+            marginTop: 'var(--explore-current-header-height)',
+          }}
+        >
+          {currentTab.id === 'EXPLORER_WHISKEY' && (
+            <WhiskeyExplorerList
+              isSearchActive={isSearchActive}
+              onSearchActiveChange={handleSearchActiveChange}
+            />
+          )}
+          {currentTab.id === 'REVIEW_WHISKEY' && <ReviewExplorerList />}
+        </section>
       </div>
-      <section
-        className="w-full h-full px-4 pb-4 pt-0"
-        style={{
-          marginTop: 'var(--explore-fixed-header-height)',
-        }}
-      >
-        {currentTab.id === 'EXPLORER_WHISKEY' && <WhiskeyExplorerList />}
-        {currentTab.id === 'REVIEW_WHISKEY' && <ReviewExplorerList />}
-      </section>
     </Suspense>
   );
 }
