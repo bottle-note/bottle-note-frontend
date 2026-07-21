@@ -2,7 +2,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ExploreSearchBar } from './ExploreSearchBar';
 
-const mockUseScrollState = jest.fn();
+const mockUseNavLayout = jest.fn();
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -21,8 +21,8 @@ jest.mock('@/queries/useRegionsQuery', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useScrollState', () => ({
-  useScrollState: () => mockUseScrollState(),
+jest.mock('@/components/ui/Layout/NavLayout', () => ({
+  useNavLayout: () => mockUseNavLayout(),
 }));
 
 jest.mock('../_hooks/useExploreFilters', () => ({
@@ -38,7 +38,7 @@ jest.mock('../_hooks/useExploreFilters', () => ({
 
 describe('ExploreSearchBar', () => {
   beforeEach(() => {
-    mockUseScrollState.mockReturnValue({ isVisible: true, isAtTop: true });
+    mockUseNavLayout.mockReturnValue({ isScrollVisible: true });
   });
 
   it('realtime 모드에서는 검색어 추가 버튼 없이 입력 변경을 전달한다', () => {
@@ -108,7 +108,7 @@ describe('ExploreSearchBar', () => {
       top: 'var(--explore-current-header-height)',
     });
 
-    mockUseScrollState.mockReturnValue({ isVisible: false, isAtTop: false });
+    mockUseNavLayout.mockReturnValue({ isScrollVisible: false });
     rerender(<ExploreSearchBar {...props} />);
 
     expect(searchBar).toHaveClass(

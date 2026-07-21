@@ -7,7 +7,6 @@ import { useAuth } from '@/hooks/auth/useAuth';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
-import { useScrollState } from '@/hooks/useScrollState';
 import { cn } from '@/lib/utils';
 
 export interface NavItem {
@@ -20,17 +19,21 @@ export interface NavItem {
 interface NavbarProps {
   maxWidth?: string;
   isSuppressed?: boolean;
+  isScrollVisible?: boolean;
 }
 
-function Navbar({ maxWidth, isSuppressed = false }: NavbarProps) {
+function Navbar({
+  maxWidth,
+  isSuppressed = false,
+  isScrollVisible = true,
+}: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { user: userData, isLoggedIn } = useAuth();
   const { handleLoginModal } = useModalStore();
   const [isMounted, setIsMounted] = useState(false);
   const [lastTapTime, setLastTapTime] = useState<{ [key: string]: number }>({});
-  const { isVisible } = useScrollState(100);
-  const shouldShowNavbar = isVisible && !isSuppressed;
+  const shouldShowNavbar = isScrollVisible && !isSuppressed;
 
   useEffect(() => {
     setIsMounted(true);
