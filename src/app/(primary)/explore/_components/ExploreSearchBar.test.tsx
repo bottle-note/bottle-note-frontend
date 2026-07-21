@@ -130,17 +130,25 @@ describe('ExploreSearchBar', () => {
   it('chip 모드에서는 기존 검색어 추가 동작을 유지한다', () => {
     const handleAddKeyword = jest.fn();
     const handleSearch = jest.fn();
+    const onSearchActiveChange = jest.fn();
 
     render(
       <ExploreSearchBar
         mode="chip"
         handleAddKeyword={handleAddKeyword}
         handleSearch={handleSearch}
+        isSearchActive={false}
+        onSearchActiveChange={onSearchActiveChange}
         description="검색어를 추가해보세요."
       />,
     );
 
-    fireEvent.change(screen.getByRole('textbox'), {
+    const input = screen.getByRole('textbox', { name: '검색어 입력' });
+
+    fireEvent.focus(input);
+    expect(onSearchActiveChange).toHaveBeenLastCalledWith(true);
+
+    fireEvent.change(input, {
       target: { value: ' peaty ' },
     });
     fireEvent.click(screen.getByRole('button', { name: '+ 검색어 추가' }));
@@ -150,5 +158,8 @@ describe('ExploreSearchBar', () => {
       value: 'peaty',
     });
     expect(handleSearch).toHaveBeenCalledTimes(1);
+
+    fireEvent.blur(input);
+    expect(onSearchActiveChange).toHaveBeenLastCalledWith(false);
   });
 });

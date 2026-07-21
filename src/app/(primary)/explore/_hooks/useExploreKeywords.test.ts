@@ -2,6 +2,10 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { renderHook, act } from '@testing-library/react';
 import { useExploreKeywords } from './useExploreKeywords';
+import {
+  REVIEW_EXPLORE_TAB_ID,
+  WHISKEY_EXPLORE_TAB_ID,
+} from '../_constants/exploreTabs';
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
@@ -10,7 +14,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 const PATHNAME = '/explore';
-const TAB_ID = 'EXPLORER_WHISKEY';
+const TAB_ID = WHISKEY_EXPLORE_TAB_ID;
 
 const setupSearchParams = (query: string) => {
   (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams(query));
@@ -88,5 +92,43 @@ describe('useExploreKeywords 훅 - 다른 필터 파라미터 보존 (회귀 방
     expect(replaced!.getAll('regionIds')).toEqual(['12']);
     expect(replaced!.get('tab')).toBe('EXPLORER_WHISKEY');
     expect(replaced!.getAll('keywords')).toEqual(['bar']);
+  });
+
+  it('다른 탭에서 넘어온 keywords는 새 탭 검색 상태로 복원하지 않는다', () => {
+    setupSearchParams('tab=EXPLORER_WHISKEY&keywords=stale-whiskey-keyword');
+
+    const { result } = renderHook(() =>
+      useExploreKeywords({ tabId: REVIEW_EXPLORE_TAB_ID }),
+    );
+
+    expect(result.current.keywords).toEqual([]);
+    expect(result.current.keywordValues).toEqual([]);
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
+
+  it('리뷰 탭 direct URL의 keywords는 정상 복원한다', () => {
+    setupSearchParams('tab=REVIEW_WHISKEY&keywords=direct-review-keyword');
+
+    const { result } = renderHook(() =>
+      useExploreKeywords({ tabId: REVIEW_EXPLORE_TAB_ID }),
+    );
+
+    expect(result.current.keywordValues).toEqual(['direct-review-keyword']);
+  });
+
+  it('잘못된 tab 값은 화면과 동일하게 리뷰 탭으로 fallback한다', () => {
+    setupSearchParams('tab=UNKNOWN&keywords=fallback-review-keyword');
+
+    const { result } = renderHook(() =>
+      useExploreKeywords({ tabId: REVIEW_EXPLORE_TAB_ID }),
+    );
+
+    const replaced = findReplaceCallWithKeyword(
+      mockReplace,
+      (params) => params.get('tab') === REVIEW_EXPLORE_TAB_ID,
+    );
+
+    expect(result.current.keywordValues).toEqual(['fallback-review-keyword']);
+    expect(replaced?.getAll('keywords')).toEqual(['fallback-review-keyword']);
   });
 });

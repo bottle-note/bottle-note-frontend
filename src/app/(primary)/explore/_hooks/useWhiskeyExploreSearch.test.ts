@@ -110,4 +110,48 @@ describe('useWhiskeyExploreSearch', () => {
     expect(params.getAll('regionIds')).toEqual(['12']);
     expect(params.get('category')).toBe('SINGLE_MALT');
   });
+
+  it('리뷰 탭에서 넘어온 keywords는 위스키 검색어로 복원하지 않는다', () => {
+    mockUseSearchParams.mockReturnValue(
+      new URLSearchParams(
+        'tab=REVIEW_WHISKEY&keywords=stale-review-keyword&regionIds=12',
+      ),
+    );
+
+    const { result } = renderHook(() => useWhiskeyExploreSearch());
+
+    expect(result.current.inputKeyword).toBe('');
+    expect(result.current.debouncedKeyword).toBe('');
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
+
+  it('위스키 탭 direct URL의 keyword는 정상 복원한다', () => {
+    mockUseSearchParams.mockReturnValue(
+      new URLSearchParams(
+        'tab=EXPLORER_WHISKEY&keywords=direct-whiskey-keyword',
+      ),
+    );
+
+    const { result } = renderHook(() => useWhiskeyExploreSearch());
+
+    expect(result.current.inputKeyword).toBe('direct-whiskey-keyword');
+    expect(result.current.debouncedKeyword).toBe('direct-whiskey-keyword');
+  });
+
+  it('debounce 도중 리뷰 탭으로 이동하면 stale keyword를 URL에 쓰지 않는다', () => {
+    let currentParams = new URLSearchParams('tab=EXPLORER_WHISKEY');
+    mockUseSearchParams.mockImplementation(() => currentParams);
+
+    const { result, rerender } = renderHook(() => useWhiskeyExploreSearch());
+
+    act(() => result.current.setInputKeyword('pending-whiskey-keyword'));
+    act(() => jest.advanceTimersByTime(150));
+
+    currentParams = new URLSearchParams('tab=REVIEW_WHISKEY');
+    rerender();
+    act(() => jest.advanceTimersByTime(150));
+
+    expect(result.current.debouncedKeyword).toBe('pending-whiskey-keyword');
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
 });

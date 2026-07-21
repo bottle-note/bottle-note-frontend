@@ -15,6 +15,8 @@ import { useExploreFilters } from '../_hooks/useExploreFilters';
 interface BaseProps {
   description: string;
   isFilter?: boolean;
+  isSearchActive: boolean;
+  onSearchActiveChange: (active: boolean) => void;
 }
 
 interface ChipSearchProps extends BaseProps {
@@ -27,8 +29,6 @@ interface RealtimeSearchProps extends BaseProps {
   mode: 'realtime';
   initialValue: string;
   onValueChange: (value: string) => void;
-  isSearchActive: boolean;
-  onSearchActiveChange: (active: boolean) => void;
 }
 
 type Props = ChipSearchProps | RealtimeSearchProps;
@@ -37,7 +37,7 @@ export const ExploreSearchBar = (props: Props) => {
   const { description, isFilter = false } = props;
   const isRealtime = props.mode === 'realtime';
   const { isScrollVisible } = useNavLayout();
-  const isSearchActive = isRealtime && props.isSearchActive;
+  const isSearchActive = props.isSearchActive;
   const shouldShowSearchBar = isSearchActive || isScrollVisible;
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const { regions } = useRegionsQuery();
@@ -85,7 +85,7 @@ export const ExploreSearchBar = (props: Props) => {
         <UnderlineSearchBar
           onSearch={isRealtime ? undefined : onAddKeyword}
           onValueChange={isRealtime ? props.onValueChange : undefined}
-          onFocusChange={isRealtime ? props.onSearchActiveChange : undefined}
+          onFocusChange={props.onSearchActiveChange}
           initialValue={isRealtime ? props.initialValue : undefined}
           ariaLabel={isRealtime ? '위스키 검색' : '검색어 입력'}
           inputClassName={isRealtime ? 'pr-16' : 'pr-[140px]'}

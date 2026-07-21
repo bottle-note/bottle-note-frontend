@@ -6,12 +6,19 @@ import ReviewCard from './ReviewListItem';
 import { ExploreSearchBar } from './ExploreSearchBar';
 import { ExploreKeywordChip } from './ExploreKeywordChip';
 import { useExploreKeywords } from '../_hooks/useExploreKeywords';
+import { REVIEW_EXPLORE_TAB_ID } from '../_constants/exploreTabs';
 
-const REVIEW_TAB_ID = 'REVIEW_WHISKEY';
+interface ReviewExplorerListProps {
+  isSearchActive: boolean;
+  onSearchActiveChange: (active: boolean) => void;
+}
 
-export const ReviewExplorerList = () => {
+export const ReviewExplorerList = ({
+  isSearchActive,
+  onSearchActiveChange,
+}: ReviewExplorerListProps) => {
   const { keywords, keywordValues, handleAddKeyword, handleRemoveKeyword } =
-    useExploreKeywords({ tabId: REVIEW_TAB_ID });
+    useExploreKeywords({ tabId: REVIEW_EXPLORE_TAB_ID });
 
   const {
     data: reviewList,
@@ -40,6 +47,8 @@ export const ReviewExplorerList = () => {
       <ExploreSearchBar
         handleSearch={refetch}
         handleAddKeyword={handleAddKeyword}
+        isSearchActive={isSearchActive}
+        onSearchActiveChange={onSearchActiveChange}
         description={`보고싶은 리뷰의 내용, 플레이버태그, 작성자, 위스키이름을\n 추가하여 검색해보세요.`}
       />
       <article className="flex gap-x-1 gap-y-1.5 flex-wrap">
