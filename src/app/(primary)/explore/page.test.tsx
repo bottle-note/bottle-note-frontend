@@ -1,0 +1,96 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
+import ExplorePage from './page';
+
+const mockUseScrollState = jest.fn();
+const mockSetNavbarSuppressed = jest.fn();
+const mockSetTabParam = jest.fn();
+const mockRouterReplace = jest.fn();
+
+jest.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams('tab=REVIEW_WHISKEY'),
+  useRouter: () => ({ replace: mockRouterReplace }),
+}));
+
+jest.mock('@/hooks/useScrollState', () => ({
+  useScrollState: () => mockUseScrollState(),
+}));
+
+jest.mock('@/hooks/useStatefulSearchParams', () => ({
+  __esModule: true,
+  default: () => [null, mockSetTabParam],
+}));
+
+jest.mock('@/hooks/useTab', () => ({
+  useTab: () => ({
+    currentTab: { name: '리뷰 둘러보기', id: 'REVIEW_WHISKEY' },
+    handleTab: jest.fn(),
+    refs: { scrollContainerRef: { current: null } },
+    registerTab: jest.fn(),
+  }),
+}));
+
+jest.mock('@/components/ui/Layout/NavLayout', () => ({
+  useNavLayout: () => ({ setNavbarSuppressed: mockSetNavbarSuppressed }),
+}));
+
+jest.mock('@/components/ui/Navigation/Tab', () => ({
+  __esModule: true,
+  default: () => <div data-testid="explore-tabs">tabs</div>,
+}));
+
+jest.mock('@/components/ui/Navigation/SubHeader', () => {
+  const SubHeader = Object.assign(
+    ({ children }: { children?: ReactNode }) => (
+      <div data-testid="explore-logo-row">{children}</div>
+    ),
+    {
+      Left: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+      Right: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+      Logo: () => <div>BottleNote Logo</div>,
+      Menu: () => <div>Menu</div>,
+    },
+  );
+
+  return { SubHeader };
+});
+
+jest.mock('./_components/ReviewExploreList', () => ({
+  ReviewExplorerList: () => <div>review list</div>,
+}));
+
+jest.mock('./_components/WhiskeyExploreList', () => ({
+  WhiskeyExplorerList: () => <div>whiskey list</div>,
+}));
+
+describe('ExplorePage scroll header', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    window.scrollTo = jest.fn();
+    mockUseScrollState.mockReturnValue({ isVisible: true, isAtTop: true });
+  });
+
+  it('스크롤 상단에서는 BottleNote 로고 영역을 표시한다', () => {
+    render(<ExplorePage />);
+
+    expect(screen.getByTestId('explore-page')).toHaveAttribute(
+      'data-header-collapsed',
+      'false',
+    );
+    expect(screen.getByTestId('explore-logo-row')).toBeInTheDocument();
+  });
+
+  it('아래로 스크롤하면 BottleNote 로고 영역을 접고 탭만 유지한다', () => {
+    mockUseScrollState.mockReturnValue({ isVisible: false, isAtTop: false });
+
+    render(<ExplorePage />);
+
+    expect(screen.getByTestId('explore-page')).toHaveAttribute(
+      'data-header-collapsed',
+      'true',
+    );
+    expect(screen.queryByTestId('explore-logo-row')).not.toBeInTheDocument();
+    expect(screen.getByTestId('explore-tabs')).toBeInTheDocument();
+  });
+});

@@ -8,6 +8,7 @@ import Tab from '@/components/ui/Navigation/Tab';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
+import { useScrollState } from '@/hooks/useScrollState';
 import { cn } from '@/lib/utils';
 import { ReviewExplorerList } from './_components/ReviewExploreList';
 import { WhiskeyExplorerList } from './_components/WhiskeyExploreList';
@@ -19,8 +20,10 @@ export default function ExplorePage() {
   const router = useRouter();
   const { setNavbarSuppressed } = useNavLayout();
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const { isVisible: isHeaderVisible } = useScrollState(100);
   const [tabParam, setTabParam] = useStatefulSearchParams<TabId>('tab');
   const tabFromUrl = (tabParam as TabId | null) || 'REVIEW_WHISKEY';
+  const isHeaderCollapsed = isSearchActive || !isHeaderVisible;
 
   const tabList = [
     { name: '리뷰 둘러보기', id: 'REVIEW_WHISKEY' },
@@ -99,10 +102,11 @@ export default function ExplorePage() {
       <div
         data-testid="explore-page"
         data-search-active={isSearchActive}
+        data-header-collapsed={isHeaderCollapsed}
         style={
           {
-            '--explore-current-header-height': isSearchActive
-              ? 'var(--explore-search-active-header-height)'
+            '--explore-current-header-height': isHeaderCollapsed
+              ? 'var(--explore-collapsed-header-height)'
               : 'var(--explore-fixed-header-height)',
           } as CSSProperties
         }
@@ -113,16 +117,18 @@ export default function ExplorePage() {
           style={{ minHeight: 'var(--explore-current-header-height)' }}
         >
           <div
-            aria-hidden={isSearchActive}
+            aria-hidden={isHeaderCollapsed}
             className={cn(
               'overflow-hidden transition-[height,opacity] duration-150 ease-out motion-reduce:transition-none',
-              isSearchActive ? 'pointer-events-none opacity-0' : 'opacity-100',
+              isHeaderCollapsed
+                ? 'pointer-events-none opacity-0'
+                : 'opacity-100',
             )}
             style={{
               height: 'calc(var(--explore-current-header-height) - 32px)',
             }}
           >
-            {!isSearchActive && (
+            {!isHeaderCollapsed && (
               <SubHeader>
                 <SubHeader.Left>
                   <SubHeader.Logo />
