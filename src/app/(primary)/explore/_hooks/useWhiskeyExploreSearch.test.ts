@@ -110,4 +110,17 @@ describe('useWhiskeyExploreSearch', () => {
     expect(params.getAll('regionIds')).toEqual(['12']);
     expect(params.get('category')).toBe('SINGLE_MALT');
   });
+
+  it('리뷰 탭에서 넘어온 keywords는 위스키 검색어로 복원하지 않는다', () => {
+    mockUseSearchParams.mockReturnValue(
+      new URLSearchParams(
+        'tab=REVIEW_WHISKEY&keywords=stale-review-keyword&regionIds=12',
+      ),
+    );
+
+    const { result } = renderHook(() => useWhiskeyExploreSearch());
+
+    expect(result.current.inputKeyword).toBe('');
+    expect(result.current.debouncedKeyword).toBe('');
+  });
 });

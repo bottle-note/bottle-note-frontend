@@ -10,7 +10,11 @@ export const useWhiskeyExploreSearch = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const initialKeyword = searchParams.getAll('keywords')[0] ?? '';
+  const sourceTabId = searchParams.get('tab') ?? 'REVIEW_WHISKEY';
+  const initialKeyword =
+    sourceTabId === 'EXPLORER_WHISKEY'
+      ? searchParams.getAll('keywords')[0] ?? ''
+      : '';
 
   const [inputKeyword, setInputKeyword] = useState(initialKeyword);
   const normalizedKeyword = useMemo(

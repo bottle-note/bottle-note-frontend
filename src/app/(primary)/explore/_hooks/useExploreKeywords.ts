@@ -12,8 +12,9 @@ export const useExploreKeywords = ({ tabId }: UseExploreKeywordsOptions) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const sourceTabId = searchParams.get('tab') ?? 'REVIEW_WHISKEY';
   const initialKeywords: SearchKeyword[] =
-    buildKeywordsFromParams(searchParams);
+    sourceTabId === tabId ? buildKeywordsFromParams(searchParams) : [];
   const [keywords, setKeywords] = useState<SearchKeyword[]>(initialKeywords);
   const keywordValues = keywords.map((keyword) => keyword.value);
 

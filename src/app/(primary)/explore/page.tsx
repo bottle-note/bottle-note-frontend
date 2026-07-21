@@ -83,9 +83,7 @@ export default function ExplorePage() {
   }, [currentTab.id]);
 
   useEffect(() => {
-    if (currentTab.id !== 'EXPLORER_WHISKEY') {
-      handleSearchActiveChange(false);
-    }
+    handleSearchActiveChange(false);
   }, [currentTab.id, handleSearchActiveChange]);
 
   useEffect(
@@ -159,7 +157,12 @@ export default function ExplorePage() {
               onSearchActiveChange={handleSearchActiveChange}
             />
           )}
-          {currentTab.id === 'REVIEW_WHISKEY' && <ReviewExplorerList />}
+          {currentTab.id === 'REVIEW_WHISKEY' && (
+            <ReviewExplorerList
+              isSearchActive={isSearchActive}
+              onSearchActiveChange={handleSearchActiveChange}
+            />
+          )}
         </section>
       </div>
     </Suspense>

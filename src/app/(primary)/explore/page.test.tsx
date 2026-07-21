@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ExplorePage from './page';
 
@@ -53,7 +53,18 @@ jest.mock('@/components/ui/Navigation/SubHeader', () => {
 });
 
 jest.mock('./_components/ReviewExploreList', () => ({
-  ReviewExplorerList: () => <div>review list</div>,
+  ReviewExplorerList: ({
+    onSearchActiveChange,
+  }: {
+    onSearchActiveChange: (active: boolean) => void;
+  }) => (
+    <div>
+      review list
+      <button type="button" onClick={() => onSearchActiveChange(true)}>
+        focus review search
+      </button>
+    </div>
+  ),
 }));
 
 jest.mock('./_components/WhiskeyExploreList', () => ({
@@ -94,5 +105,24 @@ describe('ExplorePage scroll header', () => {
     );
     expect(screen.queryByTestId('explore-logo-row')).not.toBeInTheDocument();
     expect(screen.getByTestId('explore-tabs')).toBeInTheDocument();
+  });
+
+  it('리뷰 검색 focus도 헤더를 접고 Navbar를 suppression한다', () => {
+    render(<ExplorePage />);
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'focus review search' }),
+    );
+
+    expect(screen.getByTestId('explore-page')).toHaveAttribute(
+      'data-search-active',
+      'true',
+    );
+    expect(screen.getByTestId('explore-page')).toHaveAttribute(
+      'data-header-collapsed',
+      'true',
+    );
+    expect(screen.queryByTestId('explore-logo-row')).not.toBeInTheDocument();
+    expect(mockSetNavbarSuppressed).toHaveBeenLastCalledWith(true);
   });
 });

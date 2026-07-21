@@ -89,4 +89,21 @@ describe('useExploreKeywords 훅 - 다른 필터 파라미터 보존 (회귀 방
     expect(replaced!.get('tab')).toBe('EXPLORER_WHISKEY');
     expect(replaced!.getAll('keywords')).toEqual(['bar']);
   });
+
+  it('다른 탭에서 넘어온 keywords는 새 탭 검색 상태로 복원하지 않는다', () => {
+    setupSearchParams('tab=REVIEW_WHISKEY&keywords=stale-review-keyword');
+
+    const { result } = renderHook(() =>
+      useExploreKeywords({ tabId: 'EXPLORER_WHISKEY' }),
+    );
+
+    expect(result.current.keywords).toEqual([]);
+    expect(result.current.keywordValues).toEqual([]);
+
+    const replaced = findReplaceCallWithKeyword(
+      mockReplace,
+      (params) => params.get('tab') === 'EXPLORER_WHISKEY',
+    );
+    expect(replaced?.has('keywords')).toBe(false);
+  });
 });
