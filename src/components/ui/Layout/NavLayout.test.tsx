@@ -2,10 +2,25 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import NavLayout, { useNavLayout } from './NavLayout';
 
+jest.mock('@/hooks/useScrollState', () => ({
+  useScrollState: () => ({ isVisible: true, isAtTop: true }),
+}));
+
 jest.mock('@/components/ui/Navigation/Navbar', () => ({
   __esModule: true,
-  default: ({ isSuppressed }: { isSuppressed?: boolean }) => (
-    <nav data-suppressed={String(isSuppressed)}>navbar</nav>
+  default: ({
+    isSuppressed,
+    isScrollVisible,
+  }: {
+    isSuppressed?: boolean;
+    isScrollVisible?: boolean;
+  }) => (
+    <nav
+      data-suppressed={String(isSuppressed)}
+      data-scroll-visible={String(isScrollVisible)}
+    >
+      navbar
+    </nav>
   ),
 }));
 
@@ -34,6 +49,7 @@ describe('NavLayout', () => {
 
     const navbar = screen.getByRole('navigation');
     expect(navbar).toHaveAttribute('data-suppressed', 'false');
+    expect(navbar).toHaveAttribute('data-scroll-visible', 'true');
 
     fireEvent.click(screen.getByRole('button', { name: 'suppress' }));
     expect(navbar).toHaveAttribute('data-suppressed', 'true');

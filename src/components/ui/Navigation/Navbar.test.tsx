@@ -2,8 +2,6 @@
 import { render, screen } from '@testing-library/react';
 import Navbar from './Navbar';
 
-const mockUseScrollState = jest.fn();
-
 jest.mock('next/image', () => ({
   __esModule: true,
   default: ({
@@ -33,21 +31,21 @@ jest.mock('@/utils/flutterUtil', () => ({
   handleWebViewMessage: jest.fn(),
 }));
 
-jest.mock('@/hooks/useScrollState', () => ({
-  useScrollState: () => mockUseScrollState(),
-}));
-
 describe('Navbar suppression', () => {
-  beforeEach(() => {
-    mockUseScrollState.mockReturnValue({ isVisible: true, isAtTop: true });
-  });
-
   it('기본 상태에서는 scroll visibility에 따라 노출된다', () => {
     render(<Navbar />);
 
     const navbar = screen.getByRole('navigation');
     expect(navbar).toHaveClass('translate-y-0');
     expect(navbar).toHaveAttribute('aria-hidden', 'false');
+  });
+
+  it('공유된 scroll visibility가 false이면 숨긴다', () => {
+    render(<Navbar isScrollVisible={false} />);
+
+    const navbar = screen.getByRole('navigation', { hidden: true });
+    expect(navbar).toHaveClass('pointer-events-none');
+    expect(navbar).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('suppression이 scroll visibility보다 우선한다', () => {

@@ -3,8 +3,8 @@ import Image from 'next/image';
 import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
 import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
 import UnderlineSearchBar from '@/components/feature/Search/UnderlineSearchBar';
+import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import { CATEGORY_MENUS_LIST } from '@/constants/common';
-import { useScrollState } from '@/hooks/useScrollState';
 import { cn } from '@/lib/utils';
 import { useRegionsQuery } from '@/queries/useRegionsQuery';
 import type { SearchKeyword } from './types';
@@ -36,9 +36,9 @@ type Props = ChipSearchProps | RealtimeSearchProps;
 export const ExploreSearchBar = (props: Props) => {
   const { description, isFilter = false } = props;
   const isRealtime = props.mode === 'realtime';
-  const { isVisible } = useScrollState(100);
+  const { isScrollVisible } = useNavLayout();
   const isSearchActive = isRealtime && props.isSearchActive;
-  const shouldShowSearchBar = isSearchActive || isVisible;
+  const shouldShowSearchBar = isSearchActive || isScrollVisible;
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const { regions } = useRegionsQuery();
   const {

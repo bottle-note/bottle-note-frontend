@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ExplorePage from './page';
 
-const mockUseScrollState = jest.fn();
+const mockUseNavLayout = jest.fn();
 const mockSetNavbarSuppressed = jest.fn();
 const mockSetTabParam = jest.fn();
 const mockRouterReplace = jest.fn();
@@ -11,10 +11,6 @@ const mockRouterReplace = jest.fn();
 jest.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams('tab=REVIEW_WHISKEY'),
   useRouter: () => ({ replace: mockRouterReplace }),
-}));
-
-jest.mock('@/hooks/useScrollState', () => ({
-  useScrollState: () => mockUseScrollState(),
 }));
 
 jest.mock('@/hooks/useStatefulSearchParams', () => ({
@@ -32,7 +28,7 @@ jest.mock('@/hooks/useTab', () => ({
 }));
 
 jest.mock('@/components/ui/Layout/NavLayout', () => ({
-  useNavLayout: () => ({ setNavbarSuppressed: mockSetNavbarSuppressed }),
+  useNavLayout: () => mockUseNavLayout(),
 }));
 
 jest.mock('@/components/ui/Navigation/Tab', () => ({
@@ -68,7 +64,10 @@ describe('ExplorePage scroll header', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     window.scrollTo = jest.fn();
-    mockUseScrollState.mockReturnValue({ isVisible: true, isAtTop: true });
+    mockUseNavLayout.mockReturnValue({
+      isScrollVisible: true,
+      setNavbarSuppressed: mockSetNavbarSuppressed,
+    });
   });
 
   it('스크롤 상단에서는 BottleNote 로고 영역을 표시한다', () => {
@@ -82,7 +81,10 @@ describe('ExplorePage scroll header', () => {
   });
 
   it('아래로 스크롤하면 BottleNote 로고 영역을 접고 탭만 유지한다', () => {
-    mockUseScrollState.mockReturnValue({ isVisible: false, isAtTop: false });
+    mockUseNavLayout.mockReturnValue({
+      isScrollVisible: false,
+      setNavbarSuppressed: mockSetNavbarSuppressed,
+    });
 
     render(<ExplorePage />);
 

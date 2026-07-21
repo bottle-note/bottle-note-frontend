@@ -2,9 +2,11 @@
 
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import Navbar from '@/components/ui/Navigation/Navbar';
+import { useScrollState } from '@/hooks/useScrollState';
 
 interface NavLayoutContextValue {
   isNavbarSuppressed: boolean;
+  isScrollVisible: boolean;
   setNavbarSuppressed: (suppressed: boolean) => void;
 }
 
@@ -27,15 +29,21 @@ interface Props {
 
 export default function NavLayout({ showNavbar = true, children }: Props) {
   const [isNavbarSuppressed, setNavbarSuppressed] = useState(false);
+  const { isVisible: isScrollVisible } = useScrollState(100);
   const contextValue = useMemo(
-    () => ({ isNavbarSuppressed, setNavbarSuppressed }),
-    [isNavbarSuppressed],
+    () => ({ isNavbarSuppressed, isScrollVisible, setNavbarSuppressed }),
+    [isNavbarSuppressed, isScrollVisible],
   );
 
   return (
     <NavLayoutContext.Provider value={contextValue}>
       <main>{children}</main>
-      {showNavbar && <Navbar isSuppressed={isNavbarSuppressed} />}
+      {showNavbar && (
+        <Navbar
+          isSuppressed={isNavbarSuppressed}
+          isScrollVisible={isScrollVisible}
+        />
+      )}
     </NavLayoutContext.Provider>
   );
 }
