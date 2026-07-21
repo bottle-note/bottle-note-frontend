@@ -63,6 +63,9 @@ jest.mock('./_components/ReviewExploreList', () => ({
       <button type="button" onClick={() => onSearchActiveChange(true)}>
         focus review search
       </button>
+      <button type="button" onClick={() => onSearchActiveChange(false)}>
+        blur review search
+      </button>
     </div>
   ),
 }));
@@ -124,5 +127,26 @@ describe('ExplorePage scroll header', () => {
     );
     expect(screen.queryByTestId('explore-logo-row')).not.toBeInTheDocument();
     expect(mockSetNavbarSuppressed).toHaveBeenLastCalledWith(true);
+
+    fireEvent.click(screen.getByRole('button', { name: 'blur review search' }));
+
+    expect(screen.getByTestId('explore-page')).toHaveAttribute(
+      'data-search-active',
+      'false',
+    );
+    expect(mockSetNavbarSuppressed).toHaveBeenLastCalledWith(false);
+  });
+
+  it('focus 상태에서 route unmount 시 Navbar suppression을 해제한다', () => {
+    const { unmount } = render(<ExplorePage />);
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'focus review search' }),
+    );
+    expect(mockSetNavbarSuppressed).toHaveBeenLastCalledWith(true);
+
+    unmount();
+
+    expect(mockSetNavbarSuppressed).toHaveBeenLastCalledWith(false);
   });
 });

@@ -6,8 +6,7 @@ import ReviewCard from './ReviewListItem';
 import { ExploreSearchBar } from './ExploreSearchBar';
 import { ExploreKeywordChip } from './ExploreKeywordChip';
 import { useExploreKeywords } from '../_hooks/useExploreKeywords';
-
-const REVIEW_TAB_ID = 'REVIEW_WHISKEY';
+import { REVIEW_EXPLORE_TAB_ID } from '../_constants/exploreTabs';
 
 interface ReviewExplorerListProps {
   isSearchActive: boolean;
@@ -19,7 +18,7 @@ export const ReviewExplorerList = ({
   onSearchActiveChange,
 }: ReviewExplorerListProps) => {
   const { keywords, keywordValues, handleAddKeyword, handleRemoveKeyword } =
-    useExploreKeywords({ tabId: REVIEW_TAB_ID });
+    useExploreKeywords({ tabId: REVIEW_EXPLORE_TAB_ID });
 
   const {
     data: reviewList,

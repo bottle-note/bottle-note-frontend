@@ -122,5 +122,36 @@ describe('useWhiskeyExploreSearch', () => {
 
     expect(result.current.inputKeyword).toBe('');
     expect(result.current.debouncedKeyword).toBe('');
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
+
+  it('위스키 탭 direct URL의 keyword는 정상 복원한다', () => {
+    mockUseSearchParams.mockReturnValue(
+      new URLSearchParams(
+        'tab=EXPLORER_WHISKEY&keywords=direct-whiskey-keyword',
+      ),
+    );
+
+    const { result } = renderHook(() => useWhiskeyExploreSearch());
+
+    expect(result.current.inputKeyword).toBe('direct-whiskey-keyword');
+    expect(result.current.debouncedKeyword).toBe('direct-whiskey-keyword');
+  });
+
+  it('debounce 도중 리뷰 탭으로 이동하면 stale keyword를 URL에 쓰지 않는다', () => {
+    let currentParams = new URLSearchParams('tab=EXPLORER_WHISKEY');
+    mockUseSearchParams.mockImplementation(() => currentParams);
+
+    const { result, rerender } = renderHook(() => useWhiskeyExploreSearch());
+
+    act(() => result.current.setInputKeyword('pending-whiskey-keyword'));
+    act(() => jest.advanceTimersByTime(150));
+
+    currentParams = new URLSearchParams('tab=REVIEW_WHISKEY');
+    rerender();
+    act(() => jest.advanceTimersByTime(150));
+
+    expect(result.current.debouncedKeyword).toBe('pending-whiskey-keyword');
+    expect(mockReplace).not.toHaveBeenCalled();
   });
 });

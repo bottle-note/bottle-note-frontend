@@ -9,23 +9,27 @@ import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
 import { cn } from '@/lib/utils';
+import {
+  parseExploreTabId,
+  REVIEW_EXPLORE_TAB_ID,
+  type ExploreTabId,
+  WHISKEY_EXPLORE_TAB_ID,
+} from './_constants/exploreTabs';
 import { ReviewExplorerList } from './_components/ReviewExploreList';
 import { WhiskeyExplorerList } from './_components/WhiskeyExploreList';
-
-type TabId = 'REVIEW_WHISKEY' | 'EXPLORER_WHISKEY';
 
 export default function ExplorePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { isScrollVisible, setNavbarSuppressed } = useNavLayout();
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const [tabParam, setTabParam] = useStatefulSearchParams<TabId>('tab');
-  const tabFromUrl = (tabParam as TabId | null) || 'REVIEW_WHISKEY';
+  const [tabParam, setTabParam] = useStatefulSearchParams<ExploreTabId>('tab');
+  const tabFromUrl = parseExploreTabId(tabParam);
   const isHeaderCollapsed = isSearchActive || !isScrollVisible;
 
   const tabList = [
-    { name: '리뷰 둘러보기', id: 'REVIEW_WHISKEY' },
-    { name: '위스키 둘러보기', id: 'EXPLORER_WHISKEY' },
+    { name: '리뷰 둘러보기', id: REVIEW_EXPLORE_TAB_ID },
+    { name: '위스키 둘러보기', id: WHISKEY_EXPLORE_TAB_ID },
   ];
 
   const initialTab = tabList.find((tab) => tab.id === tabFromUrl) || tabList[0];
@@ -37,7 +41,7 @@ export default function ExplorePage() {
   });
 
   const hasSyncedInitialTabRef = useRef(false);
-  const previousTabIdRef = useRef<TabId>(currentTab.id as TabId);
+  const previousTabIdRef = useRef<ExploreTabId>(currentTab.id as ExploreTabId);
 
   const handleSearchActiveChange = useCallback(
     (active: boolean) => {
@@ -53,10 +57,10 @@ export default function ExplorePage() {
 
     if (!hasSyncedInitialTabRef.current) {
       hasSyncedInitialTabRef.current = true;
-      previousTabIdRef.current = currentTab.id as TabId;
+      previousTabIdRef.current = currentTab.id as ExploreTabId;
 
       if (params.get('tab') !== currentTab.id) {
-        setTabParam(currentTab.id as TabId);
+        setTabParam(currentTab.id as ExploreTabId);
       }
 
       return;
@@ -66,7 +70,7 @@ export default function ExplorePage() {
       return;
     }
 
-    previousTabIdRef.current = currentTab.id as TabId;
+    previousTabIdRef.current = currentTab.id as ExploreTabId;
     params.delete('keywords');
     params.set('tab', currentTab.id);
 
@@ -151,13 +155,13 @@ export default function ExplorePage() {
             marginTop: 'var(--explore-current-header-height)',
           }}
         >
-          {currentTab.id === 'EXPLORER_WHISKEY' && (
+          {currentTab.id === WHISKEY_EXPLORE_TAB_ID && (
             <WhiskeyExplorerList
               isSearchActive={isSearchActive}
               onSearchActiveChange={handleSearchActiveChange}
             />
           )}
-          {currentTab.id === 'REVIEW_WHISKEY' && (
+          {currentTab.id === REVIEW_EXPLORE_TAB_ID && (
             <ReviewExplorerList
               isSearchActive={isSearchActive}
               onSearchActiveChange={handleSearchActiveChange}
