@@ -71,6 +71,7 @@ export default function MyBottle({
     data: alcoholList,
     isLoading: isFirstLoading,
     isFetching,
+    hasNextPage,
     targetRef,
   } = usePaginatedQuery<
     | RatingMyBottleListResponse
@@ -250,7 +251,7 @@ export default function MyBottle({
                   })}
             </List.Section>
           </List>
-          <div ref={targetRef} />
+          {hasNextPage && <div ref={targetRef} className="h-1" />}
         </section>
       </main>
     </Suspense>
