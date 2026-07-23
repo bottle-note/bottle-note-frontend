@@ -1,5 +1,9 @@
 import { LinkData } from '@/types/LinkButton';
-import { getFilteredCategories, generateMenu } from '@/utils/categoryUtils';
+import {
+  buildWhiskeyExploreCategoryHref,
+  getFilteredCategories,
+  generateMenu,
+} from '@/utils/categoryUtils';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 
 function CategoryList() {
@@ -17,7 +21,7 @@ function CategoryList() {
         data={{
           engName: 'ALL',
           korName: '전체',
-          linkSrc: '/search?category=ALL',
+          linkSrc: buildWhiskeyExploreCategoryHref(),
         }}
       />
     </div>
