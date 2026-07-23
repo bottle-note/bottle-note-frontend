@@ -6,6 +6,8 @@ import { useAuth } from '@/hooks/auth/useAuth';
 import { useDebouncedToggle } from '@/hooks/useDebouncedToggle';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 
+const PICK_DEBOUNCE_DELAY_MS = 500;
+
 interface Props {
   isPicked: boolean;
   handleUpdatePicked?: () => void;
@@ -41,6 +43,7 @@ const AlcoholPickButton = ({
       await AlcoholsApi.putPick({ alcoholId: id, isPicked: state });
     },
     id: alcoholId,
+    debounceDelay: PICK_DEBOUNCE_DELAY_MS,
     onApiSuccess,
     onApiError,
     errorMessage: '찜하기 업데이트에 실패했습니다. 다시 시도해주세요.',
