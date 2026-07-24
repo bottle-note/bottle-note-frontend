@@ -67,6 +67,22 @@ const config: Config = {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
+        bn: {
+          canvas: 'hsl(var(--bn-canvas) / <alpha-value>)',
+          section: 'hsl(var(--bn-section) / <alpha-value>)',
+          raised: 'hsl(var(--bn-raised) / <alpha-value>)',
+          text: {
+            DEFAULT: 'hsl(var(--bn-text) / <alpha-value>)',
+            secondary: 'hsl(var(--bn-text-secondary) / <alpha-value>)',
+            tertiary: 'hsl(var(--bn-text-tertiary) / <alpha-value>)',
+          },
+          border: 'hsl(var(--bn-border) / <alpha-value>)',
+          brand: {
+            DEFAULT: 'hsl(var(--bn-brand) / <alpha-value>)',
+            tonal: 'hsl(var(--bn-brand-tonal) / <alpha-value>)',
+            foreground: 'hsl(var(--bn-brand-foreground) / <alpha-value>)',
+          },
+        },
         ...tailwindColors,
       },
       fontSize: {

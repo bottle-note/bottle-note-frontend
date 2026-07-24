@@ -40,7 +40,7 @@ export function HomeTastingEventPreviewCard({
 
   return (
     <Link href={ROUTES.CURATION.DETAIL(event.id)} className="block">
-      <article className="relative isolate h-[312px] w-[272px] overflow-hidden rounded-lg bg-sectionWhite">
+      <article className="relative isolate h-[312px] w-[272px] overflow-hidden rounded-lg bg-sectionWhite dark:bg-bn-raised">
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
           <BaseImage
             src={event.coverImageUrl}
@@ -70,20 +70,20 @@ export function HomeTastingEventPreviewCard({
             {event.description}
           </p>
 
-          <div className="mt-auto rounded-2xl bg-white/85 px-3 py-3 backdrop-blur-sm">
+          <div className="mt-auto rounded-2xl bg-white/85 dark:bg-bn-raised/90 px-3 py-3 backdrop-blur-sm">
             <div className="space-y-2">
               {infoItems.map(({ key, Icon, title, description }) => (
                 <div key={key} className="flex gap-2">
-                  <span className="mt-0.5 flex h-3 w-3 shrink-0 items-center justify-center text-mainDarkGray">
+                  <span className="mt-0.5 flex h-3 w-3 shrink-0 items-center justify-center text-mainDarkGray dark:text-bn-text">
                     <Icon size={12} strokeWidth={2} />
                   </span>
 
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-11 font-bold text-mainDarkGray">
+                    <p className="truncate text-11 font-bold text-mainDarkGray dark:text-bn-text">
                       {title}
                     </p>
                     {description && (
-                      <p className="mt-0.5 truncate text-9 font-light text-mainGray">
+                      <p className="mt-0.5 truncate text-9 font-light text-mainGray dark:text-bn-text-secondary">
                         {description}
                       </p>
                     )}
@@ -93,10 +93,10 @@ export function HomeTastingEventPreviewCard({
             </div>
 
             <div className="mt-3 flex items-end gap-2">
-              <span className="text-9 font-semibold leading-none text-mainDarkGray">
+              <span className="text-9 font-semibold leading-none text-mainDarkGray dark:text-bn-text">
                 참가비
               </span>
-              <span className="text-16 font-extrabold leading-none text-mainDarkGray">
+              <span className="text-16 font-extrabold leading-none text-mainDarkGray dark:text-bn-text">
                 {tastingEvent.entryFeeLabel}
               </span>
             </div>
@@ -113,22 +113,22 @@ export function HomeTastingEventMoreCard() {
       href={`${ROUTES.CURATION.BASE}?tab=${CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT}`}
       className="block"
     >
-      <article className="flex h-[312px] w-[190px] flex-col justify-between rounded-lg bg-bgGray px-4 py-5">
+      <article className="flex h-[312px] w-[190px] flex-col justify-between rounded-lg bg-bgGray dark:bg-bn-raised px-4 py-5">
         <div>
-          <span className="inline-flex w-fit rounded-full bg-white px-2.5 py-1 text-10 font-bold text-subCoral">
+          <span className="inline-flex w-fit rounded-full bg-white dark:bg-bn-brand-tonal px-2.5 py-1 text-10 font-bold text-subCoral dark:text-bn-brand">
             시음회
           </span>
-          <h3 className="mt-4 text-16 font-extrabold leading-[21px] text-mainDarkGray">
+          <h3 className="mt-4 text-16 font-extrabold leading-[21px] text-mainDarkGray dark:text-bn-text">
             더 많은
             <br />
             시음회 보기
           </h3>
-          <p className="mt-3 whitespace-normal text-11 font-medium leading-[17px] text-mainGray">
+          <p className="mt-3 whitespace-normal text-11 font-medium leading-[17px] text-mainGray dark:text-bn-text-secondary">
             진행 중인 시음회를 한 번에 확인해보세요.
           </p>
         </div>
 
-        <span className="flex h-10 items-center justify-center rounded-lg bg-subCoral text-12 font-bold text-white">
+        <span className="flex h-10 items-center justify-center rounded-lg bg-subCoral dark:bg-bn-brand text-12 font-bold text-white dark:text-bn-brand-foreground">
           보러가기
         </span>
       </article>

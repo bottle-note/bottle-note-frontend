@@ -15,7 +15,11 @@ type Props<T extends { id: string; name: string }> = {
 const TAB_WIDTH = 146;
 const TAB_HEIGHT = 32;
 
-const BORDER_COLOR = '#CFCFCF';
+const ACTIVE_SURFACE = 'hsl(var(--bn-bookmark-active-surface))';
+const INACTIVE_SURFACE = 'hsl(var(--bn-bookmark-inactive-surface))';
+const BORDER_COLOR = 'hsl(var(--bn-bookmark-border))';
+const ACTIVE_TEXT = 'hsl(var(--bn-bookmark-active-text))';
+const INACTIVE_TEXT = 'hsl(var(--bn-bookmark-inactive-text))';
 const BORDER_WIDTH = 1.5;
 
 const BookmarkTab = <T extends { id: string; name: string }>({
@@ -26,7 +30,10 @@ const BookmarkTab = <T extends { id: string; name: string }>({
   registerTab,
 }: Props<T>) => {
   return (
-    <div className="w-full bg-white">
+    <div
+      className="w-full"
+      style={{ backgroundColor: 'hsl(var(--bn-canvas))' }}
+    >
       <div className="relative">
         <div
           ref={scrollContainerRef}
@@ -84,7 +91,11 @@ const BookmarkTab = <T extends { id: string; name: string }>({
                       y="0"
                       width={TAB_WIDTH}
                       height={TAB_HEIGHT}
-                      fill={currentTab.id === tab.id ? '#FFF' : '#F7F7F7'}
+                      fill={
+                        currentTab.id === tab.id
+                          ? ACTIVE_SURFACE
+                          : INACTIVE_SURFACE
+                      }
                       clipPath={`url(#tab-clip-${tab.id})`}
                     />
 
@@ -117,11 +128,11 @@ const BookmarkTab = <T extends { id: string; name: string }>({
                     )}
                   </svg>
                   <span
-                    className={`relative z-10 text-15 font-extrabold ${
-                      currentTab.id === tab.id
-                        ? 'text-orange-500'
-                        : 'text-brightGray'
-                    }`}
+                    className="relative z-10 text-15 font-extrabold"
+                    style={{
+                      color:
+                        currentTab.id === tab.id ? ACTIVE_TEXT : INACTIVE_TEXT,
+                    }}
                   >
                     {tab.name}
                   </span>

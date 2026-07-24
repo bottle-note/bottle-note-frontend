@@ -59,4 +59,13 @@ describe('Navbar suppression', () => {
     expect(navbar).toHaveAttribute('aria-hidden', 'true');
     expect(navbar.querySelector('button')).toHaveAttribute('tabindex', '-1');
   });
+
+  it('다크 scope용 semantic navbar 토큰을 제공한다', () => {
+    render(<Navbar />);
+
+    expect(screen.getByRole('navigation').querySelector('section')).toHaveClass(
+      'dark:bg-bn-raised',
+    );
+    expect(screen.getByText('홈')).toHaveClass('dark:text-bn-brand');
+  });
 });
