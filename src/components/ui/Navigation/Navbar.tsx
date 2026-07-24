@@ -53,13 +53,8 @@ function Navbar({
       link: ROUTES.REVIEW.REGISTER_BASE,
       icon: '/icon/navbar/review.svg',
     },
-    // {
-    //   name: '검색',
-    //   link: ROUTES.SEARCH.BASE,
-    //   icon: '/icon/navbar/search.svg',
-    // },
     {
-      name: '시음회',
+      name: '시음회&정보',
       link: ROUTES.CURATION.BASE,
       icon: '/icon/navbar/curation.svg',
     },
