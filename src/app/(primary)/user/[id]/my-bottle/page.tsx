@@ -36,6 +36,11 @@ interface InitialState {
 
 const SORT_OPTIONS = [{ name: '최신순', type: SORT_TYPE.LATEST }];
 
+const MY_BOTTLE_INTERSECTION_OPTIONS: IntersectionObserverInit = {
+  rootMargin: '0px',
+  threshold: 0,
+};
+
 export default function MyBottle({
   params: { id: userId },
 }: {
@@ -71,6 +76,7 @@ export default function MyBottle({
     data: alcoholList,
     isLoading: isFirstLoading,
     isFetching,
+    hasNextPage,
     targetRef,
   } = usePaginatedQuery<
     | RatingMyBottleListResponse
@@ -90,6 +96,7 @@ export default function MyBottle({
         userId: Number(userId),
       });
     },
+    intersectionOptions: MY_BOTTLE_INTERSECTION_OPTIONS,
   });
 
   const { data: userInfo } = useQuery({
@@ -249,7 +256,7 @@ export default function MyBottle({
 
                       return <></>;
                     })}
-                  <div ref={targetRef} className="h-1" />
+                  {hasNextPage && <div ref={targetRef} className="h-1" />}
                 </>
               )}
             </List.Section>
