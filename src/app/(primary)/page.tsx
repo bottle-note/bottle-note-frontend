@@ -40,18 +40,20 @@ export default async function Home() {
       {webSiteSchemas.map((schema) => (
         <JsonLd key={schema['@type']} data={schema} />
       ))}
-      <NavLayout>
-        <HomeHeader />
+      <div className="dark min-h-safe-screen bg-bn-canvas text-bn-text">
+        <NavLayout>
+          <HomeHeader />
 
-        <TarotPromoCard />
+          <TarotPromoCard />
 
-        <HomeCarousel banners={banners} />
+          <HomeCarousel banners={banners} />
 
-        <div className="pt-[22px] pb-20">
-          <HomeFeaturedSection />
-          <HomeCategorySection />
-        </div>
-      </NavLayout>
+          <div className="pt-[22px] pb-20">
+            <HomeFeaturedSection />
+            <HomeCategorySection />
+          </div>
+        </NavLayout>
+      </div>
     </>
   );
 }

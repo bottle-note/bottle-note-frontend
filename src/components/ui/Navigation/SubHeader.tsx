@@ -117,7 +117,10 @@ interface SubHeaderMainProps {
   bgColor?: string;
 }
 
-function SubHeaderMain({ children, bgColor = 'bg-white' }: SubHeaderMainProps) {
+function SubHeaderMain({
+  children,
+  bgColor = 'bg-white dark:bg-bn-canvas',
+}: SubHeaderMainProps) {
   let leftComponent = null;
   let centerComponent = null;
   let rightComponent = null;

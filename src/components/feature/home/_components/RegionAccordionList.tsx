@@ -28,13 +28,15 @@ function RegionRowContent({
         alt={group.displayName}
         width={26}
         height={26}
-        className={`w-[26px] h-[26px] object-cover ${flagUrl ? 'rounded-lg' : 'rounded-lg bg-sectionWhite p-1'}`}
+        className={`w-[26px] h-[26px] object-cover ${flagUrl ? 'rounded-lg' : 'rounded-lg bg-sectionWhite dark:bg-bn-section p-1'}`}
       />
       <div className="gap-[4px] flex items-center">
-        <span className="text-13 font-extrabold text-mainDarkGray">
+        <span className="text-13 font-extrabold text-mainDarkGray dark:text-bn-text">
           {group.displayName}
         </span>
-        <span className="text-11  text-mainDarkGray">{group.engName}</span>
+        <span className="text-11 text-mainDarkGray dark:text-bn-text-secondary">
+          {group.engName}
+        </span>
       </div>
     </div>
   );
@@ -54,7 +56,7 @@ function RegionRow({
 
   if (!hasChildren) {
     return (
-      <li className="py-[14px] px-[10px] border border-bgGray rounded-xl">
+      <li className="py-[14px] px-[10px] border border-bgGray dark:border-bn-border rounded-xl">
         <Link
           href={buildRegionHref(group.parent.regionId)}
           className="flex w-full items-center justify-between"
@@ -66,7 +68,7 @@ function RegionRow({
   }
 
   return (
-    <li className="py-[14px] px-[10px] border border-bgGray rounded-xl flex flex-col">
+    <li className="py-[14px] px-[10px] border border-bgGray dark:border-bn-border rounded-xl flex flex-col">
       <button
         type="button"
         onClick={onToggle}
@@ -100,9 +102,9 @@ function RegionRow({
             <li>
               <Link
                 href={buildRegionHref(group.parent.regionId)}
-                className="flex items-center justify-between py-[8px] border-b border-bgGray border-dashed"
+                className="flex items-center justify-between py-[8px] border-b border-bgGray dark:border-bn-border border-dashed"
               >
-                <span className="text-13 font-bold text-mainDarkGray">
+                <span className="text-13 font-bold text-mainDarkGray dark:text-bn-text">
                   {group.parent.korName}
                 </span>
               </Link>
@@ -113,13 +115,13 @@ function RegionRow({
               <li key={child.regionId}>
                 <Link
                   href={buildRegionHref(child.regionId)}
-                  className="flex items-center justify-between py-[8px] border-b border-bgGray border-dashed"
+                  className="flex items-center justify-between py-[8px] border-b border-bgGray dark:border-bn-border border-dashed"
                 >
                   <div className="gap-[4px] flex items-center">
-                    <span className="text-13 font-bold text-mainDarkGray">
+                    <span className="text-13 font-bold text-mainDarkGray dark:text-bn-text">
                       {child.korName}
                     </span>
-                    <span className="text-11  text-mainDarkGray">
+                    <span className="text-11 text-mainDarkGray dark:text-bn-text-secondary">
                       {child.engName}
                     </span>
                   </div>
@@ -154,7 +156,7 @@ export default function RegionAccordionList() {
   if (isLoading) {
     return (
       <SkeletonList count={8} gap={8}>
-        <li className="py-[14px] px-[10px] border border-bgGray rounded-xl flex items-center justify-between">
+        <li className="py-[14px] px-[10px] border border-bgGray dark:border-bn-border rounded-xl flex items-center justify-between">
           <div className="flex items-center gap-[10px]">
             <SkeletonBase width={26} height={26} borderRadius="8px" />
             <div className="flex items-center gap-[4px]">

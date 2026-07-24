@@ -222,7 +222,7 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
       }}
       plugins={[autoplayRef.current]}
       setApi={setApi}
-      className="w-full bg-white"
+      className="w-full bg-white dark:bg-bn-canvas"
     >
       <CarouselContent className="!ml-0">
         {banners.map((banner, index) => (
@@ -244,7 +244,7 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
               <button
                 type="button"
                 onClick={() => api && api.scrollPrev()}
-                className="absolute right-[68.45px] bottom-3 flex items-center justify-center w-[35.56px] h-[35.56px] rounded-full bg-mainDarkGray/60 text-white z-10"
+                className="absolute right-[68.45px] bottom-3 flex items-center justify-center w-[35.56px] h-[35.56px] rounded-full bg-mainDarkGray/60 dark:bg-bn-raised/90 text-white z-10"
               >
                 <Image
                   src="/icon/arrow-left-white.svg"
@@ -256,7 +256,7 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
               <button
                 type="button"
                 onClick={() => api && api.scrollNext()}
-                className="absolute right-3 bottom-3 flex items-center justify-center w-[35.56px] h-[35.56px] rounded-full bg-mainDarkGray/60 text-white z-10"
+                className="absolute right-3 bottom-3 flex items-center justify-center w-[35.56px] h-[35.56px] rounded-full bg-mainDarkGray/60 dark:bg-bn-raised/90 text-white z-10"
               >
                 <Image
                   src="/icon/arrow-left-white.svg"
