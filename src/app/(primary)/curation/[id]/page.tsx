@@ -144,7 +144,6 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
       <section className="px-5 py-5">
         <TastingEventInfoCard
           payload={payload}
-          label="정보"
           showMapCta
           textBehavior="wrap"
           className="bg-bgGray"
