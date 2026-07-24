@@ -36,6 +36,11 @@ interface InitialState {
 
 const SORT_OPTIONS = [{ name: '최신순', type: SORT_TYPE.LATEST }];
 
+const MY_BOTTLE_INTERSECTION_OPTIONS: IntersectionObserverInit = {
+  rootMargin: '0px',
+  threshold: 0,
+};
+
 export default function MyBottle({
   params: { id: userId },
 }: {
@@ -71,6 +76,7 @@ export default function MyBottle({
     data: alcoholList,
     isLoading: isFirstLoading,
     isFetching,
+    hasNextPage,
     targetRef,
   } = usePaginatedQuery<
     | RatingMyBottleListResponse
@@ -90,6 +96,7 @@ export default function MyBottle({
         userId: Number(userId),
       });
     },
+    intersectionOptions: MY_BOTTLE_INTERSECTION_OPTIONS,
   });
 
   const { data: userInfo } = useQuery({
@@ -199,58 +206,61 @@ export default function MyBottle({
             />
 
             <List.Section>
-              {alcoholList &&
-                [...alcoholList.map((list) => list.data.myBottleList)]
-                  .flat()
-                  .map((item) => {
-                    if (currentTab.id === 'ratings') {
-                      return (
-                        <RatingsListItem
-                          data={
-                            item as RatingMyBottleListResponse['myBottleList'][number]
-                          }
-                          isMyPage={alcoholList[0].data.isMyPage}
-                          key={item.baseMyBottleInfo.alcoholId}
-                        />
-                      );
-                    }
+              {alcoholList && (
+                <>
+                  {[...alcoholList.map((list) => list.data.myBottleList)]
+                    .flat()
+                    .map((item) => {
+                      if (currentTab.id === 'ratings') {
+                        return (
+                          <RatingsListItem
+                            data={
+                              item as RatingMyBottleListResponse['myBottleList'][number]
+                            }
+                            isMyPage={alcoholList[0].data.isMyPage}
+                            key={item.baseMyBottleInfo.alcoholId}
+                          />
+                        );
+                      }
 
-                    if (currentTab.id === 'reviews') {
-                      return (
-                        <ReviewListItem
-                          data={
-                            item as ReviewMyBottleListResponse['myBottleList'][number]
-                          }
-                          key={
-                            (
+                      if (currentTab.id === 'reviews') {
+                        return (
+                          <ReviewListItem
+                            data={
                               item as ReviewMyBottleListResponse['myBottleList'][number]
-                            ).reviewId
-                          }
-                        />
-                      );
-                    }
+                            }
+                            key={
+                              (
+                                item as ReviewMyBottleListResponse['myBottleList'][number]
+                              ).reviewId
+                            }
+                          />
+                        );
+                      }
 
-                    if (currentTab.id === 'picks') {
-                      return (
-                        <PicksListItem
-                          data={
-                            item as PickMyBottleListResponse['myBottleList'][number]
-                          }
-                          isMyPage={isMyPage}
-                          key={
-                            (
+                      if (currentTab.id === 'picks') {
+                        return (
+                          <PicksListItem
+                            data={
                               item as PickMyBottleListResponse['myBottleList'][number]
-                            ).baseMyBottleInfo.alcoholId
-                          }
-                        />
-                      );
-                    }
+                            }
+                            isMyPage={isMyPage}
+                            key={
+                              (
+                                item as PickMyBottleListResponse['myBottleList'][number]
+                              ).baseMyBottleInfo.alcoholId
+                            }
+                          />
+                        );
+                      }
 
-                    return <></>;
-                  })}
+                      return <></>;
+                    })}
+                  {hasNextPage && <div ref={targetRef} className="h-1" />}
+                </>
+              )}
             </List.Section>
           </List>
-          <div ref={targetRef} />
         </section>
       </main>
     </Suspense>

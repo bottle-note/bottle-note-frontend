@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const DEFAULT_THROTTLE_MS = 100;
 
@@ -13,39 +13,80 @@ export const useInfiniteScroll = ({
   options,
   throttleMs = DEFAULT_THROTTLE_MS,
 }: Props) => {
-  const targetRef = useRef<HTMLDivElement | null>(null);
+  const [target, setTarget] = useState<HTMLDivElement | null>(null);
   const fetchRef = useRef(fetchNextPage);
+  const isIntersectingRef = useRef(false);
+  const hasTriggeredForCurrentIntersectionRef = useRef(false);
   const lastTriggerTimeRef = useRef(0);
+  const pendingTriggerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   fetchRef.current = fetchNextPage;
+  const targetRef = useCallback((node: HTMLDivElement | null) => {
+    setTarget(node);
+  }, []);
+
+  const clearPendingTrigger = useCallback(() => {
+    if (pendingTriggerRef.current === null) return;
+
+    clearTimeout(pendingTriggerRef.current);
+    pendingTriggerRef.current = null;
+  }, []);
+
+  const triggerFetch = useCallback(() => {
+    if (!isIntersectingRef.current) return;
+
+    const now = Date.now();
+    const elapsedSinceLastTrigger = now - lastTriggerTimeRef.current;
+    const remainingThrottleMs = throttleMs - elapsedSinceLastTrigger;
+
+    if (throttleMs > 0 && remainingThrottleMs > 0) {
+      if (pendingTriggerRef.current !== null) return;
+
+      pendingTriggerRef.current = setTimeout(() => {
+        pendingTriggerRef.current = null;
+
+        if (!isIntersectingRef.current) return;
+
+        lastTriggerTimeRef.current = Date.now();
+        fetchRef.current();
+      }, remainingThrottleMs);
+      return;
+    }
+
+    lastTriggerTimeRef.current = now;
+    fetchRef.current();
+  }, [throttleMs]);
 
   const observerCallback = useCallback(
     (entries: IntersectionObserverEntry[]) => {
-      if (!entries[0]?.isIntersecting) return;
+      isIntersectingRef.current = Boolean(entries[0]?.isIntersecting);
 
-      const now = Date.now();
-      const elapsedSinceLastTrigger = now - lastTriggerTimeRef.current;
-      const isWithinThrottleWindow =
-        throttleMs > 0 && elapsedSinceLastTrigger < throttleMs;
-
-      if (isWithinThrottleWindow) {
+      if (!isIntersectingRef.current) {
+        hasTriggeredForCurrentIntersectionRef.current = false;
+        clearPendingTrigger();
         return;
       }
 
-      lastTriggerTimeRef.current = now;
-      fetchRef.current();
+      if (hasTriggeredForCurrentIntersectionRef.current) return;
+
+      hasTriggeredForCurrentIntersectionRef.current = true;
+      triggerFetch();
     },
-    [throttleMs],
+    [clearPendingTrigger, triggerFetch],
   );
 
   useEffect(() => {
-    const target = targetRef.current;
     if (!target) return;
 
     const observer = new IntersectionObserver(observerCallback, options);
 
     observer.observe(target);
-    return () => observer.unobserve(target);
-  }, [observerCallback, options]);
+    return () => {
+      isIntersectingRef.current = false;
+      hasTriggeredForCurrentIntersectionRef.current = false;
+      clearPendingTrigger();
+      observer.unobserve(target);
+    };
+  }, [clearPendingTrigger, observerCallback, options, target]);
 
   return { targetRef };
 };
