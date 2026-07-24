@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 
-const BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL;
-const BASE_URL_V2 = process.env.NEXT_PUBLIC_SERVER_URL_V2;
+const BASE_URL =
+  process.env.INTERNAL_SERVER_URL ?? process.env.NEXT_PUBLIC_SERVER_URL;
+const BASE_URL_V2 =
+  process.env.INTERNAL_SERVER_URL_V2 ?? process.env.NEXT_PUBLIC_SERVER_URL_V2;
 
 const buildTime = new Date().toLocaleString('ko-KR', {
   timeZone: 'Asia/Seoul',
