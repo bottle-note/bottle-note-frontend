@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createLoginResponse } from '@/lib/auth/server';
+import { loginPayloadSchema } from '@/lib/auth/login-payload';
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = (await request.json()) as {
-      provider: 'kakao-login' | 'apple-login';
-      accessToken?: string;
-      email?: string;
-      authorizationCode?: string;
-      idToken?: string;
-      nonce?: string;
-    };
+    const parsedPayload = loginPayloadSchema.safeParse(await request.json());
 
-    return await createLoginResponse(payload);
+    if (!parsedPayload.success) {
+      return NextResponse.json(
+        { message: 'Invalid login payload' },
+        { status: 400 },
+      );
+    }
+
+    return await createLoginResponse(parsedPayload.data);
   } catch (error) {
     return NextResponse.json(
       {

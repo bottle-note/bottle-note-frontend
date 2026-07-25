@@ -27,17 +27,9 @@ export const useAppSocialLogin = () => {
     }
   };
 
-  const onKakaoLoginSuccess = async (payload: string) => {
+  const onKakaoLoginSuccess = async (accessToken: string) => {
     try {
-      if (payload.includes('@')) {
-        await login('kakao-login', {
-          email: payload,
-        });
-      } else {
-        await login('kakao-login', {
-          accessToken: payload,
-        });
-      }
+      await login('kakao-login', { accessToken });
       fireLoginEvents('kakao');
       router.replace(getReturnToUrl());
     } catch (e) {

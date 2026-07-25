@@ -5,39 +5,13 @@ import { ApiError } from '@/utils/ApiError';
 import { extractRefreshToken } from '@/utils/cookieUtils';
 import useModalStore from '@/store/modalStore';
 import { clearAuthSession, refreshAuthSession } from '@/lib/auth/session-store';
-import type {
-  LoginParams,
-  AppleLoginParams,
-  KakaoLoginParams,
-  TokenData,
-} from './types';
+import type { AppleLoginParams, KakaoLoginParams, TokenData } from './types';
 
 const getRedirectUrl = () => `${process.env.CLIENT_URL}/oauth/kakao`;
 
 export const AuthApi = {
   // ========== 서버사이드 API (Next.js API Routes에서 사용) ==========
   server: {
-    /**
-     * 소셜 로그인을 수행합니다.
-     */
-    async login(body: LoginParams): Promise<TokenData> {
-      const response = await fetch(`${process.env.SERVER_URL}/oauth/login`, {
-        method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const refreshToken = extractRefreshToken(response);
-      const { data } = await response.json();
-
-      return {
-        accessToken: data.accessToken,
-        refreshToken,
-      };
-    },
-
     /**
      * Apple 로그인을 수행합니다.
      */
@@ -71,8 +45,20 @@ export const AuthApi = {
         },
       });
 
+      if (!response.ok) {
+        throw new Error(`Kakao login failed (status=${response.status})`);
+      }
+
       const refreshToken = extractRefreshToken(response);
       const data = await response.json();
+
+      if (!data?.accessToken) {
+        throw new Error('Bottle Note access token not found');
+      }
+
+      if (!refreshToken) {
+        throw new Error('Bottle Note refresh token not found');
+      }
 
       return {
         accessToken: data.accessToken,
@@ -121,19 +107,9 @@ export const AuthApi = {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       });
 
-      return res.json();
-    },
-
-    /**
-     * Kakao 사용자 정보를 가져옵니다.
-     */
-    async fetchKakaoUserInfo(accessToken: string) {
-      const res = await fetch('https://kapi.kakao.com/v2/user/me', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-        },
-      });
+      if (!res.ok) {
+        throw new Error(`Kakao token exchange failed (status=${res.status})`);
+      }
 
       return res.json();
     },
@@ -213,6 +189,4 @@ export const AuthApi = {
   },
 };
 
-// Re-export types and enums
-export { SOCIAL_TYPE } from './types';
-export type { LoginParams, TokenData, UserData } from './types';
+export type { TokenData, UserData } from './types';

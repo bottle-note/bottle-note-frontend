@@ -1,6 +1,7 @@
 'use client';
 
 import { UserData } from '@/types/Auth';
+import type { LoginPayload } from '@/lib/auth/login-payload';
 
 export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
@@ -14,15 +15,6 @@ type SessionListener = () => void;
 interface SessionSnapshot {
   status: AuthStatus;
   session: ClientSession | null;
-}
-
-interface LoginPayload {
-  provider: 'kakao-login' | 'apple-login';
-  accessToken?: string;
-  email?: string;
-  authorizationCode?: string;
-  idToken?: string;
-  nonce?: string;
 }
 
 let snapshot: SessionSnapshot = {

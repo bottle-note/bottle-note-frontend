@@ -9,6 +9,11 @@ import {
   logoutAuthSession,
   refreshAuthSession,
 } from '@/lib/auth/session-store';
+import type {
+  LoginCredentialsByProvider,
+  LoginPayload,
+  LoginProvider,
+} from '@/lib/auth/login-payload';
 
 export const useAuth = () => {
   const { status, session } = useSyncExternalStore(
@@ -25,14 +30,11 @@ export const useAuth = () => {
     return logoutAuthSession();
   };
 
-  const login = async (
-    provider: 'kakao-login' | 'apple-login',
-    credentials: Record<string, any>,
+  const login = async <Provider extends LoginProvider>(
+    provider: Provider,
+    credentials: LoginCredentialsByProvider[Provider],
   ) => {
-    await loginAuthSession({
-      provider,
-      ...credentials,
-    });
+    await loginAuthSession({ provider, ...credentials } as LoginPayload);
   };
 
   return {

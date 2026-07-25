@@ -2,7 +2,8 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { decodeJwt } from 'jose';
 import { AuthApi } from '@/api/auth/auth.api';
-import { SOCIAL_TYPE, TokenData, UserData } from '@/api/auth/types';
+import { TokenData, UserData } from '@/api/auth/types';
+import type { KakaoLoginPayload, LoginPayload } from '@/lib/auth/login-payload';
 
 const REFRESH_TOKEN_COOKIE = 'bn_refresh_token';
 const REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 30;
@@ -10,15 +11,6 @@ const ACCESS_TOKEN_COOKIE = 'bn_access_token';
 const TOKEN_EXPIRY_BUFFER_SECONDS = 60;
 const DEFAULT_ACCESS_TOKEN_MAX_AGE = 30 * 60;
 const isProduction = process.env.NODE_ENV === 'production';
-
-interface LoginPayload {
-  provider: 'kakao-login' | 'apple-login';
-  accessToken?: string;
-  email?: string;
-  authorizationCode?: string;
-  idToken?: string;
-  nonce?: string;
-}
 
 const createSessionPayload = (tokens: TokenData) => {
   const user = decodeJwt(tokens.accessToken) as UserData;
@@ -108,8 +100,8 @@ const applyRefreshTokenCookie = (
   });
 };
 
-async function loginWithKakao(payload: LoginPayload): Promise<TokenData> {
-  if (payload.authorizationCode) {
+async function loginWithKakao(payload: KakaoLoginPayload): Promise<TokenData> {
+  if ('authorizationCode' in payload) {
     const kakaoToken = await AuthApi.server.fetchKakaoToken(
       payload.authorizationCode,
     );
@@ -118,41 +110,21 @@ async function loginWithKakao(payload: LoginPayload): Promise<TokenData> {
       throw new Error('Kakao access token not found');
     }
 
-    const userData = await AuthApi.server.fetchKakaoUserInfo(
-      kakaoToken.access_token,
-    );
-
-    if (!userData.kakao_account?.email) {
-      throw new Error('Kakao user email not found');
-    }
-
-    return AuthApi.server.login({
-      email: userData.kakao_account.email,
-      gender: null,
-      age: null,
-      socialType: SOCIAL_TYPE.KAKAO,
-      socialUniqueId: String(userData.id),
+    return AuthApi.server.kakaoLogin({
+      accessToken: kakaoToken.access_token,
     });
   }
 
-  if (payload.accessToken) {
+  if ('accessToken' in payload) {
     return AuthApi.server.kakaoLogin({ accessToken: payload.accessToken });
-  }
-
-  if (payload.email) {
-    return AuthApi.server.login({
-      socialType: SOCIAL_TYPE.KAKAO,
-      email: payload.email,
-      socialUniqueId: '',
-      gender: null,
-      age: null,
-    });
   }
 
   throw new Error('Kakao login payload is invalid');
 }
 
-async function loginWithApple(payload: LoginPayload): Promise<TokenData> {
+async function loginWithApple(
+  payload: Extract<LoginPayload, { provider: 'apple-login' }>,
+): Promise<TokenData> {
   if (!payload.idToken || !payload.nonce) {
     throw new Error('Apple login payload is invalid');
   }
