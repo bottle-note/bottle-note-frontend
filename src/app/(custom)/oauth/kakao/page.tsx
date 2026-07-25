@@ -15,7 +15,7 @@ export default function OauthKakaoCallbackPage() {
   const authCode = searchParams.get('code');
   const { login } = useAuth();
 
-  const loginHandler = async (code: string | string[]) => {
+  const loginHandler = async (code: string) => {
     try {
       const returnTo = getReturnToUrl();
 

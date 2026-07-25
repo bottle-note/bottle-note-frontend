@@ -11,7 +11,7 @@
   - 서버 상태: TanStack Query v5
   - 클라이언트 상태: Zustand v4
 - **폼**: React Hook Form + Yup
-- **인증**: NextAuth.js
+- **인증**: 카카오·애플 소셜 로그인 + HttpOnly 쿠키 세션
 - **패키지 매니저**: pnpm
 
 ## 폴더 구조
@@ -78,9 +78,11 @@ pnpm run setenv:dev    # .env.development 설정
 ## Figma MCP 사용 규칙
 
 ### DESIGN.md 참조 필수
+
 UI 컴포넌트를 생성하거나 수정할 때 반드시 프로젝트 루트의 `DESIGN.md`를 먼저 읽고, 정의된 디자인 토큰과 컴포넌트 패턴을 따른다.
 
 ### MCP 호출 순서 (결정론적 5단계)
+
 Figma MCP를 사용할 때 반드시 아래 순서를 따른다. 순서를 건너뛰거나 임의 호출하지 않는다.
 
 1. `get_metadata` — 레이아웃 계층 구조 파악 (필수, 1회)
@@ -90,12 +92,14 @@ Figma MCP를 사용할 때 반드시 아래 순서를 따른다. 순서를 건�
 5. 코드 생성 — 위 컨텍스트 기반으로 구현
 
 ### 호출 제한
+
 - 한 화면당 최대 **5회** MCP tool 호출
 - 동일 tool 연속 재시도 금지 — 에러 시 다음 단계로 진행
 - `get_screenshot`는 토큰 소비가 가장 크므로 꼭 필요한 경우만 사용
 - 이미 로컬에 export된 JSON/PNG가 있으면 MCP 대신 로컬 파일 우선 참조
 
 ### 코드 생성 규칙
+
 - hex 값 하드코딩 금지 — `tailwind.config.ts`에 정의된 색상 토큰 또는 CSS 변수 사용
 - 새 컴포넌트를 만들기 전에 `src/components/`의 기존 컴포넌트 재사용 가능 여부 확인
 - Figma Auto Layout → Tailwind flex/grid 매핑, Figma spacing → Tailwind spacing 토큰 매핑
