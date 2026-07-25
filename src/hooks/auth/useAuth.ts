@@ -26,7 +26,7 @@ export const useAuth = () => {
   };
 
   const login = async (
-    provider: 'kakao-login' | 'apple-login' | 'preview-login',
+    provider: 'kakao-login' | 'apple-login',
     credentials: Record<string, any>,
   ) => {
     await loginAuthSession({

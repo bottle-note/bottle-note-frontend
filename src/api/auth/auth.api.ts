@@ -9,11 +9,7 @@ import type {
   LoginParams,
   AppleLoginParams,
   KakaoLoginParams,
-  BasicLoginParams,
-  BasicSignupParams,
-  RestoreParams,
   TokenData,
-  BasicSignupResponse,
 } from './types';
 
 const getRedirectUrl = () => `${process.env.CLIENT_URL}/oauth/kakao`;
@@ -129,30 +125,6 @@ export const AuthApi = {
     },
 
     /**
-     * 기본 로그인 (이메일/비밀번호) - Preview 환경 전용
-     */
-    async basicLogin(body: BasicLoginParams): Promise<TokenData> {
-      const response = await fetch(
-        `${process.env.SERVER_URL}/oauth/basic/login`,
-        {
-          method: 'POST',
-          body: JSON.stringify(body),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-
-      const refreshToken = extractRefreshToken(response);
-      const { data } = await response.json();
-
-      return {
-        accessToken: data.accessToken,
-        refreshToken,
-      };
-    },
-
-    /**
      * Kakao 사용자 정보를 가져옵니다.
      */
     async fetchKakaoUserInfo(accessToken: string) {
@@ -211,26 +183,6 @@ export const AuthApi = {
     },
 
     /**
-     * 회원 계정을 복구합니다.
-     */
-    async restore(params: RestoreParams): Promise<ApiResponse<string>> {
-      const response = await apiClient.post<ApiResponse<{ data: string }>>(
-        `/oauth/restore`,
-        params,
-        { baseUrl: 'bottle-api/v2', authRequired: false },
-      );
-
-      if (response.errors.length !== 0) {
-        throw new Error(ERROR_MESSAGES.AUTH_REQUIRED);
-      }
-
-      return {
-        ...response,
-        data: response.data.data,
-      };
-    },
-
-    /**
      * 액세스 토큰을 검증합니다.
      */
     async verifyToken(accessToken: string): Promise<ApiResponse<string>> {
@@ -258,46 +210,6 @@ export const AuthApi = {
 
       return response.nonce;
     },
-  },
-
-  // ========== Deprecated APIs ==========
-
-  /**
-   * @deprecated 기본 로그인 (이메일/비밀번호)
-   */
-  async basicLogin(
-    params: BasicLoginParams,
-  ): Promise<ApiResponse<{ accessToken: string }>> {
-    const response = await apiClient.post<ApiResponse<{ accessToken: string }>>(
-      `/oauth/basic/login`,
-      params,
-      { baseUrl: 'bottle-api/v2' },
-    );
-
-    if (response.errors.length !== 0) {
-      throw new Error(ERROR_MESSAGES.AUTH_REQUIRED);
-    }
-
-    return response;
-  },
-
-  /**
-   * @deprecated 기본 회원가입 (이메일/비밀번호)
-   */
-  async basicSignup(
-    params: BasicSignupParams,
-  ): Promise<ApiResponse<BasicSignupResponse>> {
-    const response = await apiClient.post<ApiResponse<BasicSignupResponse>>(
-      `/oauth/basic/signup`,
-      params,
-      { authRequired: false },
-    );
-
-    if (response.errors.length !== 0) {
-      throw new Error(ERROR_MESSAGES.CREATE_FAILED);
-    }
-
-    return response;
   },
 };
 

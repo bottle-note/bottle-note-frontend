@@ -1,37 +1,14 @@
 'use client';
 
 import { DeviceService } from '@/lib/DeviceService';
-import useModalStore from '@/store/modalStore';
 import { AuthApi } from '@/api/auth/auth.api';
-import { ApiError } from '@/utils/ApiError';
 import { UserApi } from '@/api/user/user.api';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { useAuth } from './auth/useAuth';
 
-export type LoginFormValues = {
-  email: string;
-  password: string;
-};
-
 export const useLogin = () => {
   const { isLoggedIn } = useAuth();
   const { isInApp } = DeviceService;
-  const { handleModalState } = useModalStore();
-
-  const handleRestore = async (data: LoginFormValues) => {
-    try {
-      await AuthApi.client.restore(data);
-      handleModalState({
-        isShowModal: true,
-        mainText: `재가입에 성공하였습니다.`,
-      });
-    } catch (error) {
-      handleModalState({
-        isShowModal: true,
-        mainText: `${(error as unknown as ApiError).message}`,
-      });
-    }
-  };
 
   const handleSendDeviceInfo = async () => {
     // 인앱 환경에서 로그인된 경우에만 디바이스 정보 전송
@@ -92,7 +69,6 @@ export const useLogin = () => {
   };
 
   return {
-    handleRestore,
     handleSendDeviceInfo,
     handleInitKakaoSdkLogin,
     handleKakaoLogin,

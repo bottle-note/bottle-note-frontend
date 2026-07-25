@@ -12,7 +12,7 @@ const DEFAULT_ACCESS_TOKEN_MAX_AGE = 30 * 60;
 const isProduction = process.env.NODE_ENV === 'production';
 
 interface LoginPayload {
-  provider: 'kakao-login' | 'apple-login' | 'preview-login';
+  provider: 'kakao-login' | 'apple-login';
   accessToken?: string;
   email?: string;
   authorizationCode?: string;
@@ -163,19 +163,6 @@ async function loginWithApple(payload: LoginPayload): Promise<TokenData> {
   });
 }
 
-async function loginWithPreview(): Promise<TokenData> {
-  const email = process.env.PREVIEW_TEST_EMAIL;
-  const password = process.env.PREVIEW_TEST_PASSWORD;
-
-  if (!email || !password) {
-    throw new Error(
-      `Preview login credentials are not configured (hasEmail=${Boolean(email)}, hasPassword=${Boolean(password)})`,
-    );
-  }
-
-  return AuthApi.server.basicLogin({ email, password });
-}
-
 export async function createLoginResponse(payload: LoginPayload) {
   let tokens: TokenData;
 
@@ -185,9 +172,6 @@ export async function createLoginResponse(payload: LoginPayload) {
       break;
     case 'apple-login':
       tokens = await loginWithApple(payload);
-      break;
-    case 'preview-login':
-      tokens = await loginWithPreview();
       break;
     default:
       throw new Error('Unsupported auth provider');

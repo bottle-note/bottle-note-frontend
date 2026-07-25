@@ -14,7 +14,7 @@ You are an expert in Next.js 14 (App Router), React 18, TypeScript, and Tailwind
 - Zustand v4 for client state
 - React Hook Form + Yup for forms
 - Tailwind CSS for styling
-- NextAuth.js for authentication
+- Kakao/Apple social login with an HttpOnly cookie session
 - pnpm as package manager
 
 ## Code Style

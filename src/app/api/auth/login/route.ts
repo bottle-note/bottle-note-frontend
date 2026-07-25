@@ -4,7 +4,7 @@ import { createLoginResponse } from '@/lib/auth/server';
 export async function POST(request: NextRequest) {
   try {
     const payload = (await request.json()) as {
-      provider: 'kakao-login' | 'apple-login' | 'preview-login';
+      provider: 'kakao-login' | 'apple-login';
       accessToken?: string;
       email?: string;
       authorizationCode?: string;

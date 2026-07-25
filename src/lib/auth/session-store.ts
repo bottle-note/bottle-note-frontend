@@ -17,7 +17,7 @@ interface SessionSnapshot {
 }
 
 interface LoginPayload {
-  provider: 'kakao-login' | 'apple-login' | 'preview-login';
+  provider: 'kakao-login' | 'apple-login';
   accessToken?: string;
   email?: string;
   authorizationCode?: string;

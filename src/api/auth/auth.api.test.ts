@@ -26,7 +26,7 @@ describe('AuthApi.server.renewToken', () => {
         ],
         get: () => null,
       },
-    } as Response);
+    } as unknown as Response);
 
     const tokens = await AuthApi.server.renewToken('current-refresh-token');
 
