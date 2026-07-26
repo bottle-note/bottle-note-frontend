@@ -2,9 +2,19 @@
 import { render, screen } from '@testing-library/react';
 import { ExploreApi } from '@/api/explore/explore.api';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
+import { useAuth } from '@/hooks/auth/useAuth';
+import useModalStore from '@/store/modalStore';
+import { ROUTES } from '@/constants/routes';
+import type { LinkData } from '@/types/LinkButton';
 import { WhiskeyExplorerList } from './WhiskeyExploreList';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
 import { useWhiskeyExploreSearch } from '../_hooks/useWhiskeyExploreSearch';
+
+const mockPush = jest.fn();
+
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
 
 jest.mock('@/api/explore/explore.api', () => ({
   ExploreApi: { getAlcohols: jest.fn() },
@@ -20,6 +30,29 @@ jest.mock('../_hooks/useExploreFilters', () => ({
 
 jest.mock('../_hooks/useWhiskeyExploreSearch', () => ({
   useWhiskeyExploreSearch: jest.fn(),
+}));
+
+jest.mock('@/hooks/auth/useAuth', () => ({
+  useAuth: jest.fn(),
+}));
+
+jest.mock('@/store/modalStore', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
+jest.mock('@/components/ui/Button/PrimaryLinkButton', () => ({
+  __esModule: true,
+  default: ({ data }: { data: LinkData }) => {
+    const href =
+      typeof data.linkSrc === 'string' ? data.linkSrc : data.linkSrc.pathname;
+
+    return (
+      <a href={href} onClick={data.handleBeforeRouteChange}>
+        {data.korName}
+      </a>
+    );
+  },
 }));
 
 jest.mock('./ExploreSearchBar', () => ({
@@ -67,6 +100,12 @@ const mockUsePaginatedQuery = usePaginatedQuery as jest.Mock;
 const mockUseExploreFilters = useExploreFilters as jest.Mock;
 const mockUseWhiskeyExploreSearch = useWhiskeyExploreSearch as jest.Mock;
 const mockGetAlcohols = ExploreApi.getAlcohols as jest.Mock;
+const mockUseAuth = useAuth as jest.Mock;
+const mockUseModalStore = useModalStore as unknown as jest.Mock;
+
+const mockHandleModalState = jest.fn();
+const mockHandleCloseModal = jest.fn();
+const mockHandleLoginModal = jest.fn();
 
 describe('WhiskeyExplorerList realtime search', () => {
   beforeEach(() => {
@@ -81,12 +120,19 @@ describe('WhiskeyExplorerList realtime search', () => {
       regionIds: [12],
       category: 'SINGLE_MALT',
     });
+    mockUseAuth.mockReturnValue({ isLoggedIn: true });
+    mockUseModalStore.mockReturnValue({
+      handleModalState: mockHandleModalState,
+      handleCloseModal: mockHandleCloseModal,
+      handleLoginModal: mockHandleLoginModal,
+    });
     mockUsePaginatedQuery.mockReturnValue({
-      data: [],
+      data: [{ data: { items: [{ alcoholId: 1 }] } }],
       isLoading: false,
       isFetching: false,
       isFetchingNextPage: false,
       isPlaceholderData: false,
+      hasNextPage: true,
       targetRef: { current: null },
       error: null,
     });
@@ -133,5 +179,102 @@ describe('WhiskeyExplorerList realtime search', () => {
       pageSize: 10,
       signal: controller.signal,
     });
+  });
+
+  it('검색 결과가 없으면 위스키 추가 문의 버튼을 노출한다', () => {
+    mockUsePaginatedQuery.mockReturnValue({
+      data: [{ data: { items: [] } }],
+      isLoading: false,
+      isFetching: false,
+      isFetchingNextPage: false,
+      isPlaceholderData: false,
+      hasNextPage: false,
+      targetRef: { current: null },
+      error: null,
+    });
+
+    render(
+      <WhiskeyExplorerList
+        isSearchActive={false}
+        onSearchActiveChange={jest.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole('link', { name: '혹시 찾는 술이 없으신가요?' }),
+    ).toBeInTheDocument();
+  });
+
+  it('위스키 리스트의 마지막 페이지에 도달하면 문의 버튼을 노출한다', () => {
+    mockUsePaginatedQuery.mockReturnValue({
+      data: [{ data: { items: [{ alcoholId: 1 }] } }],
+      isLoading: false,
+      isFetching: false,
+      isFetchingNextPage: false,
+      isPlaceholderData: false,
+      hasNextPage: false,
+      targetRef: { current: null },
+      error: null,
+    });
+
+    render(
+      <WhiskeyExplorerList
+        isSearchActive={false}
+        onSearchActiveChange={jest.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole('link', { name: '혹시 찾는 술이 없으신가요?' }),
+    ).toBeInTheDocument();
+  });
+
+  it('다음 페이지가 남아 있으면 문의 버튼을 노출하지 않는다', () => {
+    render(
+      <WhiskeyExplorerList
+        isSearchActive={false}
+        onSearchActiveChange={jest.fn()}
+      />,
+    );
+
+    expect(
+      screen.queryByRole('link', { name: '혹시 찾는 술이 없으신가요?' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('문의 버튼에서 기존 위스키 추가 요청 확인 흐름을 실행한다', () => {
+    mockUsePaginatedQuery.mockReturnValue({
+      data: [{ data: { items: [] } }],
+      isLoading: false,
+      isFetching: false,
+      isFetchingNextPage: false,
+      isPlaceholderData: false,
+      hasNextPage: false,
+      targetRef: { current: null },
+      error: null,
+    });
+
+    render(
+      <WhiskeyExplorerList
+        isSearchActive={false}
+        onSearchActiveChange={jest.fn()}
+      />,
+    );
+
+    screen.getByRole('link', { name: '혹시 찾는 술이 없으신가요?' }).click();
+
+    expect(mockHandleModalState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isShowModal: true,
+        type: 'CONFIRM',
+        mainText: '위스키 추가 요청을 하겠습니까?',
+      }),
+    );
+
+    const modalState = mockHandleModalState.mock.calls[0][0];
+    modalState.handleConfirm();
+
+    expect(mockHandleCloseModal).toHaveBeenCalled();
+    expect(mockPush).toHaveBeenCalledWith(ROUTES.INQUIRE.REGISTER);
   });
 });
