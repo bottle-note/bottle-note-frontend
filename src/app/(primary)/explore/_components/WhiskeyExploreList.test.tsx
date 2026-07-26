@@ -105,7 +105,7 @@ const mockUseModalStore = useModalStore as unknown as jest.Mock;
 
 const mockHandleModalState = jest.fn();
 const mockHandleCloseModal = jest.fn();
-const mockHandleLoginModal = jest.fn();
+const mockHandleLoginState = jest.fn();
 
 describe('WhiskeyExplorerList realtime search', () => {
   beforeEach(() => {
@@ -124,7 +124,7 @@ describe('WhiskeyExplorerList realtime search', () => {
     mockUseModalStore.mockReturnValue({
       handleModalState: mockHandleModalState,
       handleCloseModal: mockHandleCloseModal,
-      handleLoginModal: mockHandleLoginModal,
+      handleLoginState: mockHandleLoginState,
     });
     mockUsePaginatedQuery.mockReturnValue({
       data: [{ data: { items: [{ alcoholId: 1 }] } }],
@@ -276,5 +276,37 @@ describe('WhiskeyExplorerList realtime search', () => {
 
     expect(mockHandleCloseModal).toHaveBeenCalled();
     expect(mockPush).toHaveBeenCalledWith(ROUTES.INQUIRE.REGISTER);
+  });
+
+  it('비로그인 문의 요청은 로그인 후 문의 등록으로 이동할 returnTo를 지정한다', () => {
+    mockUseAuth.mockReturnValue({ isLoggedIn: false });
+    mockUsePaginatedQuery.mockReturnValue({
+      data: [{ data: { items: [] } }],
+      isLoading: false,
+      isFetching: false,
+      isFetchingNextPage: false,
+      isPlaceholderData: false,
+      hasNextPage: false,
+      targetRef: { current: null },
+      error: null,
+    });
+
+    render(
+      <WhiskeyExplorerList
+        isSearchActive={false}
+        onSearchActiveChange={jest.fn()}
+      />,
+    );
+
+    screen.getByRole('link', { name: '혹시 찾는 술이 없으신가요?' }).click();
+    const modalState = mockHandleModalState.mock.calls[0][0];
+    modalState.handleConfirm();
+
+    expect(mockHandleCloseModal).toHaveBeenCalled();
+    expect(mockHandleLoginState).toHaveBeenCalledWith(
+      true,
+      ROUTES.INQUIRE.REGISTER,
+    );
+    expect(mockPush).not.toHaveBeenCalled();
   });
 });

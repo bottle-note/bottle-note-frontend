@@ -14,6 +14,7 @@ interface ModalState {
 
 interface LoginModalState {
   isShowLoginModal: boolean;
+  returnTo?: string;
 }
 
 export type ParcialModalState = {
@@ -24,7 +25,7 @@ interface ModalStore {
   state: ModalState;
   loginState: LoginModalState;
   handleModalState: (state: ParcialModalState) => void;
-  handleLoginState: (state: boolean) => void;
+  handleLoginState: (state: boolean, returnTo?: string) => void;
   handleCloseModal: () => void;
   handleLoginModal: () => void;
 }
@@ -44,8 +45,13 @@ const useModalStore = create<ModalStore>((set) => ({
   loginState: {
     isShowLoginModal: false,
   },
-  handleLoginState: (newState) =>
-    set({ loginState: { isShowLoginModal: newState } }),
+  handleLoginState: (newState, returnTo) =>
+    set({
+      loginState: {
+        isShowLoginModal: newState,
+        returnTo: newState ? returnTo : undefined,
+      },
+    }),
   handleModalState: (newState) =>
     set((state) => ({
       state: {
@@ -71,8 +77,8 @@ const useModalStore = create<ModalStore>((set) => ({
   handleLoginModal: () =>
     set((state) => ({
       loginState: {
-        ...state.loginState,
         isShowLoginModal: !state.loginState.isShowLoginModal,
+        returnTo: undefined,
       },
     })),
 }));

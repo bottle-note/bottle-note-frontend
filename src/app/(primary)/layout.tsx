@@ -10,7 +10,7 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { loginState, handleLoginModal } = useModalStore();
+  const { loginState, handleLoginState } = useModalStore();
   const { initWebView, isMobile } = useWebViewInit();
 
   useEffect(() => {
@@ -21,7 +21,10 @@ export default function Layout({
     <div className="bg-white flex flex-col w-full mx-auto min-h-safe-screen">
       <main>{children}</main>
       {loginState.isShowLoginModal && (
-        <LoginModal handleClose={handleLoginModal} />
+        <LoginModal
+          handleClose={() => handleLoginState(false)}
+          returnTo={loginState.returnTo}
+        />
       )}
     </div>
   );

@@ -23,7 +23,7 @@ export const WhiskeyExplorerList = ({
 }: WhiskeyExplorerListProps) => {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
-  const { handleModalState, handleCloseModal, handleLoginModal } =
+  const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
   const { inputKeyword, debouncedKeyword, isTyping, setInputKeyword } =
     useWhiskeyExploreSearch();
@@ -94,7 +94,7 @@ export const WhiskeyExplorerList = ({
       handleConfirm: () => {
         if (!isLoggedIn) {
           handleCloseModal();
-          handleLoginModal();
+          handleLoginState(true, ROUTES.INQUIRE.REGISTER);
           return;
         }
         handleCloseModal();
