@@ -45,6 +45,10 @@ export const ROUTES = {
   SETTINGS: {
     BASE: '/settings',
   },
+  LEGAL: {
+    PRIVACY_POLICY: '/privacy-policy',
+    TERMS: '/terms',
+  },
   ANNOUNCEMENT: {
     BASE: '/announcement',
     DETAIL: (id: string | number) => `/announcement/${id}`,
