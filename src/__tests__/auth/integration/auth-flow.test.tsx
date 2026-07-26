@@ -65,7 +65,7 @@ function HomeRegressionHarness() {
   return React.createElement('div', null, 'home-screen');
 }
 
-describe('Auth integration', () => {
+describe('Auth business flows', () => {
   const fetchMock = jest.fn();
   let consoleErrorSpy: jest.SpyInstance;
   const routerReplace = jest.fn();
@@ -248,6 +248,16 @@ describe('Auth integration', () => {
       });
 
       expect(getAuthSnapshot().status).toBe('authenticated');
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/auth/login',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({
+            provider: 'kakao-login',
+            accessToken: 'kakao-access-token',
+          }),
+        }),
+      );
     });
 
     it('카카오 앱 로그인 성공 시 returnTo 경로로 이동한다', async () => {

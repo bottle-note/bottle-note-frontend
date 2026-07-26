@@ -41,25 +41,34 @@ export const SettingsMainScreen = ({
               {category.title}
             </h2>
             <div className="mt-[27px] space-y-[25px] text-15 font-medium text-mainBlack">
-              {category.items.map((item) => (
-                <div key={item.text}>
-                  {item.action && (
-                    <button onClick={item.action} className="w-full text-left">
-                      {item.text}
-                    </button>
-                  )}
-                  {item.link && (
-                    <Link
-                      href={item.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block"
-                    >
-                      {item.text}
-                    </Link>
-                  )}
-                </div>
-              ))}
+              {category.items.map((item) => {
+                const isExternalLink =
+                  item.link?.startsWith('http://') ||
+                  item.link?.startsWith('https://');
+
+                return (
+                  <div key={item.text}>
+                    {item.action && (
+                      <button
+                        onClick={item.action}
+                        className="w-full text-left"
+                      >
+                        {item.text}
+                      </button>
+                    )}
+                    {item.link && (
+                      <Link
+                        href={item.link}
+                        target={isExternalLink ? '_blank' : undefined}
+                        rel={isExternalLink ? 'noopener noreferrer' : undefined}
+                        className="block"
+                      >
+                        {item.text}
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

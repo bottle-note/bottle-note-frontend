@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/ui/Button/Button';
 import { ROUTES } from '@/constants/routes';
 import BackDrop from '@/components/ui/Modal/BackDrop';
@@ -10,15 +10,20 @@ import { setReturnToUrl } from '@/utils/loginRedirect';
 
 interface Props {
   handleClose: () => void;
+  returnTo?: string;
 }
 
-function LoginModal({ handleClose }: Props) {
+function LoginModal({ handleClose, returnTo }: Props) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const handleLoginClick = () => {
+    const queryString = searchParams.toString();
+    const currentUrl = `${pathname}${queryString ? `?${queryString}` : ''}`;
+
     handleClose();
-    setReturnToUrl(pathname);
+    setReturnToUrl(returnTo ?? currentUrl);
     router.push(ROUTES.LOGIN);
   };
 

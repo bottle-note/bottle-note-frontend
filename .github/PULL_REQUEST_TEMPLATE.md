@@ -1,6 +1,9 @@
 ## 관련 이슈 (Related Issue)
 
-- closes #
+<!-- Bottle Note 제품 이슈는 bottle-note/workspace에서 확인한 뒤 전체 저장소 경로로 연결해주세요. -->
+<!-- 예: Closes bottle-note/workspace#324 -->
+
+- Closes bottle-note/workspace#
 
 ## PR 타입 (Type of Change)
 
@@ -23,7 +26,7 @@
 ## 스크린샷 (Screenshots)
 
 | Before | After |
-|--------|-------|
+| ------ | ----- |
 |        |       |
 
 > UI 변경이 없는 경우 이 섹션을 삭제해주세요.

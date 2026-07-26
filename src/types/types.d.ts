@@ -21,7 +21,7 @@ declare global {
     checkPlatform: (platform: string) => string;
     openAlbum: (imageDataBase64: string) => void;
     sendLogToFlutter: (log: string) => void;
-    onKakaoLoginSuccess: (email: string) => Promise<void>;
+    onKakaoLoginSuccess: (accessToken: string) => Promise<void>;
     onKakaoLoginError: (error: string) => void;
     onAppleLoginSuccess: (data: string) => Promise<void>;
     onAppleLoginError: (error: string) => void;

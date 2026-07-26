@@ -114,7 +114,7 @@ export default function Search() {
     staleTime: 0,
   });
 
-  const { handleModalState, handleCloseModal, handleLoginModal } =
+  const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
 
   const handleClickInquire = () => {
@@ -126,7 +126,7 @@ export default function Search() {
       handleConfirm: () => {
         if (!isLoggedIn) {
           handleCloseModal();
-          handleLoginModal();
+          handleLoginState(true, ROUTES.INQUIRE.REGISTER);
           return;
         }
         handleCloseModal();
