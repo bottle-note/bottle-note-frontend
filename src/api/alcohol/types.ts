@@ -131,6 +131,7 @@ export interface RegionResponse {
   korName: string;
   engName: string;
   description: string;
+  imageUrl: string | null;
   parentId: number | null;
   sortOrder: number;
 }

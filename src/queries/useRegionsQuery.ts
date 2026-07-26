@@ -6,6 +6,7 @@ export interface Region {
   regionId: number | '';
   korName: string;
   engName: string;
+  imageUrl: string | null;
   parentId?: number | null;
   sortOrder?: number;
 }
@@ -14,6 +15,7 @@ const ALL_REGION: Region = {
   regionId: '',
   korName: '국가(전체)',
   engName: 'All',
+  imageUrl: null,
 };
 
 export const regionKeys = {
