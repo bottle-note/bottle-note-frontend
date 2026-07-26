@@ -192,10 +192,10 @@ describe('AuthApi.server.renewToken', () => {
 
   beforeEach(() => {
     fetchMock.mockReset();
-    process.env.SERVER_URL = 'https://api.example.com';
+    process.env.SERVER_URL_V2 = 'https://api-v2.example.com';
   });
 
-  it('문서 계약대로 /oauth/reissue에 refresh-token 헤더로 요청한다', async () => {
+  it('v2 /auth/reissue에 refresh-token 헤더로 요청한다', async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -214,7 +214,7 @@ describe('AuthApi.server.renewToken', () => {
     const tokens = await AuthApi.server.renewToken('current-refresh-token');
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://api.example.com/oauth/reissue',
+      'https://api-v2.example.com/auth/reissue',
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({
@@ -228,5 +228,49 @@ describe('AuthApi.server.renewToken', () => {
       accessToken: 'new-access-token',
       refreshToken: 'new-refresh-token',
     });
+  });
+});
+
+describe('AuthApi.client.verifyToken', () => {
+  const fetchMock = jest.fn();
+
+  beforeAll(() => {
+    global.fetch = fetchMock as typeof fetch;
+  });
+
+  beforeEach(() => {
+    fetchMock.mockReset();
+  });
+
+  it('v2 /auth/token/verify에 access token을 검증 요청한다', async () => {
+    const responseBody = {
+      success: true,
+      code: 200,
+      data: 'VALID',
+      errors: [],
+      meta: {
+        serverEncoding: 'UTF-8',
+        serverVersion: 'test',
+        serverPathVersion: 'v2',
+        serverResponseTime: '2026-07-26T00:00:00Z',
+      },
+    };
+
+    fetchMock.mockResolvedValueOnce(
+      createResponse({
+        body: responseBody,
+      }),
+    );
+
+    const response = await AuthApi.client.verifyToken('current-access-token');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/bottle-api/v2/auth/token/verify',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ token: 'current-access-token' }),
+      }),
+    );
+    expect(response).toEqual(responseBody);
   });
 });
