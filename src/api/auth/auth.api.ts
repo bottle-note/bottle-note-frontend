@@ -70,13 +70,16 @@ export const AuthApi = {
      * 토큰을 갱신합니다 (서버사이드).
      */
     async renewToken(refreshToken: string): Promise<TokenData> {
-      const response = await fetch(`${process.env.SERVER_URL}/oauth/reissue`, {
-        method: 'POST',
-        headers: {
-          'refresh-token': refreshToken,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${process.env.SERVER_URL_V2}/auth/reissue`,
+        {
+          method: 'POST',
+          headers: {
+            'refresh-token': refreshToken,
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error(ERROR_MESSAGES.TOKEN_REFRESH_FAILED);
@@ -163,7 +166,7 @@ export const AuthApi = {
      */
     async verifyToken(accessToken: string): Promise<ApiResponse<string>> {
       const response = await apiClient.put<ApiResponse<string>>(
-        `/oauth/token/verify`,
+        `/auth/token/verify`,
         { token: accessToken },
         { baseUrl: 'bottle-api/v2', authRequired: false },
       );
