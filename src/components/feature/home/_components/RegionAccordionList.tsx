@@ -16,19 +16,49 @@ const buildRegionHref = (regionId: number | '') =>
 
 function RegionRowContent({
   group,
-  flagUrl,
+  imageUrl,
+  fallbackImageUrl,
 }: {
   group: RegionGroup;
-  flagUrl: string;
+  imageUrl: string | null;
+  fallbackImageUrl: string;
 }) {
+  const [currentImageUrl, setCurrentImageUrl] = useState(
+    () => imageUrl || fallbackImageUrl || '/bottle.svg',
+  );
+
+  useEffect(() => {
+    setCurrentImageUrl(imageUrl || fallbackImageUrl || '/bottle.svg');
+  }, [imageUrl, fallbackImageUrl]);
+
+  const handleImageError = () => {
+    setCurrentImageUrl((previousImageUrl) => {
+      if (
+        previousImageUrl === fallbackImageUrl ||
+        previousImageUrl === '/bottle.svg'
+      ) {
+        return '/bottle.svg';
+      }
+
+      return fallbackImageUrl || '/bottle.svg';
+    });
+  };
+
+  const isBottleFallback = currentImageUrl === '/bottle.svg';
+
   return (
     <div className="flex items-center gap-[10px]">
       <Image
-        src={flagUrl || '/bottle.svg'}
+        src={currentImageUrl}
         alt={group.displayName}
         width={26}
         height={26}
-        className={`w-[26px] h-[26px] object-cover ${flagUrl ? 'rounded-lg' : 'rounded-lg bg-sectionWhite p-1'}`}
+        onError={handleImageError}
+        className={`w-[26px] h-[26px] rounded-lg ${
+          isBottleFallback
+            ? 'object-cover bg-sectionWhite p-1'
+            : 'object-contain bg-sectionWhite p-[2px]'
+        }`}
       />
       <div className="gap-[4px] flex items-center">
         <span className="text-13 font-extrabold text-mainDarkGray">
@@ -49,7 +79,8 @@ function RegionRow({
   isOpen: boolean;
   onToggle: () => void;
 }) {
-  const flagUrl = getRegionFlagUrl(group.parent.engName);
+  const imageUrl = group.parent.imageUrl;
+  const fallbackImageUrl = getRegionFlagUrl(group.parent.engName);
   const hasChildren = group.children.length > 0;
 
   if (!hasChildren) {
@@ -59,7 +90,11 @@ function RegionRow({
           href={buildRegionHref(group.parent.regionId)}
           className="flex w-full items-center justify-between"
         >
-          <RegionRowContent group={group} flagUrl={flagUrl} />
+          <RegionRowContent
+            group={group}
+            imageUrl={imageUrl}
+            fallbackImageUrl={fallbackImageUrl}
+          />
         </Link>
       </li>
     );
@@ -74,7 +109,11 @@ function RegionRow({
         aria-label={`${group.displayName} 하위 지역 ${isOpen ? '접기' : '펼치기'}`}
         className="flex w-full items-center justify-between"
       >
-        <RegionRowContent group={group} flagUrl={flagUrl} />
+        <RegionRowContent
+          group={group}
+          imageUrl={imageUrl}
+          fallbackImageUrl={fallbackImageUrl}
+        />
         <Image
           src="/icon/arrow-down-gray.svg"
           alt=""
