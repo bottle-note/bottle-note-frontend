@@ -42,7 +42,7 @@ export function SettingsMiniEventList({
   if (activeEvents.length === 0) return null;
 
   return (
-    <section className="border-b border-brightGray py-[22px]">
+    <section className="border-b border-brightGray py-[22px] dark:border-bn-border-subtle">
       <ul className="grid grid-cols-4 gap-x-3 gap-y-4">
         {activeEvents.map((event) => (
           <li key={event.id}>
@@ -60,7 +60,7 @@ export function SettingsMiniEventList({
                   className="object-cover"
                 />
               </div>
-              <span className="w-full text-center text-12 font-medium leading-none text-mainBlack">
+              <span className="w-full text-center text-12 font-medium leading-none text-mainBlack dark:text-bn-text">
                 {truncateMiniEventName(event.name)}
               </span>
             </Link>

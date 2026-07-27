@@ -50,7 +50,7 @@ interface HeaderCenterProps {
 
 const HeaderCenter = ({
   children,
-  textColor = 'text-subCoral',
+  textColor = 'text-subCoral dark:text-bn-accent-interactive',
 }: HeaderCenterProps) => {
   return (
     <p

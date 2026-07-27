@@ -50,20 +50,24 @@ Semantic color 매핑은 현재 코드 사용례를 기준으로 아래처럼 �
 
 홈 화면 다크 프리뷰는 `dark` scope 안에서 아래 semantic alias를 사용한다. 기존 `tailwindColors`는 라이트 화면의 raw palette로 보존하며, 다크 화면에 직접 재사용하지 않는다.
 
-| Semantic alias                  | Light                 | Dark C: Vivid Peach Coral | 역할                               |
-| ------------------------------- | --------------------- | ------------------------- | ---------------------------------- |
-| `bn-canvas`                     | `#FFFFFF`             | `#141414`                 | 전체 canvas                        |
-| `bn-section`                    | `#F7F7F7`             | `#1C1C1C`                 | section / tab inactive surface     |
-| `bn-raised`                     | `#FFFFFF`             | `#272727`                 | card / navbar / active tab surface |
-| `bn-text` / `bn-text-secondary` | `#101010` / `#666666` | `#F7F7F7` / `#D4D4D4`     | 본문 텍스트 계층                   |
-| `bn-border`                     | `#BFBFBF`             | `#8A8A8A`                 | card / list / input border         |
-| `bn-brand`                      | `#E58257`             | `#FFA480`                 | CTA, active tab, 강조 텍스트       |
-| `bn-brand-tonal`                | `#FFF0E9`             | `#3D2118`                 | 선택/보조 강조 surface             |
-| `bn-brand-foreground`           | `#FFFFFF`             | `#2B1006`                 | solid brand surface 위 텍스트      |
+| Semantic alias                  | Light                 | Dark: Oak & Amber Night | 역할                               |
+| ------------------------------- | --------------------- | ----------------------- | ---------------------------------- |
+| `bn-canvas`                     | `#FFFFFF`             | `#100E0C`               | 전체 canvas                        |
+| `bn-section`                    | `#F7F7F7`             | `#1A1612`               | section / tab inactive surface     |
+| `bn-raised`                     | `#FFFFFF`             | `#27211A`               | card / navbar / active tab surface |
+| `bn-text` / `bn-text-secondary` | `#101010` / `#666666` | `#F5EFE5` / `#C9BCA9`   | 본문 텍스트 계층                   |
+| `bn-border-subtle`              | `#E6E6DD`             | `#3B3228`               | divider / tag border               |
+| `bn-border-strong`              | `#BFBFBF`             | `#75624B`               | input / selected control border    |
+| `bn-accent-interactive`         | `#E58257`             | `#E99670`               | CTA, active tab/nav, 내 별점       |
+| `bn-accent-rating`              | `#666666`             | `#D9A45B`               | 공개 평균 별점                     |
+| `bn-accent-tonal`               | `#FFF0E9`             | `#38261B`               | 선택/보조 강조 surface             |
+| `bn-accent-foreground`          | `#FFFFFF`             | `#1E1209`               | solid accent surface 위 텍스트     |
 
-- Tailwind class: `bg-bn-canvas`, `bg-bn-raised`, `text-bn-text`, `text-bn-brand`, `bg-bn-brand`, `text-bn-brand-foreground`.
-- `bn-brand` C안은 피치 코랄 hue(17°)를 유지하고 채도를 높인 `#FFA480`이다.
-- 이 PR은 홈 화면에만 `.dark` scope를 적용한다. 전역 테마 preference, 설정 UI, 다른 route의 migration은 별도 단계다.
+- Tailwind class: `bg-bn-canvas`, `bg-bn-raised`, `text-bn-text`, `border-bn-border`, `border-bn-border-strong`, `bg-bn-accent-interactive`, `text-bn-accent-rating`.
+- `bn-brand`, `bn-brand-tonal`, `bn-brand-foreground`은 기존 화면의 점진적 migration을 위한 compatibility alias다. 새 코드는 역할이 드러나는 `bn-accent-*` token을 사용한다.
+- 다크 모드는 `html`이 아니라 `ThemeProvider`가 만드는 app shell의 `.dark` scope에 적용한다.
+- 설정 화면의 `화면 설정 > 다크 모드` 토글 값은 `bottle-note-theme` local storage key에 보존한다.
+- 이 PR의 완전한 dark migration 대상은 홈과 설정 화면이다. 다른 route는 semantic token 전환 전까지 기존 light appearance가 일부 남을 수 있다.
 
 ### 2.2 Typography
 

@@ -26,7 +26,7 @@ export const SettingsSubScreen = ({ config }: SettingsSubScreenProps) => {
     const Component = config.component;
     return (
       <motion.section
-        className="flex-1 overflow-y-auto"
+        className="flex-1 overflow-y-auto bg-white text-mainBlack dark:bg-bn-canvas dark:text-bn-text"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -38,12 +38,12 @@ export const SettingsSubScreen = ({ config }: SettingsSubScreenProps) => {
 
   return (
     <motion.section
-      className="flex-1 overflow-y-auto px-6"
+      className="flex-1 overflow-y-auto bg-white px-6 dark:bg-bn-canvas"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
-      <div className="space-y-0 py-[22px] text-15 font-medium text-mainBlack border-b border-brightGray">
+      <div className="space-y-0 border-b border-brightGray py-[22px] text-15 font-medium text-mainBlack dark:border-bn-border-subtle dark:text-bn-text">
         {config.items?.map((item, index) => (
           <div key={item.text} className={index === 0 ? '' : 'pt-[25px]'}>
             {item.action && (

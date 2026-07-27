@@ -40,7 +40,7 @@ export default async function Home() {
       {webSiteSchemas.map((schema) => (
         <JsonLd key={schema['@type']} data={schema} />
       ))}
-      <div className="dark min-h-safe-screen bg-bn-canvas text-bn-text">
+      <div className="min-h-safe-screen bg-bn-canvas text-bn-text">
         <NavLayout>
           <HomeHeader />
 

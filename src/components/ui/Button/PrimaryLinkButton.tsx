@@ -24,7 +24,7 @@ function PrimaryLinkButton({
       className={`relative w-full hover:pointer ${
         listType === 'Full'
           ? 'flex items-center'
-          : 'rounded-xl bg-mainCoral dark:bg-bn-brand-tonal'
+          : 'rounded-xl bg-mainCoral dark:bg-bn-raised'
       }`}
     >
       {listType === 'Full' && (
@@ -37,7 +37,7 @@ function PrimaryLinkButton({
             quality={60}
             className="rounded-xl object-cover"
           />
-          <div className="absolute w-full h-full rounded-xl bg-mainCoral bg-opacity-90 dark:bg-bn-brand-tonal dark:bg-opacity-100" />
+          <div className="absolute w-full h-full rounded-xl bg-mainCoral bg-opacity-90 dark:bg-bn-raised dark:bg-opacity-100" />
         </>
       )}
       <Link
