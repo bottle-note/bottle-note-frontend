@@ -1,42 +1,25 @@
 /**
  * @jest-environment node
  */
-import { SignJWT } from 'jose';
 import {
   isAccessTokenValid,
   createCachedSessionResponse,
+  createLoginResponse,
   createSessionResponse,
   createLogoutResponse,
-} from './server';
+} from '@/lib/auth/server';
+import type { LoginPayload } from '@/lib/auth/login-payload';
+import { createTestJwt } from '@/__tests__/auth/support/jwt';
 
 jest.mock('@/api/auth/auth.api', () => ({
   AuthApi: {
     server: {
+      fetchKakaoToken: jest.fn(),
+      kakaoLogin: jest.fn(),
       renewToken: jest.fn(),
     },
   },
 }));
-
-const SECRET = new TextEncoder().encode('test-secret-key-for-signing-jwt');
-
-async function createTestJwt(overrides: { exp?: number; sub?: string } = {}) {
-  const now = Math.floor(Date.now() / 1000);
-
-  const builder = new SignJWT({
-    sub: overrides.sub ?? 'tester@bottle-note.com',
-    userId: 1,
-    roles: 'ROLE_USER',
-    profile: null,
-  }).setProtectedHeader({ alg: 'HS256' });
-
-  if (overrides.exp !== undefined) {
-    builder.setExpirationTime(overrides.exp);
-  }
-
-  builder.setIssuedAt(now);
-
-  return builder.sign(SECRET);
-}
 
 function getCookieMap(response: Response) {
   const cookies = new Map<string, { value: string; maxAge?: number }>();
@@ -80,9 +63,7 @@ describe('isAccessTokenValid', () => {
   });
 
   it('exp 클레임이 없는 토큰은 유효하지 않다', async () => {
-    const token = await new SignJWT({ sub: 'test' })
-      .setProtectedHeader({ alg: 'HS256' })
-      .sign(SECRET);
+    const token = await createTestJwt({ sub: 'test' });
 
     expect(isAccessTokenValid(token)).toBe(false);
   });
@@ -108,6 +89,75 @@ describe('createCachedSessionResponse', () => {
 
     // 캐시 응답은 쿠키를 새로 설정하지 않아야 함
     expect(response.headers.getSetCookie()).toHaveLength(0);
+  });
+});
+
+describe('카카오 로그인 v2 오케스트레이션', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('웹 authorization code를 카카오 access token으로 교환한 뒤 v2 검증 API로 전달한다', async () => {
+    const { AuthApi } = jest.requireMock('@/api/auth/auth.api');
+    const bottleAccessToken = await createTestJwt({
+      exp: Math.floor(Date.now() / 1000) + 600,
+    });
+
+    AuthApi.server.fetchKakaoToken.mockResolvedValueOnce({
+      access_token: 'kakao-sdk-access-token',
+    });
+    AuthApi.server.kakaoLogin.mockResolvedValueOnce({
+      accessToken: bottleAccessToken,
+      refreshToken: 'bottle-refresh-token',
+    });
+
+    const response = await createLoginResponse({
+      provider: 'kakao-login',
+      authorizationCode: 'kakao-authorization-code',
+    });
+    const body = await response.json();
+    const cookies = getCookieMap(response);
+
+    expect(AuthApi.server.fetchKakaoToken).toHaveBeenCalledWith(
+      'kakao-authorization-code',
+    );
+    expect(AuthApi.server.kakaoLogin).toHaveBeenCalledWith({
+      accessToken: 'kakao-sdk-access-token',
+    });
+    expect(body.accessToken).toBe(bottleAccessToken);
+    expect(cookies.get('bn_access_token')?.value).toBe(bottleAccessToken);
+    expect(cookies.get('bn_refresh_token')?.value).toBe('bottle-refresh-token');
+  });
+
+  it('인앱에서 받은 카카오 access token은 교환 없이 바로 v2 검증 API로 전달한다', async () => {
+    const { AuthApi } = jest.requireMock('@/api/auth/auth.api');
+    const bottleAccessToken = await createTestJwt({
+      exp: Math.floor(Date.now() / 1000) + 600,
+    });
+
+    AuthApi.server.kakaoLogin.mockResolvedValueOnce({
+      accessToken: bottleAccessToken,
+      refreshToken: 'bottle-refresh-token',
+    });
+
+    await createLoginResponse({
+      provider: 'kakao-login',
+      accessToken: 'kakao-sdk-access-token',
+    });
+
+    expect(AuthApi.server.fetchKakaoToken).not.toHaveBeenCalled();
+    expect(AuthApi.server.kakaoLogin).toHaveBeenCalledWith({
+      accessToken: 'kakao-sdk-access-token',
+    });
+  });
+
+  it('이메일만 전달된 카카오 로그인 요청은 허용하지 않는다', async () => {
+    await expect(
+      createLoginResponse({
+        provider: 'kakao-login',
+        email: 'legacy@bottle-note.com',
+      } as unknown as LoginPayload),
+    ).rejects.toThrow('Kakao login payload is invalid');
   });
 });
 

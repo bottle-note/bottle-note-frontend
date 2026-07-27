@@ -71,12 +71,12 @@ export const createMenuCategories = (
         },
         {
           text: '개인정보 처리방침',
-          link: `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_NOTION_URL}`,
+          link: ROUTES.LEGAL.PRIVACY_POLICY,
           action: undefined,
         },
         {
           text: '이용약관',
-          link: `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_NOTION_URL}info?pvs=4`,
+          link: ROUTES.LEGAL.TERMS,
           action: undefined,
         },
         {

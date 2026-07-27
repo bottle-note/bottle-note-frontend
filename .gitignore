@@ -43,6 +43,9 @@ next-env.d.ts
 # oh-my-claudecode
 .omc/
 
+# local API reference skill
+/.claude/skills/bottlenote-product-api/
+
 # handoff docs
 HANDOFF.md
 

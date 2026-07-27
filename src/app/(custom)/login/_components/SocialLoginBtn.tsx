@@ -2,7 +2,7 @@ import Image from 'next/image';
 import KakaoLogo from 'public/icon/kakao-logo.svg';
 import AppleLogo from 'public/icon/apple-logo.svg';
 
-type LoginType = 'KAKAO' | 'APPLE' | 'GOOGLE' | 'NAVER';
+type LoginType = 'KAKAO' | 'APPLE';
 interface Props {
   type: LoginType;
   onClick: () => void;
@@ -42,16 +42,6 @@ function SocialLoginBtn({ type, onClick }: Props) {
             className="absolute top-1/2 -translate-y-1/2 left-4 w-4"
           />
           <span>Apple로 로그인</span>
-        </div>
-      )}
-      {type === 'GOOGLE' && (
-        <div className="flex justify-center relative bg-white">
-          <span>구글로 로그인</span>
-        </div>
-      )}
-      {type === 'NAVER' && (
-        <div className="flex justify-center relative bg-white">
-          <span>네이버로 로그인</span>
         </div>
       )}
     </button>

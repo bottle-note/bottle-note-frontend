@@ -69,6 +69,7 @@ const BookmarkTab = <T extends { id: string; name: string }>({
                     viewBox={`0 0 ${TAB_WIDTH} ${TAB_HEIGHT}`}
                     className="absolute inset-0"
                     preserveAspectRatio="none"
+                    style={{ color: BORDER_COLOR }}
                   >
                     <defs>
                       <clipPath id={`tab-clip-${tab.id}`}>
@@ -110,7 +111,7 @@ const BookmarkTab = <T extends { id: string; name: string }>({
                         L${TAB_WIDTH},${TAB_HEIGHT}
                       `}
                       fill="none"
-                      stroke={BORDER_COLOR}
+                      stroke="currentColor"
                       strokeWidth={BORDER_WIDTH}
                       strokeLinejoin="round"
                     />
@@ -122,7 +123,7 @@ const BookmarkTab = <T extends { id: string; name: string }>({
                         y1={TAB_HEIGHT - BORDER_WIDTH / 2}
                         x2={TAB_WIDTH}
                         y2={TAB_HEIGHT - BORDER_WIDTH / 2}
-                        stroke={BORDER_COLOR}
+                        stroke="currentColor"
                         strokeWidth={BORDER_WIDTH}
                       />
                     )}

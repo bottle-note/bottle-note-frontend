@@ -1,23 +1,8 @@
 /**
  * @jest-environment node
  */
-import { SignJWT } from 'jose';
-import { GET } from './route';
-
-const SECRET = new TextEncoder().encode('test-secret-key-for-signing-jwt');
-
-async function createTestJwt(exp: number) {
-  return new SignJWT({
-    sub: 'tester@bottle-note.com',
-    userId: 1,
-    roles: 'ROLE_USER',
-    profile: null,
-  })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime(exp)
-    .sign(SECRET);
-}
+import { GET } from '@/app/api/auth/session/route';
+import { createTestJwt } from '@/__tests__/auth/support/jwt';
 
 // --- mocks ---
 
@@ -74,7 +59,9 @@ beforeEach(() => {
 
 describe('GET /api/auth/session', () => {
   it('access token 쿠키가 유효하면 백엔드 호출 없이 세션을 반환한다', async () => {
-    const validToken = await createTestJwt(Math.floor(Date.now() / 1000) + 600);
+    const validToken = await createTestJwt({
+      exp: Math.floor(Date.now() / 1000) + 600,
+    });
     setCookies({ bn_access_token: validToken, bn_refresh_token: 'rt' });
 
     const response = await GET();
@@ -89,10 +76,12 @@ describe('GET /api/auth/session', () => {
   });
 
   it('access token 쿠키가 만료됐으면 refresh token으로 갱신하여 새 토큰을 반환한다', async () => {
-    const expiredToken = await createTestJwt(
-      Math.floor(Date.now() / 1000) - 100,
-    );
-    const newToken = await createTestJwt(Math.floor(Date.now() / 1000) + 600);
+    const expiredToken = await createTestJwt({
+      exp: Math.floor(Date.now() / 1000) - 100,
+    });
+    const newToken = await createTestJwt({
+      exp: Math.floor(Date.now() / 1000) + 600,
+    });
 
     setCookies({ bn_access_token: expiredToken, bn_refresh_token: 'rt' });
     mockRenewToken.mockResolvedValueOnce({
@@ -119,7 +108,9 @@ describe('GET /api/auth/session', () => {
   });
 
   it('access token 쿠키가 없으면 refresh token으로 갱신한다', async () => {
-    const newToken = await createTestJwt(Math.floor(Date.now() / 1000) + 600);
+    const newToken = await createTestJwt({
+      exp: Math.floor(Date.now() / 1000) + 600,
+    });
 
     setCookies({ bn_refresh_token: 'rt' });
     mockRenewToken.mockResolvedValueOnce({

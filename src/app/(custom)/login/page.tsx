@@ -9,7 +9,6 @@ import { DeviceService } from '@/lib/DeviceService';
 import { useLogin } from '@/hooks/useLogin';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/hooks/auth/useAuth';
-import useModalStore from '@/store/modalStore';
 import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
 import {
   setReturnToUrl,
@@ -18,8 +17,6 @@ import {
 } from '@/utils/loginRedirect';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
-
-const IS_PREVIEW = process.env.NEXT_PUBLIC_IS_PREVIEW === 'true';
 
 export default function Login() {
   const router = useRouter();
@@ -30,20 +27,7 @@ export default function Login() {
     handleKakaoLogin,
     handleAppleLogin,
   } = useLogin();
-  const { isLoggedIn, isLoading, login } = useAuth();
-  const { handleModalState } = useModalStore();
-
-  const handlePreviewLogin = async () => {
-    try {
-      await login('preview-login', {});
-    } catch (error) {
-      handleModalState({
-        isShowModal: true,
-        mainText: '프리뷰 로그인에 실패했습니다.',
-        subText: error instanceof Error ? error.message : '',
-      });
-    }
-  };
+  const { isLoggedIn, isLoading } = useAuth();
 
   useEffect(() => {
     if (returnToParam && isValidReturnUrl(returnToParam)) {
@@ -115,16 +99,6 @@ export default function Login() {
             <SocialLoginBtn type="KAKAO" onClick={handleKakaoLogin} />
             {DeviceService.platform === 'ios' && (
               <SocialLoginBtn type="APPLE" onClick={handleAppleLogin} />
-            )}
-            {IS_PREVIEW && (
-              <button
-                onClick={() => {
-                  void handlePreviewLogin();
-                }}
-                className="w-full rounded-md py-2.5 bg-gray-700 text-white text-sm border border-gray-500"
-              >
-                [Preview] 테스트 계정으로 로그인
-              </button>
             )}
           </article>
         </section>
