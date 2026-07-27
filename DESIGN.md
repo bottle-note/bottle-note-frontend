@@ -66,7 +66,8 @@ Semantic color 매핑은 현재 코드 사용례를 기준으로 아래처럼 �
 - Tailwind class: `bg-bn-canvas`, `bg-bn-raised`, `text-bn-text`, `border-bn-border`, `border-bn-border-strong`, `bg-bn-accent-interactive`, `text-bn-accent-rating`.
 - `bn-brand`, `bn-brand-tonal`, `bn-brand-foreground`은 기존 화면의 점진적 migration을 위한 compatibility alias다. 새 코드는 역할이 드러나는 `bn-accent-*` token을 사용한다.
 - 다크 모드는 `html`이 아니라 `ThemeProvider`가 만드는 app shell의 `.dark` scope에 적용한다.
-- 설정 화면의 `화면 설정 > 다크 모드` 토글 값은 `bottle-note-theme` local storage key에 보존한다.
+- 저장된 사용자 선택이 없으면 `prefers-color-scheme`의 시스템 테마를 초기값으로 사용한다.
+- 설정 화면의 `화면 설정 > 다크 모드` 토글 값은 `bottle-note-theme` local storage key에 보존하며, 저장값이 있으면 시스템 테마보다 우선한다.
 - 이 PR의 완전한 dark migration 대상은 홈과 설정 화면이다. 다른 route는 semantic token 전환 전까지 기존 light appearance가 일부 남을 수 있다.
 
 ### 2.2 Typography

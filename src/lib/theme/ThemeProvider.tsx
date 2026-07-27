@@ -24,8 +24,12 @@ interface ThemeProviderProps {
 }
 
 const THEME_STORAGE_KEY = 'bottle-note-theme';
+const DARK_MODE_MEDIA_QUERY = '(prefers-color-scheme: dark)';
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
+
+const getSystemTheme = (): Theme =>
+  window.matchMedia?.(DARK_MODE_MEDIA_QUERY).matches ? 'dark' : 'light';
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [theme, setThemeState] = useState<Theme>('light');
@@ -35,7 +39,10 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
     if (storedTheme === 'light' || storedTheme === 'dark') {
       setThemeState(storedTheme);
+      return;
     }
+
+    setThemeState(getSystemTheme());
   }, []);
 
   const setTheme = useCallback((nextTheme: Theme) => {
