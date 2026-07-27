@@ -11,19 +11,19 @@ import {
 function HomeTastingEventSkeleton() {
   return (
     <div className="flex h-[321px] gap-4 overflow-hidden">
-      <div className="h-[312px] w-[272px] shrink-0 animate-pulse rounded-lg bg-sectionWhite" />
-      <div className="h-[312px] w-[272px] shrink-0 animate-pulse rounded-lg bg-sectionWhite" />
+      <div className="h-[312px] w-[272px] shrink-0 animate-pulse rounded-lg bg-sectionWhite dark:bg-bn-raised" />
+      <div className="h-[312px] w-[272px] shrink-0 animate-pulse rounded-lg bg-sectionWhite dark:bg-bn-raised" />
     </div>
   );
 }
 
 function HomeTastingEventEmptyState() {
   return (
-    <div className="flex h-[312px] w-[272px] flex-col justify-center rounded-lg bg-sectionWhite px-5">
-      <p className="text-14 font-bold text-mainDarkGray">
+    <div className="flex h-[312px] w-[272px] flex-col justify-center rounded-lg bg-sectionWhite dark:bg-bn-raised px-5">
+      <p className="text-14 font-bold text-mainDarkGray dark:text-bn-text">
         진행 중인 시음회가 없어요.
       </p>
-      <p className="mt-2 text-11 font-medium leading-[17px] text-mainGray">
+      <p className="mt-2 text-11 font-medium leading-[17px] text-mainGray dark:text-bn-text-secondary">
         새로운 시음회가 등록되면 이곳에서 확인할 수 있어요.
       </p>
     </div>

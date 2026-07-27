@@ -16,35 +16,59 @@
 
 `tailwind.config.ts`의 `tailwindColors`를 우선 사용한다.
 
-| Token | Hex | 주요 용도 |
-| --- | --- | --- |
-| `mainCoral` | `#EF9A6E` | 검색 input border/placeholder 등 밝은 코랄 |
-| `subCoral` | `#E58257` | 주요 CTA, 활성 tab, nav text/icon, label selected |
-| `bgGray` | `#E6E6DD` | disabled label background |
-| `brightGray` | `#BFBFBF` | 비활성 버튼, 구분선, border |
-| `mainGray` | `#666666` | 보조 본문, placeholder, 설명 텍스트 |
-| `textGray` | `#C6C6C6` | 옅은 텍스트 |
-| `gray` | `#2B2B2B` | 진한 회색 |
-| `mainBlack` | `#101010` | 기본 강조 텍스트 |
-| `mainDarkGray` | `#252525` | input text, modal sub text 등 |
-| `sectionWhite` | `#F7F7F7` | 섹션/카드 배경 |
+| Token          | Hex       | 주요 용도                                         |
+| -------------- | --------- | ------------------------------------------------- |
+| `mainCoral`    | `#EF9A6E` | 검색 input border/placeholder 등 밝은 코랄        |
+| `subCoral`     | `#E58257` | 주요 CTA, 활성 tab, nav text/icon, label selected |
+| `bgGray`       | `#E6E6DD` | disabled label background                         |
+| `brightGray`   | `#BFBFBF` | 비활성 버튼, 구분선, border                       |
+| `mainGray`     | `#666666` | 보조 본문, placeholder, 설명 텍스트               |
+| `textGray`     | `#C6C6C6` | 옅은 텍스트                                       |
+| `gray`         | `#2B2B2B` | 진한 회색                                         |
+| `mainBlack`    | `#101010` | 기본 강조 텍스트                                  |
+| `mainDarkGray` | `#252525` | input text, modal sub text 등                     |
+| `sectionWhite` | `#F7F7F7` | 섹션/카드 배경                                    |
 
 CSS variable 기반 shadcn 계열 토큰도 존재한다: `background`, `foreground`, `card`, `primary`, `secondary`, `muted`, `accent`, `destructive`, `border`, `input`, `ring`. 단, BottleNote 고유 UI는 위 `tailwindColors`를 우선한다.
 
 Semantic color 매핑은 현재 코드 사용례를 기준으로 아래처럼 해석한다. 실제 class는 우선 기존 Tailwind token 이름을 그대로 사용하고, 새 semantic alias를 코드에 추가하기 전까지 문서 기준으로만 활용한다.
 
-| Semantic | Token | Hex | 기준 |
-| --- | --- | --- | --- |
-| `brand-primary` | `subCoral` | `#E58257` | 활성 tab/nav/label, 기본 Button, 브랜드 강조 텍스트/보더에 쓰는 핵심 코랄 |
-| `brand-accent` | `mainCoral` | `#EF9A6E` | 검색 input border/placeholder, 큰 CTA surface, datepicker selected, gradient highlight에 쓰는 밝은 코랄 |
-| `surface-default` | `white` | `#FFFFFF` | 기본 페이지/카드/모달 배경 |
-| `surface-section` | `sectionWhite` | `#F7F7F7` | 이미지 배경, 섹션성 카드 배경 |
-| `surface-muted` | `bgGray` | `#E6E6DD` | 비활성 label, 보조 surface |
-| `text-primary` | `mainBlack` 또는 `mainDarkGray` | `#101010` / `#252525` | 본문/강조 텍스트. 기존 화면 맥락에 맞춰 선택 |
-| `text-secondary` | `mainGray` | `#666666` | 설명, 메타, placeholder 보조 텍스트 |
-| `text-tertiary` | `textGray` 또는 `brightGray` | `#C6C6C6` / `#BFBFBF` | 옅은 보조 텍스트, 비활성 표시 |
-| `border-default` | `brightGray` | `#BFBFBF` | 일반 구분선/비활성 border |
-| `border-brand` | `subCoral` 또는 `mainCoral` | `#E58257` / `#EF9A6E` | active/brand border는 `subCoral`, input 강조 border는 `mainCoral` 우선 |
+| Semantic          | Token                           | Hex                   | 기준                                                                                                    |
+| ----------------- | ------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------- |
+| `brand-primary`   | `subCoral`                      | `#E58257`             | 활성 tab/nav/label, 기본 Button, 브랜드 강조 텍스트/보더에 쓰는 핵심 코랄                               |
+| `brand-accent`    | `mainCoral`                     | `#EF9A6E`             | 검색 input border/placeholder, 큰 CTA surface, datepicker selected, gradient highlight에 쓰는 밝은 코랄 |
+| `surface-default` | `white`                         | `#FFFFFF`             | 기본 페이지/카드/모달 배경                                                                              |
+| `surface-section` | `sectionWhite`                  | `#F7F7F7`             | 이미지 배경, 섹션성 카드 배경                                                                           |
+| `surface-muted`   | `bgGray`                        | `#E6E6DD`             | 비활성 label, 보조 surface                                                                              |
+| `text-primary`    | `mainBlack` 또는 `mainDarkGray` | `#101010` / `#252525` | 본문/강조 텍스트. 기존 화면 맥락에 맞춰 선택                                                            |
+| `text-secondary`  | `mainGray`                      | `#666666`             | 설명, 메타, placeholder 보조 텍스트                                                                     |
+| `text-tertiary`   | `textGray` 또는 `brightGray`    | `#C6C6C6` / `#BFBFBF` | 옅은 보조 텍스트, 비활성 표시                                                                           |
+| `border-default`  | `brightGray`                    | `#BFBFBF`             | 일반 구분선/비활성 border                                                                               |
+| `border-brand`    | `subCoral` 또는 `mainCoral`     | `#E58257` / `#EF9A6E` | active/brand border는 `subCoral`, input 강조 border는 `mainCoral` 우선                                  |
+
+### 2.1.1 Dark semantic tokens (Home preview)
+
+홈 화면 다크 프리뷰는 `dark` scope 안에서 아래 semantic alias를 사용한다. 기존 `tailwindColors`는 라이트 화면의 raw palette로 보존하며, 다크 화면에 직접 재사용하지 않는다.
+
+| Semantic alias                  | Light                 | Dark: Oak & Amber Night | 역할                               |
+| ------------------------------- | --------------------- | ----------------------- | ---------------------------------- |
+| `bn-canvas`                     | `#FFFFFF`             | `#100E0C`               | 전체 canvas                        |
+| `bn-section`                    | `#F7F7F7`             | `#1A1612`               | section / tab inactive surface     |
+| `bn-raised`                     | `#FFFFFF`             | `#27211A`               | card / navbar / active tab surface |
+| `bn-text` / `bn-text-secondary` | `#101010` / `#666666` | `#F5EFE5` / `#C9BCA9`   | 본문 텍스트 계층                   |
+| `bn-border-subtle`              | `#E6E6DD`             | `#3B3228`               | divider / tag border               |
+| `bn-border-strong`              | `#BFBFBF`             | `#75624B`               | input / selected control border    |
+| `bn-accent-interactive`         | `#E58257`             | `#E99670`               | CTA, active tab/nav, 내 별점       |
+| `bn-accent-rating`              | `#666666`             | `#D9A45B`               | 공개 평균 별점                     |
+| `bn-accent-tonal`               | `#FFF0E9`             | `#38261B`               | 선택/보조 강조 surface             |
+| `bn-accent-foreground`          | `#FFFFFF`             | `#1E1209`               | solid accent surface 위 텍스트     |
+
+- Tailwind class: `bg-bn-canvas`, `bg-bn-raised`, `text-bn-text`, `border-bn-border`, `border-bn-border-strong`, `bg-bn-accent-interactive`, `text-bn-accent-rating`.
+- `bn-brand`, `bn-brand-tonal`, `bn-brand-foreground`은 기존 화면의 점진적 migration을 위한 compatibility alias다. 새 코드는 역할이 드러나는 `bn-accent-*` token을 사용한다.
+- 다크 모드는 `html`이 아니라 `ThemeProvider`가 만드는 app shell의 `.dark` scope에 적용한다.
+- 저장된 사용자 선택이 없으면 `prefers-color-scheme`의 시스템 테마를 초기값으로 사용한다.
+- 설정 화면의 `화면 설정 > 다크 모드` 토글 값은 `bottle-note-theme` local storage key에 보존하며, 저장값이 있으면 시스템 테마보다 우선한다.
+- 이 PR의 완전한 dark migration 대상은 홈과 설정 화면이다. 다른 route는 semantic token 전환 전까지 기존 light appearance가 일부 남을 수 있다.
 
 ### 2.2 Typography
 
@@ -52,20 +76,20 @@ Semantic color 매핑은 현재 코드 사용례를 기준으로 아래처럼 �
 - `input`, `textarea`: 현재 global css에서 `Noto Sans`, `sans-serif`로 지정되어 있다.
 - Tailwind 확장 font size:
 
-| Class | Size / Line-height | 권장 용도 |
-| --- | --- | --- |
-| `text-9` | 9 / 9px | 매우 작은 보조 표기 |
-| `text-10` | 10 / 14px | nav label, 작은 chip |
-| `text-11` | 11 / 15px | 보조 메타 |
-| `text-12` | 12 / 16px | 설명, helper text |
-| `text-13` | 13 / 17px | 본문/label/chip |
-| `text-13.5` | 13.5 / 17.5px | 중간 본문 |
-| `text-14` | 14 / 18px | 일반 본문 |
-| `text-15` | 15 / 19px | tab, button text |
-| `text-16` | 16 / 20px | header/modal body |
-| `text-20` | 20 / 24px | modal main text, section title |
-| `text-24` | 24 / 28px | 큰 타이틀 |
-| `text-27` | 27 / 31px | 히어로 타이틀 |
+| Class       | Size / Line-height | 권장 용도                      |
+| ----------- | ------------------ | ------------------------------ |
+| `text-9`    | 9 / 9px            | 매우 작은 보조 표기            |
+| `text-10`   | 10 / 14px          | nav label, 작은 chip           |
+| `text-11`   | 11 / 15px          | 보조 메타                      |
+| `text-12`   | 12 / 16px          | 설명, helper text              |
+| `text-13`   | 13 / 17px          | 본문/label/chip                |
+| `text-13.5` | 13.5 / 17.5px      | 중간 본문                      |
+| `text-14`   | 14 / 18px          | 일반 본문                      |
+| `text-15`   | 15 / 19px          | tab, button text               |
+| `text-16`   | 16 / 20px          | header/modal body              |
+| `text-20`   | 20 / 24px          | modal main text, section title |
+| `text-24`   | 24 / 28px          | 큰 타이틀                      |
+| `text-27`   | 27 / 31px          | 히어로 타이틀                  |
 
 Figma 매핑 기본값:
 
@@ -79,20 +103,20 @@ Figma 매핑 기본값:
 
 Tailwind 기본 spacing과 아래 확장 spacing을 사용한다.
 
-| Class | rem | px |
-| --- | --- | --- |
-| `1.5` | 0.375 | 6 |
-| `2.5` | 0.625 | 10 |
+| Class  | rem   | px    |
+| ------ | ----- | ----- |
+| `1.5`  | 0.375 | 6     |
+| `2.5`  | 0.625 | 10    |
 | `2.75` | 0.688 | 약 11 |
 | `3.25` | 0.813 | 약 13 |
-| `3.5` | 0.875 | 14 |
+| `3.5`  | 0.875 | 14    |
 | `3.75` | 0.938 | 약 15 |
-| `4.5` | 1.125 | 18 |
+| `4.5`  | 1.125 | 18    |
 | `5.25` | 1.313 | 약 21 |
-| `7.5` | 1.875 | 30 |
-| `8.5` | 2.125 | 34 |
+| `7.5`  | 1.875 | 30    |
+| `8.5`  | 2.125 | 34    |
 | `8.75` | 2.188 | 약 35 |
-| `11.5` | 2.875 | 46 |
+| `11.5` | 2.875 | 46    |
 
 Figma px → Tailwind 변환:
 

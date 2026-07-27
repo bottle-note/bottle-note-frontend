@@ -27,6 +27,7 @@ import { setReturnToUrl } from '@/utils/loginRedirect';
 import SettingsPage from '@/app/(primary)/settings/page';
 import Modal from '@/components/ui/Modal/Modal';
 import { useSettingsStore } from '@/store/settingsStore';
+import { ThemeProvider } from '@/lib/theme/ThemeProvider';
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
@@ -513,7 +514,7 @@ describe('Auth business flows', () => {
 
       render(
         React.createElement(
-          React.Fragment,
+          ThemeProvider,
           null,
           React.createElement(SettingsPage),
           React.createElement(Modal),

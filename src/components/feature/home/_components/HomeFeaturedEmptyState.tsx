@@ -22,7 +22,9 @@ export function HomeFeaturedEmptyState({ type }: Props) {
         style={{ width: 30, height: 30 }}
         priority
       />
-      <p className="text-mainGray text-15 mt-5">{emptyText}</p>
+      <p className="text-mainGray dark:text-bn-text-secondary text-15 mt-5">
+        {emptyText}
+      </p>
     </div>
   );
 }

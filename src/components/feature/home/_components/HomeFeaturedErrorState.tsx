@@ -18,13 +18,13 @@ export function HomeFeaturedErrorState({ onRetry }: Props) {
         style={{ width: 30, height: 30 }}
         priority
       />
-      <p className="text-mainGray text-15 mt-5">
+      <p className="text-mainGray dark:text-bn-text-secondary text-15 mt-5">
         데이터를 불러오는데 실패했습니다.
       </p>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="mt-3 px-4 py-2 text-14 text-subCoral border border-subCoral rounded-lg"
+          className="mt-3 px-4 py-2 text-14 text-subCoral dark:text-bn-brand border border-subCoral dark:border-bn-brand rounded-lg"
         >
           다시 시도
         </button>

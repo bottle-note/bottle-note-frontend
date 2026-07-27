@@ -171,7 +171,7 @@ export default function Settings() {
   };
 
   return (
-    <main className="flex-1 flex flex-col">
+    <main className="flex flex-1 flex-col bg-white dark:bg-bn-canvas">
       <SubHeader>
         <SubHeader.Left onClick={getHeaderLeftOnClick()}>
           <Image

@@ -49,11 +49,11 @@ export function TarotPromoCard() {
     >
       <Link
         href={ROUTES.WHISKEY_TAROT}
-        className="block p-4 bg-mainCoral/10 rounded-xl relative"
+        className="block p-4 bg-mainCoral/10 dark:bg-bn-brand-tonal rounded-xl relative"
       >
         <button
           onClick={handleClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:text-bn-text-tertiary dark:hover:text-bn-text"
           aria-label="닫기"
         >
           <svg
@@ -71,10 +71,10 @@ export function TarotPromoCard() {
           </svg>
         </button>
         <div className="pr-8">
-          <h3 className="text-mainCoral font-semibold text-base">
+          <h3 className="text-mainCoral dark:text-bn-brand font-semibold text-base">
             위스키와 함께하는 타로점
           </h3>
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="text-gray-500 dark:text-bn-text-secondary text-sm mt-1">
             타로 카드를 뽑아 추천 위스키를 점쳐보세요.
           </p>
         </div>
