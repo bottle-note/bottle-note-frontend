@@ -7,7 +7,7 @@ import { curationV2Keys } from '@/queries/curationV2Keys';
 interface UseCurationFeedQueryParams {
   pageSize?: number;
   keyword?: string;
-  code?: CurationV2SpecCode;
+  code: CurationV2SpecCode;
   enabled?: boolean;
 }
 
@@ -16,7 +16,7 @@ export const useCurationFeedQuery = ({
   keyword,
   code,
   enabled = true,
-}: UseCurationFeedQueryParams = {}) => {
+}: UseCurationFeedQueryParams) => {
   return usePaginatedQuery<CurationV2FeedData>({
     queryKey: [...curationV2Keys.feed({ pageSize, keyword, code })],
     queryFn: ({ pageParam }) =>
@@ -24,7 +24,7 @@ export const useCurationFeedQuery = ({
         cursor: pageParam,
         pageSize,
         keyword,
-        code,
+        code: [code],
       }),
     pageSize,
     staleTime: 1000 * 60 * 5,

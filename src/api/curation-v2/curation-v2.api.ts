@@ -7,19 +7,25 @@ import type { CurationV2DetailItem, CurationV2FeedData } from './types';
 
 interface CurationV2FeedParams extends CursorPaginationParams {
   keyword?: string;
-  code?: CurationV2SpecCode;
+  code: CurationV2SpecCode[];
 }
 
 export const CurationV2Api = {
   /**
    * Product 피드 화면에서 사용할 spec 기반 큐레이션 v2 목록을 조회합니다.
    * - API docs: GET /api/v2/curations/feed
+   * - `code`는 하나 이상 전달해야 하며, 배열은 반복 쿼리 파라미터로 직렬화됩니다.
    * - payload는 responseSpec의 x-feed.enabled=true 필드만 포함합니다.
    */
   async getFeed(
-    params: CurationV2FeedParams = {},
+    params: CurationV2FeedParams,
   ): Promise<ApiResponse<CurationV2FeedData>> {
     const { cursor = 0, pageSize = 10, keyword, code } = params;
+
+    if (code.length === 0) {
+      throw new Error('At least one curation spec code is required.');
+    }
+
     const queryString = buildQueryParams({
       cursor,
       size: pageSize,
