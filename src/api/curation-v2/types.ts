@@ -3,16 +3,30 @@
 // ============================================
 
 import type { PageableInfo } from '@/api/_shared/types';
-import type { RecommendedWhiskyPayload, TastingEventPayload } from './schema';
+import type {
+  ProgramFeedPayload,
+  ProgramPayload,
+  RecommendedWhiskyPayload,
+  TastingEventPayload,
+} from './schema';
 
 export type {
   CurationAlcohol,
+  ProgramFeedPayload,
+  ProgramFeedSchedule,
+  ProgramPayload,
+  ProgramSchedule,
+  ProgramTag,
+  ProgramType,
+  ProgramWhisky,
   RecommendedWhiskyPayload,
   TastingEventAlcohol,
   TastingEventPayload,
 } from './schema';
 
 export type CurationV2Payload =
+  | ProgramFeedPayload
+  | ProgramPayload
   | RecommendedWhiskyPayload
   | TastingEventPayload
   | Record<string, unknown>
@@ -54,6 +68,14 @@ export interface TastingEventFeedItem extends CurationV2FeedItem {
 
 export interface TastingEventDetailItem extends CurationV2DetailItem {
   payload: TastingEventPayload;
+}
+
+export interface ProgramFeedItem extends CurationV2FeedItem {
+  payload: ProgramFeedPayload;
+}
+
+export interface ProgramDetailItem extends CurationV2DetailItem {
+  payload: ProgramPayload;
 }
 
 export interface RecommendedWhiskyFeedItem extends CurationV2FeedItem {
