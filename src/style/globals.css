@@ -263,6 +263,10 @@
     @apply bg-bgGray text-white border border-solid border-bgGray rounded-md py-1 px-3;
   }
 
+  .link-button {
+    @apply inline-flex whitespace-nowrap text-13 font-medium text-mainGray underline underline-offset-2;
+  }
+
   .tab-default {
     @apply text-subCoral/50 border-subCoral/50 border-b;
   }
