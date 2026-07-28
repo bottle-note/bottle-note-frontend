@@ -1,27 +1,50 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { ThemeProvider, useTheme } from './ThemeProvider';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
+import {
+  DARK_MODE_MEDIA_QUERY,
+  THEME_STORAGE_KEY,
+  ThemeProvider,
+  useTheme,
+} from './ThemeProvider';
+
+let systemThemeListener: ((event: MediaQueryListEvent) => void) | undefined;
 
 const mockSystemTheme = (isDarkMode: boolean) => {
   window.matchMedia = jest.fn().mockImplementation((query: string) => ({
-    matches: isDarkMode && query === '(prefers-color-scheme: dark)',
+    matches: isDarkMode && query === DARK_MODE_MEDIA_QUERY,
     media: query,
     onchange: null,
     addListener: jest.fn(),
     removeListener: jest.fn(),
-    addEventListener: jest.fn(),
+    addEventListener: jest.fn(
+      (_eventName: string, listener: (event: MediaQueryListEvent) => void) => {
+        systemThemeListener = listener;
+      },
+    ),
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
   }));
 };
 
 const ThemeConsumer = () => {
-  const { theme, toggleTheme } = useTheme();
+  const { preference, theme, setThemePreference } = useTheme();
 
   return (
     <>
-      <span>{theme}</span>
-      <button type="button" onClick={toggleTheme}>
-        테마 전환
+      <span>{`${preference}:${theme}`}</span>
+      <button type="button" onClick={() => setThemePreference('light')}>
+        라이트 모드
+      </button>
+      <button type="button" onClick={() => setThemePreference('dark')}>
+        다크 모드
+      </button>
+      <button type="button" onClick={() => setThemePreference('system')}>
+        시스템 설정 따르기
       </button>
     </>
   );
@@ -30,91 +53,76 @@ const ThemeConsumer = () => {
 describe('ThemeProvider', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    document.documentElement.className = 'touch-manipulation';
+    document.documentElement.style.colorScheme = '';
+    systemThemeListener = undefined;
     mockSystemTheme(false);
   });
 
-  it('저장된 테마가 없으면 시스템 라이트 모드를 따른다', async () => {
-    const { container } = render(
-      <ThemeProvider>
-        <ThemeConsumer />
-      </ThemeProvider>,
-    );
-
-    await waitFor(() => {
-      expect(window.matchMedia).toHaveBeenCalledWith(
-        '(prefers-color-scheme: dark)',
-      );
-      expect(screen.getByText('light')).toBeInTheDocument();
-      expect(
-        container.querySelector('[data-theme="light"]'),
-      ).toBeInTheDocument();
-    });
-  });
-
-  it('저장된 테마가 없으면 시스템 다크 모드를 따른다', async () => {
+  it('저장값이 없으면 시스템 테마를 적용한다', async () => {
     mockSystemTheme(true);
 
-    const { container } = render(
+    render(
       <ThemeProvider>
         <ThemeConsumer />
       </ThemeProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByText('dark')).toBeInTheDocument();
-      expect(
-        container.querySelector('[data-theme="dark"]'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('system:dark')).toBeInTheDocument();
+      expect(document.documentElement).toHaveClass('dark');
+      expect(document.documentElement.style.colorScheme).toBe('dark');
     });
   });
 
-  it('저장된 다크 모드를 복원한다', async () => {
-    window.localStorage.setItem('bottle-note-theme', 'dark');
-
-    const { container } = render(
-      <ThemeProvider>
-        <ThemeConsumer />
-      </ThemeProvider>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('dark')).toBeInTheDocument();
-      expect(
-        container.querySelector('[data-theme="dark"]'),
-      ).toBeInTheDocument();
-    });
-  });
-
-  it('저장된 라이트 모드는 시스템 다크 모드보다 우선한다', async () => {
+  it('저장된 선택값은 시스템 테마보다 우선한다', async () => {
     mockSystemTheme(true);
-    window.localStorage.setItem('bottle-note-theme', 'light');
+    window.localStorage.setItem(THEME_STORAGE_KEY, 'light');
 
-    const { container } = render(
+    render(
       <ThemeProvider>
         <ThemeConsumer />
       </ThemeProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByText('light')).toBeInTheDocument();
-      expect(
-        container.querySelector('[data-theme="light"]'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('light:light')).toBeInTheDocument();
+      expect(document.documentElement).not.toHaveClass('dark');
+      expect(document.documentElement.style.colorScheme).toBe('light');
     });
-    expect(window.matchMedia).not.toHaveBeenCalled();
   });
 
-  it('테마를 전환하고 선택값을 저장한다', () => {
-    const { container } = render(
+  it('명시 선택을 저장하고 html 테마를 즉시 갱신한다', async () => {
+    render(
       <ThemeProvider>
         <ThemeConsumer />
       </ThemeProvider>,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: '테마 전환' }));
+    fireEvent.click(screen.getByRole('button', { name: '다크 모드' }));
 
-    expect(screen.getByText('dark')).toBeInTheDocument();
-    expect(container.querySelector('.dark')).toBeInTheDocument();
-    expect(window.localStorage.getItem('bottle-note-theme')).toBe('dark');
+    await waitFor(() => {
+      expect(screen.getByText('dark:dark')).toBeInTheDocument();
+      expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark');
+      expect(document.documentElement).toHaveClass('dark');
+      expect(document.documentElement.style.colorScheme).toBe('dark');
+    });
+  });
+
+  it('시스템 설정 추종 중에는 OS 테마 변경을 반영한다', async () => {
+    render(
+      <ThemeProvider>
+        <ThemeConsumer />
+      </ThemeProvider>,
+    );
+
+    await waitFor(() => expect(systemThemeListener).toBeDefined());
+
+    act(() => {
+      systemThemeListener?.({ matches: true } as MediaQueryListEvent);
+    });
+
+    expect(screen.getByText('system:dark')).toBeInTheDocument();
+    expect(document.documentElement).toHaveClass('dark');
   });
 });

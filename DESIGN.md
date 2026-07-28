@@ -14,7 +14,7 @@
 
 ### 2.1 Color
 
-`tailwind.config.ts`의 `tailwindColors`를 우선 사용한다.
+`tailwind.config.ts`의 semantic token을 우선 사용한다. `tailwindColors` export는 기존 문서·테스트 호환을 위한 raw light palette이며, 기존 utility class는 semantic CSS 변수로 해석된다.
 
 | Token          | Hex       | 주요 용도                                         |
 | -------------- | --------- | ------------------------------------------------- |
@@ -29,9 +29,9 @@
 | `mainDarkGray` | `#252525` | input text, modal sub text 등                     |
 | `sectionWhite` | `#F7F7F7` | 섹션/카드 배경                                    |
 
-CSS variable 기반 shadcn 계열 토큰도 존재한다: `background`, `foreground`, `card`, `primary`, `secondary`, `muted`, `accent`, `destructive`, `border`, `input`, `ring`. 단, BottleNote 고유 UI는 위 `tailwindColors`를 우선한다.
+CSS variable 기반 shadcn 계열 토큰도 존재한다: `background`, `foreground`, `card`, `primary`, `secondary`, `muted`, `accent`, `destructive`, `border`, `input`, `ring`. BottleNote 고유 UI는 `bn-*` semantic token을 우선한다.
 
-Semantic color 매핑은 현재 코드 사용례를 기준으로 아래처럼 해석한다. 실제 class는 우선 기존 Tailwind token 이름을 그대로 사용하고, 새 semantic alias를 코드에 추가하기 전까지 문서 기준으로만 활용한다.
+Semantic color 매핑은 현재 코드 사용례를 기준으로 아래처럼 해석한다. 새 코드는 역할이 드러나는 `bn-*` class를 사용하고, 기존 utility class는 점진적 migration을 위해 semantic CSS 변수로 매핑한다.
 
 | Semantic          | Token                           | Hex                   | 기준                                                                                                    |
 | ----------------- | ------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------- |
@@ -46,9 +46,9 @@ Semantic color 매핑은 현재 코드 사용례를 기준으로 아래처럼 �
 | `border-default`  | `brightGray`                    | `#BFBFBF`             | 일반 구분선/비활성 border                                                                               |
 | `border-brand`    | `subCoral` 또는 `mainCoral`     | `#E58257` / `#EF9A6E` | active/brand border는 `subCoral`, input 강조 border는 `mainCoral` 우선                                  |
 
-### 2.1.1 Dark semantic tokens (Home preview)
+### 2.1.1 Dark semantic tokens
 
-홈 화면 다크 프리뷰는 `dark` scope 안에서 아래 semantic alias를 사용한다. 기존 `tailwindColors`는 라이트 화면의 raw palette로 보존하며, 다크 화면에 직접 재사용하지 않는다.
+모든 프로덕트 route는 `dark` scope 안에서 아래 semantic alias를 사용한다. 기존 `tailwindColors`는 라이트 화면의 raw palette로 보존하며, 다크 화면에 직접 재사용하지 않는다.
 
 | Semantic alias                  | Light                 | Dark: Oak & Amber Night | 역할                               |
 | ------------------------------- | --------------------- | ----------------------- | ---------------------------------- |
@@ -65,10 +65,10 @@ Semantic color 매핑은 현재 코드 사용례를 기준으로 아래처럼 �
 
 - Tailwind class: `bg-bn-canvas`, `bg-bn-raised`, `text-bn-text`, `border-bn-border`, `border-bn-border-strong`, `bg-bn-accent-interactive`, `text-bn-accent-rating`.
 - `bn-brand`, `bn-brand-tonal`, `bn-brand-foreground`은 기존 화면의 점진적 migration을 위한 compatibility alias다. 새 코드는 역할이 드러나는 `bn-accent-*` token을 사용한다.
-- 다크 모드는 `html`이 아니라 `ThemeProvider`가 만드는 app shell의 `.dark` scope에 적용한다.
-- 저장된 사용자 선택이 없으면 `prefers-color-scheme`의 시스템 테마를 초기값으로 사용한다.
-- 설정 화면의 `화면 설정 > 다크 모드` 토글 값은 `bottle-note-theme` local storage key에 보존하며, 저장값이 있으면 시스템 테마보다 우선한다.
-- 이 PR의 완전한 dark migration 대상은 홈과 설정 화면이다. 다른 route는 semantic token 전환 전까지 기존 light appearance가 일부 남을 수 있다.
+- `src/app/layout.tsx`의 pre-hydration script가 `<html>`에 `.dark`와 `color-scheme`을 적용한다. `<html>`은 hydration warning을 억제해야 한다.
+- `ThemeProvider`는 `system | light | dark` preference를 보유한다. 시스템 선택일 때만 `prefers-color-scheme` 변경을 구독하고, resolved theme 변경 시 `<html>` class와 `color-scheme`을 갱신한다.
+- 설정 화면의 `화면 설정 > 화면 모드`는 `시스템 설정 따르기`, `라이트 모드`, `다크 모드` 중 하나를 선택한다. preference는 `bottle-note-theme` local storage key에 보존한다.
+- 새 페이지/공통 surface는 `bg-bn-canvas`, `bg-bn-section`, `bg-bn-raised`와 `text-bn-*`, `border-bn-*`를 사용한다. 기존 `bg-white` 등 legacy class는 다크 scope에서 compatibility rule로 보정하되, 타로 등 의도적으로 흰색이 필요한 art-directed surface에는 `keep-light-surface`를 명시한다.
 
 ### 2.2 Typography
 

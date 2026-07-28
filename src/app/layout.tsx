@@ -6,6 +6,27 @@ import { BASE_URL } from '@/constants/common';
 
 const isProd = process.env.NODE_ENV === 'production';
 
+const themeInitializationScript = `
+  (() => {
+    try {
+      const storageKey = 'bottle-note-theme';
+      const preference = localStorage.getItem(storageKey);
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+      const theme = preference === 'light' || preference === 'dark'
+        ? preference
+        : systemTheme;
+      const root = document.documentElement;
+
+      root.classList.toggle('dark', theme === 'dark');
+      root.style.colorScheme = theme;
+    } catch {
+      // Storage access can fail in restricted embedded browser contexts.
+    }
+  })();
+`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(
     isProd ? BASE_URL : 'https://development.bottle-note.com',
@@ -103,8 +124,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className="touch-manipulation">
+    <html lang="ko" className="touch-manipulation" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: themeInitializationScript }}
+        />
         <link
           rel="preconnect"
           href="https://cdn.jsdelivr.net"
@@ -118,9 +142,9 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body suppressHydrationWarning>
+      <body>
         <Providers>
-          <div className="relative min-h-safe-screen w-full bg-bgGray dark:bg-bn-section">
+          <div className="relative min-h-safe-screen w-full bg-bn-canvas text-bn-text">
             {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID && (
               <GoogleAnalytics
                 gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}

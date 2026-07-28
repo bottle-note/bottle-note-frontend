@@ -14,6 +14,19 @@ export const tailwindColors = {
   sectionWhite: '#F7F7F7',
 };
 
+const legacySemanticColors = {
+  mainCoral: 'hsl(var(--bn-accent-hover) / <alpha-value>)',
+  subCoral: 'hsl(var(--bn-accent-interactive) / <alpha-value>)',
+  bgGray: 'hsl(var(--bn-section) / <alpha-value>)',
+  brightGray: 'hsl(var(--bn-border-strong) / <alpha-value>)',
+  mainGray: 'hsl(var(--bn-text-secondary) / <alpha-value>)',
+  textGray: 'hsl(var(--bn-text-tertiary) / <alpha-value>)',
+  gray: 'hsl(var(--bn-text) / <alpha-value>)',
+  mainBlack: 'hsl(var(--bn-text) / <alpha-value>)',
+  mainDarkGray: 'hsl(var(--bn-text) / <alpha-value>)',
+  sectionWhite: 'hsl(var(--bn-section) / <alpha-value>)',
+};
+
 const config: Config = {
   darkMode: ['class'],
   content: [
@@ -93,7 +106,7 @@ const config: Config = {
             foreground: 'hsl(var(--bn-brand-foreground) / <alpha-value>)',
           },
         },
-        ...tailwindColors,
+        ...legacySemanticColors,
       },
       fontSize: {
         '9': ['9px', '9px'],

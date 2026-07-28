@@ -340,6 +340,44 @@
 }
 
 @layer utilities {
+  /* Legacy light surface utilities used across existing product routes. */
+  .dark .bg-white {
+    background-color: hsl(var(--bn-raised) / var(--tw-bg-opacity, 1));
+  }
+
+  .dark .keep-light-surface {
+    background-color: hsl(0 0% 100% / var(--tw-bg-opacity, 1));
+  }
+
+  .dark main.bg-white,
+  .dark .content-container.bg-white,
+  .dark .min-h-safe-screen.bg-white {
+    background-color: hsl(var(--bn-canvas) / var(--tw-bg-opacity, 1));
+  }
+
+  .dark .bg-gray-50,
+  .dark .bg-gray-100,
+  .dark .bg-gray-200 {
+    background-color: hsl(var(--bn-section) / var(--tw-bg-opacity, 1));
+  }
+
+  .dark .text-black,
+  .dark .text-gray-900 {
+    color: hsl(var(--bn-text) / var(--tw-text-opacity, 1));
+  }
+
+  .dark .border-gray-100,
+  .dark .border-gray-200,
+  .dark .border-gray-300 {
+    border-color: hsl(var(--bn-border-subtle) / var(--tw-border-opacity, 1));
+  }
+
+  .dark .hover\:bg-gray-50:hover,
+  .dark .hover\:bg-gray-100:hover,
+  .dark .active\:bg-gray-100:active {
+    background-color: hsl(var(--bn-section) / var(--tw-bg-opacity, 1));
+  }
+
   @keyframes auto-marquee-text {
     0%,
     10% {
@@ -399,6 +437,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-bn-canvas text-bn-text;
   }
 }

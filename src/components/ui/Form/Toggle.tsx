@@ -30,7 +30,7 @@ const Toggle = ({
         aria-label={isActive ? onName : offName}
       >
         <div
-          className={`toggle-handle w-[0.8rem] h-[0.8rem] rounded-full bg-white transform transition-transform ${
+          className={`toggle-handle w-[0.8rem] h-[0.8rem] rounded-full bg-bn-raised transform transition-transform ${
             isActive ? 'translate-x-2' : 'translate-x-[-0.5rem]'
           }`}
         />

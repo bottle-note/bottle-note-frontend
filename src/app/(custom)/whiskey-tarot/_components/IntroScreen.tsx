@@ -55,7 +55,7 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
         {Array.from({ length: 50 }).map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+            className="absolute h-1 w-1 rounded-full bg-white keep-light-surface animate-pulse"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,

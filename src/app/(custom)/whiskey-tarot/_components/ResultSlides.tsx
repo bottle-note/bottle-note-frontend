@@ -89,7 +89,7 @@ function SingleCardSlide({
             className="flex-1 h-1 rounded-full overflow-hidden bg-white/20"
           >
             <div
-              className={`h-full bg-white transition-all duration-500 ${
+              className={`h-full bg-white keep-light-surface transition-all duration-500 ${
                 index < cardNumber ? 'w-full' : 'w-0'
               }`}
             />
