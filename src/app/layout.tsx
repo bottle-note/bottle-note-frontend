@@ -120,7 +120,7 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning>
         <Providers>
-          <div className="relative min-h-safe-screen w-full bg-bgGray dark:bg-bn-section">
+          <div className="relative w-full bg-bgGray min-h-safe-screen">
             {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID && (
               <GoogleAnalytics
                 gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}

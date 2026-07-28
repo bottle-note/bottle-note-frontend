@@ -8,7 +8,6 @@ import Modal from '@/components/ui/Modal/Modal';
 import { AuthProvider } from '@/lib/auth/AuthProvider';
 import { FocusScrollProvider } from './FocusScrollProvider';
 import { SafeAreaProvider } from './SafeAreaProvider';
-import { ThemeProvider } from './theme/ThemeProvider';
 
 interface Props {
   children: ReactNode;
@@ -35,16 +34,14 @@ export const Providers = ({ children }: Props) => {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <SafeAreaProvider>
-            <FocusScrollProvider>
-              <AuthInitializer />
-              {children}
-              <Modal />
-              {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
-            </FocusScrollProvider>
-          </SafeAreaProvider>
-        </ThemeProvider>
+        <SafeAreaProvider>
+          <FocusScrollProvider>
+            <AuthInitializer />
+            {children}
+            <Modal />
+            {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
+          </FocusScrollProvider>
+        </SafeAreaProvider>
       </QueryClientProvider>
     </AuthProvider>
   );

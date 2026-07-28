@@ -22,9 +22,7 @@ function PrimaryLinkButton({
   return (
     <div
       className={`relative w-full hover:pointer ${
-        listType === 'Full'
-          ? 'flex items-center'
-          : 'rounded-xl bg-mainCoral dark:bg-bn-raised'
+        listType === 'Full' ? 'flex items-center' : 'rounded-xl bg-mainCoral'
       }`}
     >
       {listType === 'Full' && (
@@ -37,7 +35,7 @@ function PrimaryLinkButton({
             quality={60}
             className="rounded-xl object-cover"
           />
-          <div className="absolute w-full h-full rounded-xl bg-mainCoral bg-opacity-90 dark:bg-bn-raised dark:bg-opacity-100" />
+          <div className="absolute w-full h-full rounded-xl bg-mainCoral bg-opacity-90" />
         </>
       )}
       <Link
@@ -47,7 +45,7 @@ function PrimaryLinkButton({
       >
         <div className={`${imgSrc ? 'space-y-[90px]' : 'space-y-[11.7px]'}`}>
           <div
-            className={`${icon && 'flex justify-between'} text-white dark:text-bn-brand relative z-20`}
+            className={`${icon && 'flex justify-between'} text-white relative z-20`}
           >
             <div>
               <p className="font-extrabold text-14">{korName}</p>
@@ -63,7 +61,7 @@ function PrimaryLinkButton({
               />
             )}
           </div>
-          <div className="border-[1px] border-white dark:border-bn-brand relative z-0" />
+          <div className="border-[1px] border-white relative z-0" />
         </div>
         {imgSrc && (
           <Image

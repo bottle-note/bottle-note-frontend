@@ -50,7 +50,7 @@ interface HeaderCenterProps {
 
 const HeaderCenter = ({
   children,
-  textColor = 'text-subCoral dark:text-bn-accent-interactive',
+  textColor = 'text-subCoral',
 }: HeaderCenterProps) => {
   return (
     <p
@@ -117,10 +117,7 @@ interface SubHeaderMainProps {
   bgColor?: string;
 }
 
-function SubHeaderMain({
-  children,
-  bgColor = 'bg-white dark:bg-bn-canvas',
-}: SubHeaderMainProps) {
+function SubHeaderMain({ children, bgColor = 'bg-white' }: SubHeaderMainProps) {
   let leftComponent = null;
   let centerComponent = null;
   let rightComponent = null;

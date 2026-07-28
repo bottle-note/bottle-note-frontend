@@ -67,32 +67,6 @@ const config: Config = {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
-        bn: {
-          canvas: 'hsl(var(--bn-canvas) / <alpha-value>)',
-          section: 'hsl(var(--bn-section) / <alpha-value>)',
-          raised: 'hsl(var(--bn-raised) / <alpha-value>)',
-          text: {
-            DEFAULT: 'hsl(var(--bn-text) / <alpha-value>)',
-            secondary: 'hsl(var(--bn-text-secondary) / <alpha-value>)',
-            tertiary: 'hsl(var(--bn-text-tertiary) / <alpha-value>)',
-          },
-          border: {
-            DEFAULT: 'hsl(var(--bn-border-subtle) / <alpha-value>)',
-            strong: 'hsl(var(--bn-border-strong) / <alpha-value>)',
-          },
-          accent: {
-            interactive: 'hsl(var(--bn-accent-interactive) / <alpha-value>)',
-            hover: 'hsl(var(--bn-accent-hover) / <alpha-value>)',
-            rating: 'hsl(var(--bn-accent-rating) / <alpha-value>)',
-            tonal: 'hsl(var(--bn-accent-tonal) / <alpha-value>)',
-            foreground: 'hsl(var(--bn-accent-foreground) / <alpha-value>)',
-          },
-          brand: {
-            DEFAULT: 'hsl(var(--bn-brand) / <alpha-value>)',
-            tonal: 'hsl(var(--bn-brand-tonal) / <alpha-value>)',
-            foreground: 'hsl(var(--bn-brand-foreground) / <alpha-value>)',
-          },
-        },
         ...tailwindColors,
       },
       fontSize: {
