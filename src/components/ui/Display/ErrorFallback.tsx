@@ -22,7 +22,7 @@ function ErrorFallback({
         style={{ width: 50, height: 60 }}
         priority
       />
-      <p className="text-mainGray whitespace-pre text-center text-15">
+      <p className="text-fg-neutral-muted whitespace-pre text-center text-15">
         {message}
       </p>
       {(onBack || onRetry) && (
@@ -31,7 +31,7 @@ function ErrorFallback({
             <button
               type="button"
               onClick={onBack}
-              className="px-5 py-2 border border-mainGray text-mainGray rounded-lg text-13"
+              className="px-5 py-2 border border-stroke-neutral-weak text-fg-neutral-muted rounded-lg text-13 active:bg-bg-layer-default-pressed"
             >
               뒤로 가기
             </button>
@@ -40,7 +40,7 @@ function ErrorFallback({
             <button
               type="button"
               onClick={onRetry}
-              className="px-5 py-2 bg-mainCoral text-white rounded-lg text-13"
+              className="px-5 py-2 bg-bg-brand-solid text-fg-brand-contrast rounded-lg text-13 active:bg-bg-brand-solid-pressed"
             >
               다시 시도
             </button>

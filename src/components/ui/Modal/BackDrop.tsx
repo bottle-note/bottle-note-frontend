@@ -24,7 +24,7 @@ function BackDrop({
   };
   const ModalContents = (
     <div
-      className={`fixed inset-0  z-40 ${isModal && 'bg-black/60'} ${isShow ? 'block' : 'hidden'}`}
+      className={`fixed inset-0 z-40 ${isModal && 'bg-bg-overlay'} ${isShow ? 'block' : 'hidden'}`}
       onClick={handleBackdropClick}
       onKeyDown={(e) => {
         if (e.key === 'Escape' && onBackdropClick) {

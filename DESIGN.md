@@ -14,37 +14,78 @@
 
 ### 2.1 Color
 
-`tailwind.config.ts`의 `tailwindColors`를 우선 사용한다.
+색상은 `Palette → Semantic role → Component`의 세 단계로 관리한다.
 
-| Token | Hex | 주요 용도 |
-| --- | --- | --- |
-| `mainCoral` | `#EF9A6E` | 검색 input border/placeholder 등 밝은 코랄 |
-| `subCoral` | `#E58257` | 주요 CTA, 활성 tab, nav text/icon, label selected |
-| `bgGray` | `#E6E6DD` | disabled label background |
-| `brightGray` | `#BFBFBF` | 비활성 버튼, 구분선, border |
-| `mainGray` | `#666666` | 보조 본문, placeholder, 설명 텍스트 |
-| `textGray` | `#C6C6C6` | 옅은 텍스트 |
-| `gray` | `#2B2B2B` | 진한 회색 |
-| `mainBlack` | `#101010` | 기본 강조 텍스트 |
-| `mainDarkGray` | `#252525` | input text, modal sub text 등 |
-| `sectionWhite` | `#F7F7F7` | 섹션/카드 배경 |
+- Palette는 색상 값 자체만 나타낸다. 테마나 사용 목적을 담지 않는다.
+- Semantic role은 `fg`, `bg`, `stroke`처럼 UI에서 맡는 역할을 나타낸다.
+- Component token은 꼭 필요한 컴포넌트 상태에만 둔다.
 
-CSS variable 기반 shadcn 계열 토큰도 존재한다: `background`, `foreground`, `card`, `primary`, `secondary`, `muted`, `accent`, `destructive`, `border`, `input`, `ring`. 단, BottleNote 고유 UI는 위 `tailwindColors`를 우선한다.
+Palette 원본 값은 `src/style/tokens/colors.css`, Semantic role은 `src/style/tokens/semantic-colors.css`에서 관리한다. `tailwind.config.ts`는 해당 CSS 변수를 Tailwind class로 연결만 한다. Palette를 화면에 직접 사용하는 것은 토큰 작업이나 예외적인 장식 표현으로 제한하고, 일반 화면은 Semantic role을 사용한다.
 
-Semantic color 매핑은 현재 코드 사용례를 기준으로 아래처럼 해석한다. 실제 class는 우선 기존 Tailwind token 이름을 그대로 사용하고, 새 semantic alias를 코드에 추가하기 전까지 문서 기준으로만 활용한다.
+#### Primitive palette
 
-| Semantic | Token | Hex | 기준 |
-| --- | --- | --- | --- |
-| `brand-primary` | `subCoral` | `#E58257` | 활성 tab/nav/label, 기본 Button, 브랜드 강조 텍스트/보더에 쓰는 핵심 코랄 |
-| `brand-accent` | `mainCoral` | `#EF9A6E` | 검색 input border/placeholder, 큰 CTA surface, datepicker selected, gradient highlight에 쓰는 밝은 코랄 |
-| `surface-default` | `white` | `#FFFFFF` | 기본 페이지/카드/모달 배경 |
-| `surface-section` | `sectionWhite` | `#F7F7F7` | 이미지 배경, 섹션성 카드 배경 |
-| `surface-muted` | `bgGray` | `#E6E6DD` | 비활성 label, 보조 surface |
-| `text-primary` | `mainBlack` 또는 `mainDarkGray` | `#101010` / `#252525` | 본문/강조 텍스트. 기존 화면 맥락에 맞춰 선택 |
-| `text-secondary` | `mainGray` | `#666666` | 설명, 메타, placeholder 보조 텍스트 |
-| `text-tertiary` | `textGray` 또는 `brightGray` | `#C6C6C6` / `#BFBFBF` | 옅은 보조 텍스트, 비활성 표시 |
-| `border-default` | `brightGray` | `#BFBFBF` | 일반 구분선/비활성 border |
-| `border-brand` | `subCoral` 또는 `mainCoral` | `#E58257` / `#EF9A6E` | active/brand border는 `subCoral`, input 강조 border는 `mainCoral` 우선 |
+| Group   | Token / Hex                                                                                                                                                                                                                                            |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Neutral | `neutral-0` `#FFFFFF`, `neutral-50` `#F7F7F7`, `neutral-200` `#E6E6DD`, `neutral-500` `#C6C6C6`, `neutral-600` `#BFBFBF`, `neutral-700` `#6F6F6F`, `neutral-800` `#666666`, `neutral-900` `#2B2B2B`, `neutral-950` `#252525`, `neutral-1000` `#101010` |
+| Oak     | `oak-50` `#F5EFE5`, `oak-200` `#C9BCA9`, `oak-500` `#8D7E6A`, `oak-600` `#75624B`, `oak-800` `#3B3228`, `oak-900` `#27211A`, `oak-950` `#1A1612`, `oak-1000` `#100E0C`                                                                                 |
+| Coral   | `coral-50` `#FFF0E9`, `coral-300` `#F2AD8D`, `coral-400` `#EF9A6E`, `coral-500` `#E99670`, `coral-600` `#E58257`, `coral-700` `#B15025`, `coral-900` `#38261B`, `coral-1000` `#1E1209`                                                                 |
+| Amber   | `amber-500` `#D9A45B`, `amber-700` `#956523`                                                                                                                                                                                                           |
+| Static  | `static-white` `#FFFFFF`, `static-black` `#000000`, `static-transparent`                                                                                                                                                                               |
+
+Tailwind에서는 `bg-palette-coral-600`, `text-palette-oak-50`, `border-palette-neutral-600`처럼 사용한다. `/50` 같은 투명도 modifier와 `dark:bg-palette-oak-1000` 같은 dark variant도 지원한다.
+
+#### Semantic color roles
+
+Semantic role은 `.dark`에서 값이 자동으로 전환된다. 일반 화면에서는 `dark:` variant를 반복하지 않고 `text-fg-neutral`, `bg-bg-layer-default`, `border-stroke-neutral-subtle`처럼 역할 class 하나만 사용한다.
+
+역할 토큰에는 `/50` 같은 임의 투명도를 붙이지 않는다. 다른 강조도가 필요하면 `muted`, `subtle`, `weak`, `pressed`처럼 의도를 나타내는 역할 variant를 추가한다. 테마와 무관하게 같은 색이어야 하는 이미지 overlay 등의 예외는 Palette의 Static 색상을 사용한다.
+
+##### Foreground
+
+| Role                  | Light / Dark            | Usage                       |
+| --------------------- | ----------------------- | --------------------------- |
+| `fg-neutral`          | neutral-1000 / oak-50   | 기본 제목, 본문, 아이콘     |
+| `fg-neutral-muted`    | neutral-800 / oak-200   | 설명과 메타 정보            |
+| `fg-neutral-subtle`   | neutral-700 / oak-500   | 낮은 강조의 도움말          |
+| `fg-neutral-inverted` | static-white / oak-1000 | 반전된 중립 배경 위 콘텐츠  |
+| `fg-placeholder`      | neutral-700 / oak-500   | 입력 placeholder            |
+| `fg-disabled`         | neutral-600 / oak-500   | 비활성 콘텐츠               |
+| `fg-brand`            | coral-700 / coral-500   | 브랜드 글자와 아이콘        |
+| `fg-brand-contrast`   | coral-1000 / coral-1000 | 브랜드 solid 배경 위 콘텐츠 |
+| `fg-rating`           | amber-700 / amber-500   | 별점과 평점                 |
+
+##### Background
+
+| Role                       | Light / Dark            | Usage                          |
+| -------------------------- | ----------------------- | ------------------------------ |
+| `bg-layer-basement`        | neutral-200 / oak-1000  | 가장 깊은 앱 배경              |
+| `bg-layer-default`         | neutral-0 / oak-950     | 일반 화면과 콘텐츠 표면        |
+| `bg-layer-default-pressed` | neutral-50 / oak-900    | 눌린 리스트와 컨트롤           |
+| `bg-layer-floating`        | neutral-0 / oak-900     | 모달, 바텀시트, 팝오버         |
+| `bg-neutral-weak`          | neutral-50 / oak-900    | 섹션, 카드, 이미지 placeholder |
+| `bg-neutral-solid`         | neutral-1000 / oak-50   | 토스트 등의 반전 배경          |
+| `bg-disabled`              | neutral-200 / oak-800   | 비활성 버튼과 필드             |
+| `bg-brand-solid`           | coral-600 / coral-500   | 주요 CTA와 선택 상태           |
+| `bg-brand-solid-pressed`   | coral-500 / coral-600   | 브랜드 solid의 pressed 상태    |
+| `bg-brand-weak`            | coral-50 / coral-900    | 낮은 강조의 브랜드 배경        |
+| `bg-overlay`               | static-black 60% / same | 모달 backdrop                  |
+| `bg-overlay-muted`         | static-black 30% / same | 이미지와 카드 overlay          |
+| `bg-transparent`           | transparent / same      | 투명 배경                      |
+
+##### Stroke
+
+| Role                      | Light / Dark          | Usage                     |
+| ------------------------- | --------------------- | ------------------------- |
+| `stroke-neutral-subtle`   | neutral-200 / oak-800 | 장식성 구분선             |
+| `stroke-neutral-weak`     | neutral-700 / oak-600 | 입력창과 컨트롤 경계      |
+| `stroke-neutral-contrast` | neutral-1000 / oak-50 | 강한 중립 테두리          |
+| `stroke-brand-solid`      | coral-700 / coral-500 | 선택과 활성 테두리        |
+| `stroke-brand-weak`       | coral-400 / coral-300 | 낮은 강조의 브랜드 구분선 |
+| `stroke-focus-ring`       | coral-700 / coral-500 | 키보드 focus ring         |
+
+#### 기존 색상 호환
+
+기존 `mainCoral`, `subCoral`, `bgGray`, `brightGray`, `mainGray`, `textGray`, `gray`, `mainBlack`, `mainDarkGray`, `sectionWhite`는 화면 회귀를 막기 위해 유지한다. shadcn 계열 CSS variable은 별도 색상 체계가 아니라 Semantic role의 호환 별칭으로 사용한다. 기존 화면은 공용 컴포넌트부터 점진적으로 옮긴다.
 
 ### 2.2 Typography
 
@@ -52,20 +93,20 @@ Semantic color 매핑은 현재 코드 사용례를 기준으로 아래처럼 �
 - `input`, `textarea`: 현재 global css에서 `Noto Sans`, `sans-serif`로 지정되어 있다.
 - Tailwind 확장 font size:
 
-| Class | Size / Line-height | 권장 용도 |
-| --- | --- | --- |
-| `text-9` | 9 / 9px | 매우 작은 보조 표기 |
-| `text-10` | 10 / 14px | nav label, 작은 chip |
-| `text-11` | 11 / 15px | 보조 메타 |
-| `text-12` | 12 / 16px | 설명, helper text |
-| `text-13` | 13 / 17px | 본문/label/chip |
-| `text-13.5` | 13.5 / 17.5px | 중간 본문 |
-| `text-14` | 14 / 18px | 일반 본문 |
-| `text-15` | 15 / 19px | tab, button text |
-| `text-16` | 16 / 20px | header/modal body |
-| `text-20` | 20 / 24px | modal main text, section title |
-| `text-24` | 24 / 28px | 큰 타이틀 |
-| `text-27` | 27 / 31px | 히어로 타이틀 |
+| Class       | Size / Line-height | 권장 용도                      |
+| ----------- | ------------------ | ------------------------------ |
+| `text-9`    | 9 / 9px            | 매우 작은 보조 표기            |
+| `text-10`   | 10 / 14px          | nav label, 작은 chip           |
+| `text-11`   | 11 / 15px          | 보조 메타                      |
+| `text-12`   | 12 / 16px          | 설명, helper text              |
+| `text-13`   | 13 / 17px          | 본문/label/chip                |
+| `text-13.5` | 13.5 / 17.5px      | 중간 본문                      |
+| `text-14`   | 14 / 18px          | 일반 본문                      |
+| `text-15`   | 15 / 19px          | tab, button text               |
+| `text-16`   | 16 / 20px          | header/modal body              |
+| `text-20`   | 20 / 24px          | modal main text, section title |
+| `text-24`   | 24 / 28px          | 큰 타이틀                      |
+| `text-27`   | 27 / 31px          | 히어로 타이틀                  |
 
 Figma 매핑 기본값:
 
@@ -79,20 +120,20 @@ Figma 매핑 기본값:
 
 Tailwind 기본 spacing과 아래 확장 spacing을 사용한다.
 
-| Class | rem | px |
-| --- | --- | --- |
-| `1.5` | 0.375 | 6 |
-| `2.5` | 0.625 | 10 |
+| Class  | rem   | px    |
+| ------ | ----- | ----- |
+| `1.5`  | 0.375 | 6     |
+| `2.5`  | 0.625 | 10    |
 | `2.75` | 0.688 | 약 11 |
 | `3.25` | 0.813 | 약 13 |
-| `3.5` | 0.875 | 14 |
+| `3.5`  | 0.875 | 14    |
 | `3.75` | 0.938 | 약 15 |
-| `4.5` | 1.125 | 18 |
+| `4.5`  | 1.125 | 18    |
 | `5.25` | 1.313 | 약 21 |
-| `7.5` | 1.875 | 30 |
-| `8.5` | 2.125 | 34 |
+| `7.5`  | 1.875 | 30    |
+| `8.5`  | 2.125 | 34    |
 | `8.75` | 2.188 | 약 35 |
-| `11.5` | 2.875 | 46 |
+| `11.5` | 2.875 | 46    |
 
 Figma px → Tailwind 변환:
 

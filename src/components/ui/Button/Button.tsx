@@ -13,16 +13,20 @@ export function Button({
   btnName,
   type = 'button',
   onClick,
-  btnStyles = 'bg-subCoral',
-  btnTextStyles = 'text-white font-bold text-15',
+  btnStyles = 'bg-bg-brand-solid active:bg-bg-brand-solid-pressed',
+  btnTextStyles = 'font-bold text-15',
   disabled = false,
 }: ButtonProps) {
   return (
     <button
       type={type}
       onClick={onClick}
-      className={`flex justify-center items-center w-full h-[52px] rounded-xl
-        ${disabled ? 'bg-brightGray cursor-not-allowed' : btnStyles}`}
+      className={`flex justify-center items-center w-full h-[52px] rounded-xl transition-colors
+        ${
+          disabled
+            ? 'bg-bg-disabled text-fg-disabled cursor-not-allowed'
+            : `${btnStyles} text-fg-brand-contrast`
+        }`}
       disabled={disabled}
     >
       <span className={btnTextStyles}>{btnName}</span>
@@ -48,8 +52,8 @@ export function DualButton({
   onClickCancel,
   okayBtnStyles,
   okayBtnTextStyles,
-  cancelBtnStyles = 'border border-subCoral',
-  cancelBtnTextStyles = 'text-subCoral font-bold text-base',
+  cancelBtnStyles = 'border border-stroke-brand-solid bg-bg-layer-default active:bg-bg-layer-default-pressed',
+  cancelBtnTextStyles = 'text-fg-brand font-bold text-base',
 }: DualButtonProps) {
   return (
     <div className="flex w-full gap-2">

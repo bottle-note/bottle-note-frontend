@@ -15,7 +15,7 @@ type Props<T extends { id: string; name: string }> = {
 const TAB_WIDTH = 146;
 const TAB_HEIGHT = 32;
 
-const BORDER_COLOR = '#CFCFCF';
+const BORDER_COLOR = 'var(--color-stroke-neutral-subtle)';
 const BORDER_WIDTH = 1.5;
 
 const BookmarkTab = <T extends { id: string; name: string }>({
@@ -26,7 +26,7 @@ const BookmarkTab = <T extends { id: string; name: string }>({
   registerTab,
 }: Props<T>) => {
   return (
-    <div className="w-full bg-white">
+    <div className="w-full bg-bg-layer-default">
       <div className="relative">
         <div
           ref={scrollContainerRef}
@@ -84,7 +84,11 @@ const BookmarkTab = <T extends { id: string; name: string }>({
                       y="0"
                       width={TAB_WIDTH}
                       height={TAB_HEIGHT}
-                      fill={currentTab.id === tab.id ? '#FFF' : '#F7F7F7'}
+                      fill={
+                        currentTab.id === tab.id
+                          ? 'var(--color-bg-layer-default)'
+                          : 'var(--color-bg-neutral-weak)'
+                      }
                       clipPath={`url(#tab-clip-${tab.id})`}
                     />
 
@@ -119,8 +123,8 @@ const BookmarkTab = <T extends { id: string; name: string }>({
                   <span
                     className={`relative z-10 text-15 font-extrabold ${
                       currentTab.id === tab.id
-                        ? 'text-orange-500'
-                        : 'text-brightGray'
+                        ? 'text-fg-brand'
+                        : 'text-fg-neutral-subtle'
                     }`}
                   >
                     {tab.name}

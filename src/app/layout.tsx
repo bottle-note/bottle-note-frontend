@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from 'next';
+import '@/style/tokens/colors.css';
+import '@/style/tokens/semantic-colors.css';
 import '@/style/globals.css';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Providers } from '@/lib/Providers';
