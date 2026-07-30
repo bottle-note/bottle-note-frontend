@@ -14,6 +14,11 @@ interface Props {
 }
 
 const WhiskeyListItem = ({ content, priority = false }: Props) => {
+  const abv =
+    typeof content.abv === 'string'
+      ? content.abv.replace(/(?:\s*%\s*)+$/, '')
+      : content.abv;
+
   return (
     <section className="flex items-center text-mainBlack py-6 w-full overflow-hidden">
       {/* image */}
@@ -37,7 +42,7 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
             engName={content.engName}
             length={50}
           />
-          <p className="text-13 text-mainDarkGray">{`도수 ${content.abv}% · ${content.korCategory}`}</p>
+          <p className="text-13 text-mainDarkGray">{`도수 ${abv}% · ${content.korCategory}`}</p>
         </div>
 
         {/* 별점 */}
