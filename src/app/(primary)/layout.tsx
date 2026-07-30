@@ -18,7 +18,7 @@ export default function Layout({
   }, [isMobile]);
 
   return (
-    <div className="bg-white flex flex-col w-full mx-auto min-h-safe-screen">
+    <div className="bg-bg-layer-default text-fg-neutral flex flex-col w-full mx-auto min-h-safe-screen">
       <main>{children}</main>
       {loginState.isShowLoginModal && (
         <LoginModal

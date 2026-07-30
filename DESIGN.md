@@ -87,6 +87,14 @@ Semantic role은 `.dark`에서 값이 자동으로 전환된다. 일반 화면�
 
 기존 `mainCoral`, `subCoral`, `bgGray`, `brightGray`, `mainGray`, `textGray`, `gray`, `mainBlack`, `mainDarkGray`, `sectionWhite`는 화면 회귀를 막기 위해 유지한다. shadcn 계열 CSS variable은 별도 색상 체계가 아니라 Semantic role의 호환 별칭으로 사용한다. 기존 화면은 공용 컴포넌트부터 점진적으로 옮긴다.
 
+#### 테마 동작
+
+- 테마 선택값은 `system`, `light`, `dark` 세 가지다.
+- 저장된 선택이 없거나 `system`이면 기기의 `prefers-color-scheme`을 따르고, 시스템 테마가 바뀌면 화면도 즉시 전환한다.
+- `light` 또는 `dark`를 직접 고르면 해당 선택을 브라우저에 저장하고 시스템 설정보다 우선한다.
+- 초기 화면이 반대 테마로 잠깐 보이지 않도록 React hydration 전에 루트의 `.dark` class를 설정한다.
+- 컴포넌트에서 현재 테마나 선택값이 필요하면 `useTheme`을 사용한다. 색상만 바꾸기 위해 테마를 읽고 조건부 class를 만들지 않는다.
+
 ### 2.2 Typography
 
 - 기본 폰트: `Suit`, `sans-serif`
@@ -143,7 +151,7 @@ Figma px → Tailwind 변환:
 
 ### 2.4 Border / Shadow
 
-- thin divider/border는 `border-brightGray`, `border-subCoral/50`, `border-b` 패턴을 우선 사용한다.
+- 중립 구분선은 `border-stroke-neutral-subtle`, 입력 경계는 `border-stroke-neutral-weak`, 선택 테두리는 `border-stroke-brand-solid`을 우선 사용한다.
 - shadow는 반복 사용되는 표준이 아직 없으므로 기존 컴포넌트 사용례를 먼저 따른다.
 
 ## 3. Layout 기준
@@ -204,9 +212,10 @@ Figma px → Tailwind 변환:
 
 파일: `src/components/ui/Button/Button.tsx`
 
-- 기본 CTA: `bg-subCoral`, `text-white font-bold text-15`, `h-[52px]`, `rounded-xl`, `w-full`
-- disabled: `bg-brightGray cursor-not-allowed`
-- secondary/cancel: `border border-subCoral`, `text-subCoral font-bold text-base`
+- 기본 CTA: `bg-bg-brand-solid`, `text-fg-brand-contrast`, `h-[52px]`, `rounded-xl`, `w-full`
+- pressed: `active:bg-bg-brand-solid-pressed`
+- disabled: `bg-bg-disabled text-fg-disabled cursor-not-allowed`
+- secondary/cancel: `border-stroke-brand-solid`, `text-fg-brand`, `bg-bg-layer-default`
 
 새 CTA가 위 구조와 같으면 `Button` 또는 `DualButton` 재사용을 우선한다.
 
@@ -231,9 +240,9 @@ Figma px → Tailwind 변환:
 
 파일: `src/components/ui/Display/Label.tsx`, global component classes
 
-- `.label-default`: white bg + subCoral text/border + `rounded-md py-1 px-3`
-- `.label-selected`: subCoral bg + white text/border
-- `.label-disabled`: bgGray bg + white text/border
+- `.label-default`: 기본 layer bg + brand text/border + `rounded-md py-1 px-3`
+- `.label-selected`: brand solid bg + brand contrast text
+- `.label-disabled`: disabled bg/text/border
 - 검색 키워드 chip은 `label-default inline-flex h-7 items-center gap-1 text-13` 패턴 사용.
 
 ### 4.3 Tab
@@ -241,8 +250,8 @@ Figma px → Tailwind 변환:
 파일: `src/components/ui/Navigation/Tab`
 
 - Default tab: `font-bold`, 약 15px, `pb-2`, bottom border
-- active: `.tab-selected` = `text-subCoral border-subCoral border-b`
-- inactive: `.tab-default` = `text-subCoral/50 border-subCoral/50 border-b`
+- active: `.tab-selected` = `text-fg-brand border-stroke-brand-solid border-b`
+- inactive: `.tab-default` = `text-fg-neutral-subtle border-stroke-brand-weak border-b`
 - 가로 스크롤/북마크형 tab은 `variant="bookmark"`를 우선 검토한다.
 
 ### 4.4 Header / Navbar
@@ -250,10 +259,10 @@ Figma px → Tailwind 변환:
 파일: `src/components/ui/Navigation/SubHeader.tsx`, `Navbar.tsx`
 
 - `SubHeader`: left/center/right 슬롯 구조, `pt-safe-header`, `px-[17px]`, `pb-[15px]`
-- center title: `text-subCoral`, `font-bold`, responsive clamp
+- center title: `text-fg-brand`, `font-bold`, responsive clamp
 - bottom navbar:
   - fixed, `max-w-content`, `bottom: var(--navbar-margin-bottom)`
-  - inner height `70px`, `bg-white`, `py-4`, `px-[26px]`, `rounded-[13px]`
+  - inner height `70px`, `bg-bg-layer-floating`, `py-4`, `px-[26px]`, `rounded-[13px]`
   - inactive item opacity `40%`
 
 ### 4.5 Search

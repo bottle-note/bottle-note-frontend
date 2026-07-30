@@ -11,6 +11,7 @@ import { AdminApi } from '@/api/admin/admin.api';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { ScreenType, ScreenConfig, MenuCategory } from '@/types/Settings';
+import { ROUTES } from '@/constants/routes';
 import { SettingsMainScreen } from './_components/SettingsMainScreen';
 import { SettingsSubScreen } from './_components/SettingsSubScreen';
 import { createScreenConfigs, createMenuCategories } from './config';
@@ -51,7 +52,7 @@ export default function Settings() {
         confirmBtnName: '로그인',
         handleConfirm: () => {
           handleCloseModal();
-          route.push('/login');
+          route.push(ROUTES.LOGIN);
         },
       });
       return;
@@ -60,6 +61,11 @@ export default function Settings() {
   };
 
   const navigateToScreen = (screen: ScreenType) => {
+    if (screen === 'themeSettings' || screen === 'loginManagement') {
+      setCurrentScreen(screen);
+      return;
+    }
+
     checkAuthAndExecute(() => setCurrentScreen(screen));
   };
 
@@ -69,6 +75,10 @@ export default function Settings() {
 
   const navigateBack = () => {
     resetToMain();
+  };
+
+  const handleLogin = () => {
+    route.push(ROUTES.LOGIN);
   };
 
   const signOutAndRedirect = async () => {
@@ -139,8 +149,14 @@ export default function Settings() {
     Exclude<ScreenType, 'main'>,
     ScreenConfig
   > = useMemo(
-    () => createScreenConfigs(handleLogout, handleDeleteAccount),
-    [handleLogout, handleDeleteAccount, route],
+    () =>
+      createScreenConfigs({
+        isLoggedIn,
+        handleLogin,
+        handleLogout,
+        handleDeleteAccount,
+      }),
+    [isLoggedIn, handleLogin, handleLogout, handleDeleteAccount],
   );
 
   const menuCategories: MenuCategory[] = useMemo(
@@ -151,8 +167,9 @@ export default function Settings() {
         handleEnvSwitchModal,
         user?.userId,
         isAdmin,
+        isLoggedIn,
       ),
-    [navigateToScreen, navigateToRoute, user?.userId, isAdmin],
+    [navigateToScreen, navigateToRoute, user?.userId, isAdmin, isLoggedIn],
   );
 
   const getHeaderTitle = () => {
@@ -171,7 +188,7 @@ export default function Settings() {
   };
 
   return (
-    <main className="flex-1 flex flex-col">
+    <main className="flex-1 flex flex-col bg-bg-layer-default text-fg-neutral">
       <SubHeader>
         <SubHeader.Left onClick={getHeaderLeftOnClick()}>
           <Image
@@ -185,7 +202,10 @@ export default function Settings() {
       </SubHeader>
 
       {currentScreen === 'main' ? (
-        <SettingsMainScreen menuCategories={menuCategories} />
+        <SettingsMainScreen
+          menuCategories={menuCategories}
+          isLoggedIn={isLoggedIn}
+        />
       ) : (
         <SettingsSubScreen
           screenType={currentScreen as Exclude<ScreenType, 'main'>}

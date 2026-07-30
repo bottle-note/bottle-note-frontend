@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthInitializer } from '@/hooks/useAuthInitializer';
 import Modal from '@/components/ui/Modal/Modal';
 import { AuthProvider } from '@/lib/auth/AuthProvider';
+import { ThemeProvider } from '@/lib/theme/ThemeProvider';
 import { FocusScrollProvider } from './FocusScrollProvider';
 import { SafeAreaProvider } from './SafeAreaProvider';
 
@@ -32,17 +33,19 @@ export const Providers = ({ children }: Props) => {
   );
 
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <SafeAreaProvider>
-          <FocusScrollProvider>
-            <AuthInitializer />
-            {children}
-            <Modal />
-            {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
-          </FocusScrollProvider>
-        </SafeAreaProvider>
-      </QueryClientProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <SafeAreaProvider>
+            <FocusScrollProvider>
+              <AuthInitializer />
+              {children}
+              <Modal />
+              {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
+            </FocusScrollProvider>
+          </SafeAreaProvider>
+        </QueryClientProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };

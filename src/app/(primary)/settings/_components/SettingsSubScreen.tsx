@@ -43,7 +43,7 @@ export const SettingsSubScreen = ({ config }: SettingsSubScreenProps) => {
       initial="hidden"
       animate="visible"
     >
-      <div className="space-y-0 py-[22px] text-15 font-medium text-mainBlack border-b border-brightGray">
+      <div className="space-y-0 py-[22px] text-15 font-medium text-fg-neutral border-b border-stroke-neutral-subtle">
         {config.items?.map((item, index) => (
           <div key={item.text} className={index === 0 ? '' : 'pt-[25px]'}>
             {item.action && (

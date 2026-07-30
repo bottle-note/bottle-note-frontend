@@ -4,6 +4,7 @@ import '@/style/tokens/semantic-colors.css';
 import '@/style/globals.css';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { Providers } from '@/lib/Providers';
+import { THEME_INITIALIZER_SCRIPT } from '@/lib/theme/theme';
 import { BASE_URL } from '@/constants/common';
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -105,8 +106,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className="touch-manipulation">
+    <html lang="ko" className="touch-manipulation" suppressHydrationWarning>
       <head>
+        {/* eslint-disable-next-line react/no-danger */}
+        <script
+          dangerouslySetInnerHTML={{ __html: THEME_INITIALIZER_SCRIPT }}
+        />
         <link
           rel="preconnect"
           href="https://cdn.jsdelivr.net"
@@ -120,9 +125,9 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body suppressHydrationWarning>
+      <body>
         <Providers>
-          <div className="relative w-full bg-bgGray min-h-safe-screen">
+          <div className="relative w-full bg-bg-layer-basement min-h-safe-screen">
             {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID && (
               <GoogleAnalytics
                 gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}
