@@ -50,11 +50,13 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
 
   return (
     <div
-      className={`min-h-safe-screen bg-white ${registrationUrl ? 'pb-28' : 'pb-8'}`}
+      className={`min-h-safe-screen bg-bg-layer-default text-fg-neutral ${
+        registrationUrl ? 'pb-28' : 'pb-8'
+      }`}
     >
       <CurationDetailHeader title={program.name} onBack={() => router.back()} />
 
-      <section className="relative h-60 w-full overflow-hidden bg-sectionWhite">
+      <section className="relative h-60 w-full overflow-hidden bg-bg-neutral-weak">
         <BaseImage
           src={program.coverImageUrl}
           alt=""
@@ -65,7 +67,7 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/75" />
         <div className="absolute bottom-5 left-5 right-5 text-white">
-          <span className="inline-flex rounded-full bg-white/70 px-2.5 py-1 text-10 font-bold text-mainDarkGray backdrop-blur-sm">
+          <span className="inline-flex rounded-full bg-white/70 px-2.5 py-1 text-10 font-bold text-palette-static-black backdrop-blur-sm">
             프로그램
           </span>
           <h1 className="mt-3 line-clamp-2 text-20 font-extrabold">
@@ -82,7 +84,7 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
       </section>
 
       <section className="px-5">
-        <p className="whitespace-pre-line text-13 font-medium leading-[1.7] text-mainDarkGray">
+        <p className="whitespace-pre-line text-13 font-medium leading-[1.7] text-fg-neutral">
           {program.description}
         </p>
         {officialUrl && (
@@ -90,7 +92,7 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
             href={officialUrl}
             target="_blank"
             rel="noreferrer"
-            className="mt-5 inline-flex h-10 items-center rounded-lg border border-subCoral px-4 text-13 font-bold text-subCoral"
+            className="mt-5 inline-flex h-10 items-center rounded-lg border border-stroke-brand-solid px-4 text-13 font-bold text-fg-brand"
           >
             공식 페이지 보기
           </a>
@@ -99,14 +101,12 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
 
       {tagLabels.length > 0 && (
         <section className="px-5 pt-6">
-          <h2 className="text-16 font-extrabold text-mainDarkGray">
-            행사 태그
-          </h2>
+          <h2 className="text-16 font-extrabold text-fg-neutral">행사 태그</h2>
           <div className="mt-3 flex flex-wrap gap-1.5">
             {tagLabels.map((tag) => (
               <span
                 key={tag}
-                className="label-default border-mainGray px-2 py-1 text-11 font-medium text-mainGray"
+                className="label-default px-2 py-1 text-11 font-medium"
               >
                 {tag}
               </span>
@@ -120,12 +120,12 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
           <Carousel
             setApi={setCarouselApi}
             opts={{ align: 'start', loop: imageUrls.length > 1 }}
-            className="w-full bg-sectionWhite"
+            className="w-full bg-bg-neutral-weak"
           >
             <CarouselContent className="!ml-0">
               {imageUrls.map((url, index) => (
                 <CarouselItem key={url} className="!pl-0">
-                  <div className="relative h-60 w-full overflow-hidden bg-sectionWhite">
+                  <div className="relative h-60 w-full overflow-hidden bg-bg-neutral-weak">
                     <BaseImage
                       src={url}
                       alt=""
@@ -156,7 +156,7 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
       )}
 
       <section className="px-5 py-7">
-        <h2 className="text-16 font-extrabold text-mainDarkGray">
+        <h2 className="text-16 font-extrabold text-fg-neutral">
           프로그램 일정
         </h2>
         <div className="mt-4">
@@ -176,9 +176,11 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
             href={registrationUrl}
             target="_blank"
             rel="noreferrer"
-            className="flex h-[52px] w-full items-center justify-center rounded-xl bg-subCoral"
+            className="flex h-[52px] w-full items-center justify-center rounded-xl bg-bg-brand-solid active:bg-bg-brand-solid-pressed"
           >
-            <span className="text-15 font-bold text-white">행사 신청하기</span>
+            <span className="text-15 font-bold text-fg-brand-contrast">
+              행사 신청하기
+            </span>
           </a>
         </div>
       )}

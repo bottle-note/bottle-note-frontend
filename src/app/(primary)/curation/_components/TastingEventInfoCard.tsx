@@ -68,17 +68,19 @@ export function TastingEventInfoCard({
   return (
     <div
       className={cn(
-        'flex flex-col gap-2 rounded-2xl bg-white/80 px-4 py-4 backdrop-blur-sm',
+        'flex flex-col gap-2 rounded-2xl bg-bg-layer-floating px-4 py-4 text-fg-neutral',
         className,
       )}
     >
       {label && (
         <span
-          className={cn(
-            'inline-flex w-fit rounded-full bg-mainCoral px-2.5 py-1 font-bold text-white',
+          className={[
+            'inline-flex w-fit rounded-full bg-bg-brand-solid px-2.5 py-1 font-bold text-fg-brand-contrast',
             labelTextClassName,
             labelClassName,
-          )}
+          ]
+            .filter(Boolean)
+            .join(' ')}
         >
           {label}
         </span>
@@ -87,7 +89,7 @@ export function TastingEventInfoCard({
       <div className={cn('flex h-full flex-col gap-4', label && 'mt-2')}>
         {infoItems.map(({ key, Icon, title, description, action }) => (
           <div key={key} className="flex gap-2.5">
-            <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-mainDarkGray">
+            <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-fg-neutral">
               <Icon size={16} strokeWidth={2} />
             </span>
 
@@ -95,10 +97,7 @@ export function TastingEventInfoCard({
               <div className="flex min-w-0 items-start justify-between w-full gap-2">
                 {title && (
                   <p
-                    className={cn(
-                      'min-w-0 flex-1 font-bold text-mainDarkGray',
-                      titleTextClassName,
-                    )}
+                    className={`min-w-0 flex-1 font-bold ${titleTextClassName}`}
                   >
                     {title}
                   </p>
@@ -109,7 +108,7 @@ export function TastingEventInfoCard({
                     target="_blank"
                     rel="noreferrer"
                     className={cn(
-                      'shrink-0 rounded-md bg-white px-3 py-1 font-bold text-mainDarkGray',
+                      'shrink-0 rounded-md bg-bg-layer-default px-3 py-1 font-bold text-fg-neutral',
                       shouldWrapText
                         ? 'text-13 leading-[17px]'
                         : 'text-12 leading-sm',
@@ -121,10 +120,7 @@ export function TastingEventInfoCard({
               </div>
               {description && (
                 <p
-                  className={cn(
-                    'font-light text-mainGray',
-                    getDescriptionTextClassName(key),
-                  )}
+                  className={`font-light text-fg-neutral-muted ${getDescriptionTextClassName(key)}`}
                 >
                   {description}
                 </p>
@@ -135,14 +131,15 @@ export function TastingEventInfoCard({
 
         <div className="mt-auto flex items-end gap-2">
           <span
-            className={cn(
-              'text-[10px] font-semibold leading-none text-mainDarkGray',
-              shouldWrapText && 'text-13 leading-[17px]',
-            )}
+            className={`font-semibold text-fg-neutral ${
+              shouldWrapText
+                ? 'text-13 leading-[17px]'
+                : 'text-[10px] leading-none'
+            }`}
           >
             참가비
           </span>
-          <span className="text-[19px] font-bold leading-none text-mainDarkGray">
+          <span className="text-[19px] font-bold leading-none text-fg-neutral">
             {tastingEvent.entryFeeLabel}
           </span>
         </div>

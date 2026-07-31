@@ -15,6 +15,17 @@ const payload: TastingEventPayload = {
 };
 
 describe('TastingEventInfoCard 장소 정보', () => {
+  it('테마에 따라 바뀌는 카드와 보조 텍스트 색상을 사용한다', () => {
+    render(<TastingEventInfoCard payload={payload} />);
+
+    const address = screen.getByText(
+      '서울 송파구 송파대로 145 2층 보틀노트 테이스팅룸',
+    );
+
+    expect(address).toHaveClass('text-fg-neutral-muted');
+    expect(address.closest('.bg-bg-layer-floating')).not.toBeNull();
+  });
+
   it('목록 카드에서 지번주소와 detailAddress를 함께 렌더링한다', () => {
     render(<TastingEventInfoCard payload={payload} />);
 

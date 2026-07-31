@@ -1,8 +1,8 @@
 import Link from 'next/link';
+import { Star, UserRound } from 'lucide-react';
 import type { TastingEventAlcohol } from '@/api/curation-v2/types';
 import ItemImage from '@/components/feature/List/_components/ItemImage';
 import ItemInfo from '@/components/feature/List/_components/ItemInfo';
-import { ItemStats } from '@/components/feature/List/_components/ItemStats';
 import { ROUTES } from '@/constants/routes';
 
 const isText = (value?: string | null): value is string => Boolean(value);
@@ -23,11 +23,11 @@ export function TastingEventLineupItem({
   const isDetailAvailable = alcoholId != null;
   const content = (
     <>
-      <div className="absolute z-10 left-0 top-6 flex h-5 w-5 items-center justify-center rounded-full bg-mainDarkGray text-10 font-bold text-white">
+      <div className="absolute left-0 top-6 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-bg-neutral-solid text-10 font-bold text-fg-neutral-inverted">
         {order}
       </div>
 
-      <div className="flex w-full gap-3 overflow-hidden text-mainBlack">
+      <div className="flex w-full gap-3 overflow-hidden text-fg-neutral">
         <ItemImage
           src={alcohol.imageUrl ?? ''}
           alt={alcohol.korName}
@@ -43,19 +43,25 @@ export function TastingEventLineupItem({
             />
 
             {details.length > 0 && (
-              <p className="text-13 text-mainDarkGray">{details.join(' · ')}</p>
+              <p className="text-13 text-fg-neutral">{details.join(' · ')}</p>
             )}
 
             {typeof stats?.rating === 'number' && (
-              <div className="flex items-center gap-1 text-mainGray">
+              <div className="flex items-center gap-1 text-fg-neutral-muted">
                 <span className="text-12 font-medium">유저평균</span>
-                <ItemStats
-                  iconSrc="/icon/star-filled-maingray.svg"
-                  pointContent={stats.rating.toFixed(1)}
-                  countContent={(stats.totalRatingsCount ?? 0).toString()}
-                  subTextClass="ml-[2px] text-11 font-medium"
-                  mainTextClass="justify-start text-mainGray"
+                <Star
+                  aria-hidden
+                  className="h-3 w-3 fill-current"
+                  strokeWidth={1.5}
                 />
+                <span className="text-12 font-semibold">
+                  {stats.rating.toFixed(1)}
+                </span>
+                <span className="ml-0.5 flex items-center text-11 font-medium">
+                  (
+                  <UserRound aria-hidden className="h-3 w-3" />
+                  {stats.totalRatingsCount ?? 0})
+                </span>
               </div>
             )}
           </div>
@@ -73,7 +79,7 @@ export function TastingEventLineupItem({
           {chips.map((chip) => (
             <span
               key={chip}
-              className="label-default border-mainGray px-2 py-1 text-11 font-medium text-mainGray"
+              className="label-default px-2 py-1 text-11 font-medium"
             >
               {chip}
             </span>
@@ -82,7 +88,7 @@ export function TastingEventLineupItem({
       )}
 
       {comment && (
-        <p className="mt-5 text-13 font-medium leading-[1.8] text-mainGray">
+        <p className="mt-5 text-13 font-medium leading-[1.8] text-fg-neutral-muted">
           {comment}
         </p>
       )}
@@ -94,7 +100,7 @@ export function TastingEventLineupItem({
       {isDetailAvailable ? (
         <Link
           href={ROUTES.SEARCH.ALL(alcoholId)}
-          className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-subCoral focus-visible:ring-offset-2"
+          className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-layer-default"
         >
           {content}
         </Link>

@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { ArrowLeft } from 'lucide-react';
 import AutoMarqueeText from '@/components/ui/Display/AutoMarqueeText';
 
 const DETAIL_HEADER_HEIGHT = 'calc(var(--header-height-with-safe) + 38px)';
@@ -14,19 +14,18 @@ export function CurationDetailHeader({
 }: CurationDetailHeaderProps) {
   return (
     <>
-      <div className="fixed-content top-0 z-30 bg-white">
+      <div className="fixed-content top-0 z-30 bg-bg-layer-default">
         <div className="flex w-full items-center px-[17px] pb-[15px] pt-safe-header">
           {onBack ? (
             <button
               type="button"
               className="flex w-11 shrink-0 items-center"
               onClick={onBack}
+              aria-label="뒤로가기"
             >
-              <Image
-                src="/icon/arrow-left-subcoral.svg"
-                alt="뒤로가기"
-                width={23}
-                height={23}
+              <ArrowLeft
+                aria-hidden
+                className="h-[23px] w-[23px] text-fg-brand"
               />
             </button>
           ) : (
@@ -36,7 +35,7 @@ export function CurationDetailHeader({
           <div className="min-w-0 flex-1 px-2">
             <AutoMarqueeText
               text={title}
-              className="text-center text-16 font-bold text-subCoral"
+              className="text-center text-16 font-bold text-fg-brand"
             />
           </div>
 

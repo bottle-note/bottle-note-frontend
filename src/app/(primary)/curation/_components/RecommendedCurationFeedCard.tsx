@@ -14,7 +14,7 @@ export function RecommendedCurationFeedCard({
 }: RecommendedCurationFeedCardProps) {
   return (
     <Link href={ROUTES.CURATION.DETAIL(curation.id)} className="block">
-      <article className="relative isolate h-[157px] w-full overflow-hidden rounded-lg bg-sectionWhite">
+      <article className="relative isolate h-[157px] w-full overflow-hidden rounded-lg bg-bg-neutral-weak">
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
           <BaseImage
             src={curation.coverImageUrl}

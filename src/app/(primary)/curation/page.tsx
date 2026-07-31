@@ -128,7 +128,7 @@ export default function CurationPage() {
 
   return (
     <>
-      <div className="fixed-content top-0 z-10 items-center justify-center bg-white">
+      <div className="fixed-content top-0 z-10 items-center justify-center bg-bg-layer-default">
         <SubHeader>
           <SubHeader.Left>
             <SubHeader.Logo />
@@ -148,7 +148,7 @@ export default function CurationPage() {
       </div>
 
       <section
-        className="w-full bg-white"
+        className="w-full bg-bg-layer-default text-fg-neutral"
         style={{
           marginTop: 'calc(var(--header-height-with-safe) + var(--tab-height))',
         }}
@@ -157,7 +157,7 @@ export default function CurationPage() {
           <UnderlineSearchBar
             onSearch={setSearchKeyword}
             placeholder="키워드를 입력하세요"
-            inputClassName="border-b border-subCoral pl-0 pr-20 pb-2 pt-0 text-13 font-medium placeholder-brightGray focus:border-subCoral"
+            inputClassName="border-b border-stroke-brand-solid pb-2 pl-0 pr-20 pt-0 text-13 font-medium focus:border-stroke-brand-solid"
             actionsClassName="-top-1"
             renderActions={({ submit }) => (
               <button
@@ -175,16 +175,16 @@ export default function CurationPage() {
         {activeQuery.isLoading && (
           <div className="space-y-7 px-5 pb-navbar">
             <div
-              className={`animate-pulse rounded-lg bg-sectionWhite ${skeletonHeight}`}
+              className={`animate-pulse rounded-lg bg-bg-neutral-weak ${skeletonHeight}`}
             />
             <div
-              className={`animate-pulse rounded-lg bg-sectionWhite ${skeletonHeight}`}
+              className={`animate-pulse rounded-lg bg-bg-neutral-weak ${skeletonHeight}`}
             />
           </div>
         )}
 
         {activeQuery.error && (
-          <p className="px-5 pb-navbar text-13 font-medium text-mainGray">
+          <p className="px-5 pb-navbar text-13 font-medium text-fg-neutral-muted">
             {errorMessage}
           </p>
         )}
@@ -193,7 +193,7 @@ export default function CurationPage() {
           !activeQuery.error &&
           (!activeData || activeData.length === 0) &&
           !activeQuery.hasNextPage && (
-            <p className="px-5 pb-navbar text-13 font-medium text-mainGray">
+            <p className="px-5 pb-navbar text-13 font-medium text-fg-neutral-muted">
               {emptyMessage}
             </p>
           )}
@@ -205,7 +205,7 @@ export default function CurationPage() {
           activeQuery.hasNextPage && (
             <div className="px-5 pb-navbar">
               <div ref={activeQuery.targetRef} className="h-1" />
-              <p className="py-2 text-center text-12 font-medium text-mainGray">
+              <p className="py-2 text-center text-12 font-medium text-fg-neutral-muted">
                 불러오는 중...
               </p>
             </div>
@@ -243,7 +243,7 @@ export default function CurationPage() {
                 <div ref={activeQuery.targetRef} className="h-1" />
               )}
               {activeQuery.isFetchingNextPage && (
-                <p className="py-2 text-center text-12 font-medium text-mainGray">
+                <p className="py-2 text-center text-12 font-medium text-fg-neutral-muted">
                   불러오는 중...
                 </p>
               )}

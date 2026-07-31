@@ -1,10 +1,9 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import Image from 'next/image';
+import { X } from 'lucide-react';
 import { useSearchInput } from '@/hooks/useSearchInput';
 import { cn } from '@/lib/utils';
-import DeleteIcon from 'public/icon/reset-mainGray.svg';
 
 interface UnderlineSearchBarActions {
   searchText: string;
@@ -58,14 +57,14 @@ export default function UnderlineSearchBar({
   };
 
   return (
-    <div className={cn('relative w-full', className)}>
+    <div className={cn('relative w-full text-fg-neutral', className)}>
       <input
         ref={inputRef}
         type="text"
         aria-label={ariaLabel ?? placeholder}
         placeholder={placeholder}
         className={cn(
-          'w-full appearance-none rounded-none border-b-2 border-gray-200 bg-transparent px-2 py-2.5 text-base outline-none transition-colors placeholder-mainGray placeholder:text-13 focus:border-amber-500',
+          'w-full appearance-none rounded-none border-b-2 border-stroke-neutral-subtle bg-transparent px-2 py-2.5 text-base outline-none transition-colors placeholder:text-fg-neutral-muted focus:border-stroke-focus-ring',
           inputClassName,
         )}
         value={searchText}
@@ -94,7 +93,7 @@ export default function UnderlineSearchBar({
               className="flex h-6 w-6 items-center justify-center"
               aria-label="검색어 지우기"
             >
-              <Image src={DeleteIcon} alt="" width={14} height={14} />
+              <X aria-hidden className="h-3.5 w-3.5 text-fg-neutral-muted" />
             </button>
           )}
           {renderActions?.({ searchText, submit: handleSubmit })}
