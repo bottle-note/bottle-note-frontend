@@ -9,6 +9,7 @@ import { addNewLine } from '@/utils/addNewLine';
 import { truncStr } from '@/utils/truncStr';
 import { ROUTES } from '@/constants/routes';
 import { LABEL_NAMES } from '@/constants/common';
+import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import Ellipsis from 'public/icon/ellipsis-vertical-subcoral.svg';
 
 interface Props {
@@ -32,7 +33,7 @@ export const ReviewListItem = ({ data }: Props) => {
   } = data;
 
   return (
-    <section className="text-mainBlack border-brightGray border-b py-4 flex items-center">
+    <section className="flex items-center border-b border-stroke-neutral-subtle py-4 text-fg-neutral">
       {/* image */}
       <Link href={ROUTES.REVIEW.DETAIL(reviewId)}>
         <ItemImage src={imageUrl} alt="image" />
@@ -47,14 +48,20 @@ export const ReviewListItem = ({ data }: Props) => {
         {isHot && (
           <Label
             name={LABEL_NAMES.HOT_5}
-            styleClass="bg-subCoral text-white px-2 py-[0.1rem] border-subCoral text-[8px] rounded mb-1"
+            styleClass="mb-1 rounded border-stroke-brand-solid bg-bg-brand-solid px-2 py-[0.1rem] text-[8px] text-fg-brand-contrast"
           />
         )}
         {isBestReview && (
           <Label
             name={LABEL_NAMES.BEST}
-            icon="/icon/thumbup-filled-white.svg"
-            styleClass="bg-mainCoral text-white px-2 py-[0.1rem] text-10 border-mainCoral rounded"
+            icon={
+              <SemanticIcon
+                src="/icon/thumbup-filled-white.svg"
+                width={10}
+                height={10}
+              />
+            }
+            styleClass="rounded border-stroke-brand-primary-solid bg-bg-brand-primary-solid px-2 py-[0.1rem] text-10 text-fg-brand-contrast"
           />
         )}
         <ItemInfo
@@ -64,7 +71,9 @@ export const ReviewListItem = ({ data }: Props) => {
         />
 
         {/* review content */}
-        <p className="text-12 font-bold">[{truncStr(reviewContent, 25)}]</p>
+        <p className="text-12 font-bold text-fg-neutral-muted">
+          [{truncStr(reviewContent, 25)}]
+        </p>
 
         {/* flavor tags */}
         {!!reviewTastingTags.length && (
@@ -82,7 +91,7 @@ export const ReviewListItem = ({ data }: Props) => {
           </div>
         )}
 
-        <p className="text-10 text-mainGray">
+        <p className="text-10 text-fg-neutral-muted">
           {format(new Date(reviewModifyAt), 'yyyy.MM.dd')}
         </p>
       </Link>

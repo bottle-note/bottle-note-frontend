@@ -23,11 +23,11 @@ export default function FlavorAxisControl({
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-baseline gap-1.5">
-        <span className="text-12 font-bold text-mainDarkGray">{label}</span>
-        <span className="text-[10px] text-mainGray">{descriptor}</span>
+        <span className="text-12 font-bold text-fg-neutral">{label}</span>
+        <span className="text-[10px] text-fg-neutral-muted">{descriptor}</span>
       </div>
       <div className="flex items-center gap-1.5">
-        <span className="text-[9px] text-mainGray/60 whitespace-nowrap shrink-0 w-[24px]">
+        <span className="w-[24px] shrink-0 whitespace-nowrap text-[9px] text-fg-neutral-subtle">
           {minHint}
         </span>
         <input
@@ -42,17 +42,17 @@ export default function FlavorAxisControl({
             [&::-webkit-slider-thumb]:w-4
             [&::-webkit-slider-thumb]:h-4
             [&::-webkit-slider-thumb]:rounded-full
-            [&::-webkit-slider-thumb]:bg-subCoral
+            [&::-webkit-slider-thumb]:bg-bg-brand-solid
             [&::-webkit-slider-thumb]:shadow-sm
             [&::-webkit-slider-thumb]:cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #E58257 ${(value / TASTING_MAX_VALUE) * 100}%, #E6E6DD ${(value / TASTING_MAX_VALUE) * 100}%)`,
+            background: `linear-gradient(to right, var(--color-bg-brand-solid) ${(value / TASTING_MAX_VALUE) * 100}%, var(--color-stroke-neutral-subtle) ${(value / TASTING_MAX_VALUE) * 100}%)`,
           }}
         />
-        <span className="text-[9px] text-mainGray/60 whitespace-nowrap shrink-0">
+        <span className="shrink-0 whitespace-nowrap text-[9px] text-fg-neutral-subtle">
           {maxHint}
         </span>
-        <span className="text-12 font-bold text-subCoral w-3 text-right shrink-0">
+        <span className="w-3 shrink-0 text-right text-12 font-bold text-fg-brand">
           {value}
         </span>
       </div>

@@ -14,7 +14,8 @@ function ProfileImage({
   borderWidth = 'thin',
   opacity = 1,
 }: Props) {
-  const borderClass = borderWidth === 'bold' ? 'border-2 border-subCoral' : '';
+  const borderClass =
+    borderWidth === 'bold' ? 'border-2 border-stroke-brand-solid' : '';
   const opacityClass = !profileImgSrc && opacity < 1 ? 'opacity-50' : '';
 
   return (

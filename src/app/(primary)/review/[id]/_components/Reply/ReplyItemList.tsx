@@ -46,7 +46,7 @@ const RootReplyItemMemo = memo(
               key={`sub-${subComment.reviewReplyId}`}
               className="relative ml-[6px]"
             >
-              <div className="absolute top-0 w-px h-full bg-gray/30" />
+              <div className="absolute top-0 h-full w-px bg-stroke-neutral-subtle" />
               <div className="ml-4">
                 <ReplyItem
                   data={subComment}
@@ -178,7 +178,7 @@ export default function ReplyItemList({
     <>
       {firstPage && firstPage.totalCount > 0 ? (
         <>
-          <div className="h-4 bg-sectionWhite" />
+          <div className="h-4 bg-bg-layer-basement" />
           <List
             isListFirstLoading={isRootFirstLoading}
             isScrollLoading={isRootFetching}
@@ -197,7 +197,7 @@ export default function ReplyItemList({
                       subReplies={subReplyMap.get(comment.reviewReplyId)}
                     />
                     {index !== firstPage.totalCount - 1 && (
-                      <div className="border-b border-mainGray/30" />
+                      <div className="border-b border-stroke-neutral-subtle" />
                     )}
                   </React.Fragment>
                 ))}
@@ -208,7 +208,7 @@ export default function ReplyItemList({
         </>
       ) : (
         <>
-          <div className="h-4 bg-sectionWhite" />
+          <div className="h-4 bg-bg-layer-basement" />
           <section className="py-5 mb-20">
             <EmptyView text="아직 댓글이 없어요!" />
           </section>

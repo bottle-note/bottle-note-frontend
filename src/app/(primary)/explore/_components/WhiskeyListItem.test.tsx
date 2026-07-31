@@ -12,10 +12,6 @@ jest.mock('@/components/feature/List/_components/ItemInfo', () => ({
   default: ({ korName }: { korName: string }) => <p>{korName}</p>,
 }));
 
-jest.mock('@/components/feature/List/_components/ItemStats', () => ({
-  ItemStats: () => null,
-}));
-
 jest.mock('@/components/ui/Display/Star', () => ({
   __esModule: true,
   default: () => null,
@@ -53,7 +49,9 @@ describe('WhiskeyListItem', () => {
     (abv) => {
       render(<WhiskeyListItem content={createContent(abv)} />);
 
-      expect(screen.getByText('도수 40% · 싱글 몰트')).toBeInTheDocument();
+      expect(screen.getByText('도수 40% · 싱글 몰트')).toHaveClass(
+        'text-fg-neutral-muted',
+      );
     },
   );
 

@@ -68,12 +68,14 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
 
   return (
     <div
-      className={`min-h-safe-screen bg-white ${shouldShowCta ? 'pb-28' : 'pb-8'}`}
+      className={`min-h-safe-screen bg-bg-layer-default text-fg-neutral ${
+        shouldShowCta ? 'pb-28' : 'pb-8'
+      }`}
     >
       <CurationDetailHeader title={event.name} onBack={() => router.back()} />
 
       {/* 상단 */}
-      <section className="relative h-60 w-full overflow-hidden bg-sectionWhite">
+      <section className="relative h-60 w-full overflow-hidden bg-bg-neutral-weak">
         <BaseImage
           src={event.coverImageUrl}
           alt=""
@@ -83,8 +85,8 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/10 to-black/70" />
-        <div className="absolute bottom-5 left-5 right-5 text-black">
-          <span className="inline-flex rounded-full bg-white/70 px-2.5 py-1 text-10 font-bold backdrop-blur-sm">
+        <div className="absolute bottom-5 left-5 right-5">
+          <span className="inline-flex rounded-full bg-white/70 px-2.5 py-1 text-10 font-bold text-palette-static-black backdrop-blur-sm">
             시음회
           </span>
           <h1 className="mt-3 line-clamp-2 text-20 font-extrabold text-white">
@@ -102,13 +104,13 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
           payload={payload}
           showMapCta
           textBehavior="wrap"
-          className="bg-bgGray"
+          className="bg-bg-neutral-weak"
         />
       </section>
 
       {/* 시음회 설명 */}
       <section className="px-5">
-        <p className="whitespace-pre-line text-13 font-medium text-mainDarkGray">
+        <p className="whitespace-pre-line text-13 font-medium text-fg-neutral">
           {event.description}
         </p>
       </section>
@@ -119,12 +121,12 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
           <Carousel
             setApi={setCarouselApi}
             opts={{ align: 'start', loop: imageUrls.length > 1 }}
-            className="w-full bg-sectionWhite"
+            className="w-full bg-bg-neutral-weak"
           >
             <CarouselContent className="!ml-0">
               {imageUrls.map((url, index) => (
                 <CarouselItem key={url} className="!pl-0">
-                  <div className="relative h-60 w-full overflow-hidden bg-sectionWhite">
+                  <div className="relative h-60 w-full overflow-hidden bg-bg-neutral-weak">
                     <BaseImage
                       src={url}
                       alt=""
@@ -157,17 +159,17 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
       {/* 시음회 라인업 */}
       {alcohols.length > 0 && (
         <section className="px-5 py-6">
-          <h2 className="text-16 font-extrabold text-mainDarkGray">
+          <h2 className="text-16 font-extrabold text-fg-neutral">
             시음회 라인업
           </h2>
           <List>
-            <List.Section className="mt-4 divide-y divide-bgGray border-t border-bgGray">
+            <List.Section className="mt-4 divide-y divide-stroke-neutral-basement border-t border-stroke-neutral-basement">
               {alcohols.map((item, index) => (
                 <TastingEventLineupItem
                   key={
-                    item.source ??
-                    item.alcohol.alcoholId ??
-                    `${item.alcohol.korName}-${index}`
+                    item.alcohol.alcoholId != null
+                      ? `alcohol-${item.alcohol.alcoholId}`
+                      : `manual-${item.alcohol.korName}-${item.alcohol.engName ?? ''}`
                   }
                   item={item}
                   order={index + 1}
@@ -185,19 +187,14 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
               href={applicationLink}
               target="_blank"
               rel="noreferrer"
-              className="flex h-[52px] w-full items-center justify-center rounded-xl bg-subCoral"
+              className="flex h-[52px] w-full items-center justify-center rounded-xl bg-bg-brand-solid active:bg-bg-brand-solid-pressed"
             >
-              <span className="text-15 font-bold text-white">
+              <span className="text-15 font-bold text-fg-brand-contrast">
                 시음회 신청하기
               </span>
             </a>
           ) : (
-            <Button
-              btnName="모집 마감"
-              onClick={() => undefined}
-              btnStyles="bg-subCoral"
-              disabled
-            />
+            <Button btnName="모집 마감" onClick={() => undefined} disabled />
           )}
         </div>
       )}
@@ -236,13 +233,13 @@ function CurationDetail({
   }, [carouselApi]);
 
   return (
-    <div className="min-h-safe-screen bg-white pb-8">
+    <div className="min-h-safe-screen bg-bg-layer-default pb-8 text-fg-neutral">
       <CurationDetailHeader
         title={curation.name}
         onBack={() => router.back()}
       />
 
-      <section className="relative h-60 w-full overflow-hidden bg-sectionWhite">
+      <section className="relative h-60 w-full overflow-hidden bg-bg-neutral-weak">
         <BaseImage
           src={curation.coverImageUrl}
           alt=""
@@ -252,8 +249,8 @@ function CurationDetail({
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/75" />
-        <div className="absolute bottom-5 left-5 right-5 text-black">
-          <span className="inline-flex rounded-full bg-white/70 px-2.5 py-1 text-10 font-bold backdrop-blur-sm">
+        <div className="absolute bottom-5 left-5 right-5">
+          <span className="inline-flex rounded-full bg-white/70 px-2.5 py-1 text-10 font-bold text-palette-static-black backdrop-blur-sm">
             {label}
           </span>
           <h1 className="mt-3 line-clamp-2 text-20 font-extrabold text-white">
@@ -263,7 +260,7 @@ function CurationDetail({
       </section>
 
       <section className="px-5 py-5">
-        <p className="whitespace-pre-line text-13 font-medium text-mainDarkGray">
+        <p className="whitespace-pre-line text-13 font-medium text-fg-neutral">
           {curation.description}
         </p>
       </section>
@@ -273,12 +270,12 @@ function CurationDetail({
           <Carousel
             setApi={setCarouselApi}
             opts={{ align: 'start', loop: imageUrls.length > 1 }}
-            className="w-full bg-sectionWhite"
+            className="w-full bg-bg-neutral-weak"
           >
             <CarouselContent className="!ml-0">
               {imageUrls.map((url, index) => (
                 <CarouselItem key={url} className="!pl-0">
-                  <div className="relative h-60 w-full overflow-hidden bg-sectionWhite">
+                  <div className="relative h-60 w-full overflow-hidden bg-bg-neutral-weak">
                     <BaseImage
                       src={url}
                       alt=""
@@ -310,17 +307,17 @@ function CurationDetail({
 
       {curation.payload.length > 0 && (
         <section className="px-5 py-6">
-          <h2 className="text-16 font-extrabold text-mainDarkGray">
+          <h2 className="text-16 font-extrabold text-fg-neutral">
             추천 라인업
           </h2>
           <List>
-            <List.Section className="mt-4 divide-y divide-bgGray border-t border-bgGray">
+            <List.Section className="mt-4 divide-y divide-stroke-neutral-basement border-t border-stroke-neutral-basement">
               {curation.payload.map((item, index) => (
                 <TastingEventLineupItem
                   key={
-                    item.source ??
-                    item.alcohol.alcoholId ??
-                    `${item.alcohol.korName}-${index}`
+                    item.alcohol.alcoholId != null
+                      ? `alcohol-${item.alcohol.alcoholId}`
+                      : `manual-${item.alcohol.korName}-${item.alcohol.engName ?? ''}`
                   }
                   item={item}
                   order={index + 1}
@@ -336,13 +333,13 @@ function CurationDetail({
 
 function CurationDetailSkeleton() {
   return (
-    <div className="min-h-safe-screen bg-white pb-28">
+    <div className="min-h-safe-screen bg-bg-layer-default pb-28">
       <CurationDetailHeader title="큐레이션" />
-      <div className="h-60 bg-sectionWhite" />
+      <div className="h-60 bg-bg-neutral-weak" />
       <div className="px-5 py-5">
-        <div className="h-56 rounded-xl bg-sectionWhite" />
-        <div className="mt-5 h-20 rounded-md bg-sectionWhite" />
-        <div className="mt-5 h-60 rounded-xl bg-sectionWhite" />
+        <div className="h-56 rounded-xl bg-bg-neutral-weak" />
+        <div className="mt-5 h-20 rounded-md bg-bg-neutral-weak" />
+        <div className="mt-5 h-60 rounded-xl bg-bg-neutral-weak" />
       </div>
     </div>
   );

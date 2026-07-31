@@ -1,6 +1,5 @@
-import Image from 'next/image';
+import { X } from 'lucide-react';
 import type { SearchKeyword } from './types';
-import DeleteIcon from 'public/icon/reset-mainGray.svg';
 
 interface Props {
   keyword: SearchKeyword;
@@ -21,12 +20,7 @@ export const ExploreKeywordChip = ({
       aria-label={`${keyword.label} 검색어 지우기`}
     >
       <span className="leading-none">{keyword.label}</span>
-      <Image
-        src={DeleteIcon}
-        alt=""
-        aria-hidden
-        className="block h-3.5 w-3.5 shrink-0"
-      />
+      <X aria-hidden className="h-3.5 w-3.5 shrink-0 text-fg-brand" />
     </button>
   );
 };

@@ -30,7 +30,7 @@ function LoginModal({ handleClose, returnTo }: Props) {
   return (
     <BackDrop isShow>
       <div className="w-full h-full flex flex-col justify-end items-center px-4 gap-3 pb-safe content-container">
-        <section className="relative w-full pt-20 bg-white rounded-xl text-center flex flex-col items-center space-y-3 px-4">
+        <section className="relative w-full pt-20 bg-bg-layer-floating text-fg-neutral rounded-xl text-center flex flex-col items-center space-y-3 px-4">
           <article className="absolute top-[-10px]">
             <Image
               src="/icon/logo-subcoral.svg"
@@ -46,7 +46,10 @@ function LoginModal({ handleClose, returnTo }: Props) {
             <p className="modal-subText">로그인 하시겠습니까?</p>
           </article>
           <Button btnName="로그인" onClick={handleLoginClick} />
-          <button className="text-10 text-mainGray pb-3" onClick={handleClose}>
+          <button
+            className="text-10 text-fg-neutral-muted pb-3"
+            onClick={handleClose}
+          >
             다음에 할게요
           </button>
         </section>

@@ -40,7 +40,7 @@ function AlcoholInfo({ data, onSelectAlcohol }: AlcoholInfoProps) {
           <button
             type="button"
             onClick={onSelectAlcohol}
-            className="w-[99px] h-[171px] bg-white rounded-md flex items-center justify-center shrink-0"
+            className="flex h-[171px] w-[99px] shrink-0 items-center justify-center rounded-md border border-stroke-neutral-subtle bg-bg-neutral-weak"
           >
             <Image
               src="/icon/plus-subcoral.svg"

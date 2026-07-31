@@ -40,7 +40,7 @@ export default function TastingNoteForm() {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(true)}
-                className="text-13 text-subCoral underline underline-offset-2"
+                className="text-13 text-fg-brand underline underline-offset-2"
               >
                 수정하기
               </button>
@@ -50,10 +50,10 @@ export default function TastingNoteForm() {
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="w-full py-3 border border-dashed border-subCoral/50 rounded-lg
+              className="w-full py-3 border border-dashed border-stroke-brand-weak rounded-lg
                 flex items-center justify-center gap-2
-                text-14 text-subCoral
-                active:bg-subCoral/5 transition-colors"
+                text-14 text-fg-brand
+                active:bg-bg-brand-weak transition-colors"
             >
               <svg
                 width="16"

@@ -30,7 +30,7 @@ export const RatingsListItem = ({ data, isMyPage }: Props) => {
   } = data;
 
   return (
-    <section className="flex items-center text-mainBlack border-brightGray border-b py-2">
+    <section className="flex items-center border-b border-stroke-neutral-subtle py-2 text-fg-neutral">
       {/* image */}
       <Link href={ROUTES.SEARCH.ALL(alcoholId)}>
         <ItemImage src={imageUrl} alt="image" />
@@ -44,7 +44,7 @@ export const RatingsListItem = ({ data, isMyPage }: Props) => {
         {isHot && (
           <Label
             name={LABEL_NAMES.HOT_5}
-            styleClass="bg-subCoral text-white px-2 py-[0.1rem] border-subCoral text-[8px] rounded mb-1"
+            styleClass="mb-1 rounded border-stroke-brand-solid bg-bg-brand-solid px-2 py-[0.1rem] text-[8px] text-fg-brand-contrast"
           />
         )}
         <ItemInfo
@@ -62,12 +62,13 @@ export const RatingsListItem = ({ data, isMyPage }: Props) => {
 
       {/* my rating point */}
       <div className="ml-auto pr-1 flex flex-col items-end">
-        {isMyPage && <p className="text-10 text-mainGray font-bold">내 별점</p>}
+        {isMyPage && (
+          <p className="text-10 font-bold text-fg-neutral-muted">내 별점</p>
+        )}
         <Star
           rating={myRatingPoint}
           size={20}
-          color="main"
-          textStyle="text-16 text-mainCoral font-black"
+          textStyle="text-16 text-fg-brand-primary font-black"
         />
       </div>
     </section>

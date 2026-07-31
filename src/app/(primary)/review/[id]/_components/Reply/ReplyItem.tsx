@@ -4,6 +4,7 @@ import React, { useState, memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { MoreVertical } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 import { ReplyApi } from '@/api/reply/reply.api';
 import { useBlockActions } from '@/hooks/useBlockActions';
@@ -117,13 +118,13 @@ const ReplyItem = memo(function ReplyItem({
         {isBlocked ? (
           <div className="space-y-[10px] mb-2">
             <div className="flex items-center space-x-1">
-              <div className="rounded-full w-[22px] h-[22px] bg-brightGray" />
-              <p className="text-mainGray text-12">차단한 사용자</p>
+              <div className="h-[22px] w-[22px] rounded-full bg-bg-disabled" />
+              <p className="text-12 text-fg-neutral-muted">차단한 사용자</p>
             </div>
-            <div className="flex items-center justify-between text-mainGray">
+            <div className="flex items-center justify-between text-fg-neutral-muted">
               <div className="text-13">차단한 사용자의 리뷰입니다.</div>
               <button
-                className="text-13 border-b border-mainGray"
+                className="border-b border-stroke-neutral-weak text-13"
                 onClick={() =>
                   handleUnblockUser(String(data?.userId), data.nickName)
                 }
@@ -138,19 +139,19 @@ const ReplyItem = memo(function ReplyItem({
               <Link href={ROUTES.USER.BASE(data?.userId!)}>
                 <div className="flex items-center space-x-[5px] h-8 px-">
                   <ProfileImage profileImgSrc={data?.imageUrl} size={22} />
-                  <p className="text-mainGray text-12 font-bold">
+                  <p className="text-12 font-bold text-fg-neutral-muted">
                     {truncStr(data?.nickName, 12)}
                   </p>
                   {isReviewUser && (
                     <Label
                       name={LABEL_NAMES.REVIEW_AUTHOR}
-                      styleClass="border-mainCoral text-mainCoral px-[5.82px] py-[2.91px] rounded text-9"
+                      styleClass="rounded border border-stroke-brand-primary-solid bg-bg-layer-default px-[5.82px] py-[2.91px] text-9 text-fg-brand-primary"
                     />
                   )}
                 </div>
               </Link>
               <div className="flex justify-between">
-                <p className="text-mainGray text-11">
+                <p className="text-11 text-fg-neutral-subtle">
                   {formatDate(data?.createAt) as string}
                 </p>
                 {data?.status !== 'DELETED' && (
@@ -161,19 +162,17 @@ const ReplyItem = memo(function ReplyItem({
                       else handleLoginModal();
                     }}
                   >
-                    <Image
-                      src="/icon/ellipsis-darkgray.svg"
-                      width={14}
-                      height={14}
-                      alt="report"
+                    <MoreVertical
+                      aria-label="댓글 메뉴"
+                      className="h-3.5 w-3.5 text-fg-neutral-muted"
                     />
                   </button>
                 )}
               </div>
             </div>
-            <div className="text-15 text-mainDarkGray whitespace-pre-wrap break-words flex my-2">
+            <div className="my-2 flex whitespace-pre-wrap break-words text-15 text-fg-neutral">
               {'rootReviewId' in data && (
-                <div className="text-mainCoral mr-1">
+                <div className="mr-1 text-fg-brand-primary">
                   {data?.parentReviewReplyAuthor}
                 </div>
               )}
@@ -185,7 +184,7 @@ const ReplyItem = memo(function ReplyItem({
           <div className="flex space-x-[6px] text-13">
             {data?.status !== 'DELETED' && !isBlocked && (
               <button
-                className=" text-subCoral"
+                className="text-fg-brand"
                 onClick={() => {
                   if (isLoggedIn) {
                     updateReplyUser();
@@ -200,13 +199,13 @@ const ReplyItem = memo(function ReplyItem({
             {'subReplyCount' in data && data?.subReplyCount !== 0 && (
               <>
                 {!isBlocked && data?.status !== 'DELETED' && (
-                  <p className="text-subCoral">·</p>
+                  <p className="text-fg-brand">·</p>
                 )}
                 <button
                   className="flex items-center space-x-[2px]"
                   onClick={handleUpdateSubReply}
                 >
-                  <div className="text-subCoral pr-[1px]">
+                  <div className="pr-[1px] text-fg-brand">
                     답글 {data?.subReplyCount}개
                   </div>
                   <Image

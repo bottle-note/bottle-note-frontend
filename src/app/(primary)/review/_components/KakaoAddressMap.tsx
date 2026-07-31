@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
+import { CircleX } from 'lucide-react';
 import useModalStore from '@/store/modalStore';
 import { KakaoPlace } from '@/types/Review';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
 import RecentSearch from '@/components/feature/Search/RecentSearch';
-import DeleteIcon from 'public//icon/reset-mainGray.svg';
 import SearchIcon from 'public/icon/search-subcoral.svg';
 
 interface Props {
@@ -76,9 +76,10 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
           el.innerHTML = itemStr;
           el.className = 'item';
 
-          el.style.borderTop = '1px solid #bfbfbf';
+          el.style.borderTop = '1px solid var(--color-stroke-neutral-subtle)';
           if (index === totalCount - 1) {
-            el.style.borderBottom = '1px solid #bfbfbf';
+            el.style.borderBottom =
+              '1px solid var(--color-stroke-neutral-subtle)';
           }
 
           el.style.padding = '10px 0';
@@ -91,17 +92,17 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
           titleRowElements.style.justifyContent = 'space-between';
 
           const titleElements = el.querySelector('.title') as HTMLElement;
-          titleElements.style.color = '#101010';
+          titleElements.style.color = 'var(--color-fg-neutral)';
           titleElements.style.fontSize = '14px';
           titleElements.style.fontWeight = 'bold';
           titleElements.style.marginRight = '10px';
 
           const categoryElements = el.querySelector('.category') as HTMLElement;
-          categoryElements.style.color = '#666666';
+          categoryElements.style.color = 'var(--color-fg-neutral-muted)';
           categoryElements.style.fontSize = '14px';
 
           const urlElements = el.querySelector('.url') as HTMLElement;
-          urlElements.style.color = '#E58257';
+          urlElements.style.color = 'var(--color-fg-brand)';
           urlElements.style.fontSize = '12px';
 
           const rowElement = el.getElementsByClassName('row');
@@ -116,8 +117,9 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
           Array.from(labelElement).forEach((element) => {
             const htmlElement = element as HTMLElement;
             htmlElement.style.marginRight = '10px';
-            htmlElement.style.border = '2px solid #e6e6dd';
-            htmlElement.style.color = '#666666';
+            htmlElement.style.border =
+              '2px solid var(--color-stroke-neutral-subtle)';
+            htmlElement.style.color = 'var(--color-fg-neutral-muted)';
             htmlElement.style.fontSize = '12px';
             htmlElement.style.width = '50px';
             htmlElement.style.display = 'flex';
@@ -129,7 +131,7 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
           const detailElement = el.getElementsByClassName('detail');
           Array.from(detailElement).forEach((element) => {
             const htmlElement = element as HTMLElement;
-            htmlElement.style.color = '#101010';
+            htmlElement.style.color = 'var(--color-fg-neutral)';
             htmlElement.style.fontSize = '12px';
           });
 
@@ -215,7 +217,7 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
             type="text"
             id="keyword"
             ref={keywordRef}
-            className="w-full bg-white rounded-lg h-10 pl-4 pr-12 text-subCoral border-subCoral border outline-none placeholder-mainCoral text-15"
+            className="h-10 w-full rounded-lg border border-stroke-brand-solid bg-bg-layer-floating pl-4 pr-12 text-15 text-fg-brand placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
             placeholder="도로명 주소 혹은 상호명 입력"
             value={searchText}
             onChange={(e) => {
@@ -233,7 +235,10 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
               }}
               className="absolute right-11 top-1/2 transform -translate-y-1/2"
             >
-              <Image src={DeleteIcon} alt="delete" />
+              <CircleX
+                aria-label="검색어 삭제"
+                className="h-4 w-4 text-fg-neutral-muted"
+              />
             </button>
           )}
           <button

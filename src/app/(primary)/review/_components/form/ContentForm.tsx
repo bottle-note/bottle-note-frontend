@@ -73,16 +73,16 @@ export default function ContentForm() {
       <textarea
         {...register('review')}
         placeholder={`위스키 리뷰를 작성해보세요.\n(작성 완료 후 공개/비공개 여부를 변경할 수 있습니다.)`}
-        className="text-16 w-full h-48 placeholder:text-14"
+        className="h-48 w-full resize-none rounded-lg bg-bg-neutral-weak p-3 text-16 text-fg-neutral placeholder:text-14 placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
         maxLength={700}
       />
       <div className="flex justify-between items-center mt-1">
-        <p className="text-12 text-mainGray">{review.length}/700</p>
+        <p className="text-12 text-fg-neutral-subtle">{review.length}/700</p>
         <button
           type="button"
           onClick={handleExtractTags}
           disabled={isExtracting}
-          className={`text-15 px-2 py-1 rounded-md border border-solid w-24 shrink-0 ${isExtracting ? 'border-brightGray text-bgGray' : 'border-subCoral text-white bg-subCoral'}`}
+          className={`w-24 shrink-0 text-15 ${isExtracting ? 'label-disabled' : 'label-selected'}`}
         >
           {isExtracting ? '추출 중...' : '태그 추출'}
         </button>

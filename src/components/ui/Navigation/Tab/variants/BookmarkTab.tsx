@@ -10,13 +10,24 @@ type Props<T extends { id: string; name: string }> = {
   ) => (el: HTMLDivElement | HTMLButtonElement | null) => void;
   tabList: T[];
   scrollContainerRef?: RefObject<HTMLDivElement>;
+  surface?: 'default' | 'floating';
 };
 
 const TAB_WIDTH = 146;
 const TAB_HEIGHT = 32;
 
-const BORDER_COLOR = '#CFCFCF';
+const BORDER_COLOR = 'var(--color-stroke-neutral-subtle)';
 const BORDER_WIDTH = 1.5;
+const SURFACE_STYLES = {
+  default: {
+    className: 'bg-bg-layer-default',
+    color: 'var(--color-bg-layer-default)',
+  },
+  floating: {
+    className: 'bg-bg-layer-floating',
+    color: 'var(--color-bg-layer-floating)',
+  },
+} as const;
 
 const BookmarkTab = <T extends { id: string; name: string }>({
   currentTab,
@@ -24,9 +35,12 @@ const BookmarkTab = <T extends { id: string; name: string }>({
   tabList,
   scrollContainerRef,
   registerTab,
+  surface = 'default',
 }: Props<T>) => {
+  const surfaceStyle = SURFACE_STYLES[surface];
+
   return (
-    <div className="w-full bg-white">
+    <div className={`w-full ${surfaceStyle.className}`}>
       <div className="relative">
         <div
           ref={scrollContainerRef}
@@ -84,7 +98,11 @@ const BookmarkTab = <T extends { id: string; name: string }>({
                       y="0"
                       width={TAB_WIDTH}
                       height={TAB_HEIGHT}
-                      fill={currentTab.id === tab.id ? '#FFF' : '#F7F7F7'}
+                      fill={
+                        currentTab.id === tab.id
+                          ? surfaceStyle.color
+                          : 'var(--color-bg-neutral-weak)'
+                      }
                       clipPath={`url(#tab-clip-${tab.id})`}
                     />
 
@@ -119,8 +137,8 @@ const BookmarkTab = <T extends { id: string; name: string }>({
                   <span
                     className={`relative z-10 text-15 font-extrabold ${
                       currentTab.id === tab.id
-                        ? 'text-orange-500'
-                        : 'text-brightGray'
+                        ? 'text-fg-brand'
+                        : 'text-fg-neutral-subtle'
                     }`}
                   >
                     {tab.name}

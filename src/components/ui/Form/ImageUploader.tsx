@@ -112,6 +112,7 @@ export default function ImageUploader({
               className="h-full"
             />
             <button
+              type="button"
               onClick={() => removeImage(data?.image)}
               className="absolute top-0 right-0 bg-black"
             >
@@ -126,8 +127,9 @@ export default function ImageUploader({
         ))}
 
         <button
+          type="button"
           onClick={onClickAddImage}
-          className="h-[3.8rem] w-[3.8rem] border border-subCoral flex flex-col justify-center items-center"
+          className="flex h-[3.8rem] w-[3.8rem] flex-col items-center justify-center border border-stroke-brand-solid"
         >
           <Image
             src="/icon/plus-subcoral.svg"

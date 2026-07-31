@@ -15,10 +15,10 @@ const ItemInfo = ({ korName, engName, korCategory, length }: Props) => {
 
   return (
     <article className="flex flex-col space-y-1">
-      <h2 className="text-15 leading-[1.3] font-bold text-mainDarkGray line-clamp-2">
+      <h2 className="line-clamp-2 text-15 font-bold leading-[1.3] text-fg-neutral">
         {korName}
       </h2>
-      <p className="text-13 text-mainDarkGray">
+      <p className="text-13 text-fg-neutral-muted">
         <span>{engNameText}</span>
         {korCategory && <span> · {korCategory}</span>}
       </p>

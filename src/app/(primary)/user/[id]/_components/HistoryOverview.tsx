@@ -24,7 +24,7 @@ const HistoryOverview = ({ rates, reviews, likes, id }: Props) => {
   ];
 
   return (
-    <article className="grid grid-cols-3 divide-x pt-[22px] text-fontBurgundy border-t border-subCoral">
+    <article className="grid grid-cols-3 divide-x divide-stroke-neutral-weak border-t border-stroke-brand-solid pt-[22px] text-fg-neutral">
       {HISTORY_OVERVIEW.map((item) => (
         <button
           className="flex justify-center items-center"
@@ -32,7 +32,7 @@ const HistoryOverview = ({ rates, reviews, likes, id }: Props) => {
           key={item.name}
         >
           <p className="flex flex-col items-center px-8.5" key={item.name}>
-            <span className="text-27 font-extrabold text-subCoral">
+            <span className="text-27 font-extrabold text-fg-brand">
               {item.value}
             </span>
             <span className="text-13 font-bold whitespace-nowrap">

@@ -6,18 +6,16 @@ jest.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
-jest.mock('next/image', () => ({
-  __esModule: true,
-  default: ({
-    alt = '',
-    ...props
-  }: React.ImgHTMLAttributes<HTMLImageElement>) => (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img alt={alt} {...props} />
-  ),
-}));
-
 describe('UnderlineSearchBar', () => {
+  it('검색 입력에 시맨틱 테두리와 placeholder 색상을 사용한다', () => {
+    render(<UnderlineSearchBar />);
+
+    expect(screen.getByRole('textbox')).toHaveClass(
+      'border-stroke-neutral-subtle',
+      'placeholder:text-fg-neutral-muted',
+    );
+  });
+
   it('input focus와 blur 상태를 외부에 전달한다', () => {
     const onFocusChange = jest.fn();
 

@@ -38,7 +38,7 @@ function BannerImage({
     return (
       <>
         {!isLoaded && (
-          <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+          <div className="absolute inset-0 animate-pulse bg-bg-neutral-weak" />
         )}
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <video
@@ -60,7 +60,7 @@ function BannerImage({
   return (
     <>
       {!isLoaded && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+        <div className="absolute inset-0 animate-pulse bg-bg-neutral-weak" />
       )}
       <Image
         src={banner.imageUrl}
@@ -222,7 +222,7 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
       }}
       plugins={[autoplayRef.current]}
       setApi={setApi}
-      className="w-full bg-white"
+      className="w-full bg-bg-layer-default"
     >
       <CarouselContent className="!ml-0">
         {banners.map((banner, index) => (
@@ -244,7 +244,7 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
               <button
                 type="button"
                 onClick={() => api && api.scrollPrev()}
-                className="absolute right-[68.45px] bottom-3 flex items-center justify-center w-[35.56px] h-[35.56px] rounded-full bg-mainDarkGray/60 text-white z-10"
+                className="absolute bottom-3 right-[68.45px] z-10 flex h-[35.56px] w-[35.56px] items-center justify-center rounded-full bg-bg-overlay text-palette-static-white"
               >
                 <Image
                   src="/icon/arrow-left-white.svg"
@@ -256,7 +256,7 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
               <button
                 type="button"
                 onClick={() => api && api.scrollNext()}
-                className="absolute right-3 bottom-3 flex items-center justify-center w-[35.56px] h-[35.56px] rounded-full bg-mainDarkGray/60 text-white z-10"
+                className="absolute bottom-3 right-3 z-10 flex h-[35.56px] w-[35.56px] items-center justify-center rounded-full bg-bg-overlay text-palette-static-white"
               >
                 <Image
                   src="/icon/arrow-left-white.svg"

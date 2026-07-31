@@ -14,6 +14,7 @@ interface BaseTabProps<T extends TabItem> {
 
 interface BookmarkTabProps<T extends TabItem> extends BaseTabProps<T> {
   variant: 'bookmark';
+  surface?: 'default' | 'floating';
   scrollContainerRef?: React.RefObject<HTMLDivElement>;
   registerTab?: (
     id: string,
@@ -34,6 +35,7 @@ function Tab<T extends TabItem>({ ...props }: TabProps<T>) {
           currentTab={props.currentTab}
           tabList={props.tabList}
           handleTab={props.handleTab}
+          surface={props.surface}
           scrollContainerRef={props.scrollContainerRef}
           registerTab={props.registerTab}
         />

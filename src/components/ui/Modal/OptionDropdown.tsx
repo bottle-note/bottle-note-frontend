@@ -16,14 +16,14 @@ export default function OptionDropdown({
   return (
     <BackDrop isShow onBackdropClick={handleClose}>
       <div className="content-container absolute bottom-0 left-0 right-0 flex flex-col items-center px-4 gap-3 pb-safe">
-        <section className="w-full bg-white rounded-xl divide-y max-h-[400px] overflow-y-scroll">
-          <article className="py-4 text-center text-mainGray text-sm">
+        <section className="w-full bg-bg-layer-floating text-fg-neutral rounded-xl divide-y divide-stroke-neutral-subtle max-h-[400px] overflow-y-scroll">
+          <article className="py-4 text-center text-fg-neutral-muted text-sm">
             {title}
           </article>
           {options.map((option) => (
             <button
               key={option.type}
-              className="block w-full py-4 text-center text-subCoral"
+              className="block w-full py-4 text-center text-fg-brand active:bg-bg-layer-default-pressed"
               onClick={() => {
                 handleOptionSelect(option);
                 handleClose();
@@ -34,7 +34,7 @@ export default function OptionDropdown({
           ))}
         </section>
         <button
-          className="w-full bg-white rounded-xl py-4"
+          className="w-full bg-bg-layer-floating text-fg-neutral rounded-xl py-4 active:bg-bg-layer-default-pressed"
           onClick={handleClose}
         >
           닫기

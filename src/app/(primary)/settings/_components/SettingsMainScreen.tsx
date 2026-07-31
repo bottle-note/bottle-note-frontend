@@ -7,6 +7,7 @@ import { SettingsMiniEventList } from './SettingsMiniEventList';
 
 interface SettingsMainScreenProps {
   menuCategories: MenuCategory[];
+  isLoggedIn: boolean;
 }
 
 const containerVariants = {
@@ -23,6 +24,7 @@ const containerVariants = {
 
 export const SettingsMainScreen = ({
   menuCategories,
+  isLoggedIn,
 }: SettingsMainScreenProps) => {
   return (
     <motion.section
@@ -31,16 +33,18 @@ export const SettingsMainScreen = ({
       initial="hidden"
       animate="visible"
     >
-      <SettingsMiniEventList />
+      {isLoggedIn && <SettingsMiniEventList />}
 
       {menuCategories.map((category, categoryIndex) => (
         <div key={category.title}>
-          {categoryIndex > 0 && <div className="border-t border-brightGray" />}
+          {categoryIndex > 0 && (
+            <div className="border-t border-stroke-neutral-subtle" />
+          )}
           <div className="py-[22px]">
-            <h2 className="text-subCoral text-13 font-bold">
+            <h2 className="text-fg-brand text-13 font-bold">
               {category.title}
             </h2>
-            <div className="mt-[27px] space-y-[25px] text-15 font-medium text-mainBlack">
+            <div className="mt-[27px] space-y-[25px] text-15 font-medium text-fg-neutral">
               {category.items.map((item) => {
                 const isExternalLink =
                   item.link?.startsWith('http://') ||
@@ -74,8 +78,8 @@ export const SettingsMainScreen = ({
         </div>
       ))}
 
-      <div className="py-[22px] border-t border-brightGray">
-        <div className="flex justify-between items-center text-15 text-brightGray">
+      <div className="py-[22px] border-t border-stroke-neutral-subtle">
+        <div className="flex justify-between items-center text-15 text-fg-disabled">
           <span>빌드 {process.env.NEXT_PUBLIC_BUILD_TIME}</span>
         </div>
       </div>

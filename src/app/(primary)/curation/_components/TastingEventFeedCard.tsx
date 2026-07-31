@@ -16,7 +16,7 @@ export function TastingEventFeedCard({
 }: TastingEventFeedCardProps) {
   return (
     <Link href={ROUTES.CURATION.DETAIL(event.id)} className="block">
-      <article className="relative isolate h-[390px] w-full overflow-hidden rounded-lg bg-sectionWhite">
+      <article className="relative isolate h-[390px] w-full overflow-hidden rounded-lg bg-bg-neutral-weak">
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
           <BaseImage
             src={event.coverImageUrl}

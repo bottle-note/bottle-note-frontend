@@ -1,8 +1,8 @@
-import Image from 'next/image';
 import Label from '@/components/ui/Display/Label';
 import AlcoholPickButton from '@/components/domain/alcohol/AlcoholPickButton';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import Star from '@/components/ui/Display/Star';
+import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import useModalStore from '@/store/modalStore';
 import { AlcoholInfo } from '@/types/Alcohol';
 import { useNavigateReviewWrite } from '@/hooks/useNavigateReviewWrite';
@@ -25,16 +25,17 @@ function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
         outerWidthClass="w-[140px]"
         innerHeightClass="h-[200px]"
         innerWidthClass="w-[100px]"
+        bgColor="bg-bg-layer-default"
         priority
         enableModal={true}
       />
-      <article className="flex-1 py-3 text-white overflow-x-hidden">
+      <article className="flex-1 overflow-x-hidden py-3 text-fg-brand-contrast">
         {data && (
           <>
             <div className="space-y-[6px]">
               <Label
                 name={data.korCategory}
-                styleClass="border-white px-[7.69px] py-[3.85px] rounded-[4.62px] text-10"
+                styleClass="rounded-[4.62px] border-stroke-brand-contrast px-[7.69px] py-[3.85px] text-10"
               />
               <h1 className="text-20 font-bold whitespace-normal break-words">
                 {data?.korName}
@@ -48,29 +49,28 @@ function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
                 <Star
                   rating={data?.rating}
                   size={27}
-                  textStyle="text-white text-27 font-extrabold leading-[27px]"
-                  color="white"
+                  textStyle="text-27 font-extrabold leading-[27px]"
+                  tone="brandContrast"
                   align="end"
                 />
                 <div className="text-10">
                   (유저평가 {data.totalRatingsCount})
                 </div>
               </div>
-              <div className="border-[0.5px] border-white" />
+              <div className="border-[0.5px] border-stroke-brand-contrast" />
               <div className="flex space-x-3">
                 <button
                   className="flex items-end space-x-[0.5px]"
                   onClick={() => handleReviewWrite(data.alcoholId)}
                 >
-                  <Image
+                  <SemanticIcon
                     src="/icon/edit-outlined-white.svg"
-                    alt="write"
                     width={16}
                     height={16}
                   />
                   <p className="text-12 font-normal">리뷰 작성</p>
                 </button>
-                <div className="border-[0.5px] border-white my-[0.1rem]" />
+                <div className="my-[0.1rem] border-[0.5px] border-stroke-brand-contrast" />
                 <AlcoholPickButton
                   size={16}
                   isPicked={isPicked}

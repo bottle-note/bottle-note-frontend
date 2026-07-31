@@ -19,7 +19,7 @@ export default function ReviewPriceLocation({
   if (!shouldShowPriceOrLocation) return null;
 
   return (
-    <section className="mx-5 py-5 space-y-2 border-b border-mainGray/30 text-13.5">
+    <section className="mx-5 space-y-2 border-b border-stroke-neutral-subtle py-5 text-13.5">
       {hasValidPrice && hasValidSizeType && (
         <div className="flex items-center space-x-[6px]">
           <Image
@@ -36,10 +36,10 @@ export default function ReviewPriceLocation({
                 : 'Glass Price'
             }
           />
-          <p className="text-mainDarkGray font-bold">
+          <p className="font-bold text-fg-neutral">
             {data.reviewInfo.sizeType === 'BOTTLE' ? '병 가격 ' : '잔 가격'}
           </p>
-          <p className="text-mainDarkGray font-normal">
+          <p className="font-normal text-fg-neutral">
             {numberWithCommas(data.reviewInfo.price)}₩
           </p>
         </div>
@@ -52,8 +52,8 @@ export default function ReviewPriceLocation({
             height={18.4}
             alt="address"
           />
-          <p className="text-mainDarkGray font-bold">장소</p>
-          <p className="text-mainDarkGray">
+          <p className="font-bold text-fg-neutral">장소</p>
+          <p className="text-fg-neutral">
             <>
               <p>{data.reviewInfo?.locationInfo?.name}</p>
               {data.reviewInfo?.locationInfo?.address}{' '}
@@ -67,7 +67,7 @@ export default function ReviewPriceLocation({
                     window.open(mapUrl, '_blank', 'noopener,noreferrer');
                   }
                 }}
-                className="text-subCoral cursor-pointer"
+                className="cursor-pointer text-fg-brand"
               >
                 지도보기
               </a>

@@ -1,10 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { useDebouncedToggle } from '@/hooks/useDebouncedToggle';
 import { trackGA4Event } from '@/utils/analytics/ga4';
+import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 
 const PICK_DEBOUNCE_DELAY_MS = 500;
 
@@ -15,7 +15,7 @@ interface Props {
   onApiError?: () => void;
   handleNotLogin: () => void;
   pickBtnName?: string;
-  iconColor?: 'white' | 'subcoral';
+  tone?: 'brand' | 'brandContrast';
   size?: number;
   alcoholId: number;
   alcoholName?: string;
@@ -31,7 +31,7 @@ const AlcoholPickButton = ({
   alcoholId,
   alcoholName = '',
   pickBtnName,
-  iconColor = 'white',
+  tone = 'brandContrast',
   size = 18,
   fontSize = 'text-12',
 }: Props) => {
@@ -68,24 +68,22 @@ const AlcoholPickButton = ({
     });
     handleToggle(newPickState);
   };
-
   const iconType = isPicked ? 'filled' : 'outlined';
-  const iconSrc = `/icon/pick-${iconType}-${iconColor}.svg`;
 
   return (
     <button
-      className={
+      className={`${tone === 'brand' ? 'text-fg-brand' : 'text-fg-brand-contrast'} ${
         pickBtnName
           ? 'flex items-center space-x-[3px]'
           : 'justify-self-end row-start-3'
-      }
+      }`}
       onClick={handleClick}
+      aria-label={isPicked ? '찜 취소' : '찜하기'}
     >
-      <Image
-        src={iconSrc}
+      <SemanticIcon
+        src={`/icon/pick-${iconType}-subcoral.svg`}
         width={size}
         height={size}
-        alt={isPicked ? 'Pick' : 'Unpick'}
       />
       {pickBtnName && (
         <p className={`${fontSize} font-normal`}>{pickBtnName}</p>

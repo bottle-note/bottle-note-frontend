@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import Image from 'next/image';
+import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 
 interface BaseStar {
   size?: number;
@@ -21,12 +21,12 @@ const Star = ({
   rate,
   handleRate,
 }: StarProps) => {
-  const imageRef = useRef<HTMLImageElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // TODO: + 마우스 무브, 터치까지 대응되도록 수정
-  const handleAction = (event: React.MouseEvent) => {
-    if (imageRef.current) {
-      const rect = imageRef.current.getBoundingClientRect();
+  const handleAction = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const { width } = rect;
 
@@ -40,40 +40,35 @@ const Star = ({
     }
   };
 
-  let src = '/icon/star-outlined-subcoral.svg';
-  if (rate >= index) {
-    src = '/icon/star-filled-subcoral.svg';
-  } else if (rate === index - 0.5) {
-    src = '/icon/star-half-subcoral.svg';
-  }
+  const isFilled = rate >= index;
+  const isHalfFilled = rate === index - 0.5;
+  const iconSrc = isFilled
+    ? '/icon/star-filled-subcoral.svg'
+    : isHalfFilled
+      ? '/icon/star-half-subcoral.svg'
+      : '/icon/star-outlined-subcoral.svg';
 
-  // FIXME: 별점 렌더링시 약간의 위치 움직임 있음
   return (
     <div
       className="flex items-center justify-center"
       style={{ width: `${outerWidthSize}px`, height: `${outerHeightSize}px` }}
     >
-      <div
-        className="relative"
+      <button
+        ref={buttonRef}
+        type="button"
+        className="relative text-fg-rating"
         style={{ width: `${size}px`, height: `${size}px` }}
         onClick={handleAction}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
-            handleAction(event as unknown as React.MouseEvent);
+            event.preventDefault();
+            handleRate(index);
           }
         }}
-        role="button"
-        tabIndex={0}
+        aria-label={`${index}점`}
       >
-        <Image
-          src={src}
-          fill
-          alt="star"
-          ref={imageRef}
-          className="object-contain"
-          sizes={`${size}px`}
-        />
-      </div>
+        <SemanticIcon src={iconSrc} width={size} height={size} />
+      </button>
     </div>
   );
 };

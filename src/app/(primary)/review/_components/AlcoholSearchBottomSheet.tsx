@@ -91,6 +91,7 @@ export default function AlcoholSearchBottomSheet({
       <article className="space-y-4 pb-3">
         <Tab
           variant="bookmark"
+          surface="floating"
           tabList={categoryTabList}
           handleTab={handleCategoryTab}
           currentTab={categorySelectedTab}
@@ -128,11 +129,11 @@ export default function AlcoholSearchBottomSheet({
             <div ref={targetRef} className="h-1" />
           </div>
         ) : hasSearched ? (
-          <div className="flex flex-col items-center justify-center h-full text-mainGray">
+          <div className="flex h-full flex-col items-center justify-center text-fg-neutral-muted">
             <p className="text-14">검색 결과가 없습니다.</p>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-mainGray">
+          <div className="flex h-full flex-col items-center justify-center text-fg-neutral-muted">
             <p className="text-14">위스키 이름을 검색해보세요.</p>
           </div>
         )}

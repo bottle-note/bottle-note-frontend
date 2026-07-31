@@ -1,8 +1,8 @@
 import React from 'react';
-import Image from 'next/image';
 import ReviewLikeButton from '@/components/domain/review/ReviewLikeButton';
 import ReplyButton from '@/components/domain/review/ReplyButton';
 import VisibilityToggle from '@/components/ui/Form/VisibilityToggle';
+import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import { formatDate } from '@/utils/formatDate';
 
 interface ReviewFooterProps {
@@ -46,7 +46,7 @@ export default function ReviewListActions({
 }: ReviewFooterProps) {
   return (
     <div
-      className={`flex justify-between ${textSize} text-mainGray ${className}`}
+      className={`flex justify-between ${textSize} text-fg-neutral-muted ${className}`}
     >
       <div className="flex space-x-4">
         <div className="flex items-center space-x-[2px]">
@@ -79,12 +79,15 @@ export default function ReviewListActions({
       </div>
       <div className="flex items-center">
         <p className="text-12">{formatDate(createAt) as string}</p>
-        <button className="cursor-pointer" onClick={onOptionClick}>
-          <Image
+        <button
+          className="cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
+          onClick={onOptionClick}
+          aria-label="리뷰 메뉴"
+        >
+          <SemanticIcon
             src="/icon/ellipsis-darkgray.svg"
             width={16.8}
             height={16.8}
-            alt="report"
           />
         </button>
       </div>

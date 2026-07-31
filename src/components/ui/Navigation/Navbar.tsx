@@ -126,7 +126,7 @@ function Navbar({
       )}
       style={{ bottom: 'var(--navbar-margin-bottom)' }}
     >
-      <section className="h-[70px] flex justify-between bg-white py-4 px-[26px] rounded-[13px] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
+      <section className="h-[70px] flex justify-between bg-bg-layer-floating text-fg-neutral py-4 px-[26px] rounded-[13px] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
         {navItems.map((menu, index) => (
           <React.Fragment key={menu.link}>
             <button
@@ -145,13 +145,13 @@ function Navbar({
                   height={26}
                   style={{ width: 26, height: 26 }}
                 />
-                <span className="text-10 font-medium text-subCoral">
+                <span className="text-10 font-medium text-fg-brand">
                   {menu.name}
                 </span>
               </div>
             </button>
             {index !== navItems.length - 1 && (
-              <span className="border-[0.01rem] border-subCoral opacity-40" />
+              <span className="border-[0.01rem] border-stroke-neutral-subtle" />
             )}
           </React.Fragment>
         ))}

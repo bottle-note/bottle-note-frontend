@@ -24,12 +24,12 @@ export default function BottomSheet({
       repositionInputs={false}
     >
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 z-40 bg-black/60" />
+        <Drawer.Overlay className="fixed inset-0 z-40 bg-bg-overlay" />
         <Drawer.Content
-          className={`fixed bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-2xl bg-white max-w-content mx-auto ${className}`}
+          className={`fixed bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-2xl bg-bg-layer-floating text-fg-neutral max-w-content mx-auto ${className}`}
           style={{ height: `${height}vh` }}
         >
-          <Drawer.Handle className="mx-auto mt-4 h-1.5 w-12 flex-shrink-0 rounded-full bg-gray-300" />
+          <Drawer.Handle className="mx-auto mt-4 h-1.5 w-12 flex-shrink-0 rounded-full bg-bg-disabled" />
           {children}
         </Drawer.Content>
       </Drawer.Portal>

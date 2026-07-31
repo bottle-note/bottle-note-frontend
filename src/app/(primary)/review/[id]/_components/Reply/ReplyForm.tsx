@@ -104,7 +104,7 @@ export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
           : 'calc(var(--safe-area-bottom, 32px) + 8px)',
       }}
     >
-      <div className="bg-[#f6f6f6] py-2 px-3 rounded-lg shadow-md flex items-center">
+      <div className="flex items-center rounded-lg border border-stroke-neutral-subtle bg-bg-layer-floating px-3 py-2 shadow-md">
         <div className="flex-grow flex items-center">
           <textarea
             placeholder={
@@ -112,7 +112,7 @@ export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
                 ? '댓글을 입력해 주세요'
                 : '로그인 후 댓글을 작성할 수 있어요:)'
             }
-            className="flex-grow p-1 text-mainGray text-13 bg-[#f6f6f6] resize-none max-h-[50px] overflow-hidden focus:outline-none"
+            className="max-h-[50px] flex-grow resize-none overflow-hidden bg-transparent p-1 text-13 text-fg-neutral placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
             onInput={handleInput}
             rows={1}
             ref={setRefs}
@@ -123,7 +123,8 @@ export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
           />
         </div>
         <button
-          className={`ml-2 px-4 py-1 ${content?.length !== 0 ? 'text-subCoral' : 'text-mainGray'}`}
+          type="button"
+          className={`ml-2 px-4 py-1 ${content?.length !== 0 ? 'text-fg-brand' : 'text-fg-disabled'}`}
           onClick={handleButtonClick}
         >
           등록

@@ -1,0 +1,126 @@
+:root {
+  /*
+   * Semantic color roles
+   *
+   * Product UI should use these roles instead of palette colors. Each variable
+   * stores a complete CSS color so a role cannot be altered with an arbitrary
+   * opacity. Add a role variant when another emphasis level is needed.
+   */
+
+  /* Foreground */
+  --color-fg-neutral: rgb(var(--palette-neutral-950));
+  --color-fg-neutral-muted: rgb(var(--palette-neutral-800));
+  --color-fg-neutral-subtle: rgb(var(--palette-neutral-600));
+  --color-fg-neutral-inverted: rgb(var(--palette-static-white));
+  --color-fg-placeholder: rgb(var(--palette-neutral-700));
+  --color-fg-disabled: rgb(var(--palette-neutral-600));
+  --color-fg-brand: rgb(var(--palette-coral-600));
+  --color-fg-brand-primary: rgb(var(--palette-coral-400));
+  --color-fg-brand-contrast: rgb(var(--palette-static-white));
+  --color-fg-rating: rgb(var(--palette-coral-600));
+
+  /* Background */
+  --color-bg-layer-basement: rgb(var(--palette-neutral-200));
+  --color-bg-layer-default: rgb(var(--palette-neutral-0));
+  --color-bg-layer-default-pressed: rgb(var(--palette-neutral-50));
+  --color-bg-layer-floating: rgb(var(--palette-neutral-0));
+  --color-bg-neutral-weak: rgb(var(--palette-neutral-50));
+  --color-bg-neutral-solid: rgb(var(--palette-neutral-1000));
+  --color-bg-disabled: rgb(var(--palette-neutral-600));
+  --color-bg-brand-solid: rgb(var(--palette-coral-600));
+  --color-bg-brand-primary-solid: rgb(var(--palette-coral-400));
+  --color-bg-brand-solid-pressed: rgb(var(--palette-coral-500));
+  --color-bg-brand-weak: rgb(var(--palette-coral-400) / 10%);
+  --color-bg-overlay: rgb(var(--palette-static-black) / 60%);
+  --color-bg-overlay-muted: rgb(var(--palette-static-black) / 30%);
+  --color-bg-transparent: transparent;
+
+  /* Stroke */
+  --color-stroke-neutral-basement: rgb(var(--palette-neutral-200));
+  --color-stroke-neutral-subtle: rgb(var(--palette-neutral-600));
+  --color-stroke-neutral-weak: rgb(var(--palette-neutral-800));
+  --color-stroke-neutral-contrast: rgb(var(--palette-neutral-1000));
+  --color-stroke-brand-solid: rgb(var(--palette-coral-600));
+  --color-stroke-brand-primary-solid: rgb(var(--palette-coral-400));
+  --color-stroke-brand-weak: rgb(var(--palette-coral-400));
+  --color-stroke-brand-contrast: rgb(var(--palette-static-white));
+  --color-stroke-focus-ring: rgb(var(--palette-coral-600));
+
+  /*
+   * shadcn compatibility aliases
+   *
+   * Existing shadcn-style utilities remain available while screens migrate to
+   * fg, bg, and stroke roles. Destructive and chart colors stay standalone
+   * until status and data-visualization palettes are defined.
+   */
+  --background: var(--color-bg-layer-default);
+  --foreground: var(--color-fg-neutral);
+  --card: var(--color-bg-layer-floating);
+  --card-foreground: var(--color-fg-neutral);
+  --popover: var(--color-bg-layer-floating);
+  --popover-foreground: var(--color-fg-neutral);
+  --primary: var(--color-bg-brand-solid);
+  --primary-foreground: var(--color-fg-brand-contrast);
+  --secondary: var(--color-bg-neutral-weak);
+  --secondary-foreground: var(--color-fg-neutral);
+  --muted: var(--color-bg-neutral-weak);
+  --muted-foreground: var(--color-fg-neutral-muted);
+  --accent: var(--color-bg-neutral-weak);
+  --accent-foreground: var(--color-fg-neutral);
+  --destructive: hsl(0 84.2% 60.2%);
+  --destructive-foreground: rgb(var(--palette-static-white));
+  --border: var(--color-stroke-neutral-subtle);
+  --input: var(--color-stroke-neutral-weak);
+  --ring: var(--color-stroke-focus-ring);
+  --chart-1: hsl(12 76% 61%);
+  --chart-2: hsl(173 58% 39%);
+  --chart-3: hsl(197 37% 24%);
+  --chart-4: hsl(43 74% 66%);
+  --chart-5: hsl(27 87% 67%);
+}
+
+.dark {
+  /* Foreground */
+  --color-fg-neutral: rgb(var(--palette-oak-50));
+  --color-fg-neutral-muted: rgb(var(--palette-oak-200));
+  --color-fg-neutral-subtle: rgb(var(--palette-oak-500));
+  --color-fg-neutral-inverted: rgb(var(--palette-oak-1000));
+  --color-fg-placeholder: rgb(var(--palette-oak-500));
+  --color-fg-disabled: rgb(var(--palette-oak-500));
+  --color-fg-brand: rgb(var(--palette-coral-500));
+  --color-fg-brand-primary: rgb(var(--palette-coral-500));
+  --color-fg-brand-contrast: rgb(var(--palette-coral-1000));
+  --color-fg-rating: rgb(var(--palette-amber-500));
+
+  /* Background */
+  --color-bg-layer-basement: rgb(var(--palette-oak-1000));
+  --color-bg-layer-default: rgb(var(--palette-oak-950));
+  --color-bg-layer-default-pressed: rgb(var(--palette-oak-900));
+  --color-bg-layer-floating: rgb(var(--palette-oak-900));
+  --color-bg-neutral-weak: rgb(var(--palette-oak-900));
+  --color-bg-neutral-solid: rgb(var(--palette-oak-50));
+  --color-bg-disabled: rgb(var(--palette-oak-800));
+  --color-bg-brand-solid: rgb(var(--palette-coral-500));
+  --color-bg-brand-primary-solid: rgb(var(--palette-coral-500));
+  --color-bg-brand-solid-pressed: rgb(var(--palette-coral-600));
+  --color-bg-brand-weak: rgb(var(--palette-coral-900));
+
+  /* Stroke */
+  --color-stroke-neutral-basement: rgb(var(--palette-oak-800));
+  --color-stroke-neutral-subtle: rgb(var(--palette-oak-800));
+  --color-stroke-neutral-weak: rgb(var(--palette-oak-600));
+  --color-stroke-neutral-contrast: rgb(var(--palette-oak-50));
+  --color-stroke-brand-solid: rgb(var(--palette-coral-500));
+  --color-stroke-brand-primary-solid: rgb(var(--palette-coral-500));
+  --color-stroke-brand-weak: rgb(var(--palette-coral-300));
+  --color-stroke-brand-contrast: rgb(var(--palette-coral-1000));
+  --color-stroke-focus-ring: rgb(var(--palette-coral-500));
+
+  /* shadcn colors that do not have BottleNote roles yet. */
+  --destructive: hsl(0 62.8% 30.6%);
+  --chart-1: hsl(220 70% 50%);
+  --chart-2: hsl(160 60% 45%);
+  --chart-3: hsl(30 80% 55%);
+  --chart-4: hsl(280 65% 60%);
+  --chart-5: hsl(340 75% 55%);
+}

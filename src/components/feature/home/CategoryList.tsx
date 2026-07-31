@@ -21,6 +21,7 @@ function CategoryList() {
         data={{
           engName: 'ALL',
           korName: '전체',
+          listType: 'Half',
           linkSrc: buildWhiskeyExploreCategoryHref(),
         }}
       />

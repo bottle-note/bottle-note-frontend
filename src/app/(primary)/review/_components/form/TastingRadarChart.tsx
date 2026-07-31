@@ -149,8 +149,12 @@ function ValueBadge({
         cx={animX}
         cy={animY}
         r={haloR}
-        fill={hasValue ? 'rgba(229,130,87,0.05)' : 'rgba(180,180,170,0.04)'}
-        stroke={hasValue ? 'rgba(229,130,87,0.2)' : 'rgba(180,180,170,0.15)'}
+        fill={hasValue ? 'var(--color-bg-brand-weak)' : 'transparent'}
+        stroke={
+          hasValue
+            ? 'var(--color-stroke-brand-weak)'
+            : 'var(--color-stroke-neutral-subtle)'
+        }
         strokeWidth={isDragging ? 1.5 : 1}
         strokeDasharray={isDragging ? 'none' : '3 2'}
       />
@@ -159,15 +163,19 @@ function ValueBadge({
         cx={animX}
         cy={animY}
         r={glowR}
-        fill={hasValue ? 'rgba(229,130,87,0.1)' : 'rgba(180,180,170,0.06)'}
+        fill={
+          hasValue ? 'var(--color-bg-brand-weak)' : 'var(--color-bg-disabled)'
+        }
       />
       {/* 메인 원 */}
       <motion.circle
         cx={animX}
         cy={animY}
         r={r}
-        fill={hasValue ? '#E58257' : '#CDCDC5'}
-        stroke="#fff"
+        fill={
+          hasValue ? 'var(--color-bg-brand-solid)' : 'var(--color-bg-disabled)'
+        }
+        stroke="var(--color-bg-layer-default)"
         strokeWidth={isDragging ? 3 : 2.5}
         filter={isDragging ? 'url(#badge-glow)' : 'url(#badge-shadow)'}
       />
@@ -178,7 +186,7 @@ function ValueBadge({
         dy={0.5}
         textAnchor="middle"
         dominantBaseline="central"
-        fill="#fff"
+        fill="var(--color-fg-brand-contrast)"
         fontSize={isDragging ? 13 : isActive ? 12 : 10}
         fontWeight={700}
         style={{ pointerEvents: 'none', userSelect: 'none' }}
@@ -363,7 +371,7 @@ export default function TastingRadarChart({
             dx="0"
             dy="1"
             stdDeviation="3"
-            floodColor="#E58257"
+            floodColor="var(--color-bg-brand-solid)"
             floodOpacity="0.35"
           />
         </filter>
@@ -377,7 +385,7 @@ export default function TastingRadarChart({
             key={level}
             points={buildPolygonPoints(ctrX, ctrY, radius, AXIS_COUNT)}
             fill="none"
-            stroke="#E6E6DD"
+            stroke="var(--color-stroke-neutral-subtle)"
             strokeWidth={level === TASTING_MAX_VALUE ? 1.5 : 0.8}
             opacity={level === TASTING_MAX_VALUE ? 0.8 : 0.5}
           />
@@ -385,7 +393,7 @@ export default function TastingRadarChart({
       })}
 
       {/* 각 축의 격자 레벨 숫자 */}
-      {TASTING_AXES.map((_, axisIdx) => {
+      {TASTING_AXES.map((axis, axisIdx) => {
         const angle = (2 * Math.PI * axisIdx) / AXIS_COUNT + ANGLE_OFFSET;
         const perpAngle = angle + Math.PI / 2;
         const offsetDist = 7;
@@ -397,12 +405,12 @@ export default function TastingRadarChart({
 
           return (
             <text
-              key={`grid-${axisIdx}-${level}`}
+              key={`grid-${axis.key}-${level}`}
               x={px + offsetDist * Math.cos(perpAngle)}
               y={py + offsetDist * Math.sin(perpAngle)}
               textAnchor="middle"
               dominantBaseline="central"
-              fill="#C4C4BB"
+              fill="var(--color-fg-neutral-subtle)"
               fontSize={7}
               fontWeight={400}
               style={{ pointerEvents: 'none' }}
@@ -423,7 +431,7 @@ export default function TastingRadarChart({
             y1={ctrY}
             x2={x}
             y2={y}
-            stroke="#E6E6DD"
+            stroke="var(--color-stroke-neutral-subtle)"
             strokeWidth={0.8}
             opacity={0.6}
           />
@@ -434,9 +442,9 @@ export default function TastingRadarChart({
       <motion.polygon
         animate={{ points: valuePolygon }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        fill="#EF9A6E"
+        fill="var(--color-bg-brand-solid)"
         fillOpacity={0.25}
-        stroke="#E58257"
+        stroke="var(--color-stroke-brand-solid)"
         strokeWidth={2}
       />
 
@@ -462,7 +470,7 @@ export default function TastingRadarChart({
             y={y}
             textAnchor="middle"
             dominantBaseline="central"
-            className="fill-mainDarkGray"
+            className="fill-fg-neutral"
             fontSize={11}
             fontWeight={
               activeAxis === axis.key || draggingIdx === i ? 700 : 600
@@ -509,7 +517,7 @@ export default function TastingRadarChart({
             y={ctrY}
             textAnchor="middle"
             dominantBaseline="central"
-            fill="#E58257"
+            fill="var(--color-fg-brand)"
             fontSize={13}
             fontWeight={700}
             style={{ pointerEvents: 'none' }}

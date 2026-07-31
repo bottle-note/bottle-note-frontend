@@ -78,7 +78,10 @@ export default function User({ params: { id } }: { params: { id: string } }) {
 
   return (
     <NavLayout>
-      <main className="text-mainBlack mb-24">
+      <main
+        data-testid="user-profile-page"
+        className="mb-24 bg-bg-layer-default text-fg-neutral"
+      >
         <SubHeader>
           <SubHeader.Left>
             <SubHeader.Logo />
@@ -87,8 +90,8 @@ export default function User({ params: { id } }: { params: { id: string } }) {
             <SubHeader.Menu />
           </SubHeader.Right>
         </SubHeader>
-        <section className="bg-white px-5">
-          <section className="border-t border-subCoral">
+        <section className="bg-bg-layer-default px-5">
+          <section className="border-t border-stroke-brand-solid">
             <UserInfo
               profileImgSrc={userData?.imageUrl ?? null}
               follower={userData?.followerCount ?? 0}
@@ -109,8 +112,8 @@ export default function User({ params: { id } }: { params: { id: string } }) {
           <article>
             <div className="mb-[26px]">
               <div className="font-semibold">
-                <p className="text-15 text-subCoral">{historyTitle}</p>
-                <p className="text-10 text-brightGray">
+                <p className="text-15 text-fg-brand">{historyTitle}</p>
+                <p className="text-10 text-fg-neutral-muted">
                   별점, 평가, 찜하기 활동내역을 살펴볼 수 있어요.
                 </p>
               </div>

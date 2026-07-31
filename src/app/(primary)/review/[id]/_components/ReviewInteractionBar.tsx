@@ -1,10 +1,10 @@
 import { useState, useMemo, type MutableRefObject } from 'react';
-import Image from 'next/image';
+import { ExternalLink, MessageCircle } from 'lucide-react';
 import ReviewLikeButton from '@/components/domain/review/ReviewLikeButton';
 import ShareDropdown from '@/components/share/ShareDropdown';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { useAuth } from '@/hooks/auth/useAuth';
-import type { ShareConfig, ShareChannel } from '@/types/share';
+import type { ShareConfig } from '@/types/share';
 
 interface ReviewInteractionBarProps {
   data: ReviewDetailsWithoutAlcoholInfo;
@@ -58,7 +58,7 @@ export default function ReviewInteractionBar({
   }, [data]);
 
   // 공유 Analytics 콜백 (추후 확장 가능)
-  const handleShare = (_channel: ShareChannel, _success: boolean) => {
+  const handleShare = () => {
     // TODO: 추후 Analytics 연동
     // trackShareEvent({
     //   contentType: 'review',
@@ -81,9 +81,9 @@ export default function ReviewInteractionBar({
           handleNotLogin={handleLogin}
           likeBtnName="좋아요"
         />
-        <div className="text-mainGray text-10">{likeCount}개</div>
+        <div className="text-10 text-fg-neutral-subtle">{likeCount}개</div>
       </div>
-      <span className="border-[0.01rem] w-px border-mainGray opacity-40 h-4" />
+      <span className="h-4 w-px border-[0.01rem] border-stroke-neutral-subtle" />
       <button
         className="flex-1 flex text-center justify-center items-center space-x-1"
         onClick={() => {
@@ -94,32 +94,25 @@ export default function ReviewInteractionBar({
           }
         }}
       >
-        <Image
-          src={
+        <MessageCircle
+          aria-hidden
+          className={`h-4 w-4 ${
             data.reviewInfo?.hasReplyByMe
-              ? '/icon/comment-filled-subcoral.svg'
-              : '/icon/comment-outlined-gray.svg'
-          }
-          width={16}
-          height={16}
-          alt="comment"
+              ? 'fill-current text-fg-brand'
+              : 'text-fg-neutral-muted'
+          }`}
         />
-        <p className="relative w-fit text-mainGray font-bold text-13">
+        <p className="relative w-fit text-13 font-bold text-fg-neutral-muted">
           댓글 작성
         </p>
       </button>
-      <span className="border-[0.01rem] w-px border-mainGray opacity-40 h-4" />
+      <span className="h-4 w-px border-[0.01rem] border-stroke-neutral-subtle" />
       <button
         className="flex-1 flex text-center justify-center items-center space-x-1"
         onClick={() => setIsShareOpen(true)}
       >
-        <Image
-          src="/icon/externallink-outlined-gray.svg"
-          alt="linkIcon"
-          width={16}
-          height={16}
-        />
-        <p className="text-mainGray font-bold text-13">공유</p>
+        <ExternalLink aria-hidden className="h-4 w-4 text-fg-neutral-muted" />
+        <p className="text-13 font-bold text-fg-neutral-muted">공유</p>
       </button>
 
       <ShareDropdown

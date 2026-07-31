@@ -80,16 +80,21 @@ export function ProgramEventInfoCard({
   ];
 
   return (
-    <div className={cn('rounded-2xl bg-bgGray px-4 py-4', className)}>
+    <div
+      className={cn(
+        'rounded-2xl bg-bg-neutral-weak px-4 py-4 text-fg-neutral',
+        className,
+      )}
+    >
       <div className="flex flex-col gap-4">
         {infoItems.map(({ key, Icon, label, value, action }) => (
           <div key={key} className="flex gap-2.5">
-            <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-mainDarkGray">
+            <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-fg-neutral">
               <Icon size={16} strokeWidth={2} />
             </span>
             <div className="min-w-0 flex-1">
               <div className="flex min-w-0 items-start justify-between gap-2">
-                <p className="min-w-0 flex-1 break-words text-14 font-bold leading-[18px] text-mainDarkGray">
+                <p className="min-w-0 flex-1 break-words text-14 font-bold leading-[18px] text-fg-neutral">
                   {label}
                 </p>
                 {action && (
@@ -97,13 +102,13 @@ export function ProgramEventInfoCard({
                     href={action.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="shrink-0 rounded-md bg-white px-3 py-1 text-13 font-bold leading-[17px] text-mainDarkGray"
+                    className="shrink-0 rounded-md bg-bg-layer-default px-3 py-1 text-13 font-bold leading-[17px] text-fg-neutral"
                   >
                     {action.label}
                   </a>
                 )}
               </div>
-              <p className="mt-1 break-words text-13 font-light leading-[17px] text-mainGray">
+              <p className="mt-1 break-words text-13 font-light leading-[17px] text-fg-neutral-muted">
                 {value}
               </p>
             </div>

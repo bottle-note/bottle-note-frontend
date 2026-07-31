@@ -62,23 +62,23 @@ export default function AlcoholItem({ data }: Props) {
   return (
     <div className="w-[145px] overflow-hidden rounded-lg">
       <Link href={href} className="block">
-        <div className="w-full h-[145px] bg-sectionWhite relative flex shrink-0 items-center justify-center">
+        <div className="relative flex h-[145px] w-full shrink-0 items-center justify-center bg-bg-neutral-weak">
           <AlcoholImage
             imageUrl={imageUrl}
             outerHeightClass="h-[145px]"
             outerWidthClass="w-[145px]"
             innerHeightClass="h-[125px]"
             innerWidthClass="w-[125px]"
-            bgColor="bg-sectionWhite"
-            blendMode="mix-blend-multiply"
+            bgColor="bg-bg-neutral-weak"
+            blendMode="mix-blend-multiply dark:mix-blend-normal"
             rounded="rounded-none"
           />
         </div>
-        <div className="h-[80px] px-2 py-[10px] space-y-[6px] bg-bgGray">
-          <div className="text-13 h-[38px] font-extrabold whitespace-normal break-words text-mainDarkGray">
+        <div className="h-[80px] space-y-[6px] bg-bg-layer-basement px-2 py-[10px]">
+          <div className="h-[38px] whitespace-normal break-words text-13 font-extrabold text-fg-neutral">
             {korName && truncStr(korName, 20)}
           </div>
-          <div className="flex items-end justify-between text-subCoral">
+          <div className="flex items-end justify-between text-fg-brand">
             <Star rating={rating} size={15} align="end" />
             <p className="text-11 font-bold leading-none tracking-tight">
               {(engCategory || '').toUpperCase()}

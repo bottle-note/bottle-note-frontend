@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { ThumbsUp } from 'lucide-react';
 import { ReviewApi } from '@/api/review/review.api';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { useDebouncedToggle } from '@/hooks/useDebouncedToggle';
@@ -59,9 +59,16 @@ const ReviewLikeButton = ({
     handleToggle(newLikeState);
   };
 
-  const iconType = isLiked ? 'filled' : 'outlined';
-  const iconColor = isLiked ? likeIconColor : unLikeIconColor;
-  const iconSrc = `/icon/thumbup-${iconType}-${iconColor}.svg`;
+  let iconClass = 'text-fg-neutral-muted';
+
+  if (isLiked) {
+    iconClass =
+      likeIconColor === 'white'
+        ? 'fill-current text-palette-static-white'
+        : 'fill-current text-fg-brand';
+  } else if (unLikeIconColor === 'subcoral') {
+    iconClass = 'text-fg-brand';
+  }
 
   return (
     <button
@@ -73,16 +80,15 @@ const ReviewLikeButton = ({
       onClick={handleClick}
       style={{ alignItems: 'center' }}
     >
-      <Image
-        src={iconSrc}
+      <ThumbsUp
+        aria-label="좋아요"
+        className={iconClass}
         width={size}
         height={size}
-        alt="좋아요"
-        style={{ display: 'block' }}
       />
       {likeBtnName && (
         <span
-          className="text-mainGray font-bold text-13"
+          className="text-13 font-bold text-fg-neutral-muted"
           style={{
             marginLeft: '4px',
           }}

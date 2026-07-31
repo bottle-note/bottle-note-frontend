@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ArrowRight } from 'lucide-react';
 import { LinkData } from '@/types/LinkButton';
 
 interface Props {
@@ -22,7 +23,9 @@ function PrimaryLinkButton({
   return (
     <div
       className={`relative w-full hover:pointer ${
-        listType === 'Full' ? 'flex items-center' : 'rounded-xl bg-mainCoral'
+        listType === 'Full'
+          ? 'flex items-center'
+          : 'rounded-xl bg-bg-brand-primary-solid'
       }`}
     >
       {listType === 'Full' && (
@@ -35,7 +38,7 @@ function PrimaryLinkButton({
             quality={60}
             className="rounded-xl object-cover"
           />
-          <div className="absolute w-full h-full rounded-xl bg-mainCoral bg-opacity-90" />
+          <div className="absolute h-full w-full rounded-xl bg-bg-brand-primary-solid opacity-90" />
         </>
       )}
       <Link
@@ -45,23 +48,15 @@ function PrimaryLinkButton({
       >
         <div className={`${imgSrc ? 'space-y-[90px]' : 'space-y-[11.7px]'}`}>
           <div
-            className={`${icon && 'flex justify-between'} text-white relative z-20`}
+            className={`${icon ? 'flex justify-between' : ''} relative z-20 text-fg-brand-contrast`}
           >
             <div>
               <p className="font-extrabold text-14">{korName}</p>
               <p className="text-12 font-normal">{engName}</p>
             </div>
-            {icon && (
-              <Image
-                src="/icon/arrow-right-white.svg"
-                alt="arrowIcon"
-                width={25}
-                height={25}
-                style={{ width: 25, height: 25 }}
-              />
-            )}
+            {icon && <ArrowRight aria-hidden className="h-[25px] w-[25px]" />}
           </div>
-          <div className="border-[1px] border-white relative z-0" />
+          <div className="relative z-0 border border-fg-brand-contrast" />
         </div>
         {imgSrc && (
           <Image

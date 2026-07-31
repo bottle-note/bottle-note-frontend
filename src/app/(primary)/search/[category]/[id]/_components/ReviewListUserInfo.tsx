@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Label from '@/components/ui/Display/Label';
 import ProfileImage from '@/components/domain/user/ProfileImage';
+import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import useRelationshipsStore from '@/store/relationshipsStore';
 import { truncStr } from '@/utils/truncStr';
 import Star from '@/components/ui/Display/Star';
@@ -32,7 +33,7 @@ export default function ReviewListUserInfo({
   userImageSize = 22,
   userNameSize = 'text-12',
   starSize = 22,
-  starTextStyle = 'text-subCoral font-semibold text-20 min-w-5',
+  starTextStyle = 'min-w-5 text-20 font-semibold text-fg-rating',
   className = '',
 }: ReviewListUserInfoProps) {
   const { isUserBlocked } = useRelationshipsStore();
@@ -45,9 +46,11 @@ export default function ReviewListUserInfo({
           <div className="flex items-center space-x-1">
             {isBlocked ? (
               <>
-                <div className="rounded-full w-[22px] h-[22px] bg-brightGray" />
+                <div className="h-[22px] w-[22px] rounded-full bg-bg-disabled" />
 
-                <p className={`text-mainGray ${userNameSize}`}>차단한 사용자</p>
+                <p className={`text-fg-neutral-muted ${userNameSize}`}>
+                  차단한 사용자
+                </p>
               </>
             ) : (
               <>
@@ -55,7 +58,7 @@ export default function ReviewListUserInfo({
                   profileImgSrc={userInfo.userProfileImage}
                   size={userImageSize}
                 />
-                <p className={`text-mainGray ${userNameSize}`}>
+                <p className={`text-fg-neutral-muted ${userNameSize}`}>
                   {truncStr(userInfo.nickName, 12)}
                 </p>
               </>
@@ -66,19 +69,27 @@ export default function ReviewListUserInfo({
           {isBestReview && (
             <Label
               name={LABEL_NAMES.BEST}
-              icon="/icon/thumbup-filled-white.svg"
-              iconHeight={12}
-              iconWidth={12}
-              styleClass={`${isBlocked ? 'bg-brightGray border-brightGray' : 'bg-mainCoral border-mainCoral'} text-white px-2 py-[3px] text-10 rounded`}
+              icon={
+                <SemanticIcon
+                  src="/icon/thumbup-filled-white.svg"
+                  width={12}
+                  height={12}
+                />
+              }
+              styleClass={`${isBlocked ? 'border-stroke-neutral-subtle bg-bg-disabled text-fg-disabled' : 'border-stroke-brand-primary-solid bg-bg-brand-primary-solid text-fg-brand-contrast'} rounded px-2 py-[3px] text-10`}
             />
           )}
           {isMyReview && (
             <Label
               name={LABEL_NAMES.MY_REVIEW}
-              icon="/icon/user-outlined-subcoral.svg"
-              iconHeight={12}
-              iconWidth={12}
-              styleClass="border-mainCoral text-mainCoral px-2 py-[3px] text-10 rounded"
+              icon={
+                <SemanticIcon
+                  src="/icon/user-outlined-subcoral.svg"
+                  width={12}
+                  height={12}
+                />
+              }
+              styleClass="rounded border-stroke-brand-primary-solid bg-bg-transparent px-2 py-[3px] text-10 text-fg-brand-primary"
             />
           )}
         </div>

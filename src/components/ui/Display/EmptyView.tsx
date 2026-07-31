@@ -16,7 +16,7 @@ function EmptyView({ text = '검색 결과가 없어요!' }: Props) {
         style={{ width: 50, height: 60 }}
         priority
       />
-      <p className="text-mainGray whitespace-pre text-center">{text}</p>
+      <p className="text-fg-neutral-muted whitespace-pre text-center">{text}</p>
     </div>
   );
 }

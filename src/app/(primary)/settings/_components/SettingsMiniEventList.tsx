@@ -42,7 +42,7 @@ export function SettingsMiniEventList({
   if (activeEvents.length === 0) return null;
 
   return (
-    <section className="border-b border-brightGray py-[22px]">
+    <section className="border-b border-stroke-neutral-subtle py-[22px]">
       <ul className="grid grid-cols-4 gap-x-3 gap-y-4">
         {activeEvents.map((event) => (
           <li key={event.id}>
@@ -51,7 +51,7 @@ export function SettingsMiniEventList({
               className="flex flex-col items-center gap-2"
               aria-label={event.name}
             >
-              <div className="relative h-14 w-14 overflow-hidden rounded-lg bg-brightGray">
+              <div className="relative h-14 w-14 overflow-hidden rounded-lg bg-bg-disabled">
                 <Image
                   src={event.thumbnailUrl}
                   alt=""
@@ -60,7 +60,7 @@ export function SettingsMiniEventList({
                   className="object-cover"
                 />
               </div>
-              <span className="w-full text-center text-12 font-medium leading-none text-mainBlack">
+              <span className="w-full text-center text-12 font-medium leading-none text-fg-neutral">
                 {truncateMiniEventName(event.name)}
               </span>
             </Link>

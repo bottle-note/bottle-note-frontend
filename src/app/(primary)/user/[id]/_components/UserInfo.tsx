@@ -38,7 +38,7 @@ const UserInfo = ({
 
       <article className="py-[13.5px] space-y-3">
         <div className="space-y-1">
-          <h1 className="text-20 font-extrabold text-subCoral">{nickName}</h1>
+          <h1 className="text-20 font-extrabold text-fg-brand">{nickName}</h1>
 
           <div className="flex gap-2">
             <button
@@ -68,7 +68,7 @@ const UserInfo = ({
         <div className="space-x-1 text-sm">
           {isMyProfile && (
             <button
-              className="border border-subCoral px-2.5 py-1 rounded-md text-10 bg-white text-subCoral"
+              className="rounded-md border border-stroke-brand-solid bg-bg-layer-default px-2.5 py-1 text-10 text-fg-brand"
               onClick={() => router.push(ROUTES.USER.EDIT(currentId))}
             >
               프로필 수정

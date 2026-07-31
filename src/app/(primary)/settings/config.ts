@@ -1,23 +1,47 @@
 import { ScreenConfig, MenuCategory, ScreenType } from '@/types/Settings';
 import { ROUTES } from '@/constants/routes';
 import BlockManagement from './_components/BlockManagement';
+import ThemeSettings from './_components/ThemeSettings';
 
-export const createScreenConfigs = (
-  handleLogout: () => void,
-  handleDeleteAccount: () => void,
-): Record<string, ScreenConfig> => ({
+interface CreateScreenConfigsParams {
+  isLoggedIn: boolean;
+  handleLogin: () => void;
+  handleLogout: () => void;
+  handleDeleteAccount: () => void;
+}
+
+export const createScreenConfigs = ({
+  isLoggedIn,
+  handleLogin,
+  handleLogout,
+  handleDeleteAccount,
+}: CreateScreenConfigsParams): Record<
+  Exclude<ScreenType, 'main'>,
+  ScreenConfig
+> => ({
+  themeSettings: {
+    title: '화면 테마',
+    component: ThemeSettings,
+  },
   loginManagement: {
     title: '로그인관리',
-    items: [
-      {
-        text: '로그아웃',
-        action: handleLogout,
-      },
-      {
-        text: '서비스 탈퇴',
-        action: handleDeleteAccount,
-      },
-    ],
+    items: isLoggedIn
+      ? [
+          {
+            text: '로그아웃',
+            action: handleLogout,
+          },
+          {
+            text: '서비스 탈퇴',
+            action: handleDeleteAccount,
+          },
+        ]
+      : [
+          {
+            text: '로그인',
+            action: handleLogin,
+          },
+        ],
   },
   blockManagement: {
     title: '차단 사용자 관리',
@@ -31,7 +55,28 @@ export const createMenuCategories = (
   handleSwitchEnv?: () => void,
   userId?: string | number,
   isAdmin?: boolean,
+  isLoggedIn = false,
 ): MenuCategory[] => {
+  const publicItems = [
+    {
+      text: '화면 테마',
+      action: () => onScreenNavigate('themeSettings'),
+    },
+    {
+      text: '로그인 관리',
+      action: () => onScreenNavigate('loginManagement'),
+    },
+  ];
+
+  if (!isLoggedIn) {
+    return [
+      {
+        title: '기타',
+        items: publicItems,
+      },
+    ];
+  }
+
   const baseCategories: MenuCategory[] = [
     {
       title: '내 정보',
@@ -79,10 +124,7 @@ export const createMenuCategories = (
           link: ROUTES.LEGAL.TERMS,
           action: undefined,
         },
-        {
-          text: '로그인 관리',
-          action: () => onScreenNavigate('loginManagement'),
-        },
+        ...publicItems,
       ],
     },
   ];

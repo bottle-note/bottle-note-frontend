@@ -10,7 +10,6 @@ import React, {
 import Link from 'next/link';
 import Image from 'next/image';
 import { ROUTES } from '@/constants/routes';
-import { useAuth } from '@/hooks/auth/useAuth';
 import Logo from 'public/bottle_note_Icon_logo.svg';
 import Menu from 'public/icon/menu-subcoral.svg';
 
@@ -50,7 +49,7 @@ interface HeaderCenterProps {
 
 const HeaderCenter = ({
   children,
-  textColor = 'text-subCoral',
+  textColor = 'text-fg-brand',
 }: HeaderCenterProps) => {
   return (
     <p
@@ -99,10 +98,6 @@ const HeaderLogo = () => {
 };
 
 const HeaderMenu = () => {
-  const { isLoggedIn } = useAuth();
-
-  if (!isLoggedIn) return null;
-
   return (
     <div className="pt-2">
       <Link href={ROUTES.SETTINGS.BASE}>
@@ -117,7 +112,10 @@ interface SubHeaderMainProps {
   bgColor?: string;
 }
 
-function SubHeaderMain({ children, bgColor = 'bg-white' }: SubHeaderMainProps) {
+function SubHeaderMain({
+  children,
+  bgColor = 'bg-bg-layer-default',
+}: SubHeaderMainProps) {
   let leftComponent = null;
   let centerComponent = null;
   let rightComponent = null;

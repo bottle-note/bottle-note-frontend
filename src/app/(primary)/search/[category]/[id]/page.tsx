@@ -36,6 +36,7 @@ import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import useDebounceAction from '@/hooks/useDebounceAction';
 import ShareDropdown from '@/components/share/ShareDropdown';
+import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import type { ShareConfig, ShareChannel } from '@/types/share';
 import FloatingReviewButton from './_components/FloatingReviewButton';
 import AlcoholDetailHeader from './_components/AlcoholDetailHeader';
@@ -60,7 +61,6 @@ export default function SearchAlcohol() {
   const [isPicked, setIsPicked] = useState<boolean>(false);
   const [rate, setRate] = useState(0);
   const [userNickName, setUserNickName] = useState<string>('');
-  const [isUnmounting, setIsUnmounting] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
 
   const viewTrackedAlcoholIdRef = useRef<string | null>(null);
@@ -132,12 +132,6 @@ export default function SearchAlcohol() {
     }
   }, [alcoholId, isLoggedIn]);
 
-  useEffect(() => {
-    return () => {
-      setIsUnmounting(true);
-    };
-  }, []);
-
   const handleRate = useCallback(
     async (selectedRate: number) => {
       if (!isLoggedIn) return bridgeToLogin('rating');
@@ -166,11 +160,11 @@ export default function SearchAlcohol() {
   const getRatingMessage = (myAvgRating: number, myRating: number) => {
     if (myAvgRating !== 0 && myRating !== 0)
       return (
-        <div className="text-center text-12 space-y-2">
+        <div className="space-y-2 text-center text-12 text-fg-neutral">
           <div>
             <p>{`${userNickName}`}님의</p>
             <p>
-              <span className="text-subCoral font-medium">
+              <span className="font-medium text-fg-rating">
                 평균 별점은 {`${myAvgRating}`}점
               </span>
               이에요.
@@ -185,14 +179,16 @@ export default function SearchAlcohol() {
 
     if (myAvgRating !== 0 && myRating === 0)
       return (
-        <div className="text-center text-12">
+        <div className="text-center text-12 text-fg-neutral">
           <p>최근 별점 {`${myAvgRating}`}을 주셨어요.</p>
           <p>별점이 없어요! 별점 평가를 안하실건가요?</p>
         </div>
       );
 
     return (
-      <div className="text-center text-12">이 술에 대한 평가를 남겨보세요.</div>
+      <div className="text-center text-12 text-fg-neutral">
+        이 술에 대한 평가를 남겨보세요.
+      </div>
     );
   };
 
@@ -239,33 +235,31 @@ export default function SearchAlcohol() {
         ) : (
           <>
             <div className="relative">
-              <div
-                className={`absolute inset-0 bg-mainCoral ${
-                  isUnmounting ? 'hidden' : ''
-                }`}
-              />
+              <div className="absolute inset-0 bg-bg-brand-primary-solid" />
 
               {/* 콘텐츠 레이어 */}
               <div className="relative z-10">
-                <SubHeader bgColor="bg-none">
+                <SubHeader bgColor="bg-bg-transparent">
                   <SubHeader.Left
                     onClick={() => {
                       router.back();
                     }}
                   >
-                    <Image
+                    <SemanticIcon
                       src="/icon/arrow-left-white.svg"
-                      alt="arrowIcon"
                       width={23}
                       height={23}
+                      className="text-fg-brand-contrast"
+                      label="뒤로가기"
                     />
                   </SubHeader.Left>
                   <SubHeader.Right onClick={() => setIsShareOpen(true)}>
-                    <Image
+                    <SemanticIcon
                       src="/icon/externallink-outlined-white.svg"
-                      alt="linkIcon"
                       width={23}
                       height={23}
+                      className="text-fg-brand-contrast"
+                      label="공유하기"
                     />
                   </SubHeader.Right>
                 </SubHeader>
@@ -287,15 +281,17 @@ export default function SearchAlcohol() {
                   <StarRating rate={rate} size={42} handleRate={handleRate} />
                 </div>
               </article>
-              <section className="mx-5 py-[21px] border-y border-mainGray/30">
+              <section className="mx-5 border-y border-stroke-neutral-subtle py-[21px]">
                 <div className="grid gap-2">
                   {alcoholDetails.map((item: DetailItem) => (
                     <div
                       key={item.content}
-                      className="flex text-12 text-mainDarkGray items-start gap-2"
+                      className="flex items-start gap-2 text-12"
                     >
-                      <div className="min-w-14 font-semibold">{item.title}</div>
-                      <div className="flex-1 font-normal break-words">
+                      <div className="min-w-14 font-semibold text-fg-neutral-muted">
+                        {item.title}
+                      </div>
+                      <div className="flex-1 break-words font-normal text-fg-neutral">
                         {item.content}
                       </div>
                     </div>
@@ -306,8 +302,8 @@ export default function SearchAlcohol() {
                 <FlavorTags tagList={data.alcohols.alcoholsTastingTags} />
               )}
               {data?.friendsInfo && data.friendsInfo.followerCount !== 0 && (
-                <section className="mx-5 py-5 border-b border-mainGray/30 space-y-2">
-                  <div className="flex items-end space-x-1 text-13 text-mainDarkGray">
+                <section className="mx-5 space-y-2 border-b border-stroke-neutral-subtle py-5">
+                  <div className="flex items-end space-x-1 text-13 text-fg-neutral">
                     <div>마셔본 친구</div>
                     <div className="font-extralight">
                       {data.friendsInfo.followerCount}
@@ -320,9 +316,7 @@ export default function SearchAlcohol() {
                         className="flex-shrink-0 flex flex-col items-center space-y-1"
                       >
                         <Link href={ROUTES.USER.BASE(user.userId)}>
-                          <div
-                            className={`${user.user_image_url && 'border border-brightGray'} w-14 h-14 rounded-full overflow-hidden border border-bgGray`}
-                          >
+                          <div className="h-14 w-14 overflow-hidden rounded-full border border-stroke-neutral-basement">
                             <Image
                               className="object-cover"
                               src={user.user_image_url || ProfileDefaultImg}
@@ -332,7 +326,7 @@ export default function SearchAlcohol() {
                             />
                           </div>
                         </Link>
-                        <p className="text-11 text-mainDarkGray">
+                        <p className="text-11 text-fg-neutral-muted">
                           {truncStr(user.nickName, 4)}
                         </p>
                         <Star rating={user.rating} size={14} />
@@ -346,12 +340,12 @@ export default function SearchAlcohol() {
               {data?.reviewInfo?.reviewList &&
               data.reviewInfo.totalCount !== 0 ? (
                 <>
-                  <div className="h-4 bg-sectionWhite" />
+                  <div className="h-4 bg-bg-layer-basement" />
                   <section className="mx-5 pt-[34px] pb-[20px]">
-                    <p className="text-11 text-mainGray font-normal mb-[10px]">
+                    <p className="mb-[10px] text-11 font-normal text-fg-neutral-muted">
                       총 {data.reviewInfo.totalCount}개
                     </p>
-                    <div className="border-b border-mainGray/30" />
+                    <div className="border-b border-stroke-neutral-subtle" />
                     {data.reviewInfo.reviewList.map((review) => (
                       <React.Fragment key={review.reviewId}>
                         <ReviewListItem
@@ -387,7 +381,7 @@ export default function SearchAlcohol() {
                 </>
               ) : (
                 <>
-                  <div className="h-4 bg-sectionWhite" />
+                  <div className="h-4 bg-bg-layer-basement" />
                   <section className="py-5">
                     <EmptyView text="아직 리뷰가 없어요!" />
                   </section>

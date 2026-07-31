@@ -87,7 +87,7 @@ const BaseImage = ({
         }
       >
         {isLoading && (
-          <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+          <div className="absolute inset-0 animate-pulse bg-bg-neutral-weak" />
         )}
         <Image
           priority={priority}

@@ -1,11 +1,11 @@
 import Link from 'next/link';
+import { Star as StarIcon, UserRound } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 import { LABEL_NAMES } from '@/constants/common';
 import { ExploreAlcohol } from '@/types/Explore';
 import ItemImage from '@/components/feature/List/_components/ItemImage';
 import ItemInfo from '@/components/feature/List/_components/ItemInfo';
 import Star from '@/components/ui/Display/Star';
-import { ItemStats } from '@/components/feature/List/_components/ItemStats';
 import Label from '@/components/ui/Display/Label';
 
 interface Props {
@@ -18,9 +18,10 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
     typeof content.abv === 'string'
       ? content.abv.replace(/(?:\s*%\s*)+$/, '')
       : content.abv;
+  const tastingTags = [...new Set(content.alcoholsTastingTags ?? [])];
 
   return (
-    <section className="flex items-center text-mainBlack py-6 w-full overflow-hidden">
+    <section className="flex w-full items-center overflow-hidden py-6 text-fg-neutral">
       {/* image */}
       <Link href={ROUTES.SEARCH.ALL(content.alcoholId)} className="shrink-0">
         <ItemImage
@@ -42,7 +43,7 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
             engName={content.engName}
             length={50}
           />
-          <p className="text-13 text-mainDarkGray">{`도수 ${abv}% · ${content.korCategory}`}</p>
+          <p className="text-13 text-fg-neutral-muted">{`도수 ${abv}% · ${content.korCategory}`}</p>
         </div>
 
         {/* 별점 */}
@@ -61,24 +62,28 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
               </div>
             }
           />
-          <div className="text-mainGray">
-            <ItemStats
-              iconSrc="/icon/star-filled-maingray.svg"
-              pointContent={content.rating.toFixed(1)}
-              countContent={content.totalRatingsCount.toString()}
-              subTextClass="ml-[2px]"
+          <div className="flex items-center gap-0.5 text-12 font-semibold text-fg-neutral-muted">
+            <StarIcon
+              aria-hidden
+              className="h-3 w-3 fill-current"
+              strokeWidth={1.5}
             />
+            <span>
+              {content.rating === 0 ? '-' : content.rating.toFixed(1)}
+            </span>
+            <span className="ml-0.5 flex items-center">
+              (
+              <UserRound aria-hidden className="h-3 w-3" />
+              {content.totalRatingsCount})
+            </span>
           </div>
         </div>
 
         {/*  태그 */}
         <div className="flex w-full min-w-0 gap-x-1 overflow-x-auto scrollbar-hide">
-          {content.alcoholsTastingTags?.map((tag) => (
-            <div key={tag} className="overflow-hidden flex-shrink-0">
-              <Label
-                name={tag}
-                styleClass="label-default border-mainGray text-mainGray px-2 py-1 text-11"
-              />
+          {tastingTags.map((tag) => (
+            <div key={tag} className="flex-shrink-0 overflow-hidden">
+              <Label name={tag} styleClass="label-default px-2 py-1 text-11" />
             </div>
           ))}
         </div>

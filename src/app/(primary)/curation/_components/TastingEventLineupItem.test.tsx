@@ -13,12 +13,6 @@ jest.mock('@/components/feature/List/_components/ItemInfo', () => ({
   default: ({ korName }: { korName: string }) => <p>{korName}</p>,
 }));
 
-jest.mock('@/components/feature/List/_components/ItemStats', () => ({
-  ItemStats: ({ pointContent }: { pointContent: string }) => (
-    <span>{pointContent}</span>
-  ),
-}));
-
 const createItem = (alcoholId: number | null): TastingEventAlcohol => ({
   alcohol: {
     alcoholId,
@@ -43,6 +37,10 @@ describe('TastingEventLineupItem', () => {
     expect(link).toHaveAttribute('href', ROUTES.SEARCH.ALL(123));
     expect(screen.getAllByRole('link')).toHaveLength(1);
     expect(screen.getByText('상세보기 >')).toHaveClass('link-button');
+    expect(screen.getByText('도수 40%')).toHaveClass('text-fg-neutral');
+    expect(screen.getByText('부드러운 시트러스 향')).toHaveClass(
+      'text-fg-neutral-muted',
+    );
   });
 
   it('상세 ID가 없는 수동 라인업에는 상세 Link와 상세보기 안내를 노출하지 않는다', () => {

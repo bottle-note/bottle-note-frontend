@@ -1,8 +1,6 @@
 interface Props {
   offName?: string;
   onName?: string;
-  offColor?: string;
-  onColor?: string;
   isActive: boolean;
   onToggle: () => void;
   disabled?: boolean;
@@ -12,8 +10,6 @@ interface Props {
 const Toggle = ({
   onName = '리뷰 공개',
   offName = '리뷰 비공개',
-  onColor = 'bg-mainCoral',
-  offColor = 'bg-mainGray',
   isActive,
   onToggle,
   disabled = false,
@@ -23,19 +19,19 @@ const Toggle = ({
     <div className="flex items-center space-x-[3px]">
       <button
         className={`toggle-container flex items-center justify-center w-8 h-4 rounded-full ${
-          isActive ? onColor : offColor
+          isActive ? 'bg-bg-brand-primary-solid' : 'bg-bg-disabled'
         }`}
         disabled={disabled}
         onClick={onToggle}
         aria-label={isActive ? onName : offName}
       >
         <div
-          className={`toggle-handle w-[0.8rem] h-[0.8rem] rounded-full bg-white transform transition-transform ${
+          className={`toggle-handle w-[0.8rem] h-[0.8rem] rounded-full bg-bg-layer-default transform transition-transform ${
             isActive ? 'translate-x-2' : 'translate-x-[-0.5rem]'
           }`}
         />
       </button>
-      <p className={`${textSize} text-mainGray`}>
+      <p className={`${textSize} text-fg-neutral-muted`}>
         {isActive ? onName : offName}
       </p>
     </div>

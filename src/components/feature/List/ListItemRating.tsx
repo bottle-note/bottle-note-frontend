@@ -68,7 +68,7 @@ const ListItemRating = ({ data }: Props) => {
             <AlcoholPickButton
               isPicked={isPicked}
               alcoholId={alcoholId}
-              iconColor="subcoral"
+              tone="brand"
               handleUpdatePicked={() => setIsPicked((prev) => !prev)}
               onApiError={() => setIsPicked(initialIsPicked)}
               handleNotLogin={handleLoginModal}
