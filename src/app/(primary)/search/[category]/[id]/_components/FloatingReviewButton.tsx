@@ -1,8 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import { useScrollState } from '@/hooks/useScrollState';
 import { useNavigateReviewWrite } from '@/hooks/useNavigateReviewWrite';
+import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 
 const FloatingReviewButton = ({ alcoholId }: { alcoholId: string }) => {
   const { isAtTop, isVisible } = useScrollState();
@@ -20,7 +20,7 @@ const FloatingReviewButton = ({ alcoholId }: { alcoholId: string }) => {
   return (
     <button
       onClick={handleClick}
-      className={`fixed z-20 transition-all duration-300 ease-in-out bg-subCoral text-white rounded-full shadow-lg hover:shadow-xl ${getPositionClass()}`}
+      className={`fixed z-20 rounded-full bg-bg-brand-solid text-fg-brand-contrast shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl active:bg-bg-brand-solid-pressed ${getPositionClass()}`}
       style={{
         width: isAtTop ? 'auto' : '52px',
         height: '52px',
@@ -29,13 +29,7 @@ const FloatingReviewButton = ({ alcoholId }: { alcoholId: string }) => {
       }}
     >
       <div className="flex items-center justify-center h-full">
-        <Image
-          src="/icon/plus-white.svg"
-          alt="write"
-          width={17}
-          height={17}
-          className="flex-shrink-0"
-        />
+        <SemanticIcon src="/icon/plus-white.svg" width={17} height={17} />
         <div
           className="overflow-hidden transition-all duration-300 ease-in-out"
           style={{

@@ -85,7 +85,7 @@ describe('HomeCarousel - 비디오 배너 poster', () => {
 
     const skeleton = container.querySelector('.animate-pulse');
     expect(skeleton).not.toBeNull();
-    expect(skeleton).toHaveClass('bg-gray-200');
+    expect(skeleton).toHaveClass('bg-bg-neutral-weak');
   });
 
   it('빈 배너 배열이면 아무것도 렌더링하지 않는다', () => {

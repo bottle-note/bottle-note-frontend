@@ -39,6 +39,7 @@
   --color-stroke-neutral-contrast: rgb(var(--palette-neutral-1000));
   --color-stroke-brand-solid: rgb(var(--palette-coral-700));
   --color-stroke-brand-weak: rgb(var(--palette-coral-400));
+  --color-stroke-brand-contrast: rgb(var(--palette-coral-1000));
   --color-stroke-focus-ring: rgb(var(--palette-coral-700));
 
   /*
@@ -104,6 +105,7 @@
   --color-stroke-neutral-contrast: rgb(var(--palette-oak-50));
   --color-stroke-brand-solid: rgb(var(--palette-coral-500));
   --color-stroke-brand-weak: rgb(var(--palette-coral-300));
+  --color-stroke-brand-contrast: rgb(var(--palette-coral-1000));
   --color-stroke-focus-ring: rgb(var(--palette-coral-500));
 
   /* shadcn colors that do not have BottleNote roles yet. */

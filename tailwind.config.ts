@@ -102,6 +102,7 @@ export const semanticColors = {
     brand: {
       solid: semanticColor('stroke-brand-solid'),
       weak: semanticColor('stroke-brand-weak'),
+      contrast: semanticColor('stroke-brand-contrast'),
     },
     'focus-ring': semanticColor('stroke-focus-ring'),
   },

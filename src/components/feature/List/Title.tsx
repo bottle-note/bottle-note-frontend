@@ -1,6 +1,6 @@
 const Title = ({ title }: { title: string }) => {
   return (
-    <span className="text-xs font-bold text-mainGray shrink-0">{`${title} ∙ `}</span>
+    <span className="shrink-0 text-xs font-bold text-fg-neutral-muted">{`${title} ∙ `}</span>
   );
 };
 

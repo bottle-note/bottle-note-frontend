@@ -19,11 +19,11 @@ export function HomeFeaturedLoginRequired() {
           style={{ width: 28, height: 48 }}
           priority
         />
-        <p className="text-mainGray text-16">
+        <p className="text-16 text-fg-neutral-muted">
           로그인 후 확인 가능한 서비스 입니다.
         </p>
         <button
-          className="w-[237px] py-[8.5px] text-16 font-bold text-subCoral border border-subCoral rounded-[18px]"
+          className="w-[237px] rounded-[18px] border border-stroke-brand-solid py-[8.5px] text-16 font-bold text-fg-brand"
           onClick={() => router.push(ROUTES.LOGIN)}
         >
           로그인 하러가기

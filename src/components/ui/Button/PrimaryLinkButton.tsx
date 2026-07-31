@@ -20,12 +20,14 @@ function PrimaryLinkButton({
     handleBeforeRouteChange,
   },
 }: Props) {
+  const isTonal = listType === 'Half';
+
   return (
     <div
       className={`relative w-full hover:pointer ${
         listType === 'Full'
           ? 'flex items-center'
-          : 'rounded-xl bg-bg-brand-solid'
+          : 'rounded-xl border border-stroke-brand-weak bg-bg-brand-weak'
       }`}
     >
       {listType === 'Full' && (
@@ -48,7 +50,9 @@ function PrimaryLinkButton({
       >
         <div className={`${imgSrc ? 'space-y-[90px]' : 'space-y-[11.7px]'}`}>
           <div
-            className={`${icon && 'flex justify-between'} relative z-20 text-fg-brand-contrast`}
+            className={`${icon ? 'flex justify-between' : ''} relative z-20 ${
+              isTonal ? 'text-fg-brand' : 'text-fg-brand-contrast'
+            }`}
           >
             <div>
               <p className="font-extrabold text-14">{korName}</p>
@@ -56,7 +60,11 @@ function PrimaryLinkButton({
             </div>
             {icon && <ArrowRight aria-hidden className="h-[25px] w-[25px]" />}
           </div>
-          <div className="relative z-0 border border-fg-brand-contrast" />
+          <div
+            className={`relative z-0 border ${
+              isTonal ? 'border-stroke-brand-weak' : 'border-fg-brand-contrast'
+            }`}
+          />
         </div>
         {imgSrc && (
           <Image

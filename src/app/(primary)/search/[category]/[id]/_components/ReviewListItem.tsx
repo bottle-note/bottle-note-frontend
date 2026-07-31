@@ -14,6 +14,7 @@ import useModalStore from '@/store/modalStore';
 import useRelationshipsStore from '@/store/relationshipsStore';
 import { useAuth } from '@/hooks/auth/useAuth';
 import ReviewActionDropdown from '@/components/domain/review/ReviewActionDropdown';
+import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import { useBlockActions } from '@/hooks/useBlockActions';
 
 interface Props {
@@ -33,6 +34,10 @@ function ReviewListItem({ data, onRefresh }: Props) {
   const [isLiked, setIsLiked] = useState(isLikedByMe);
   const [currentStatus, setCurrentStatus] = useState(data.status === 'PUBLIC');
   const [likeCount, setLikeCount] = useState(data.likeCount);
+  const priceIconSrc =
+    data.sizeType === 'BOTTLE'
+      ? '/bottle.svg'
+      : '/icon/glass-filled-subcoral.svg';
 
   useEffect(() => {
     setCurrentStatus(data.status === 'PUBLIC');
@@ -44,7 +49,7 @@ function ReviewListItem({ data, onRefresh }: Props) {
 
   return (
     <>
-      <div className="border-b border-mainGray/30 py-[35px] space-y-[10px]">
+      <div className="space-y-[10px] border-b border-stroke-neutral-subtle py-[35px]">
         <ReviewListUserInfo
           userInfo={data.userInfo}
           rating={data.rating}
@@ -53,13 +58,13 @@ function ReviewListItem({ data, onRefresh }: Props) {
           userImageSize={22}
           userNameSize="text-12"
           starSize={22}
-          starTextStyle="text-subCoral font-semibold text-20 min-w-5"
+          starTextStyle="min-w-5 text-20 font-semibold text-fg-rating"
         />
         {isUserBlocked(String(data.userInfo.userId)) ? (
-          <div className="flex items-center justify-between text-mainGray">
+          <div className="flex items-center justify-between text-fg-neutral-muted">
             <div className="text-13">차단한 사용자의 리뷰입니다.</div>
             <button
-              className="text-13 border-b border-mainGray"
+              className="border-b border-stroke-neutral-weak text-13"
               onClick={() =>
                 handleUnblockUser(
                   String(data.userInfo.userId),
@@ -73,22 +78,16 @@ function ReviewListItem({ data, onRefresh }: Props) {
         ) : (
           <>
             <div className="flex items-center space-x-1 text-13">
-              <Image
-                src={
-                  data.sizeType === 'BOTTLE'
-                    ? '/bottle.svg'
-                    : '/icon/glass-filled-subcoral.svg'
-                }
+              <SemanticIcon
+                src={priceIconSrc}
                 width={23}
                 height={23}
-                alt={
-                  data.sizeType === 'BOTTLE' ? 'Bottle Price' : 'Glass Price'
-                }
+                className="text-fg-brand"
               />
-              <p className="text-mainGray font-bold">
+              <p className="font-bold text-fg-neutral-muted">
                 {data.sizeType === 'BOTTLE' ? '병 가격 ' : '잔 가격'}
               </p>
-              <p className="text-mainGray font-normal">
+              <p className="font-normal text-fg-neutral-muted">
                 {data.price ? `${numberWithCommas(data.price)}₩` : '-'}
               </p>
             </div>
@@ -103,10 +102,10 @@ function ReviewListItem({ data, onRefresh }: Props) {
               >
                 <div className="flex space-x-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-mainDarkGray text-13.5 break-words">
+                    <p className="break-words text-13.5 text-fg-neutral">
                       {truncStr(data.reviewContent, 135)}
                       {data.reviewContent.length > 135 && (
-                        <span className="text-mainGray">더보기</span>
+                        <span className="text-fg-neutral-muted">더보기</span>
                       )}
                     </p>
                   </div>

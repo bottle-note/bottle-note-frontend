@@ -40,7 +40,7 @@ export function HomeTastingEventPreviewCard({
 
   return (
     <Link href={ROUTES.CURATION.DETAIL(event.id)} className="block">
-      <article className="relative isolate h-[312px] w-[272px] overflow-hidden rounded-lg bg-sectionWhite">
+      <article className="relative isolate h-[312px] w-[272px] overflow-hidden rounded-lg bg-bg-neutral-weak">
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
           <BaseImage
             src={event.coverImageUrl}
@@ -50,40 +50,40 @@ export function HomeTastingEventPreviewCard({
             sizes="272px"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0 bg-bg-overlay-muted" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-[#4A3426]/50 to-[#3B2B22]/70" />
         </div>
 
         <div className="relative z-10 flex h-full flex-col px-4 pb-4 pt-4">
-          <span className="inline-flex w-fit rounded-full bg-white/35 px-2.5 py-1 text-10 font-bold text-white backdrop-blur-sm">
+          <span className="inline-flex w-fit rounded-full bg-palette-static-white/35 px-2.5 py-1 text-10 font-bold text-palette-static-white backdrop-blur-sm">
             시음회
           </span>
 
           <h3 className="mt-3">
             <AutoMarqueeText
               text={event.name}
-              className="text-16 font-extrabold leading-[21px] text-white"
+              className="text-16 font-extrabold leading-[21px] text-palette-static-white"
             />
           </h3>
 
-          <p className="mt-2 line-clamp-2 whitespace-normal text-11 font-light leading-[17px] text-white">
+          <p className="mt-2 line-clamp-2 whitespace-normal text-11 font-light leading-[17px] text-palette-static-white">
             {event.description}
           </p>
 
-          <div className="mt-auto rounded-2xl bg-white/85 px-3 py-3 backdrop-blur-sm">
+          <div className="mt-auto rounded-2xl bg-palette-static-white/85 px-3 py-3 backdrop-blur-sm">
             <div className="space-y-2">
               {infoItems.map(({ key, Icon, title, description }) => (
                 <div key={key} className="flex gap-2">
-                  <span className="mt-0.5 flex h-3 w-3 shrink-0 items-center justify-center text-mainDarkGray">
+                  <span className="mt-0.5 flex h-3 w-3 shrink-0 items-center justify-center text-palette-neutral-950">
                     <Icon size={12} strokeWidth={2} />
                   </span>
 
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-11 font-bold text-mainDarkGray">
+                    <p className="truncate text-11 font-bold text-palette-neutral-950">
                       {title}
                     </p>
                     {description && (
-                      <p className="mt-0.5 truncate text-9 font-light text-mainGray">
+                      <p className="mt-0.5 truncate text-9 font-light text-palette-neutral-800">
                         {description}
                       </p>
                     )}
@@ -93,10 +93,10 @@ export function HomeTastingEventPreviewCard({
             </div>
 
             <div className="mt-3 flex items-end gap-2">
-              <span className="text-9 font-semibold leading-none text-mainDarkGray">
+              <span className="text-9 font-semibold leading-none text-palette-neutral-950">
                 참가비
               </span>
-              <span className="text-16 font-extrabold leading-none text-mainDarkGray">
+              <span className="text-16 font-extrabold leading-none text-palette-neutral-950">
                 {tastingEvent.entryFeeLabel}
               </span>
             </div>
@@ -113,22 +113,22 @@ export function HomeTastingEventMoreCard() {
       href={`${ROUTES.CURATION.BASE}?tab=${CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT}`}
       className="block"
     >
-      <article className="flex h-[312px] w-[190px] flex-col justify-between rounded-lg bg-bgGray px-4 py-5">
+      <article className="flex h-[312px] w-[190px] flex-col justify-between rounded-lg border border-stroke-neutral-subtle bg-bg-layer-floating px-4 py-5">
         <div>
-          <span className="inline-flex w-fit rounded-full bg-white px-2.5 py-1 text-10 font-bold text-subCoral">
+          <span className="inline-flex w-fit rounded-full bg-bg-brand-weak px-2.5 py-1 text-10 font-bold text-fg-brand">
             시음회
           </span>
-          <h3 className="mt-4 text-16 font-extrabold leading-[21px] text-mainDarkGray">
+          <h3 className="mt-4 text-16 font-extrabold leading-[21px] text-fg-neutral">
             더 많은
             <br />
             시음회 보기
           </h3>
-          <p className="mt-3 whitespace-normal text-11 font-medium leading-[17px] text-mainGray">
+          <p className="mt-3 whitespace-normal text-11 font-medium leading-[17px] text-fg-neutral-muted">
             진행 중인 시음회를 한 번에 확인해보세요.
           </p>
         </div>
 
-        <span className="flex h-10 items-center justify-center rounded-lg bg-subCoral text-12 font-bold text-white">
+        <span className="flex h-10 items-center justify-center rounded-lg bg-bg-brand-solid text-12 font-bold text-fg-brand-contrast">
           보러가기
         </span>
       </article>

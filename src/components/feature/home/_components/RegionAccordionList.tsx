@@ -10,6 +10,7 @@ import { getRegionFlagUrl } from '@/constants/regionFlags';
 import type { RegionGroup } from '@/utils/regionGrouper';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import SkeletonList from '@/components/ui/Loading/Skeletons/SkeletonList';
+import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 
 const buildRegionHref = (regionId: number | '') =>
   `/explore?regionIds=${regionId}&tab=EXPLORER_WHISKEY`;
@@ -56,15 +57,15 @@ function RegionRowContent({
         onError={handleImageError}
         className={`w-[26px] h-[26px] rounded-lg ${
           isBottleFallback
-            ? 'object-cover bg-sectionWhite p-1'
-            : 'object-contain bg-sectionWhite p-[2px]'
+            ? 'bg-bg-neutral-weak object-cover p-1'
+            : 'bg-bg-neutral-weak object-contain p-[2px]'
         }`}
       />
       <div className="gap-[4px] flex items-center">
-        <span className="text-13 font-extrabold text-mainDarkGray">
+        <span className="text-13 font-extrabold text-fg-neutral">
           {group.displayName}
         </span>
-        <span className="text-11  text-mainDarkGray">{group.engName}</span>
+        <span className="text-11 text-fg-neutral-muted">{group.engName}</span>
       </div>
     </div>
   );
@@ -85,7 +86,7 @@ function RegionRow({
 
   if (!hasChildren) {
     return (
-      <li className="py-[14px] px-[10px] border border-bgGray rounded-xl">
+      <li className="rounded-xl border border-stroke-neutral-subtle px-[10px] py-[14px]">
         <Link
           href={buildRegionHref(group.parent.regionId)}
           className="flex w-full items-center justify-between"
@@ -101,7 +102,7 @@ function RegionRow({
   }
 
   return (
-    <li className="py-[14px] px-[10px] border border-bgGray rounded-xl flex flex-col">
+    <li className="flex flex-col rounded-xl border border-stroke-neutral-subtle px-[10px] py-[14px]">
       <button
         type="button"
         onClick={onToggle}
@@ -114,12 +115,11 @@ function RegionRow({
           imageUrl={imageUrl}
           fallbackImageUrl={fallbackImageUrl}
         />
-        <Image
+        <SemanticIcon
           src="/icon/arrow-down-gray.svg"
-          alt=""
           width={22}
           height={22}
-          className={`transition-transform duration-200 ${
+          className={`text-fg-neutral-muted transition-transform duration-200 ${
             isOpen ? 'rotate-180' : ''
           }`}
         />
@@ -139,9 +139,9 @@ function RegionRow({
             <li>
               <Link
                 href={buildRegionHref(group.parent.regionId)}
-                className="flex items-center justify-between py-[8px] border-b border-bgGray border-dashed"
+                className="flex items-center justify-between border-b border-dashed border-stroke-neutral-subtle py-[8px]"
               >
-                <span className="text-13 font-bold text-mainDarkGray">
+                <span className="text-13 font-bold text-fg-neutral">
                   {group.parent.korName}
                 </span>
               </Link>
@@ -152,13 +152,13 @@ function RegionRow({
               <li key={child.regionId}>
                 <Link
                   href={buildRegionHref(child.regionId)}
-                  className="flex items-center justify-between py-[8px] border-b border-bgGray border-dashed"
+                  className="flex items-center justify-between border-b border-dashed border-stroke-neutral-subtle py-[8px]"
                 >
                   <div className="gap-[4px] flex items-center">
-                    <span className="text-13 font-bold text-mainDarkGray">
+                    <span className="text-13 font-bold text-fg-neutral">
                       {child.korName}
                     </span>
-                    <span className="text-11  text-mainDarkGray">
+                    <span className="text-11 text-fg-neutral-muted">
                       {child.engName}
                     </span>
                   </div>
@@ -193,7 +193,7 @@ export default function RegionAccordionList() {
   if (isLoading) {
     return (
       <SkeletonList count={8} gap={8}>
-        <li className="py-[14px] px-[10px] border border-bgGray rounded-xl flex items-center justify-between">
+        <li className="flex items-center justify-between rounded-xl border border-stroke-neutral-subtle px-[10px] py-[14px]">
           <div className="flex items-center gap-[10px]">
             <SkeletonBase width={26} height={26} borderRadius="8px" />
             <div className="flex items-center gap-[4px]">

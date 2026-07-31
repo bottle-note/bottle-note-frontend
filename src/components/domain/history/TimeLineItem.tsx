@@ -68,7 +68,7 @@ function TimeLineItem(props: Props) {
     >
       <div
         data-testid="timeline-date"
-        className="flex shrink-0 flex-col items-end text-fg-neutral-muted"
+        className="flex w-6 shrink-0 flex-col items-end text-fg-neutral-muted"
       >
         <p className="text-10 font-medium">{dateTime.date}</p>
         <p className="text-9 font-extralight">{dateTime.time}</p>

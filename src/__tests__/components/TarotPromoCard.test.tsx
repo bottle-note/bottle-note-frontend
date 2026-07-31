@@ -48,4 +48,22 @@ describe('TarotPromoCard', () => {
       screen.queryByText('위스키와 함께하는 타로점'),
     ).not.toBeInTheDocument();
   });
+
+  it('테마에 따라 바뀌는 배경과 텍스트 역할 토큰을 사용한다', () => {
+    render(<TarotPromoCard />);
+
+    act(() => {
+      jest.advanceTimersByTime(300);
+    });
+
+    expect(
+      screen.getByText('위스키와 함께하는 타로점').closest('a'),
+    ).toHaveClass('bg-bg-brand-weak');
+    expect(screen.getByText('위스키와 함께하는 타로점')).toHaveClass(
+      'text-fg-brand',
+    );
+    expect(
+      screen.getByText('타로 카드를 뽑아 추천 위스키를 점쳐보세요.'),
+    ).toHaveClass('text-fg-neutral-muted');
+  });
 });

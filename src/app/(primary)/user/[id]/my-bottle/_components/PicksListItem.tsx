@@ -34,7 +34,7 @@ export const PicksListItem = ({ data, isMyPage }: Props) => {
   const { handleLoginModal } = useModalStore();
 
   return (
-    <section className="text-mainBlack border-brightGray border-b py-2 flex items-center">
+    <section className="flex items-center border-b border-stroke-neutral-subtle py-2 text-fg-neutral">
       {/* image */}
       <Link href={ROUTES.SEARCH.ALL(alcoholId)}>
         <ItemImage src={imageUrl} alt="image" />
@@ -48,7 +48,7 @@ export const PicksListItem = ({ data, isMyPage }: Props) => {
         {isHot && (
           <Label
             name={LABEL_NAMES.HOT_5}
-            styleClass="bg-subCoral text-white px-2 py-[0.1rem] border-subCoral text-[8px] rounded mb-1"
+            styleClass="mb-1 rounded border-stroke-brand-solid bg-bg-brand-solid px-2 py-[0.1rem] text-[8px] text-fg-brand-contrast"
           />
         )}
         <ItemInfo
@@ -67,7 +67,7 @@ export const PicksListItem = ({ data, isMyPage }: Props) => {
       {/* my rating point */}
       <div className="ml-auto pr-1 flex flex-col items-end">
         {!isMyPage && initialIsPicked && (
-          <p className="text-10 text-mainGray font-bold">통했찜</p>
+          <p className="text-10 font-bold text-fg-neutral-muted">통했찜</p>
         )}
         <AlcoholPickButton
           isPicked={isPicked}
@@ -77,7 +77,7 @@ export const PicksListItem = ({ data, isMyPage }: Props) => {
           }
           onApiError={() => setIsPicked(initialIsPicked)}
           size={25}
-          iconColor="subcoral"
+          tone="brand"
           handleNotLogin={handleLoginModal}
         />
       </div>
