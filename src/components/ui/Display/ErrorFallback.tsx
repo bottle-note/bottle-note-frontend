@@ -40,7 +40,7 @@ function ErrorFallback({
             <button
               type="button"
               onClick={onRetry}
-              className="px-5 py-2 bg-bg-brand-solid text-fg-brand-contrast rounded-lg text-13 active:bg-bg-brand-solid-pressed"
+              className="px-5 py-2 bg-bg-brand-primary-solid text-fg-brand-contrast rounded-lg text-13"
             >
               다시 시도
             </button>

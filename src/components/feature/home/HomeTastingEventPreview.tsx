@@ -19,7 +19,7 @@ function HomeTastingEventSkeleton() {
 
 function HomeTastingEventEmptyState() {
   return (
-    <div className="flex h-[312px] w-[272px] flex-col justify-center rounded-lg bg-bg-layer-floating px-5">
+    <div className="flex h-[312px] w-[272px] flex-col justify-center rounded-lg bg-bg-neutral-weak px-5">
       <p className="text-14 font-bold text-fg-neutral">
         진행 중인 시음회가 없어요.
       </p>

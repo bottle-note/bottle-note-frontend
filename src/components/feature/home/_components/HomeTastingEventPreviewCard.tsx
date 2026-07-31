@@ -113,9 +113,9 @@ export function HomeTastingEventMoreCard() {
       href={`${ROUTES.CURATION.BASE}?tab=${CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT}`}
       className="block"
     >
-      <article className="flex h-[312px] w-[190px] flex-col justify-between rounded-lg border border-stroke-neutral-subtle bg-bg-layer-floating px-4 py-5">
+      <article className="flex h-[312px] w-[190px] flex-col justify-between rounded-lg bg-bg-layer-basement px-4 py-5">
         <div>
-          <span className="inline-flex w-fit rounded-full bg-bg-brand-weak px-2.5 py-1 text-10 font-bold text-fg-brand">
+          <span className="inline-flex w-fit rounded-full bg-bg-layer-default px-2.5 py-1 text-10 font-bold text-fg-brand">
             시음회
           </span>
           <h3 className="mt-4 text-16 font-extrabold leading-[21px] text-fg-neutral">

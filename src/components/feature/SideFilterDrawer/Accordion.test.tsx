@@ -24,7 +24,7 @@ describe('SideFilterDrawer Accordion', () => {
 
     expect(screen.getByRole('button', { name: '전체' })).toHaveClass(
       'text-11',
-      'bg-bg-brand-solid',
+      'bg-bg-brand-primary-solid',
       'text-fg-brand-contrast',
     );
     expect(screen.getByRole('button', { name: '한국' })).toHaveClass(

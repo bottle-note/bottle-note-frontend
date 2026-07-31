@@ -50,7 +50,7 @@ describe('MyBottle list items', () => {
     expect(screen.getByText('3.5').parentElement).toHaveClass(
       'text-fg-neutral-muted',
     );
-    expect(screen.getByText('4.0')).toHaveClass('text-fg-rating');
+    expect(screen.getByText('4.0')).toHaveClass('text-fg-brand-primary');
   });
 
   it('리뷰 본문과 날짜를 보조 텍스트 색상으로 표시한다', () => {

@@ -96,7 +96,7 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
         >
           {/* 헤더 */}
-          <header className="flex items-center justify-between border-b border-stroke-neutral-subtle px-5 py-3 pt-safe-header">
+          <header className="flex items-center justify-between border-b border-stroke-neutral-basement px-5 py-3 pt-safe-header">
             <button
               type="button"
               onClick={handleClose}

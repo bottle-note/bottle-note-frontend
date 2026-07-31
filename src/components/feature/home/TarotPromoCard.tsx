@@ -71,7 +71,7 @@ export function TarotPromoCard() {
           </svg>
         </button>
         <div className="pr-8">
-          <h3 className="text-base font-semibold text-fg-brand">
+          <h3 className="text-base font-semibold text-fg-brand-primary">
             위스키와 함께하는 타로점
           </h3>
           <p className="mt-1 text-sm text-fg-neutral-muted">

@@ -78,14 +78,14 @@ const ReviewListItem = ({ content, priority = false }: Props) => {
                       className="h-2.5 w-2.5 fill-current"
                     />
                   }
-                  styleClass="rounded border-stroke-brand-solid bg-bg-brand-solid px-2 py-[0.1rem] text-10 text-fg-brand-contrast"
+                  styleClass="rounded border-stroke-brand-primary-solid bg-bg-brand-primary-solid px-2 py-[0.1rem] text-10 text-fg-brand-contrast"
                 />
               )}
               {content.isMyReview && (
                 <Label
                   name={LABEL_NAMES.MY_REVIEW}
                   icon={<UserRound aria-hidden className="h-2.5 w-2.5" />}
-                  styleClass="rounded border-stroke-brand-solid bg-transparent px-2 py-[0.1rem] text-10 text-fg-brand"
+                  styleClass="rounded border-stroke-brand-primary-solid bg-transparent px-2 py-[0.1rem] text-10 text-fg-brand-primary"
                 />
               )}
             </div>

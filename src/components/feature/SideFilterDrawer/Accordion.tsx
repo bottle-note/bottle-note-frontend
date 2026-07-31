@@ -27,7 +27,7 @@ const AccordionItemWrapper = ({
   return (
     <>
       {/* 토글 헤더 */}
-      <div className="flex items-center justify-between border-b border-stroke-neutral-subtle px-5 py-3">
+      <div className="flex items-center justify-between border-b border-stroke-neutral-basement px-5 py-3">
         <div className="flex items-center space-x-1">
           <p className="text-12 font-bold text-fg-neutral">
             {title}
@@ -121,7 +121,7 @@ const AccordionItemContent = ({
     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring
     ${
       isSelected
-        ? 'border-stroke-brand-solid bg-bg-brand-solid text-fg-brand-contrast'
+        ? 'border-stroke-brand-primary-solid bg-bg-brand-primary-solid text-fg-brand-contrast'
         : 'border-stroke-neutral-subtle bg-bg-layer-default text-fg-neutral-muted hover:bg-bg-layer-default-pressed'
     }
   `;

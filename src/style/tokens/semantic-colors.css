@@ -8,15 +8,16 @@
    */
 
   /* Foreground */
-  --color-fg-neutral: rgb(var(--palette-neutral-1000));
+  --color-fg-neutral: rgb(var(--palette-neutral-950));
   --color-fg-neutral-muted: rgb(var(--palette-neutral-800));
-  --color-fg-neutral-subtle: rgb(var(--palette-neutral-700));
+  --color-fg-neutral-subtle: rgb(var(--palette-neutral-600));
   --color-fg-neutral-inverted: rgb(var(--palette-static-white));
   --color-fg-placeholder: rgb(var(--palette-neutral-700));
   --color-fg-disabled: rgb(var(--palette-neutral-600));
-  --color-fg-brand: rgb(var(--palette-coral-700));
-  --color-fg-brand-contrast: rgb(var(--palette-coral-1000));
-  --color-fg-rating: rgb(var(--palette-amber-700));
+  --color-fg-brand: rgb(var(--palette-coral-600));
+  --color-fg-brand-primary: rgb(var(--palette-coral-400));
+  --color-fg-brand-contrast: rgb(var(--palette-static-white));
+  --color-fg-rating: rgb(var(--palette-coral-600));
 
   /* Background */
   --color-bg-layer-basement: rgb(var(--palette-neutral-200));
@@ -25,22 +26,25 @@
   --color-bg-layer-floating: rgb(var(--palette-neutral-0));
   --color-bg-neutral-weak: rgb(var(--palette-neutral-50));
   --color-bg-neutral-solid: rgb(var(--palette-neutral-1000));
-  --color-bg-disabled: rgb(var(--palette-neutral-200));
+  --color-bg-disabled: rgb(var(--palette-neutral-600));
   --color-bg-brand-solid: rgb(var(--palette-coral-600));
+  --color-bg-brand-primary-solid: rgb(var(--palette-coral-400));
   --color-bg-brand-solid-pressed: rgb(var(--palette-coral-500));
-  --color-bg-brand-weak: rgb(var(--palette-coral-50));
+  --color-bg-brand-weak: rgb(var(--palette-coral-400) / 10%);
   --color-bg-overlay: rgb(var(--palette-static-black) / 60%);
   --color-bg-overlay-muted: rgb(var(--palette-static-black) / 30%);
   --color-bg-transparent: transparent;
 
   /* Stroke */
-  --color-stroke-neutral-subtle: rgb(var(--palette-neutral-200));
-  --color-stroke-neutral-weak: rgb(var(--palette-neutral-700));
+  --color-stroke-neutral-basement: rgb(var(--palette-neutral-200));
+  --color-stroke-neutral-subtle: rgb(var(--palette-neutral-600));
+  --color-stroke-neutral-weak: rgb(var(--palette-neutral-800));
   --color-stroke-neutral-contrast: rgb(var(--palette-neutral-1000));
-  --color-stroke-brand-solid: rgb(var(--palette-coral-700));
+  --color-stroke-brand-solid: rgb(var(--palette-coral-600));
+  --color-stroke-brand-primary-solid: rgb(var(--palette-coral-400));
   --color-stroke-brand-weak: rgb(var(--palette-coral-400));
-  --color-stroke-brand-contrast: rgb(var(--palette-coral-1000));
-  --color-stroke-focus-ring: rgb(var(--palette-coral-700));
+  --color-stroke-brand-contrast: rgb(var(--palette-static-white));
+  --color-stroke-focus-ring: rgb(var(--palette-coral-600));
 
   /*
    * shadcn compatibility aliases
@@ -84,6 +88,7 @@
   --color-fg-placeholder: rgb(var(--palette-oak-500));
   --color-fg-disabled: rgb(var(--palette-oak-500));
   --color-fg-brand: rgb(var(--palette-coral-500));
+  --color-fg-brand-primary: rgb(var(--palette-coral-500));
   --color-fg-brand-contrast: rgb(var(--palette-coral-1000));
   --color-fg-rating: rgb(var(--palette-amber-500));
 
@@ -96,14 +101,17 @@
   --color-bg-neutral-solid: rgb(var(--palette-oak-50));
   --color-bg-disabled: rgb(var(--palette-oak-800));
   --color-bg-brand-solid: rgb(var(--palette-coral-500));
+  --color-bg-brand-primary-solid: rgb(var(--palette-coral-500));
   --color-bg-brand-solid-pressed: rgb(var(--palette-coral-600));
   --color-bg-brand-weak: rgb(var(--palette-coral-900));
 
   /* Stroke */
+  --color-stroke-neutral-basement: rgb(var(--palette-oak-800));
   --color-stroke-neutral-subtle: rgb(var(--palette-oak-800));
   --color-stroke-neutral-weak: rgb(var(--palette-oak-600));
   --color-stroke-neutral-contrast: rgb(var(--palette-oak-50));
   --color-stroke-brand-solid: rgb(var(--palette-coral-500));
+  --color-stroke-brand-primary-solid: rgb(var(--palette-coral-500));
   --color-stroke-brand-weak: rgb(var(--palette-coral-300));
   --color-stroke-brand-contrast: rgb(var(--palette-coral-1000));
   --color-stroke-focus-ring: rgb(var(--palette-coral-500));

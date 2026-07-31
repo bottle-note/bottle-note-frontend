@@ -22,7 +22,7 @@ export function ProgramScheduleItem({
   )}`;
 
   return (
-    <article className="border-b border-stroke-neutral-subtle py-6 first:pt-0 last:border-b-0 last:pb-0">
+    <article className="border-b border-stroke-neutral-basement py-6 first:pt-0 last:border-b-0 last:pb-0">
       <div className="flex items-start gap-3">
         <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-bg-neutral-solid text-11 font-bold text-fg-neutral-inverted">
           {order}
@@ -74,7 +74,7 @@ export function ProgramScheduleItem({
               <h4 className="text-14 font-extrabold text-fg-neutral">
                 시음 위스키
               </h4>
-              <div className="mt-3 divide-y divide-stroke-neutral-subtle border-t border-stroke-neutral-subtle">
+              <div className="mt-3 divide-y divide-stroke-neutral-basement border-t border-stroke-neutral-basement">
                 {program.whiskies.map((whisky, index) => (
                   <TastingEventLineupItem
                     key={

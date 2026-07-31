@@ -19,7 +19,7 @@ const Toggle = ({
     <div className="flex items-center space-x-[3px]">
       <button
         className={`toggle-container flex items-center justify-center w-8 h-4 rounded-full ${
-          isActive ? 'bg-bg-brand-solid' : 'bg-bg-disabled'
+          isActive ? 'bg-bg-brand-primary-solid' : 'bg-bg-disabled'
         }`}
         disabled={disabled}
         onClick={onToggle}

@@ -60,7 +60,7 @@ describe('TarotPromoCard', () => {
       screen.getByText('위스키와 함께하는 타로점').closest('a'),
     ).toHaveClass('bg-bg-brand-weak');
     expect(screen.getByText('위스키와 함께하는 타로점')).toHaveClass(
-      'text-fg-brand',
+      'text-fg-brand-primary',
     );
     expect(
       screen.getByText('타로 카드를 뽑아 추천 위스키를 점쳐보세요.'),

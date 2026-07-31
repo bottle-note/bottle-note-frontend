@@ -75,7 +75,7 @@ export function TastingEventInfoCard({
       {label && (
         <span
           className={[
-            'inline-flex w-fit rounded-full bg-bg-brand-solid px-2.5 py-1 font-bold text-fg-brand-contrast',
+            'inline-flex w-fit rounded-full bg-bg-brand-primary-solid px-2.5 py-1 font-bold text-fg-brand-contrast',
             labelTextClassName,
             labelClassName,
           ]

@@ -20,7 +20,7 @@ describe('AlcoholItem', () => {
 
     expect(screen.getByText('달모어 15년')).toHaveClass('text-fg-neutral');
     expect(screen.getByText('달모어 15년').parentElement).toHaveClass(
-      'bg-bg-layer-floating',
+      'bg-bg-layer-basement',
     );
     expect(screen.getByText('4.3').parentElement).toHaveClass('text-fg-rating');
     expect(

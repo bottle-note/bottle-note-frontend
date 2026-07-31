@@ -74,7 +74,7 @@ export default function AlcoholItem({ data }: Props) {
             rounded="rounded-none"
           />
         </div>
-        <div className="h-[80px] space-y-[6px] bg-bg-layer-floating px-2 py-[10px]">
+        <div className="h-[80px] space-y-[6px] bg-bg-layer-basement px-2 py-[10px]">
           <div className="h-[38px] whitespace-normal break-words text-13 font-extrabold text-fg-neutral">
             {korName && truncStr(korName, 20)}
           </div>

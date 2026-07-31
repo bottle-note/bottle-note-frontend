@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import PrimaryLinkButton from './PrimaryLinkButton';
 
 describe('PrimaryLinkButton', () => {
-  it('Half 카드는 테마별 톤 배경과 브랜드 텍스트를 사용한다', () => {
+  it('Half 카드는 기존 라이트 포인트 컬러를 유지한다', () => {
     render(
       <PrimaryLinkButton
         data={{
@@ -16,9 +16,9 @@ describe('PrimaryLinkButton', () => {
 
     const card = screen.getByRole('link', { name: /싱글몰트/ }).parentElement;
 
-    expect(card).toHaveClass('bg-bg-brand-weak', 'border-stroke-brand-weak');
+    expect(card).toHaveClass('bg-bg-brand-primary-solid');
     expect(
-      screen.getByText('싱글몰트').closest('.text-fg-brand'),
+      screen.getByText('싱글몰트').closest('.text-fg-brand-contrast'),
     ).not.toBeNull();
   });
 

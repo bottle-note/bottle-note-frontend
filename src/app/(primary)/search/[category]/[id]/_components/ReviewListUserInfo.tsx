@@ -76,7 +76,7 @@ export default function ReviewListUserInfo({
                   height={12}
                 />
               }
-              styleClass={`${isBlocked ? 'border-stroke-neutral-subtle bg-bg-disabled text-fg-disabled' : 'border-stroke-brand-solid bg-bg-brand-solid text-fg-brand-contrast'} rounded px-2 py-[3px] text-10`}
+              styleClass={`${isBlocked ? 'border-stroke-neutral-subtle bg-bg-disabled text-fg-disabled' : 'border-stroke-brand-primary-solid bg-bg-brand-primary-solid text-fg-brand-contrast'} rounded px-2 py-[3px] text-10`}
             />
           )}
           {isMyReview && (
@@ -89,7 +89,7 @@ export default function ReviewListUserInfo({
                   height={12}
                 />
               }
-              styleClass="rounded border-stroke-brand-solid bg-bg-transparent px-2 py-[3px] text-10 text-fg-brand"
+              styleClass="rounded border-stroke-brand-primary-solid bg-bg-transparent px-2 py-[3px] text-10 text-fg-brand-primary"
             />
           )}
         </div>

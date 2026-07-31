@@ -51,7 +51,7 @@ export default function ReviewUserHeader({
                 icon="/icon/thumbup-filled-white.svg"
                 iconHeight={11.45}
                 iconWidth={11.45}
-                styleClass="label-selected px-2 py-[3px] text-10 rounded"
+                styleClass="rounded border border-stroke-brand-primary-solid bg-bg-brand-primary-solid px-2 py-[3px] text-10 text-fg-brand-contrast"
               />
             )}
             {data.reviewInfo?.isMyReview && (
@@ -60,7 +60,7 @@ export default function ReviewUserHeader({
                 icon="/icon/user-outlined-subcoral.svg"
                 iconHeight={11.45}
                 iconWidth={11.45}
-                styleClass="label-default px-2 py-[3px] text-10 rounded"
+                styleClass="rounded border border-stroke-brand-primary-solid bg-bg-layer-default px-2 py-[3px] text-10 text-fg-brand-primary"
               />
             )}
           </div>

@@ -61,7 +61,7 @@ export const ReviewListItem = ({ data }: Props) => {
                 height={10}
               />
             }
-            styleClass="rounded border-stroke-brand-solid bg-bg-brand-solid px-2 py-[0.1rem] text-10 text-fg-brand-contrast"
+            styleClass="rounded border-stroke-brand-primary-solid bg-bg-brand-primary-solid px-2 py-[0.1rem] text-10 text-fg-brand-contrast"
           />
         )}
         <ItemInfo

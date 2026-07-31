@@ -44,7 +44,9 @@ jest.mock('@/hooks/useBlockActions', () => ({
 
 jest.mock('@/components/domain/alcohol/AlcoholImage', () => ({
   __esModule: true,
-  default: () => <div data-testid="alcohol-image" />,
+  default: ({ bgColor }: { bgColor?: string }) => (
+    <div data-bg-color={bgColor} data-testid="alcohol-image" />
+  ),
 }));
 
 jest.mock('@/components/domain/alcohol/AlcoholPickButton', () => ({
@@ -124,6 +126,10 @@ describe('위스키 상세 시맨틱 색상', () => {
     }).parentElement?.parentElement;
 
     expect(article).toHaveClass('text-fg-brand-contrast');
+    expect(screen.getByTestId('alcohol-image')).toHaveAttribute(
+      'data-bg-color',
+      'bg-bg-layer-default',
+    );
     expect(screen.getByRole('button', { name: '싱글 몰트' })).toHaveClass(
       'border-stroke-brand-contrast',
     );

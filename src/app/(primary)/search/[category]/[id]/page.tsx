@@ -235,7 +235,7 @@ export default function SearchAlcohol() {
         ) : (
           <>
             <div className="relative">
-              <div className="absolute inset-0 bg-bg-brand-solid" />
+              <div className="absolute inset-0 bg-bg-brand-primary-solid" />
 
               {/* 콘텐츠 레이어 */}
               <div className="relative z-10">
@@ -316,7 +316,7 @@ export default function SearchAlcohol() {
                         className="flex-shrink-0 flex flex-col items-center space-y-1"
                       >
                         <Link href={ROUTES.USER.BASE(user.userId)}>
-                          <div className="h-14 w-14 overflow-hidden rounded-full border border-stroke-neutral-subtle">
+                          <div className="h-14 w-14 overflow-hidden rounded-full border border-stroke-neutral-basement">
                             <Image
                               className="object-cover"
                               src={user.user_image_url || ProfileDefaultImg}

@@ -62,6 +62,7 @@ export const semanticColors = {
     disabled: semanticColor('fg-disabled'),
     brand: {
       DEFAULT: semanticColor('fg-brand'),
+      primary: semanticColor('fg-brand-primary'),
       contrast: semanticColor('fg-brand-contrast'),
     },
     rating: semanticColor('fg-rating'),
@@ -85,6 +86,9 @@ export const semanticColors = {
         DEFAULT: semanticColor('bg-brand-solid'),
         pressed: semanticColor('bg-brand-solid-pressed'),
       },
+      primary: {
+        solid: semanticColor('bg-brand-primary-solid'),
+      },
       weak: semanticColor('bg-brand-weak'),
     },
     overlay: {
@@ -95,12 +99,16 @@ export const semanticColors = {
   },
   stroke: {
     neutral: {
+      basement: semanticColor('stroke-neutral-basement'),
       subtle: semanticColor('stroke-neutral-subtle'),
       weak: semanticColor('stroke-neutral-weak'),
       contrast: semanticColor('stroke-neutral-contrast'),
     },
     brand: {
       solid: semanticColor('stroke-brand-solid'),
+      primary: {
+        solid: semanticColor('stroke-brand-primary-solid'),
+      },
       weak: semanticColor('stroke-brand-weak'),
       contrast: semanticColor('stroke-brand-contrast'),
     },

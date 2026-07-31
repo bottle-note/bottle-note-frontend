@@ -25,6 +25,7 @@ function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
         outerWidthClass="w-[140px]"
         innerHeightClass="h-[200px]"
         innerWidthClass="w-[100px]"
+        bgColor="bg-bg-layer-default"
         priority
         enableModal={true}
       />

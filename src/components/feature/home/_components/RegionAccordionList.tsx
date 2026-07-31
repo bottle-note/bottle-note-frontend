@@ -86,7 +86,7 @@ function RegionRow({
 
   if (!hasChildren) {
     return (
-      <li className="rounded-xl border border-stroke-neutral-subtle px-[10px] py-[14px]">
+      <li className="rounded-xl border border-stroke-neutral-basement px-[10px] py-[14px]">
         <Link
           href={buildRegionHref(group.parent.regionId)}
           className="flex w-full items-center justify-between"
@@ -102,7 +102,7 @@ function RegionRow({
   }
 
   return (
-    <li className="flex flex-col rounded-xl border border-stroke-neutral-subtle px-[10px] py-[14px]">
+    <li className="flex flex-col rounded-xl border border-stroke-neutral-basement px-[10px] py-[14px]">
       <button
         type="button"
         onClick={onToggle}
@@ -139,7 +139,7 @@ function RegionRow({
             <li>
               <Link
                 href={buildRegionHref(group.parent.regionId)}
-                className="flex items-center justify-between border-b border-dashed border-stroke-neutral-subtle py-[8px]"
+                className="flex items-center justify-between border-b border-dashed border-stroke-neutral-basement py-[8px]"
               >
                 <span className="text-13 font-bold text-fg-neutral">
                   {group.parent.korName}
@@ -152,7 +152,7 @@ function RegionRow({
               <li key={child.regionId}>
                 <Link
                   href={buildRegionHref(child.regionId)}
-                  className="flex items-center justify-between border-b border-dashed border-stroke-neutral-subtle py-[8px]"
+                  className="flex items-center justify-between border-b border-dashed border-stroke-neutral-basement py-[8px]"
                 >
                   <div className="gap-[4px] flex items-center">
                     <span className="text-13 font-bold text-fg-neutral">
@@ -193,7 +193,7 @@ export default function RegionAccordionList() {
   if (isLoading) {
     return (
       <SkeletonList count={8} gap={8}>
-        <li className="flex items-center justify-between rounded-xl border border-stroke-neutral-subtle px-[10px] py-[14px]">
+        <li className="flex items-center justify-between rounded-xl border border-stroke-neutral-basement px-[10px] py-[14px]">
           <div className="flex items-center gap-[10px]">
             <SkeletonBase width={26} height={26} borderRadius="8px" />
             <div className="flex items-center gap-[4px]">

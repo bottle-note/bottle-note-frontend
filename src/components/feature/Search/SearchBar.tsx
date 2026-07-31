@@ -65,7 +65,7 @@ export default function SearchBar({
   const inputProps = {
     type: 'text',
     className:
-      'h-10 w-full rounded-lg border border-stroke-brand-solid bg-bg-layer-floating pl-4 pr-12 text-15 text-fg-neutral placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring',
+      'h-10 w-full rounded-lg border border-stroke-brand-primary-solid bg-bg-layer-floating pl-4 pr-12 text-15 text-fg-neutral placeholder:text-fg-brand-primary focus-visible:ring-2 focus-visible:ring-stroke-focus-ring',
     placeholder,
     'aria-label': '검색어 입력',
   };

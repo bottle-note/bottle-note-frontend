@@ -163,7 +163,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
             시음회 라인업
           </h2>
           <List>
-            <List.Section className="mt-4 divide-y divide-stroke-neutral-subtle border-t border-stroke-neutral-subtle">
+            <List.Section className="mt-4 divide-y divide-stroke-neutral-basement border-t border-stroke-neutral-basement">
               {alcohols.map((item, index) => (
                 <TastingEventLineupItem
                   key={
@@ -311,7 +311,7 @@ function CurationDetail({
             추천 라인업
           </h2>
           <List>
-            <List.Section className="mt-4 divide-y divide-stroke-neutral-subtle border-t border-stroke-neutral-subtle">
+            <List.Section className="mt-4 divide-y divide-stroke-neutral-basement border-t border-stroke-neutral-basement">
               {curation.payload.map((item, index) => (
                 <TastingEventLineupItem
                   key={

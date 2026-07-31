@@ -145,7 +145,7 @@ const ReplyItem = memo(function ReplyItem({
                   {isReviewUser && (
                     <Label
                       name={LABEL_NAMES.REVIEW_AUTHOR}
-                      styleClass="label-default px-[5.82px] py-[2.91px] rounded text-9"
+                      styleClass="rounded border border-stroke-brand-primary-solid bg-bg-layer-default px-[5.82px] py-[2.91px] text-9 text-fg-brand-primary"
                     />
                   )}
                 </div>
@@ -172,7 +172,7 @@ const ReplyItem = memo(function ReplyItem({
             </div>
             <div className="my-2 flex whitespace-pre-wrap break-words text-15 text-fg-neutral">
               {'rootReviewId' in data && (
-                <div className="mr-1 text-fg-brand">
+                <div className="mr-1 text-fg-brand-primary">
                   {data?.parentReviewReplyAuthor}
                 </div>
               )}
