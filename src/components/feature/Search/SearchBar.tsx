@@ -1,10 +1,8 @@
 'use client';
 
 import React, { useEffect, Dispatch, SetStateAction } from 'react';
-import Image from 'next/image';
+import { CircleX, Search } from 'lucide-react';
 import { useSearchInput } from '@/hooks/useSearchInput';
-import EnterIcon from 'public/icon/search-subcoral.svg';
-import DeleteIcon from 'public/icon/reset-mainGray.svg';
 
 interface Props {
   handleSearch?: (value: string) => void;
@@ -21,7 +19,7 @@ interface Props {
 
 const SearchButton = () => (
   <div className="px-2 w-10 absolute top-0 right-1 h-full flex items-center justify-center">
-    <Image src={EnterIcon} alt="search button" />
+    <Search aria-hidden className="h-4 w-4 text-fg-brand" />
   </div>
 );
 
@@ -67,7 +65,7 @@ export default function SearchBar({
   const inputProps = {
     type: 'text',
     className:
-      'w-full bg-white rounded-lg h-10 pl-4 pr-12 outline-none text-mainDarkGray placeholder-mainCoral text-15 border border-mainCoral',
+      'h-10 w-full rounded-lg border border-stroke-brand-solid bg-bg-layer-floating pl-4 pr-12 text-15 text-fg-neutral placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring',
     placeholder,
     'aria-label': '검색어 입력',
   };
@@ -100,10 +98,11 @@ export default function SearchBar({
           className="absolute right-14 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
           aria-label="검색어 지우기"
         >
-          <Image src={DeleteIcon} alt="delete" />
+          <CircleX aria-hidden className="h-4 w-4 text-fg-neutral-muted" />
         </button>
       )}
       <button
+        type="button"
         className="px-2 w-10 absolute top-0 right-1 h-full flex items-center justify-center"
         onClick={handleSubmit}
         aria-label="검색"

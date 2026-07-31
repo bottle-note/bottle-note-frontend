@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { CircleHelp, CircleX } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 import useModalStore from '@/store/modalStore';
 import HoverTouchBox from '@/components/ui/Interactive/HoverTouchBox';
@@ -44,28 +45,26 @@ export default function TagsForm() {
   };
 
   const ExtraButtons = (
-    <div className="flex gap-1 text-13 text-mainDarkGray ">
+    <div className="flex gap-1 text-13 text-fg-neutral-muted">
       <HoverTouchBox
         id="flavor-tooltip"
         tooltipContent={
-          <div className="absolute z-10 left-5 flex items-center bg-white p-2 border border-subCoral rounded-md space-x-1">
+          <div className="absolute left-5 z-10 flex items-center space-x-1 rounded-md border border-stroke-brand-solid bg-bg-layer-floating p-2">
             <Image
               src="/icon/questionmark-subcoral.svg"
               alt="questionMarkIcon"
               width={15}
               height={15}
             />
-            <p className="text-11 text-subCoral">
+            <p className="text-11 text-fg-brand">
               위스키에서 느껴지는 느낌을 태그로 등록해보세요!
             </p>
           </div>
         }
       >
-        <Image
-          src="/icon/questionmark-gray.svg"
-          alt="questionMarkIcon"
-          width={15}
-          height={15}
+        <CircleHelp
+          aria-label="플레이버 태그 도움말"
+          className="h-[15px] w-[15px]"
         />
       </HoverTouchBox>
       <p>
@@ -87,10 +86,10 @@ export default function TagsForm() {
         }}
       >
         <article className="ml-7 mt-[6px]">
-          <div className="h-11 flex items-center border-b border-subCoral">
+          <div className="flex h-11 items-center border-b border-stroke-brand-solid">
             <input
               type="text"
-              className="text-15 text-mainDarkGray w-full"
+              className="w-full bg-transparent text-15 text-fg-neutral placeholder:text-fg-placeholder focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
               placeholder="예) 반건조 된 건자두"
               value={tagValue}
               maxLength={12}
@@ -105,7 +104,8 @@ export default function TagsForm() {
               }}
             />
             <button
-              className={`text-15 px-2 py-1 rounded-md border border-solid w-24 shrink-0 ${watchTags?.length < TAGS_LIMIT ? 'border-subCoral text-white bg-subCoral' : 'border-brightGray text-bgGray'}`}
+              type="button"
+              className={`w-24 shrink-0 text-15 ${watchTags?.length < TAGS_LIMIT ? 'label-selected' : 'label-disabled'}`}
               disabled={watchTags?.length === TAGS_LIMIT}
               onClick={handleAddTag}
             >
@@ -116,25 +116,16 @@ export default function TagsForm() {
             <div className="flex flex-wrap gap-1 pt-2">
               {watchTags.map((tag: string) => (
                 <div key={tag} className="overflow-hidden flex-shrink-0">
-                  <div className="inline-block text-13 bg-white text-subCoral border border-solid border-subCoral px-2 py-1 rounded-md">
+                  <div className="label-default inline-block text-13">
                     <div className="flex items-center justify-center space-x-1">
                       <p>{tag}</p>
-                      <span
+                      <button
+                        type="button"
+                        aria-label={`${tag} 태그 삭제`}
                         onClick={() => handleDeleteTag(tag)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            handleDeleteTag(tag);
-                          }
-                        }}
                       >
-                        <Image
-                          className="mr-1"
-                          src="/icon/reset-mainGray.svg"
-                          alt="deleteIcon"
-                          width={15}
-                          height={15}
-                        />
-                      </span>
+                        <CircleX className="h-[15px] w-[15px] text-fg-neutral-muted" />
+                      </button>
                     </div>
                   </div>
                 </div>

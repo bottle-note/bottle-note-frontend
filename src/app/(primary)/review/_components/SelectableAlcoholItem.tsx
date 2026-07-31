@@ -1,11 +1,10 @@
 'use client';
 
-import Image from 'next/image';
+import { UserRound } from 'lucide-react';
 import Star from '@/components/ui/Display/Star';
 import { Alcohol } from '@/api/alcohol/types';
 import ItemImage from '@/components/feature/List/_components/ItemImage';
 import ItemInfo from '@/components/feature/List/_components/ItemInfo';
-import RatingCountIcon from 'public/icon/rating-count-black.svg';
 
 interface Props {
   data: Alcohol;
@@ -31,7 +30,7 @@ export default function SelectableAlcoholItem({ data, onSelect }: Props) {
     <button
       type="button"
       onClick={handleClick}
-      className="flex items-center text-mainBlack border-brightGray border-b border-solid py-1 w-full text-left hover:bg-gray-50 active:bg-gray-100 transition-colors"
+      className="flex w-full items-center border-b border-solid border-stroke-neutral-subtle py-1 text-left text-fg-neutral transition-colors hover:bg-bg-layer-default-pressed active:bg-bg-layer-default-pressed"
     >
       <ItemImage src={imageUrl} alt="image" />
 
@@ -47,10 +46,9 @@ export default function SelectableAlcoholItem({ data, onSelect }: Props) {
         <Star rating={rating} />
         <p className="flex text-10 mt-1.5">
           (
-          <Image
-            src={RatingCountIcon}
-            alt="평가 참여자 수"
-            className="pb-[2px]"
+          <UserRound
+            aria-label="평가 참여자 수"
+            className="h-3 w-3 pb-[2px] text-fg-neutral-muted"
           />
           <span>{ratingCount ?? 0}</span>)
         </p>

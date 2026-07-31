@@ -89,18 +89,18 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 bg-white flex flex-col max-w-content mx-auto"
+          className="fixed inset-0 z-50 mx-auto flex max-w-content flex-col bg-bg-layer-default text-fg-neutral"
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
         >
           {/* 헤더 */}
-          <header className="flex items-center justify-between px-5 py-3 border-b border-bgGray pt-safe-header">
+          <header className="flex items-center justify-between border-b border-stroke-neutral-subtle px-5 py-3 pt-safe-header">
             <button
               type="button"
               onClick={handleClose}
-              className="flex items-center gap-1 text-14 text-mainGray"
+              className="flex items-center gap-1 text-14 text-fg-neutral-muted"
             >
               <Image
                 src="/icon/arrow-left-subcoral.svg"
@@ -109,13 +109,11 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
                 height={20}
               />
             </button>
-            <h2 className="text-16 font-bold text-mainDarkGray">
-              테이스팅 노트
-            </h2>
+            <h2 className="text-16 font-bold text-fg-neutral">테이스팅 노트</h2>
             <button
               type="button"
               onClick={handleClose}
-              className="text-14 font-bold text-subCoral"
+              className="text-14 font-bold text-fg-brand"
             >
               완료
             </button>
@@ -130,10 +128,10 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
             >
-              <p className="text-14 text-mainDarkGray font-medium">
+              <p className="text-14 font-medium text-fg-neutral">
                 이 위스키에서 느낀 풍미를 기록해보세요
               </p>
-              <p className="text-12 text-mainGray mt-1">
+              <p className="mt-1 text-12 text-fg-neutral-muted">
                 차트를 터치하거나 원을 드래그해서 조절하세요
               </p>
             </motion.div>
@@ -181,7 +179,7 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
               <button
                 type="button"
                 onClick={handleReset}
-                className="text-13 text-mainGray underline underline-offset-2"
+                className="text-13 text-fg-neutral-muted underline underline-offset-2"
               >
                 초기화
               </button>

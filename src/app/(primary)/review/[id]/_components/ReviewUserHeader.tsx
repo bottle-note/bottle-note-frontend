@@ -30,7 +30,7 @@ export default function ReviewUserHeader({
               profileImgSrc={data.reviewInfo.userInfo.userProfileImage}
               size={30}
             />
-            <p className="text-mainGray text-13">
+            <p className="text-13 text-fg-neutral-muted">
               {data.reviewInfo?.userInfo?.nickName &&
                 truncStr(data.reviewInfo.userInfo.nickName, 12)}
             </p>
@@ -39,7 +39,7 @@ export default function ReviewUserHeader({
         <Star
           rating={data.reviewInfo?.rating ?? 0}
           size={27}
-          textStyle="text-24 text-subCoral font-semibold min-w-7"
+          textStyle="text-24 text-fg-brand font-semibold min-w-7"
         />
       </article>
       {(data.reviewInfo?.isBestReview || data.reviewInfo?.isMyReview) && (
@@ -51,7 +51,7 @@ export default function ReviewUserHeader({
                 icon="/icon/thumbup-filled-white.svg"
                 iconHeight={11.45}
                 iconWidth={11.45}
-                styleClass="bg-mainCoral text-white px-2 py-[3px] border-mainCoral text-10 rounded"
+                styleClass="label-selected px-2 py-[3px] text-10 rounded"
               />
             )}
             {data.reviewInfo?.isMyReview && (
@@ -60,7 +60,7 @@ export default function ReviewUserHeader({
                 icon="/icon/user-outlined-subcoral.svg"
                 iconHeight={11.45}
                 iconWidth={11.45}
-                styleClass="border-mainCoral text-mainCoral px-2 py-[3px] text-10 rounded"
+                styleClass="label-default px-2 py-[3px] text-10 rounded"
               />
             )}
           </div>

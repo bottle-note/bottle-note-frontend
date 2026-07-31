@@ -10,6 +10,7 @@ type Props<T extends { id: string; name: string }> = {
   ) => (el: HTMLDivElement | HTMLButtonElement | null) => void;
   tabList: T[];
   scrollContainerRef?: RefObject<HTMLDivElement>;
+  surface?: 'default' | 'floating';
 };
 
 const TAB_WIDTH = 146;
@@ -17,6 +18,16 @@ const TAB_HEIGHT = 32;
 
 const BORDER_COLOR = 'var(--color-stroke-neutral-subtle)';
 const BORDER_WIDTH = 1.5;
+const SURFACE_STYLES = {
+  default: {
+    className: 'bg-bg-layer-default',
+    color: 'var(--color-bg-layer-default)',
+  },
+  floating: {
+    className: 'bg-bg-layer-floating',
+    color: 'var(--color-bg-layer-floating)',
+  },
+} as const;
 
 const BookmarkTab = <T extends { id: string; name: string }>({
   currentTab,
@@ -24,9 +35,12 @@ const BookmarkTab = <T extends { id: string; name: string }>({
   tabList,
   scrollContainerRef,
   registerTab,
+  surface = 'default',
 }: Props<T>) => {
+  const surfaceStyle = SURFACE_STYLES[surface];
+
   return (
-    <div className="w-full bg-bg-layer-default">
+    <div className={`w-full ${surfaceStyle.className}`}>
       <div className="relative">
         <div
           ref={scrollContainerRef}
@@ -86,7 +100,7 @@ const BookmarkTab = <T extends { id: string; name: string }>({
                       height={TAB_HEIGHT}
                       fill={
                         currentTab.id === tab.id
-                          ? 'var(--color-bg-layer-default)'
+                          ? surfaceStyle.color
                           : 'var(--color-bg-neutral-weak)'
                       }
                       clipPath={`url(#tab-clip-${tab.id})`}

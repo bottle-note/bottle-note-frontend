@@ -1,6 +1,6 @@
 import React from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { MessageCircle } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 
 interface ReplyButtonProps {
@@ -38,17 +38,15 @@ export default function ReplyButton({
         }
       }}
     >
-      <Image
-        src={
-          hasReplyByMe
-            ? '/icon/comment-filled-subcoral.svg'
-            : '/icon/comment-outlined-gray.svg'
+      <MessageCircle
+        aria-hidden
+        className={
+          hasReplyByMe ? 'fill-current text-fg-brand' : 'text-fg-neutral-muted'
         }
         width={size}
         height={size}
-        alt="comment"
       />
-      <p className={`text-mainGray ${textSize}`}>{replyCount}</p>
+      <p className={`text-fg-neutral-muted ${textSize}`}>{replyCount}</p>
     </div>
   );
 }

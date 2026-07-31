@@ -45,9 +45,11 @@ export default function OptionsContainer({
       >
         <div className="flex items-center space-x-1">
           <Image src={iconSrc} alt={iconAlt} width={20} height={20} />
-          <p className="text-14 text-mainDarkGray font-bold">
+          <p className="text-14 font-bold text-fg-neutral">
             {title}{' '}
-            <span className="text-mainGray font-normal">{subTitle}</span>
+            <span className="font-normal text-fg-neutral-muted">
+              {subTitle}
+            </span>
           </p>
           <div
             onClick={(e) => {

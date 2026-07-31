@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { CircleX } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 import SearchAddress from '../SearchAddress';
 import OptionsContainer from '../OptionsContainer';
@@ -41,21 +41,23 @@ export default function AddressForm() {
             window.open(mapUrl, '_blank', 'noopener,noreferrer');
           }
         }}
-        className="text-subCoral cursor-pointer"
+        className="cursor-pointer text-fg-brand"
       >
         지도보기
       </a>
-      <div className="text-subCoral">|</div>
+      <div className="text-fg-brand">|</div>
       <button
+        type="button"
         onClick={() => {
           setSearchModal(true);
         }}
-        className="text-subCoral"
+        className="text-fg-brand"
       >
         주소변경
       </button>
-      <div className="text-subCoral">|</div>
+      <div className="text-fg-brand">|</div>
       <button
+        type="button"
         className="flex items-center space-x-[2px]"
         onClick={resetAddress}
         onKeyDown={(e) => {
@@ -64,13 +66,8 @@ export default function AddressForm() {
           }
         }}
       >
-        <p className="text-mainGray">주소삭제</p>
-        <Image
-          src="/icon/reset-mainGray.svg"
-          alt="resetIcon"
-          width={16}
-          height={16}
-        />
+        <p className="text-fg-neutral-muted">주소삭제</p>
+        <CircleX aria-hidden className="h-4 w-4 text-fg-neutral-muted" />
       </button>
     </div>
   );
@@ -87,22 +84,23 @@ export default function AddressForm() {
         <article className="ml-7 mt-[6px] text-14">
           {!watch('address') ? (
             <button
-              className="w-full border-subCoral border rounded-lg py-2"
+              type="button"
+              className="w-full rounded-lg border border-stroke-brand-solid py-2"
               onClick={() => {
                 setSearchModal(true);
               }}
             >
-              <p className="text-subCoral">장소 검색</p>
+              <p className="text-fg-brand">장소 검색</p>
             </button>
           ) : (
             <div className="w-full space-y-1">
               <div className="pb-1">{watch('mapUrl') && ExtraButtons}</div>
-              <p className="text-mainDarkGray">{watch('address')}</p>
-              <div className="border-b border-subCoral">
+              <p className="text-fg-neutral">{watch('address')}</p>
+              <div className="border-b border-stroke-brand-solid">
                 <input
                   type="text"
                   placeholder="상세 주소를 입력하세요."
-                  className="w-full h-5 text-mainDarkGray bg-transparent border-none focus:outline-none placeholder:text-[#BFBFBF]"
+                  className="h-5 w-full border-none bg-transparent text-fg-neutral placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
                   maxLength={30}
                   {...register('detailAddress')}
                 />

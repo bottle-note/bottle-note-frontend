@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Image from 'next/image';
+import { MoreVertical } from 'lucide-react';
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { formatDate } from '@/utils/formatDate';
@@ -44,21 +44,21 @@ function ReviewDetails({
         <div className="mb-[10px]">
           <ReviewUserHeader data={data} onRefresh={onRefresh} />
         </div>
-        <section className="mx-5 pb-5 border-b border-mainGray/30">
+        <section className="mx-5 border-b border-stroke-neutral-subtle pb-5">
           {productImages?.length > 0 && (
             <div className="mb-[22px]">
               <ReviewImageCarousel images={productImages} priority />
             </div>
           )}
           <div
-            className="text-15 text-mainDarkGray whitespace-pre-line break-words"
+            className="whitespace-pre-line break-words text-15 text-fg-neutral"
             dangerouslySetInnerHTML={{
               __html: data.reviewInfo?.reviewContent?.replace(/\n/g, '<br />'),
             }}
           />
           <article className="flex items-center justify-between mt-[10px]">
             {data.reviewInfo?.createAt && (
-              <p className="text-mainGray text-13">
+              <p className="text-13 text-fg-neutral-muted">
                 {formatDate(data.reviewInfo.createAt) as string}
               </p>
             )}
@@ -66,11 +66,9 @@ function ReviewDetails({
               className="cursor-pointer"
               onClick={() => setIsOptionShow(true)}
             >
-              <Image
-                src="/icon/ellipsis-darkgray.svg"
-                width={17.62}
-                height={17.62}
-                alt="report"
+              <MoreVertical
+                aria-label="리뷰 메뉴"
+                className="h-[18px] w-[18px] text-fg-neutral-muted"
               />
             </button>
           </article>
@@ -79,7 +77,7 @@ function ReviewDetails({
           data.reviewInfo.tastingTagList.length !== 0 && (
             <FlavorTags
               tagList={data.reviewInfo.tastingTagList}
-              styleClass="border-subCoral text-subCoral py-[5px] px-[10px] rounded-md text-12"
+              styleClass="label-default py-[5px] px-[10px] rounded-md text-12"
             />
           )}
 

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 
 import {
   Carousel,
@@ -68,12 +67,12 @@ export const ReviewImageCarousel = ({
         align: 'start',
         loop: true,
       }}
-      className="w-full bg-white"
+      className="w-full bg-bg-layer-default"
     >
       <CarouselContent>
         {images.map((image, index) => (
           <CarouselItem key={image.id}>
-            <div className="aspect-square bg-gray-100 rounded-md overflow-hidden border">
+            <div className="aspect-square overflow-hidden rounded-md border border-stroke-neutral-subtle bg-bg-neutral-weak">
               <BaseImage
                 src={image.src}
                 alt={image.alt}
@@ -89,9 +88,9 @@ export const ReviewImageCarousel = ({
       </CarouselContent>
       {images.length > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-          {images.map((_, index) => (
+          {images.map((image, index) => (
             <div
-              key={index}
+              key={image.id}
               className={`w-2 h-2 rounded-full transition-opacity ${
                 current === index ? 'bg-white' : 'bg-white/50'
               }`}

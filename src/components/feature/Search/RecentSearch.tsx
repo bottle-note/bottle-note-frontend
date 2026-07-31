@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
+import { X } from 'lucide-react';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
-import DeleteIcon from 'public/icon/close-subcoral.svg';
 
 interface Props {
   handleSearch: (keyword: string) => void;
@@ -26,19 +25,23 @@ export default function RecentSearch({ handleSearch, keyValue }: Props) {
   };
 
   return (
-    <section className="bg-white content-container h-full px-5">
-      <h2 className="text-sm font-bold text-subCoral">최근 검색어</h2>
-      <article className="text-xs my-3 border-t border-subCoral">
-        {list.map((text, idx) => (
+    <section className="content-container h-full bg-bg-layer-default px-5 text-fg-neutral">
+      <h2 className="text-sm font-bold text-fg-brand">최근 검색어</h2>
+      <article className="my-3 border-t border-stroke-brand-weak text-xs">
+        {list.map((text) => (
           <article
-            className="flex justify-between items-center py-3 text-subCoral border-b border-subCoral"
-            key={`${text}_${idx}`}
+            className="flex items-center justify-between border-b border-stroke-brand-weak py-3 text-fg-brand"
+            key={text}
           >
             <span className="w-full" onMouseDown={() => handleSearch(text)}>
               {text}
             </span>
-            <button onMouseDown={(e) => handleDeleteOne(e, text)}>
-              <Image src={DeleteIcon} alt="delete" />
+            <button
+              type="button"
+              aria-label={`${text} 검색 기록 삭제`}
+              onMouseDown={(e) => handleDeleteOne(e, text)}
+            >
+              <X aria-hidden className="h-4 w-4" />
             </button>
           </article>
         ))}
@@ -46,12 +49,18 @@ export default function RecentSearch({ handleSearch, keyValue }: Props) {
 
       <article className="flex flex-col items-start gap-2">
         {list.length === 0 && (
-          <span className="text-xs text-mainGray">최근 검색어가 없습니다.</span>
+          <span className="text-xs text-fg-neutral-muted">
+            최근 검색어가 없습니다.
+          </span>
         )}
       </article>
 
       {list.length > 0 && (
-        <button className="text-10 text-mainGray" onMouseDown={handleDeleteAll}>
+        <button
+          type="button"
+          className="text-10 text-fg-neutral-muted"
+          onMouseDown={handleDeleteAll}
+        >
           전체기록삭제
         </button>
       )}
