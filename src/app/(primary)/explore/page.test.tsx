@@ -87,6 +87,10 @@ describe('ExplorePage scroll header', () => {
   it('스크롤 상단에서는 BottleNote 로고 영역을 표시한다', () => {
     render(<ExplorePage />);
 
+    expect(screen.getByTestId('explore-page')).toHaveClass(
+      'bg-bg-layer-default',
+      'text-fg-neutral',
+    );
     expect(screen.getByTestId('explore-page')).toHaveAttribute(
       'data-header-collapsed',
       'false',

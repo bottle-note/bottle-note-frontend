@@ -103,6 +103,7 @@ export default function ExplorePage() {
         data-testid="explore-page"
         data-search-active={isSearchActive}
         data-header-collapsed={isHeaderCollapsed}
+        className="min-h-safe-screen bg-bg-layer-default text-fg-neutral"
         style={
           {
             '--explore-current-header-height': isHeaderCollapsed
@@ -113,7 +114,7 @@ export default function ExplorePage() {
       >
         <div
           data-testid="explore-fixed-header"
-          className="fixed-content top-0 z-10 overflow-hidden bg-white transition-[min-height] duration-150 ease-out motion-reduce:transition-none"
+          className="fixed-content top-0 z-10 overflow-hidden bg-bg-layer-default transition-[min-height] duration-150 ease-out motion-reduce:transition-none"
           style={{ minHeight: 'var(--explore-current-header-height)' }}
         >
           <div

@@ -114,7 +114,7 @@ export const WhiskeyExplorerList = ({
         description="이름이나 플레이버 태그를 입력해 검색해보세요."
         isFilter
       />
-      <div className="border-b border-borderGray" />
+      <div className="border-b border-stroke-neutral-subtle" />
 
       <List
         emptyViewText="조건에 맞는 위스키가 없어요."
@@ -123,7 +123,7 @@ export const WhiskeyExplorerList = ({
         isScrollLoading={isFetchingNextPage}
         isEmpty={isEmpty}
       >
-        <List.Section className="divide-y-[1px]">
+        <List.Section className="divide-y divide-stroke-neutral-subtle">
           {alcoholList &&
             [...alcoholList].map((listData, pageIndex) =>
               listData.data.items

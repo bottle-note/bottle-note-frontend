@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Image from 'next/image';
+import { CircleHelp, ListFilter } from 'lucide-react';
 import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
 import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
 import UnderlineSearchBar from '@/components/feature/Search/UnderlineSearchBar';
@@ -8,8 +8,6 @@ import { CATEGORY_MENUS_LIST } from '@/constants/common';
 import { cn } from '@/lib/utils';
 import { useRegionsQuery } from '@/queries/useRegionsQuery';
 import type { SearchKeyword } from './types';
-import HelpIcon from 'public/icon/help-filled-subcoral.svg';
-import FilterIcon from 'public/icon/filter-subcoral.svg';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
 
 interface BaseProps {
@@ -72,7 +70,7 @@ export const ExploreSearchBar = (props: Props) => {
     <section
       data-testid="explore-search-bar"
       className={cn(
-        'sticky z-[9] -mx-4 bg-white px-4 pt-[5px]',
+        'sticky z-[9] -mx-4 bg-bg-layer-default px-4 pt-[5px] text-fg-neutral',
         shouldShowSearchBar
           ? 'pointer-events-auto translate-y-0 transition-[top,transform] duration-150 ease-out motion-reduce:transition-none'
           : 'pointer-events-none -translate-y-full transition-[top,transform] [transition-duration:120ms] ease-in motion-reduce:transition-none',
@@ -107,9 +105,10 @@ export const ExploreSearchBar = (props: Props) => {
                       <button
                         type="button"
                         aria-label="필터메뉴"
+                        className="rounded-sm text-fg-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
                         onClick={() => setIsOpenSideFilter(true)}
                       >
-                        <Image src={FilterIcon} alt="" />
+                        <ListFilter aria-hidden className="h-5 w-5" />
                       </button>
                     )}
                   </>
@@ -119,8 +118,11 @@ export const ExploreSearchBar = (props: Props) => {
         />
 
         <div className="flex items-start gap-[2px] py-[10px]">
-          <Image src={HelpIcon} alt="help" className="pt-[1px]" />
-          <p className="text-12 text-mainGray whitespace-pre-line">
+          <CircleHelp
+            aria-hidden
+            className="mt-[1px] h-3.5 w-3.5 shrink-0 text-fg-brand"
+          />
+          <p className="whitespace-pre-line text-12 text-fg-neutral-muted">
             {description}
           </p>
         </div>

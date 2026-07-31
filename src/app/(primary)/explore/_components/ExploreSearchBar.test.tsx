@@ -67,6 +67,13 @@ describe('ExploreSearchBar', () => {
     expect(
       screen.getByRole('button', { name: '필터메뉴' }),
     ).toBeInTheDocument();
+    expect(screen.getByTestId('explore-search-bar')).toHaveClass(
+      'bg-bg-layer-default',
+      'text-fg-neutral',
+    );
+    expect(
+      screen.getByText('이름이나 플레이버 태그를 입력해 검색해보세요.'),
+    ).toHaveClass('text-fg-neutral-muted');
 
     fireEvent.change(input, { target: { value: 'macallan' } });
     expect(onValueChange).toHaveBeenCalledWith('macallan');

@@ -51,9 +51,9 @@ export const ReviewExplorerList = ({
         onSearchActiveChange={onSearchActiveChange}
         description={`보고싶은 리뷰의 내용, 플레이버태그, 작성자, 위스키이름을\n 추가하여 검색해보세요.`}
       />
-      <article className="flex gap-x-1 gap-y-1.5 flex-wrap">
+      <article className="flex flex-wrap gap-x-1 gap-y-1.5">
         {keywords.map((keyword) => (
-          <div key={keyword.value} className="overflow-hidden flex-shrink-0">
+          <div key={keyword.value} className="flex-shrink-0 overflow-hidden">
             <ExploreKeywordChip
               keyword={keyword}
               onRemove={handleRemoveKeyword}
@@ -71,7 +71,7 @@ export const ReviewExplorerList = ({
           (!reviewList || reviewList[0]?.data.items.length === 0)
         }
       >
-        <List.Section className="space-y-[30px] divide-y-[1px]">
+        <List.Section className="divide-y divide-stroke-neutral-subtle space-y-[30px]">
           {reviewList &&
             [...reviewList].map((listData, pageIndex) =>
               listData.data.items

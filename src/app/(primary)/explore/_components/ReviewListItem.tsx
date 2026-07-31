@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { Ellipsis, ThumbsUp, UserRound } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 import { LABEL_NAMES } from '@/constants/common';
 import { ExploreReview } from '@/types/Explore';
@@ -33,10 +33,11 @@ const ReviewListItem = ({ content, priority = false }: Props) => {
     content.reviewImages,
     '리뷰 이미지',
   );
+  const reviewTags = [...new Set(content.reviewTags)];
 
   return (
     <>
-      <article className="flex flex-col w-full pt-[30px]">
+      <article className="flex w-full flex-col pt-[30px] text-fg-neutral">
         {/* 유저 정보 */}
         <div className="flex flex-col gap-[9px] mb-5">
           <div className="flex justify-between items-center w-full">
@@ -50,12 +51,13 @@ const ReviewListItem = ({ content, priority = false }: Props) => {
               userNickNameProps={{
                 size: 13,
                 color: 'mainGray',
+                className: 'text-fg-neutral-muted',
               }}
             />
             <Star
               rating={content.reviewRating ?? 0}
               size={21}
-              textStyle="text-20 text-subCoral font-semibold w-7"
+              textStyle="w-7 text-20 font-semibold text-fg-rating"
             />
           </div>
           <div className="flex justify-between items-start w-full gap-2">
@@ -63,22 +65,27 @@ const ReviewListItem = ({ content, priority = false }: Props) => {
               href={ROUTES.SEARCH.ALL(content.alcoholId)}
               className="min-w-0 flex-1"
             >
-              <p className="text-13 text-mainDarkGray break-words">{`${content.alcoholName}  >`}</p>
+              <p className="break-words text-13 text-fg-neutral">{`${content.alcoholName}  >`}</p>
             </Link>
 
             <div className="flex gap-1 flex-shrink-0">
               {content.isBestReview && (
                 <Label
                   name={LABEL_NAMES.BEST}
-                  icon="/icon/thumbup-filled-white.svg"
-                  styleClass="bg-mainCoral text-white px-2 py-[0.1rem] border-mainCoral text-10 rounded"
+                  icon={
+                    <ThumbsUp
+                      aria-hidden
+                      className="h-2.5 w-2.5 fill-current"
+                    />
+                  }
+                  styleClass="rounded border-stroke-brand-solid bg-bg-brand-solid px-2 py-[0.1rem] text-10 text-fg-brand-contrast"
                 />
               )}
               {content.isMyReview && (
                 <Label
                   name={LABEL_NAMES.MY_REVIEW}
-                  icon="/icon/user-outlined-subcoral.svg"
-                  styleClass="border-mainCoral text-mainCoral px-2 py-[0.1rem] text-10 rounded"
+                  icon={<UserRound aria-hidden className="h-2.5 w-2.5" />}
+                  styleClass="rounded border-stroke-brand-solid bg-transparent px-2 py-[0.1rem] text-10 text-fg-brand"
                 />
               )}
             </div>
@@ -90,13 +97,13 @@ const ReviewListItem = ({ content, priority = false }: Props) => {
           <div className="flex flex-col gap-[14px]">
             <ReviewImageCarousel images={productImages} priority={priority} />
             <div
-              className="text-15 text-mainDarkGray whitespace-pre-line break-words"
+              className="whitespace-pre-line break-words text-15 text-fg-neutral"
               dangerouslySetInnerHTML={{
                 __html: content.reviewContent.replace(/\n/g, '<br />'),
               }}
             />
             <div className="flex flex-wrap gap-[6px]">
-              {content.reviewTags.map((tag) => (
+              {reviewTags.map((tag) => (
                 <div key={tag} className="overflow-hidden flex-shrink-0">
                   <Label name={tag} styleClass="label-default text-13" />
                 </div>
@@ -123,7 +130,7 @@ const ReviewListItem = ({ content, priority = false }: Props) => {
                 handleNotLogin={handleLoginModal}
                 size={17}
               />
-              <p className="text-13 text-mainGray">{likeCount}</p>
+              <p className="text-13 text-fg-neutral-muted">{likeCount}</p>
             </div>
             <ReplyButton
               reviewId={content.reviewId}
@@ -134,22 +141,18 @@ const ReviewListItem = ({ content, priority = false }: Props) => {
             />
           </div>
           <div className="flex items-center space-x-1">
-            <p className="text-13 text-mainGray">
+            <p className="text-13 text-fg-neutral-muted">
               {formatDate(content.createAt) as string}
             </p>
             <button
-              className="cursor-pointer"
+              className="cursor-pointer rounded-sm text-fg-neutral-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
+              aria-label="리뷰 메뉴"
               onClick={() => {
                 if (isLoggedIn) setIsReportOptionShow(true);
                 else handleLoginModal();
               }}
             >
-              <Image
-                src="/icon/ellipsis-darkgray.svg"
-                width={17}
-                height={17}
-                alt="report"
-              />
+              <Ellipsis aria-hidden className="h-[17px] w-[17px]" />
             </button>
           </div>
         </div>

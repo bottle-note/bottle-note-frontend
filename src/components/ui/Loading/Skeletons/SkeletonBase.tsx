@@ -27,6 +27,8 @@ const SkeletonBase = ({
       className={className}
       circle={circle}
       borderRadius={borderRadius}
+      baseColor="var(--color-bg-neutral-weak)"
+      highlightColor="var(--color-bg-layer-floating)"
     />
   );
 };

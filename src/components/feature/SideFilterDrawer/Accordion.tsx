@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import CheckedIcon from 'public/icon/check-white.svg';
-import ArrowIcon from 'public/icon/arrow-down-darkgray.svg';
+import { Check, ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface AccordionItemWrapperProps {
   title: string;
   subTitle?: string;
-  toggleIcon?: string;
   forceOpen?: boolean;
 }
 
 const AccordionItemWrapper = ({
   title,
   subTitle,
-  toggleIcon = ArrowIcon,
   forceOpen,
   children,
 }: React.PropsWithChildren<AccordionItemWrapperProps>) => {
@@ -30,32 +27,29 @@ const AccordionItemWrapper = ({
   return (
     <>
       {/* 토글 헤더 */}
-      <div className="px-5 py-3 flex items-center justify-between border-b border-bgGray">
+      <div className="flex items-center justify-between border-b border-stroke-neutral-subtle px-5 py-3">
         <div className="flex items-center space-x-1">
-          <p className="text-12 text-mainDarkGray font-bold">
+          <p className="text-12 font-bold text-fg-neutral">
             {title}
-            <span className="text-mainGray font-normal">{subTitle}</span>
+            <span className="font-normal text-fg-neutral-muted">
+              {subTitle}
+            </span>
           </p>
         </div>
-        <div
-          className="flex items-center cursor-pointer"
+        <button
+          type="button"
+          aria-label={`${title} 필터 ${isOpen ? '접기' : '펼치기'}`}
+          aria-expanded={isOpen}
+          className="flex cursor-pointer items-center rounded-sm text-fg-neutral-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
           onClick={handleOpen}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              handleOpen();
-            }
-          }}
         >
-          <Image
-            className={`transform transition-transform duration-300 ${
+          <ChevronDown
+            aria-hidden
+            className={`h-4 w-4 transform transition-transform duration-300 ${
               isOpen ? 'rotate-180' : 'rotate-0'
             }`}
-            src={toggleIcon}
-            alt="필터 눌러서 열고 닫기"
-            width={16}
-            height={16}
           />
-        </div>
+        </button>
       </div>
 
       {/* 컨텐츠 */}
@@ -69,7 +63,7 @@ const AccordionItemWrapper = ({
             isOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
           }`}
         >
-          <div className="py-3 px-5 bg-sectionWhite">{children}</div>
+          <div className="bg-bg-neutral-weak px-5 py-3">{children}</div>
         </div>
       </div>
     </>
@@ -122,17 +116,20 @@ const AccordionItemContent = ({
   onClick,
 }: AccordionContentProps) => {
   const baseStyles = `
-  text-11 font-semibold min-w-[74px] h-9
-  px-3 rounded
-  flex items-center justify-center
-  transition-all duration-200 ease-in-out
-  ${isSelected ? 'bg-mainCoral text-white' : 'bg-white text-brightGray'}
-`;
+    flex h-9 w-full min-w-[74px] items-center justify-center rounded border px-3
+    text-11 font-semibold transition-all duration-200 ease-in-out
+    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring
+    ${
+      isSelected
+        ? 'border-stroke-brand-solid bg-bg-brand-solid text-fg-brand-contrast'
+        : 'border-stroke-neutral-subtle bg-bg-layer-default text-fg-neutral-muted hover:bg-bg-layer-default-pressed'
+    }
+  `;
 
-  const contentStyles = `
-  flex items-center gap-2
-  ${IconComponent ? 'justify-between w-full' : 'justify-center'}
-`;
+  const contentStyles = cn(
+    'flex items-center gap-2',
+    IconComponent ? 'w-full justify-between' : 'justify-center',
+  );
 
   const renderTitle = () => {
     if (title.includes('/')) {
@@ -150,32 +147,31 @@ const AccordionItemContent = ({
   };
 
   return (
-    <div
+    <button
+      type="button"
       className={baseStyles}
       onClick={() => onClick && onClick(value)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          if (onClick) {
-            onClick(value);
-          }
-        }
-      }}
+      aria-pressed={isSelected}
     >
       <div className={contentStyles}>
         {IconComponent && (
           <div className="flex items-center gap-1">
             {IconComponent && (
-              <IconComponent color={isSelected ? '#FFFFFF' : '#BFBFBF'} />
+              <IconComponent
+                color={
+                  isSelected
+                    ? 'var(--color-fg-brand-contrast)'
+                    : 'var(--color-fg-neutral-muted)'
+                }
+              />
             )}
             {renderTitle()}
           </div>
         )}
         {!IconComponent && renderTitle()}
-        {isSelected && <Image src={CheckedIcon} alt="CheckedIcon" />}
+        {isSelected && <Check aria-hidden className="h-4 w-4" />}
       </div>
-    </div>
+    </button>
   );
 };
 

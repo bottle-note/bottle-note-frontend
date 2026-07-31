@@ -2,6 +2,7 @@ import Link from 'next/link';
 import ProfileImage from '@/components/domain/user/ProfileImage';
 import { ROUTES } from '@/constants/routes';
 import { ThemeColor } from '@/style/theme';
+import { cn } from '@/lib/utils';
 
 export interface UserImageProps {
   imgSrc: string | null;
@@ -16,17 +17,22 @@ export interface UserNickNameProps {
   nickName: string;
   size?: number;
   color?: ThemeColor;
+  className?: string;
 }
 
 export const UserNickName = ({
   nickName,
   size = 13,
   color = 'mainGray',
+  className,
 }: UserNickNameProps) => {
   const textColorClass = `text-${color}`;
 
   return (
-    <p style={{ fontSize: `${size}px` }} className={`${textColorClass}`}>
+    <p
+      style={{ fontSize: `${size}px` }}
+      className={cn(textColorClass, className)}
+    >
       {nickName}
     </p>
   );
