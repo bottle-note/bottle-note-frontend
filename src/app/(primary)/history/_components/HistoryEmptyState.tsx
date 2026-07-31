@@ -20,8 +20,8 @@ export const HistoryEmptyState = ({
   };
 
   return (
-    <section className="w-full mt-3 mb-[26px]">
-      <article className="py-5 w-full border-y border-mainGray/30">
+    <section className="mb-[26px] mt-3 w-full">
+      <article className="w-full border-y border-stroke-neutral-subtle py-5">
         <EmptyView text={getEmptyViewText()} />
       </article>
     </section>

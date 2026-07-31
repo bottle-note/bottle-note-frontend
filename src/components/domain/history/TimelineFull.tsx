@@ -128,46 +128,52 @@ export default function TimelineFull({
         </div>
       </div>
       {data.userHistories.length !== 0 && !error ? (
-        <List
-          isListFirstLoading={false}
-          isScrollLoading={isFetching}
-          isError={!!error}
-        >
-          <List.Section>
-            <article className="relative w-[339px]">
-              <div className="absolute left-[2.67rem] top-6 bottom-0 w-px border-l border-dashed border-subCoral z-0" />
-              <div className="text-10 text-mainGray bg-bgGray rounded-md p-2 mb-5 ml-3 relative z-10">
-                {latestYearMonth?.year || 0}년 {latestYearMonth?.month || 0}
-                월까지 기록된 {currentUserInfo?.nickname || ''}님의
-                활동여정이에요!
-              </div>
-              <div className="relative z-10 pb-3">
-                {processedHistory.yearMonths.map((yearMonth, index) => {
-                  const items = processedHistory.groupedHistory[yearMonth];
-                  return (
-                    <TimelineMonthGroup
-                      key={yearMonth}
-                      yearMonth={yearMonth}
-                      items={items}
-                      isFirstGroup={index === 0}
-                      isLastGroup={
-                        index === processedHistory.yearMonths.length - 1
-                      }
-                    />
-                  );
-                })}
-              </div>
-              {isLastPage && isSubscriptionDateInRange(subscriptionDate) && (
-                <div className="relative z-10 pb-3 mt-5">
-                  <div className="relative pb-5">
-                    <div className="absolute left-0 right-0 h-px bg-bgGray" />
-                  </div>
-                  <TimeLineItem isStart date={subscriptionDate} type="BOTTLE" />
+        <div className="w-full max-w-[399px]">
+          <List
+            isListFirstLoading={false}
+            isScrollLoading={isFetching}
+            isError={!!error}
+          >
+            <List.Section>
+              <article className="relative w-full">
+                <div className="absolute bottom-0 left-11 top-6 z-0 w-px border-l border-dashed border-subCoral" />
+                <div className="text-10 text-mainGray bg-bgGray rounded-md p-2 mb-5 ml-3 relative z-10">
+                  {latestYearMonth?.year || 0}년 {latestYearMonth?.month || 0}
+                  월까지 기록된 {currentUserInfo?.nickname || ''}님의
+                  활동여정이에요!
                 </div>
-              )}
-            </article>
-          </List.Section>
-        </List>
+                <div className="relative z-10 pb-3">
+                  {processedHistory.yearMonths.map((yearMonth, index) => {
+                    const items = processedHistory.groupedHistory[yearMonth];
+                    return (
+                      <TimelineMonthGroup
+                        key={yearMonth}
+                        yearMonth={yearMonth}
+                        items={items}
+                        isFirstGroup={index === 0}
+                        isLastGroup={
+                          index === processedHistory.yearMonths.length - 1
+                        }
+                      />
+                    );
+                  })}
+                </div>
+                {isLastPage && isSubscriptionDateInRange(subscriptionDate) && (
+                  <div className="relative z-10 pb-3 mt-5">
+                    <div className="relative pb-5">
+                      <div className="absolute left-0 right-0 h-px bg-bgGray" />
+                    </div>
+                    <TimeLineItem
+                      isStart
+                      date={subscriptionDate}
+                      type="BOTTLE"
+                    />
+                  </div>
+                )}
+              </article>
+            </List.Section>
+          </List>
+        </div>
       ) : (
         <HistoryEmptyState
           isLoading={isLoading}

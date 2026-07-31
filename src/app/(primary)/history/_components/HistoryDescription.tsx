@@ -21,7 +21,7 @@ export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
     iconAlt: '별점 추가 아이콘',
     renderDescription: ({ rate }) => (
       <div className="flex items-center">
-        <p className="text-12 text-mainGray">
+        <p className="text-12 text-fg-neutral-muted">
           <strong>별점 {rate?.currentValue}점</strong>을 주셨어요.
         </p>
       </div>
@@ -46,7 +46,7 @@ export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
       const ratingValue = isNegative ? ratingDiffStr?.slice(1) : ratingDiffStr;
       return (
         <div className="flex items-center">
-          <p className="text-mainGray text-12 mr-1">
+          <p className="mr-1 text-12 text-fg-neutral-muted">
             <strong>별점 {rate?.currentValue}점</strong>을 주셨어요.
           </p>
           {/* 뭐가 무제인지 모르겠지만 tailwindcss가 적용되지 않는다. 추후 파보기 */}
@@ -69,7 +69,7 @@ export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
     iconAlt: '별점 삭제 아이콘',
     renderDescription: () => (
       <div className="flex items-center">
-        <p className="text-12 text-mainGray">
+        <p className="text-12 text-fg-neutral-muted">
           <strong>별점삭제</strong>를 하셨어요.
         </p>
       </div>
@@ -79,7 +79,7 @@ export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
     getIcon: () => '/icon/history/review_subcoral.svg',
     iconAlt: '리뷰 작성 아이콘',
     renderDescription: ({ description }) => (
-      <p className="text-12 text-mainGray">
+      <p className="text-12 text-fg-neutral-muted">
         <strong>[{description && truncStr(description, 7)}]리뷰를</strong>{' '}
         작성했어요!
       </p>
@@ -90,7 +90,7 @@ export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
     getIcon: () => '/icon/history/like_unfilled_subcoral.svg',
     iconAlt: '리뷰 좋아요 아이콘',
     renderDescription: ({ description }) => (
-      <p className="text-12 text-mainGray">
+      <p className="text-12 text-fg-neutral-muted">
         <strong>
           [{description && truncStr(description, 7)}]리뷰에 좋아요
         </strong>
@@ -103,7 +103,7 @@ export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
     getIcon: () => '/icon/history/review_white.svg',
     iconAlt: '베스트 리뷰 아이콘',
     renderDescription: ({ description }) => (
-      <p className="text-12 text-mainGray">
+      <p className="text-12 text-fg-neutral-muted">
         <strong>
           [{description && truncStr(description, 7)}]베스트 리뷰가 됐어요!
         </strong>
@@ -115,7 +115,7 @@ export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
     getIcon: () => '/icon/history/review_subcoral.svg',
     iconAlt: '리뷰 댓글 작성 아이콘',
     renderDescription: ({ description }) => (
-      <p className="text-12 text-mainGray">
+      <p className="text-12 text-fg-neutral-muted">
         <strong>[{description && truncStr(description, 7)}]리뷰에 댓글</strong>
         을 작성했어요!
       </p>
@@ -126,7 +126,7 @@ export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
     getIcon: () => '/icon/history/pick_unfilled_subcoral.svg',
     iconAlt: '찜해제 아이콘',
     renderDescription: () => (
-      <p className="text-12 text-mainGray">
+      <p className="text-12 text-fg-neutral-muted">
         <strong>찜하기 해제</strong> 하셨어요.
       </p>
     ),
@@ -135,7 +135,7 @@ export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
     getIcon: () => '/icon/history/pick_filled_subcoral.svg',
     iconAlt: '찜하기 아이콘',
     renderDescription: () => (
-      <p className="text-12 text-mainGray">
+      <p className="text-12 text-fg-neutral-muted">
         <strong>찜하기</strong> 하셨어요.
       </p>
     ),

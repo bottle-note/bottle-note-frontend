@@ -23,7 +23,7 @@ export default function TimelineMonthGroup({
         <div className="pl-4 mb-5">
           <Label
             name={yearMonth}
-            styleClass="border-white px-2.5 py-1 rounded-md text-11 bg-bgGray text-subCoral"
+            styleClass="rounded-md border-stroke-neutral-subtle bg-bg-neutral-weak px-2.5 py-1 text-11 text-fg-brand"
           />
         </div>
       )}
@@ -35,7 +35,7 @@ export default function TimelineMonthGroup({
             <React.Fragment key={item.historyId}>
               {showDivider && (
                 <div className="relative py-1">
-                  <div className="absolute left-0 right-0 h-px bg-bgGray" />
+                  <div className="absolute left-0 right-0 h-px bg-stroke-neutral-subtle" />
                 </div>
               )}
               <TimeLineItem

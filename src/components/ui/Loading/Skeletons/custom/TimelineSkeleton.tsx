@@ -10,11 +10,11 @@ export const TimelineSkeleton = ({
   const skeletonItems = Array.from({ length: 5 }, (_, i) => i);
 
   return (
-    <div className="relative w-[339px] mx-auto">
+    <div className="relative mx-auto w-full max-w-[399px]">
       {type === 'mypage' && (
-        <div className="border-t border-mainGray/30 my-3" />
+        <div className="my-3 border-t border-stroke-neutral-subtle" />
       )}
-      <div className="absolute left-[3.1rem] top-6 bottom-0 w-px border-l border-dashed border-mainGray/50 z-0" />
+      <div className="absolute bottom-0 left-11 top-6 z-0 w-px border-l border-dashed border-stroke-neutral-weak" />
 
       <div className="relative z-10 pb-3">
         <div className="pl-2 mb-5">
@@ -27,14 +27,14 @@ export const TimelineSkeleton = ({
 
         <div className="z-10 space-y-5">
           {skeletonItems.map(() => (
-            <div key={uuid()} className="flex items-start space-x-1">
-              <div className="relative">
-                <SkeletonBase width={35} height={24} />
+            <div key={uuid()} className="flex items-start gap-2.5">
+              <div className="relative w-6 shrink-0">
+                <SkeletonBase width={24} height={24} />
               </div>
 
-              <SkeletonBase circle width={24} height={24} />
+              <SkeletonBase circle width={20} height={20} />
 
-              <div className="p-3 rounded-lg bg-gray-50 flex-1">
+              <div className="flex-1 rounded-lg bg-bg-neutral-weak p-3">
                 <div className="flex">
                   <div className="flex-1">
                     <SkeletonBase width="80%" height={16} className="mb-2" />
@@ -48,14 +48,7 @@ export const TimelineSkeleton = ({
         </div>
       </div>
       {type === 'mypage' && (
-        <div
-          className="absolute left-0 right-0 bottom-0 pointer-events-none z-10"
-          style={{
-            height: '200px',
-            background:
-              'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
-          }}
-        />
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-[200px] bg-gradient-to-b from-transparent to-bg-layer-default" />
       )}
     </div>
   );

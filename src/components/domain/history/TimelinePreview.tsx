@@ -79,9 +79,15 @@ export default function TimelinePreview({
 
   return (
     <>
-      <div className="border-t border-mainGray/30 my-3" />
-      <div className="relative w-[339px] mx-auto">
-        <div className="absolute left-[2.7rem] top-6 bottom-0 w-px border-l border-dashed border-subCoral z-0" />
+      <div className="my-3 border-t border-stroke-neutral-subtle" />
+      <div
+        data-testid="timeline-preview"
+        className="relative mx-auto w-full max-w-[399px]"
+      >
+        <div
+          data-testid="timeline-axis"
+          className="absolute bottom-0 left-11 top-6 z-0 w-px border-l border-dashed border-stroke-brand-solid"
+        />
         <div className="relative z-10 pb-3">
           {Object.entries(processedHistory.groupedHistory).map(
             ([yearMonth, items], index) => (
@@ -99,12 +105,8 @@ export default function TimelinePreview({
         </div>
         {showGradient && (
           <div
-            className="absolute left-0 right-0 bottom-0 pointer-events-none z-10"
-            style={{
-              height: gradientHeight,
-              background:
-                'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%)',
-            }}
+            className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-b from-transparent to-bg-layer-default"
+            style={{ height: gradientHeight }}
           />
         )}
       </div>
