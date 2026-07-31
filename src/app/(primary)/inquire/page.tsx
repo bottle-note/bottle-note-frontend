@@ -51,7 +51,7 @@ export default function Inquire() {
   };
 
   return (
-    <div>
+    <div className="min-h-safe-screen bg-bg-layer-default text-fg-neutral">
       <SubHeader>
         <SubHeader.Left
           onClick={() => {

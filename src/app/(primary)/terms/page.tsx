@@ -14,7 +14,7 @@ export default async function TermsPage() {
   const document = await getLegalDocument('terms');
 
   return (
-    <div className="content-container min-h-safe-screen bg-white">
+    <div className="content-container min-h-safe-screen bg-bg-layer-default text-fg-neutral">
       <LegalPageHeader title="이용약관" />
       <LegalDocumentRenderer document={document} />
     </div>

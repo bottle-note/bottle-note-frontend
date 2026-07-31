@@ -14,7 +14,7 @@ export default async function PrivacyPolicyPage() {
   const document = await getLegalDocument('privacy-policy');
 
   return (
-    <div className="content-container min-h-safe-screen bg-white">
+    <div className="content-container min-h-safe-screen bg-bg-layer-default text-fg-neutral">
       <LegalPageHeader title="개인정보 처리방침" />
       <LegalDocumentRenderer document={document} />
     </div>
