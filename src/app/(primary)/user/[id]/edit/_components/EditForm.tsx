@@ -94,10 +94,10 @@ function EditForm({ userId }: Props) {
       <div className="flex flex-col gap-8">
         <div>
           <article className="flex flex-col relative">
-            <label className="text-13 text-mainDarkGray">닉네임</label>
+            <label className="text-13 text-fg-neutral">닉네임</label>
             <input
               placeholder="닉네임 입력"
-              className="border-b border-mainGray py-2 text-15 placeholder:text-[#BFBFBF] bg-transparent outline-none appearance-none rounded-none"
+              className="border-b border-stroke-neutral-subtle py-2 text-15 placeholder:text-fg-placeholder bg-transparent outline-none appearance-none rounded-none"
               value={nickName}
               onChange={(e) => setNickName(e.target.value)}
               type="text"
@@ -123,7 +123,7 @@ function EditForm({ userId }: Props) {
               </button>
             </div>
           </article>
-          <div className="text-right clear-start text-mainGray text-10 mt-1">{`${nickName.length}/20`}</div>
+          <div className="text-right clear-start text-fg-neutral-muted text-10 mt-1">{`${nickName.length}/20`}</div>
         </div>
       </div>
     </>

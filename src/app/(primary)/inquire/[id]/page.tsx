@@ -86,7 +86,7 @@ export default function Inquire() {
 
   return (
     <>
-      <section className="pb-8 relative">
+      <section className="min-h-safe-screen bg-bg-layer-default pb-8 relative text-fg-neutral">
         <SubHeader>
           <SubHeader.Left
             onClick={() => {
@@ -105,21 +105,21 @@ export default function Inquire() {
         {inquireDetails !== null && (
           <>
             <article className="mt-4 mx-5 flex justify-between items-center">
-              <p className="text-13 font-bold text-subCoral">
+              <p className="text-13 font-bold text-fg-brand">
                 {inquireDetails.typeName} 문의
               </p>
-              <p className="text-12 text-mainGray">
+              <p className="text-12 text-fg-neutral-muted">
                 {formatDate(inquireDetails.createAt) as string}
               </p>
             </article>
 
             <article className="mx-5 mt-2 space-y-[18px]">
-              <h3 className="text-16 font-bold text-black">
+              <h3 className="text-16 font-bold text-fg-neutral">
                 {inquireDetails.title}
               </h3>
               <div>
                 <p
-                  className="text-12 text-black whitespace-pre-line"
+                  className="text-12 text-fg-neutral whitespace-pre-line"
                   dangerouslySetInnerHTML={{
                     __html: inquireDetails.content?.replace(/\n/g, '<br />'),
                   }}
@@ -160,19 +160,19 @@ export default function Inquire() {
               )}
             </article>
 
-            <article className="border-t border-b border-bgGray mx-5 my-[26px] py-[26px]">
+            <article className="border-t border-b border-stroke-neutral-subtle mx-5 my-[26px] py-[26px]">
               <div className="flex items-center justify-between">
-                <p className="text-13 text-subCoral font-bold">
+                <p className="text-13 text-fg-brand font-bold">
                   {getStatusText(inquireDetails.status as Status)}
                 </p>
                 {inquireDetails.adminId && inquireDetails.lastModifyAt && (
-                  <p className="text-mainGray text-12">
+                  <p className="text-fg-neutral-muted text-12">
                     {formatDate(inquireDetails.lastModifyAt) as string}
                   </p>
                 )}
               </div>
               {inquireDetails.adminId && (
-                <div className="pt-5 text-12 break-words text-mainDarkGray">
+                <div className="pt-5 text-12 break-words text-fg-neutral">
                   {inquireDetails.responseContent}
                 </div>
               )}

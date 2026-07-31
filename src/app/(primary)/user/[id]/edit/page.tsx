@@ -92,7 +92,7 @@ export default function UserEditPage({
   };
 
   return (
-    <main>
+    <main className="min-h-safe-screen bg-bg-layer-default text-fg-neutral">
       <SubHeader>
         <SubHeader.Left
           onClick={() => {
@@ -134,7 +134,7 @@ export default function UserEditPage({
           className="absolute top-[20%] z-20"
           onClick={() => setIsOptionShow(true)}
         />
-        <div className="bg-white bg-opacity-60 rounded-full z-10 absolute top-[20%]">
+        <div className="bg-bg-layer-floating rounded-full z-10 absolute top-[20%]">
           <ProfileImage
             profileImgSrc={profileImg}
             size={104}

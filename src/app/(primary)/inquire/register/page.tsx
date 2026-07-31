@@ -141,7 +141,7 @@ export default function InquireRegister() {
   return (
     <>
       <FormProvider {...formMethods}>
-        <section className="pb-8 relative">
+        <section className="min-h-safe-screen bg-bg-layer-default pb-8 relative text-fg-neutral">
           <SubHeader>
             <SubHeader.Left
               onClick={() => {
@@ -173,7 +173,7 @@ export default function InquireRegister() {
             <InquireTypeSelector paramsType={paramsType} />
 
             <article className="space-y-[10px]">
-              <label className="block text-12 mb-1 text-mainGray">
+              <label className="block text-12 mb-1 text-fg-neutral-muted">
                 <span className="font-bold">이미지 첨부 </span>
                 <span className="font-light">(선택·최대 5장)</span>
               </label>

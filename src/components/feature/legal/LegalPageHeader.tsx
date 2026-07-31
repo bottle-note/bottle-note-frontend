@@ -12,7 +12,7 @@ export function LegalPageHeader({ title }: LegalPageHeaderProps) {
   const router = useRouter();
 
   return (
-    <header className="sticky top-0 z-10 border-b border-brightGray/40 bg-white">
+    <header className="sticky top-0 z-10 border-b border-stroke-neutral-subtle bg-bg-layer-default">
       <SubHeader>
         <SubHeader.Left onClick={() => router.back()}>
           <Image

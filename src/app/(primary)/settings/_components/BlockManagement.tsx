@@ -67,7 +67,7 @@ export default function BlockManagement() {
 
   return (
     <>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-bg-layer-default text-fg-neutral">
         <div className="px-6 pt-6">
           <List
             emptyViewText="차단된 사용자가 없습니다."
@@ -90,13 +90,13 @@ export default function BlockManagement() {
                     className="py-[14px]"
                   >
                     {index > 0 && (
-                      <div className="border-t border-brightGray -mt-[14px] mb-[14px]" />
+                      <div className="border-t border-stroke-neutral-subtle -mt-[14px] mb-[14px]" />
                     )}
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-[10px]">
                         <ProfileImage size={36} />
-                        <span className="text-13 font-bold text-mainDarkGray">
+                        <span className="text-13 font-bold text-fg-neutral">
                           {user?.userName}
                         </span>
                       </div>
@@ -109,8 +109,8 @@ export default function BlockManagement() {
                         }
                         className={`px-[10px] py-1 border border-subCoral rounded text-12 font-medium transition-colors flex-shrink-0 ${
                           isUnblocking
-                            ? 'bg-subCoral text-white'
-                            : 'text-subCoral'
+                            ? 'bg-bg-brand-solid text-fg-brand-contrast'
+                            : 'text-fg-brand'
                         }`}
                       >
                         {isUnblocking ? '차단하기' : '차단해제'}
@@ -118,7 +118,7 @@ export default function BlockManagement() {
                     </div>
 
                     {isLast && (
-                      <div className="border-t border-brightGray mt-[14px] -mb-[14px]" />
+                      <div className="border-t border-stroke-neutral-subtle mt-[14px] -mb-[14px]" />
                     )}
                   </motion.div>
                 );

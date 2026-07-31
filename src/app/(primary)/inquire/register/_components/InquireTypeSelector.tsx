@@ -14,14 +14,15 @@ export default function InquireTypeSelector({
 }: InquireTypeSelectorProps) {
   const { setValue, watch } = useFormContext<FormValues>();
 
-  const labelBaseStyle = 'border border-subCoral rounded-md text-15 px-3 py-2';
+  const labelBaseStyle =
+    'border border-stroke-brand-solid rounded-md text-15 px-3 py-2';
   const typeList =
     paramsType === 'business' ? BUSINESS_TYPE_LIST : SERVICE_TYPE_LIST;
 
   return (
     <article className="space-y-[10px]">
       <label
-        className="block font-bold text-mainGray text-13 mb-1"
+        className="block font-bold text-fg-neutral-muted text-13 mb-1"
         htmlFor="type"
       >
         문의 유형
@@ -44,8 +45,12 @@ export default function InquireTypeSelector({
                   setValue('type', item.type as string);
                 }
               }}
-              selectedStyle={labelBaseStyle + ' bg-subCoral text-white'}
-              unselectedStyle={labelBaseStyle + ' bg-white text-subCoral'}
+              selectedStyle={
+                labelBaseStyle + ' bg-bg-brand-solid text-fg-brand-contrast'
+              }
+              unselectedStyle={
+                labelBaseStyle + ' bg-bg-layer-default text-fg-brand'
+              }
             />
           );
         })}
