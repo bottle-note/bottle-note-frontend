@@ -63,3 +63,19 @@ describe('CurationV2Api.getFeed', () => {
     expect(mockGet).not.toHaveBeenCalled();
   });
 });
+
+describe('CurationV2Api.getDetail', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockGet.mockResolvedValue(feedResponse);
+  });
+
+  it('v2 큐레이션 상세 경로를 사용한다', async () => {
+    await CurationV2Api.getDetail(12);
+
+    expect(mockGet).toHaveBeenCalledWith('/curations/12', {
+      authRequired: false,
+      baseUrl: 'bottle-api/v2',
+    });
+  });
+});
