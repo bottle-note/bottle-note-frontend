@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
 import List from '@/components/feature/List/List';
@@ -10,7 +10,6 @@ import { Category } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { Alcohol } from '@/api/alcohol/types';
-import { CurationApi } from '@/api/curation/curation.api';
 import { useRegionsQuery } from '@/queries/useRegionsQuery';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import useModalStore from '@/store/modalStore';
@@ -23,6 +22,9 @@ import { SearchHistoryService } from '@/lib/SearchHistoryService';
 import SearchBarLink from '@/components/feature/Search/SearchBarLink';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { useSearchPageState } from '@/app/(primary)/search/hook/useSearchPageState';
+import { useCurationDetailQuery } from '@/queries/useCurationDetailQuery';
+import { TastingEventLineupItem } from '@/app/(primary)/curation/_components/TastingEventLineupItem';
+import { getCurationAlcohols } from '@/app/(primary)/search/_utils/getCurationAlcohols';
 
 const SORT_OPTIONS = [
   { name: '인기도순', type: SORT_TYPE.POPULAR },
@@ -41,16 +43,25 @@ export default function Search() {
   const { regionOptions } = useRegionsQuery();
   const [showTab, setShowTab] = useState(true);
 
-  const curationIdNum = Number(filterState.curationId);
+  const curationId = filterState.curationId;
   const isCurationSearch =
-    !!filterState.curationId && !Number.isNaN(curationIdNum);
+    Boolean(curationId) && !Number.isNaN(Number(curationId));
+  const {
+    data: curation,
+    isLoading: isCurationLoading,
+    isError: isCurationError,
+  } = useCurationDetailQuery(isCurationSearch ? curationId : undefined);
+  const curationAlcohols = useMemo(
+    () => (curation ? getCurationAlcohols(curation) : []),
+    [curation],
+  );
 
   const {
     data: alcoholList,
-    isLoading: isFirstLoading,
-    isFetching,
+    isLoading: isAlcoholListLoading,
+    isFetching: isAlcoholListFetching,
     targetRef,
-    error,
+    error: alcoholListError,
   } = usePaginatedQuery<{
     alcohols: Alcohol[];
     totalCount: number;
@@ -65,44 +76,6 @@ export default function Search() {
       filterState.curationId,
     ],
     queryFn: async ({ pageParam }) => {
-      if (isCurationSearch) {
-        const alcoholsResult = await CurationApi.getAlcoholsByCurationId(
-          curationIdNum,
-          {
-            cursor: pageParam,
-            pageSize: 10,
-          },
-        );
-
-        // CurationAlcoholItem을 Alcohol로 변환
-        const alcohols: Alcohol[] = alcoholsResult.data.items.map(
-          ({
-            korCategoryName,
-            engCategoryName,
-            reviewCount,
-            pickCount,
-            ...rest
-          }) => ({
-            ...rest,
-            korCategory: korCategoryName,
-            engCategory: engCategoryName,
-            popularScore: 0,
-          }),
-        );
-
-        return {
-          data: {
-            alcohols,
-            totalCount: alcoholsResult.data.items.length,
-          },
-          errors: [],
-          success: true,
-          code: 200,
-          meta: alcoholsResult.meta,
-        };
-      }
-
-      // 일반 검색인 경우 기존 API 사용
       return AlcoholsApi.getList({
         ...filterState,
         regionId:
@@ -112,7 +85,18 @@ export default function Search() {
       });
     },
     staleTime: 0,
+    enabled: !isCurationSearch,
   });
+  const isFirstLoading = isCurationSearch
+    ? isCurationLoading
+    : isAlcoholListLoading;
+  const isFetching = isCurationSearch
+    ? isCurationLoading
+    : isAlcoholListFetching;
+  const isError = isCurationSearch ? isCurationError : !!alcoholListError;
+  const totalCount = isCurationSearch
+    ? curationAlcohols.length
+    : alcoholList?.[0]?.data.totalCount ?? 0;
 
   const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
@@ -260,11 +244,9 @@ export default function Search() {
               <List
                 isListFirstLoading={isFirstLoading}
                 isScrollLoading={isFetching}
-                isError={!!error}
+                isError={isError}
               >
-                <List.Total
-                  total={alcoholList ? alcoholList[0].data.totalCount : 0}
-                />
+                <List.Total total={totalCount} />
                 {!isCurationSearch && (
                   <List.SortOrderSwitch
                     type={filterState.sortOrder}
@@ -293,15 +275,31 @@ export default function Search() {
                   />
                 )}
 
-                {alcoholList &&
+                {isCurationSearch ? (
+                  <List.Section className="mt-4 divide-y divide-stroke-neutral-basement border-t border-stroke-neutral-basement">
+                    {curationAlcohols.map((item, index) => (
+                      <TastingEventLineupItem
+                        key={
+                          item.alcohol.alcoholId != null
+                            ? `alcohol-${item.alcohol.alcoholId}`
+                            : `manual-${item.alcohol.korName}-${item.alcohol.engName ?? ''}`
+                        }
+                        item={item}
+                        order={index + 1}
+                      />
+                    ))}
+                  </List.Section>
+                ) : (
+                  alcoholList &&
                   [...alcoholList.map((list) => list.data.alcohols)]
                     .flat()
                     .map((item: Alcohol) => (
                       <List.Item key={item.alcoholId} data={item} />
-                    ))}
+                    ))
+                )}
               </List>
 
-              <div ref={targetRef} />
+              {!isCurationSearch && <div ref={targetRef} />}
             </section>
           )}
 
