@@ -1,19 +1,41 @@
-# Agent Instructions
+# Bottle Note Frontend Agent Guide
 
-## Browser Debugging
+## 1. 프로젝트
 
-- Use the Playwright MCP for browser-based debugging and local UI verification in this workspace.
-- Do not substitute another browser-control tool or standalone browser automation when the Playwright MCP is available.
-- If the flow requires authentication, do not bypass or mock it. Ask the user to sign in, then resume after the user confirms that login is complete.
-- Reuse the authenticated Playwright MCP browser session for subsequent checks.
-- Reproduce issues at the viewport size and document scroll height reported by the user.
-- For infinite-scroll debugging, compare network requests before scrolling with requests made after the sentinel enters the viewport.
+- Bottle Note는 사용자가 주류를 탐색하고 별점·리뷰를 기록하며 다른 사용자와 취향을 공유하는 서비스의 프론트엔드다. 현재 콘텐츠와 화면은 위스키를 중심으로 구성되어 있다.
+- Next.js 14 App Router, React 18, TypeScript, Tailwind CSS를 사용한다. 패키지 매니저는 pnpm이다.
+- 화면은 모바일 우선으로 작성하며 일반 브라우저와 Flutter WebView 양쪽에서 동작해야 한다.
+- 서버 상태는 TanStack Query로 관리한다. Zustand는 여러 화면이 실제로 공유해야 하는 클라이언트 상태에만 사용한다.
+- UI를 수정할 때는 `DESIGN.md`, `tailwind.config.ts`, 인접한 기존 컴포넌트의 토큰과 패턴을 먼저 확인한다.
 
-## Pull Requests
+## 2. 도메인 지식
 
-- Bottle Note 제품 이슈의 원본 저장소는 `bottle-note/workspace`입니다.
-- PR을 열기 전에 `gh issue view <번호> --repo bottle-note/workspace`로 원본 이슈의 제목, 범위, 라벨 및 완료 조건을 확인합니다.
-- 이슈 번호를 모르면 `bottle-note/workspace`에서 현재 사용자에게 할당된 프론트엔드 이슈를 먼저 검색합니다.
-- PR 본문에는 교차 저장소 참조를 사용합니다. 이슈를 종료할 때는 `Closes bottle-note/workspace#<번호>`로 작성합니다.
-- `Closes #<번호>`는 `bottle-note-frontend` 저장소의 이슈로 해석되므로 사용하지 않습니다.
-- 백엔드·기획 등 다른 영역의 의존성이 있는 이슈는 PR 참고사항에 구현 범위와 후속 작업을 구분해 기록합니다.
+- 핵심 도메인은 주류 탐색, 별점, 리뷰, 찜(`pick`), 댓글, 팔로우, 마이보틀, 큐레이션, 테이스팅 이벤트·프로그램이다.
+- 별점은 0.5점 단위이며 0.5점부터 5점까지 기록한다.
+- 리뷰는 공개/비공개 상태를 가지며 병(`BOTTLE`)/잔(`GLASS`) 가격, 장소, 이미지, 테이스팅 태그를 포함할 수 있다.
+- 마이보틀은 사용자의 별점, 리뷰, 찜 기록을 모아 보는 영역이다.
+- 로그인, 이미지 선택, 공유 등은 브라우저와 Flutter WebView의 동작 차이를 고려한다.
+- API 경로, 메서드, 인증 여부, 요청과 응답 스키마는 [Bottle Note Product API OpenAPI 문서](https://bottle-note.github.io/workspace/#product)를 단일 기준으로 삼는다. 기계가 읽을 수 있는 스펙은 `https://bottle-note.github.io/workspace/openapi.product.json`이다. OpenAPI와 기존 코드가 다르면 임의로 맞추거나 필드를 추측하지 말고 차이를 먼저 밝힌다.
+
+## 3. 코드 작성 방식
+
+- 현재 요구사항을 해결하는 가장 작고 직관적인 변경을 우선한다.
+- 미래의 가능성만을 위한 범용화, 레이어 추가, 과도한 추상화와 오버엔지니어링을 하지 않는다.
+- 한 곳에서만 쓰는 로직을 성급하게 훅, 유틸, 스토어 또는 공용 컴포넌트로 분리하지 않는다. 코드가 실제로 반복되고 분리했을 때 더 읽기 쉬운 경우에만 추출한다.
+- 새 구조를 만들기 전에 인접한 코드와 기존 컴포넌트를 재사용한다. 다만 잘못된 레거시 패턴을 그대로 복제하지는 않는다.
+- 데이터 흐름을 숨기는 간접 호출보다 입력, 변환, 출력이 드러나는 코드를 선호한다.
+- 서버 상태를 Zustand에 복제하지 않는다. 파생 가능한 상태를 별도로 저장하지 않는다.
+- API 작업 전 OpenAPI에서 계약을 확인한다. 스펙에 없는 필드, 응답 래퍼, 기본값, 성공·오류 동작을 추측하지 않는다. OpenAPI에 접근할 수 없으면 구현 전에 문서 위치나 계약을 확인한다.
+- 변경과 직접 관련 없는 파일은 수정하지 않는다. 기존 사용자 변경을 덮어쓰지 않는다.
+- Bottle Note 제품 이슈의 원본 저장소는 `bottle-note/workspace`다. PR 전 `gh issue view <번호> --repo bottle-note/workspace`로 제목, 범위, 라벨, 완료 조건을 확인한다. 번호를 모르면 그 저장소에서 현재 사용자에게 할당된 프론트엔드 이슈를 찾는다.
+- 이슈를 종료하는 PR은 `Closes bottle-note/workspace#<번호>`를 사용한다. 다른 영역의 의존성이 있으면 현재 구현 범위와 후속 작업을 PR에 구분해 적는다.
+
+## 4. 테스트 방식
+
+- 테스트 수나 커버리지를 늘리는 것 자체를 목표로 삼지 않는다. 변경 위험에 비례하는 최소 검증만 수행한다.
+- 컴포넌트 구현 세부사항을 확인하는 Jest/React Testing Library 테스트와 API 목킹 중심 테스트를 새로 추가하지 않는다.
+- 사용자가 실제로 수행하는 중요한 도메인 흐름만 Playwright E2E로 검증한다. 예: 로그인, 주류 탐색, 별점·리뷰 작성, 찜, 마이보틀, 큐레이션.
+- 버그 수정은 문제가 발생한 사용자 시나리오와 핵심 회귀 경로만 검증한다.
+- 브라우저 디버깅과 로컬 UI 확인에는 Playwright MCP를 사용한다. 사용할 수 있는데 다른 브라우저 자동화 도구로 대체하지 않는다.
+- 인증이 필요한 흐름은 우회하거나 목킹하지 않는다. 사용자에게 로그인을 요청한 뒤 인증된 Playwright 세션을 재사용한다.
+- 사용자가 제시한 viewport와 문서 스크롤 높이에서 재현한다. 무한 스크롤은 sentinel 진입 전후의 네트워크 요청을 비교한다.
