@@ -44,4 +44,17 @@ effectiveDate: null
       },
     });
   });
+
+  it('개인정보 수집·이용 동의 문서를 불러온다', async () => {
+    await expect(
+      getLegalDocument('privacy-collection-use'),
+    ).resolves.toMatchObject({
+      metadata: {
+        title: '보틀노트 개인정보 수집·이용 동의',
+        version: 'draft-2026-08-02',
+        status: 'draft',
+        effectiveDate: null,
+      },
+    });
+  });
 });
