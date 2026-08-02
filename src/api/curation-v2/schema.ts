@@ -75,6 +75,8 @@ export const programFeedPayloadSchema = z.object({
 });
 
 const programScheduleSchema = programFeedItemSchema.extend({
+  programDate: z.string().nullish(),
+  startTime: z.string().nullish(),
   endTime: z.string().nullish(),
   venue: z.string().nullish(),
   host: z.string().nullish(),
@@ -95,7 +97,7 @@ export const programPayloadSchema = z.object({
   officialUrl: z.string().nullish(),
   registrationUrl: z.string().nullish(),
   programTags: z.array(programTagSchema).optional(),
-  programs: z.array(programScheduleSchema).min(1),
+  programs: z.array(programScheduleSchema),
 });
 
 export type CurationAlcohol = z.infer<typeof curationAlcoholSchema>;

@@ -69,7 +69,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
   return (
     <div
       className={`min-h-safe-screen bg-bg-layer-default text-fg-neutral ${
-        shouldShowCta ? 'pb-28' : 'pb-8'
+        shouldShowCta ? 'pb-[var(--sticky-cta-space)]' : 'pb-8'
       }`}
     >
       <CurationDetailHeader title={event.name} onBack={() => router.back()} />
@@ -181,7 +181,10 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
       )}
 
       {shouldShowCta && (
-        <div className="fixed-content bottom-7 z-20 px-5">
+        <div
+          className="fixed-content z-20 px-5"
+          style={{ bottom: 'var(--navbar-margin-bottom)' }}
+        >
           {canApply ? (
             <a
               href={applicationLink}

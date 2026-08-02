@@ -67,7 +67,7 @@ export function TastingEventLineupItem({
           </div>
 
           {isDetailAvailable && (
-            <div className="shrink-0 pt-0.5">
+            <div className="shrink-0">
               <span className="link-button">상세보기 &gt;</span>
             </div>
           )}
