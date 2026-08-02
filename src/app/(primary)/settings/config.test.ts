@@ -62,6 +62,25 @@ describe('settings menu config', () => {
     );
   });
 
+  it('로그인 상태에서 마케팅 정보 수신 동의 문서로 이동할 수 있다', () => {
+    const categories = createMenuCategories(
+      jest.fn(),
+      jest.fn(),
+      undefined,
+      1,
+      false,
+      true,
+    );
+    const marketingConsentMenu = categories
+      .flatMap((category) => category.items)
+      .find((item) => item.text === '마케팅 정보 수신 동의');
+
+    expect(marketingConsentMenu).toMatchObject({
+      link: '/marketing-consent',
+      action: undefined,
+    });
+  });
+
   it('비로그인 상태의 로그인 관리에는 로그인 항목만 제공한다', () => {
     const handleLogin = jest.fn();
     const configs = createScreenConfigs({

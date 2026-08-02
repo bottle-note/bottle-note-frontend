@@ -46,6 +46,7 @@ export const ROUTES = {
     BASE: '/settings',
   },
   LEGAL: {
+    MARKETING_CONSENT: '/marketing-consent',
     PRIVACY_POLICY: '/privacy-policy',
     TERMS: '/terms',
   },

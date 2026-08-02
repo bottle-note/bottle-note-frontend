@@ -9,6 +9,7 @@ const LEGAL_CONTENT_DIRECTORY = path.join(
 );
 
 const LEGAL_DOCUMENT_FILES = {
+  'marketing-consent': 'marketing-consent.md',
   'privacy-policy': 'privacy-policy.md',
   terms: 'terms.md',
 } as const;
