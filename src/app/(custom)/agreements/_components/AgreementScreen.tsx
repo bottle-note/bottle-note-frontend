@@ -5,23 +5,32 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button/Button';
 import { ROUTES } from '@/constants/routes';
 
+type AgreementRequirement = 'all' | 'optional' | 'required';
+
 interface AgreementCheckboxProps {
   checked: boolean;
-  href: string;
+  href?: string;
   id: string;
-  isRequired: boolean;
   label: string;
   onChange: (checked: boolean) => void;
+  requirement: AgreementRequirement;
 }
 
 function AgreementCheckbox({
   checked,
   href,
   id,
-  isRequired,
   label,
   onChange,
+  requirement,
 }: AgreementCheckboxProps) {
+  const prefix =
+    requirement === 'required'
+      ? '[필수] '
+      : requirement === 'optional'
+        ? '[선택] '
+        : '';
+
   return (
     <div className="flex items-center gap-3 py-4">
       <label
@@ -41,17 +50,23 @@ function AgreementCheckbox({
         >
           {checked ? '✓' : ''}
         </span>
-        <span className="min-w-0 text-14 font-medium text-fg-neutral">
-          {isRequired ? '[필수] ' : '[선택] '}
+        <span
+          className={`min-w-0 text-14 text-fg-neutral ${
+            requirement === 'all' ? 'font-bold' : 'font-medium'
+          }`}
+        >
+          {prefix}
           {label}
         </span>
       </label>
-      <Link
-        className="shrink-0 text-13 font-medium text-fg-brand underline underline-offset-4"
-        href={href}
-      >
-        내용 보기
-      </Link>
+      {href && (
+        <Link
+          className="shrink-0 text-13 font-medium text-fg-brand underline underline-offset-4"
+          href={href}
+        >
+          내용 보기
+        </Link>
+      )}
     </div>
   );
 }
@@ -63,7 +78,15 @@ export function AgreementScreen() {
   const [isMarketingAgreed, setIsMarketingAgreed] = useState(false);
   const [isPreviewSubmitted, setIsPreviewSubmitted] = useState(false);
 
+  const isAllAgreed =
+    isTermsAgreed && isPrivacyCollectionUseAgreed && isMarketingAgreed;
   const canContinue = isTermsAgreed && isPrivacyCollectionUseAgreed;
+
+  const handleAllAgreementChange = (checked: boolean) => {
+    setIsTermsAgreed(checked);
+    setIsPrivacyCollectionUseAgreed(checked);
+    setIsMarketingAgreed(checked);
+  };
 
   return (
     <main className="content-container flex min-h-safe-screen flex-col bg-bg-layer-default px-5 pb-safe-lg pt-safe text-fg-neutral">
@@ -101,35 +124,37 @@ export function AgreementScreen() {
         className="mt-6 divide-y divide-stroke-neutral-subtle border-y border-stroke-neutral-subtle"
       >
         <AgreementCheckbox
+          checked={isAllAgreed}
+          id="agreement-all"
+          label="전체 동의"
+          onChange={handleAllAgreementChange}
+          requirement="all"
+        />
+        <AgreementCheckbox
           checked={isTermsAgreed}
           href={ROUTES.LEGAL.TERMS}
           id="terms"
-          isRequired
           label="이용약관 동의"
           onChange={setIsTermsAgreed}
+          requirement="required"
         />
         <AgreementCheckbox
           checked={isPrivacyCollectionUseAgreed}
           href={ROUTES.LEGAL.PRIVACY_COLLECTION_USE}
           id="privacy-collection-use"
-          isRequired
           label="개인정보 수집·이용 동의"
           onChange={setIsPrivacyCollectionUseAgreed}
+          requirement="required"
         />
         <AgreementCheckbox
           checked={isMarketingAgreed}
           href={ROUTES.LEGAL.MARKETING_CONSENT}
           id="marketing"
-          isRequired={false}
           label="마케팅 정보 수신 동의"
           onChange={setIsMarketingAgreed}
+          requirement="optional"
         />
       </section>
-
-      <p className="mt-4 text-12 leading-5 text-fg-neutral-muted">
-        마케팅 정보 수신 동의는 선택 사항이며, 동의하지 않아도 기본 서비스
-        이용에는 제한이 없습니다.
-      </p>
 
       <div className="mt-auto pt-10">
         <Button
