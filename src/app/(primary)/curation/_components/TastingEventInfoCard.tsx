@@ -86,7 +86,13 @@ export function TastingEventInfoCard({
         </span>
       )}
 
-      <div className={cn('flex h-full flex-col gap-4', label && 'mt-2')}>
+      <div
+        className={cn(
+          'flex h-full flex-col',
+          shouldWrapText ? 'gap-6' : 'gap-4',
+          label && 'mt-2',
+        )}
+      >
         {infoItems.map(({ key, Icon, title, description, action }) => (
           <div key={key} className="flex gap-2.5">
             <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-fg-neutral">
@@ -129,7 +135,7 @@ export function TastingEventInfoCard({
           </div>
         ))}
 
-        <div className="mt-auto flex items-end gap-2">
+        <div className="mt-auto flex items-end justify-between gap-2 border-t border-stroke-neutral-basement pt-4">
           <span
             className={`font-semibold text-fg-neutral ${
               shouldWrapText
@@ -139,7 +145,7 @@ export function TastingEventInfoCard({
           >
             참가비
           </span>
-          <span className="text-[19px] font-bold leading-none text-fg-neutral">
+          <span className="text-right text-[19px] font-bold leading-none text-fg-neutral">
             {tastingEvent.entryFeeLabel}
           </span>
         </div>
