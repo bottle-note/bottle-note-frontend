@@ -1,4 +1,4 @@
-import { parseFrontmatter } from './legalDocuments';
+import { getLegalDocument, parseFrontmatter } from './legalDocuments';
 
 describe('parseFrontmatter', () => {
   it('frontmatter와 Markdown 본문을 분리한다', () => {
@@ -32,5 +32,16 @@ effectiveDate: null
     expect(() => parseFrontmatter('---\ntitle: 문서')).toThrow(
       'Legal document frontmatter is not closed.',
     );
+  });
+
+  it('마케팅 동의 문서를 불러온다', async () => {
+    await expect(getLegalDocument('marketing-consent')).resolves.toMatchObject({
+      metadata: {
+        title: '보틀노트 마케팅 활용 및 광고성 정보 수신 동의',
+        version: 'draft-2026-08-02',
+        status: 'draft',
+        effectiveDate: null,
+      },
+    });
   });
 });
