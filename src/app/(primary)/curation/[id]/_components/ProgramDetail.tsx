@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ChevronRight, ExternalLink } from 'lucide-react';
 import type { ProgramDetailItem } from '@/api/curation-v2/types';
 import BaseImage from '@/components/ui/Display/BaseImage';
 import {
@@ -51,7 +52,7 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
   return (
     <div
       className={`min-h-safe-screen bg-bg-layer-default text-fg-neutral ${
-        registrationUrl ? 'pb-28' : 'pb-8'
+        registrationUrl ? 'pb-[var(--sticky-cta-space)]' : 'pb-8'
       }`}
     >
       <CurationDetailHeader title={program.name} onBack={() => router.back()} />
@@ -92,9 +93,13 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
             href={officialUrl}
             target="_blank"
             rel="noreferrer"
-            className="mt-5 inline-flex h-10 items-center rounded-lg border border-stroke-brand-solid px-4 text-13 font-bold text-fg-brand"
+            className="mt-5 flex w-full items-center justify-between py-2 text-14 font-bold text-fg-brand"
           >
-            공식 페이지 보기
+            <span className="flex items-center gap-2">
+              <ExternalLink size={16} aria-hidden />
+              공식 페이지 보기
+            </span>
+            <ChevronRight size={16} aria-hidden />
           </a>
         )}
       </section>
@@ -155,23 +160,27 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
         </section>
       )}
 
-      <section className="px-5 py-7">
-        <h2 className="text-16 font-extrabold text-fg-neutral">
-          프로그램 일정
-        </h2>
-        <div className="mt-4">
-          {payload.programs.map((item, index) => (
-            <ProgramScheduleItem
-              key={`${item.name}-${item.programDate}-${item.startTime}`}
-              program={item}
-              order={index + 1}
-            />
-          ))}
-        </div>
-      </section>
+      {payload.programs.length > 0 && (
+        <section className="px-5 py-7">
+          <h2 className="text-16 font-extrabold text-fg-neutral">
+            프로그램 및 이벤트 라인업
+          </h2>
+          <div className="mt-4 space-y-4">
+            {payload.programs.map((item, index) => (
+              <ProgramScheduleItem
+                key={`${item.name}-${index}`}
+                program={item}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {registrationUrl && (
-        <div className="fixed-content bottom-7 z-20 px-5">
+        <div
+          className="fixed-content z-20 px-5"
+          style={{ bottom: 'var(--navbar-margin-bottom)' }}
+        >
           <a
             href={registrationUrl}
             target="_blank"
@@ -179,7 +188,7 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
             className="flex h-[52px] w-full items-center justify-center rounded-xl bg-bg-brand-solid active:bg-bg-brand-solid-pressed"
           >
             <span className="text-15 font-bold text-fg-brand-contrast">
-              행사 신청하기
+              행사 참가 신청
             </span>
           </a>
         </div>

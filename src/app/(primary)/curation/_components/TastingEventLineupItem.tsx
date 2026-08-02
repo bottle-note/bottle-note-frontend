@@ -23,7 +23,11 @@ export function TastingEventLineupItem({
   const isDetailAvailable = alcoholId != null;
   const content = (
     <>
-      <div className="absolute left-0 top-6 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-bg-neutral-solid text-10 font-bold text-fg-neutral-inverted">
+      <div
+        className={`absolute left-0 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-bg-neutral-solid text-10 font-bold text-fg-neutral-inverted ${
+          chips.length > 0 ? 'top-6' : 'top-3'
+        }`}
+      >
         {order}
       </div>
 
@@ -34,7 +38,7 @@ export function TastingEventLineupItem({
           className="h-[128px] w-[95px]"
         />
 
-        <div className="flex min-w-0 flex-1 items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-1 items-baseline justify-between gap-3">
           <div className="min-w-0 flex-1 space-y-2">
             <ItemInfo
               korName={alcohol.korName}
@@ -67,15 +71,13 @@ export function TastingEventLineupItem({
           </div>
 
           {isDetailAvailable && (
-            <div className="shrink-0 pt-0.5">
-              <span className="link-button">상세보기 &gt;</span>
-            </div>
+            <span className="link-button shrink-0">상세보기 &gt;</span>
           )}
         </div>
       </div>
 
       {chips.length > 0 && (
-        <div className="mt-5 flex w-full flex-wrap gap-1.5">
+        <div className="mt-2 flex w-full flex-wrap gap-1.5">
           {chips.map((chip) => (
             <span
               key={chip}
@@ -96,7 +98,7 @@ export function TastingEventLineupItem({
   );
 
   return (
-    <article className="relative py-6">
+    <article className={`relative ${chips.length > 0 ? 'py-6' : 'py-3'}`}>
       {isDetailAvailable ? (
         <Link
           href={ROUTES.SEARCH.ALL(alcoholId)}
