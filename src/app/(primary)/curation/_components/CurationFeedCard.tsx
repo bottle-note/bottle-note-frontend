@@ -3,15 +3,17 @@ import type { CurationV2FeedItem } from '@/api/curation-v2/types';
 import BaseImage from '@/components/ui/Display/BaseImage';
 import { ROUTES } from '@/constants/routes';
 
-interface RecommendedCurationFeedCardProps {
+interface CurationFeedCardProps {
   curation: CurationV2FeedItem;
+  badgeLabel: string;
   priority?: boolean;
 }
 
-export function RecommendedCurationFeedCard({
+export function CurationFeedCard({
   curation,
+  badgeLabel,
   priority = false,
-}: RecommendedCurationFeedCardProps) {
+}: CurationFeedCardProps) {
   return (
     <Link href={ROUTES.CURATION.DETAIL(curation.id)} className="block">
       <article className="relative isolate h-[157px] w-full overflow-hidden rounded-lg bg-bg-neutral-weak">
@@ -31,7 +33,7 @@ export function RecommendedCurationFeedCard({
 
         <div className="relative z-10 flex h-full flex-col px-4 pb-4 pt-4">
           <span className="inline-flex w-fit rounded-full bg-white/30 px-2.5 py-1 text-11 font-bold text-white backdrop-blur-sm">
-            큐레이션
+            {badgeLabel}
           </span>
           <h2 className="mt-4 line-clamp-2 text-[22px] font-extrabold leading-[26px] text-white">
             {curation.name}

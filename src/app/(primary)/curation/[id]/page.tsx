@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
   isProgramDetailItem,
-  isRecommendedWhiskyFeedItem,
+  isRecommendedWhiskyDetailItem,
   isTastingEventFeedItem,
+  isWhiskyPairingDetailItem,
 } from '@/api/curation-v2/guards';
 import type {
   RecommendedWhiskyDetailItem,
@@ -28,6 +29,7 @@ import { TastingEventLineupItem } from '@/app/(primary)/curation/_components/Tas
 import { CurationDetailHeader } from '@/app/(primary)/curation/_components/CurationDetailHeader';
 import { parseTastingEventPayload } from '@/app/(primary)/curation/_utils/parseTastingEventPayload';
 import { ProgramDetail } from './_components/ProgramDetail';
+import { WhiskyPairingDetail } from './_components/WhiskyPairingDetail';
 
 function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
   const router = useRouter();
@@ -377,8 +379,12 @@ export default function CurationDetailPage() {
     return <ProgramDetail program={data} />;
   }
 
-  if (isRecommendedWhiskyFeedItem(data)) {
-    return <CurationDetail curation={data as RecommendedWhiskyDetailItem} />;
+  if (isWhiskyPairingDetailItem(data)) {
+    return <WhiskyPairingDetail pairing={data} />;
+  }
+
+  if (isRecommendedWhiskyDetailItem(data)) {
+    return <CurationDetail curation={data} />;
   }
 
   return (

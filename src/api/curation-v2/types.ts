@@ -8,6 +8,7 @@ import type {
   ProgramPayload,
   RecommendedWhiskyPayload,
   TastingEventPayload,
+  WhiskyPairingPayload,
 } from './schema';
 
 export type {
@@ -19,9 +20,12 @@ export type {
   ProgramTag,
   ProgramType,
   ProgramWhisky,
+  PairingFood,
   RecommendedWhiskyPayload,
   TastingEventAlcohol,
   TastingEventPayload,
+  WhiskyPairingItem,
+  WhiskyPairingPayload,
 } from './schema';
 
 export type CurationV2Payload =
@@ -29,6 +33,7 @@ export type CurationV2Payload =
   | ProgramPayload
   | RecommendedWhiskyPayload
   | TastingEventPayload
+  | WhiskyPairingPayload
   | Record<string, unknown>
   | null;
 
@@ -78,10 +83,14 @@ export interface ProgramDetailItem extends CurationV2DetailItem {
   payload: ProgramPayload;
 }
 
-export interface RecommendedWhiskyFeedItem extends CurationV2FeedItem {
+export interface RecommendedWhiskyDetailItem extends CurationV2DetailItem {
   payload: RecommendedWhiskyPayload;
 }
 
-export interface RecommendedWhiskyDetailItem extends CurationV2DetailItem {
-  payload: RecommendedWhiskyPayload;
+export interface WhiskyPairingFeedItem extends CurationV2FeedItem {
+  payload: WhiskyPairingPayload;
+}
+
+export interface WhiskyPairingDetailItem extends CurationV2DetailItem {
+  payload: WhiskyPairingPayload;
 }
