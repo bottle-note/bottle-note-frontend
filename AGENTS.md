@@ -15,7 +15,6 @@
 - 리뷰는 공개/비공개 상태를 가지며 병(`BOTTLE`)/잔(`GLASS`) 가격, 장소, 이미지, 테이스팅 태그를 포함할 수 있다.
 - 마이보틀은 사용자의 별점, 리뷰, 찜 기록을 모아 보는 영역이다.
 - 로그인, 이미지 선택, 공유 등은 브라우저와 Flutter WebView의 동작 차이를 고려한다.
-- API 경로, 메서드, 인증 여부, 요청과 응답 스키마는 [Bottle Note Product API OpenAPI 문서](https://bottle-note.github.io/workspace/#product)를 단일 기준으로 삼는다. 기계가 읽을 수 있는 스펙은 `https://bottle-note.github.io/workspace/openapi.product.json`이다. OpenAPI와 기존 코드가 다르면 임의로 맞추거나 필드를 추측하지 말고 차이를 먼저 밝힌다.
 
 ## 3. 코드 작성 방식
 
@@ -25,7 +24,7 @@
 - 새 구조를 만들기 전에 인접한 코드와 기존 컴포넌트를 재사용한다. 다만 잘못된 레거시 패턴을 그대로 복제하지는 않는다.
 - 데이터 흐름을 숨기는 간접 호출보다 입력, 변환, 출력이 드러나는 코드를 선호한다.
 - 서버 상태를 Zustand에 복제하지 않는다. 파생 가능한 상태를 별도로 저장하지 않는다.
-- API 작업 전 OpenAPI에서 계약을 확인한다. 스펙에 없는 필드, 응답 래퍼, 기본값, 성공·오류 동작을 추측하지 않는다. OpenAPI에 접근할 수 없으면 구현 전에 문서 위치나 계약을 확인한다.
+- API 작업 전 [Bottle Note Product API OpenAPI 문서](https://bottle-note.github.io/workspace/#product)에서 경로, 메서드, 인증 여부와 요청·응답 스키마를 확인한다. 스펙에 없는 필드, 응답 래퍼, 기본값, 성공·오류 동작을 추측하지 않는다.
 - 변경과 직접 관련 없는 파일은 수정하지 않는다. 기존 사용자 변경을 덮어쓰지 않는다.
 - Bottle Note 제품 이슈의 원본 저장소는 `bottle-note/workspace`다. PR 전 `gh issue view <번호> --repo bottle-note/workspace`로 제목, 범위, 라벨, 완료 조건을 확인한다. 번호를 모르면 그 저장소에서 현재 사용자에게 할당된 프론트엔드 이슈를 찾는다.
 - 이슈를 종료하는 PR은 `Closes bottle-note/workspace#<번호>`를 사용한다. 다른 영역의 의존성이 있으면 현재 구현 범위와 후속 작업을 PR에 구분해 적는다.
