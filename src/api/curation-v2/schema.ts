@@ -41,6 +41,18 @@ export const tastingEventPayloadSchema = z.object({
 
 export const recommendedWhiskyPayloadSchema = z.array(curationAlcoholSchema);
 
+export const pairingFoodSchema = z.object({
+  itemName: z.string(),
+  pairingNote: z.string(),
+  itemImageUrl: z.string().optional(),
+});
+
+export const whiskyPairingItemSchema = curationAlcoholSchema.extend({
+  pairings: z.array(pairingFoodSchema).min(1),
+});
+
+export const whiskyPairingPayloadSchema = z.array(whiskyPairingItemSchema);
+
 export const programTypeSchema = z.enum([
   'MASTER_CLASS',
   'TASTING',
@@ -104,6 +116,9 @@ export type CurationAlcohol = z.infer<typeof curationAlcoholSchema>;
 export type RecommendedWhiskyPayload = z.infer<
   typeof recommendedWhiskyPayloadSchema
 >;
+export type PairingFood = z.infer<typeof pairingFoodSchema>;
+export type WhiskyPairingItem = z.infer<typeof whiskyPairingItemSchema>;
+export type WhiskyPairingPayload = z.infer<typeof whiskyPairingPayloadSchema>;
 export type TastingEventAlcohol = CurationAlcohol;
 export type TastingEventPayload = z.infer<typeof tastingEventPayloadSchema>;
 export type ProgramType = z.infer<typeof programTypeSchema>;

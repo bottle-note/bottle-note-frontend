@@ -8,21 +8,26 @@ import { useTab } from '@/hooks/useTab';
 import { useCurationsQuery } from '@/queries/useCurationsQuery';
 import { useProgramsQuery } from '@/queries/useProgramsQuery';
 import { useTastingEventsQuery } from '@/queries/useTastingEventsQuery';
+import { useWhiskyPairingsQuery } from '@/queries/useWhiskyPairingsQuery';
 import UnderlineSearchBar from '@/components/feature/Search/UnderlineSearchBar';
 import Tab from '@/components/ui/Navigation/Tab';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import { CurationFeedCard } from './_components/CurationFeedCard';
 import { ProgramFeedCard } from './_components/ProgramFeedCard';
-import { RecommendedCurationFeedCard } from './_components/RecommendedCurationFeedCard';
 import { TastingEventFeedCard } from './_components/TastingEventFeedCard';
 
 type CurationTabId =
   | typeof CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT
   | typeof CURATION_V2_SPEC_CODES.PROGRAM
+  | typeof CURATION_V2_SPEC_CODES.WHISKY_PAIRING
   | typeof CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY;
 
+// Product가 전용 렌더러를 제공하는 스펙만 고정 노출합니다. 데이터가 없는
+// 스펙도 탭과 빈 상태를 유지하며, 새 스펙은 렌더러와 함께 명시적으로 추가합니다.
 const tabList = [
   { name: '시음회', id: CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT },
   { name: '프로그램', id: CURATION_V2_SPEC_CODES.PROGRAM },
+  { name: '페어링', id: CURATION_V2_SPEC_CODES.WHISKY_PAIRING },
   { name: '큐레이션', id: CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY },
 ] satisfies { name: string; id: CurationTabId }[];
 
@@ -79,7 +84,9 @@ export default function CurationPage() {
   const isTastingEventTab =
     currentTab.id === CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT;
   const isProgramTab = currentTab.id === CURATION_V2_SPEC_CODES.PROGRAM;
-  const isRecommendedTab = !isTastingEventTab && !isProgramTab;
+  const isPairingTab = currentTab.id === CURATION_V2_SPEC_CODES.WHISKY_PAIRING;
+  const isRecommendedTab =
+    currentTab.id === CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY;
   const curationsQuery = useCurationsQuery(
     10,
     trimmedSearchKeyword,
@@ -92,39 +99,103 @@ export default function CurationPage() {
     CURATION_V2_SPEC_CODES.PROGRAM,
     isProgramTab,
   );
+  const pairingsQuery = useWhiskyPairingsQuery(
+    10,
+    trimmedSearchKeyword,
+    CURATION_V2_SPEC_CODES.WHISKY_PAIRING,
+    isPairingTab,
+  );
   const tastingEventsQuery = useTastingEventsQuery(
     10,
     trimmedSearchKeyword,
     CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT,
     isTastingEventTab,
   );
-  const activeQuery = isTastingEventTab
-    ? tastingEventsQuery
-    : isProgramTab
-      ? programsQuery
-      : curationsQuery;
-  const activeData = isTastingEventTab
-    ? tastingEventsQuery.data
-    : isProgramTab
-      ? programsQuery.data
-      : curationsQuery.data;
+
+  const activeTabState = (() => {
+    switch (currentTab.id) {
+      case CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT:
+        return {
+          query: tastingEventsQuery,
+          data: tastingEventsQuery.data,
+          emptyMessage: '진행 중인 시음회가 없어요.',
+          errorMessage: '시음회 정보를 불러오지 못했어요.',
+          skeletonHeight: 'h-[390px]',
+        };
+      case CURATION_V2_SPEC_CODES.PROGRAM:
+        return {
+          query: programsQuery,
+          data: programsQuery.data,
+          emptyMessage: '등록된 프로그램이 없어요.',
+          errorMessage: '프로그램 정보를 불러오지 못했어요.',
+          skeletonHeight: 'h-[248px]',
+        };
+      case CURATION_V2_SPEC_CODES.WHISKY_PAIRING:
+        return {
+          query: pairingsQuery,
+          data: pairingsQuery.data,
+          emptyMessage: '등록된 페어링이 없어요.',
+          errorMessage: '페어링 정보를 불러오지 못했어요.',
+          skeletonHeight: 'h-[157px]',
+        };
+      case CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY:
+        return {
+          query: curationsQuery,
+          data: curationsQuery.data,
+          emptyMessage: '등록된 큐레이션이 없어요.',
+          errorMessage: '큐레이션 정보를 불러오지 못했어요.',
+          skeletonHeight: 'h-[157px]',
+        };
+    }
+  })();
+  const {
+    query: activeQuery,
+    data: activeData,
+    errorMessage,
+    skeletonHeight,
+  } = activeTabState;
   const emptyMessage = trimmedSearchKeyword
     ? '검색 결과가 없어요.'
-    : isTastingEventTab
-      ? '진행 중인 시음회가 없어요.'
-      : isProgramTab
-        ? '등록된 프로그램이 없어요.'
-        : '등록된 큐레이션이 없어요.';
-  const errorMessage = isTastingEventTab
-    ? '시음회 정보를 불러오지 못했어요.'
-    : isProgramTab
-      ? '프로그램 정보를 불러오지 못했어요.'
-      : '큐레이션 정보를 불러오지 못했어요.';
-  const skeletonHeight = isTastingEventTab
-    ? 'h-[390px]'
-    : isProgramTab
-      ? 'h-[248px]'
-      : 'h-[157px]';
+    : activeTabState.emptyMessage;
+
+  const renderFeedItems = () => {
+    switch (currentTab.id) {
+      case CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT:
+        return tastingEventsQuery.data?.map((event, index) => (
+          <TastingEventFeedCard
+            key={event.id}
+            event={event}
+            priority={index === 0}
+          />
+        ));
+      case CURATION_V2_SPEC_CODES.PROGRAM:
+        return programsQuery.data?.map((program, index) => (
+          <ProgramFeedCard
+            key={program.id}
+            program={program}
+            priority={index === 0}
+          />
+        ));
+      case CURATION_V2_SPEC_CODES.WHISKY_PAIRING:
+        return pairingsQuery.data?.map((pairing, index) => (
+          <CurationFeedCard
+            key={pairing.id}
+            curation={pairing}
+            badgeLabel="페어링"
+            priority={index === 0}
+          />
+        ));
+      case CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY:
+        return curationsQuery.data?.map((curation, index) => (
+          <CurationFeedCard
+            key={curation.id}
+            curation={curation}
+            badgeLabel="큐레이션"
+            priority={index === 0}
+          />
+        ));
+    }
+  };
 
   return (
     <>
@@ -216,29 +287,7 @@ export default function CurationPage() {
           activeData &&
           activeData.length > 0 && (
             <div className="space-y-7 px-5 pb-navbar">
-              {isTastingEventTab
-                ? tastingEventsQuery.data?.map((event, index) => (
-                    <TastingEventFeedCard
-                      key={event.id}
-                      event={event}
-                      priority={index === 0}
-                    />
-                  ))
-                : isProgramTab
-                  ? programsQuery.data?.map((program, index) => (
-                      <ProgramFeedCard
-                        key={program.id}
-                        program={program}
-                        priority={index === 0}
-                      />
-                    ))
-                  : curationsQuery.data?.map((curation, index) => (
-                      <RecommendedCurationFeedCard
-                        key={curation.id}
-                        curation={curation}
-                        priority={index === 0}
-                      />
-                    ))}
+              {renderFeedItems()}
               {activeQuery.hasNextPage && (
                 <div ref={activeQuery.targetRef} className="h-1" />
               )}
