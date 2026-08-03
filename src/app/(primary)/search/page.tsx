@@ -13,7 +13,7 @@ import { Alcohol } from '@/api/alcohol/types';
 import { useRegionsQuery } from '@/queries/useRegionsQuery';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import useModalStore from '@/store/modalStore';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useTab } from '@/hooks/useTab';
 import Tab from '@/components/ui/Navigation/Tab';
 import { ROUTES } from '@/constants/routes';
@@ -35,7 +35,7 @@ const SORT_OPTIONS = [
 
 export default function Search() {
   const router = useRouter();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuthSession();
   const { data: featuredList = [], isLoading: isFeaturedLoading } =
     useHomeFeaturedQuery({ type: 'week' });
   const { filterState, handleFilter, isEmptySearch, urlKeyword } =

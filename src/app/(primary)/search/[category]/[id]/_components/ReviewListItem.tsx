@@ -12,7 +12,7 @@ import { truncStr } from '@/utils/truncStr';
 import ReviewListActions from '@/app/(primary)/search/[category]/[id]/_components/ReviewListActions';
 import useModalStore from '@/store/modalStore';
 import useRelationshipsStore from '@/store/relationshipsStore';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import ReviewActionDropdown from '@/components/domain/review/ReviewActionDropdown';
 import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import { useBlockActions } from '@/hooks/useBlockActions';
@@ -24,7 +24,7 @@ interface Props {
 
 function ReviewListItem({ data, onRefresh }: Props) {
   const { id: alcoholId } = useParams();
-  const { user: userData, isLoggedIn } = useAuth();
+  const { user: userData, isLoggedIn } = useAuthSession();
   const { isLikedByMe } = data;
   const { handleLoginModal } = useModalStore();
   const { isUserBlocked } = useRelationshipsStore();

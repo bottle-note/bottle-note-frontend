@@ -3,7 +3,7 @@ import { ExternalLink, MessageCircle } from 'lucide-react';
 import ReviewLikeButton from '@/components/domain/review/ReviewLikeButton';
 import ShareDropdown from '@/components/share/ShareDropdown';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import type { ShareConfig } from '@/types/share';
 
 interface ReviewInteractionBarProps {
@@ -25,7 +25,7 @@ export default function ReviewInteractionBar({
   handleLogin,
   textareaRef,
 }: ReviewInteractionBarProps) {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuthSession();
   const [isShareOpen, setIsShareOpen] = useState(false);
 
   // ShareConfig 생성

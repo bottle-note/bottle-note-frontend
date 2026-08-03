@@ -18,8 +18,8 @@ jest.mock('@/hooks/useScrollState', () => ({
   useScrollState: () => ({ isAtTop: true, isVisible: true }),
 }));
 
-jest.mock('@/hooks/auth/useAuth', () => ({
-  useAuth: () => ({
+jest.mock('@/hooks/auth/useAuthSession', () => ({
+  useAuthSession: () => ({
     isLoggedIn: true,
     user: { userId: 1 },
   }),

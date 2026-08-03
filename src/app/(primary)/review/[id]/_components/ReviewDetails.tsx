@@ -3,7 +3,7 @@ import { MoreVertical } from 'lucide-react';
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { formatDate } from '@/utils/formatDate';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import ReviewActionDropdown from '@/components/domain/review/ReviewActionDropdown';
 import {
   ReviewImageCarousel,
@@ -28,7 +28,7 @@ function ReviewDetails({
   onRefresh,
   textareaRef,
 }: Props) {
-  const { user: userData } = useAuth();
+  const { user: userData } = useAuthSession();
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(data?.reviewInfo?.isLikedByMe);
   const [likeCount, setLikeCount] = useState(data?.reviewInfo?.likeCount);

@@ -1,7 +1,7 @@
 'use client';
 
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useDebouncedToggle } from '@/hooks/useDebouncedToggle';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import SemanticIcon from '@/components/ui/Display/SemanticIcon';
@@ -35,7 +35,7 @@ const AlcoholPickButton = ({
   size = 18,
   fontSize = 'text-12',
 }: Props) => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuthSession();
 
   const { handleToggle } = useDebouncedToggle({
     isToggled: isPicked,

@@ -109,6 +109,7 @@ describe('카카오 로그인 v2 오케스트레이션', () => {
     AuthApi.server.kakaoLogin.mockResolvedValueOnce({
       accessToken: bottleAccessToken,
       refreshToken: 'bottle-refresh-token',
+      agreementRequired: true,
     });
 
     const response = await createLoginResponse({
@@ -125,6 +126,7 @@ describe('카카오 로그인 v2 오케스트레이션', () => {
       accessToken: 'kakao-sdk-access-token',
     });
     expect(body.accessToken).toBe(bottleAccessToken);
+    expect(body.agreementRequired).toBe(true);
     expect(cookies.get('bn_access_token')?.value).toBe(bottleAccessToken);
     expect(cookies.get('bn_refresh_token')?.value).toBe('bottle-refresh-token');
   });
@@ -138,6 +140,7 @@ describe('카카오 로그인 v2 오케스트레이션', () => {
     AuthApi.server.kakaoLogin.mockResolvedValueOnce({
       accessToken: bottleAccessToken,
       refreshToken: 'bottle-refresh-token',
+      agreementRequired: false,
     });
 
     await createLoginResponse({

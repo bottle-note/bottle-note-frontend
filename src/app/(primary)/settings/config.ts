@@ -126,7 +126,7 @@ export const createMenuCategories = (
         },
         {
           text: '마케팅 정보 수신 동의',
-          link: ROUTES.LEGAL.MARKETING_CONSENT,
+          link: ROUTES.SETTINGS.MARKETING_CONSENT,
           action: undefined,
         },
         ...publicItems,

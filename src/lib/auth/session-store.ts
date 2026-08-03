@@ -10,6 +10,11 @@ export interface ClientSession {
   user: UserData;
 }
 
+export interface LoginResult {
+  session: ClientSession;
+  agreementRequired: boolean;
+}
+
 type SessionListener = () => void;
 
 interface SessionSnapshot {
@@ -145,7 +150,9 @@ export const refreshAuthSession = async () => {
   return refreshPromise;
 };
 
-export const loginAuthSession = async (payload: LoginPayload) => {
+export const loginAuthSession = async (
+  payload: LoginPayload,
+): Promise<LoginResult> => {
   const response = await fetch('/api/auth/login', {
     method: 'POST',
     credentials: 'same-origin',
@@ -162,9 +169,20 @@ export const loginAuthSession = async (payload: LoginPayload) => {
     throw new Error(errorBody?.message || 'Login failed');
   }
 
-  const session = (await response.json()) as ClientSession;
+  const { agreementRequired, ...session } =
+    (await response.json()) as ClientSession & {
+      agreementRequired: boolean;
+    };
+
+  if (typeof agreementRequired !== 'boolean') {
+    throw new Error('Invalid login response');
+  }
+
   setAuthenticatedSession(session);
-  return session;
+  return {
+    session,
+    agreementRequired,
+  };
 };
 
 export const logoutAuthSession = async () => {

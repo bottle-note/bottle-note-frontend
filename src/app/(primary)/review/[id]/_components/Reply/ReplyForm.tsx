@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useCallback } from 'react';
 import { useFormContext, FieldValues, SubmitHandler } from 'react-hook-form';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import useModalStore from '@/store/modalStore';
 import { useScrollState } from '@/hooks/useScrollState';
 
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuthSession();
   const { register, watch, handleSubmit, setValue } = useFormContext();
   const content = watch('content') ?? '';
   const mentionName = watch('replyToReplyUserName');

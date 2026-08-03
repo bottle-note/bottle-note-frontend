@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import AlcoholPickButton from './AlcoholPickButton';
 
-jest.mock('@/hooks/auth/useAuth', () => ({
-  useAuth: () => ({ isLoggedIn: true }),
+jest.mock('@/hooks/auth/useAuthSession', () => ({
+  useAuthSession: () => ({ isLoggedIn: true }),
 }));
 
 jest.mock('@/hooks/useDebouncedToggle', () => ({

@@ -38,9 +38,22 @@ effectiveDate: null
     await expect(getLegalDocument('marketing-consent')).resolves.toMatchObject({
       metadata: {
         title: '보틀노트 마케팅 활용 및 광고성 정보 수신 동의',
-        version: 'draft-2026-08-02',
-        status: 'draft',
-        effectiveDate: null,
+        version: '2026-08-03',
+        status: 'published',
+        effectiveDate: '2026-08-04',
+      },
+    });
+  });
+
+  it('개인정보 수집·이용 동의 문서를 불러온다', async () => {
+    await expect(
+      getLegalDocument('privacy-collection-use'),
+    ).resolves.toMatchObject({
+      metadata: {
+        title: '보틀노트 개인정보 수집·이용 동의',
+        version: '2026-08-03',
+        status: 'published',
+        effectiveDate: '2026-08-04',
       },
     });
   });

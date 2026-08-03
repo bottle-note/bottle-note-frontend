@@ -8,7 +8,7 @@ import ProfileImage from '@/components/domain/user/ProfileImage';
 import OptionDropdown from '@/components/ui/Modal/OptionDropdown';
 import { UserApi } from '@/api/user/user.api';
 import useModalStore from '@/store/modalStore';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { uploadImages } from '@/utils/S3Upload';
 import { useWebviewCamera } from '@/hooks/useWebviewCamera';
 import { useWebViewInit } from '@/hooks/useWebViewInit';
@@ -22,7 +22,7 @@ export default function UserEditPage({
 }: {
   params: { id: string };
 }) {
-  const { user: userData } = useAuth();
+  const { user: userData } = useAuthSession();
   const router = useRouter();
   const { isMobile } = useWebViewInit();
   const { handleModalState, handleCloseModal } = useModalStore();

@@ -1,33 +1,26 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
-import { useLogin } from '@/hooks/useLogin';
+import { useSocialLogin } from '@/hooks/useSocialLogin';
 import { ROUTES } from '@/constants/routes';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
-import {
-  setReturnToUrl,
-  getReturnToUrl,
-  isValidReturnUrl,
-} from '@/utils/loginRedirect';
+import { setReturnToUrl, isValidReturnUrl } from '@/utils/loginRedirect';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
 export default function Login() {
   const router = useRouter();
   const [returnToParam] = useStatefulSearchParams<string | null>('returnTo');
-  const {
-    handleSendDeviceInfo,
-    handleInitKakaoSdkLogin,
-    handleKakaoLogin,
-    handleAppleLogin,
-  } = useLogin();
-  const { isLoggedIn, isLoading } = useAuth();
+  const { startKakaoLogin, startAppleLogin, continueAuthenticatedSession } =
+    useSocialLogin();
+  const { isLoggedIn, isLoading } = useAuthSession();
+  const hasCheckedInitialSession = useRef(false);
 
   useEffect(() => {
     if (returnToParam && isValidReturnUrl(returnToParam)) {
@@ -37,17 +30,14 @@ export default function Login() {
 
   // 이미 로그인된 상태면 리다이렉트 (session 로딩 완료 후에만 실행)
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || hasCheckedInitialSession.current) return;
+
+    hasCheckedInitialSession.current = true;
 
     if (isLoggedIn) {
-      // 디바이스 정보 전송 후 리다이렉트
-      (async () => {
-        await handleSendDeviceInfo();
-        router.replace(getReturnToUrl());
-      })();
+      void continueAuthenticatedSession();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleSendDeviceInfo는 isLoggedIn에 의존하므로 별도 추가 불필요
-  }, [isLoggedIn, isLoading, router]);
+  }, [continueAuthenticatedSession, isLoggedIn, isLoading]);
 
   // 인앱 환경에서 초기화
   useEffect(() => {
@@ -55,10 +45,6 @@ export default function Login() {
       handleWebViewMessage('deviceToken');
       DeviceService.setIsInApp(window.isInApp);
     }
-  }, []);
-
-  useEffect(() => {
-    handleInitKakaoSdkLogin();
   }, []);
 
   return (
@@ -96,9 +82,9 @@ export default function Login() {
           </article>
 
           <article className="flex flex-col gap-2 px-4">
-            <SocialLoginBtn type="KAKAO" onClick={handleKakaoLogin} />
+            <SocialLoginBtn type="KAKAO" onClick={startKakaoLogin} />
             {DeviceService.platform === 'ios' && (
-              <SocialLoginBtn type="APPLE" onClick={handleAppleLogin} />
+              <SocialLoginBtn type="APPLE" onClick={startAppleLogin} />
             )}
           </article>
         </section>

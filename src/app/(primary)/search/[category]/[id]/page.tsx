@@ -22,7 +22,7 @@ import StarRating from '@/components/ui/Form/StarRating';
 import EmptyView from '@/components/ui/Display/EmptyView';
 import { truncStr } from '@/utils/truncStr';
 // import { shareOrCopy } from '@/utils/shareOrCopy';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { AlcoholDetailsResponse } from '@/api/alcohol/types';
 import { UserApi } from '@/api/user/user.api';
@@ -50,7 +50,7 @@ interface DetailItem {
 export default function SearchAlcohol() {
   const router = useRouter();
   const params = useParams();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuthSession();
   const { id: alcoholId } = params;
   const { handleModalState } = useModalStore();
   const { bridgeToLogin } = useLoginBridge();

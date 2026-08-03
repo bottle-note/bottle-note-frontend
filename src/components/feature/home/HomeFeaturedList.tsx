@@ -3,7 +3,7 @@
 import React from 'react';
 import { useHomeFeaturedQuery } from '@/queries/useHomeFeaturedQuery';
 import { useCurrentUserQuery } from '@/queries/useCurrentUserQuery';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { LoadingStateSkeleton } from '@/components/ui/Loading/Skeletons/custom/PopularSkeleton';
 import type { HomeFeaturedType } from '@/types/HomeFeatured';
 import { HOME_FEATURED_CONFIG } from '@/constants/home';
@@ -19,7 +19,7 @@ interface Props {
 }
 
 function HomeFeaturedList({ type = 'week' }: Props) {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuthSession();
   const { requiresAuth } = HOME_FEATURED_CONFIG[type];
 
   // 로그인이 필요한 타입인데 로그인하지 않은 경우 쿼리 비활성화

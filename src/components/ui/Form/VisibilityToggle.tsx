@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ReviewApi } from '@/api/review/review.api';
 import useModalStore from '@/store/modalStore';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import Toggle from '@/components/ui/Form/Toggle';
 
 interface Props {
@@ -19,7 +19,7 @@ const VisibilityToggle = ({
   onSuccess,
   textSize,
 }: Props) => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuthSession();
   const { handleModalState } = useModalStore();
   const [isActive, setIsActive] = useState(initialStatus);
 

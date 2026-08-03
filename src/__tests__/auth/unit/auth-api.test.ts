@@ -45,6 +45,7 @@ describe('카카오 v2 로그인 API 계약', () => {
           accessToken: 'bottle-access-token',
           isFirstLogin: false,
           nickname: '테스트사용자',
+          agreementRequired: false,
         },
         refreshToken: 'bottle-refresh-token',
       }),
@@ -66,6 +67,7 @@ describe('카카오 v2 로그인 API 계약', () => {
     expect(tokens).toEqual({
       accessToken: 'bottle-access-token',
       refreshToken: 'bottle-refresh-token',
+      agreementRequired: false,
     });
   });
 
