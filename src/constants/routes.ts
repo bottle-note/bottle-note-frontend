@@ -44,6 +44,7 @@ export const ROUTES = {
   },
   SETTINGS: {
     BASE: '/settings',
+    MARKETING_CONSENT: '/settings/marketing-consent',
   },
   AGREEMENTS: '/agreements',
   LEGAL: {

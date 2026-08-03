@@ -62,7 +62,7 @@ describe('settings menu config', () => {
     );
   });
 
-  it('로그인 상태에서 마케팅 정보 수신 동의 문서로 이동할 수 있다', () => {
+  it('로그인 상태에서 마케팅 정보 수신 동의 관리 화면으로 이동할 수 있다', () => {
     const categories = createMenuCategories(
       jest.fn(),
       jest.fn(),
@@ -76,7 +76,7 @@ describe('settings menu config', () => {
       .find((item) => item.text === '마케팅 정보 수신 동의');
 
     expect(marketingConsentMenu).toMatchObject({
-      link: '/marketing-consent',
+      link: '/settings/marketing-consent',
       action: undefined,
     });
   });
