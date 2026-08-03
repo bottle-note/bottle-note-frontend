@@ -15,6 +15,10 @@ export const ERROR_MESSAGES = {
   TOKEN_EXPIRED: '인증이 만료되었습니다. 다시 로그인해주세요.',
   TOKEN_REFRESH_FAILED: '토큰 갱신에 실패했습니다.',
 
+  // 사용자 동의
+  AGREEMENT_FETCH_FAILED: '동의 상태를 불러오는데 실패했습니다.',
+  AGREEMENT_SUBMIT_FAILED: '동의 처리에 실패했습니다.',
+
   // 위스키
   ALCOHOL_FETCH_FAILED: '위스키 정보를 불러오는데 실패했습니다.',
   ALCOHOL_LIST_FETCH_FAILED: '위스키 목록을 불러오는데 실패했습니다.',
