@@ -10,6 +10,7 @@ export interface Banner {
   descriptionB: string;
   descriptionFontColor: string;
   imageUrl: string;
+  posterUrl: string | null;
   textPosition: BannerTextPosition;
   targetUrl: string;
   isExternalUrl: boolean;
