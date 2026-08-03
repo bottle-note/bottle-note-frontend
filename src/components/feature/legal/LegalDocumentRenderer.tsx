@@ -14,7 +14,7 @@ const markdownStyles = [
   '[&_h2]:pb-2 [&_h2]:text-20 [&_h2]:font-bold [&_h2]:leading-7',
   '[&_h3]:mb-2 [&_h3]:mt-7 [&_h3]:text-16 [&_h3]:font-bold',
   '[&_p]:my-3',
-  '[&_a]:font-medium [&_a]:text-subCoral [&_a]:underline',
+  '[&_a]:font-medium [&_a]:underline',
   '[&_strong]:font-bold [&_strong]:text-fg-neutral',
   '[&_blockquote]:my-5 [&_blockquote]:rounded-md [&_blockquote]:border-l-4',
   '[&_blockquote]:border-stroke-brand-solid [&_blockquote]:bg-bg-neutral-weak',
@@ -45,7 +45,23 @@ export function LegalDocumentRenderer({
   return (
     <article className="px-5 pb-safe-lg pt-8">
       <div className={markdownStyles}>
-        <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          skipHtml
+          components={{
+            a: ({ href, ...props }) => (
+              <a
+                {...props}
+                href={href}
+                className={
+                  href?.startsWith('mailto:')
+                    ? 'text-fg-neutral-muted'
+                    : 'text-subCoral'
+                }
+              />
+            ),
+          }}
+        >
           {content}
         </ReactMarkdown>
       </div>
