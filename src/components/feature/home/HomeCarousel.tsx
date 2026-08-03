@@ -24,15 +24,32 @@ const POSITION_CLASS: Record<BannerTextPosition, string> = {
 
 interface BannerImageProps {
   banner: Banner;
+  isActive: boolean;
   isPriority: boolean;
 }
 
 function BannerImage({
   banner,
+  isActive,
   isPriority,
   onError,
 }: BannerImageProps & { onError?: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [posterSrc, setPosterSrc] = useState(
+    banner.posterUrl || BANNER_VIDEO_POSTER,
+  );
+
+  useEffect(() => {
+    if (
+      banner.mediaType === 'VIDEO' &&
+      isActive &&
+      videoRef.current &&
+      videoRef.current.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
+    ) {
+      setIsLoaded(true);
+    }
+  }, [banner.mediaType, isActive]);
 
   if (banner.mediaType === 'VIDEO') {
     return (
@@ -42,17 +59,32 @@ function BannerImage({
         )}
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <video
-          src={banner.imageUrl}
-          poster={BANNER_VIDEO_POSTER}
-          autoPlay
+          ref={videoRef}
+          src={isActive ? banner.imageUrl : undefined}
+          poster={posterSrc}
+          autoPlay={isActive}
           muted
           loop
           playsInline
-          preload={isPriority ? 'auto' : 'none'}
+          preload={isActive ? 'auto' : 'none'}
           onLoadedData={() => setIsLoaded(true)}
           onError={onError}
           className="absolute inset-0 w-full h-full object-cover"
         />
+        {(!isActive || !isLoaded) && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={posterSrc}
+            alt=""
+            aria-hidden="true"
+            onError={() => {
+              if (posterSrc !== BANNER_VIDEO_POSTER) {
+                setPosterSrc(BANNER_VIDEO_POSTER);
+              }
+            }}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
       </>
     );
   }
@@ -169,6 +201,7 @@ interface HomeCarouselProps {
 
 export default function HomeCarousel({ banners }: HomeCarouselProps) {
   const [api, setApi] = useState<CarouselApi | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [failedBannerIds, setFailedBannerIds] = useState<Set<number>>(
     new Set(),
   );
@@ -189,16 +222,20 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
   );
 
   useEffect(() => {
-    if (!api || failedBannerIds.size === 0) return;
+    if (!api) return;
 
     const onSelect = () => {
       const currentIndex = api.selectedScrollSnap();
       const currentBanner = banners?.[currentIndex];
       if (currentBanner && failedBannerIds.has(currentBanner.id)) {
         api.scrollNext();
+        return;
       }
+
+      setSelectedIndex(currentIndex);
     };
 
+    onSelect();
     api.on('select', onSelect);
     return () => {
       api.off('select', onSelect);
@@ -237,6 +274,7 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
             >
               <BannerImage
                 banner={banner}
+                isActive={index === selectedIndex}
                 isPriority={index === 0}
                 onError={() => handleBannerError(banner.id)}
               />
