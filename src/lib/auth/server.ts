@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { decodeJwt } from 'jose';
 import { AuthApi } from '@/api/auth/auth.api';
-import { TokenData, UserData } from '@/api/auth/types';
+import { LoginTokenData, TokenData, UserData } from '@/api/auth/types';
 import type { KakaoLoginPayload, LoginPayload } from '@/lib/auth/login-payload';
 
 const REFRESH_TOKEN_COOKIE = 'bn_refresh_token';
@@ -100,7 +100,9 @@ const applyRefreshTokenCookie = (
   });
 };
 
-async function loginWithKakao(payload: KakaoLoginPayload): Promise<TokenData> {
+async function loginWithKakao(
+  payload: KakaoLoginPayload,
+): Promise<LoginTokenData> {
   if ('authorizationCode' in payload) {
     const kakaoToken = await AuthApi.server.fetchKakaoToken(
       payload.authorizationCode,
@@ -124,7 +126,7 @@ async function loginWithKakao(payload: KakaoLoginPayload): Promise<TokenData> {
 
 async function loginWithApple(
   payload: Extract<LoginPayload, { provider: 'apple-login' }>,
-): Promise<TokenData> {
+): Promise<LoginTokenData> {
   if (!payload.idToken || !payload.nonce) {
     throw new Error('Apple login payload is invalid');
   }
@@ -136,7 +138,7 @@ async function loginWithApple(
 }
 
 export async function createLoginResponse(payload: LoginPayload) {
-  let tokens: TokenData;
+  let tokens: LoginTokenData;
 
   switch (payload.provider) {
     case 'kakao-login':
@@ -149,7 +151,10 @@ export async function createLoginResponse(payload: LoginPayload) {
       throw new Error('Unsupported auth provider');
   }
 
-  const response = NextResponse.json(createSessionPayload(tokens));
+  const response = NextResponse.json({
+    ...createSessionPayload(tokens),
+    agreementRequired: tokens.agreementRequired,
+  });
   applyRefreshTokenCookie(response, tokens.refreshToken);
   applyAccessTokenCookie(response, tokens.accessToken);
 

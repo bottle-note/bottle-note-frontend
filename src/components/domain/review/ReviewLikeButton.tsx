@@ -2,7 +2,7 @@
 
 import { ThumbsUp } from 'lucide-react';
 import { ReviewApi } from '@/api/review/review.api';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useDebouncedToggle } from '@/hooks/useDebouncedToggle';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 
@@ -31,7 +31,7 @@ const ReviewLikeButton = ({
   likeIconColor = 'subcoral',
   size = 18,
 }: Props) => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuthSession();
 
   const { handleToggle } = useDebouncedToggle({
     isToggled: isLiked,

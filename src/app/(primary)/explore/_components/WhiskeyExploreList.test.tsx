@@ -2,7 +2,7 @@
 import { render, screen } from '@testing-library/react';
 import { ExploreApi } from '@/api/explore/explore.api';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import type { LinkData } from '@/types/LinkButton';
@@ -32,8 +32,8 @@ jest.mock('../_hooks/useWhiskeyExploreSearch', () => ({
   useWhiskeyExploreSearch: jest.fn(),
 }));
 
-jest.mock('@/hooks/auth/useAuth', () => ({
-  useAuth: jest.fn(),
+jest.mock('@/hooks/auth/useAuthSession', () => ({
+  useAuthSession: jest.fn(),
 }));
 
 jest.mock('@/store/modalStore', () => ({
@@ -100,7 +100,7 @@ const mockUsePaginatedQuery = usePaginatedQuery as jest.Mock;
 const mockUseExploreFilters = useExploreFilters as jest.Mock;
 const mockUseWhiskeyExploreSearch = useWhiskeyExploreSearch as jest.Mock;
 const mockGetAlcohols = ExploreApi.getAlcohols as jest.Mock;
-const mockUseAuth = useAuth as jest.Mock;
+const mockUseAuth = useAuthSession as jest.Mock;
 const mockUseModalStore = useModalStore as unknown as jest.Mock;
 
 const mockHandleModalState = jest.fn();

@@ -8,7 +8,7 @@ import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import TimelinePreview from '@/components/domain/history/TimelinePreview';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import useModalStore from '@/store/modalStore';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { HistoryApi } from '@/api/history/history.api';
 import { History } from '@/api/history/types';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
@@ -20,7 +20,7 @@ import HistoryOverview from './_components/HistoryOverview';
 export default function User({ params: { id } }: { params: { id: string } }) {
   const router = useRouter();
   const { handleModalState, handleLoginModal } = useModalStore();
-  const { user: loginUserData, isLoggedIn } = useAuth();
+  const { user: loginUserData, isLoggedIn } = useAuthSession();
   const [userData, setUserData] = useState<UserInfoType | null>(null);
 
   const handleConfirmUser = () => {

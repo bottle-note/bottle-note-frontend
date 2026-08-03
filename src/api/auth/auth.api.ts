@@ -5,7 +5,12 @@ import { ApiError } from '@/utils/ApiError';
 import { extractRefreshToken } from '@/utils/cookieUtils';
 import useModalStore from '@/store/modalStore';
 import { clearAuthSession, refreshAuthSession } from '@/lib/auth/session-store';
-import type { AppleLoginParams, KakaoLoginParams, TokenData } from './types';
+import type {
+  AppleLoginParams,
+  KakaoLoginParams,
+  LoginTokenData,
+  TokenData,
+} from './types';
 
 const getRedirectUrl = () => `${process.env.CLIENT_URL}/oauth/kakao`;
 
@@ -15,7 +20,7 @@ export const AuthApi = {
     /**
      * Apple 로그인을 수행합니다.
      */
-    async appleLogin(body: AppleLoginParams): Promise<TokenData> {
+    async appleLogin(body: AppleLoginParams): Promise<LoginTokenData> {
       const response = await fetch(`${process.env.SERVER_URL_V2}/auth/apple`, {
         method: 'POST',
         body: JSON.stringify(body),
@@ -24,19 +29,36 @@ export const AuthApi = {
         },
       });
 
+      if (!response.ok) {
+        throw new Error(`Apple login failed (status=${response.status})`);
+      }
+
       const refreshToken = extractRefreshToken(response);
       const data = await response.json();
+
+      if (!data?.accessToken) {
+        throw new Error('Bottle Note access token not found');
+      }
+
+      if (!refreshToken) {
+        throw new Error('Bottle Note refresh token not found');
+      }
+
+      if (typeof data.agreementRequired !== 'boolean') {
+        throw new Error('Agreement requirement not found');
+      }
 
       return {
         accessToken: data.accessToken,
         refreshToken,
+        agreementRequired: data.agreementRequired,
       };
     },
 
     /**
      * Kakao 로그인을 수행합니다.
      */
-    async kakaoLogin(body: KakaoLoginParams): Promise<TokenData> {
+    async kakaoLogin(body: KakaoLoginParams): Promise<LoginTokenData> {
       const response = await fetch(`${process.env.SERVER_URL_V2}/auth/kakao`, {
         method: 'POST',
         body: JSON.stringify(body),
@@ -60,9 +82,14 @@ export const AuthApi = {
         throw new Error('Bottle Note refresh token not found');
       }
 
+      if (typeof data.agreementRequired !== 'boolean') {
+        throw new Error('Agreement requirement not found');
+      }
+
       return {
         accessToken: data.accessToken,
         refreshToken,
+        agreementRequired: data.agreementRequired,
       };
     },
 

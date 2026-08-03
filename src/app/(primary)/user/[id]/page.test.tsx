@@ -13,8 +13,8 @@ jest.mock('@/api/user/user.api', () => ({
   },
 }));
 
-jest.mock('@/hooks/auth/useAuth', () => ({
-  useAuth: () => ({ user: null, isLoggedIn: false }),
+jest.mock('@/hooks/auth/useAuthSession', () => ({
+  useAuthSession: () => ({ user: null, isLoggedIn: false }),
 }));
 
 jest.mock('@/store/modalStore', () => ({

@@ -6,7 +6,7 @@ import Star from '@/components/ui/Display/Star';
 import VisibilityToggle from '@/components/ui/Form/VisibilityToggle';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import ProfileImage from '@/components/domain/user/ProfileImage';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { ROUTES } from '@/constants/routes';
 import { LABEL_NAMES } from '@/constants/common';
 
@@ -19,7 +19,7 @@ export default function ReviewUserHeader({
   data,
   onRefresh,
 }: ReviewUserHeaderProps) {
-  const { user: userData } = useAuth();
+  const { user: userData } = useAuthSession();
 
   return (
     <section className="mx-5">

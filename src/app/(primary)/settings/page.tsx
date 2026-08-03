@@ -3,7 +3,7 @@
 import { useMemo, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import useModalStore from '@/store/modalStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { UserApi } from '@/api/user/user.api';
@@ -18,7 +18,7 @@ import { createScreenConfigs, createMenuCategories } from './config';
 
 export default function Settings() {
   const route = useRouter();
-  const { logout, user, isLoggedIn } = useAuth();
+  const { logout, user, isLoggedIn } = useAuthSession();
   const { handleModalState, handleCloseModal } = useModalStore();
   const { currentScreen, setCurrentScreen, resetToMain, clearStorage } =
     useSettingsStore();

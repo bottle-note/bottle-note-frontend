@@ -18,8 +18,8 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn() }),
 }));
 
-jest.mock('@/hooks/auth/useAuth', () => ({
-  useAuth: () => ({ user: null, isLoggedIn: false }),
+jest.mock('@/hooks/auth/useAuthSession', () => ({
+  useAuthSession: () => ({ user: null, isLoggedIn: false }),
 }));
 
 jest.mock('@/store/modalStore', () => ({

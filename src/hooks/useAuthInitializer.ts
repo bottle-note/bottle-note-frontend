@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import useRelationshipsStore from '@/store/relationshipsStore';
 import { BlockApi } from '@/api/block/block.api';
 
 export const useAuthInitializer = () => {
-  const { isLoggedIn, isLoading } = useAuth();
+  const { isLoggedIn, isLoading } = useAuthSession();
   const { setBlocked } = useRelationshipsStore();
 
   useEffect(() => {

@@ -8,7 +8,7 @@ import UserInfoDisplay from '@/components/domain/user/UserInfoDisplay';
 import Star from '@/components/ui/Display/Star';
 import useModalStore from '@/store/modalStore';
 import { formatDate } from '@/utils/formatDate';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import ReviewActionDropdown from '@/components/domain/review/ReviewActionDropdown';
 import {
   ReviewImageCarousel,
@@ -25,7 +25,7 @@ interface Props {
 
 const ReviewListItem = ({ content, priority = false }: Props) => {
   const { handleLoginModal } = useModalStore();
-  const { isLoggedIn, user: userData } = useAuth();
+  const { isLoggedIn, user: userData } = useAuthSession();
   const [isLiked, setIsLiked] = useState(content.isLikedByMe);
   const [likeCount, setLikeCount] = useState(content.likeCount);
   const [isReportOptionShow, setIsReportOptionShow] = useState(false);

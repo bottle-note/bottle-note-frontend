@@ -5,15 +5,15 @@ import {
   sendLogToFlutter,
   checkPlatform,
 } from '@/utils/flutterUtil';
-import { useAppSocialLogin } from './useAppSocialLogin';
+import { useSocialLogin } from './useSocialLogin';
 
 export const useWebViewInit = () => {
   const {
-    onKakaoLoginSuccess,
-    onKakaoLoginError,
-    onAppleLoginSuccess,
-    onAppleLoginError,
-  } = useAppSocialLogin();
+    onKakaoAppLoginSuccess,
+    onKakaoAppLoginError,
+    onAppleAppLoginSuccess,
+    onAppleAppLoginError,
+  } = useSocialLogin();
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -32,10 +32,10 @@ export const useWebViewInit = () => {
     window.getDeviceToken = getDeviceToken;
     window.checkPlatform = checkPlatform;
     window.sendLogToFlutter = sendLogToFlutter;
-    window.onKakaoLoginSuccess = onKakaoLoginSuccess;
-    window.onKakaoLoginError = onKakaoLoginError;
-    window.onAppleLoginSuccess = onAppleLoginSuccess;
-    window.onAppleLoginError = onAppleLoginError;
+    window.onKakaoLoginSuccess = onKakaoAppLoginSuccess;
+    window.onKakaoLoginError = onKakaoAppLoginError;
+    window.onAppleLoginSuccess = onAppleAppLoginSuccess;
+    window.onAppleLoginError = onAppleAppLoginError;
 
     if (isMobile) {
       handleWebViewMessage('checkPlatform');

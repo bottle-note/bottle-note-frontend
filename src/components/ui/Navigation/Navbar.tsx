@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
@@ -29,7 +29,7 @@ function Navbar({
 }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user: userData, isLoggedIn } = useAuth();
+  const { user: userData, isLoggedIn } = useAuthSession();
   const { handleLoginModal } = useModalStore();
   const [isMounted, setIsMounted] = useState(false);
   const [lastTapTime, setLastTapTime] = useState<{ [key: string]: number }>({});

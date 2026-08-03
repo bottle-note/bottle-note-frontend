@@ -21,6 +21,7 @@ const createRequest = (body: unknown) =>
 const createSuccessfulLoginResponse = () =>
   NextResponse.json({
     accessToken: 'bottle-access-token',
+    agreementRequired: false,
     user: {
       sub: 'tester@bottle-note.com',
       userId: 1,

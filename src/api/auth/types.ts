@@ -20,6 +20,10 @@ export interface TokenData {
   refreshToken: string;
 }
 
+export interface LoginTokenData extends TokenData {
+  agreementRequired: boolean;
+}
+
 export interface UserData {
   sub: string;
   roles?: 'ROLE_USER' | 'ROLE_ADMIN';

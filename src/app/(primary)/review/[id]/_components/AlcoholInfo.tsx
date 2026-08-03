@@ -8,7 +8,7 @@ import AlcoholPickButton from '@/components/domain/alcohol/AlcoholPickButton';
 import Label from '@/components/ui/Display/Label';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import type { AlcoholInfo as AlcoholType } from '@/types/Review';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { ROUTES } from '@/constants/routes';
 
 interface Props {
@@ -18,7 +18,7 @@ interface Props {
 
 function AlcoholInfo({ data, handleLogin }: Props) {
   const router = useRouter();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuthSession();
   const { isPicked: originalIsPicked } = data;
   const [isPicked, setIsPicked] = useState<boolean>(originalIsPicked);
 

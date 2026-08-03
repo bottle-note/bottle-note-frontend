@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import Button from '@/components/ui/Button/Button';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import useModalStore from '@/store/modalStore';
 import List from '@/components/feature/List/List';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
@@ -20,7 +20,7 @@ export default function Inquire() {
   const paramsType =
     (searchParams.get('type') as keyof typeof INQUIRE_TYPE) || 'service';
   const serviceType = INQUIRE_TYPE[paramsType] || paramsType;
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuthSession();
   const { handleLoginModal } = useModalStore();
 
   const {

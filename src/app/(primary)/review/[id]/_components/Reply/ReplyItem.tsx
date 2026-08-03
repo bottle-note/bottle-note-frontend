@@ -16,7 +16,7 @@ import ProfileImage from '@/components/domain/user/ProfileImage';
 import { RootReply, SubReply } from '@/types/Reply';
 import useModalStore from '@/store/modalStore';
 import useRelationshipsStore from '@/store/relationshipsStore';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { ROUTES } from '@/constants/routes';
 import { LABEL_NAMES } from '@/constants/common';
 
@@ -40,7 +40,7 @@ const ReplyItem = memo(function ReplyItem({
   onToggleSubReply,
 }: Props) {
   const router = useRouter();
-  const { isLoggedIn, user: userData } = useAuth();
+  const { isLoggedIn, user: userData } = useAuthSession();
   const { setValue } = useFormContext();
   const { handleModalState, handleLoginModal, handleCloseModal } =
     useModalStore();

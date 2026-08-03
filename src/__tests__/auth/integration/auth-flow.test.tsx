@@ -10,7 +10,7 @@ import {
 } from '@testing-library/react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { AuthProvider } from '@/lib/auth/AuthProvider';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { apiClient } from '@/shared/api/apiClient';
 import useModalStore from '@/store/modalStore';
 import {
@@ -19,7 +19,7 @@ import {
   setAuthenticatedSession,
 } from '@/lib/auth/session-store';
 import { useAuthInitializer } from '@/hooks/useAuthInitializer';
-import { useAppSocialLogin } from '@/hooks/useAppSocialLogin';
+import { useSocialLogin } from '@/hooks/useSocialLogin';
 import OauthKakaoCallbackPage from '@/app/(custom)/oauth/kakao/page';
 import LoginPage from '@/app/(custom)/login/page';
 import { DeviceService } from '@/lib/DeviceService';
@@ -47,6 +47,11 @@ const sessionPayload = {
 const refreshedSessionPayload = {
   ...sessionPayload,
   accessToken: 'refreshed-access-token',
+};
+
+const loginResponsePayload = {
+  ...sessionPayload,
+  agreementRequired: false,
 };
 
 const createJsonResponse = (body: unknown, init?: { status?: number }) =>
@@ -147,7 +152,7 @@ describe('Auth business flows', () => {
     it('앱 시작 시 refresh cookie가 유효하면 authenticated 상태가 된다', async () => {
       fetchMock.mockResolvedValueOnce(createJsonResponse(sessionPayload));
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() => useAuthSession(), { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -168,7 +173,7 @@ describe('Auth business flows', () => {
         createJsonResponse({ message: 'No refresh token' }, { status: 401 }),
       );
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() => useAuthSession(), { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -239,12 +244,12 @@ describe('Auth business flows', () => {
 
   describe('login flows', () => {
     it('카카오 앱 로그인 성공 시 authenticated 상태가 된다', async () => {
-      fetchMock.mockResolvedValueOnce(createJsonResponse(sessionPayload));
+      fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
 
-      const { result } = renderHook(() => useAppSocialLogin());
+      const { result } = renderHook(() => useSocialLogin());
 
       await act(async () => {
-        await result.current.onKakaoLoginSuccess('kakao-access-token');
+        await result.current.onKakaoAppLoginSuccess('kakao-access-token');
       });
 
       expect(getAuthSnapshot().status).toBe('authenticated');
@@ -261,20 +266,20 @@ describe('Auth business flows', () => {
     });
 
     it('카카오 앱 로그인 성공 시 returnTo 경로로 이동한다', async () => {
-      fetchMock.mockResolvedValueOnce(createJsonResponse(sessionPayload));
+      fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
       setReturnToUrl('/explore');
 
-      const { result } = renderHook(() => useAppSocialLogin());
+      const { result } = renderHook(() => useSocialLogin());
 
       await act(async () => {
-        await result.current.onKakaoLoginSuccess('kakao-access-token');
+        await result.current.onKakaoAppLoginSuccess('kakao-access-token');
       });
 
       expect(routerReplace).toHaveBeenCalledWith('/explore');
     });
 
     it('카카오 웹 로그인 callback 페이지는 authorizationCode로 로그인 요청을 보낸다', async () => {
-      fetchMock.mockResolvedValueOnce(createJsonResponse(sessionPayload));
+      fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
       (useSearchParams as jest.Mock).mockReturnValue(
         new URLSearchParams('code=oauth-code'),
       );
@@ -299,7 +304,7 @@ describe('Auth business flows', () => {
     });
 
     it('카카오 웹 로그인 성공 시 returnTo 경로로 이동한다', async () => {
-      fetchMock.mockResolvedValueOnce(createJsonResponse(sessionPayload));
+      fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
       (useSearchParams as jest.Mock).mockReturnValue(
         new URLSearchParams('code=oauth-code'),
       );
@@ -313,12 +318,12 @@ describe('Auth business flows', () => {
     });
 
     it('애플 로그인 성공 시 authenticated 상태가 된다', async () => {
-      fetchMock.mockResolvedValueOnce(createJsonResponse(sessionPayload));
+      fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
 
-      const { result } = renderHook(() => useAppSocialLogin());
+      const { result } = renderHook(() => useSocialLogin());
 
       await act(async () => {
-        await result.current.onAppleLoginSuccess(
+        await result.current.onAppleAppLoginSuccess(
           JSON.stringify({
             idToken: 'apple-id-token',
             nonce: 'apple-nonce',
@@ -330,13 +335,13 @@ describe('Auth business flows', () => {
     });
 
     it('애플 로그인 성공 시 returnTo 경로로 이동한다', async () => {
-      fetchMock.mockResolvedValueOnce(createJsonResponse(sessionPayload));
+      fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
       setReturnToUrl('/settings');
 
-      const { result } = renderHook(() => useAppSocialLogin());
+      const { result } = renderHook(() => useSocialLogin());
 
       await act(async () => {
-        await result.current.onAppleLoginSuccess(
+        await result.current.onAppleAppLoginSuccess(
           JSON.stringify({
             idToken: 'apple-id-token',
             nonce: 'apple-nonce',
@@ -352,10 +357,10 @@ describe('Auth business flows', () => {
         createJsonResponse({ message: 'Login failed' }, { status: 400 }),
       );
 
-      const { result } = renderHook(() => useAppSocialLogin());
+      const { result } = renderHook(() => useSocialLogin());
 
       await act(async () => {
-        await result.current.onKakaoLoginSuccess('kakao-access-token');
+        await result.current.onKakaoAppLoginSuccess('kakao-access-token');
       });
 
       expect(getAuthSnapshot().status).not.toBe('authenticated');
@@ -366,10 +371,10 @@ describe('Auth business flows', () => {
         createJsonResponse({ message: 'Login failed' }, { status: 400 }),
       );
 
-      const { result } = renderHook(() => useAppSocialLogin());
+      const { result } = renderHook(() => useSocialLogin());
 
       await act(async () => {
-        await result.current.onKakaoLoginSuccess('kakao-access-token');
+        await result.current.onKakaoAppLoginSuccess('kakao-access-token');
       });
 
       expect(useModalStore.getState().state.mainText).toBe('로그인 실패');
@@ -461,7 +466,7 @@ describe('Auth business flows', () => {
     it('로그아웃 시 refresh cookie 삭제 요청이 수행된다', async () => {
       fetchMock.mockResolvedValueOnce(createJsonResponse(sessionPayload));
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() => useAuthSession(), { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoggedIn).toBe(true);
@@ -483,7 +488,7 @@ describe('Auth business flows', () => {
     it('로그아웃 시 unauthenticated 상태가 된다', async () => {
       fetchMock.mockResolvedValueOnce(createJsonResponse(sessionPayload));
 
-      const { result } = renderHook(() => useAuth(), { wrapper });
+      const { result } = renderHook(() => useAuthSession(), { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoggedIn).toBe(true);

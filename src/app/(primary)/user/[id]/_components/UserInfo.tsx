@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { ROUTES } from '@/constants/routes';
 import ProfileImage from '@/components/domain/user/ProfileImage';
 import { FollowButton } from './FollowButton';
@@ -24,7 +24,7 @@ const UserInfo = ({
   currentId,
   nickName,
 }: Props) => {
-  const { user: userData } = useAuth();
+  const { user: userData } = useAuthSession();
   const [isMyProfile, setIsMyProfile] = useState(false);
   const router = useRouter();
 

@@ -1,13 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/auth/useAuth';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 
 export const useNavigateReviewWrite = () => {
   const router = useRouter();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuthSession();
   const { handleLoginModal } = useModalStore();
 
   const handleReviewWrite = (alcoholId: string | number) => {
