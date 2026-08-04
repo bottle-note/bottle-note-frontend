@@ -1,8 +1,13 @@
-import React from 'react';
+'use client';
+
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
+import { ChevronDown, X } from 'lucide-react';
+import { Drawer } from 'vaul';
 import { AlcoholInfo as AlcoholType } from '@/types/Alcohol';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import Label from '@/components/ui/Display/Label';
+import BottomSheet from '@/components/ui/Modal/BottomSheet';
 
 interface AlcoholInfoProps {
   data?: AlcoholType;
@@ -121,11 +126,11 @@ function AlcoholBasicInfo({
         name={korCategory}
         styleClass={`border-white px-2 py-[0.15rem] rounded-md text-10 ${isEmpty ? 'opacity-60' : ''}`}
       />
-      <h1 className="text-16 font-bold whitespace-normal break-words">
+      <h1 className="text-[18px] font-bold leading-[22px] whitespace-normal break-words">
         {korName}
       </h1>
       <p
-        className={`text-12 whitespace-normal break-words ${isEmpty ? 'opacity-80' : ''}`}
+        className={`text-13 whitespace-normal break-words ${isEmpty ? 'opacity-80' : ''}`}
       >
         {isEmpty ? engName : engName?.toUpperCase()}
       </p>
@@ -150,8 +155,10 @@ function AlcoholDetailList({ details, isEmpty }: AlcoholDetailListProps) {
           key={item.title}
           className={`flex items-start gap-2 text-white ${isEmpty ? 'opacity-60' : ''}`}
         >
-          <div className="w-[52px] text-13 font-semibold">{item.title}</div>
-          <div className="flex-1 text-12 font-light">{item.content || '-'}</div>
+          <div className="w-[60px] shrink-0 whitespace-nowrap text-14 font-semibold">
+            {item.title}
+          </div>
+          <div className="flex-1 text-13 font-light">{item.content || '-'}</div>
         </div>
       ))}
     </div>
@@ -167,19 +174,110 @@ interface AlcoholTastingTagsProps {
 }
 
 function AlcoholTastingTags({ tags }: AlcoholTastingTagsProps) {
-  if (tags.length === 0) return null;
+  const uniqueTags = useMemo(() => [...new Set(tags)], [tags]);
+  const tagListRef = useRef<HTMLUListElement>(null);
+  const [visibleTagCount, setVisibleTagCount] = useState(uniqueTags.length);
+  const [isTagDrawerOpen, setIsTagDrawerOpen] = useState(false);
+
+  useLayoutEffect(() => {
+    const tagList = tagListRef.current;
+
+    if (!tagList) return undefined;
+
+    const measureVisibleTags = () => {
+      const tagElements = Array.from(tagList.children) as HTMLElement[];
+
+      if (tagElements.length === 0) {
+        setVisibleTagCount(0);
+        return;
+      }
+
+      const firstLineTop = tagElements[0].offsetTop;
+      const firstHiddenIndex = tagElements.findIndex(
+        (element) => element.offsetTop > firstLineTop,
+      );
+
+      setVisibleTagCount(
+        firstHiddenIndex === -1 ? tagElements.length : firstHiddenIndex,
+      );
+    };
+
+    measureVisibleTags();
+
+    if (typeof ResizeObserver === 'undefined') return undefined;
+
+    const resizeObserver = new ResizeObserver(measureVisibleTags);
+    resizeObserver.observe(tagList);
+
+    return () => resizeObserver.disconnect();
+  }, [uniqueTags]);
+
+  if (uniqueTags.length === 0) return null;
+
+  const hiddenTagCount = uniqueTags.length - visibleTagCount;
 
   return (
     <div className="mt-[10px]">
-      <div className="flex flex-wrap gap-[6px]">
-        {tags.map((tag: string) => (
-          <Label
+      <ul
+        ref={tagListRef}
+        className="flex h-7 flex-wrap gap-[6px] overflow-hidden"
+      >
+        {uniqueTags.map((tag: string, index) => (
+          <li
             key={tag}
-            name={tag}
-            styleClass="border-white px-[10px] py-[5px] rounded-md text-12 text-white"
-          />
+            aria-hidden={index >= visibleTagCount}
+            className="flex h-7 shrink-0 items-center rounded-md border border-white px-[10px] text-12 text-white"
+          >
+            {tag}
+          </li>
         ))}
-      </div>
+      </ul>
+
+      {hiddenTagCount > 0 && (
+        <div className="mt-1 flex justify-end">
+          <button
+            type="button"
+            aria-expanded={isTagDrawerOpen}
+            aria-haspopup="dialog"
+            onClick={() => setIsTagDrawerOpen(true)}
+            className="flex h-7 items-center gap-1 px-1 text-12 font-medium text-white underline underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          >
+            {hiddenTagCount}개 태그 더보기
+            <ChevronDown aria-hidden className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      <BottomSheet
+        isOpen={isTagDrawerOpen}
+        onClose={() => setIsTagDrawerOpen(false)}
+        height={40}
+      >
+        <Drawer.Title className="px-5 pt-4 text-center text-20 font-bold">
+          테이스팅 태그 {uniqueTags.length}개
+        </Drawer.Title>
+        <Drawer.Description className="sr-only">
+          이 위스키의 테이스팅 태그 전체 목록입니다.
+        </Drawer.Description>
+        <button
+          type="button"
+          aria-label="테이스팅 태그 닫기"
+          onClick={() => setIsTagDrawerOpen(false)}
+          className="absolute right-4 top-9 flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stroke-focus-ring"
+        >
+          <X aria-hidden className="h-6 w-6" />
+        </button>
+        <ul className="flex flex-wrap gap-2 overflow-y-auto px-5 pb-safe pt-6">
+          {uniqueTags.map((tag) => (
+            <li
+              key={tag}
+              className="flex h-9 items-center rounded-md border border-stroke-neutral-contrast px-3 text-12 text-fg-neutral"
+            >
+              {tag}
+            </li>
+          ))}
+        </ul>
+      </BottomSheet>
     </div>
   );
 }

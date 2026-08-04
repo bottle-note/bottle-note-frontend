@@ -15,7 +15,7 @@ export default function ImagesForm() {
   }, []);
 
   const ImageCounter = imageCount.current > 0 && (
-    <span className="text-12 font-medium text-fg-brand">
+    <span className="text-13 font-medium text-fg-brand">
       {imageCount.current} / {imageCount.max}
     </span>
   );

@@ -45,9 +45,9 @@ export default function OptionsContainer({
       >
         <div className="flex items-center space-x-1">
           <Image src={iconSrc} alt={iconAlt} width={20} height={20} />
-          <p className="text-14 font-bold text-fg-neutral">
+          <p className="text-15 font-bold text-fg-neutral">
             {title}{' '}
-            <span className="font-normal text-fg-neutral-muted">
+            <span className="text-13 font-normal text-fg-neutral-muted">
               {subTitle}
             </span>
           </p>

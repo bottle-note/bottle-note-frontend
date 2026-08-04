@@ -77,7 +77,7 @@ export default function ContentForm() {
         maxLength={700}
       />
       <div className="flex justify-between items-center mt-1">
-        <p className="text-12 text-fg-neutral-subtle">{review.length}/700</p>
+        <p className="text-13 text-fg-neutral-subtle">{review.length}/700</p>
         <button
           type="button"
           onClick={handleExtractTags}
