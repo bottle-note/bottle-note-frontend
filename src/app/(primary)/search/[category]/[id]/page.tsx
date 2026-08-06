@@ -319,7 +319,7 @@ export default function SearchAlcohol() {
                           <div className="h-14 w-14 overflow-hidden rounded-full border border-stroke-neutral-basement">
                             <Image
                               className="object-cover"
-                              src={user.user_image_url || ProfileDefaultImg}
+                              src={user.userImageUrl ?? ProfileDefaultImg}
                               alt="user_img"
                               width={59}
                               height={59}

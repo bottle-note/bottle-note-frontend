@@ -85,7 +85,7 @@ export interface AlcoholInfo {
 export interface FriendsInfo {
   followerCount: number;
   friends: {
-    user_image_url: string;
+    userImageUrl: string | null;
     userId: number;
     nickName: string;
     rating: number;
