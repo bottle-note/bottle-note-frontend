@@ -122,12 +122,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${BASE_URL}/announcement`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.3,
-    },
-    {
       url: `${BASE_URL}/privacy-policy`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
