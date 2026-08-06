@@ -6,6 +6,8 @@ import { TimelineSkeleton } from '@/components/ui/Loading/Skeletons/custom/Timel
 import { HistoryEmptyState } from '@/app/(primary)/history/_components/HistoryEmptyState';
 import TimelineMonthGroup from '@/components/domain/history/TimelineMonthGroup';
 
+const EMPTY_HISTORY_LIST: HistoryType[] = [];
+
 export interface TimelinePreviewProps {
   data?: ApiResponse<{
     userHistories: HistoryType[];
@@ -38,7 +40,8 @@ export default function TimelinePreview({
     return data[0].data;
   }, [data]);
 
-  const historyList: HistoryType[] = historyData?.userHistories || [];
+  const historyList: HistoryType[] =
+    historyData?.userHistories ?? EMPTY_HISTORY_LIST;
   const totalCount = historyData?.totalCount || 0;
 
   let gradientHeight = '0px';

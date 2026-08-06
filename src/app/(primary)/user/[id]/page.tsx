@@ -57,7 +57,7 @@ export default function User({ params: { id } }: { params: { id: string } }) {
         pageSize: 10,
       });
     },
-    enabled: !!id,
+    enabled: Boolean(id) && isLoggedIn,
   });
 
   useEffect(() => {
