@@ -110,11 +110,6 @@ export const createMenuCategories = (
       title: '기타',
       items: [
         {
-          text: '공지사항',
-          link: `${process.env.NEXT_PUBLIC_BOTTLE_NOTE_NOTION_URL}board?pvs=4`,
-          action: undefined,
-        },
-        {
           text: '개인정보 처리방침',
           link: ROUTES.LEGAL.PRIVACY_POLICY,
           action: undefined,

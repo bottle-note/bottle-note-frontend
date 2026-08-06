@@ -60,6 +60,7 @@ describe('settings menu config', () => {
         '로그인 관리',
       ]),
     );
+    expect(menuTexts).not.toContain('공지사항');
   });
 
   it('로그인 상태에서 마케팅 정보 수신 동의 관리 화면으로 이동할 수 있다', () => {

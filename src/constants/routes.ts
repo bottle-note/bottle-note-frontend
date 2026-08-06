@@ -53,10 +53,6 @@ export const ROUTES = {
     PRIVACY_POLICY: '/privacy-policy',
     TERMS: '/terms',
   },
-  ANNOUNCEMENT: {
-    BASE: '/announcement',
-    DETAIL: (id: string | number) => `/announcement/${id}`,
-  },
   INQUIRE: {
     BASE: '/inquire',
     REGISTER: '/inquire/register',
