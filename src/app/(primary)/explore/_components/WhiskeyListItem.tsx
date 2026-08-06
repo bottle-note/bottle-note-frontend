@@ -21,13 +21,13 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
   const tastingTags = [...new Set(content.alcoholsTastingTags ?? [])];
 
   return (
-    <section className="flex w-full items-center overflow-hidden py-6 text-fg-neutral">
+    <section className="flex w-full items-center overflow-hidden py-6 text-fg-neutral gap-3">
       {/* image */}
       <Link href={ROUTES.SEARCH.ALL(content.alcoholId)} className="shrink-0">
         <ItemImage
           src={content.alcoholUrlImg}
           alt="image"
-          className="w-[95px] h-[128px]"
+          className="w-[95px] h-[128px] bg-white rounded-sm"
           priority={priority}
         />
       </Link>
