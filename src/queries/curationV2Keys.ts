@@ -9,7 +9,7 @@ export const curationV2Keys = {
   }: {
     pageSize: number;
     keyword?: string;
-    code: CurationV2SpecCode;
+    code: CurationV2SpecCode | readonly CurationV2SpecCode[];
   }) => [...curationV2Keys.all, 'feed', { pageSize, keyword, code }] as const,
   curations: (
     pageSize: number,

@@ -42,13 +42,13 @@ describe('CurationV2Api.getFeed', () => {
       cursor: 0,
       pageSize: 10,
       code: [
-        CURATION_V2_SPEC_CODES.PROGRAM,
-        CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT,
+        CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY,
+        CURATION_V2_SPEC_CODES.WHISKY_PAIRING,
       ],
     });
 
     expect(mockGet).toHaveBeenCalledWith(
-      '/curations/feed?cursor=0&size=10&code=PROGRAM&code=WHISKY_TASTING_EVENT',
+      '/curations/feed?cursor=0&size=10&code=RECOMMENDED_WHISKY&code=WHISKY_PAIRING',
       { authRequired: false, baseUrl: 'bottle-api/v2' },
     );
   });
