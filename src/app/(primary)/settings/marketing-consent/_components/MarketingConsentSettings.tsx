@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AgreementApi } from '@/api/agreement/agreement.api';
@@ -165,26 +164,9 @@ export function MarketingConsentSettings({
                   </th>
                   <td className="px-4 py-4 text-fg-neutral-muted">정보 없음</td>
                 </tr>
-                <tr>
-                  <th className="w-32 bg-bg-neutral-weak px-4 py-4 text-left font-medium text-fg-neutral-muted">
-                    동의 원문
-                  </th>
-                  <td className="px-4 py-4">
-                    <Link
-                      className="font-medium text-fg-brand underline underline-offset-4"
-                      href={ROUTES.LEGAL.MARKETING_CONSENT}
-                    >
-                      현재 문서 보기
-                    </Link>
-                  </td>
-                </tr>
               </tbody>
             </table>
           </div>
-
-          <p className="mt-3 text-12 leading-5 text-fg-neutral-subtle">
-            현재 시행 중인 마케팅 정보 수신 동의 문서가 표시됩니다.
-          </p>
 
           <div className="mt-10">
             {isAgreed ? (
