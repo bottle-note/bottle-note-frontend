@@ -5,6 +5,11 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 import { CURATION_V2_SPEC_CODES } from '@/api/curation-v2/constants';
 import { isWhiskyPairingFeedItem } from '@/api/curation-v2/guards';
+import type {
+  ProgramFeedItem,
+  TastingEventFeedItem,
+} from '@/api/curation-v2/types';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useTab } from '@/hooks/useTab';
 import { useCurationsQuery } from '@/queries/useCurationsQuery';
 import { useProgramsQuery } from '@/queries/useProgramsQuery';
@@ -12,7 +17,9 @@ import { useTastingEventsQuery } from '@/queries/useTastingEventsQuery';
 import UnderlineSearchBar from '@/components/feature/Search/UnderlineSearchBar';
 import Tab from '@/components/ui/Navigation/Tab';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import useModalStore from '@/store/modalStore';
 import { CurationFeedCard } from './_components/CurationFeedCard';
+import { GuestCurationLoginPrompt } from './_components/GuestCurationLoginPrompt';
 import { ProgramFeedCard } from './_components/ProgramFeedCard';
 import { TastingEventFeedCard } from './_components/TastingEventFeedCard';
 
@@ -32,6 +39,8 @@ const tabList = [
 const DEFAULT_TAB_ID =
   CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT satisfies CurationTabId;
 
+const GUEST_FEED_ITEM_LIMIT = 2;
+
 const isCurationTabId = (value: string | null): value is CurationTabId => {
   return tabList.some((tab) => tab.id === value);
 };
@@ -40,6 +49,8 @@ export default function CurationPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
+  const { handleLoginModal } = useModalStore();
   const [searchKeyword, setSearchKeyword] = useState('');
   const tabParam = searchParams.get('tab');
   const tabFromUrl = isCurationTabId(tabParam) ? tabParam : DEFAULT_TAB_ID;
@@ -139,25 +150,36 @@ export default function CurationPage() {
   const emptyMessage = trimmedSearchKeyword
     ? '검색 결과가 없어요.'
     : activeTabState.emptyMessage;
+  const isGuestRestrictedTab = isTastingEventTab || isProgramTab;
+  const shouldShowGuestLoginPrompt =
+    !isAuthLoading &&
+    !isLoggedIn &&
+    isGuestRestrictedTab &&
+    activeData !== undefined &&
+    (activeData.length > GUEST_FEED_ITEM_LIMIT || activeQuery.hasNextPage);
 
-  const renderFeedItems = () => {
+  const renderFeedItems = (startIndex = 0, endIndex?: number) => {
     switch (currentTab.id) {
       case CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT:
-        return tastingEventsQuery.data?.map((event, index) => (
-          <TastingEventFeedCard
-            key={event.id}
-            event={event}
-            priority={index === 0}
-          />
-        ));
+        return tastingEventsQuery.data
+          ?.slice(startIndex, endIndex)
+          .map((event: TastingEventFeedItem, index: number) => (
+            <TastingEventFeedCard
+              key={event.id}
+              event={event}
+              priority={startIndex + index === 0}
+            />
+          ));
       case CURATION_V2_SPEC_CODES.PROGRAM:
-        return programsQuery.data?.map((program, index) => (
-          <ProgramFeedCard
-            key={program.id}
-            program={program}
-            priority={index === 0}
-          />
-        ));
+        return programsQuery.data
+          ?.slice(startIndex, endIndex)
+          .map((program: ProgramFeedItem, index: number) => (
+            <ProgramFeedCard
+              key={program.id}
+              program={program}
+              priority={startIndex + index === 0}
+            />
+          ));
       case CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY:
         return curationsQuery.data?.map((curation, index) => (
           <CurationFeedCard
@@ -262,15 +284,25 @@ export default function CurationPage() {
           activeData &&
           activeData.length > 0 && (
             <div className="space-y-7 px-5 pb-navbar">
-              {renderFeedItems()}
-              {activeQuery.hasNextPage && (
+              {shouldShowGuestLoginPrompt ? (
+                <>
+                  {renderFeedItems(0, GUEST_FEED_ITEM_LIMIT)}
+                  <GuestCurationLoginPrompt onLogin={handleLoginModal}>
+                    {renderFeedItems(GUEST_FEED_ITEM_LIMIT)}
+                  </GuestCurationLoginPrompt>
+                </>
+              ) : (
+                renderFeedItems()
+              )}
+              {activeQuery.hasNextPage && !shouldShowGuestLoginPrompt && (
                 <div ref={activeQuery.targetRef} className="h-1" />
               )}
-              {activeQuery.isFetchingNextPage && (
-                <p className="py-2 text-center text-12 font-medium text-fg-neutral-muted">
-                  불러오는 중...
-                </p>
-              )}
+              {activeQuery.isFetchingNextPage &&
+                !shouldShowGuestLoginPrompt && (
+                  <p className="py-2 text-center text-12 font-medium text-fg-neutral-muted">
+                    불러오는 중...
+                  </p>
+                )}
             </div>
           )}
       </section>
