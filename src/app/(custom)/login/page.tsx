@@ -22,6 +22,15 @@ export default function Login() {
   const { isLoggedIn, isLoading } = useAuthSession();
   const hasCheckedInitialSession = useRef(false);
 
+  const handleBack = () => {
+    const returnTo =
+      returnToParam && isValidReturnUrl(returnToParam)
+        ? returnToParam
+        : ROUTES.HOME;
+
+    router.replace(returnTo);
+  };
+
   useEffect(() => {
     if (returnToParam && isValidReturnUrl(returnToParam)) {
       setReturnToUrl(returnToParam);
@@ -52,11 +61,7 @@ export default function Login() {
       <main className="w-full flex flex-1 flex-col justify-end items-center bg-subCoral pb-5">
         <section className="w-full">
           <SubHeader bgColor="bg-subCoral">
-            <SubHeader.Left
-              onClick={() => {
-                router.push(ROUTES.HOME);
-              }}
-            >
+            <SubHeader.Left onClick={handleBack}>
               <Image
                 src="/icon/arrow-left-white.svg"
                 alt="arrowIcon"
