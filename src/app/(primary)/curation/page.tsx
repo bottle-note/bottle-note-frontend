@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 import { CURATION_V2_SPEC_CODES } from '@/api/curation-v2/constants';
 import { isWhiskyPairingFeedItem } from '@/api/curation-v2/guards';
+import { ROUTES } from '@/constants/routes';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useTab } from '@/hooks/useTab';
 import { useCurationsQuery } from '@/queries/useCurationsQuery';
 import { useProgramsQuery } from '@/queries/useProgramsQuery';
@@ -13,6 +15,7 @@ import UnderlineSearchBar from '@/components/feature/Search/UnderlineSearchBar';
 import Tab from '@/components/ui/Navigation/Tab';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { CurationFeedCard } from './_components/CurationFeedCard';
+import { GuestCurationLoginPrompt } from './_components/GuestCurationLoginPrompt';
 import { ProgramFeedCard } from './_components/ProgramFeedCard';
 import { TastingEventFeedCard } from './_components/TastingEventFeedCard';
 
@@ -32,6 +35,8 @@ const tabList = [
 const DEFAULT_TAB_ID =
   CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT satisfies CurationTabId;
 
+const GUEST_PREVIEW_ITEM_COUNT = 3;
+
 const isCurationTabId = (value: string | null): value is CurationTabId => {
   return tabList.some((tab) => tab.id === value);
 };
@@ -40,7 +45,10 @@ export default function CurationPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [isGuestGateActive, setIsGuestGateActive] = useState(false);
+  const guestGateRef = useRef<HTMLDivElement>(null);
   const tabParam = searchParams.get('tab');
   const tabFromUrl = isCurationTabId(tabParam) ? tabParam : DEFAULT_TAB_ID;
   const initialTab = tabList.find((tab) => tab.id === tabFromUrl) ?? tabList[0];
@@ -76,6 +84,14 @@ export default function CurationPage() {
     params.set('tab', id);
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const handleGuestLogin = () => {
+    const returnTo = `${pathname}?${new URLSearchParams({
+      tab: currentTab.id,
+    }).toString()}`;
+
+    router.push(`${ROUTES.LOGIN}?returnTo=${encodeURIComponent(returnTo)}`);
   };
 
   const trimmedSearchKeyword = searchKeyword.trim();
@@ -139,36 +155,69 @@ export default function CurationPage() {
   const emptyMessage = trimmedSearchKeyword
     ? '검색 결과가 없어요.'
     : activeTabState.emptyMessage;
+  const shouldGateGuestFeed =
+    !isAuthLoading &&
+    !isLoggedIn &&
+    !activeQuery.isLoading &&
+    !activeQuery.error &&
+    Boolean(activeData && activeData.length > GUEST_PREVIEW_ITEM_COUNT);
 
-  const renderFeedItems = () => {
+  useEffect(() => {
+    setIsGuestGateActive(false);
+
+    if (!shouldGateGuestFeed || !guestGateRef.current) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) {
+        return;
+      }
+
+      setIsGuestGateActive(true);
+      observer.disconnect();
+    });
+
+    observer.observe(guestGateRef.current);
+
+    return () => observer.disconnect();
+  }, [currentTab.id, shouldGateGuestFeed, trimmedSearchKeyword]);
+
+  const renderFeedItems = (startIndex = 0, endIndex?: number) => {
     switch (currentTab.id) {
       case CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT:
-        return tastingEventsQuery.data?.map((event, index) => (
-          <TastingEventFeedCard
-            key={event.id}
-            event={event}
-            priority={index === 0}
-          />
-        ));
+        return tastingEventsQuery.data
+          ?.slice(startIndex, endIndex)
+          .map((event, index) => (
+            <TastingEventFeedCard
+              key={event.id}
+              event={event}
+              priority={startIndex + index === 0}
+            />
+          ));
       case CURATION_V2_SPEC_CODES.PROGRAM:
-        return programsQuery.data?.map((program, index) => (
-          <ProgramFeedCard
-            key={program.id}
-            program={program}
-            priority={index === 0}
-          />
-        ));
+        return programsQuery.data
+          ?.slice(startIndex, endIndex)
+          .map((program, index) => (
+            <ProgramFeedCard
+              key={program.id}
+              program={program}
+              priority={startIndex + index === 0}
+            />
+          ));
       case CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY:
-        return curationsQuery.data?.map((curation, index) => (
-          <CurationFeedCard
-            key={curation.id}
-            curation={curation}
-            badgeLabel={
-              isWhiskyPairingFeedItem(curation) ? '페어링' : '큐레이션'
-            }
-            priority={index === 0}
-          />
-        ));
+        return curationsQuery.data
+          ?.slice(startIndex, endIndex)
+          .map((curation, index) => (
+            <CurationFeedCard
+              key={curation.id}
+              curation={curation}
+              badgeLabel={
+                isWhiskyPairingFeedItem(curation) ? '페어링' : '큐레이션'
+              }
+              priority={startIndex + index === 0}
+            />
+          ));
     }
   };
 
@@ -261,12 +310,30 @@ export default function CurationPage() {
           !activeQuery.error &&
           activeData &&
           activeData.length > 0 && (
-            <div className="space-y-7 px-5 pb-navbar">
-              {renderFeedItems()}
-              {activeQuery.hasNextPage && (
+            <div
+              className={`space-y-7 px-5 ${shouldGateGuestFeed ? 'pb-0' : 'pb-navbar'}`}
+            >
+              {shouldGateGuestFeed ? (
+                <>
+                  {renderFeedItems(0, GUEST_PREVIEW_ITEM_COUNT)}
+                  <div
+                    ref={guestGateRef}
+                    aria-hidden="true"
+                    className="pointer-events-none h-24 select-none overflow-hidden"
+                  >
+                    {renderFeedItems(
+                      GUEST_PREVIEW_ITEM_COUNT,
+                      GUEST_PREVIEW_ITEM_COUNT + 1,
+                    )}
+                  </div>
+                </>
+              ) : (
+                renderFeedItems()
+              )}
+              {activeQuery.hasNextPage && !shouldGateGuestFeed && (
                 <div ref={activeQuery.targetRef} className="h-1" />
               )}
-              {activeQuery.isFetchingNextPage && (
+              {activeQuery.isFetchingNextPage && !shouldGateGuestFeed && (
                 <p className="py-2 text-center text-12 font-medium text-fg-neutral-muted">
                   불러오는 중...
                 </p>
@@ -274,6 +341,10 @@ export default function CurationPage() {
             </div>
           )}
       </section>
+
+      {isGuestGateActive && (
+        <GuestCurationLoginPrompt onLogin={handleGuestLogin} />
+      )}
     </>
   );
 }
