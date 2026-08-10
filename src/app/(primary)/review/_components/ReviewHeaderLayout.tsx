@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import AlcoholPickButton from '@/components/domain/alcohol/AlcoholPickButton';
+import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import { AlcoholInfo as AlcoholDetails } from '@/types/Alcohol';
 import useModalStore from '@/store/modalStore';
 import AlcoholInfo from './AlcoholInfo';
@@ -20,7 +20,7 @@ export default function ReviewHeaderLayout({
   alcoholData,
   onBack,
   headerTitle,
-  headerTextColor = 'text-white',
+  headerTextColor = 'text-fg-brand-contrast',
   onSelectAlcohol,
   isEmptyState = false,
 }: ReviewHeaderLayoutProps) {
@@ -57,11 +57,12 @@ export default function ReviewHeaderLayout({
       <div className="relative z-20">
         <SubHeader bgColor="bg-transparent">
           <SubHeader.Left onClick={onBack}>
-            <Image
+            <SemanticIcon
               src="/icon/arrow-left-white.svg"
-              alt="arrowIcon"
               width={23}
               height={23}
+              className="text-fg-brand-contrast"
+              label="뒤로가기"
             />
           </SubHeader.Left>
           <SubHeader.Center textColor={headerTextColor}>
