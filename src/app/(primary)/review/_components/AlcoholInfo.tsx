@@ -2,7 +2,7 @@
 
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
-import { ChevronDown, X } from 'lucide-react';
+import { ChevronDown, Pencil, X } from 'lucide-react';
 import { Drawer } from 'vaul';
 import { AlcoholInfo as AlcoholType } from '@/types/Alcohol';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
@@ -45,7 +45,7 @@ function AlcoholInfo({ data, onSelectAlcohol }: AlcoholInfoProps) {
           <button
             type="button"
             onClick={onSelectAlcohol}
-            className="flex h-[171px] w-[99px] shrink-0 items-center justify-center rounded-md border border-stroke-neutral-subtle bg-bg-neutral-weak"
+            className="flex h-[171px] w-[99px] shrink-0 items-center justify-center rounded-md border border-stroke-neutral-subtle bg-palette-static-white"
           >
             <Image
               src="/icon/plus-subcoral.svg"
@@ -56,15 +56,20 @@ function AlcoholInfo({ data, onSelectAlcohol }: AlcoholInfoProps) {
           </button>
         ) : (
           <div className="relative shrink-0">
-            <AlcoholImage imageUrl={alcoholUrlImg} />
+            <AlcoholImage
+              imageUrl={alcoholUrlImg}
+              bgColor="bg-palette-static-white"
+            />
             {onSelectAlcohol && (
               <button
                 type="button"
                 onClick={onSelectAlcohol}
-                className="absolute bottom-[9px] left-[9px] right-[9px] h-[19px] bg-mainCoral/65 rounded-[3px] flex items-center justify-center"
+                aria-label="위스키 변경"
+                className="group absolute inset-0 flex items-end overflow-hidden rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stroke-focus-ring"
               >
-                <span className="text-white text-[9px] font-normal">
-                  위스키 변경
+                <span className="flex h-9 w-full items-center justify-center gap-1 bg-bg-overlay-muted text-palette-static-white backdrop-blur-sm transition-colors group-active:bg-bg-overlay">
+                  <Pencil aria-hidden className="h-3.5 w-3.5" />
+                  <span className="text-11 font-semibold">위스키 변경</span>
                 </span>
               </button>
             )}
@@ -72,7 +77,7 @@ function AlcoholInfo({ data, onSelectAlcohol }: AlcoholInfoProps) {
         )}
 
         {/* 텍스트 정보 영역 */}
-        <article className="w-full text-white space-y-2 overflow-x-hidden">
+        <article className="w-full space-y-2 overflow-x-hidden text-fg-brand-contrast">
           <div className="space-y-[8px]">
             {/* 기본 정보: 카테고리, 한글명, 영문명 */}
             <AlcoholBasicInfo
@@ -87,7 +92,7 @@ function AlcoholInfo({ data, onSelectAlcohol }: AlcoholInfoProps) {
 
             {/* 구분선 */}
             <div
-              className={`border-[0.5px] border-white ${isEmpty ? 'opacity-60' : ''}`}
+              className={`border-[0.5px] border-stroke-brand-contrast ${isEmpty ? 'opacity-60' : ''}`}
             />
           </div>
         </article>
@@ -124,7 +129,7 @@ function AlcoholBasicInfo({
     <div className="space-y-[6px]">
       <Label
         name={korCategory}
-        styleClass={`border-white px-2 py-[0.15rem] rounded-md text-10 ${isEmpty ? 'opacity-60' : ''}`}
+        styleClass={`border-stroke-brand-contrast px-2 py-[0.15rem] rounded-md text-10 ${isEmpty ? 'opacity-60' : ''}`}
       />
       <h1 className="text-[18px] font-bold leading-[22px] whitespace-normal break-words">
         {korName}
@@ -153,7 +158,7 @@ function AlcoholDetailList({ details, isEmpty }: AlcoholDetailListProps) {
       {details.map((item: DetailItem) => (
         <div
           key={item.title}
-          className={`flex items-start gap-2 text-white ${isEmpty ? 'opacity-60' : ''}`}
+          className={`flex items-start gap-2 text-fg-brand-contrast ${isEmpty ? 'opacity-60' : ''}`}
         >
           <div className="w-[60px] shrink-0 whitespace-nowrap text-14 font-semibold">
             {item.title}
@@ -226,7 +231,7 @@ function AlcoholTastingTags({ tags }: AlcoholTastingTagsProps) {
           <li
             key={tag}
             aria-hidden={index >= visibleTagCount}
-            className="flex h-7 shrink-0 items-center rounded-md border border-white px-[10px] text-12 text-white"
+            className="flex h-7 shrink-0 items-center rounded-md border border-stroke-brand-contrast px-[10px] text-12 text-fg-brand-contrast"
           >
             {tag}
           </li>
@@ -240,7 +245,7 @@ function AlcoholTastingTags({ tags }: AlcoholTastingTagsProps) {
             aria-expanded={isTagDrawerOpen}
             aria-haspopup="dialog"
             onClick={() => setIsTagDrawerOpen(true)}
-            className="flex h-7 items-center gap-1 px-1 text-12 font-medium text-white underline underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className="flex h-7 items-center gap-1 px-1 text-12 font-medium text-fg-brand-contrast underline underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stroke-brand-contrast"
           >
             {hiddenTagCount}개 태그 더보기
             <ChevronDown aria-hidden className="h-4 w-4" />
