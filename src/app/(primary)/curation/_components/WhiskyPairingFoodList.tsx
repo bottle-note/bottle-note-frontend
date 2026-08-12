@@ -23,13 +23,14 @@ export function WhiskyPairingFoodList({
             페어링 {index + 1}
           </span>
           <div className="mt-2 flex items-start gap-3">
-            <div className="h-[60px] w-[60px] shrink-0 overflow-hidden rounded-lg bg-bg-layer-default">
+            <div className="h-[60px] w-[60px] shrink-0 overflow-hidden rounded-lg bg-palette-static-white">
               <BaseImage
                 src={food.itemImageUrl ?? ''}
                 alt={food.itemName}
                 width={60}
                 height={60}
                 className="object-cover"
+                backgroundClassName="bg-palette-static-white"
               />
             </div>
             <div className="min-w-0 flex-1">

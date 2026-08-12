@@ -51,7 +51,7 @@ export function SettingsMiniEventList({
               className="flex flex-col items-center gap-2"
               aria-label={event.name}
             >
-              <div className="relative h-14 w-14 overflow-hidden rounded-lg bg-bg-disabled">
+              <div className="relative h-14 w-14 overflow-hidden rounded-lg bg-palette-static-white">
                 <Image
                   src={event.thumbnailUrl}
                   alt=""

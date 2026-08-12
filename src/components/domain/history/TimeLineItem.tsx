@@ -101,7 +101,8 @@ function TimeLineItem(props: Props) {
               src={imageSrc}
               alt="alcohol image"
               priority
-              className="rounded object-contain"
+              className="rounded bg-palette-static-white object-contain"
+              backgroundClassName="bg-palette-static-white"
               width={25}
               height={34}
               fill

@@ -62,14 +62,14 @@ export default function AlcoholItem({ data }: Props) {
   return (
     <div className="w-[145px] overflow-hidden rounded-lg">
       <Link href={href} className="block">
-        <div className="relative flex h-[145px] w-full shrink-0 items-center justify-center bg-bg-neutral-weak">
+        <div className="relative flex h-[145px] w-full shrink-0 items-center justify-center bg-palette-static-white">
           <AlcoholImage
             imageUrl={imageUrl}
             outerHeightClass="h-[145px]"
             outerWidthClass="w-[145px]"
             innerHeightClass="h-[125px]"
             innerWidthClass="w-[125px]"
-            bgColor="bg-bg-neutral-weak"
+            bgColor="bg-palette-static-white"
             blendMode="mix-blend-multiply dark:mix-blend-normal"
             rounded="rounded-none"
           />

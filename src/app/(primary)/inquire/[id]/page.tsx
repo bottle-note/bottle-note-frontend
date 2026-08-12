@@ -129,7 +129,7 @@ export default function Inquire() {
                 <div className="flex overflow-x-auto gap-[6px] pb-2">
                   {inquireDetails.imageUrlList.map((imgData) => (
                     <div
-                      className="relative flex-shrink-0 cursor-pointer"
+                      className="relative flex-shrink-0 cursor-pointer bg-palette-static-white"
                       key={imgData.viewUrl}
                       role="button"
                       tabIndex={0}
@@ -151,6 +151,7 @@ export default function Inquire() {
                         alt="Inquire image"
                         priority
                         className="cover"
+                        backgroundClassName="bg-palette-static-white"
                         width={104}
                         height={104}
                       />

@@ -23,7 +23,7 @@ const AlcoholImage = ({
   outerWidthClass = 'w-[99px]',
   innerWidthClass = 'w-[70px]',
   innerHeightClass = 'h-[141px]',
-  bgColor = 'bg-bg-neutral-weak',
+  bgColor = 'bg-palette-static-white',
   blendMode = '',
   rounded = 'rounded-lg',
   priority = false,
@@ -60,6 +60,7 @@ const AlcoholImage = ({
             alt="alcohol image"
             priority={priority}
             className={`object-contain ${blendMode}`}
+            backgroundClassName={bgColor}
             rounded={rounded}
             sizes={`${innerWidth}px`}
             fill
