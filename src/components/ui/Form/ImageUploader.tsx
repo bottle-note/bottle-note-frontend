@@ -102,14 +102,17 @@ export default function ImageUploader({
         className={`flex justify-start items-center h-[3.8rem] space-x-2 ${useMarginLeft ? 'ml-7 mt-[6px]' : ''}`}
       >
         {previewImages?.map((data) => (
-          <figure key={data?.image} className="relative h-full">
+          <figure
+            key={data?.image}
+            className="relative h-full bg-palette-static-white"
+          >
             <Image
               src={data?.image}
               alt="이미지"
               height={60}
               width={60}
               quality={75}
-              className="h-full"
+              className="h-full bg-palette-static-white"
             />
             <button
               type="button"

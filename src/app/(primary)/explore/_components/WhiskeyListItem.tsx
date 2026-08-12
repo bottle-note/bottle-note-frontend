@@ -27,7 +27,7 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
         <ItemImage
           src={content.alcoholUrlImg}
           alt="image"
-          className="w-[95px] h-[128px] bg-white rounded-sm"
+          className="w-[95px] h-[128px] bg-palette-static-white rounded-sm"
           priority={priority}
         />
       </Link>

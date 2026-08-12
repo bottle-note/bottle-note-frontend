@@ -110,9 +110,9 @@ function ReviewListItem({ data, onRefresh }: Props) {
                     </p>
                   </div>
                   {data.reviewImageUrl && (
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 bg-palette-static-white">
                       <Image
-                        className="w-[68px] h-[68px] object-cover"
+                        className="w-[68px] h-[68px] bg-palette-static-white object-cover"
                         src={data.reviewImageUrl}
                         alt="content_img"
                         width={68}

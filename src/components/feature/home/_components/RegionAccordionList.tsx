@@ -57,8 +57,8 @@ function RegionRowContent({
         onError={handleImageError}
         className={`w-[26px] h-[26px] rounded-lg ${
           isBottleFallback
-            ? 'bg-bg-neutral-weak object-cover p-1'
-            : 'bg-bg-neutral-weak object-contain p-[2px]'
+            ? 'bg-palette-static-white object-cover p-1'
+            : 'bg-palette-static-white object-contain p-[2px]'
         }`}
       />
       <div className="gap-[4px] flex items-center">

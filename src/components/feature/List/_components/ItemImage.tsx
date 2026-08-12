@@ -14,7 +14,7 @@ const ItemImage = ({ src, alt, className, priority = false }: Props) => {
   return (
     <div
       className={cn(
-        `w-[89px] h-[89px] flex shrink-0 p-2 justify-center items-center`,
+        `w-[89px] h-[89px] flex shrink-0 bg-palette-static-white p-2 justify-center items-center`,
         className,
       )}
     >
@@ -24,6 +24,7 @@ const ItemImage = ({ src, alt, className, priority = false }: Props) => {
           alt={alt}
           priority={priority}
           className="object-contain w-auto h-auto"
+          backgroundClassName="bg-palette-static-white"
           fill
           sizes="85px"
         />

@@ -33,6 +33,7 @@ interface Props {
   height?: number;
   rounded?: string;
   quality?: number;
+  backgroundClassName?: string;
 }
 
 const BaseImage = ({
@@ -48,6 +49,7 @@ const BaseImage = ({
   height,
   rounded = '',
   quality,
+  backgroundClassName = '',
 }: Props) => {
   const [imgSrc, setImgSrc] = useState(src || Fallback);
   const [isLoading, setIsLoading] = useState(true);
@@ -64,7 +66,7 @@ const BaseImage = ({
 
   return (
     <div
-      className={`relative ${rounded}`}
+      className={`relative ${rounded} ${backgroundClassName}`}
       style={{
         width: width ? `${width}px` : '100%',
         height: height ? `${height}px` : '100%',
@@ -87,7 +89,9 @@ const BaseImage = ({
         }
       >
         {isLoading && (
-          <div className="absolute inset-0 animate-pulse bg-bg-neutral-weak" />
+          <div
+            className={`absolute inset-0 animate-pulse ${backgroundClassName || 'bg-bg-neutral-weak'}`}
+          />
         )}
         <Image
           priority={priority}
