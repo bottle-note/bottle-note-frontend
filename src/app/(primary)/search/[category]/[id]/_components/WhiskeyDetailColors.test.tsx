@@ -128,7 +128,7 @@ describe('위스키 상세 시맨틱 색상', () => {
     expect(article).toHaveClass('text-fg-brand-contrast');
     expect(screen.getByTestId('alcohol-image')).toHaveAttribute(
       'data-bg-color',
-      'bg-bg-layer-default',
+      'bg-palette-static-white',
     );
     expect(screen.getByRole('button', { name: '싱글 몰트' })).toHaveClass(
       'border-stroke-brand-contrast',
