@@ -164,10 +164,13 @@ describe('WhiskeyExplorerList realtime search', () => {
       '12',
       'macallan',
     ]);
-    expect(config.keepPreviousData).toBe(true);
+    expect(config.keepPreviousData).toBeUndefined();
 
     const controller = new AbortController();
-    await config.queryFn({ pageParam: 37, signal: controller.signal });
+    await config.queryFn({
+      pageParam: 'eyJrZXkiOiIzNyJ9.signature',
+      signal: controller.signal,
+    });
 
     expect(mockGetAlcohols).toHaveBeenCalledWith({
       keywords: ['macallan'],
@@ -175,8 +178,8 @@ describe('WhiskeyExplorerList realtime search', () => {
       category: 'SINGLE_MALT',
       sortType: 'POPULAR',
       sortOrder: 'DESC',
-      cursor: 37,
-      pageSize: 10,
+      cursor: 'eyJrZXkiOiIzNyJ9.signature',
+      size: 10,
       signal: controller.signal,
     });
   });

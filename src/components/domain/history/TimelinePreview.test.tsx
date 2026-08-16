@@ -4,17 +4,41 @@ import type { ApiResponse } from '@/api/_shared/types';
 import TimelinePreview from './TimelinePreview';
 
 const historyData: ApiResponse<{
-  userHistories: [];
+  userHistories: Array<{
+    historyId: number;
+    createdAt: string;
+    eventCategory: 'RATING';
+    eventType: 'START_RATING';
+    alcoholId: number;
+    alcoholName: string;
+    imageUrl: string;
+    redirectUrl: string;
+    content: string;
+    message: string;
+    dynamicMessage: null;
+  }>;
   subscriptionDate: string;
-  totalCount: number;
 }>[] = [
   {
     success: true,
     code: 200,
     data: {
-      userHistories: [],
+      userHistories: [
+        {
+          historyId: 1,
+          createdAt: '2024-01-02T00:00:00',
+          eventCategory: 'RATING',
+          eventType: 'START_RATING',
+          alcoholId: 1,
+          alcoholName: '테스트 위스키',
+          imageUrl: '',
+          redirectUrl: '/search/whisky/1',
+          content: '',
+          message: '',
+          dynamicMessage: null,
+        },
+      ],
       subscriptionDate: '2024-01-01T00:00:00',
-      totalCount: 1,
     },
     errors: [],
     meta: {

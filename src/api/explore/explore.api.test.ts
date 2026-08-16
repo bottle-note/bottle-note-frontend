@@ -9,6 +9,9 @@ jest.mock('@/shared/api/apiClient', () => ({
 
 const mockGet = apiClient.get as jest.Mock;
 
+const getSearchParams = () =>
+  new URLSearchParams((mockGet.mock.calls[0][0] as string).split('?')[1]);
+
 describe('ExploreApi.getAlcohols', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -17,28 +20,20 @@ describe('ExploreApi.getAlcohols', () => {
       code: 200,
       data: { items: [] },
       errors: [],
-      meta: {
-        pageable: {
-          currentCursor: 0,
-          cursor: 0,
-          pageSize: 10,
-          hasNext: false,
-        },
-      },
+      meta: { pagination: { hasNext: false, nextCursor: null } },
     });
   });
 
-  it('검색 요청의 AbortSignal을 apiClient까지 전달한다', async () => {
+  it('첫 요청은 cursor를 생략하고 size와 AbortSignal을 전달한다', async () => {
     const controller = new AbortController();
 
     await ExploreApi.getAlcohols({
       keywords: ['macallan'],
       sortType: 'POPULAR',
       sortOrder: 'DESC',
-      cursor: 0,
-      pageSize: 10,
+      size: 10,
       signal: controller.signal,
-    });
+    } as never);
 
     expect(mockGet).toHaveBeenCalledWith(
       expect.stringContaining('/alcohols/explore/standard?'),
@@ -47,5 +42,20 @@ describe('ExploreApi.getAlcohols', () => {
         signal: controller.signal,
       },
     );
+    expect(getSearchParams().get('cursor')).toBeNull();
+    expect(getSearchParams().get('size')).toBe('10');
+    expect(getSearchParams().has('pageSize')).toBe(false);
+  });
+
+  it('다음 요청은 opaque cursor를 원문 그대로 전달한다', async () => {
+    const cursor = 'eyJpZCI6MzcLCJzb3J0IjoiLz8rPSJ9';
+
+    await ExploreApi.getAlcohols({
+      keywords: ['macallan'],
+      cursor,
+      size: 10,
+    } as never);
+
+    expect(getSearchParams().get('cursor')).toBe(cursor);
   });
 });

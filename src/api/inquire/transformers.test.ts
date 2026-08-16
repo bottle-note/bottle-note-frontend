@@ -21,7 +21,6 @@ describe('transformServiceInquireList', () => {
           helpStatus: 'SUCCESS',
         },
       ],
-      totalCount: 2,
     };
 
     // When
@@ -29,7 +28,7 @@ describe('transformServiceInquireList', () => {
 
     // Then
     expect(result.items).toHaveLength(2);
-    expect(result.totalCount).toBe(2);
+    expect(result).not.toHaveProperty('totalCount');
     expect(result.items[0]).toEqual({
       id: 1,
       title: '문의 제목 1',
@@ -50,7 +49,6 @@ describe('transformServiceInquireList', () => {
     // Given
     const raw: ServiceInquireListRaw = {
       helpList: [],
-      totalCount: 0,
     };
 
     // When
@@ -58,6 +56,6 @@ describe('transformServiceInquireList', () => {
 
     // Then
     expect(result.items).toHaveLength(0);
-    expect(result.totalCount).toBe(0);
+    expect(result).not.toHaveProperty('totalCount');
   });
 });

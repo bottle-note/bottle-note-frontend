@@ -15,13 +15,13 @@ describe('buildQueryParams', () => {
 
     it('숫자 파라미터를 문자열로 변환한다', () => {
       // Given
-      const params = { cursor: 0, pageSize: 10 };
+      const params = { top: 0, size: 10 };
 
       // When
       const result = buildQueryParams(params);
 
       // Then
-      expect(result).toBe('cursor=0&pageSize=10');
+      expect(result).toBe('top=0&size=10');
     });
 
     it('불리언 파라미터를 문자열로 변환한다', () => {
@@ -157,8 +157,8 @@ describe('buildQueryParams', () => {
       // Given
       const params = {
         keyword: 'whisky',
-        cursor: 0,
-        pageSize: 10,
+        cursor: 'eyJrZXkiOiJhLWJfYyJ9.signature',
+        size: 10,
         isActive: true,
         categories: ['BOURBON', 'SCOTCH'],
         emptyValue: '',
@@ -169,8 +169,10 @@ describe('buildQueryParams', () => {
 
       // Then
       expect(result).toContain('keyword=whisky');
-      expect(result).toContain('cursor=0');
-      expect(result).toContain('pageSize=10');
+      expect(new URLSearchParams(result).get('cursor')).toBe(
+        'eyJrZXkiOiJhLWJfYyJ9.signature',
+      );
+      expect(result).toContain('size=10');
       expect(result).toContain('isActive=true');
       expect(result).toContain('categories=BOURBON');
       expect(result).toContain('categories=SCOTCH');
@@ -181,14 +183,21 @@ describe('buildQueryParams', () => {
   describe('숫자 0 처리', () => {
     it('숫자 0은 유효한 값으로 처리한다', () => {
       // Given
-      const params = { cursor: 0, pageSize: 10 };
+      const params = { top: 0, size: 10 };
 
       // When
       const result = buildQueryParams(params);
 
       // Then
-      expect(result).toBe('cursor=0&pageSize=10');
+      expect(result).toBe('top=0&size=10');
     });
+  });
+
+  it('첫 목록 요청의 undefined cursor는 쿼리에 포함하지 않는다', () => {
+    const result = buildQueryParams({ cursor: undefined, size: 10 });
+
+    expect(result).toBe('size=10');
+    expect(new URLSearchParams(result).has('cursor')).toBe(false);
   });
 });
 
