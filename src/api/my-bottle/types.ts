@@ -2,17 +2,13 @@
 // MyBottle API - Request/Response Types
 // ============================================
 
-import {
-  CursorPaginationParams,
-  SORT_TYPE,
-  SORT_ORDER,
-} from '@/api/_shared/types';
+import { InfiniteListParams, SORT_TYPE, SORT_ORDER } from '@/api/_shared/types';
 
 // --------------- Request Types ---------------
 
 export type MyBottleTabType = 'ratings' | 'reviews' | 'picks';
 
-export type MyBottleListParams = CursorPaginationParams & {
+export type MyBottleListParams = InfiniteListParams & {
   keyword?: string;
   regionId?: number | '';
   sortType?: SORT_TYPE;
@@ -33,7 +29,6 @@ interface BaseMyBottleInfo {
 interface MyBottleListResponse {
   userId: number;
   isMyPage: boolean;
-  totalCount: number;
 }
 
 export interface RatingMyBottleItem {

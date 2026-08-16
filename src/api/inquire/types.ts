@@ -2,8 +2,6 @@
 // Inquire API - Request/Response Types
 // ============================================
 
-// --------------- Request Types ---------------
-
 export interface InquireQueryParams {
   title: string;
   content: string;
@@ -17,8 +15,6 @@ export interface InquireQueryParams {
       }[]
     | null;
 }
-
-// --------------- Response Types ---------------
 
 export type InquireStatus = 'WAITING' | 'SUCCESS' | 'REJECT' | 'DELETED';
 
@@ -37,10 +33,8 @@ export interface InquireListItem {
   status: InquireStatus;
 }
 
-// 하위 호환성을 위한 alias
 export type ServiceInquireItem = InquireListItem;
 
-// 서비스 문의 관련
 export interface ServiceInquireListRaw {
   helpList: {
     helpId: number;
@@ -49,12 +43,10 @@ export interface ServiceInquireListRaw {
     createAt: string;
     helpStatus: InquireStatus;
   }[];
-  totalCount: number;
 }
 
 export interface ServiceInquireListResponse {
   items: InquireListItem[];
-  totalCount: number;
 }
 
 export interface ServiceInquireDetailsResponse {
@@ -73,10 +65,8 @@ export interface ServiceInquireDetailsResponse {
   }[];
 }
 
-// 비즈니스 문의 관련
 export interface BusinessInquireListResponse {
   items: InquireListItem[];
-  totalCount: number;
 }
 
 export interface BusinessInquireDetailsResponse {

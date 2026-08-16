@@ -2,12 +2,12 @@ import { CURATION_V2_SPEC_CODES } from '@/api/curation-v2/constants';
 import { useCurationFeedQuery } from '@/queries/useCurationFeedQuery';
 
 export const useCurationsQuery = (
-  pageSize = 10,
+  size = 10,
   keyword?: string,
   enabled = true,
 ) => {
   const query = useCurationFeedQuery({
-    pageSize,
+    size,
     keyword,
     code: [
       CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY,
@@ -17,8 +17,5 @@ export const useCurationsQuery = (
   });
   const data = query.data?.flatMap((page) => page.data.items);
 
-  return {
-    ...query,
-    data,
-  };
+  return { ...query, data };
 };

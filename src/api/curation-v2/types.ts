@@ -2,7 +2,6 @@
 // Curation V2 API - Request/Response Types
 // ============================================
 
-import type { PageableInfo } from '@/api/_shared/types';
 import type {
   ProgramFeedPayload,
   ProgramPayload,
@@ -60,7 +59,6 @@ export interface CurationV2FeedItem {
 
 export interface CurationV2FeedData {
   items: CurationV2FeedItem[];
-  pageable: PageableInfo;
 }
 
 export interface CurationV2DetailItem extends CurationV2FeedItem {

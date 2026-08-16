@@ -3,33 +3,31 @@ import type { CurationV2SpecCode } from '@/api/curation-v2/constants';
 export const curationV2Keys = {
   all: ['curation-v2'] as const,
   feed: ({
-    pageSize,
+    size,
     keyword,
     code,
   }: {
-    pageSize: number;
+    size: number;
     keyword?: string;
     code: CurationV2SpecCode | readonly CurationV2SpecCode[];
-  }) => [...curationV2Keys.all, 'feed', { pageSize, keyword, code }] as const,
+  }) => [...curationV2Keys.all, 'feed', { size, keyword, code }] as const,
   curations: (
-    pageSize: number,
+    size: number,
     keyword: string | undefined,
     code: CurationV2SpecCode,
-  ) =>
-    [...curationV2Keys.feed({ pageSize, keyword, code }), 'curations'] as const,
+  ) => [...curationV2Keys.feed({ size, keyword, code }), 'curations'] as const,
   programs: (
-    pageSize: number,
+    size: number,
     keyword: string | undefined,
     code: CurationV2SpecCode,
-  ) =>
-    [...curationV2Keys.feed({ pageSize, keyword, code }), 'programs'] as const,
+  ) => [...curationV2Keys.feed({ size, keyword, code }), 'programs'] as const,
   tastingEvents: (
-    pageSize: number,
+    size: number,
     keyword: string | undefined,
     code: CurationV2SpecCode,
   ) =>
     [
-      ...curationV2Keys.feed({ pageSize, keyword, code }),
+      ...curationV2Keys.feed({ size, keyword, code }),
       'tasting-events',
     ] as const,
   detail: (curationId: string | number) =>

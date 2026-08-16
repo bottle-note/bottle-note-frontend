@@ -5,14 +5,14 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { curationV2Keys } from '@/queries/curationV2Keys';
 
 interface UseCurationFeedQueryParams {
-  pageSize?: number;
+  size?: number;
   keyword?: string;
   code: CurationV2SpecCode | readonly CurationV2SpecCode[];
   enabled?: boolean;
 }
 
 export const useCurationFeedQuery = ({
-  pageSize = 10,
+  size = 10,
   keyword,
   code,
   enabled = true,
@@ -20,18 +20,17 @@ export const useCurationFeedQuery = ({
   const codes = Array.isArray(code) ? [...code] : [code];
 
   return usePaginatedQuery<CurationV2FeedData>({
-    queryKey: [...curationV2Keys.feed({ pageSize, keyword, code: codes })],
+    queryKey: [...curationV2Keys.feed({ size, keyword, code: codes })],
     queryFn: ({ pageParam }) =>
       CurationV2Api.getFeed({
         cursor: pageParam,
-        pageSize,
+        size,
         keyword,
         code: codes,
       }),
-    pageSize,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
     refetchOnMount: false,
-    enabled,
+    enabled: enabled && codes.length > 0,
   });
 };

@@ -14,7 +14,8 @@ export interface ApiResponse<T> {
     serverVersion: string;
     serverPathVersion: string;
     serverResponseTime: string;
-    pageable?: PageableInfo;
+    pagination?: PaginationMeta;
+    searchParameters?: Record<string, unknown>;
   };
 }
 
@@ -24,18 +25,16 @@ export interface ErrorResponse {
   status: string;
 }
 
-export interface PageableInfo {
-  pageSize: number;
+export interface PaginationMeta {
   hasNext: boolean;
-  currentCursor: number;
-  cursor?: number;
+  nextCursor: string | null;
 }
 
 // --------------- Query Parameter Types ---------------
 
-export interface CursorPaginationParams {
-  cursor?: number;
-  pageSize?: number;
+export interface InfiniteListParams {
+  cursor?: string;
+  size?: number;
 }
 
 // --------------- Enums ---------------

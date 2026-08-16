@@ -19,11 +19,11 @@ export const ReplyApi = {
   async getRootReplyList(
     params: RootReplyListParams,
   ): Promise<ApiResponse<RootReplyListResponse>> {
-    const { reviewId, cursor, pageSize } = params;
+    const { reviewId, cursor, size } = params;
 
     const queryString = buildQueryParams({
       cursor,
-      pageSize,
+      size,
     });
 
     const response = await apiClient.get<ApiResponse<RootReplyListResponse>>(
@@ -44,10 +44,11 @@ export const ReplyApi = {
   async getSubReplyList(
     params: SubReplyListParams,
   ): Promise<ApiResponse<SubReplyListResponse>> {
-    const { reviewId, rootReplyId } = params;
+    const { reviewId, rootReplyId, cursor, size } = params;
+    const queryString = buildQueryParams({ cursor, size });
 
     const response = await apiClient.get<ApiResponse<SubReplyListResponse>>(
-      `/review/reply/${reviewId}/sub/${rootReplyId}`,
+      `/review/reply/${reviewId}/sub/${rootReplyId}?${queryString}`,
       { authRequired: false },
     );
 

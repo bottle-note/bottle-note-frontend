@@ -2,15 +2,11 @@
 // Rate API - Request/Response Types
 // ============================================
 
-import {
-  CursorPaginationParams,
-  SORT_TYPE,
-  SORT_ORDER,
-} from '@/api/_shared/types';
+import { InfiniteListParams, SORT_TYPE, SORT_ORDER } from '@/api/_shared/types';
 
 // --------------- Request Types ---------------
 
-export type RateListParams = CursorPaginationParams & {
+export type RateListParams = InfiniteListParams & {
   keyword?: string;
   category?: string;
   regionId?: number | '';
@@ -35,7 +31,6 @@ export interface RateApiRaw {
   korCategoryName: string;
   imageUrl: string;
   isPicked: boolean;
-  totalCount: number;
 }
 
 // 변환된 타입
@@ -52,7 +47,6 @@ export interface RateAlcohol {
 
 export interface RateListResponse {
   ratings: RateAlcohol[];
-  totalCount: number;
 }
 
 export interface UserRatingResponse {

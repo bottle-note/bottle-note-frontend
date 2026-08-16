@@ -22,7 +22,6 @@ export interface MenuCategory {
 }
 
 export interface BlockListApi {
-  totalCount: number;
   items: {
     userId: string;
     userName: string;

@@ -1,11 +1,11 @@
 import { apiClient } from '@/shared/api/apiClient';
-import { ApiResponse, CursorPaginationParams } from '@/api/_shared/types';
+import { ApiResponse, InfiniteListParams } from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import type { CurationV2SpecCode } from './constants';
 import type { CurationV2DetailItem, CurationV2FeedData } from './types';
 
-interface CurationV2FeedParams extends CursorPaginationParams {
+interface CurationV2FeedParams extends InfiniteListParams {
   keyword?: string;
   code: CurationV2SpecCode[];
 }
@@ -20,7 +20,7 @@ export const CurationV2Api = {
   async getFeed(
     params: CurationV2FeedParams,
   ): Promise<ApiResponse<CurationV2FeedData>> {
-    const { cursor = 0, pageSize = 10, keyword, code } = params;
+    const { cursor, size = 10, keyword, code } = params;
 
     if (code.length === 0) {
       throw new Error('At least one curation spec code is required.');
@@ -28,7 +28,7 @@ export const CurationV2Api = {
 
     const queryString = buildQueryParams({
       cursor,
-      size: pageSize,
+      size,
       keyword,
       code,
     });

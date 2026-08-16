@@ -15,11 +15,11 @@ export const HistoryApi = {
     baseParams: HistoryListQueryParams,
     filterParams?: string,
   ): Promise<ApiResponse<HistoryListResponse>> {
-    const { userId, cursor, pageSize } = baseParams;
+    const { userId, cursor, size } = baseParams;
 
     const queryString = buildQueryParams({
       cursor,
-      pageSize,
+      size,
     });
 
     const fullQueryString = filterParams

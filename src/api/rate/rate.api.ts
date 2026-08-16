@@ -20,15 +20,8 @@ export const RateApi = {
   async getList(
     params: RateListParams,
   ): Promise<ApiResponse<RateListResponse>> {
-    const {
-      keyword,
-      category,
-      regionId,
-      sortType,
-      sortOrder,
-      cursor,
-      pageSize,
-    } = params;
+    const { keyword, category, regionId, sortType, sortOrder, cursor, size } =
+      params;
 
     const queryString = buildQueryParams({
       keyword,
@@ -37,11 +30,11 @@ export const RateApi = {
       sortType,
       sortOrder,
       cursor,
-      pageSize,
+      size,
     });
 
     const response = await apiClient.get<
-      ApiResponse<{ ratings: RateApiRaw[]; totalCount: number }>
+      ApiResponse<{ ratings: RateApiRaw[] }>
     >(`/rating?${queryString}`, { authRequired: false });
 
     if (response.errors.length !== 0) {
@@ -55,7 +48,6 @@ export const RateApi = {
       ...response,
       data: {
         ratings: transformedRatings,
-        totalCount: response.data.totalCount,
       },
     };
   },

@@ -1,9 +1,14 @@
+import { useEffect, useRef } from 'react';
 import {
-  keepPreviousData as preservePreviousData,
+  hashKey,
+  type QueryFunctionContext,
+  type QueryKey,
   useInfiniteQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { ApiResponse } from '@/api/_shared/types';
+import { ApiError } from '@/utils/ApiError';
 
 const DEFAULT_INTERSECTION_OPTIONS: IntersectionObserverInit = {
   rootMargin: '800px',
@@ -11,24 +16,29 @@ const DEFAULT_INTERSECTION_OPTIONS: IntersectionObserverInit = {
 };
 
 interface Props<T> {
-  queryKey: [string, ...Array<any>];
-  queryFn: (params: any) => Promise<ApiResponse<T>>;
-  pageSize?: number;
+  queryKey: QueryKey;
+  queryFn: (
+    context: QueryFunctionContext<QueryKey, string | undefined>,
+  ) => Promise<ApiResponse<T>>;
   staleTime?: number;
   enabled?: boolean;
   refetchOnMount?: boolean;
   gcTime?: number;
   intersectionOptions?: IntersectionObserverInit;
   intersectionThrottleMs?: number;
-  keepPreviousData?: boolean;
 }
 
+const isCursorExpiredError = (error: unknown) =>
+  error instanceof ApiError &&
+  error.response.status === 410 &&
+  error.code === 'CURSOR_EXPIRED';
+
 export const getNextPageParam = <T>(lastPage: ApiResponse<T>) => {
-  const pageable = lastPage.meta.pageable;
+  const pagination = lastPage.meta.pagination;
 
-  if (!pageable?.hasNext) return undefined;
+  if (!pagination?.hasNext || !pagination.nextCursor) return undefined;
 
-  return pageable.cursor;
+  return pagination.nextCursor;
 };
 
 export const usePaginatedQuery = <T>({
@@ -40,8 +50,17 @@ export const usePaginatedQuery = <T>({
   gcTime = 1000 * 60 * 10,
   intersectionOptions = DEFAULT_INTERSECTION_OPTIONS,
   intersectionThrottleMs,
-  keepPreviousData = false,
 }: Props<T>) => {
+  const queryClient = useQueryClient();
+  const queryHash = hashKey(queryKey);
+  const restartGuardRef = useRef({ queryHash, used: false });
+  const failedPageParamRef = useRef<string | undefined>(undefined);
+
+  if (restartGuardRef.current.queryHash !== queryHash) {
+    restartGuardRef.current = { queryHash, used: false };
+    failedPageParamRef.current = undefined;
+  }
+
   const {
     data,
     error,
@@ -54,17 +73,33 @@ export const usePaginatedQuery = <T>({
     refetch,
   } = useInfiniteQuery({
     queryKey,
-    queryFn,
+    queryFn: async (context) => {
+      failedPageParamRef.current = context.pageParam;
+      return queryFn(context);
+    },
     getNextPageParam,
-    initialPageParam: 0,
+    initialPageParam: undefined as string | undefined,
     refetchOnMount,
     refetchOnWindowFocus: false,
     gcTime,
     staleTime,
     enabled,
     retry: false,
-    placeholderData: keepPreviousData ? preservePreviousData : undefined,
+    placeholderData: undefined,
   });
+
+  useEffect(() => {
+    if (
+      !isCursorExpiredError(error) ||
+      failedPageParamRef.current === undefined ||
+      restartGuardRef.current.used
+    ) {
+      return;
+    }
+
+    restartGuardRef.current.used = true;
+    void queryClient.resetQueries({ queryKey, exact: true });
+  }, [error, queryClient, queryKey, queryHash]);
 
   const { targetRef } = useInfiniteScroll({
     fetchNextPage: () => {

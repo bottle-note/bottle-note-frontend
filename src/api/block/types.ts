@@ -2,7 +2,9 @@
 // Block API - Request/Response Types
 // ============================================
 
-// --------------- Response Types ---------------
+import type { InfiniteListParams } from '@/api/_shared/types';
+
+export type BlockListParams = InfiniteListParams;
 
 export interface BlockedUser {
   userId: string;
@@ -11,6 +13,5 @@ export interface BlockedUser {
 }
 
 export interface BlockListResponse {
-  totalCount: number;
   items: BlockedUser[];
 }

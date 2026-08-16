@@ -10,12 +10,20 @@ import type {
   PickMyBottleListResponse,
 } from './types';
 
+const toMyBottleQueryString = (params: MyBottleListParams) => {
+  const { keyword, regionId, sortType, sortOrder, cursor, size } = params;
+
+  return buildQueryParams({
+    keyword: keyword ? decodeURI(keyword) : undefined,
+    regionId: regionId || undefined,
+    sortType,
+    sortOrder,
+    cursor,
+    size,
+  });
+};
+
 export const MyBottleApi = {
-  /**
-   * 마이보틀 유형에 따른 API 함수를 반환합니다.
-   * @param type - 마이보틀 탭 유형
-   * @returns 해당 유형의 API 함수
-   */
   getMyBottle(type: MyBottleTabType) {
     if (type === 'ratings') return MyBottleApi.getRatings;
     if (type === 'reviews') return MyBottleApi.getReviews;
@@ -24,9 +32,6 @@ export const MyBottleApi = {
     throw new Error(ERROR_MESSAGES.MY_BOTTLE_FETCH_FAILED);
   },
 
-  /**
-   * 리뷰 마이보틀 목록을 조회합니다.
-   */
   async getReviews({
     params,
     userId,
@@ -34,20 +39,9 @@ export const MyBottleApi = {
     params: MyBottleListParams;
     userId: number;
   }): Promise<ApiResponse<ReviewMyBottleListResponse>> {
-    const { keyword, regionId, sortType, sortOrder, cursor, pageSize } = params;
-
-    const queryString = buildQueryParams({
-      keyword: keyword ? decodeURI(keyword) : undefined,
-      regionId: regionId || undefined,
-      sortType,
-      sortOrder,
-      cursor,
-      pageSize,
-    });
-
     const response = await apiClient.get<
       ApiResponse<ReviewMyBottleListResponse>
-    >(`/my-page/${userId}/my-bottle/reviews?${queryString}`, {
+    >(`/my-page/${userId}/my-bottle/reviews?${toMyBottleQueryString(params)}`, {
       authRequired: true,
     });
 
@@ -58,9 +52,6 @@ export const MyBottleApi = {
     return response;
   },
 
-  /**
-   * 평점 마이보틀 목록을 조회합니다.
-   */
   async getRatings({
     params,
     userId,
@@ -68,20 +59,9 @@ export const MyBottleApi = {
     params: MyBottleListParams;
     userId: number;
   }): Promise<ApiResponse<RatingMyBottleListResponse>> {
-    const { keyword, regionId, sortType, sortOrder, cursor, pageSize } = params;
-
-    const queryString = buildQueryParams({
-      keyword: keyword ? decodeURI(keyword) : undefined,
-      regionId: regionId || undefined,
-      sortType,
-      sortOrder,
-      cursor,
-      pageSize,
-    });
-
     const response = await apiClient.get<
       ApiResponse<RatingMyBottleListResponse>
-    >(`/my-page/${userId}/my-bottle/ratings?${queryString}`, {
+    >(`/my-page/${userId}/my-bottle/ratings?${toMyBottleQueryString(params)}`, {
       authRequired: true,
     });
 
@@ -92,9 +72,6 @@ export const MyBottleApi = {
     return response;
   },
 
-  /**
-   * 픽 마이보틀 목록을 조회합니다.
-   */
   async getPicks({
     params,
     userId,
@@ -102,19 +79,8 @@ export const MyBottleApi = {
     params: MyBottleListParams;
     userId: number;
   }): Promise<ApiResponse<PickMyBottleListResponse>> {
-    const { keyword, regionId, sortType, sortOrder, cursor, pageSize } = params;
-
-    const queryString = buildQueryParams({
-      keyword: keyword ? decodeURI(keyword) : undefined,
-      regionId: regionId || undefined,
-      sortType,
-      sortOrder,
-      cursor,
-      pageSize,
-    });
-
     const response = await apiClient.get<ApiResponse<PickMyBottleListResponse>>(
-      `/my-page/${userId}/my-bottle/picks?${queryString}`,
+      `/my-page/${userId}/my-bottle/picks?${toMyBottleQueryString(params)}`,
       { authRequired: true },
     );
 

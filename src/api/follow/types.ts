@@ -2,14 +2,16 @@
 // Follow API - Request/Response Types
 // ============================================
 
+import type { InfiniteListParams } from '@/api/_shared/types';
+
 // --------------- Request Types ---------------
 
 export type RelationType = 'follower' | 'following';
 
-export interface RelationListParams {
+export type RelationListParams = InfiniteListParams & {
   userId: number;
   type: RelationType;
-}
+};
 
 export type FollowStatus = 'UNFOLLOW' | 'FOLLOWING';
 
@@ -33,7 +35,6 @@ export interface RelationInfo {
 export interface RelationListResponse {
   followingList: RelationInfo[];
   followerList: RelationInfo[];
-  totalCount: number;
 }
 
 export interface UpdateFollowResponse {

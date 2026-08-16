@@ -25,13 +25,13 @@ export const ReviewApi = {
   async getReviewList(
     params: ReviewListParams,
   ): Promise<ApiResponse<ReviewListResponse>> {
-    const { alcoholId, sortType, sortOrder, cursor, pageSize } = params;
+    const { alcoholId, sortType, sortOrder, cursor, size } = params;
 
     const queryString = buildQueryParams({
       sortType,
       sortOrder,
       cursor,
-      pageSize,
+      size,
     });
 
     const response = await apiClient.get<ApiResponse<ReviewListResponse>>(
@@ -52,13 +52,13 @@ export const ReviewApi = {
   async getMyReviewList(
     params: ReviewListParams,
   ): Promise<ApiResponse<ReviewListResponse>> {
-    const { alcoholId, sortType, sortOrder, cursor, pageSize } = params;
+    const { alcoholId, sortType, sortOrder, cursor, size } = params;
 
     const queryString = buildQueryParams({
       sortType,
       sortOrder,
       cursor,
-      pageSize,
+      size,
     });
 
     const response = await apiClient.get<ApiResponse<ReviewListResponse>>(

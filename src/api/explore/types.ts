@@ -2,7 +2,7 @@
 // Explore API - Request/Response Types
 // ============================================
 
-import type { CursorPaginationParams } from '@/api/_shared/types';
+import type { InfiniteListParams } from '@/api/_shared/types';
 
 // --------------- Request Types ---------------
 
@@ -15,13 +15,12 @@ export type ExploreSortType =
 
 export type ExploreSortOrder = 'DESC' | 'ASC';
 
-export type ExploreListParams = CursorPaginationParams & {
+export type ExploreListParams = InfiniteListParams & {
   keywords: string[];
   regionIds?: number[];
   category?: string;
   sortType?: ExploreSortType;
   sortOrder?: ExploreSortOrder;
-  seed?: number;
   signal?: AbortSignal;
 };
 

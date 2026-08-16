@@ -1,5 +1,5 @@
 import { REVIEW_FILTER_TYPES, PICKS_STATUS } from '@/constants/history';
-import type { CursorPaginationParams } from '@/api/_shared/types';
+import type { InfiniteListParams } from '@/api/_shared/types';
 
 export interface Rate {
   currentValue: string;
@@ -34,12 +34,11 @@ export interface History {
 }
 
 export interface HistoryListApi {
-  totalCount: number;
   subscriptionDate: string;
   userHistories: History[];
 }
 
-export type HistoryListQueryParams = CursorPaginationParams & {
+export type HistoryListQueryParams = InfiniteListParams & {
   userId: string;
 };
 
