@@ -102,7 +102,7 @@ export interface AlcoholDetailsResponse {
   alcohols: AlcoholInfo;
   friendsInfo: FriendsInfo;
   reviewInfo: {
-    totalCount: number;
+    totalCount?: number;
     reviewList: ReviewInDetails[];
   };
 }
