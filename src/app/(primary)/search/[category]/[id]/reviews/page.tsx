@@ -59,7 +59,7 @@ function Reviews() {
   } = usePaginatedQuery<{
     reviewList: ReviewInDetails[];
   }>({
-    queryKey: ['review', filterState, alcoholId],
+    queryKey: ['review', user?.userId ?? null, filterState, alcoholId],
     queryFn: ({ pageParam }) => {
       return ReviewApi.getReviewList({
         alcoholId: alcoholId as string,

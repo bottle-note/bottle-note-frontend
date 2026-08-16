@@ -5,6 +5,7 @@ import { ReplyApi } from '@/api/reply/reply.api';
 import List from '@/components/feature/List/List';
 import EmptyView from '@/components/ui/Display/EmptyView';
 import { sortReplies } from '@/app/(primary)/review/utils/sortReplies';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import ReplyItem from './ReplyItem';
 
 interface SubReplyListProps {
@@ -14,6 +15,7 @@ interface SubReplyListProps {
   setIsRefetch: React.Dispatch<React.SetStateAction<boolean>>;
   isOpen: boolean;
   refreshToken: number;
+  viewerUserId: number | null;
 }
 
 const SubReplyList = ({
@@ -23,11 +25,18 @@ const SubReplyList = ({
   setIsRefetch,
   isOpen,
   refreshToken,
+  viewerUserId,
 }: SubReplyListProps) => {
   const { data, targetRef, hasNextPage } = usePaginatedQuery<{
     reviewReplies: SubReply[];
   }>({
-    queryKey: ['review-sub-reply', reviewId, rootReplyId, refreshToken],
+    queryKey: [
+      'review-sub-reply',
+      viewerUserId,
+      reviewId,
+      rootReplyId,
+      refreshToken,
+    ],
     queryFn: ({ pageParam }) =>
       ReplyApi.getSubReplyList({
         reviewId: String(reviewId),
@@ -80,6 +89,7 @@ const RootReplyItemMemo = memo(
     isSubReplyShow,
     onToggleSubReply,
     subReplyRefreshToken,
+    viewerUserId,
   }: {
     comment: RootReply;
     reviewUserId: number;
@@ -88,6 +98,7 @@ const RootReplyItemMemo = memo(
     isSubReplyShow: boolean;
     onToggleSubReply: (id: number) => void;
     subReplyRefreshToken: number;
+    viewerUserId: number | null;
   }) => {
     const handleToggle = useCallback(() => {
       onToggleSubReply(comment.reviewReplyId);
@@ -109,6 +120,7 @@ const RootReplyItemMemo = memo(
           setIsRefetch={setIsRefetch}
           isOpen={isSubReplyShow}
           refreshToken={subReplyRefreshToken}
+          viewerUserId={viewerUserId}
         />
       </ReplyItem>
     );
@@ -132,6 +144,8 @@ export default function ReplyItemList({
   setIsRefetch,
   lastCreatedRootReplyId,
 }: Props) {
+  const { user } = useAuthSession();
+  const viewerUserId = user?.userId ?? null;
   const [openReplyIds, setOpenReplyIds] = useState<Set<number>>(new Set());
   const [subReplyRefreshToken, setSubReplyRefreshToken] = useState(0);
   const {
@@ -142,7 +156,7 @@ export default function ReplyItemList({
     hasNextPage: hasNextRootReplyPage,
     refetch: refetchRootReply,
   } = usePaginatedQuery<{ reviewReplies: RootReply[] }>({
-    queryKey: ['review-reply', reviewId],
+    queryKey: ['review-reply', viewerUserId, reviewId],
     queryFn: ({ pageParam }) =>
       ReplyApi.getRootReplyList({
         reviewId: String(reviewId),
@@ -205,6 +219,7 @@ export default function ReplyItemList({
                   isSubReplyShow={openReplyIds.has(comment.reviewReplyId)}
                   onToggleSubReply={handleToggleSubReply}
                   subReplyRefreshToken={subReplyRefreshToken}
+                  viewerUserId={viewerUserId}
                 />
                 {index !== rootReplies.length - 1 && (
                   <div className="border-b border-stroke-neutral-subtle" />

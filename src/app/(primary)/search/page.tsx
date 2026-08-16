@@ -36,7 +36,7 @@ const SORT_OPTIONS = [
 
 export default function Search() {
   const router = useRouter();
-  const { isLoggedIn } = useAuthSession();
+  const { isLoggedIn, user } = useAuthSession();
   const { data: featuredList = [], isLoading: isFeaturedLoading } =
     useHomeFeaturedQuery({ type: 'week' });
   const { filterState, handleFilter, isEmptySearch, urlKeyword } =
@@ -72,6 +72,7 @@ export default function Search() {
       filterState.sortOrder,
       filterState.keyword,
       filterState.curationId,
+      user?.userId ?? null,
     ],
     queryFn: async ({ pageParam }) => {
       return ExploreApi.getAlcohols({

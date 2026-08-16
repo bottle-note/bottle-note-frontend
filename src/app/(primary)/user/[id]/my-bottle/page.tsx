@@ -16,6 +16,7 @@ import { RegionId } from '@/types/common';
 import SearchBarLink from '@/components/feature/Search/SearchBarLink';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import {
   MyBottleTabType,
   PickMyBottleListResponse,
@@ -48,6 +49,7 @@ export default function MyBottle({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { isLoggedIn, user } = useAuthSession();
   const { regionOptions } = useRegionsQuery();
   const myBottleType = searchParams.get('type') as MyBottleTabType;
   const urlKeyword = searchParams.get('keyword') || '';
@@ -83,7 +85,7 @@ export default function MyBottle({
     | ReviewMyBottleListResponse
     | PickMyBottleListResponse
   >({
-    queryKey: ['my-bottle', userId, currentTab.id, filterState],
+    queryKey: ['my-bottle', user?.userId, userId, currentTab.id, filterState],
     queryFn: ({ pageParam }) => {
       const apiMethod = MyBottleApi.getMyBottle(currentTab.id);
 
@@ -97,6 +99,7 @@ export default function MyBottle({
       });
     },
     intersectionOptions: MY_BOTTLE_INTERSECTION_OPTIONS,
+    enabled: isLoggedIn,
   });
 
   const { data: userInfo } = useQuery({

@@ -31,7 +31,7 @@ export const useHomeFeaturedQuery = ({
   const isRecent = type === 'recent';
 
   return useQuery({
-    queryKey: [...homeFeaturedKeys.type(type), isRecent ? user?.userId : null],
+    queryKey: [...homeFeaturedKeys.type(type), user?.userId ?? null],
     queryFn: async (): Promise<Alcohol[]> => {
       switch (type) {
         case 'week': {

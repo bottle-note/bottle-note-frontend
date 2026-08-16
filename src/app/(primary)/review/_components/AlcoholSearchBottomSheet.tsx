@@ -11,6 +11,7 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { Category } from '@/types/common';
 import { SORT_TYPE, SORT_ORDER } from '@/api/_shared/types';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import SelectableAlcoholItem from './SelectableAlcoholItem';
 
 interface Props {
@@ -26,6 +27,7 @@ export default function AlcoholSearchBottomSheet({
   onClose,
   onSelectAlcohol,
 }: Props) {
+  const { user } = useAuthSession();
   const [keyword, setKeyword] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<
     Category | undefined
@@ -41,7 +43,12 @@ export default function AlcoholSearchBottomSheet({
   });
 
   const { data, isLoading, isFetching, targetRef } = usePaginatedQuery({
-    queryKey: ['alcoholSearch', keyword, selectedCategory],
+    queryKey: [
+      'alcoholSearch',
+      user?.userId ?? null,
+      keyword,
+      selectedCategory,
+    ],
     queryFn: async ({ pageParam }) => {
       return ExploreApi.getAlcohols({
         keywords: keyword ? [keyword] : [],

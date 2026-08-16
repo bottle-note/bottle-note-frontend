@@ -33,8 +33,6 @@ export interface InquireListItem {
   status: InquireStatus;
 }
 
-export type ServiceInquireItem = InquireListItem;
-
 export interface ServiceInquireListRaw {
   helpList: {
     helpId: number;

@@ -11,6 +11,7 @@ import { FollowApi } from '@/api/follow/follow.api';
 import { RelationInfo } from '@/api/follow/types';
 import ListSection from '@/components/feature/List/ListSection';
 import Tab from '@/components/ui/Navigation/Tab';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { FollowerListItem } from '../_components/FollowerListItem';
 
 export default function UserFollowPage({
@@ -19,6 +20,7 @@ export default function UserFollowPage({
   params: { id: string };
 }) {
   const router = useRouter();
+  const { isLoggedIn, user } = useAuthSession();
   const currTapType = useSearchParams().get('type') ?? 'following';
   const { currentTab, handleTab, tabList } = useTab({
     tabList: [
@@ -36,7 +38,7 @@ export default function UserFollowPage({
     followingList?: RelationInfo[];
     followerList?: RelationInfo[];
   }>({
-    queryKey: ['follow', userId, currentTab.id],
+    queryKey: ['follow', user?.userId, userId, currentTab.id],
     queryFn: ({ pageParam }) => {
       return FollowApi.getRelationList({
         userId: Number(userId),
@@ -45,7 +47,7 @@ export default function UserFollowPage({
         size: 20,
       });
     },
-    enabled: Boolean(userId),
+    enabled: Boolean(userId) && isLoggedIn,
   });
 
   const followingUsers =

@@ -22,7 +22,7 @@ export const WhiskeyExplorerList = ({
   onSearchActiveChange,
 }: WhiskeyExplorerListProps) => {
   const router = useRouter();
-  const { isLoggedIn } = useAuthSession();
+  const { isLoggedIn, user } = useAuthSession();
   const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
   const { inputKeyword, debouncedKeyword, isTyping, setInputKeyword } =
@@ -46,6 +46,7 @@ export const WhiskeyExplorerList = ({
       category || 'all',
       regionIds.join(',') || 'all',
       debouncedKeyword,
+      user?.userId ?? null,
     ],
     queryFn: ({ pageParam, signal }) => {
       return ExploreApi.getAlcohols({

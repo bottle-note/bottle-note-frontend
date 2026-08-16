@@ -9,7 +9,7 @@ import useModalStore from '@/store/modalStore';
 import List from '@/components/feature/List/List';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { InquireApi } from '@/api/inquire/inquire.api';
-import { ServiceInquireItem } from '@/api/inquire/types';
+import { InquireListItem } from '@/api/inquire/types';
 import { ROUTES } from '@/constants/routes';
 import InquireTable from '@/app/(primary)/inquire/_components/InquireTable';
 import { INQUIRE_TYPE } from '@/constants/Inquire';
@@ -29,7 +29,7 @@ export default function Inquire() {
     isFetching,
     targetRef,
   } = usePaginatedQuery<{
-    items: ServiceInquireItem[];
+    items: InquireListItem[];
   }>({
     queryKey: ['inquireList', user?.userId, paramsType],
     queryFn: ({ pageParam }) => {
