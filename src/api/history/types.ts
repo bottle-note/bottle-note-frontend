@@ -2,11 +2,11 @@
 // History API - Request/Response Types
 // ============================================
 
-import type { CursorPaginationParams } from '@/api/_shared/types';
+import type { InfiniteListParams } from '@/api/_shared/types';
 
 // --------------- Request Types ---------------
 
-export type HistoryListQueryParams = CursorPaginationParams & {
+export type HistoryListQueryParams = InfiniteListParams & {
   userId: string;
 };
 
@@ -46,7 +46,6 @@ export interface History {
 }
 
 export interface HistoryListResponse {
-  totalCount: number;
   subscriptionDate: string;
   userHistories: History[];
 }

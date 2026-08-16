@@ -47,14 +47,13 @@ export default function User({ params: { id } }: { params: { id: string } }) {
   } = usePaginatedQuery<{
     userHistories: History[];
     subscriptionDate: string;
-    totalCount: number;
   }>({
-    queryKey: ['history', id],
+    queryKey: ['history', id, loginUserData?.userId],
     queryFn: ({ pageParam }) => {
       return HistoryApi.getHistoryList({
         userId: String(id),
         cursor: pageParam,
-        pageSize: 10,
+        size: 10,
       });
     },
     enabled: Boolean(id) && isLoggedIn,

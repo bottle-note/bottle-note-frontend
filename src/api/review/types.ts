@@ -2,15 +2,11 @@
 // Review API - Request/Response Types
 // ============================================
 
-import {
-  CursorPaginationParams,
-  SORT_TYPE,
-  SORT_ORDER,
-} from '@/api/_shared/types';
+import { InfiniteListParams, SORT_TYPE, SORT_ORDER } from '@/api/_shared/types';
 
 // --------------- Request Types ---------------
 
-export type ReviewListParams = CursorPaginationParams & {
+export type ReviewListParams = InfiniteListParams & {
   alcoholId: string;
   sortType?: SORT_TYPE;
   sortOrder?: SORT_ORDER;
@@ -95,7 +91,6 @@ export interface Review {
 
 export interface ReviewListResponse {
   reviewList: Review[];
-  totalCount: number;
 }
 
 export interface ReviewAlcoholInfo {

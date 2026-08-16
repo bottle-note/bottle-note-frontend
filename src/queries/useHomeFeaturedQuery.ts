@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import type { Alcohol } from '@/api/alcohol/types';
 import type { HomeFeaturedType } from '@/types/HomeFeatured';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 
 // Query Key 팩토리
 export const homeFeaturedKeys = {
@@ -26,8 +27,11 @@ export const useHomeFeaturedQuery = ({
   type,
   enabled = true,
 }: UseHomeFeaturedQueryOptions) => {
+  const { isLoggedIn, user } = useAuthSession();
+  const isRecent = type === 'recent';
+
   return useQuery({
-    queryKey: homeFeaturedKeys.type(type),
+    queryKey: [...homeFeaturedKeys.type(type), user?.userId ?? null],
     queryFn: async (): Promise<Alcohol[]> => {
       switch (type) {
         case 'week': {
@@ -43,14 +47,14 @@ export const useHomeFeaturedQuery = ({
           return response.data;
         }
         case 'recent': {
-          const response = await AlcoholsApi.getHistory();
+          const response = await AlcoholsApi.getHistory({ size: 6 });
           return response.data.items;
         }
         default:
           return [];
       }
     },
-    enabled,
+    enabled: enabled && (!isRecent || isLoggedIn),
     // recent는 항상 최신 데이터 필요, 나머지는 5분 캐시
     staleTime: type === 'recent' ? 0 : 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10, // 10분 GC

@@ -8,7 +8,8 @@ import { useHomeFeaturedQuery } from '@/queries/useHomeFeaturedQuery';
 import { SORT_TYPE } from '@/api/_shared/types';
 import { Category } from '@/types/common';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
-import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
+import { ExploreApi } from '@/api/explore/explore.api';
+import type { ExploreAlcohol, ExploreSortType } from '@/api/explore/types';
 import { Alcohol } from '@/api/alcohol/types';
 import { useRegionsQuery } from '@/queries/useRegionsQuery';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
@@ -20,11 +21,11 @@ import { ROUTES } from '@/constants/routes';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
 import SearchBarLink from '@/components/feature/Search/SearchBarLink';
-import { trackGA4Event } from '@/utils/analytics/ga4';
 import { useSearchPageState } from '@/app/(primary)/search/hook/useSearchPageState';
 import { useCurationDetailQuery } from '@/queries/useCurationDetailQuery';
 import { TastingEventLineupItem } from '@/app/(primary)/curation/_components/TastingEventLineupItem';
 import { getCurationAlcohols } from '@/app/(primary)/search/_utils/getCurationAlcohols';
+import WhiskeyListItem from '@/app/(primary)/explore/_components/WhiskeyListItem';
 
 const SORT_OPTIONS = [
   { name: '인기도순', type: SORT_TYPE.POPULAR },
@@ -35,7 +36,7 @@ const SORT_OPTIONS = [
 
 export default function Search() {
   const router = useRouter();
-  const { isLoggedIn } = useAuthSession();
+  const { isLoggedIn, user } = useAuthSession();
   const { data: featuredList = [], isLoading: isFeaturedLoading } =
     useHomeFeaturedQuery({ type: 'week' });
   const { filterState, handleFilter, isEmptySearch, urlKeyword } =
@@ -62,10 +63,7 @@ export default function Search() {
     isFetching: isAlcoholListFetching,
     targetRef,
     error: alcoholListError,
-  } = usePaginatedQuery<{
-    alcohols: Alcohol[];
-    totalCount: number;
-  }>({
+  } = usePaginatedQuery<{ items: ExploreAlcohol[] }>({
     queryKey: [
       'search',
       filterState.category,
@@ -74,14 +72,21 @@ export default function Search() {
       filterState.sortOrder,
       filterState.keyword,
       filterState.curationId,
+      user?.userId ?? null,
     ],
     queryFn: async ({ pageParam }) => {
-      return AlcoholsApi.getList({
-        ...filterState,
-        regionId:
-          filterState.regionId === '' ? '' : Number(filterState.regionId),
+      return ExploreApi.getAlcohols({
+        keywords: filterState.keyword ? [filterState.keyword] : [],
+        category:
+          filterState.category === 'ALL' ? undefined : filterState.category,
+        regionIds:
+          filterState.regionId === ''
+            ? undefined
+            : [Number(filterState.regionId)],
+        sortType: filterState.sortType as ExploreSortType,
+        sortOrder: filterState.sortOrder,
         cursor: pageParam,
-        pageSize: 10,
+        size: 10,
       });
     },
     staleTime: 0,
@@ -94,9 +99,6 @@ export default function Search() {
     ? isCurationLoading
     : isAlcoholListFetching;
   const isError = isCurationSearch ? isCurationError : !!alcoholListError;
-  const totalCount = isCurationSearch
-    ? curationAlcohols.length
-    : alcoholList?.[0]?.data.totalCount ?? 0;
 
   const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
@@ -147,15 +149,6 @@ export default function Search() {
       searchHistory.save(urlKeyword);
     }
   }, [urlKeyword]);
-
-  useEffect(() => {
-    if (urlKeyword && alcoholList && !isFirstLoading) {
-      trackGA4Event('search', {
-        search_term: urlKeyword,
-        result_count: alcoholList[0]?.data.totalCount ?? 0,
-      });
-    }
-  }, [urlKeyword, isFirstLoading]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -246,7 +239,6 @@ export default function Search() {
                 isScrollLoading={isFetching}
                 isError={isError}
               >
-                <List.Total total={totalCount} />
                 {!isCurationSearch && (
                   <List.SortOrderSwitch
                     type={filterState.sortOrder}
@@ -291,10 +283,10 @@ export default function Search() {
                   </List.Section>
                 ) : (
                   alcoholList &&
-                  [...alcoholList.map((list) => list.data.alcohols)]
+                  [...alcoholList.map((list) => list.data.items)]
                     .flat()
-                    .map((item: Alcohol) => (
-                      <List.Item key={item.alcoholId} data={item} />
+                    .map((item) => (
+                      <WhiskeyListItem key={item.alcoholId} content={item} />
                     ))
                 )}
               </List>

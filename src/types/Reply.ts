@@ -14,7 +14,6 @@ export interface RootReply extends Reply {
 
 export interface RootReplyListApi {
   reviewReplies: RootReply[];
-  totalCount: number;
 }
 
 export interface SubReply extends Reply {
@@ -25,7 +24,6 @@ export interface SubReply extends Reply {
 
 export interface SubReplyListApi {
   reviewReplies: SubReply[];
-  totalCount: number;
 }
 
 export interface ReplyQueryParams {

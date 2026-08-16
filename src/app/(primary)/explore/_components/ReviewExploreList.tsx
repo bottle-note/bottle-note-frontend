@@ -2,6 +2,7 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ExploreApi } from '@/api/explore/explore.api';
 import { ExploreReview } from '@/api/explore/types';
 import List from '@/components/feature/List/List';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import ReviewCard from './ReviewListItem';
 import { ExploreSearchBar } from './ExploreSearchBar';
 import { ExploreKeywordChip } from './ExploreKeywordChip';
@@ -17,6 +18,7 @@ export const ReviewExplorerList = ({
   isSearchActive,
   onSearchActiveChange,
 }: ReviewExplorerListProps) => {
+  const { user } = useAuthSession();
   const { keywords, keywordValues, handleAddKeyword, handleRemoveKeyword } =
     useExploreKeywords({ tabId: REVIEW_EXPLORE_TAB_ID });
 
@@ -30,13 +32,13 @@ export const ReviewExplorerList = ({
   } = usePaginatedQuery<{
     items: ExploreReview[];
   }>({
-    queryKey: ['explore.reviews', ...keywordValues],
+    queryKey: ['explore.reviews', user?.userId ?? null, ...keywordValues],
     queryFn: ({ pageParam }) => {
       return ExploreApi.getReviews({
         keywords: keywordValues,
         ...{
           cursor: pageParam,
-          pageSize: 10,
+          size: 10,
         },
       });
     },

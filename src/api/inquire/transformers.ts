@@ -24,8 +24,5 @@ export function transformServiceInquireList(
     status: inquiry.helpStatus,
   }));
 
-  return {
-    items,
-    totalCount: raw.totalCount,
-  };
+  return { items };
 }

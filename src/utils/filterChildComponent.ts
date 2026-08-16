@@ -1,11 +1,16 @@
-import React, { isValidElement } from 'react';
+import {
+  Children,
+  isValidElement,
+  type ElementType,
+  type ReactNode,
+} from 'react';
 
 export const filterChildComponent = (
-  children: React.ReactNode,
-  type: ({ children }: any) => JSX.Element,
+  children: ReactNode,
+  type: ElementType,
 ) => {
-  const childrens = React.Children.toArray(children);
-  return childrens.filter(
+  const childElements = Children.toArray(children);
+  return childElements.filter(
     (child) => isValidElement(child) && child.type === type,
   );
 };

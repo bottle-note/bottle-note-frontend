@@ -9,7 +9,7 @@ import useModalStore from '@/store/modalStore';
 import List from '@/components/feature/List/List';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { InquireApi } from '@/api/inquire/inquire.api';
-import { ServiceInquireItem } from '@/api/inquire/types';
+import { InquireListItem } from '@/api/inquire/types';
 import { ROUTES } from '@/constants/routes';
 import InquireTable from '@/app/(primary)/inquire/_components/InquireTable';
 import { INQUIRE_TYPE } from '@/constants/Inquire';
@@ -20,7 +20,7 @@ export default function Inquire() {
   const paramsType =
     (searchParams.get('type') as keyof typeof INQUIRE_TYPE) || 'service';
   const serviceType = INQUIRE_TYPE[paramsType] || paramsType;
-  const { isLoggedIn } = useAuthSession();
+  const { isLoggedIn, user } = useAuthSession();
   const { handleLoginModal } = useModalStore();
 
   const {
@@ -29,14 +29,13 @@ export default function Inquire() {
     isFetching,
     targetRef,
   } = usePaginatedQuery<{
-    items: ServiceInquireItem[];
-    totalCount: number;
+    items: InquireListItem[];
   }>({
-    queryKey: ['inquireList', paramsType],
+    queryKey: ['inquireList', user?.userId, paramsType],
     queryFn: ({ pageParam }) => {
       const queryParams = {
         cursor: pageParam,
-        pageSize: 10,
+        size: 10,
       };
       if (paramsType === 'business') {
         return InquireApi.getBusinessInquireList(queryParams);
@@ -44,6 +43,7 @@ export default function Inquire() {
         return InquireApi.getInquireList(queryParams);
       }
     },
+    enabled: isLoggedIn,
   });
 
   const handleItemClick = (helpId: number) => {
@@ -72,7 +72,7 @@ export default function Inquire() {
           isListFirstLoading={isLoading}
           isScrollLoading={isFetching}
           emptyViewText="문의사항이 없습니다."
-          isEmpty={!inquireList || inquireList[0].data.totalCount === 0}
+          isEmpty={!inquireList || inquireList[0].data.items.length === 0}
         >
           <List.Section>
             {inquireList && (

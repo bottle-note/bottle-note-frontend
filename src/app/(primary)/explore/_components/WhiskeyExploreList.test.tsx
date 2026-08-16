@@ -120,7 +120,10 @@ describe('WhiskeyExplorerList realtime search', () => {
       regionIds: [12],
       category: 'SINGLE_MALT',
     });
-    mockUseAuth.mockReturnValue({ isLoggedIn: true });
+    mockUseAuth.mockReturnValue({
+      isLoggedIn: true,
+      user: { userId: 101 },
+    });
     mockUseModalStore.mockReturnValue({
       handleModalState: mockHandleModalState,
       handleCloseModal: mockHandleCloseModal,
@@ -163,11 +166,16 @@ describe('WhiskeyExplorerList realtime search', () => {
       'SINGLE_MALT',
       '12',
       'macallan',
+      101,
     ]);
-    expect(config.keepPreviousData).toBe(true);
+    expect(config.keepPreviousData).toBeUndefined();
 
     const controller = new AbortController();
-    await config.queryFn({ pageParam: 37, signal: controller.signal });
+    const opaqueCursor = 'opaque.cursor_-with-specials';
+    await config.queryFn({
+      pageParam: opaqueCursor,
+      signal: controller.signal,
+    });
 
     expect(mockGetAlcohols).toHaveBeenCalledWith({
       keywords: ['macallan'],
@@ -175,10 +183,38 @@ describe('WhiskeyExplorerList realtime search', () => {
       category: 'SINGLE_MALT',
       sortType: 'POPULAR',
       sortOrder: 'DESC',
-      cursor: 37,
-      pageSize: 10,
+      cursor: opaqueCursor,
+      size: 10,
       signal: controller.signal,
     });
+  });
+
+  it('viewer가 변경되면 개인화 목록에 별도 query key를 사용한다', () => {
+    const { rerender } = render(
+      <WhiskeyExplorerList
+        isSearchActive={false}
+        onSearchActiveChange={jest.fn()}
+      />,
+    );
+
+    expect(mockUsePaginatedQuery.mock.calls.at(-1)?.[0].queryKey).toContain(
+      101,
+    );
+
+    mockUseAuth.mockReturnValue({
+      isLoggedIn: true,
+      user: { userId: 202 },
+    });
+    rerender(
+      <WhiskeyExplorerList
+        isSearchActive={false}
+        onSearchActiveChange={jest.fn()}
+      />,
+    );
+
+    expect(mockUsePaginatedQuery.mock.calls.at(-1)?.[0].queryKey).toContain(
+      202,
+    );
   });
 
   it('검색 결과가 없으면 위스키 추가 문의 버튼을 노출한다', () => {

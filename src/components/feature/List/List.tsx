@@ -1,3 +1,4 @@
+import { isValidElement } from 'react';
 import { v4 as uuid } from 'uuid';
 import { filterChildComponent } from '@/utils/filterChildComponent';
 import EmptyView from '@/components/ui/Display/EmptyView';
@@ -27,7 +28,11 @@ const ListMain = ({
   isEmpty,
 }: ListMainProps) => {
   const title = filterChildComponent(children, Title);
-  const totalDisplay = filterChildComponent(children, Total);
+  const totalDisplay = filterChildComponent(children, Total).filter(
+    (child) =>
+      isValidElement<{ total?: number | null }>(child) &&
+      child.props.total != null,
+  );
   const sortOrderSwitch = filterChildComponent(children, SortOrderSwitch);
   const optionSelect = filterChildComponent(children, OptionSelect);
   const items = filterChildComponent(children, ListItem);

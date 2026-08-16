@@ -13,7 +13,6 @@ describe('transformRateItem', () => {
       korCategoryName: '스카치',
       imageUrl: 'https://example.com/image.jpg',
       isPicked: true,
-      totalCount: 50,
     };
 
     // When
@@ -41,7 +40,6 @@ describe('transformRateList', () => {
         korCategoryName: '스카치',
         imageUrl: 'https://example.com/1.jpg',
         isPicked: true,
-        totalCount: 50,
       },
       {
         alcoholId: 2,
@@ -52,7 +50,6 @@ describe('transformRateList', () => {
         korCategoryName: '버번',
         imageUrl: 'https://example.com/2.jpg',
         isPicked: false,
-        totalCount: 40,
       },
     ];
 

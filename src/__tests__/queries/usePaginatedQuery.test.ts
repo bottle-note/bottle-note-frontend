@@ -1,42 +1,33 @@
 import { describe, expect, it } from '@jest/globals';
-import type { ApiResponse, PageableInfo } from '@/api/_shared/types';
+import type { ApiResponse } from '@/api/_shared/types';
 import { getNextPageParam } from '@/queries/usePaginatedQuery';
 
-const createResponse = (pageable?: PageableInfo) =>
+const createResponse = (pagination?: {
+  hasNext: boolean;
+  nextCursor: string | null;
+}) =>
   ({
-    meta: { pageable },
-  }) as ApiResponse<never>;
+    meta: { pagination },
+  }) as unknown as ApiResponse<never>;
 
 describe('getNextPageParam', () => {
-  it('서버가 내려준 다음 cursor를 계산 없이 그대로 반환한다', () => {
-    const response = createResponse({
-      currentCursor: 10,
-      cursor: 37,
-      pageSize: 10,
-      hasNext: true,
-    });
+  it('서버가 내려준 opaque nextCursor를 해석하거나 변경하지 않고 그대로 반환한다', () => {
+    const nextCursor = 'eyJpZCI6MzcLCJzb3J0IjoiLz8rPSJ9';
 
-    expect(getNextPageParam(response)).toBe(37);
+    expect(
+      getNextPageParam(createResponse({ hasNext: true, nextCursor })),
+    ).toBe(nextCursor);
   });
 
-  it('다음 페이지가 없으면 cursor 값과 관계없이 요청을 중지한다', () => {
-    const response = createResponse({
-      currentCursor: 10,
-      cursor: 20,
-      pageSize: 10,
-      hasNext: false,
-    });
-
-    expect(getNextPageParam(response)).toBeUndefined();
+  it.each([
+    { hasNext: false, nextCursor: 'still-present' },
+    { hasNext: true, nextCursor: null },
+    { hasNext: true, nextCursor: '' },
+  ])('terminal meta.pagination=%o에서는 다음 요청을 중지한다', (pagination) => {
+    expect(getNextPageParam(createResponse(pagination))).toBeUndefined();
   });
 
-  it('다음 페이지 cursor가 누락되면 프론트에서 값을 계산하지 않는다', () => {
-    const response = createResponse({
-      currentCursor: 10,
-      pageSize: 10,
-      hasNext: true,
-    });
-
-    expect(getNextPageParam(response)).toBeUndefined();
+  it('pagination meta가 없으면 cursor를 생성하지 않는다', () => {
+    expect(getNextPageParam(createResponse())).toBeUndefined();
   });
 });

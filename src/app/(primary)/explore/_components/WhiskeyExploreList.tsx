@@ -22,7 +22,7 @@ export const WhiskeyExplorerList = ({
   onSearchActiveChange,
 }: WhiskeyExplorerListProps) => {
   const router = useRouter();
-  const { isLoggedIn } = useAuthSession();
+  const { isLoggedIn, user } = useAuthSession();
   const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
   const { inputKeyword, debouncedKeyword, isTyping, setInputKeyword } =
@@ -46,6 +46,7 @@ export const WhiskeyExplorerList = ({
       category || 'all',
       regionIds.join(',') || 'all',
       debouncedKeyword,
+      user?.userId ?? null,
     ],
     queryFn: ({ pageParam, signal }) => {
       return ExploreApi.getAlcohols({
@@ -55,12 +56,11 @@ export const WhiskeyExplorerList = ({
         sortType: 'POPULAR',
         sortOrder: 'DESC',
         cursor: pageParam,
-        pageSize: 10,
+        size: 10,
         signal,
       });
     },
     staleTime: 1000 * 60 * 5,
-    keepPreviousData: true,
   });
 
   const isSearching = isFetching && !isFetchingNextPage;

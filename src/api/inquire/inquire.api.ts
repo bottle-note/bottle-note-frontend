@@ -1,5 +1,5 @@
 import { apiClient } from '@/shared/api/apiClient';
-import { ApiResponse, CursorPaginationParams } from '@/api/_shared/types';
+import { ApiResponse, InfiniteListParams } from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import { transformServiceInquireList } from './transformers';
@@ -20,13 +20,13 @@ export const InquireApi = {
    * @returns 문의 목록
    */
   async getInquireList(
-    params: CursorPaginationParams,
+    params: InfiniteListParams,
   ): Promise<ApiResponse<ServiceInquireListResponse>> {
-    const { cursor, pageSize } = params;
+    const { cursor, size } = params;
 
     const queryString = buildQueryParams({
       cursor,
-      pageSize,
+      size,
     });
 
     const response = await apiClient.get<ApiResponse<ServiceInquireListRaw>>(
@@ -93,13 +93,13 @@ export const InquireApi = {
    * @returns 문의 목록
    */
   async getBusinessInquireList(
-    params: CursorPaginationParams,
+    params: InfiniteListParams,
   ): Promise<ApiResponse<BusinessInquireListResponse>> {
-    const { cursor, pageSize } = params;
+    const { cursor, size } = params;
 
     const queryString = buildQueryParams({
       cursor,
-      pageSize,
+      size,
     });
 
     const response = await apiClient.get<

@@ -1,13 +1,11 @@
 import { apiClient } from '@/shared/api/apiClient';
-import { ApiResponse } from '@/api/_shared/types';
+import { ApiResponse, InfiniteListParams } from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import { transformAlcoholList, transformCategories } from './transformers';
 import type {
-  AlcoholListParams,
   AlcoholApiRaw,
   Alcohol,
-  AlcoholListResponse,
   AlcoholDetailsResponse,
   RegionResponse,
   CategoryResponse,
@@ -90,12 +88,15 @@ export const AlcoholsApi = {
   /**
    * 최근 본 위스키 목록을 조회합니다.
    */
-  async getHistory(): Promise<ApiResponse<{ items: Alcohol[] }>> {
+  async getHistory(
+    params: InfiniteListParams,
+  ): Promise<ApiResponse<{ items: Alcohol[] }>> {
+    const { cursor, size } = params;
+    const queryString = buildQueryParams({ cursor, size });
     const response = await apiClient.get<
       ApiResponse<{ items: AlcoholApiRaw[] }>
-    >(`/history/view/alcohols`, {
-      authRequired: false,
-      cache: 'force-cache',
+    >(`/history/view/alcohols?${queryString}`, {
+      authRequired: true,
     });
 
     if (response.errors.length !== 0) {
@@ -149,49 +150,6 @@ export const AlcoholsApi = {
   },
 
   /**
-   * 위스키 목록을 검색합니다.
-   */
-  async getList(
-    params: AlcoholListParams,
-  ): Promise<ApiResponse<AlcoholListResponse>> {
-    const {
-      keyword,
-      category,
-      regionId,
-      sortType,
-      sortOrder,
-      cursor,
-      pageSize,
-    } = params;
-
-    const queryString = buildQueryParams({
-      keyword,
-      category: category !== 'ALL' ? category : undefined,
-      regionId: regionId || undefined,
-      sortType,
-      sortOrder,
-      cursor,
-      pageSize,
-    });
-
-    const response = await apiClient.get<
-      ApiResponse<{ alcohols: AlcoholApiRaw[]; totalCount: number }>
-    >(`/alcohols/search?${queryString}`, { authRequired: false });
-
-    if (response.errors.length !== 0) {
-      throw new Error(ERROR_MESSAGES.ALCOHOL_LIST_FETCH_FAILED);
-    }
-
-    return {
-      ...response,
-      data: {
-        alcohols: transformAlcoholList(response.data.alcohols),
-        totalCount: response.data.totalCount,
-      },
-    };
-  },
-
-  /**
    * 위스키 상세 정보를 조회합니다.
    */
   async getAlcoholDetails(
@@ -232,8 +190,4 @@ export const AlcoholsApi = {
   },
 };
 
-export type {
-  AlcoholListParams,
-  Alcohol,
-  AlcoholDetailsResponse,
-} from './types';
+export type { Alcohol, AlcoholDetailsResponse } from './types';

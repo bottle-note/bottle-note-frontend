@@ -12,7 +12,6 @@ interface BaseMyBottleInfo {
 interface MyBottleListResponse {
   userId: number;
   isMyPage: boolean;
-  totalCount: number;
 }
 
 export interface RatingMyBottleListResponse extends MyBottleListResponse {

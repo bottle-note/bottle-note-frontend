@@ -2,18 +2,18 @@
 // Reply API - Request/Response Types
 // ============================================
 
-import type { CursorPaginationParams } from '@/api/_shared/types';
+import type { InfiniteListParams } from '@/api/_shared/types';
 
 // --------------- Request Types ---------------
 
-export type RootReplyListParams = CursorPaginationParams & {
+export type RootReplyListParams = InfiniteListParams & {
   reviewId: string;
 };
 
-export interface SubReplyListParams {
+export type SubReplyListParams = InfiniteListParams & {
   reviewId: string;
   rootReplyId: string;
-}
+};
 
 export interface ReplyQueryParams {
   content: string;
@@ -40,7 +40,6 @@ export interface RootReply extends Reply {
 
 export interface RootReplyListResponse {
   reviewReplies: RootReply[];
-  totalCount: number;
 }
 
 export interface SubReply extends Reply {
@@ -51,7 +50,6 @@ export interface SubReply extends Reply {
 
 export interface SubReplyListResponse {
   reviewReplies: SubReply[];
-  totalCount: number;
 }
 
 export interface ReplyPostResponse {

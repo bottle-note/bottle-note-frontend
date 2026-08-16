@@ -11,6 +11,7 @@ import { FollowApi } from '@/api/follow/follow.api';
 import { RelationInfo } from '@/api/follow/types';
 import ListSection from '@/components/feature/List/ListSection';
 import Tab from '@/components/ui/Navigation/Tab';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { FollowerListItem } from '../_components/FollowerListItem';
 
 export default function UserFollowPage({
@@ -19,6 +20,7 @@ export default function UserFollowPage({
   params: { id: string };
 }) {
   const router = useRouter();
+  const { isLoggedIn, user } = useAuthSession();
   const currTapType = useSearchParams().get('type') ?? 'following';
   const { currentTab, handleTab, tabList } = useTab({
     tabList: [
@@ -35,16 +37,23 @@ export default function UserFollowPage({
   } = usePaginatedQuery<{
     followingList?: RelationInfo[];
     followerList?: RelationInfo[];
-    totalCount: number;
   }>({
-    queryKey: ['follow', currentTab.id],
-    queryFn: () => {
+    queryKey: ['follow', user?.userId, userId, currentTab.id],
+    queryFn: ({ pageParam }) => {
       return FollowApi.getRelationList({
         userId: Number(userId),
         type: currentTab.id,
+        cursor: pageParam,
+        size: 20,
       });
     },
+    enabled: Boolean(userId) && isLoggedIn,
   });
+
+  const followingUsers =
+    relationList?.flatMap((page) => page.data.followingList ?? []) ?? [];
+  const followerUsers =
+    relationList?.flatMap((page) => page.data.followerList ?? []) ?? [];
 
   useEffect(() => {
     handleTab(currTapType);
@@ -82,22 +91,17 @@ export default function UserFollowPage({
               emptyViewText={`아직 팔로잉중인 사람이 없습니다.\n다른 유저를 팔로우 해보세요!`}
               isListFirstLoading={isFirstLoading}
               isScrollLoading={isFetching}
+              isEmpty={!isFirstLoading && followingUsers.length === 0}
             >
               <List.Title title="내가 팔로우 하는 유저" />
-              <List.Total
-                total={relationList[0].data.followingList?.length ?? 0}
-                unit="명"
-              />
 
               <ListSection className="flex flex-col">
-                {relationList[0].data.followingList
-                  ?.flat()
-                  .map((item: RelationInfo, idx) => (
-                    <FollowerListItem
-                      key={`${item.userId}_${idx}`}
-                      userInfo={{ ...item, userId: item.followUserId }}
-                    />
-                  ))}
+                {followingUsers.map((item: RelationInfo, idx) => (
+                  <FollowerListItem
+                    key={`${item.userId}_${idx}`}
+                    userInfo={{ ...item, userId: item.followUserId }}
+                  />
+                ))}
               </ListSection>
               <div ref={targetRef} />
             </List>
@@ -109,22 +113,17 @@ export default function UserFollowPage({
               emptyViewText={`아직 팔로워가 없습니다.\n활동을 더욱 열심히 해보세요!`}
               isListFirstLoading={isFirstLoading}
               isScrollLoading={isFetching}
+              isEmpty={!isFirstLoading && followerUsers.length === 0}
             >
               <List.Title title="나를 팔로우 하는 유저" />
-              <List.Total
-                total={relationList[0].data.followerList?.length ?? 0}
-                unit="명"
-              />
 
               <ListSection className="flex flex-col">
-                {relationList[0].data.followerList
-                  ?.flat()
-                  .map((item: RelationInfo, idx) => (
-                    <FollowerListItem
-                      key={`${item.userId}_${idx}`}
-                      userInfo={item}
-                    />
-                  ))}
+                {followerUsers.map((item: RelationInfo, idx) => (
+                  <FollowerListItem
+                    key={`${item.userId}_${idx}`}
+                    userInfo={item}
+                  />
+                ))}
               </ListSection>
               <div ref={targetRef} />
             </List>

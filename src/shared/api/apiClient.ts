@@ -119,7 +119,7 @@ class ApiClient {
           result?.errors?.[0]?.message ||
           result?.message ||
           'API request failed';
-        throw new ApiError(errorMessage, response);
+        throw new ApiError(errorMessage, response, result?.errors?.[0]?.code);
       }
 
       return result;

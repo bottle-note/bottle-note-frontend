@@ -1,15 +1,14 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { renderHook } from '@testing-library/react';
-import {
-  keepPreviousData as preservePreviousData,
-  useInfiniteQuery,
-} from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { ApiError } from '@/utils/ApiError';
 import { usePaginatedQuery } from './usePaginatedQuery';
 
 jest.mock('@tanstack/react-query', () => ({
-  keepPreviousData: jest.fn(),
+  hashKey: jest.fn(() => 'test-query'),
   useInfiniteQuery: jest.fn(),
+  useQueryClient: jest.fn(() => ({ resetQueries: jest.fn() })),
 }));
 
 jest.mock('@/hooks/useInfiniteScroll', () => ({
@@ -18,6 +17,7 @@ jest.mock('@/hooks/useInfiniteScroll', () => ({
 
 const mockUseInfiniteQuery = useInfiniteQuery as jest.Mock;
 const mockUseInfiniteScroll = useInfiniteScroll as jest.Mock;
+const mockUseQueryClient = useQueryClient as jest.Mock;
 
 const createQueryResult = (overrides = {}) => ({
   data: { pages: [] },
@@ -38,19 +38,25 @@ describe('usePaginatedQuery previous data', () => {
     mockUseInfiniteScroll.mockReturnValue({ targetRef: { current: null } });
   });
 
-  it('옵션 활성화 시 이전 페이지를 placeholder로 유지한다', () => {
+  it('query context 변경 시 이전 페이지를 placeholder로 유지하지 않는다', () => {
     mockUseInfiniteQuery.mockReturnValue(createQueryResult());
 
-    renderHook(() =>
-      usePaginatedQuery({
-        queryKey: ['explore.alcohols', 'macallan'],
-        queryFn: jest.fn(),
-        keepPreviousData: true,
-      }),
+    const { rerender } = renderHook(
+      ({ keyword }) =>
+        usePaginatedQuery({
+          queryKey: ['explore.alcohols', keyword],
+          queryFn: jest.fn(),
+        }),
+      { initialProps: { keyword: 'macallan' } },
     );
 
-    expect(mockUseInfiniteQuery).toHaveBeenCalledWith(
-      expect.objectContaining({ placeholderData: preservePreviousData }),
+    rerender({ keyword: 'lagavulin' });
+
+    expect(mockUseInfiniteQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        queryKey: ['explore.alcohols', 'lagavulin'],
+        placeholderData: undefined,
+      }),
     );
   });
 
@@ -68,7 +74,6 @@ describe('usePaginatedQuery previous data', () => {
       usePaginatedQuery({
         queryKey: ['explore.alcohols', 'macallan'],
         queryFn: jest.fn(),
-        keepPreviousData: true,
       }),
     );
 
@@ -87,7 +92,6 @@ describe('usePaginatedQuery previous data', () => {
       usePaginatedQuery({
         queryKey: ['explore.alcohols', 'macallan'],
         queryFn: jest.fn(),
-        keepPreviousData: true,
       }),
     );
 
@@ -97,4 +101,80 @@ describe('usePaginatedQuery previous data', () => {
 
     expect(fetchNextPage).toHaveBeenCalledTimes(1);
   });
+
+  it('첫 요청 pageParam을 undefined로 두고 CURSOR_EXPIRED next page를 정확히 한 번 reset한다', async () => {
+    const resetQueries = jest.fn();
+    const cursorExpired = new ApiError(
+      'expired',
+      { status: 410 } as Response,
+      'CURSOR_EXPIRED',
+    );
+    const queryFn = jest.fn().mockRejectedValue(cursorExpired);
+
+    mockUseQueryClient.mockReturnValue({ resetQueries });
+    mockUseInfiniteQuery.mockReturnValue(createQueryResult());
+
+    const { result, rerender } = renderHook(() =>
+      usePaginatedQuery({
+        queryKey: ['explore.alcohols', 'macallan'],
+        queryFn,
+      }),
+    );
+
+    const options = mockUseInfiniteQuery.mock.calls[0][0];
+    expect(options.initialPageParam).toBeUndefined();
+
+    await expect(options.queryFn({ pageParam: 'opaque-cursor' })).rejects.toBe(
+      cursorExpired,
+    );
+
+    mockUseInfiniteQuery.mockReturnValue(
+      createQueryResult({ error: cursorExpired }),
+    );
+    rerender();
+
+    expect(resetQueries).toHaveBeenCalledWith({
+      queryKey: ['explore.alcohols', 'macallan'],
+      exact: true,
+    });
+
+    rerender();
+    expect(resetQueries).toHaveBeenCalledTimes(1);
+    expect(result.current.error).toBe(cursorExpired);
+  });
+
+  it.each([
+    { response: { status: 400 } as Response, code: 'INVALID_CURSOR' },
+    { response: { status: 400 } as Response, code: 'CURSOR_CONTEXT_MISMATCH' },
+    { response: { status: 410 } as Response, code: 'OTHER_410' },
+  ])(
+    'invalid/context mismatch/other 410은 자동 restart하지 않는다',
+    async (error) => {
+      const resetQueries = jest.fn();
+      const queryFn = jest
+        .fn()
+        .mockRejectedValue(new ApiError('cursor', error.response, error.code));
+
+      mockUseQueryClient.mockReturnValue({ resetQueries });
+      mockUseInfiniteQuery.mockReturnValue(createQueryResult());
+
+      const { rerender } = renderHook(() =>
+        usePaginatedQuery({
+          queryKey: ['explore.alcohols', 'macallan'],
+          queryFn,
+        }),
+      );
+      const options = mockUseInfiniteQuery.mock.calls[0][0];
+      const rejectedError = await options
+        .queryFn({ pageParam: 'opaque-cursor' })
+        .catch((caught: unknown) => caught);
+
+      mockUseInfiniteQuery.mockReturnValue(
+        createQueryResult({ error: rejectedError }),
+      );
+      rerender();
+
+      expect(resetQueries).not.toHaveBeenCalled();
+    },
+  );
 });

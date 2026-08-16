@@ -16,12 +16,14 @@ import type {
 import { useHistoryFilterStore } from '@/store/historyFilterStore';
 import { UserApi } from '@/api/user/user.api';
 import type { CurrentUserInfo } from '@/api/user/types';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { RATING_NUM_VALUES, PICKS_STATUS } from '@/constants/history';
 import TimelineFull from '@/components/domain/history/TimelineFull';
 import HistoryFilterModal from './_components/filter/HistoryFilterModal';
 
 export default function History() {
   const queryClient = useQueryClient();
+  const { isLoggedIn, user } = useAuthSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlKeyword = searchParams.get('keyword') || '';
@@ -38,15 +40,15 @@ export default function History() {
     isLoading,
     error,
     isFetching,
+    hasNextPage,
     targetRef,
-    refetch,
   } = usePaginatedQuery<HistoryListResponse>({
-    queryKey: ['history', currentUserInfo?.id, currentParams],
+    queryKey: ['history', user?.userId, currentUserInfo?.id, currentParams],
     queryFn: async ({ pageParam }) => {
       const queryParams: HistoryListQueryParams = {
         userId: String(currentUserInfo?.id),
         cursor: pageParam,
-        pageSize: 10,
+        size: 10,
       };
 
       const params = getQueryParams();
@@ -77,7 +79,7 @@ export default function History() {
 
       return HistoryApi.getHistoryList(queryParams, urlParams.toString());
     },
-    enabled: !!currentUserInfo?.id,
+    enabled: isLoggedIn && !!currentUserInfo?.id,
   });
 
   const accumulatedHistories = historyData?.reduce(
@@ -91,27 +93,31 @@ export default function History() {
     {} as HistoryListResponse,
   );
 
-  const handleFilterChange = async () => {
+  const handleFilterChange = () => {
     const newParams = getQueryParams().toString();
     if (newParams !== currentParams) {
       setCurrentParams(newParams);
-      await refetch();
     }
   };
 
-  const handleClose = async () => {
+  const handleClose = () => {
     setIsOpen(false);
-    await handleFilterChange();
+    handleFilterChange();
   };
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      setCurrentUserInfo(null);
+      return;
+    }
+
     const fetchUserInfo = async () => {
       const response = await UserApi.getCurUserInfo();
       setCurrentUserInfo(response.data);
     };
 
     fetchUserInfo();
-  }, []);
+  }, [isLoggedIn, user?.userId]);
 
   useEffect(() => {
     setKeyword(urlKeyword);
@@ -167,9 +173,7 @@ export default function History() {
         />
         <TimelineFull
           data={accumulatedHistories}
-          isLastPage={
-            !!(historyData && !historyData.at(-1)?.meta.pageable?.hasNext)
-          }
+          isLastPage={Boolean(historyData) && !hasNextPage}
           currentUserInfo={currentUserInfo}
           handleOpenFilterModal={() => setIsOpen(true)}
           shouldReset={shouldReset}

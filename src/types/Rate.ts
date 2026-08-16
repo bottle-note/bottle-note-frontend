@@ -9,9 +9,7 @@ export interface RateAlcoholAPI {
   isPicked: boolean;
 }
 
-export interface RateAPI extends Omit<RateAlcoholAPI, 'rating'> {
-  totalCount: number;
-}
+export type RateAPI = Omit<RateAlcoholAPI, 'rating'>;
 
 export interface UserRatingApi {
   alcoholId: number;

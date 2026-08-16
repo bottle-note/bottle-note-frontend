@@ -1,5 +1,6 @@
 import { apiClient } from '@/shared/api/apiClient';
 import { ApiResponse } from '@/api/_shared/types';
+import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import type {
   RelationListParams,
@@ -15,10 +16,11 @@ export const FollowApi = {
   async getRelationList(
     params: RelationListParams,
   ): Promise<ApiResponse<RelationListResponse>> {
-    const { userId, type } = params;
+    const { userId, type, cursor, size } = params;
+    const queryString = buildQueryParams({ cursor, size });
 
     const response = await apiClient.get<ApiResponse<RelationListResponse>>(
-      `/follow/${userId}/${type}-list`,
+      `/follow/${userId}/${type}-list?${queryString}`,
       { authRequired: true },
     );
 

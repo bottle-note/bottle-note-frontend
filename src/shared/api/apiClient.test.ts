@@ -13,8 +13,14 @@ jest.mock('@/store/modalStore', () => ({
   },
 }));
 
-describe('apiClient request cancellation', () => {
+describe('apiClient request cancellation and semantic errors', () => {
   const originalFetch = global.fetch;
+  const createErrorResponse = (status: number, body: unknown) =>
+    ({
+      ok: false,
+      status,
+      json: jest.fn().mockResolvedValue(body),
+    }) as unknown as Response;
 
   afterEach(() => {
     global.fetch = originalFetch;
@@ -37,5 +43,34 @@ describe('apiClient request cancellation', () => {
     ).rejects.toBe(abortError);
 
     expect(consoleError).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [410, 'CURSOR_EXPIRED'],
+    [400, 'INVALID_CURSOR'],
+    [400, 'CURSOR_CONTEXT_MISMATCH'],
+  ])('errors[0].code=%s를 ApiError.code에 보존한다', async (status, code) => {
+    global.fetch = jest.fn().mockResolvedValue(
+      createErrorResponse(status, {
+        errors: [{ code, message: 'cursor error', status: String(status) }],
+      }),
+    );
+
+    await expect(
+      apiClient.get('/test', { authRequired: false }),
+    ).rejects.toMatchObject({
+      code,
+      message: 'cursor error',
+    });
+  });
+
+  it('오류 본문 또는 semantic code가 없으면 ApiError.code는 null이다', async () => {
+    global.fetch = jest.fn().mockResolvedValue(createErrorResponse(500, null));
+
+    await expect(
+      apiClient.get('/test', { authRequired: false }),
+    ).rejects.toMatchObject({
+      code: null,
+    });
   });
 });

@@ -2,21 +2,7 @@
 // Alcohol API - Request/Response Types
 // ============================================
 
-import {
-  CursorPaginationParams,
-  SORT_TYPE,
-  SORT_ORDER,
-} from '@/api/_shared/types';
-
 // --------------- Request Types ---------------
-
-export type AlcoholListParams = CursorPaginationParams & {
-  keyword?: string;
-  category?: string;
-  regionId?: number | '';
-  sortType?: SORT_TYPE;
-  sortOrder?: SORT_ORDER;
-};
 
 export interface PickParams {
   alcoholId: string | number;
@@ -54,11 +40,6 @@ export interface Alcohol {
   isPicked: boolean;
   popularScore?: number;
   path?: string;
-}
-
-export interface AlcoholListResponse {
-  alcohols: Alcohol[];
-  totalCount: number;
 }
 
 export interface AlcoholInfo {
@@ -121,7 +102,7 @@ export interface AlcoholDetailsResponse {
   alcohols: AlcoholInfo;
   friendsInfo: FriendsInfo;
   reviewInfo: {
-    totalCount: number;
+    totalCount?: number;
     reviewList: ReviewInDetails[];
   };
 }

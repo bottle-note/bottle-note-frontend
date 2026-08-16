@@ -43,12 +43,10 @@ export interface ServiceInquireListApi {
     createAt: string;
     helpStatus: Status;
   }[];
-  totalCount: number;
 }
 
 export interface BusinessInquireListApi {
   items: InquireList[];
-  totalCount: number;
 }
 
 interface InquireDetailsApi {

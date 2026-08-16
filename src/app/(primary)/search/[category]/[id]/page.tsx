@@ -20,6 +20,7 @@ import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import NavLayout from '@/components/ui/Layout/NavLayout';
 import StarRating from '@/components/ui/Form/StarRating';
 import EmptyView from '@/components/ui/Display/EmptyView';
+import List from '@/components/feature/List/List';
 import { truncStr } from '@/utils/truncStr';
 // import { shareOrCopy } from '@/utils/shareOrCopy';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
@@ -226,6 +227,9 @@ export default function SearchAlcohol() {
     // TODO: Analytics tracking
   };
 
+  const reviewList = data?.reviewInfo?.reviewList ?? [];
+  const reviewTotalCount = data?.reviewInfo?.totalCount;
+
   return (
     <>
       {alcoholSchema && <JsonLd data={alcoholSchema} />}
@@ -337,16 +341,17 @@ export default function SearchAlcohol() {
               )}
             </div>
             <>
-              {data?.reviewInfo?.reviewList &&
-              data.reviewInfo.totalCount !== 0 ? (
+              {reviewList.length > 0 ? (
                 <>
                   <div className="h-4 bg-bg-layer-basement" />
                   <section className="mx-5 pt-[34px] pb-[20px]">
-                    <p className="mb-[10px] text-11 font-normal text-fg-neutral-muted">
-                      총 {data.reviewInfo.totalCount}개
-                    </p>
+                    {typeof reviewTotalCount === 'number' && (
+                      <div className="mb-[10px]">
+                        <List.Total total={reviewTotalCount} />
+                      </div>
+                    )}
                     <div className="border-b border-stroke-neutral-subtle" />
-                    {data.reviewInfo.reviewList.map((review) => (
+                    {reviewList.map((review) => (
                       <React.Fragment key={review.reviewId}>
                         <ReviewListItem
                           data={review}

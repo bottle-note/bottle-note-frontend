@@ -9,23 +9,15 @@ import { useCurationFeedQuery } from '@/queries/useCurationFeedQuery';
 export { curationV2Keys };
 
 export const useProgramsQuery = (
-  pageSize = 10,
+  size = 10,
   keyword?: string,
   code: CurationV2SpecCode = CURATION_V2_SPEC_CODES.PROGRAM,
   enabled = true,
 ) => {
-  const query = useCurationFeedQuery({
-    pageSize,
-    keyword,
-    code,
-    enabled,
-  });
+  const query = useCurationFeedQuery({ size, keyword, code, enabled });
   const data = query.data
     ?.flatMap((page) => page.data.items)
     .filter(isProgramFeedItem);
 
-  return {
-    ...query,
-    data,
-  };
+  return { ...query, data };
 };

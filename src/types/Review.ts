@@ -78,7 +78,6 @@ export interface ReviewTempData {
 
 export interface ReviewListApi {
   reviewList: Review[];
-  totalCount: number;
 }
 
 export interface ReviewDetailsApi {
