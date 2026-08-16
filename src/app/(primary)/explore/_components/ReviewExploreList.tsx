@@ -36,7 +36,7 @@ export const ReviewExplorerList = ({
         keywords: keywordValues,
         ...{
           cursor: pageParam,
-          pageSize: 10,
+          size: 10,
         },
       });
     },

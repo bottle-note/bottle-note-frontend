@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { groupHistoryByDate } from '@/app/(primary)/history/utils/historyUtils';
 import { History as HistoryType } from '@/types/History';
 import { ApiResponse } from '@/api/_shared/types';
+import type { HistoryListResponse } from '@/api/history/types';
 import { TimelineSkeleton } from '@/components/ui/Loading/Skeletons/custom/TimelineSkeleton';
 import { HistoryEmptyState } from '@/app/(primary)/history/_components/HistoryEmptyState';
 import TimelineMonthGroup from '@/components/domain/history/TimelineMonthGroup';
@@ -9,11 +10,7 @@ import TimelineMonthGroup from '@/components/domain/history/TimelineMonthGroup';
 const EMPTY_HISTORY_LIST: HistoryType[] = [];
 
 export interface TimelinePreviewProps {
-  data?: ApiResponse<{
-    userHistories: HistoryType[];
-    subscriptionDate: string;
-    totalCount: number;
-  }>[];
+  data?: ApiResponse<HistoryListResponse>[];
   isLoading?: boolean;
   error?: Error | null;
   limit?: number;
@@ -42,12 +39,12 @@ export default function TimelinePreview({
 
   const historyList: HistoryType[] =
     historyData?.userHistories ?? EMPTY_HISTORY_LIST;
-  const totalCount = historyData?.totalCount || 0;
+  const loadedCount = historyList.length;
 
   let gradientHeight = '0px';
   if (showGradient) {
-    if (totalCount < 3) gradientHeight = '0px';
-    else if (totalCount === 3) gradientHeight = '150px';
+    if (loadedCount < 3) gradientHeight = '0px';
+    else if (loadedCount === 3) gradientHeight = '150px';
     else gradientHeight = '400px';
   }
 
@@ -76,7 +73,7 @@ export default function TimelinePreview({
     return <TimelineSkeleton />;
   }
 
-  if (totalCount === 0 || error) {
+  if (loadedCount === 0 || error) {
     return <HistoryEmptyState error={error} />;
   }
 

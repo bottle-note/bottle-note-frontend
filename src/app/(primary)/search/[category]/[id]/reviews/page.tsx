@@ -15,6 +15,7 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useFilter } from '@/hooks/useFilter';
 import { useNavigateReviewWrite } from '@/hooks/useNavigateReviewWrite';
 import ReviewItemSkeleton from '@/components/ui/Loading/Skeletons/ReviewItemSkeleton';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 
 const SORT_OPTIONS = [
   { name: '인기도순', type: SORT_TYPE.POPULAR },
@@ -35,6 +36,7 @@ function Reviews() {
   const alcoholId = params?.id as string;
   const alcoholKorName = searchParams.get('name');
   const { handleReviewWrite } = useNavigateReviewWrite();
+  const { isLoggedIn, user } = useAuthSession();
   const [activeTab, setActiveTab] = useState('tab1');
 
   const handleTabClick = (tab: string) => {
@@ -56,7 +58,6 @@ function Reviews() {
     refetch: refetchReview,
   } = usePaginatedQuery<{
     reviewList: ReviewInDetails[];
-    totalCount: number;
   }>({
     queryKey: ['review', filterState, alcoholId],
     queryFn: ({ pageParam }) => {
@@ -64,7 +65,7 @@ function Reviews() {
         alcoholId: alcoholId as string,
         ...filterState,
         cursor: pageParam,
-        pageSize: 10,
+        size: 10,
       });
     },
   });
@@ -80,17 +81,17 @@ function Reviews() {
     refetch: refetchMyReview,
   } = usePaginatedQuery<{
     reviewList: ReviewInDetails[];
-    totalCount: number;
   }>({
-    queryKey: ['myReview', filterMyState],
+    queryKey: ['myReview', user?.userId, alcoholId, filterMyState],
     queryFn: ({ pageParam }) => {
       return ReviewApi.getMyReviewList({
         alcoholId: alcoholId as string,
         ...filterMyState,
         cursor: pageParam,
-        pageSize: 10,
+        size: 10,
       });
     },
+    enabled: isLoggedIn,
   });
 
   const refreshReviews = useCallback(() => {
@@ -146,9 +147,6 @@ function Reviews() {
                 isListFirstLoading={isFirstLoading}
                 isScrollLoading={isFetching}
               >
-                <List.Total
-                  total={reviewList ? reviewList[0].data.totalCount : 0}
-                />
                 <List.SortOrderSwitch
                   type={filterState.sortOrder}
                   handleSortOrder={(value) => handleFilter('sortOrder', value)}
@@ -189,9 +187,6 @@ function Reviews() {
                 isListFirstLoading={isMyReviewFirstLoading}
                 isScrollLoading={isMyReviewFetching}
               >
-                <List.Total
-                  total={myReviewList ? myReviewList[0].data.totalCount : 0}
-                />
                 <List.SortOrderSwitch
                   type={filterMyState.sortOrder}
                   handleSortOrder={(value) =>

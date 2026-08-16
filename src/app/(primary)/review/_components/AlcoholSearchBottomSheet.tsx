@@ -6,7 +6,7 @@ import SearchBar from '@/components/feature/Search/SearchBar';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
 import Tab from '@/components/ui/Navigation/Tab';
 import { useTab } from '@/hooks/useTab';
-import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
+import { ExploreApi } from '@/api/explore/explore.api';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { Category } from '@/types/common';
 import { SORT_TYPE, SORT_ORDER } from '@/api/_shared/types';
@@ -42,22 +42,21 @@ export default function AlcoholSearchBottomSheet({
 
   const { data, isLoading, isFetching, targetRef } = usePaginatedQuery({
     queryKey: ['alcoholSearch', keyword, selectedCategory],
-    queryFn: async ({ pageParam = 0 }) => {
-      return AlcoholsApi.getList({
-        keyword: keyword || undefined,
+    queryFn: async ({ pageParam }) => {
+      return ExploreApi.getAlcohols({
+        keywords: keyword ? [keyword] : [],
         category: selectedCategory,
         sortType: SORT_TYPE.POPULAR,
         sortOrder: SORT_ORDER.DESC,
         cursor: pageParam,
-        pageSize: PAGE_SIZE,
+        size: PAGE_SIZE,
       });
     },
-    pageSize: PAGE_SIZE,
     enabled: isOpen,
     staleTime: 1000 * 60 * 5,
   });
 
-  const searchResults = data?.flatMap((page) => page.data.alcohols) ?? [];
+  const searchResults = data?.flatMap((page) => page.data.items) ?? [];
   const isFetchingMore = isFetching && !isLoading;
   const hasSearched = data !== undefined;
 

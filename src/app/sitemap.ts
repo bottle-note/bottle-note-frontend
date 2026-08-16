@@ -1,10 +1,10 @@
 import { MetadataRoute } from 'next';
 import { ApiResponse } from '@/api/_shared/types';
-import { ExploreReview } from '@/types/Explore';
+import type { ExploreAlcohol, ExploreReview } from '@/api/explore/types';
 import { BASE_URL } from '@/constants/common';
 
 const SITEMAP_CONFIG = {
-  PAGE_SIZE: 1000,
+  PAGE_SIZE: 100,
   CACHE_POLICY: 'no-store' as const,
 };
 
@@ -40,36 +40,56 @@ async function fetchFromAPI<T>(endpoint: string): Promise<T> {
   return response.json();
 }
 
-interface AlcoholResponse {
-  alcohols: Array<{
-    alcoholId: number;
-    engCategoryName: string;
-    modifyDate?: string;
-    createDate: string;
-  }>;
-  totalCount: number;
-}
+async function fetchCursorItems<T>(
+  endpoint: string,
+  params: Record<string, string>,
+): Promise<T[]> {
+  const items: T[] = [];
+  const seenCursors = new Set<string>();
+  let cursor: string | undefined;
 
-interface ReviewResponse {
-  items: ExploreReview[];
+  while (true) {
+    const queryParams = new URLSearchParams({
+      ...params,
+      size: String(SITEMAP_CONFIG.PAGE_SIZE),
+    });
+    if (cursor) queryParams.set('cursor', cursor);
+
+    const response = await fetchFromAPI<ApiResponse<{ items: T[] }>>(
+      `${endpoint}?${queryParams.toString()}`,
+    );
+    if (response.errors.length !== 0) break;
+
+    items.push(...response.data.items);
+
+    const pagination = response.meta.pagination;
+    if (!pagination?.hasNext || !pagination.nextCursor) break;
+    if (seenCursors.has(pagination.nextCursor)) {
+      throw new Error('Sitemap cursor repeated');
+    }
+
+    seenCursors.add(pagination.nextCursor);
+    cursor = pagination.nextCursor;
+  }
+
+  return items;
 }
 
 async function fetchAlcoholPages(
   baseUrl: string,
 ): Promise<MetadataRoute.Sitemap> {
   try {
-    const response = await fetchFromAPI<ApiResponse<AlcoholResponse>>(
-      `/alcohols/search?sortType=POPULAR&sortOrder=DESC&cursor=0&pageSize=${SITEMAP_CONFIG.PAGE_SIZE}`,
+    const alcohols = await fetchCursorItems<ExploreAlcohol>(
+      '/alcohols/explore/standard',
+      { sortType: 'POPULAR', sortOrder: 'DESC' },
     );
 
-    if (response.errors.length === 0 && response.data.alcohols) {
-      return response.data.alcohols.map((alcohol) => ({
-        url: `${baseUrl}/search/${alcohol.engCategoryName}/${alcohol.alcoholId}`,
-        lastModified: parseDate(alcohol.modifyDate || alcohol.createDate),
-        changeFrequency: 'weekly' as const,
-        priority: 0.8,
-      }));
-    }
+    return alcohols.map((alcohol) => ({
+      url: `${baseUrl}/search/${alcohol.engCategory}/${alcohol.alcoholId}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    }));
   } catch (error) {
     console.error('❌ [Sitemap] Failed to fetch alcohols:', error);
   }
@@ -81,21 +101,19 @@ async function fetchReviewPages(
   baseUrl: string,
 ): Promise<{ pages: MetadataRoute.Sitemap; reviewItems: ExploreReview[] }> {
   try {
-    const response = await fetchFromAPI<ApiResponse<ReviewResponse>>(
-      `/reviews/explore/standard?keywords=&cursor=0&size=${SITEMAP_CONFIG.PAGE_SIZE}`,
+    const reviewItems = await fetchCursorItems<ExploreReview>(
+      '/reviews/explore/standard',
+      { keywords: '' },
     );
 
-    if (response.errors.length === 0 && response.data.items) {
-      const reviewItems = response.data.items;
-      const pages = reviewItems.map((review) => ({
-        url: `${baseUrl}/review/${review.reviewId}`,
-        lastModified: parseDate(review.modifiedAt || review.createAt),
-        changeFrequency: 'daily' as const,
-        priority: 1,
-      }));
+    const pages = reviewItems.map((review) => ({
+      url: `${baseUrl}/review/${review.reviewId}`,
+      lastModified: parseDate(review.modifiedAt || review.createAt),
+      changeFrequency: 'daily' as const,
+      priority: 1,
+    }));
 
-      return { pages, reviewItems };
-    }
+    return { pages, reviewItems };
   } catch (error) {
     console.error('❌ [Sitemap] Failed to fetch reviews:', error);
   }

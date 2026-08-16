@@ -1,19 +1,34 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useBlockActions } from '@/hooks/useBlockActions';
 import { BlockApi } from '@/api/block/block.api';
+import type { BlockListResponse } from '@/api/block/types';
 import ProfileImage from '@/components/domain/user/ProfileImage';
-import { BlockListApi } from '@/types/Settings';
 import List from '@/components/feature/List/List';
+import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 
 export default function BlockManagement() {
-  const [blockedUsers, setBlockedUsers] = useState<BlockListApi | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { isLoggedIn, user } = useAuthSession();
   const [unblockingUsers, setUnblockingUsers] = useState<Set<string>>(
     new Set(),
   );
+
+  const {
+    data: blockPages,
+    isLoading,
+    isFetching,
+    targetRef,
+  } = usePaginatedQuery<BlockListResponse>({
+    queryKey: ['blocks', user?.userId],
+    queryFn: ({ pageParam }) =>
+      BlockApi.getBlockList({ cursor: pageParam, size: 20 }),
+    enabled: isLoggedIn,
+  });
+
+  const blockedUsers = blockPages?.flatMap((page) => page.data.items) ?? [];
 
   const { handleBlockUser, handleUnblockUser } = useBlockActions({
     onUnblockStart: (userId) => {
@@ -35,23 +50,6 @@ export default function BlockManagement() {
     },
   });
 
-  useEffect(() => {
-    const fetchBlockList = async () => {
-      try {
-        const response = await BlockApi.getBlockList();
-        if (response.data?.items) {
-          setBlockedUsers(response.data);
-        }
-      } catch (error) {
-        console.error('차단 목록 조회 실패:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBlockList();
-  }, []);
-
   const itemVariants = {
     hidden: { opacity: 0, x: 50 },
     visible: (i: number) => ({
@@ -71,13 +69,13 @@ export default function BlockManagement() {
         <div className="px-6 pt-6">
           <List
             emptyViewText="차단된 사용자가 없습니다."
-            isListFirstLoading={loading}
-            isEmpty={(blockedUsers?.items?.length ?? 0) === 0}
+            isListFirstLoading={isLoading}
+            isScrollLoading={isFetching}
+            isEmpty={!isLoading && blockedUsers.length === 0}
           >
-            <List.Total total={blockedUsers?.totalCount ?? 0} unit="명" />
             <List.Section>
-              {blockedUsers?.items?.map((user, index) => {
-                const isLast = index === blockedUsers.items.length - 1;
+              {blockedUsers.map((user, index) => {
+                const isLast = index === blockedUsers.length - 1;
                 const isUnblocking = unblockingUsers.has(user.userId);
 
                 return (
@@ -124,6 +122,7 @@ export default function BlockManagement() {
                 );
               })}
             </List.Section>
+            <div ref={targetRef} />
           </List>
         </div>
       </div>

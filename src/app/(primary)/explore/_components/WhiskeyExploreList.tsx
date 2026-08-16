@@ -55,12 +55,11 @@ export const WhiskeyExplorerList = ({
         sortType: 'POPULAR',
         sortOrder: 'DESC',
         cursor: pageParam,
-        pageSize: 10,
+        size: 10,
         signal,
       });
     },
     staleTime: 1000 * 60 * 5,
-    keepPreviousData: true,
   });
 
   const isSearching = isFetching && !isFetchingNextPage;

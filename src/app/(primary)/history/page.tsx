@@ -38,15 +38,15 @@ export default function History() {
     isLoading,
     error,
     isFetching,
+    hasNextPage,
     targetRef,
-    refetch,
   } = usePaginatedQuery<HistoryListResponse>({
     queryKey: ['history', currentUserInfo?.id, currentParams],
     queryFn: async ({ pageParam }) => {
       const queryParams: HistoryListQueryParams = {
         userId: String(currentUserInfo?.id),
         cursor: pageParam,
-        pageSize: 10,
+        size: 10,
       };
 
       const params = getQueryParams();
@@ -91,17 +91,16 @@ export default function History() {
     {} as HistoryListResponse,
   );
 
-  const handleFilterChange = async () => {
+  const handleFilterChange = () => {
     const newParams = getQueryParams().toString();
     if (newParams !== currentParams) {
       setCurrentParams(newParams);
-      await refetch();
     }
   };
 
-  const handleClose = async () => {
+  const handleClose = () => {
     setIsOpen(false);
-    await handleFilterChange();
+    handleFilterChange();
   };
 
   useEffect(() => {
@@ -167,9 +166,7 @@ export default function History() {
         />
         <TimelineFull
           data={accumulatedHistories}
-          isLastPage={
-            !!(historyData && !historyData.at(-1)?.meta.pageable?.hasNext)
-          }
+          isLastPage={Boolean(historyData) && !hasNextPage}
           currentUserInfo={currentUserInfo}
           handleOpenFilterModal={() => setIsOpen(true)}
           shouldReset={shouldReset}

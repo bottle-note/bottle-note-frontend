@@ -3,7 +3,8 @@ import Image from 'next/image';
 import { isWithinInterval, parseISO } from 'date-fns';
 import List from '@/components/feature/List/List';
 import { groupHistoryByDate } from '@/app/(primary)/history/utils/historyUtils';
-import { HistoryListApi, History as HistoryType } from '@/types/History';
+import { History as HistoryType } from '@/types/History';
+import type { HistoryListResponse } from '@/api/history/types';
 import { CurrentUserInfoApi } from '@/types/User';
 import { TimelineSkeleton } from '@/components/ui/Loading/Skeletons/custom/TimelineSkeleton';
 import { HistoryEmptyState } from '@/app/(primary)/history/_components/HistoryEmptyState';
@@ -13,7 +14,7 @@ import { useHistoryFilterStore } from '@/store/historyFilterStore';
 import FilterIcon from 'public/icon/filter-subcoral.svg';
 
 export interface TimelineFullProps {
-  data?: HistoryListApi;
+  data?: HistoryListResponse;
   isLoading?: boolean;
   error?: Error | null;
   isLastPage: boolean;
@@ -47,8 +48,13 @@ export default function TimelineFull({
   });
 
   const historyList: HistoryType[] = data?.userHistories || [];
-  const totalCount = data?.totalCount || 0;
   const subscriptionDate = data?.subscriptionDate || '';
+  const isFiltering =
+    filterState.ratingPoint.length > 0 ||
+    filterState.historyReviewFilterType.length > 0 ||
+    filterState.picksStatus.length > 0 ||
+    Boolean(filterState.date.startDate || filterState.date.endDate) ||
+    filterState.keyword.trim().length > 0;
 
   function getLatestYearMonth() {
     const latestYearMonth = processedHistory.yearMonths?.[0];
@@ -178,7 +184,7 @@ export default function TimelineFull({
         <HistoryEmptyState
           isLoading={isLoading}
           error={error}
-          isFiltering={totalCount !== 0 && data.userHistories.length === 0}
+          isFiltering={isFiltering}
         />
       )}
       <div ref={targetRef} />

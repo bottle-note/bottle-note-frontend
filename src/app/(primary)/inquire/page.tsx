@@ -20,7 +20,7 @@ export default function Inquire() {
   const paramsType =
     (searchParams.get('type') as keyof typeof INQUIRE_TYPE) || 'service';
   const serviceType = INQUIRE_TYPE[paramsType] || paramsType;
-  const { isLoggedIn } = useAuthSession();
+  const { isLoggedIn, user } = useAuthSession();
   const { handleLoginModal } = useModalStore();
 
   const {
@@ -30,13 +30,12 @@ export default function Inquire() {
     targetRef,
   } = usePaginatedQuery<{
     items: ServiceInquireItem[];
-    totalCount: number;
   }>({
-    queryKey: ['inquireList', paramsType],
+    queryKey: ['inquireList', user?.userId, paramsType],
     queryFn: ({ pageParam }) => {
       const queryParams = {
         cursor: pageParam,
-        pageSize: 10,
+        size: 10,
       };
       if (paramsType === 'business') {
         return InquireApi.getBusinessInquireList(queryParams);
@@ -44,6 +43,7 @@ export default function Inquire() {
         return InquireApi.getInquireList(queryParams);
       }
     },
+    enabled: isLoggedIn,
   });
 
   const handleItemClick = (helpId: number) => {
@@ -72,7 +72,7 @@ export default function Inquire() {
           isListFirstLoading={isLoading}
           isScrollLoading={isFetching}
           emptyViewText="문의사항이 없습니다."
-          isEmpty={!inquireList || inquireList[0].data.totalCount === 0}
+          isEmpty={!inquireList || inquireList[0].data.items.length === 0}
         >
           <List.Section>
             {inquireList && (

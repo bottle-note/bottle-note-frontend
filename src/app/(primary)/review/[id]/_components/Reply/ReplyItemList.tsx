@@ -1,11 +1,75 @@
-import React, { useEffect, useState, useCallback, memo } from 'react';
-import { RootReply, SubReply } from '@/types/Reply';
+import React, { useCallback, useEffect, useMemo, useState, memo } from 'react';
+import type { RootReply, SubReply } from '@/api/reply/types';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ReplyApi } from '@/api/reply/reply.api';
 import List from '@/components/feature/List/List';
 import EmptyView from '@/components/ui/Display/EmptyView';
 import { sortReplies } from '@/app/(primary)/review/utils/sortReplies';
 import ReplyItem from './ReplyItem';
+
+interface SubReplyListProps {
+  reviewId: string | string[];
+  rootReplyId: number;
+  reviewUserId: number;
+  setIsRefetch: React.Dispatch<React.SetStateAction<boolean>>;
+  isOpen: boolean;
+  refreshToken: number;
+}
+
+const SubReplyList = ({
+  reviewId,
+  rootReplyId,
+  reviewUserId,
+  setIsRefetch,
+  isOpen,
+  refreshToken,
+}: SubReplyListProps) => {
+  const { data, targetRef, hasNextPage } = usePaginatedQuery<{
+    reviewReplies: SubReply[];
+  }>({
+    queryKey: ['review-sub-reply', reviewId, rootReplyId, refreshToken],
+    queryFn: ({ pageParam }) =>
+      ReplyApi.getSubReplyList({
+        reviewId: String(reviewId),
+        rootReplyId: String(rootReplyId),
+        cursor: pageParam,
+        size: 10,
+      }),
+    enabled: isOpen,
+  });
+  const subReplies = useMemo(
+    () =>
+      sortReplies(
+        data?.flatMap((page) => page.data.reviewReplies) ?? [],
+        rootReplyId,
+      ),
+    [data, rootReplyId],
+  );
+
+  if (!isOpen || subReplies.length === 0) return null;
+
+  return (
+    <>
+      {subReplies.map((subComment) => (
+        <div
+          key={`sub-${subComment.reviewReplyId}`}
+          className="relative ml-[6px]"
+        >
+          <div className="absolute top-0 h-full w-px bg-stroke-neutral-subtle" />
+          <div className="ml-4">
+            <ReplyItem
+              data={subComment}
+              isReviewUser={reviewUserId === subComment.userId}
+              reviewId={reviewId}
+              setIsRefetch={setIsRefetch}
+            />
+          </div>
+        </div>
+      ))}
+      {hasNextPage && <div ref={targetRef} className="h-1" />}
+    </>
+  );
+};
 
 const RootReplyItemMemo = memo(
   ({
@@ -15,7 +79,7 @@ const RootReplyItemMemo = memo(
     setIsRefetch,
     isSubReplyShow,
     onToggleSubReply,
-    subReplies,
+    subReplyRefreshToken,
   }: {
     comment: RootReply;
     reviewUserId: number;
@@ -23,7 +87,7 @@ const RootReplyItemMemo = memo(
     setIsRefetch: React.Dispatch<React.SetStateAction<boolean>>;
     isSubReplyShow: boolean;
     onToggleSubReply: (id: number) => void;
-    subReplies: SubReply[] | undefined;
+    subReplyRefreshToken: number;
   }) => {
     const handleToggle = useCallback(() => {
       onToggleSubReply(comment.reviewReplyId);
@@ -38,25 +102,14 @@ const RootReplyItemMemo = memo(
         isSubReplyShow={isSubReplyShow}
         onToggleSubReply={handleToggle}
       >
-        {isSubReplyShow &&
-          subReplies &&
-          subReplies.length > 0 &&
-          subReplies.map((subComment) => (
-            <div
-              key={`sub-${subComment.reviewReplyId}`}
-              className="relative ml-[6px]"
-            >
-              <div className="absolute top-0 h-full w-px bg-stroke-neutral-subtle" />
-              <div className="ml-4">
-                <ReplyItem
-                  data={subComment}
-                  isReviewUser={reviewUserId === subComment.userId}
-                  reviewId={reviewId}
-                  setIsRefetch={setIsRefetch}
-                />
-              </div>
-            </div>
-          ))}
+        <SubReplyList
+          reviewId={reviewId}
+          rootReplyId={comment.reviewReplyId}
+          reviewUserId={reviewUserId}
+          setIsRefetch={setIsRefetch}
+          isOpen={isSubReplyShow}
+          refreshToken={subReplyRefreshToken}
+        />
       </ReplyItem>
     );
   },
@@ -79,141 +132,89 @@ export default function ReplyItemList({
   setIsRefetch,
   lastCreatedRootReplyId,
 }: Props) {
-  const [subReplyMap, setSubReplyMap] = useState<Map<number, SubReply[]>>(
-    new Map(),
-  );
   const [openReplyIds, setOpenReplyIds] = useState<Set<number>>(new Set());
-
+  const [subReplyRefreshToken, setSubReplyRefreshToken] = useState(0);
   const {
-    data: rootReplyList,
+    data: rootReplyPages,
     isLoading: isRootFirstLoading,
     isFetching: isRootFetching,
     targetRef: rootReplyTargetRef,
+    hasNextPage: hasNextRootReplyPage,
     refetch: refetchRootReply,
-  } = usePaginatedQuery<{ reviewReplies: RootReply[]; totalCount: number }>({
-    queryKey: ['review_reply', reviewId],
-    queryFn: ({ pageParam }) => {
-      return ReplyApi.getRootReplyList({
-        reviewId: reviewId as string,
+  } = usePaginatedQuery<{ reviewReplies: RootReply[] }>({
+    queryKey: ['review-reply', reviewId],
+    queryFn: ({ pageParam }) =>
+      ReplyApi.getRootReplyList({
+        reviewId: String(reviewId),
         cursor: pageParam,
-        pageSize: 10,
-      });
-    },
+        size: 10,
+      }),
   });
+  const rootReplies =
+    rootReplyPages?.flatMap((page) => page.data.reviewReplies) ?? [];
 
-  const getSubReplyList = useCallback(
-    async (rootReplyId: number) => {
-      const result = await ReplyApi.getSubReplyList({
-        reviewId: reviewId.toString(),
-        rootReplyId: rootReplyId.toString(),
-      });
-
-      if (result && result.data.totalCount > 0) {
-        const replyFormattedList = sortReplies(
-          result.data.reviewReplies,
-          rootReplyId,
-        );
-        setSubReplyMap((prev) => {
-          const newMap = new Map(prev);
-          newMap.set(rootReplyId, replyFormattedList);
-          return newMap;
-        });
-      }
-    },
-    [reviewId],
-  );
-
-  const handleToggleSubReply = useCallback(
-    (rootReplyId: number) => {
-      setOpenReplyIds((prev) => {
-        const newSet = new Set(prev);
-        if (newSet.has(rootReplyId)) {
-          newSet.delete(rootReplyId);
-        } else {
-          newSet.add(rootReplyId);
-
-          if (!subReplyMap.has(rootReplyId)) {
-            getSubReplyList(rootReplyId);
-          }
-        }
-        return newSet;
-      });
-    },
-    [subReplyMap, getSubReplyList],
-  );
+  const handleToggleSubReply = useCallback((rootReplyId: number) => {
+    setOpenReplyIds((previous) => {
+      const next = new Set(previous);
+      if (next.has(rootReplyId)) next.delete(rootReplyId);
+      else next.add(rootReplyId);
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
-    if (isRefetch) {
-      const previousOpenIds = new Set(openReplyIds);
+    if (!isRefetch) return;
 
-      // 항상 rootReply를 refetch하여 count 업데이트
-      refetchRootReply().then(async () => {
-        // 대댓글을 등록한 경우, 해당 루트 댓글의 대댓글 목록만 다시 fetch
-        if (lastCreatedRootReplyId) {
-          setOpenReplyIds((prev) => new Set(prev).add(lastCreatedRootReplyId));
-          // 해당 대댓글을 다시 fetch (await로 완료될 때까지 대기)
-          await getSubReplyList(lastCreatedRootReplyId);
-        } else {
-          // 루트 댓글을 등록한 경우, 기존에 열려있던 대댓글 목록들을 다시 fetch
-          setSubReplyMap(new Map());
-          previousOpenIds.forEach((id) => {
-            getSubReplyList(id);
-          });
-        }
-      });
-      setIsRefetch(false);
+    if (lastCreatedRootReplyId) {
+      setOpenReplyIds((previous) =>
+        new Set(previous).add(lastCreatedRootReplyId),
+      );
     }
-  }, [
-    isRefetch,
-    refetchRootReply,
-    setIsRefetch,
-    lastCreatedRootReplyId,
-    getSubReplyList,
-    openReplyIds,
-  ]);
+    setSubReplyRefreshToken((previous) => previous + 1);
+    refetchRootReply();
+    setIsRefetch(false);
+  }, [isRefetch, lastCreatedRootReplyId, refetchRootReply, setIsRefetch]);
 
-  const firstPage = rootReplyList?.[0]?.data;
+  if (!isRootFirstLoading && rootReplies.length === 0) {
+    return (
+      <>
+        <div className="h-4 bg-bg-layer-basement" />
+        <section className="py-5 mb-20">
+          <EmptyView text="아직 댓글이 없어요!" />
+        </section>
+      </>
+    );
+  }
 
   return (
     <>
-      {firstPage && firstPage.totalCount > 0 ? (
-        <>
-          <div className="h-4 bg-bg-layer-basement" />
-          <List
-            isListFirstLoading={isRootFirstLoading}
-            isScrollLoading={isRootFetching}
-          >
-            <List.Section>
-              <section className="mx-5 py-5 space-y-3 pb-40">
-                {firstPage.reviewReplies.map((comment, index) => (
-                  <React.Fragment key={`root-${comment.reviewReplyId}`}>
-                    <RootReplyItemMemo
-                      comment={comment}
-                      reviewUserId={reviewUserId}
-                      reviewId={reviewId}
-                      setIsRefetch={setIsRefetch}
-                      isSubReplyShow={openReplyIds.has(comment.reviewReplyId)}
-                      onToggleSubReply={handleToggleSubReply}
-                      subReplies={subReplyMap.get(comment.reviewReplyId)}
-                    />
-                    {index !== firstPage.totalCount - 1 && (
-                      <div className="border-b border-stroke-neutral-subtle" />
-                    )}
-                  </React.Fragment>
-                ))}
-              </section>
-            </List.Section>
-          </List>
-          <div ref={rootReplyTargetRef} />
-        </>
-      ) : (
-        <>
-          <div className="h-4 bg-bg-layer-basement" />
-          <section className="py-5 mb-20">
-            <EmptyView text="아직 댓글이 없어요!" />
+      <div className="h-4 bg-bg-layer-basement" />
+      <List
+        isListFirstLoading={isRootFirstLoading}
+        isScrollLoading={isRootFetching}
+      >
+        <List.Section>
+          <section className="mx-5 py-5 space-y-3 pb-40">
+            {rootReplies.map((comment, index) => (
+              <React.Fragment key={`root-${comment.reviewReplyId}`}>
+                <RootReplyItemMemo
+                  comment={comment}
+                  reviewUserId={reviewUserId}
+                  reviewId={reviewId}
+                  setIsRefetch={setIsRefetch}
+                  isSubReplyShow={openReplyIds.has(comment.reviewReplyId)}
+                  onToggleSubReply={handleToggleSubReply}
+                  subReplyRefreshToken={subReplyRefreshToken}
+                />
+                {index !== rootReplies.length - 1 && (
+                  <div className="border-b border-stroke-neutral-subtle" />
+                )}
+              </React.Fragment>
+            ))}
           </section>
-        </>
-      )}
+        </List.Section>
+      </List>
+      {hasNextRootReplyPage && <div ref={rootReplyTargetRef} />}
     </>
   );
 }

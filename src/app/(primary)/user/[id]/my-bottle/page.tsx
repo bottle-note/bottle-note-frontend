@@ -21,7 +21,7 @@ import {
   PickMyBottleListResponse,
   RatingMyBottleListResponse,
   ReviewMyBottleListResponse,
-} from '@/types/MyBottle';
+} from '@/api/my-bottle/types';
 import { RatingsListItem } from './_components/RatingsListItem';
 import { ReviewListItem } from './_components/ReviewListItem';
 import { PicksListItem } from './_components/PicksListItem';
@@ -83,7 +83,7 @@ export default function MyBottle({
     | ReviewMyBottleListResponse
     | PickMyBottleListResponse
   >({
-    queryKey: ['my-bottle', filterState, currentTab.id],
+    queryKey: ['my-bottle', userId, currentTab.id, filterState],
     queryFn: ({ pageParam }) => {
       const apiMethod = MyBottleApi.getMyBottle(currentTab.id);
 
@@ -91,7 +91,7 @@ export default function MyBottle({
         params: {
           ...filterState,
           cursor: pageParam,
-          pageSize: 10,
+          size: 10,
         },
         userId: Number(userId),
       });
@@ -189,9 +189,7 @@ export default function MyBottle({
             }
           >
             <List.Title title={listTitle} />
-            <List.Total
-              total={alcoholList ? alcoholList[0].data.totalCount : 0}
-            />
+
             <List.SortOrderSwitch
               type={filterState.sortOrder}
               handleSortOrder={(value) => handleFilter('sortOrder', value)}
