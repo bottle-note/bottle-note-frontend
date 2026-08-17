@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { ExploreApi } from '@/api/explore/explore.api';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
@@ -36,9 +36,39 @@ jest.mock('@/hooks/auth/useAuthSession', () => ({
   useAuthSession: jest.fn(),
 }));
 
+jest.mock('@/components/ui/Layout/NavLayout', () => ({
+  useNavLayout: () => ({ isScrollVisible: true }),
+}));
+
 jest.mock('@/store/modalStore', () => ({
   __esModule: true,
   default: jest.fn(),
+}));
+
+jest.mock('@tanstack/react-virtual', () => ({
+  useWindowVirtualizer: ({
+    count,
+    estimateSize,
+    getItemKey,
+  }: {
+    count: number;
+    estimateSize: () => number;
+    getItemKey: (index: number) => React.Key;
+  }) => {
+    const size = estimateSize();
+
+    return {
+      getTotalSize: () => count * size,
+      getVirtualItems: () =>
+        Array.from({ length: Math.min(count, 10) }, (_, index) => ({
+          index,
+          key: getItemKey(index),
+          size,
+          start: index * size,
+        })),
+      measureElement: jest.fn(),
+    };
+  },
 }));
 
 jest.mock('@/components/ui/Button/PrimaryLinkButton', () => ({
@@ -73,7 +103,11 @@ jest.mock('./ExploreSearchBar', () => ({
 }));
 
 jest.mock('./WhiskeyListItem', () => {
-  const MockWhiskeyListItem = () => <div>whiskey</div>;
+  const MockWhiskeyListItem = ({
+    content,
+  }: {
+    content: { alcoholId: number };
+  }) => <div>{`whiskey-${content.alcoholId}`}</div>;
   return { __esModule: true, default: MockWhiskeyListItem };
 });
 
@@ -276,6 +310,39 @@ describe('WhiskeyExplorerList realtime search', () => {
     expect(
       screen.queryByRole('link', { name: '혹시 찾는 술이 없으신가요?' }),
     ).not.toBeInTheDocument();
+  });
+
+  it('결과가 많아도 현재 화면 주변의 위스키만 DOM에 표시한다', () => {
+    const items = Array.from({ length: 100 }, (_, index) => ({
+      alcoholId: index + 1,
+    }));
+    mockUsePaginatedQuery.mockReturnValue({
+      data: [{ data: { items } }],
+      isLoading: false,
+      isFetching: false,
+      isFetchingNextPage: false,
+      isPlaceholderData: false,
+      hasNextPage: true,
+      targetRef: { current: null },
+      error: null,
+    });
+
+    render(
+      <WhiskeyExplorerList
+        isSearchActive={false}
+        onSearchActiveChange={jest.fn()}
+      />,
+    );
+
+    const list = screen.getByRole('list', { name: '위스키 목록' });
+    const visibleItems = within(list).getAllByRole('listitem');
+
+    expect(visibleItems.length).toBeGreaterThan(0);
+    expect(visibleItems.length).toBeLessThan(items.length);
+    expect(visibleItems[0]).toHaveAttribute('aria-posinset', '1');
+    expect(visibleItems[0]).toHaveAttribute('aria-setsize', '100');
+    expect(within(list).getByText('whiskey-1')).toBeInTheDocument();
+    expect(within(list).queryByText('whiskey-100')).not.toBeInTheDocument();
   });
 
   it('문의 버튼에서 기존 위스키 추가 요청 확인 흐름을 실행한다', () => {

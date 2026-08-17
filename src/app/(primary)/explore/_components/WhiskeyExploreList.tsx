@@ -1,10 +1,13 @@
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { ExploreApi } from '@/api/explore/explore.api';
 import type { ExploreAlcohol } from '@/api/explore/types';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import List from '@/components/feature/List/List';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import WhiskeyListItem from './WhiskeyListItem';
@@ -17,11 +20,15 @@ interface WhiskeyExplorerListProps {
   onSearchActiveChange: (active: boolean) => void;
 }
 
+const ESTIMATED_WHISKEY_ITEM_HEIGHT = 177;
+const WHISKEY_LIST_OVERSCAN = 5;
+
 export const WhiskeyExplorerList = ({
   isSearchActive,
   onSearchActiveChange,
 }: WhiskeyExplorerListProps) => {
   const router = useRouter();
+  const { isScrollVisible } = useNavLayout();
   const { isLoggedIn, user } = useAuthSession();
   const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
@@ -71,11 +78,11 @@ export const WhiskeyExplorerList = ({
     !isPlaceholderData &&
     (!alcoholList || alcoholList[0]?.data.items.length === 0);
 
-  const alcoholCount =
-    alcoholList?.reduce(
-      (count, listData) => count + listData.data.items.length,
-      0,
-    ) ?? 0;
+  const alcohols = useMemo(
+    () => alcoholList?.flatMap((listData) => listData.data.items.flat()) ?? [],
+    [alcoholList],
+  );
+  const alcoholCount = alcohols.length;
   const hasReachedEnd =
     !isFirstLoading &&
     !isFetching &&
@@ -84,6 +91,40 @@ export const WhiskeyExplorerList = ({
     alcoholList !== undefined &&
     hasNextPage === false;
   const showInquireButton = isEmpty || (hasReachedEnd && alcoholCount > 0);
+  const listRef = useRef<HTMLDivElement>(null);
+  const [listOffset, setListOffset] = useState(0);
+  const getItemKey = useCallback(
+    (index: number) => alcohols[index]?.alcoholId ?? index,
+    [alcohols],
+  );
+  const virtualizer = useWindowVirtualizer<HTMLDivElement>({
+    count: alcoholCount,
+    estimateSize: () => ESTIMATED_WHISKEY_ITEM_HEIGHT,
+    getItemKey,
+    overscan: WHISKEY_LIST_OVERSCAN,
+    scrollMargin: listOffset,
+  });
+
+  useLayoutEffect(() => {
+    const updateListOffset = () => {
+      if (!listRef.current) return;
+
+      const nextOffset =
+        listRef.current.getBoundingClientRect().top + window.scrollY;
+      setListOffset((currentOffset) =>
+        Math.abs(currentOffset - nextOffset) < 1 ? currentOffset : nextOffset,
+      );
+    };
+
+    updateListOffset();
+    const transitionTimer = window.setTimeout(updateListOffset, 160);
+    window.addEventListener('resize', updateListOffset);
+
+    return () => {
+      window.clearTimeout(transitionTimer);
+      window.removeEventListener('resize', updateListOffset);
+    };
+  }, [isScrollVisible, isSearchActive]);
 
   const handleClickInquire = () => {
     handleModalState({
@@ -123,19 +164,43 @@ export const WhiskeyExplorerList = ({
         isScrollLoading={isFetchingNextPage}
         isEmpty={isEmpty}
       >
-        <List.Section className="divide-y divide-stroke-neutral-subtle">
-          {alcoholList &&
-            [...alcoholList].map((listData, pageIndex) =>
-              listData.data.items
-                .flat()
-                .map((data, itemIndex) => (
-                  <WhiskeyListItem
-                    key={data.alcoholId}
-                    content={data}
-                    priority={pageIndex === 0 && itemIndex < 4}
-                  />
-                )),
-            )}
+        <List.Section>
+          <div ref={listRef}>
+            <div
+              role="list"
+              aria-label="위스키 목록"
+              className="relative w-full"
+              style={{ height: virtualizer.getTotalSize() }}
+            >
+              {virtualizer.getVirtualItems().map((virtualItem) => {
+                const alcohol = alcohols[virtualItem.index];
+
+                return (
+                  <div
+                    key={virtualItem.key}
+                    ref={virtualizer.measureElement}
+                    role="listitem"
+                    aria-posinset={virtualItem.index + 1}
+                    aria-setsize={alcoholCount}
+                    data-index={virtualItem.index}
+                    className={`absolute left-0 top-0 w-full ${
+                      virtualItem.index === 0
+                        ? ''
+                        : 'border-t border-stroke-neutral-subtle'
+                    }`}
+                    style={{
+                      transform: `translateY(${virtualItem.start - listOffset}px)`,
+                    }}
+                  >
+                    <WhiskeyListItem
+                      content={alcohol}
+                      priority={virtualItem.index < 4}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </List.Section>
       </List>
       <div ref={targetRef} />
