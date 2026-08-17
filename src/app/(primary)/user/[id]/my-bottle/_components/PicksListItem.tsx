@@ -36,7 +36,7 @@ export const PicksListItem = ({ data, isMyPage }: Props) => {
   return (
     <section className="flex items-center border-b border-stroke-neutral-subtle py-2 text-fg-neutral">
       {/* image */}
-      <Link href={ROUTES.SEARCH.ALL(alcoholId)}>
+      <Link href={ROUTES.SEARCH.ALL(alcoholId)} className="mr-3 shrink-0">
         <ItemImage src={imageUrl} alt="image" />
       </Link>
 

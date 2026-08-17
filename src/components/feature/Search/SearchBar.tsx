@@ -13,6 +13,7 @@ interface Props {
   >;
   readOnly?: boolean;
   value?: string;
+  onValueChange?: (value: string) => void;
   onDelete?: () => void;
   initialValue?: string;
 }
@@ -30,6 +31,7 @@ export default function SearchBar({
   setUpdateSearchText,
   readOnly = false,
   value,
+  onValueChange,
   onDelete,
   initialValue,
 }: Props) {
@@ -59,7 +61,13 @@ export default function SearchBar({
       onDelete();
     } else {
       handleClear();
+      onValueChange?.('');
     }
+  };
+
+  const handleInputChange = (newValue: string) => {
+    handleChange(newValue);
+    onValueChange?.(newValue);
   };
 
   const inputProps = {
@@ -85,7 +93,7 @@ export default function SearchBar({
         ref={inputRef}
         {...inputProps}
         value={displayValue}
-        onChange={(e) => !readOnly && handleChange(e.target.value)}
+        onChange={(e) => !readOnly && handleInputChange(e.target.value)}
         onKeyDown={readOnly ? undefined : handleKeyDown}
         onFocus={() => !readOnly && handleFocusChange(true)}
         onBlur={() => !readOnly && handleFocusChange(false)}

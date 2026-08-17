@@ -31,7 +31,7 @@ export default function SelectableAlcoholItem({ data, onSelect }: Props) {
       onClick={handleClick}
       className="flex w-full items-center border-b border-solid border-stroke-neutral-subtle py-1 text-left text-fg-neutral transition-colors hover:bg-bg-layer-default-pressed active:bg-bg-layer-default-pressed"
     >
-      <ItemImage src={alcoholUrlImg} alt="image" />
+      <ItemImage src={alcoholUrlImg} alt="image" className="mr-3" />
 
       <div className="flex flex-col items-start justify-center space-y-1.5">
         <ItemInfo
