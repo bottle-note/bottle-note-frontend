@@ -33,7 +33,7 @@ const ListItem = ({ data }: Props) => {
   return (
     <section className="flex items-center text-mainBlack border-brightGray border-b py-1">
       {/* image */}
-      <Link href={ROUTES.SEARCH.ALL(alcoholId)}>
+      <Link href={ROUTES.SEARCH.ALL(alcoholId)} className="mr-3 shrink-0">
         <ItemImage src={imageUrl} alt="image" />
       </Link>
 

@@ -35,7 +35,7 @@ export const ReviewListItem = ({ data }: Props) => {
   return (
     <section className="flex items-center border-b border-stroke-neutral-subtle py-4 text-fg-neutral">
       {/* image */}
-      <Link href={ROUTES.REVIEW.DETAIL(reviewId)}>
+      <Link href={ROUTES.REVIEW.DETAIL(reviewId)} className="mr-3 shrink-0">
         <ItemImage src={imageUrl} alt="image" />
       </Link>
 
