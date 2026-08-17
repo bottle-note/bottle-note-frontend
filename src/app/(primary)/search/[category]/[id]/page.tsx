@@ -28,6 +28,7 @@ import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { AlcoholDetailsResponse } from '@/api/alcohol/types';
 import { UserApi } from '@/api/user/user.api';
 import { RateApi } from '@/api/rate/rate.api';
+import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import useModalStore from '@/store/modalStore';
 import { useLoginBridge } from '@/hooks/useLoginBridge';
 import { trackGA4Event } from '@/utils/analytics/ga4';
@@ -55,7 +56,10 @@ export default function SearchAlcohol() {
   const { id: alcoholId } = params;
   const { handleModalState } = useModalStore();
   const { bridgeToLogin } = useLoginBridge();
-  const { debounce } = useDebounceAction(DEBOUNCE_DELAY);
+  // 연속 입력은 2초 동안 묶되, 상세 화면 이탈 시 마지막 별점은 즉시 전송한다.
+  const { debounce } = useDebounceAction(DEBOUNCE_DELAY, {
+    flushOnUnmount: true,
+  });
 
   const [data, setData] = useState<AlcoholDetailsResponse | null>(null);
   const [alcoholDetails, setAlcoholDetails] = useState<DetailItem[]>([]);
@@ -112,12 +116,14 @@ export default function SearchAlcohol() {
     }
   };
 
-  const fetchUserRating = async (alcohol: string) => {
+  const fetchUserRating = async (alcohol: string): Promise<boolean> => {
     try {
       const ratingResult = await RateApi.getUserRating(alcohol);
       setRate(ratingResult.data.rating);
+      return true;
     } catch (error) {
       console.error('Failed to fetch user rating:', error);
+      return false;
     }
   };
 
@@ -150,7 +156,14 @@ export default function SearchAlcohol() {
             alcohol_name: data?.alcohols.korName ?? '',
           });
         } catch (error) {
-          fetchUserRating(alcoholId.toString());
+          const isRecovered = await fetchUserRating(alcoholId.toString());
+          handleModalState({
+            isShowModal: true,
+            mainText: ERROR_MESSAGES.RATE_CREATE_FAILED,
+            subText: isRecovered
+              ? '저장된 별점으로 복구했습니다. 다시 시도해주세요.'
+              : '저장 상태를 확인하지 못했습니다. 다시 시도해주세요.',
+          });
           console.error(error);
         }
       });
