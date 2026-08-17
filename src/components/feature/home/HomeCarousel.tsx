@@ -140,7 +140,7 @@ function BannerOverlay({ banner }: { banner: Banner }) {
     <div className="flex flex-col">
       {banner.descriptionA && (
         <span
-          className="text-24 font-thin"
+          className="text-24 font-medium"
           style={{ color: banner.descriptionFontColor, textShadow }}
         >
           {banner.descriptionA}
@@ -148,7 +148,7 @@ function BannerOverlay({ banner }: { banner: Banner }) {
       )}
       {banner.descriptionB && (
         <span
-          className="text-24 font-thin"
+          className="text-24 font-medium"
           style={{ color: banner.descriptionFontColor, textShadow }}
         >
           {banner.descriptionB}
