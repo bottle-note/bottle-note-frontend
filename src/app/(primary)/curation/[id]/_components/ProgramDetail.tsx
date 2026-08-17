@@ -97,7 +97,7 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
           >
             <span className="flex items-center gap-2">
               <ExternalLink size={16} aria-hidden />
-              공식 페이지 보기
+              참조 링크
             </span>
             <ChevronRight size={16} aria-hidden />
           </a>
