@@ -130,7 +130,7 @@ describe('위스키 상세 시맨틱 색상', () => {
       'data-bg-color',
       'bg-palette-static-white',
     );
-    expect(screen.getByRole('button', { name: '싱글 몰트' })).toHaveClass(
+    expect(screen.getByText('싱글 몰트')).toHaveClass(
       'border-stroke-brand-contrast',
     );
     expect(

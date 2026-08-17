@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Ellipsis, ThumbsUp, UserRound } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
@@ -21,9 +21,10 @@ import Label from '@/components/ui/Display/Label';
 interface Props {
   content: ExploreReview;
   priority?: boolean;
+  onLikeChange?: (reviewId: number, isLiked: boolean) => void;
 }
 
-const ReviewListItem = ({ content, priority = false }: Props) => {
+const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
   const { handleLoginModal } = useModalStore();
   const { isLoggedIn, user: userData } = useAuthSession();
   const [isLiked, setIsLiked] = useState(content.isLikedByMe);
@@ -34,6 +35,11 @@ const ReviewListItem = ({ content, priority = false }: Props) => {
     '리뷰 이미지',
   );
   const reviewTags = [...new Set(content.reviewTags)];
+
+  useEffect(() => {
+    setIsLiked(content.isLikedByMe);
+    setLikeCount(content.likeCount);
+  }, [content.isLikedByMe, content.likeCount]);
 
   return (
     <>
@@ -120,13 +126,15 @@ const ReviewListItem = ({ content, priority = false }: Props) => {
                 reviewId={content.reviewId}
                 isLiked={isLiked}
                 handleUpdateLiked={() => {
-                  setIsLiked((prev) => !prev);
-                  setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+                  const nextIsLiked = !isLiked;
+                  setIsLiked(nextIsLiked);
+                  setLikeCount((prev) =>
+                    Math.max(0, prev + (nextIsLiked ? 1 : -1)),
+                  );
                 }}
-                onApiError={() => {
-                  setLikeCount(content.likeCount);
-                  setIsLiked(content.isLikedByMe);
-                }}
+                onToggleRequest={(nextIsLiked) =>
+                  onLikeChange?.(content.reviewId, nextIsLiked)
+                }
                 handleNotLogin={handleLoginModal}
                 size={17}
               />
@@ -170,4 +178,4 @@ const ReviewListItem = ({ content, priority = false }: Props) => {
   );
 };
 
-export default ReviewListItem;
+export default memo(ReviewListItem);

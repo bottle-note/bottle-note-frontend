@@ -11,6 +11,7 @@ interface Props {
   isLiked: boolean;
   likeBtnName?: string;
   handleUpdateLiked: () => void;
+  onToggleRequest?: (nextIsLiked: boolean) => void;
   onApiSuccess?: () => void;
   onApiError?: () => void;
   handleNotLogin: () => void;
@@ -24,6 +25,7 @@ const ReviewLikeButton = ({
   isLiked,
   likeBtnName,
   handleUpdateLiked,
+  onToggleRequest,
   onApiSuccess,
   onApiError,
   handleNotLogin,
@@ -56,6 +58,11 @@ const ReviewLikeButton = ({
       review_id: String(reviewId),
       action: newLikeState ? 'like' : 'unlike',
     });
+    if (onToggleRequest) {
+      onToggleRequest(newLikeState);
+      return;
+    }
+
     handleToggle(newLikeState);
   };
 
