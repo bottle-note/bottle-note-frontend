@@ -34,6 +34,8 @@
   --color-bg-overlay: rgb(var(--palette-static-black) / 60%);
   --color-bg-overlay-muted: rgb(var(--palette-static-black) / 30%);
   --color-bg-transparent: transparent;
+  --color-bg-skeleton-base: rgb(var(--palette-neutral-200));
+  --color-bg-skeleton-highlight: rgb(var(--palette-neutral-50));
 
   /* Stroke */
   --color-stroke-neutral-basement: rgb(var(--palette-neutral-200));
@@ -104,6 +106,8 @@
   --color-bg-brand-primary-solid: rgb(var(--palette-coral-500));
   --color-bg-brand-solid-pressed: rgb(var(--palette-coral-600));
   --color-bg-brand-weak: rgb(var(--palette-coral-900));
+  --color-bg-skeleton-base: rgb(var(--palette-oak-800));
+  --color-bg-skeleton-highlight: rgb(var(--palette-oak-900));
 
   /* Stroke */
   --color-stroke-neutral-basement: rgb(var(--palette-oak-800));
