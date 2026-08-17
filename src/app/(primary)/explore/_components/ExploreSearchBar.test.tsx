@@ -169,4 +169,37 @@ describe('ExploreSearchBar', () => {
     fireEvent.blur(input);
     expect(onSearchActiveChange).toHaveBeenLastCalledWith(false);
   });
+
+  it('chip 모드에서 Enter로 공백을 제외한 검색어만 추가한다', () => {
+    const handleAddKeyword = jest.fn();
+    const handleSearch = jest.fn();
+
+    render(
+      <ExploreSearchBar
+        mode="chip"
+        handleAddKeyword={handleAddKeyword}
+        handleSearch={handleSearch}
+        isSearchActive={false}
+        onSearchActiveChange={jest.fn()}
+        description="검색어를 추가해보세요."
+      />,
+    );
+
+    const input = screen.getByRole('textbox', { name: '검색어 입력' });
+
+    fireEvent.change(input, { target: { value: ' peaty ' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    expect(handleAddKeyword).toHaveBeenCalledWith({
+      label: 'peaty',
+      value: 'peaty',
+    });
+    expect(handleSearch).toHaveBeenCalledTimes(1);
+
+    fireEvent.change(input, { target: { value: '   ' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    expect(handleAddKeyword).toHaveBeenCalledTimes(1);
+    expect(handleSearch).toHaveBeenCalledTimes(1);
+  });
 });

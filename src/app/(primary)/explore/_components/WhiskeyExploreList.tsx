@@ -12,8 +12,10 @@ import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import WhiskeyListItem from './WhiskeyListItem';
 import { ExploreSearchBar } from './ExploreSearchBar';
+import { ExploreKeywordChip } from './ExploreKeywordChip';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
-import { useWhiskeyExploreSearch } from '../_hooks/useWhiskeyExploreSearch';
+import { useExploreKeywords } from '../_hooks/useExploreKeywords';
+import { WHISKEY_EXPLORE_TAB_ID } from '../_constants/exploreTabs';
 
 interface WhiskeyExplorerListProps {
   isSearchActive: boolean;
@@ -32,8 +34,8 @@ export const WhiskeyExplorerList = ({
   const { isLoggedIn, user } = useAuthSession();
   const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
-  const { inputKeyword, debouncedKeyword, isTyping, setInputKeyword } =
-    useWhiskeyExploreSearch();
+  const { keywords, keywordValues, handleAddKeyword, handleRemoveKeyword } =
+    useExploreKeywords({ tabId: WHISKEY_EXPLORE_TAB_ID });
   const { regionIds, category } = useExploreFilters();
 
   const {
@@ -45,6 +47,7 @@ export const WhiskeyExplorerList = ({
     hasNextPage,
     targetRef,
     error,
+    refetch,
   } = usePaginatedQuery<{
     items: ExploreAlcohol[];
   }>({
@@ -52,12 +55,12 @@ export const WhiskeyExplorerList = ({
       'explore.alcohols',
       category || 'all',
       regionIds.join(',') || 'all',
-      debouncedKeyword,
+      ...keywordValues,
       user?.userId ?? null,
     ],
     queryFn: ({ pageParam, signal }) => {
       return ExploreApi.getAlcohols({
-        keywords: debouncedKeyword ? [debouncedKeyword] : [],
+        keywords: keywordValues,
         regionIds: regionIds.length > 0 ? regionIds : undefined,
         category: category || undefined,
         sortType: 'POPULAR',
@@ -73,7 +76,6 @@ export const WhiskeyExplorerList = ({
   const isSearching = isFetching && !isFetchingNextPage;
   const isEmpty =
     !error &&
-    !isTyping &&
     !isSearching &&
     !isPlaceholderData &&
     (!alcoholList || alcoholList[0]?.data.items.length === 0);
@@ -148,14 +150,24 @@ export const WhiskeyExplorerList = ({
   return (
     <section>
       <ExploreSearchBar
-        mode="realtime"
-        initialValue={inputKeyword}
-        onValueChange={setInputKeyword}
+        handleSearch={refetch}
+        handleAddKeyword={handleAddKeyword}
         isSearchActive={isSearchActive}
         onSearchActiveChange={onSearchActiveChange}
         description="이름이나 플레이버 태그를 입력해 검색해보세요."
         isFilter
       />
+      <article className="flex flex-wrap gap-x-1 gap-y-1.5">
+        {keywords.map((keyword) => (
+          <div key={keyword.value} className="flex-shrink-0 overflow-hidden">
+            <ExploreKeywordChip
+              keyword={keyword}
+              onRemove={handleRemoveKeyword}
+              textClassName="text-12"
+            />
+          </div>
+        ))}
+      </article>
       <div className="border-b border-stroke-neutral-subtle" />
 
       <List

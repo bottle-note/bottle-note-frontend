@@ -8,7 +8,7 @@ import { ROUTES } from '@/constants/routes';
 import type { LinkData } from '@/types/LinkButton';
 import { WhiskeyExplorerList } from './WhiskeyExploreList';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
-import { useWhiskeyExploreSearch } from '../_hooks/useWhiskeyExploreSearch';
+import { useExploreKeywords } from '../_hooks/useExploreKeywords';
 
 const mockPush = jest.fn();
 
@@ -28,8 +28,8 @@ jest.mock('../_hooks/useExploreFilters', () => ({
   useExploreFilters: jest.fn(),
 }));
 
-jest.mock('../_hooks/useWhiskeyExploreSearch', () => ({
-  useWhiskeyExploreSearch: jest.fn(),
+jest.mock('../_hooks/useExploreKeywords', () => ({
+  useExploreKeywords: jest.fn(),
 }));
 
 jest.mock('@/hooks/auth/useAuthSession', () => ({
@@ -87,14 +87,12 @@ jest.mock('@/components/ui/Button/PrimaryLinkButton', () => ({
 
 jest.mock('./ExploreSearchBar', () => ({
   ExploreSearchBar: ({
-    mode,
     onSearchActiveChange,
   }: {
-    mode: string;
     onSearchActiveChange: (active: boolean) => void;
   }) => (
     <div>
-      <div data-testid="search-mode">{mode}</div>
+      <div data-testid="search-mode">chip</div>
       <button type="button" onClick={() => onSearchActiveChange(true)}>
         focus search
       </button>
@@ -132,7 +130,7 @@ jest.mock('@/components/feature/List/List', () => {
 
 const mockUsePaginatedQuery = usePaginatedQuery as jest.Mock;
 const mockUseExploreFilters = useExploreFilters as jest.Mock;
-const mockUseWhiskeyExploreSearch = useWhiskeyExploreSearch as jest.Mock;
+const mockUseExploreKeywords = useExploreKeywords as jest.Mock;
 const mockGetAlcohols = ExploreApi.getAlcohols as jest.Mock;
 const mockUseAuth = useAuthSession as jest.Mock;
 const mockUseModalStore = useModalStore as unknown as jest.Mock;
@@ -141,14 +139,17 @@ const mockHandleModalState = jest.fn();
 const mockHandleCloseModal = jest.fn();
 const mockHandleLoginState = jest.fn();
 
-describe('WhiskeyExplorerList realtime search', () => {
+describe('WhiskeyExplorerList keyword-tag search', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseWhiskeyExploreSearch.mockReturnValue({
-      inputKeyword: 'macallan',
-      debouncedKeyword: 'macallan',
-      isTyping: false,
-      setInputKeyword: jest.fn(),
+    mockUseExploreKeywords.mockReturnValue({
+      keywords: [
+        { label: 'macallan', value: 'macallan' },
+        { label: 'peaty', value: 'peaty' },
+      ],
+      keywordValues: ['macallan', 'peaty'],
+      handleAddKeyword: jest.fn(),
+      handleRemoveKeyword: jest.fn(),
     });
     mockUseExploreFilters.mockReturnValue({
       regionIds: [12],
@@ -172,10 +173,11 @@ describe('WhiskeyExplorerList realtime search', () => {
       hasNextPage: true,
       targetRef: { current: null },
       error: null,
+      refetch: jest.fn(),
     });
   });
 
-  it('단일 debounce 검색어와 필터를 query key 및 API 요청에 사용한다', async () => {
+  it('검색 태그와 필터를 query key 및 API 요청에 사용한다', async () => {
     const onSearchActiveChange = jest.fn();
     render(
       <WhiskeyExplorerList
@@ -184,12 +186,14 @@ describe('WhiskeyExplorerList realtime search', () => {
       />,
     );
 
-    expect(screen.getByTestId('search-mode')).toHaveTextContent('realtime');
+    expect(screen.getByTestId('search-mode')).toHaveTextContent('chip');
     expect(screen.getByTestId('whiskey-list')).toHaveAttribute(
       'data-empty-view-text',
       '조건에 맞는 위스키가 없어요.',
     );
-    expect(screen.queryByText('+ 검색어 추가')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'macallan 검색어 지우기' }),
+    ).toBeInTheDocument();
 
     screen.getByRole('button', { name: 'focus search' }).click();
     expect(onSearchActiveChange).toHaveBeenCalledWith(true);
@@ -200,6 +204,7 @@ describe('WhiskeyExplorerList realtime search', () => {
       'SINGLE_MALT',
       '12',
       'macallan',
+      'peaty',
       101,
     ]);
     expect(config.keepPreviousData).toBeUndefined();
@@ -212,7 +217,7 @@ describe('WhiskeyExplorerList realtime search', () => {
     });
 
     expect(mockGetAlcohols).toHaveBeenCalledWith({
-      keywords: ['macallan'],
+      keywords: ['macallan', 'peaty'],
       regionIds: [12],
       category: 'SINGLE_MALT',
       sortType: 'POPULAR',
@@ -221,6 +226,33 @@ describe('WhiskeyExplorerList realtime search', () => {
       size: 10,
       signal: controller.signal,
     });
+  });
+
+  it('각 검색 태그의 제거 동작을 전달한다', () => {
+    const handleRemoveKeyword = jest.fn();
+    mockUseExploreKeywords.mockReturnValue({
+      keywords: [
+        { label: 'macallan', value: 'macallan' },
+        { label: 'peaty', value: 'peaty' },
+      ],
+      keywordValues: ['macallan', 'peaty'],
+      handleAddKeyword: jest.fn(),
+      handleRemoveKeyword,
+    });
+
+    render(
+      <WhiskeyExplorerList
+        isSearchActive={false}
+        onSearchActiveChange={jest.fn()}
+      />,
+    );
+
+    screen.getByRole('button', { name: 'macallan 검색어 지우기' }).click();
+
+    expect(handleRemoveKeyword).toHaveBeenCalledWith('macallan');
+    expect(
+      screen.getByRole('button', { name: 'peaty 검색어 지우기' }),
+    ).toBeInTheDocument();
   });
 
   it('viewer가 변경되면 개인화 목록에 별도 query key를 사용한다', () => {
