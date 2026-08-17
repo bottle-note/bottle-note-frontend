@@ -1,16 +1,30 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import {
+  type InfiniteData,
+  type QueryKey,
+  useQueryClient,
+} from '@tanstack/react-query';
 import {
   type VirtualItem,
   useWindowVirtualizer,
 } from '@tanstack/react-virtual';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ExploreApi } from '@/api/explore/explore.api';
+import { ReviewApi } from '@/api/review/review.api';
 import { ExploreReview } from '@/api/explore/types';
 import type { ApiResponse } from '@/api/_shared/types';
 import List from '@/components/feature/List/List';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useNavLayout } from '@/components/ui/Layout/NavLayout';
+import useModalStore from '@/store/modalStore';
+import { DEBOUNCE_DELAY } from '@/constants/common';
 import ReviewCard from './ReviewListItem';
 import { ExploreSearchBar } from './ExploreSearchBar';
 import { ExploreKeywordChip } from './ExploreKeywordChip';
@@ -26,6 +40,15 @@ interface ReviewListData {
   items: ExploreReview[];
 }
 
+interface PendingReviewLike {
+  timer: number | undefined;
+  chain: Promise<void>;
+  version: number;
+  desiredState: boolean;
+  serverState: boolean;
+  queryKeys: Map<string, QueryKey>;
+}
+
 const ESTIMATED_REVIEW_ITEM_HEIGHT = 320;
 const REVIEW_LIST_OVERSCAN = 3;
 let reviewMeasurementCache:
@@ -37,6 +60,7 @@ export const ReviewExplorerList = ({
   onSearchActiveChange,
 }: ReviewExplorerListProps) => {
   const queryClient = useQueryClient();
+  const { handleModalState } = useModalStore();
   const { isScrollVisible } = useNavLayout();
   const { user } = useAuthSession();
   const { keywords, keywordValues, handleAddKeyword, handleRemoveKeyword } =
@@ -78,6 +102,8 @@ export const ReviewExplorerList = ({
   );
   const reviewCount = reviews.length;
   const listRef = useRef<HTMLDivElement>(null);
+  const isMountedRef = useRef(true);
+  const pendingLikesRef = useRef(new Map<number, PendingReviewLike>());
   const [listOffset, setListOffset] = useState(0);
   const getItemKey = useCallback(
     (index: number) => reviews[index]?.reviewId ?? index,
@@ -115,7 +141,7 @@ export const ReviewExplorerList = ({
       window.clearTimeout(transitionTimer);
       window.removeEventListener('resize', updateListOffset);
     };
-  }, [isScrollVisible, isSearchActive]);
+  }, [isScrollVisible, isSearchActive, keywords]);
 
   useLayoutEffect(
     () => () => {
@@ -127,11 +153,11 @@ export const ReviewExplorerList = ({
     [measurementCacheKey, virtualizer],
   );
 
-  const handleLikeChange = useCallback(
-    (reviewId: number, nextIsLiked: boolean) => {
+  const updateReviewLikeCache = useCallback(
+    (targetQueryKey: QueryKey, reviewId: number, nextIsLiked: boolean) => {
       queryClient.setQueryData<
         InfiniteData<ApiResponse<ReviewListData>, string | undefined>
-      >(queryKey, (currentData) => {
+      >(targetQueryKey, (currentData) => {
         if (!currentData) return currentData;
 
         return {
@@ -162,7 +188,112 @@ export const ReviewExplorerList = ({
         };
       });
     },
-    [queryClient, queryKey],
+    [queryClient],
+  );
+
+  useEffect(() => {
+    isMountedRef.current = true;
+
+    return () => {
+      isMountedRef.current = false;
+      pendingLikesRef.current.forEach((pendingLike, reviewId) => {
+        if (pendingLike.timer === undefined) return;
+
+        window.clearTimeout(pendingLike.timer);
+        pendingLike.queryKeys.forEach((targetQueryKey) => {
+          updateReviewLikeCache(
+            targetQueryKey,
+            reviewId,
+            pendingLike.serverState,
+          );
+        });
+      });
+    };
+  }, [updateReviewLikeCache]);
+
+  const handleLikeChange = useCallback(
+    (reviewId: number, nextIsLiked: boolean) => {
+      let pendingLike = pendingLikesRef.current.get(reviewId);
+
+      if (!pendingLike) {
+        const currentData =
+          queryClient.getQueryData<
+            InfiniteData<ApiResponse<ReviewListData>, string | undefined>
+          >(queryKey);
+        const review = currentData?.pages
+          .flatMap((page) => page.data.items)
+          .find((item) => item.reviewId === reviewId);
+        if (!review) return;
+
+        pendingLike = {
+          timer: undefined,
+          chain: Promise.resolve(),
+          version: 0,
+          desiredState: review.isLikedByMe,
+          serverState: review.isLikedByMe,
+          queryKeys: new Map(),
+        };
+        pendingLikesRef.current.set(reviewId, pendingLike);
+      }
+
+      pendingLike.version += 1;
+      pendingLike.desiredState = nextIsLiked;
+      pendingLike.queryKeys.set(measurementCacheKey, queryKey);
+      updateReviewLikeCache(queryKey, reviewId, nextIsLiked);
+
+      if (pendingLike.timer !== undefined) {
+        window.clearTimeout(pendingLike.timer);
+      }
+
+      const syncVersion = pendingLike.version;
+      const requestedState = pendingLike.desiredState;
+
+      pendingLike.timer = window.setTimeout(() => {
+        pendingLike.timer = undefined;
+        pendingLike.chain = pendingLike.chain.then(async () => {
+          if (
+            syncVersion !== pendingLike.version ||
+            requestedState === pendingLike.serverState
+          ) {
+            return;
+          }
+
+          try {
+            await ReviewApi.putLike({
+              reviewId: String(reviewId),
+              isLiked: requestedState,
+            });
+            pendingLike.serverState = requestedState;
+          } catch (error) {
+            console.error('Error updating review like status:', error);
+
+            if (syncVersion !== pendingLike.version) return;
+
+            pendingLike.queryKeys.forEach((targetQueryKey) => {
+              updateReviewLikeCache(
+                targetQueryKey,
+                reviewId,
+                pendingLike.serverState,
+              );
+            });
+
+            if (isMountedRef.current) {
+              handleModalState({
+                isShowModal: true,
+                mainText: '좋아요 업데이트에 실패했습니다. 다시 시도해주세요.',
+              });
+            }
+          }
+        });
+      }, DEBOUNCE_DELAY);
+    },
+    [
+      handleModalState,
+      measurementCacheKey,
+      queryClient,
+      queryKey,
+      updateReviewLikeCache,
+    ],
   );
 
   return (

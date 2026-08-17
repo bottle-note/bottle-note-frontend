@@ -11,10 +11,10 @@ interface Props {
   isLiked: boolean;
   likeBtnName?: string;
   handleUpdateLiked: () => void;
+  onToggleRequest?: (nextIsLiked: boolean) => void;
   onApiSuccess?: () => void;
   onApiError?: () => void;
   handleNotLogin: () => void;
-  cancelOnUnmount?: boolean;
   likeIconColor?: 'white' | 'subcoral';
   unLikeIconColor?: 'gray' | 'subcoral';
   size?: number;
@@ -25,10 +25,10 @@ const ReviewLikeButton = ({
   isLiked,
   likeBtnName,
   handleUpdateLiked,
+  onToggleRequest,
   onApiSuccess,
   onApiError,
   handleNotLogin,
-  cancelOnUnmount = true,
   unLikeIconColor = 'gray',
   likeIconColor = 'subcoral',
   size = 18,
@@ -41,7 +41,6 @@ const ReviewLikeButton = ({
       await ReviewApi.putLike({ reviewId: String(id), isLiked: state });
     },
     id: reviewId,
-    cancelOnUnmount,
     onApiSuccess,
     onApiError,
     errorMessage: '좋아요 업데이트에 실패했습니다. 다시 시도해주세요.',
@@ -59,6 +58,11 @@ const ReviewLikeButton = ({
       review_id: String(reviewId),
       action: newLikeState ? 'like' : 'unlike',
     });
+    if (onToggleRequest) {
+      onToggleRequest(newLikeState);
+      return;
+    }
+
     handleToggle(newLikeState);
   };
 

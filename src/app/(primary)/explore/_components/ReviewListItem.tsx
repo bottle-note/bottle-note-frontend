@@ -131,15 +131,11 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
                   setLikeCount((prev) =>
                     Math.max(0, prev + (nextIsLiked ? 1 : -1)),
                   );
-                  onLikeChange?.(content.reviewId, nextIsLiked);
                 }}
-                onApiError={() => {
-                  setLikeCount(content.likeCount);
-                  setIsLiked(content.isLikedByMe);
-                  onLikeChange?.(content.reviewId, content.isLikedByMe);
-                }}
+                onToggleRequest={(nextIsLiked) =>
+                  onLikeChange?.(content.reviewId, nextIsLiked)
+                }
                 handleNotLogin={handleLoginModal}
-                cancelOnUnmount={false}
                 size={17}
               />
               <p className="text-13 text-fg-neutral-muted">{likeCount}</p>
