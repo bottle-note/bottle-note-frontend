@@ -8,6 +8,7 @@ interface UseDebouncedToggleParams<T> {
   apiCall: (params: { id: T; state: boolean }) => Promise<void>;
   id: T;
   debounceDelay?: number;
+  cancelOnUnmount?: boolean;
   onApiSuccess?: () => void;
   onApiError?: () => void;
   errorMessage: string;
@@ -18,12 +19,13 @@ export const useDebouncedToggle = <T extends string | number>({
   apiCall,
   id,
   debounceDelay = DEBOUNCE_DELAY,
+  cancelOnUnmount = true,
   onApiSuccess,
   onApiError,
   errorMessage,
 }: UseDebouncedToggleParams<T>) => {
   const { handleModalState } = useModalStore();
-  const { debounce } = useDebounceAction(debounceDelay);
+  const { debounce } = useDebounceAction(debounceDelay, { cancelOnUnmount });
 
   const lastSyncedStateRef = useRef(isToggled);
   const pendingStateRef = useRef<boolean | null>(null);

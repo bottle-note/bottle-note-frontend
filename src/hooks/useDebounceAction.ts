@@ -1,6 +1,13 @@
 import { useRef, useCallback, useEffect } from 'react';
 
-const useDebounceAction = (delay: number = 2000) => {
+interface UseDebounceActionOptions {
+  cancelOnUnmount?: boolean;
+}
+
+const useDebounceAction = (
+  delay: number = 2000,
+  { cancelOnUnmount = true }: UseDebounceActionOptions = {},
+) => {
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const debounce = useCallback(
@@ -22,11 +29,11 @@ const useDebounceAction = (delay: number = 2000) => {
 
   useEffect(() => {
     return () => {
-      if (debounceTimerRef.current) {
+      if (cancelOnUnmount && debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, []);
+  }, [cancelOnUnmount]);
 
   const cancel = useCallback(() => {
     if (debounceTimerRef.current) {

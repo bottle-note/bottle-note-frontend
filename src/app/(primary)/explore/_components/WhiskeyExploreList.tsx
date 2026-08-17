@@ -103,6 +103,7 @@ export const WhiskeyExplorerList = ({
     getItemKey,
     overscan: WHISKEY_LIST_OVERSCAN,
     scrollMargin: listOffset,
+    useFlushSync: false,
   });
 
   useLayoutEffect(() => {

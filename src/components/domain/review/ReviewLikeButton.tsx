@@ -14,6 +14,7 @@ interface Props {
   onApiSuccess?: () => void;
   onApiError?: () => void;
   handleNotLogin: () => void;
+  cancelOnUnmount?: boolean;
   likeIconColor?: 'white' | 'subcoral';
   unLikeIconColor?: 'gray' | 'subcoral';
   size?: number;
@@ -27,6 +28,7 @@ const ReviewLikeButton = ({
   onApiSuccess,
   onApiError,
   handleNotLogin,
+  cancelOnUnmount = true,
   unLikeIconColor = 'gray',
   likeIconColor = 'subcoral',
   size = 18,
@@ -39,6 +41,7 @@ const ReviewLikeButton = ({
       await ReviewApi.putLike({ reviewId: String(id), isLiked: state });
     },
     id: reviewId,
+    cancelOnUnmount,
     onApiSuccess,
     onApiError,
     errorMessage: '좋아요 업데이트에 실패했습니다. 다시 시도해주세요.',
