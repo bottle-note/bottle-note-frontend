@@ -26,6 +26,17 @@ export default function InquireRegister() {
   const paramsType =
     (searchParams.get('type') as keyof typeof INQUIRE_TYPE) || 'service';
   const serviceType = INQUIRE_TYPE[paramsType] || paramsType;
+  const keyword = searchParams.get('keyword')?.trim() || '';
+  const inquireType =
+    paramsType === 'service' && searchParams.get('inquireType') === 'WHISKEY'
+      ? 'WHISKEY'
+      : '';
+  const rawReturnUrl = searchParams.get('returnUrl');
+  const returnUrl =
+    rawReturnUrl?.startsWith('/review/register') &&
+    !rawReturnUrl.startsWith('//')
+      ? rawReturnUrl
+      : null;
   const { handleModalState, handleCloseModal } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
 
@@ -60,10 +71,10 @@ export default function InquireRegister() {
     mode: 'onSubmit',
     resolver: yupResolver(schema as yup.ObjectSchema<FormValues>),
     defaultValues: {
-      title: '',
-      content: '',
+      title: keyword ? `[위스키 등록 요청] ${keyword}` : '',
+      content: keyword ? `검색한 위스키: ${keyword}\n\n등록을 요청합니다.` : '',
       contact: paramsType === 'business' ? '' : undefined,
-      type: paramsType === 'service' ? '' : undefined,
+      type: paramsType === 'service' ? inquireType : undefined,
       businessSupportType: paramsType === 'business' ? '' : undefined,
       images: null,
       imageUrlList: null,
@@ -76,6 +87,15 @@ export default function InquireRegister() {
     watch,
     formState: { errors },
   } = formMethods;
+
+  const handleExit = () => {
+    if (returnUrl) {
+      router.replace(returnUrl);
+      return;
+    }
+
+    router.back();
+  };
 
   const onSave = async (data: FormValues) => {
     const processSubmission = async () => {
@@ -117,7 +137,7 @@ export default function InquireRegister() {
           handleConfirm: () => {
             handleCloseModal();
             reset();
-            router.back();
+            handleExit();
           },
         });
       }
@@ -153,10 +173,10 @@ export default function InquireRegister() {
                     handleConfirm: () => {
                       handleCloseModal();
                       reset();
-                      router.back();
+                      handleExit();
                     },
                   });
-                } else router.back();
+                } else handleExit();
               }}
             >
               <Image

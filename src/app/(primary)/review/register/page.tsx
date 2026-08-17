@@ -29,9 +29,12 @@ function ReviewRegister() {
   const isKeyboardVisible = useKeyboardVisible();
 
   const initialAlcoholId = searchParams.get('alcoholId') || '';
+  const initialSearchKeyword = searchParams.get('searchKeyword') || '';
   const [selectedAlcoholId, setSelectedAlcoholId] =
     useState<string>(initialAlcoholId);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(
+    searchParams.get('searchOpen') === 'true',
+  );
 
   const {
     alcoholData,
@@ -141,6 +144,37 @@ function ReviewRegister() {
     router.replace(`/review/register?alcoholId=${alcoholId}`);
   };
 
+  const handleCloseSearch = () => {
+    setIsSearchOpen(false);
+
+    if (!searchParams.has('searchOpen') && !searchParams.has('searchKeyword')) {
+      return;
+    }
+
+    const params = new URLSearchParams();
+    if (selectedAlcoholId) params.set('alcoholId', selectedAlcoholId);
+    const query = params.toString();
+    router.replace(`/review/register${query ? `?${query}` : ''}`);
+  };
+
+  const handleRequestAlcohol = (keyword: string) => {
+    const returnParams = new URLSearchParams({
+      searchOpen: 'true',
+      searchKeyword: keyword,
+    });
+    if (selectedAlcoholId) {
+      returnParams.set('alcoholId', selectedAlcoholId);
+    }
+
+    const inquireParams = new URLSearchParams({
+      type: 'service',
+      inquireType: 'WHISKEY',
+      keyword,
+      returnUrl: `/review/register?${returnParams.toString()}`,
+    });
+    router.push(`/inquire/register?${inquireParams.toString()}`);
+  };
+
   const handleBack = () => {
     if (!selectedAlcoholId) {
       router.back();
@@ -204,8 +238,10 @@ function ReviewRegister() {
 
       <AlcoholSearchBottomSheet
         isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
+        onClose={handleCloseSearch}
         onSelectAlcohol={handleSelectAlcohol}
+        onRequestAlcohol={handleRequestAlcohol}
+        initialKeyword={initialSearchKeyword}
       />
 
       {isToastVisible && <Toast message={toastMessage} />}
