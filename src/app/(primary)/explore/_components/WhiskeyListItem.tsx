@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Link from 'next/link';
 import { Star as StarIcon, UserRound } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
@@ -82,9 +83,12 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
         {/*  태그 */}
         <div className="flex w-full min-w-0 gap-x-1 overflow-x-auto scrollbar-hide">
           {tastingTags.map((tag) => (
-            <div key={tag} className="flex-shrink-0 overflow-hidden">
-              <Label name={tag} styleClass="label-default px-2 py-1 text-11" />
-            </div>
+            <Label
+              key={tag}
+              name={tag}
+              styleClass="label-default px-2 py-1 text-11"
+              baseStyle="inline-flex shrink-0 items-center overflow-hidden"
+            />
           ))}
         </div>
       </Link>
@@ -92,4 +96,4 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
   );
 };
 
-export default WhiskeyListItem;
+export default memo(WhiskeyListItem);

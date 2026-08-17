@@ -28,7 +28,7 @@ function Label({
   isSelected = false,
   selectedStyle,
   unselectedStyle,
-  baseStyle = 'inline-block cursor-pointer transition-colors',
+  baseStyle,
 }: Props) {
   const renderIcon = () => {
     if (!icon) return null;
@@ -50,27 +50,40 @@ function Label({
 
   const getClassNames = () => {
     const buttonStyles = getButtonStyles();
+    const resolvedBaseStyle =
+      baseStyle ??
+      (onClick
+        ? 'inline-flex items-center cursor-pointer transition-colors'
+        : 'inline-flex items-center');
 
     if (buttonStyles) {
-      return `${baseStyle} ${buttonStyles}`;
+      return `${resolvedBaseStyle} ${buttonStyles}`;
     }
 
-    return `border border-solid ${baseStyle} ${styleClass}`;
+    return `border border-solid ${resolvedBaseStyle} ${styleClass}`;
   };
 
-  return (
-    <button type="button" onClick={onClick} className={getClassNames()}>
-      <div className="flex items-center">
-        {position === 'before' && icon && (
-          <span className={`mr-1 ${iconClass}`}>{renderIcon()}</span>
-        )}
-        {name}
-        {position === 'after' && icon && (
-          <span className={`ml-1 ${iconClass}`}>{renderIcon()}</span>
-        )}
-      </div>
-    </button>
+  const content = (
+    <>
+      {position === 'before' && icon && (
+        <span className={`mr-1 ${iconClass}`}>{renderIcon()}</span>
+      )}
+      {name}
+      {position === 'after' && icon && (
+        <span className={`ml-1 ${iconClass}`}>{renderIcon()}</span>
+      )}
+    </>
   );
+
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} className={getClassNames()}>
+        {content}
+      </button>
+    );
+  }
+
+  return <span className={getClassNames()}>{content}</span>;
 }
 
 export default Label;
