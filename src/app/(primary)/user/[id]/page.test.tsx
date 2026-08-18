@@ -36,6 +36,7 @@ jest.mock('@/queries/usePaginatedQuery', () => ({
 jest.mock('@/components/ui/Layout/NavLayout', () => ({
   __esModule: true,
   default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  useNavLayout: () => ({ isNavigationVisible: true }),
 }));
 
 jest.mock('@/components/ui/Navigation/SubHeader', () => {
