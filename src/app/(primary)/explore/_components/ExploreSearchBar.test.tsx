@@ -38,7 +38,7 @@ jest.mock('../_hooks/useExploreFilters', () => ({
 
 describe('ExploreSearchBar', () => {
   beforeEach(() => {
-    mockUseNavLayout.mockReturnValue({ isScrollVisible: true });
+    mockUseNavLayout.mockReturnValue({ isNavigationVisible: true });
   });
 
   it('realtime 모드에서는 검색어 추가 버튼 없이 입력 변경을 전달한다', () => {
@@ -105,33 +105,34 @@ describe('ExploreSearchBar', () => {
     const searchBar = screen.getByTestId('explore-search-bar');
     expect(searchBar).toHaveClass(
       'sticky',
-      'translate-y-0',
-      'transition-[top,transform]',
-      'duration-150',
-      'ease-out',
-      'motion-reduce:transition-none',
+      'transition-[transform,opacity]',
+      'scroll-navigation-motion',
+      'opacity-100',
     );
     expect(searchBar).toHaveStyle({
-      top: 'var(--explore-current-header-height)',
+      top: 'var(--logo-header-expanded-height)',
+      transform: 'translateY(0)',
     });
 
-    mockUseNavLayout.mockReturnValue({ isScrollVisible: false });
+    mockUseNavLayout.mockReturnValue({ isNavigationVisible: false });
     rerender(<ExploreSearchBar {...props} />);
 
     expect(searchBar).toHaveClass(
-      '-translate-y-full',
       'pointer-events-none',
-      'transition-[top,transform]',
-      '[transition-duration:120ms]',
-      'ease-in',
-      'motion-reduce:transition-none',
+      'transition-[transform,opacity]',
+      'scroll-navigation-motion',
+      'opacity-0',
     );
-    expect(searchBar).not.toHaveClass('duration-150');
+    expect(searchBar).toHaveStyle({
+      transform: 'translateY(calc(-100% - var(--logo-header-slide-distance)))',
+    });
 
     rerender(<ExploreSearchBar {...props} isSearchActive />);
 
-    expect(searchBar).toHaveClass('translate-y-0', 'pointer-events-auto');
-    expect(searchBar).not.toHaveClass('-translate-y-full');
+    expect(searchBar).toHaveClass('pointer-events-auto', 'opacity-100');
+    expect(searchBar).toHaveStyle({
+      transform: 'translateY(calc(-1 * var(--logo-header-slide-distance)))',
+    });
   });
 
   it('chip 모드에서는 기존 검색어 추가 동작을 유지한다', () => {

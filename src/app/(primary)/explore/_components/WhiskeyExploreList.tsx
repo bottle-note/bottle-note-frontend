@@ -7,7 +7,6 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import List from '@/components/feature/List/List';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
-import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import WhiskeyListItem from './WhiskeyListItem';
@@ -28,7 +27,6 @@ export const WhiskeyExplorerList = ({
   onSearchActiveChange,
 }: WhiskeyExplorerListProps) => {
   const router = useRouter();
-  const { isScrollVisible } = useNavLayout();
   const { isLoggedIn, user } = useAuthSession();
   const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
@@ -118,14 +116,12 @@ export const WhiskeyExplorerList = ({
     };
 
     updateListOffset();
-    const transitionTimer = window.setTimeout(updateListOffset, 160);
     window.addEventListener('resize', updateListOffset);
 
     return () => {
-      window.clearTimeout(transitionTimer);
       window.removeEventListener('resize', updateListOffset);
     };
-  }, [isScrollVisible, isSearchActive]);
+  }, []);
 
   const handleClickInquire = () => {
     handleModalState({

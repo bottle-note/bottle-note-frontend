@@ -19,13 +19,13 @@ export interface NavItem {
 interface NavbarProps {
   maxWidth?: string;
   isSuppressed?: boolean;
-  isScrollVisible?: boolean;
+  isNavigationVisible?: boolean;
 }
 
 function Navbar({
   maxWidth,
   isSuppressed = false,
-  isScrollVisible = true,
+  isNavigationVisible = true,
 }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -33,7 +33,7 @@ function Navbar({
   const { handleLoginModal } = useModalStore();
   const [isMounted, setIsMounted] = useState(false);
   const [lastTapTime, setLastTapTime] = useState<{ [key: string]: number }>({});
-  const shouldShowNavbar = isScrollVisible && !isSuppressed;
+  const shouldShowNavbar = isNavigationVisible && !isSuppressed;
 
   useEffect(() => {
     setIsMounted(true);
@@ -118,7 +118,7 @@ function Navbar({
     <nav
       aria-hidden={!shouldShowNavbar}
       className={cn(
-        `fixed left-0 right-0 mx-auto w-full px-4 z-10 transition-transform duration-300 ease-in-out`,
+        `scroll-navigation-motion fixed left-0 right-0 mx-auto w-full px-4 z-10 transition-transform`,
         shouldShowNavbar
           ? 'translate-y-0'
           : 'pointer-events-none translate-y-[calc(100%+var(--navbar-margin-bottom))]',

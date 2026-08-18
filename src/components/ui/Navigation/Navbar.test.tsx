@@ -41,7 +41,7 @@ describe('Navbar suppression', () => {
   });
 
   it('공유된 scroll visibility가 false이면 숨긴다', () => {
-    render(<Navbar isScrollVisible={false} />);
+    render(<Navbar isNavigationVisible={false} />);
 
     const navbar = screen.getByRole('navigation', { hidden: true });
     expect(navbar).toHaveClass('pointer-events-none');

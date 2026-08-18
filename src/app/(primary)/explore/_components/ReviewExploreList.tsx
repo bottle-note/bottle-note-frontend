@@ -22,7 +22,6 @@ import { ExploreReview } from '@/api/explore/types';
 import type { ApiResponse } from '@/api/_shared/types';
 import List from '@/components/feature/List/List';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
-import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import useModalStore from '@/store/modalStore';
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import ReviewCard from './ReviewListItem';
@@ -61,7 +60,6 @@ export const ReviewExplorerList = ({
 }: ReviewExplorerListProps) => {
   const queryClient = useQueryClient();
   const { handleModalState } = useModalStore();
-  const { isScrollVisible } = useNavLayout();
   const { user } = useAuthSession();
   const { keywords, keywordValues, handleAddKeyword, handleRemoveKeyword } =
     useExploreKeywords({ tabId: REVIEW_EXPLORE_TAB_ID });
@@ -134,14 +132,12 @@ export const ReviewExplorerList = ({
     };
 
     updateListOffset();
-    const transitionTimer = window.setTimeout(updateListOffset, 160);
     window.addEventListener('resize', updateListOffset);
 
     return () => {
-      window.clearTimeout(transitionTimer);
       window.removeEventListener('resize', updateListOffset);
     };
-  }, [isScrollVisible, isSearchActive, keywords]);
+  }, [keywords]);
 
   useLayoutEffect(
     () => () => {

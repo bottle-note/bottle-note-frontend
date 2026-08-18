@@ -34,9 +34,14 @@ type Props = ChipSearchProps | RealtimeSearchProps;
 export const ExploreSearchBar = (props: Props) => {
   const { description, isFilter = false } = props;
   const isRealtime = props.mode === 'realtime';
-  const { isScrollVisible } = useNavLayout();
+  const { isNavigationVisible } = useNavLayout();
   const isSearchActive = props.isSearchActive;
-  const shouldShowSearchBar = isSearchActive || isScrollVisible;
+  const shouldShowSearchBar = isSearchActive || isNavigationVisible;
+  const searchBarTransform = isSearchActive
+    ? 'translateY(calc(-1 * var(--logo-header-slide-distance)))'
+    : isNavigationVisible
+      ? 'translateY(0)'
+      : 'translateY(calc(-100% - var(--logo-header-slide-distance)))';
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const { regions } = useRegionsQuery();
   const {
@@ -70,13 +75,15 @@ export const ExploreSearchBar = (props: Props) => {
     <section
       data-testid="explore-search-bar"
       className={cn(
-        'sticky z-[9] -mx-4 bg-bg-layer-default px-4 pt-[5px] text-fg-neutral',
-        shouldShowSearchBar
-          ? 'pointer-events-auto translate-y-0 transition-[top,transform] duration-150 ease-out motion-reduce:transition-none'
-          : 'pointer-events-none -translate-y-full transition-[top,transform] [transition-duration:120ms] ease-in motion-reduce:transition-none',
+        'scroll-navigation-motion sticky z-[9] -mx-4 bg-bg-layer-default px-4 pt-[5px] text-fg-neutral transition-[transform,opacity]',
+        {
+          'pointer-events-auto opacity-100': shouldShowSearchBar,
+          'pointer-events-none opacity-0': !shouldShowSearchBar,
+        },
       )}
       style={{
-        top: 'var(--explore-current-header-height)',
+        top: 'var(--logo-header-expanded-height)',
+        transform: searchBarTransform,
       }}
     >
       <article className="relative w-full">

@@ -1,6 +1,6 @@
 import HomeCarousel from '@/components/feature/home/HomeCarousel';
-import HomeHeader from '@/components/feature/home/HomeHeader';
 import NavLayout from '@/components/ui/Layout/NavLayout';
+import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
 import JsonLd from '@/components/seo/JsonLd';
 import { generateWebSiteSchema } from '@/utils/seo/generateWebSiteSchema';
 import { TarotPromoCard } from '@/components/feature/home/TarotPromoCard';
@@ -41,7 +41,7 @@ export default async function Home() {
         <JsonLd key={schema['@type']} data={schema} />
       ))}
       <NavLayout>
-        <HomeHeader />
+        <AutoHideLogoHeader />
 
         <TarotPromoCard />
 

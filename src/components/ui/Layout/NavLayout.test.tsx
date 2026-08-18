@@ -10,14 +10,14 @@ jest.mock('@/components/ui/Navigation/Navbar', () => ({
   __esModule: true,
   default: ({
     isSuppressed,
-    isScrollVisible,
+    isNavigationVisible,
   }: {
     isSuppressed?: boolean;
-    isScrollVisible?: boolean;
+    isNavigationVisible?: boolean;
   }) => (
     <nav
       data-suppressed={String(isSuppressed)}
-      data-scroll-visible={String(isScrollVisible)}
+      data-navigation-visible={String(isNavigationVisible)}
     >
       navbar
     </nav>
@@ -49,7 +49,7 @@ describe('NavLayout', () => {
 
     const navbar = screen.getByRole('navigation');
     expect(navbar).toHaveAttribute('data-suppressed', 'false');
-    expect(navbar).toHaveAttribute('data-scroll-visible', 'true');
+    expect(navbar).toHaveAttribute('data-navigation-visible', 'true');
 
     fireEvent.click(screen.getByRole('button', { name: 'suppress' }));
     expect(navbar).toHaveAttribute('data-suppressed', 'true');

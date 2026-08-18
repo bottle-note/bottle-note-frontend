@@ -8,8 +8,8 @@ interface GuestCurationLoginPromptProps {
 export function GuestCurationLoginPrompt({
   onLogin,
 }: GuestCurationLoginPromptProps) {
-  const { isNavbarSuppressed, isScrollVisible } = useNavLayout();
-  const isNavbarVisible = isScrollVisible && !isNavbarSuppressed;
+  const { isNavbarSuppressed, isNavigationVisible } = useNavLayout();
+  const isNavbarVisible = isNavigationVisible && !isNavbarSuppressed;
 
   return (
     <>

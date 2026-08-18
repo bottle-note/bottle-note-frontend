@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { UserApi } from '@/api/user/user.api';
 import { UserInfo as UserInfoType } from '@/api/user/types';
-import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
 import TimelinePreview from '@/components/domain/history/TimelinePreview';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import useModalStore from '@/store/modalStore';
@@ -81,14 +81,7 @@ export default function User({ params: { id } }: { params: { id: string } }) {
         data-testid="user-profile-page"
         className="mb-24 bg-bg-layer-default text-fg-neutral"
       >
-        <SubHeader>
-          <SubHeader.Left>
-            <SubHeader.Logo />
-          </SubHeader.Left>
-          <SubHeader.Right>
-            <SubHeader.Menu />
-          </SubHeader.Right>
-        </SubHeader>
+        <AutoHideLogoHeader />
         <section className="bg-bg-layer-default px-5">
           <section className="border-t border-stroke-brand-solid">
             <UserInfo
