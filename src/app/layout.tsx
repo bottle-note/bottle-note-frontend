@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import '@/style/tokens/colors.css';
 import '@/style/tokens/semantic-colors.css';
 import '@/style/globals.css';
-import { GoogleAnalytics } from '@next/third-parties/google';
+import { GoogleTagManager } from '@next/third-parties/google';
 import { Providers } from '@/lib/Providers';
 import { THEME_INITIALIZER_SCRIPT } from '@/lib/theme/theme';
 import { BASE_URL } from '@/constants/common';
@@ -105,6 +105,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const gtmId = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
+
   return (
     <html lang="ko" className="touch-manipulation" suppressHydrationWarning>
       <head>
@@ -125,14 +127,21 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
+      {gtmId && <GoogleTagManager gtmId={gtmId} />}
       <body>
+        {gtmId && (
+          <noscript>
+            <iframe
+              title="Google Tag Manager"
+              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+              height="0"
+              width="0"
+              className="hidden invisible"
+            />
+          </noscript>
+        )}
         <Providers>
           <div className="relative w-full bg-bg-layer-basement min-h-safe-screen">
-            {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID && (
-              <GoogleAnalytics
-                gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}
-              />
-            )}
             <div className="max-w-content justify-center items-center mx-auto">
               {children}
             </div>

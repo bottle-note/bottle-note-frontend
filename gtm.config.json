@@ -1,0 +1,71 @@
+{
+  "templateEnvironment": "dev",
+  "templates": {
+    "baseTag": "Google Tag - GA4 Dev",
+    "eventTag": "GA4 Event - search",
+    "trigger": "CE - search",
+    "variable": "DLV - alcohol_id"
+  },
+  "environments": {
+    "dev": {
+      "accountId": "6370682004",
+      "containerPublicId": "GTM-M4MMS6DR",
+      "workspaceId": "2",
+      "measurementId": "G-EES9MR11MY",
+      "baseTagName": "Google Tag - GA4 Dev"
+    },
+    "prod": {
+      "accountId": "6370682004",
+      "containerPublicId": "GTM-TVSGX863",
+      "measurementIdEnv": "GTM_PROD_GA4_MEASUREMENT_ID",
+      "baseTagName": "Google Tag - GA4 Prod"
+    }
+  },
+  "events": [
+    { "name": "login", "parameters": ["method", "trigger"] },
+    { "name": "sign_up", "parameters": ["method", "trigger"] },
+    {
+      "name": "rate_alcohol",
+      "parameters": ["alcohol_id", "alcohol_name"]
+    },
+    { "name": "write_review_start", "parameters": ["alcohol_id"] },
+    { "name": "write_review_complete", "parameters": ["alcohol_id"] },
+    {
+      "name": "write_review_failed",
+      "parameters": ["alcohol_id", "failure_type"]
+    },
+    {
+      "name": "add_to_picks",
+      "parameters": ["alcohol_id", "alcohol_name", "action"]
+    },
+    { "name": "search", "parameters": ["result_count", "query_length"] },
+    {
+      "name": "search_result_click",
+      "parameters": ["alcohol_id", "result_position"]
+    },
+    { "name": "search_no_results", "parameters": ["query_length"] },
+    {
+      "name": "view_alcohol_detail",
+      "parameters": ["alcohol_id", "alcohol_name"]
+    },
+    { "name": "login_prompt_shown", "parameters": ["trigger"] },
+    { "name": "login_prompt_converted", "parameters": ["trigger"] },
+    { "name": "tarot_start", "parameters": [] },
+    { "name": "tarot_complete", "parameters": ["result_alcohol_id"] },
+    {
+      "name": "follow_user",
+      "parameters": ["follow_user_id", "action"]
+    },
+    { "name": "like_review", "parameters": ["review_id", "action"] },
+    {
+      "name": "share",
+      "parameters": [
+        "content_type",
+        "content_id",
+        "share_channel",
+        "platform",
+        "share_success"
+      ]
+    }
+  ]
+}
