@@ -175,9 +175,10 @@
     --search-bar-height: 56px;
     --search-fixed-area-height: 70px;
     --tab-height: 81px;
-    --explore-fixed-header-height: calc(100px + var(--safe-area-top));
-    --explore-collapsed-header-height: calc(
-      var(--header-height-with-safe) + 32px
+    --logo-header-expanded-height: calc(93px + var(--safe-area-top));
+    --logo-header-collapsed-height: calc(var(--header-height-with-safe) + 32px);
+    --logo-header-slide-distance: calc(
+      var(--logo-header-expanded-height) - var(--logo-header-collapsed-height)
     );
 
     /* Navbar (px 단위 통일) */
@@ -235,6 +236,17 @@
 }
 
 @layer utilities {
+  .scroll-navigation-motion {
+    transition-duration: 200ms;
+    transition-timing-function: ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-navigation-motion {
+      transition-duration: 0ms;
+    }
+  }
+
   @keyframes auto-marquee-text {
     0%,
     10% {

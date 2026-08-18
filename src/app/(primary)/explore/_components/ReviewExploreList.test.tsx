@@ -51,10 +51,6 @@ jest.mock('@/hooks/auth/useAuthSession', () => ({
   useAuthSession: () => ({ user: { userId: 1 } }),
 }));
 
-jest.mock('@/components/ui/Layout/NavLayout', () => ({
-  useNavLayout: () => ({ isScrollVisible: true }),
-}));
-
 jest.mock('../_hooks/useExploreKeywords', () => ({
   useExploreKeywords: () => ({
     keywords: [],

@@ -1,6 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import ExplorePage from './page';
 
 const mockUseNavLayout = jest.fn();
@@ -36,21 +35,12 @@ jest.mock('@/components/ui/Navigation/Tab', () => ({
   default: () => <div data-testid="explore-tabs">tabs</div>,
 }));
 
-jest.mock('@/components/ui/Navigation/SubHeader', () => {
-  const SubHeader = Object.assign(
-    ({ children }: { children?: ReactNode }) => (
-      <div data-testid="explore-logo-row">{children}</div>
-    ),
-    {
-      Left: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
-      Right: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
-      Logo: () => <div>BottleNote Logo</div>,
-      Menu: () => <div>Menu</div>,
-    },
-  );
-
-  return { SubHeader };
-});
+jest.mock('@/components/ui/Navigation/AutoHideLogoHeader', () => ({
+  __esModule: true,
+  default: ({ isVisible = true }: { isVisible?: boolean }) => (
+    <div data-testid="explore-logo-row" data-visible={String(isVisible)} />
+  ),
+}));
 
 jest.mock('./_components/ReviewExploreList', () => ({
   ReviewExplorerList: ({
@@ -79,7 +69,7 @@ describe('ExplorePage scroll header', () => {
     jest.clearAllMocks();
     window.scrollTo = jest.fn();
     mockUseNavLayout.mockReturnValue({
-      isScrollVisible: true,
+      isNavigationVisible: true,
       setNavbarSuppressed: mockSetNavbarSuppressed,
     });
   });
@@ -96,11 +86,15 @@ describe('ExplorePage scroll header', () => {
       'false',
     );
     expect(screen.getByTestId('explore-logo-row')).toBeInTheDocument();
+    expect(screen.getByTestId('explore-logo-row')).toHaveAttribute(
+      'data-visible',
+      'true',
+    );
   });
 
   it('아래로 스크롤하면 BottleNote 로고 영역을 접고 탭만 유지한다', () => {
     mockUseNavLayout.mockReturnValue({
-      isScrollVisible: false,
+      isNavigationVisible: false,
       setNavbarSuppressed: mockSetNavbarSuppressed,
     });
 
@@ -110,7 +104,10 @@ describe('ExplorePage scroll header', () => {
       'data-header-collapsed',
       'true',
     );
-    expect(screen.queryByTestId('explore-logo-row')).not.toBeInTheDocument();
+    expect(screen.getByTestId('explore-logo-row')).toHaveAttribute(
+      'data-visible',
+      'false',
+    );
     expect(screen.getByTestId('explore-tabs')).toBeInTheDocument();
   });
 
@@ -129,7 +126,10 @@ describe('ExplorePage scroll header', () => {
       'data-header-collapsed',
       'true',
     );
-    expect(screen.queryByTestId('explore-logo-row')).not.toBeInTheDocument();
+    expect(screen.getByTestId('explore-logo-row')).toHaveAttribute(
+      'data-visible',
+      'false',
+    );
     expect(mockSetNavbarSuppressed).toHaveBeenLastCalledWith(true);
 
     fireEvent.click(screen.getByRole('button', { name: 'blur review search' }));

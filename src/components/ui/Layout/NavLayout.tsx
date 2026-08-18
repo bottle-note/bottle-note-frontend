@@ -6,7 +6,7 @@ import { useScrollState } from '@/hooks/useScrollState';
 
 interface NavLayoutContextValue {
   isNavbarSuppressed: boolean;
-  isScrollVisible: boolean;
+  isNavigationVisible: boolean;
   setNavbarSuppressed: (suppressed: boolean) => void;
 }
 
@@ -29,10 +29,10 @@ interface Props {
 
 export default function NavLayout({ showNavbar = true, children }: Props) {
   const [isNavbarSuppressed, setNavbarSuppressed] = useState(false);
-  const { isVisible: isScrollVisible } = useScrollState(100);
+  const { isVisible: isNavigationVisible } = useScrollState(100);
   const contextValue = useMemo(
-    () => ({ isNavbarSuppressed, isScrollVisible, setNavbarSuppressed }),
-    [isNavbarSuppressed, isScrollVisible],
+    () => ({ isNavbarSuppressed, isNavigationVisible, setNavbarSuppressed }),
+    [isNavbarSuppressed, isNavigationVisible],
   );
 
   return (
@@ -41,7 +41,7 @@ export default function NavLayout({ showNavbar = true, children }: Props) {
       {showNavbar && (
         <Navbar
           isSuppressed={isNavbarSuppressed}
-          isScrollVisible={isScrollVisible}
+          isNavigationVisible={isNavigationVisible}
         />
       )}
     </NavLayoutContext.Provider>

@@ -13,7 +13,8 @@ import { useProgramsQuery } from '@/queries/useProgramsQuery';
 import { useTastingEventsQuery } from '@/queries/useTastingEventsQuery';
 import UnderlineSearchBar from '@/components/feature/Search/UnderlineSearchBar';
 import Tab from '@/components/ui/Navigation/Tab';
-import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
+import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import { CurationFeedCard } from './_components/CurationFeedCard';
 import { GuestCurationLoginPrompt } from './_components/GuestCurationLoginPrompt';
 import { ProgramFeedCard } from './_components/ProgramFeedCard';
@@ -45,6 +46,7 @@ export default function CurationPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { isNavigationVisible } = useNavLayout();
   const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
   const [searchKeyword, setSearchKeyword] = useState('');
   const [isGuestGateActive, setIsGuestGateActive] = useState(false);
@@ -57,7 +59,6 @@ export default function CurationPage() {
     scroll: true,
     initialTab,
   });
-
   useEffect(() => {
     if (currentTab.id !== tabFromUrl) {
       handleTab(tabFromUrl);
@@ -223,29 +224,31 @@ export default function CurationPage() {
 
   return (
     <>
-      <div className="fixed-content top-0 z-10 items-center justify-center bg-bg-layer-default">
-        <SubHeader>
-          <SubHeader.Left>
-            <SubHeader.Logo />
-          </SubHeader.Left>
-          <SubHeader.Right>
-            <SubHeader.Menu />
-          </SubHeader.Right>
-        </SubHeader>
-        <Tab
-          variant="bookmark"
-          tabList={tabList}
-          handleTab={handleCurationTab}
-          currentTab={currentTab}
-          scrollContainerRef={refs.scrollContainerRef}
-          registerTab={registerTab}
-        />
+      <div className="fixed-content top-0 z-10 bg-bg-layer-default">
+        <AutoHideLogoHeader sticky={false} />
+        <div
+          className="scroll-navigation-motion absolute inset-x-0 top-[var(--header-height-with-safe)] transition-transform"
+          style={{
+            transform: isNavigationVisible
+              ? 'translateY(var(--logo-header-slide-distance))'
+              : 'translateY(0)',
+          }}
+        >
+          <Tab
+            variant="bookmark"
+            tabList={tabList}
+            handleTab={handleCurationTab}
+            currentTab={currentTab}
+            scrollContainerRef={refs.scrollContainerRef}
+            registerTab={registerTab}
+          />
+        </div>
       </div>
 
       <section
         className="w-full bg-bg-layer-default text-fg-neutral"
         style={{
-          marginTop: 'calc(var(--header-height-with-safe) + var(--tab-height))',
+          marginTop: 'var(--logo-header-expanded-height)',
         }}
       >
         <div className="px-5 pb-7 pt-7">

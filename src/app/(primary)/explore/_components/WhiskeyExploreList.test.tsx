@@ -36,10 +36,6 @@ jest.mock('@/hooks/auth/useAuthSession', () => ({
   useAuthSession: jest.fn(),
 }));
 
-jest.mock('@/components/ui/Layout/NavLayout', () => ({
-  useNavLayout: () => ({ isScrollVisible: true }),
-}));
-
 jest.mock('@/store/modalStore', () => ({
   __esModule: true,
   default: jest.fn(),
