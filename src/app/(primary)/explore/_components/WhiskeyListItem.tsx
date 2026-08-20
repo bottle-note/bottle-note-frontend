@@ -1,7 +1,7 @@
 import { memo } from 'react';
-import Link from 'next/link';
 import { Star as StarIcon, UserRound } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
+import StackTransitionLink from '@/app/(primary)/_components/StackTransitionLink';
 import { LABEL_NAMES } from '@/constants/common';
 import { ExploreAlcohol } from '@/types/Explore';
 import ItemImage from '@/components/feature/List/_components/ItemImage';
@@ -24,17 +24,20 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
   return (
     <section className="flex w-full items-center overflow-hidden py-6 text-fg-neutral gap-3">
       {/* image */}
-      <Link href={ROUTES.SEARCH.ALL(content.alcoholId)} className="shrink-0">
+      <StackTransitionLink
+        href={ROUTES.SEARCH.ALL(content.alcoholId)}
+        className="shrink-0"
+      >
         <ItemImage
           src={content.alcoholUrlImg}
           alt="image"
           className="w-[95px] h-[128px] bg-palette-static-white rounded-sm"
           priority={priority}
         />
-      </Link>
+      </StackTransitionLink>
 
       {/* info */}
-      <Link
+      <StackTransitionLink
         href={ROUTES.SEARCH.ALL(content.alcoholId)}
         className="flex min-w-0 flex-1 flex-col items-start justify-center space-y-2"
       >
@@ -91,7 +94,7 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
             />
           ))}
         </div>
-      </Link>
+      </StackTransitionLink>
     </section>
   );
 };
