@@ -75,14 +75,11 @@ export default function ExplorePage() {
     router.replace(`/explore?${params.toString()}`, {
       scroll: false,
     });
-  }, [currentTab.id, router, searchParams, setTabParam]);
-
-  useEffect(() => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
     });
-  }, [currentTab.id]);
+  }, [currentTab.id, router, searchParams, setTabParam]);
 
   useEffect(() => {
     handleSearchActiveChange(false);

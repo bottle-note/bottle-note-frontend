@@ -6,6 +6,10 @@ const mockUseNavLayout = jest.fn();
 const mockSetNavbarSuppressed = jest.fn();
 const mockSetTabParam = jest.fn();
 const mockRouterReplace = jest.fn();
+let mockCurrentTab = {
+  name: '리뷰 둘러보기',
+  id: 'REVIEW_WHISKEY',
+};
 
 jest.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams('tab=REVIEW_WHISKEY'),
@@ -19,7 +23,7 @@ jest.mock('@/hooks/useStatefulSearchParams', () => ({
 
 jest.mock('@/hooks/useTab', () => ({
   useTab: () => ({
-    currentTab: { name: '리뷰 둘러보기', id: 'REVIEW_WHISKEY' },
+    currentTab: mockCurrentTab,
     handleTab: jest.fn(),
     refs: { scrollContainerRef: { current: null } },
     registerTab: jest.fn(),
@@ -68,6 +72,10 @@ describe('ExplorePage scroll header', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     window.scrollTo = jest.fn();
+    mockCurrentTab = {
+      name: '리뷰 둘러보기',
+      id: 'REVIEW_WHISKEY',
+    };
     mockUseNavLayout.mockReturnValue({
       isNavigationVisible: true,
       setNavbarSuppressed: mockSetNavbarSuppressed,
@@ -90,6 +98,23 @@ describe('ExplorePage scroll header', () => {
       'data-visible',
       'true',
     );
+  });
+
+  it('초기 진입은 스크롤을 유지하고 실제 탭 변경만 상단으로 이동한다', () => {
+    const { rerender } = render(<ExplorePage />);
+
+    expect(window.scrollTo).not.toHaveBeenCalled();
+
+    mockCurrentTab = {
+      name: '위스키 둘러보기',
+      id: 'EXPLORER_WHISKEY',
+    };
+    rerender(<ExplorePage />);
+
+    expect(window.scrollTo).toHaveBeenCalledWith({
+      top: 0,
+      behavior: 'smooth',
+    });
   });
 
   it('아래로 스크롤하면 BottleNote 로고 영역을 접고 탭만 유지한다', () => {

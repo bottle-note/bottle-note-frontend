@@ -293,6 +293,64 @@
   }
 }
 
+/* Explore → whiskey detail View Transition PoC */
+html[data-stack-transition]::view-transition-group(root) {
+  animation-duration: 280ms;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+html[data-stack-transition='push']::view-transition-old(root) {
+  z-index: 1;
+  animation-name: stack-push-old;
+}
+
+html[data-stack-transition='push']::view-transition-new(root) {
+  z-index: 2;
+  animation-name: stack-push-new;
+}
+
+html[data-stack-transition='pop']::view-transition-old(root) {
+  z-index: 2;
+  animation-name: stack-pop-old;
+}
+
+html[data-stack-transition='pop']::view-transition-new(root) {
+  z-index: 1;
+  animation-name: stack-pop-new;
+}
+
+@keyframes stack-push-old {
+  to {
+    transform: translateX(-20%) scale(0.98);
+  }
+}
+
+@keyframes stack-push-new {
+  from {
+    transform: translateX(100%);
+    box-shadow: -12px 0 24px rgb(0 0 0 / 12%);
+  }
+}
+
+@keyframes stack-pop-old {
+  to {
+    transform: translateX(100%);
+    box-shadow: -12px 0 24px rgb(0 0 0 / 12%);
+  }
+}
+
+@keyframes stack-pop-new {
+  from {
+    transform: translateX(-20%) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-stack-transition]::view-transition-group(root) {
+    animation-duration: 0ms;
+  }
+}
+
 .react-datepicker__header {
   @apply !border-none !bg-mainCoral;
 }
