@@ -8,6 +8,7 @@ import {
 import {
   programFeedPayloadSchema,
   programPayloadSchema,
+  tastingEventPayloadSchema,
   whiskyPairingPayloadSchema,
 } from './schema';
 import type { CurationV2DetailItem, CurationV2FeedItem } from './types';
@@ -61,6 +62,32 @@ const feedItem: CurationV2FeedItem = {
   createAt: '2026-07-01',
   payload: programFeedPayload,
 };
+
+describe('WHISKY_TASTING_EVENT payload contract', () => {
+  const tastingEventPayload = {
+    capacity: 20,
+    entryFee: 0,
+    eventDate: '2026-08-20',
+    eventTime: '19:00',
+    guideText: '행사 안내',
+    barAddress: '서울 송파구',
+    isRecruiting: true,
+    detailAddress: '2층',
+    applicationLink: 'https://example.com',
+  };
+
+  it.each([true, false, null, undefined])(
+    '가격 미정 상태 %s를 허용한다',
+    (isTbc) => {
+      expect(
+        tastingEventPayloadSchema.safeParse({
+          ...tastingEventPayload,
+          is_tbc: isTbc,
+        }).success,
+      ).toBe(true);
+    },
+  );
+});
 
 describe('PROGRAM payload contract', () => {
   it('feed projection은 x-feed enabled 필드만으로 판별한다', () => {

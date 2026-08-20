@@ -4,7 +4,10 @@ import type {
   TastingEventPreviewModel,
   TastingEventPreviewPayload,
 } from './types';
-import { getTastingEventCapacityLabel } from '../_utils/parseTastingEventPayload';
+import {
+  formatTastingEventFee,
+  getTastingEventCapacityLabel,
+} from '../_utils/parseTastingEventPayload';
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -115,10 +118,7 @@ export const buildTastingEventPreviewModel = (
     placeLabel: payload.placeName ?? payload.barAddress,
     fullAddress,
     capacityLabel: getTastingEventCapacityLabel(payload.capacity),
-    entryFeeLabel:
-      payload.entryFee > 0
-        ? `${payload.entryFee.toLocaleString('ko-KR')}원`
-        : '무료',
+    entryFeeLabel: formatTastingEventFee(payload.entryFee, payload.is_tbc),
     mapSearchUrl: fullAddress
       ? `https://map.naver.com/p/search/${encodeURIComponent(fullAddress)}`
       : '',
