@@ -28,6 +28,7 @@ const curationAlcoholSchema = z.object({
 export const tastingEventPayloadSchema = z.object({
   capacity: z.number(),
   entryFee: z.number(),
+  is_tbc: z.boolean().nullish(),
   eventDate: z.string(),
   eventTime: z.string(),
   guideText: z.string(),
