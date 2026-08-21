@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -17,6 +17,7 @@ import { useReviewAutoSave } from '@/app/(primary)/review/hook/useReviewAutoSave
 import { useReviewSubmission } from '@/app/(primary)/review/hook/useReviewSubmission';
 import useModalStore from '@/store/modalStore';
 import Toast from '@/components/ui/Interactive/Toast';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 import ReviewForm from '../_components/form/ReviewForm';
 import ReviewHeaderLayout from '../_components/ReviewHeaderLayout';
 import AlcoholSearchBottomSheet from '../_components/AlcoholSearchBottomSheet';
@@ -35,6 +36,7 @@ function ReviewRegister() {
   const [isSearchOpen, setIsSearchOpen] = useState(
     searchParams.get('searchOpen') === 'true',
   );
+  const hasTrackedReviewStartRef = useRef(false);
 
   const {
     alcoholData,
@@ -76,6 +78,17 @@ function ReviewRegister() {
   } = formMethods;
 
   const formValues = watch();
+
+  useEffect(() => {
+    if (!isDirty || !selectedAlcoholId || hasTrackedReviewStartRef.current) {
+      return;
+    }
+
+    hasTrackedReviewStartRef.current = true;
+    trackGA4Event('write_review_start', {
+      alcohol_id: selectedAlcoholId,
+    });
+  }, [isDirty, selectedAlcoholId]);
 
   const getCurrentData = useCallback((): ReviewTempData | null => {
     const currentFormData: ReviewTempData['content'] = {

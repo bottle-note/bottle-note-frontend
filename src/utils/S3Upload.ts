@@ -12,14 +12,18 @@ export async function uploadImages(
       const contentType = (file.type || 'image/jpeg') as AllowedContentType;
       const response = await S3Api.getUploadUrl(type, 1, contentType);
       const info = response.data.imageUploadInfo[0];
+      const { uploadUrl, ...rest } = info;
 
-      await fetch(info.uploadUrl, {
+      const uploadResponse = await fetch(uploadUrl, {
         method: 'PUT',
         body: file,
         headers: { 'Content-Type': contentType },
       });
 
-      const { uploadUrl, ...rest } = info;
+      if (!uploadResponse.ok) {
+        throw new Error('이미지 업로드에 실패했습니다.');
+      }
+
       return { ...rest, order: index + 1 };
     }),
   );
