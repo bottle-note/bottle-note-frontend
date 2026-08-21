@@ -24,6 +24,16 @@ export const useReviewSubmission = ({
   const router = useRouter();
   const { handleModalState, handleCloseModal } = useModalStore();
 
+  const trackReviewFailure = (
+    failureType: 'image_upload' | 'rating_save' | 'review_save',
+  ) => {
+    if (reviewId) return;
+    trackGA4Event('write_review_failed', {
+      alcohol_id: alcoholId,
+      failure_type: failureType,
+    });
+  };
+
   const handleUploadImages = async (images: File[]) => {
     if (!images.length) return null;
     try {
@@ -108,18 +118,23 @@ export const useReviewSubmission = ({
       viewUrl: string;
     }[] = [],
   ) => {
-    // 유저 이미지 업로드
-    const userImages = data.images?.map((file) => file.image) ?? [];
     let newImgUrlList = null;
-    if (userImages.length > 0) {
-      newImgUrlList = await handleUploadImages(userImages);
-    }
-
-    // 테이스팅 노트 차트 이미지 생성 → 별도 경로(tasting-graph)로 업로드
-    const chartFile = await captureTastingNote(data.tastingNote);
     let chartImgUrlList = null;
-    if (chartFile) {
-      chartImgUrlList = await uploadImages('tastingGraph', [chartFile]);
+    try {
+      // 유저 이미지 업로드
+      const userImages = data.images?.map((file) => file.image) ?? [];
+      if (userImages.length > 0) {
+        newImgUrlList = await handleUploadImages(userImages);
+      }
+
+      // 테이스팅 노트 차트 이미지 생성 → 별도 경로(tasting-graph)로 업로드
+      const chartFile = await captureTastingNote(data.tastingNote);
+      if (chartFile) {
+        chartImgUrlList = await uploadImages('tastingGraph', [chartFile]);
+      }
+    } catch (error) {
+      trackReviewFailure('image_upload');
+      throw error;
     }
 
     // 새 차트가 생성된 경우에만 기존 차트 이미지 교체
@@ -140,11 +155,23 @@ export const useReviewSubmission = ({
 
     const reviewParams = createReviewParams(data, finalImageUrlList);
 
-    const ratingResult = await handleRatingUpdate(data.rating ?? 0);
+    let ratingResult = null;
+    try {
+      ratingResult = await handleRatingUpdate(data.rating ?? 0);
+    } catch (error) {
+      trackReviewFailure('rating_save');
+      throw error;
+    }
 
-    const reviewResult = reviewId
-      ? await ReviewApi.modifyReview(reviewId, reviewParams)
-      : await ReviewApi.registerReview(reviewParams);
+    let reviewResult;
+    try {
+      reviewResult = reviewId
+        ? await ReviewApi.modifyReview(reviewId, reviewParams)
+        : await ReviewApi.registerReview(reviewParams);
+    } catch (error) {
+      trackReviewFailure('review_save');
+      throw error;
+    }
 
     if (reviewResult) {
       const hasRatingError = data.rating !== initialRating && !ratingResult;

@@ -161,20 +161,35 @@ function buildEventTag(template, event, measurementId, triggerId) {
   }
   measurementParameter.value = measurementId;
 
-  const eventParameters = tag.parameter.find(
-    (parameter) => parameter.key === 'eventParameters',
+  const eventParameters = tag.parameter.find((parameter) =>
+    ['eventSettingsTable', 'eventParameters'].includes(parameter.key),
   );
+  if (event.parameters.length === 0) {
+    tag.parameter = tag.parameter.filter(
+      (parameter) => parameter !== eventParameters,
+    );
+    return tag;
+  }
   if (!eventParameters) {
     throw new Error(
-      'GA4 이벤트 태그 템플릿에서 eventParameters를 찾지 못했습니다.',
+      'GA4 이벤트 태그 템플릿에서 이벤트 매개변수 설정을 찾지 못했습니다.',
     );
   }
+  const isEventSettingsTable = eventParameters.key === 'eventSettingsTable';
   eventParameters.type = 'list';
   eventParameters.list = event.parameters.map((name) => ({
     type: 'map',
     map: [
-      { type: 'template', key: 'name', value: name },
-      { type: 'template', key: 'value', value: `{{DLV - ${name}}}` },
+      {
+        type: 'template',
+        key: isEventSettingsTable ? 'parameter' : 'name',
+        value: name,
+      },
+      {
+        type: 'template',
+        key: isEventSettingsTable ? 'parameterValue' : 'value',
+        value: `{{DLV - ${name}}}`,
+      },
     ],
   }));
   delete eventParameters.value;
@@ -208,27 +223,41 @@ async function createApiClient() {
   }
 
   return async function request(relativePath, options = {}) {
-    const accessToken = await client.getAccessToken();
-    const token =
-      typeof accessToken === 'string' ? accessToken : accessToken?.token;
-    if (!token) throw new Error('Google 액세스 토큰을 발급받지 못했습니다.');
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const accessToken = await client.getAccessToken();
+      const token =
+        typeof accessToken === 'string' ? accessToken : accessToken?.token;
+      if (!token) throw new Error('Google 액세스 토큰을 발급받지 못했습니다.');
 
-    const response = await fetch(`${API_BASE}/${relativePath}`, {
-      ...options,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
+      const response = await fetch(`${API_BASE}/${relativePath}`, {
+        ...options,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      });
 
-    const body = response.status === 204 ? null : await response.json();
-    if (!response.ok) {
+      const body = response.status === 204 ? null : await response.json();
+      if (response.ok) return body;
+
+      if (response.status === 429 && attempt < 2) {
+        const retryAfter = Number(response.headers.get('retry-after'));
+        const waitMs = Math.max(
+          Number.isFinite(retryAfter) ? retryAfter * 1000 : 0,
+          60_000,
+        );
+        console.log(
+          `GTM API 요청 한도 도달. ${Math.ceil(waitMs / 1000)}초 후 다시 시도합니다.`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+        continue;
+      }
+
       throw new Error(
         `${options.method ?? 'GET'} ${relativePath} 실패 (${response.status})\n${JSON.stringify(body, null, 2)}`,
       );
     }
-    return body;
   };
 }
 

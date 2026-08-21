@@ -29,8 +29,15 @@ export interface GA4EventMap {
     alcohol_id: string;
     alcohol_name: string;
   };
+  write_review_start: {
+    alcohol_id: string;
+  };
   write_review_complete: {
     alcohol_id: string;
+  };
+  write_review_failed: {
+    alcohol_id: string;
+    failure_type: 'image_upload' | 'rating_save' | 'review_save';
   };
   add_to_picks: {
     alcohol_id: string;
@@ -40,8 +47,15 @@ export interface GA4EventMap {
 
   // 🟡 2순위 — 탐색 행동
   search: {
-    search_term: string;
     result_count: number;
+    query_length: number;
+  };
+  search_result_click: {
+    alcohol_id: string;
+    result_position: number;
+  };
+  search_no_results: {
+    query_length: number;
   };
   view_alcohol_detail: {
     alcohol_id: string;

@@ -12,9 +12,10 @@ import Label from '@/components/ui/Display/Label';
 interface Props {
   content: ExploreAlcohol;
   priority?: boolean;
+  onClick?: () => void;
 }
 
-const WhiskeyListItem = ({ content, priority = false }: Props) => {
+const WhiskeyListItem = ({ content, priority = false, onClick }: Props) => {
   const abv =
     typeof content.abv === 'string'
       ? content.abv.replace(/(?:\s*%\s*)+$/, '')
@@ -24,7 +25,11 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
   return (
     <section className="flex w-full items-center overflow-hidden py-6 text-fg-neutral gap-3">
       {/* image */}
-      <Link href={ROUTES.SEARCH.ALL(content.alcoholId)} className="shrink-0">
+      <Link
+        href={ROUTES.SEARCH.ALL(content.alcoholId)}
+        className="shrink-0"
+        onClick={onClick}
+      >
         <ItemImage
           src={content.alcoholUrlImg}
           alt="image"
@@ -37,6 +42,7 @@ const WhiskeyListItem = ({ content, priority = false }: Props) => {
       <Link
         href={ROUTES.SEARCH.ALL(content.alcoholId)}
         className="flex min-w-0 flex-1 flex-col items-start justify-center space-y-2"
+        onClick={onClick}
       >
         <div className="min-w-0 space-y-2">
           <ItemInfo

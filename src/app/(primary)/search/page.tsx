@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
 import List from '@/components/feature/List/List';
@@ -26,6 +26,7 @@ import { useCurationDetailQuery } from '@/queries/useCurationDetailQuery';
 import { TastingEventLineupItem } from '@/app/(primary)/curation/_components/TastingEventLineupItem';
 import { getCurationAlcohols } from '@/app/(primary)/search/_utils/getCurationAlcohols';
 import WhiskeyListItem from '@/app/(primary)/explore/_components/WhiskeyListItem';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 
 const SORT_OPTIONS = [
   { name: '인기도순', type: SORT_TYPE.POPULAR },
@@ -43,6 +44,7 @@ export default function Search() {
     useSearchPageState();
   const { regionOptions } = useRegionsQuery();
   const [showTab, setShowTab] = useState(true);
+  const trackedSearchKeywordRef = useRef<string | null>(null);
 
   const curationId = filterState.curationId;
   const isCurationSearch =
@@ -99,6 +101,10 @@ export default function Search() {
     ? isCurationLoading
     : isAlcoholListFetching;
   const isError = isCurationSearch ? isCurationError : !!alcoholListError;
+  const searchedAlcohols = useMemo(
+    () => alcoholList?.flatMap((page) => page.data.items) ?? [],
+    [alcoholList],
+  );
 
   const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
@@ -149,6 +155,34 @@ export default function Search() {
       searchHistory.save(urlKeyword);
     }
   }, [urlKeyword]);
+
+  useEffect(() => {
+    const keyword = urlKeyword?.trim();
+    const firstPage = alcoholList?.[0];
+
+    if (
+      !keyword ||
+      !firstPage ||
+      isCurationSearch ||
+      filterState.keyword.trim() !== keyword ||
+      trackedSearchKeywordRef.current === keyword
+    ) {
+      return;
+    }
+
+    trackedSearchKeywordRef.current = keyword;
+    const resultCount = firstPage.data.items.length;
+    const queryLength = keyword.length;
+
+    trackGA4Event('search', {
+      result_count: resultCount,
+      query_length: queryLength,
+    });
+
+    if (resultCount === 0) {
+      trackGA4Event('search_no_results', { query_length: queryLength });
+    }
+  }, [alcoholList, filterState.keyword, isCurationSearch, urlKeyword]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -282,12 +316,20 @@ export default function Search() {
                     ))}
                   </List.Section>
                 ) : (
-                  alcoholList &&
-                  [...alcoholList.map((list) => list.data.items)]
-                    .flat()
-                    .map((item) => (
-                      <WhiskeyListItem key={item.alcoholId} content={item} />
-                    ))
+                  <List.Section>
+                    {searchedAlcohols.map((item, index) => (
+                      <WhiskeyListItem
+                        key={item.alcoholId}
+                        content={item}
+                        onClick={() =>
+                          trackGA4Event('search_result_click', {
+                            alcohol_id: String(item.alcoholId),
+                            result_position: index + 1,
+                          })
+                        }
+                      />
+                    ))}
+                  </List.Section>
                 )}
               </List>
 
