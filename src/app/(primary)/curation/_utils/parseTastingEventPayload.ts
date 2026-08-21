@@ -27,6 +27,17 @@ export const getTastingEventCapacityLabel = (capacity: number) =>
     ? '모집 인원 미정'
     : `${capacity.toLocaleString('ko-KR')}명 정원`;
 
+export const formatTastingEventFee = (
+  entryFee: number,
+  isTbc?: boolean | null,
+) => {
+  if (isTbc) {
+    return '가격 미정';
+  }
+
+  return entryFee > 0 ? `${entryFee.toLocaleString('ko-KR')}원` : '무료';
+};
+
 export function parseTastingEventPayload(payload: TastingEventPayload) {
   const eventDate = new Date(payload.eventDate);
   const eventDateLabel = Number.isNaN(eventDate.getTime())
@@ -53,10 +64,7 @@ export function parseTastingEventPayload(payload: TastingEventPayload) {
     fullAddress,
     placeLabel,
     capacityLabel: getTastingEventCapacityLabel(payload.capacity),
-    entryFeeLabel:
-      payload.entryFee > 0
-        ? `${payload.entryFee.toLocaleString('ko-KR')}원`
-        : '무료',
+    entryFeeLabel: formatTastingEventFee(payload.entryFee, payload.is_tbc),
     mapSearchUrl: mapSearchKeyword
       ? `https://map.naver.com/p/search/${encodeURIComponent(mapSearchKeyword)}`
       : '',
