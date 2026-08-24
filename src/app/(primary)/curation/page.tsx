@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Search } from 'lucide-react';
+import { ListFilter } from 'lucide-react';
 import {
   CURATION_V2_SORT_TYPES,
   CURATION_V2_SPEC_CODES,
@@ -16,8 +16,9 @@ import { useTab } from '@/hooks/useTab';
 import { useCurationsQuery } from '@/queries/useCurationsQuery';
 import { useProgramsQuery } from '@/queries/useProgramsQuery';
 import { useTastingEventsQuery } from '@/queries/useTastingEventsQuery';
-import List from '@/components/feature/List/List';
 import UnderlineSearchBar from '@/components/feature/Search/UnderlineSearchBar';
+import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
+import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
 import Tab from '@/components/ui/Navigation/Tab';
 import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
 import { useNavLayout } from '@/components/ui/Layout/NavLayout';
@@ -43,6 +44,7 @@ const DEFAULT_TAB_ID =
   CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT satisfies CurationTabId;
 
 const GUEST_PREVIEW_ITEM_COUNT = 3;
+const SEARCH_DEBOUNCE_DELAY_MS = 300;
 
 const CURATION_SORT_OPTIONS = [
   { name: '최신순', type: CURATION_V2_SORT_TYPES.EXPOSURE_START_DATE },
@@ -64,10 +66,12 @@ export default function CurationPage() {
   const searchParams = useSearchParams();
   const { isNavigationVisible } = useNavLayout();
   const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
-  const [searchKeyword, setSearchKeyword] = useState('');
+  const [inputKeyword, setInputKeyword] = useState('');
+  const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState('');
   const [sortType, setSortType] = useState<CurationV2SortType>(
     CURATION_V2_SORT_TYPES.EXPOSURE_START_DATE,
   );
+  const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const [isGuestGateActive, setIsGuestGateActive] = useState(false);
   const guestGateRef = useRef<HTMLDivElement>(null);
   const tabParam = searchParams.get('tab');
@@ -83,6 +87,16 @@ export default function CurationPage() {
       handleTab(tabFromUrl);
     }
   }, [currentTab.id, handleTab, tabFromUrl]);
+
+  const normalizedSearchKeyword = inputKeyword.trim().replace(/\s+/g, ' ');
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearchKeyword(normalizedSearchKeyword);
+    }, SEARCH_DEBOUNCE_DELAY_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [normalizedSearchKeyword]);
 
   useEffect(() => {
     if (tabParam === tabFromUrl) {
@@ -115,6 +129,10 @@ export default function CurationPage() {
     }
   };
 
+  const resetFilter = () => {
+    setSortType(CURATION_V2_SORT_TYPES.EXPOSURE_START_DATE);
+  };
+
   const handleGuestLogin = () => {
     const returnTo = `${pathname}?${new URLSearchParams({
       tab: currentTab.id,
@@ -123,7 +141,7 @@ export default function CurationPage() {
     router.push(`${ROUTES.LOGIN}?returnTo=${encodeURIComponent(returnTo)}`);
   };
 
-  const trimmedSearchKeyword = searchKeyword.trim();
+  const trimmedSearchKeyword = debouncedSearchKeyword;
   const isTastingEventTab =
     currentTab.id === CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT;
   const isProgramTab = currentTab.id === CURATION_V2_SPEC_CODES.PROGRAM;
@@ -288,29 +306,44 @@ export default function CurationPage() {
       >
         <div className="px-5 pb-7 pt-7">
           <UnderlineSearchBar
-            onSearch={setSearchKeyword}
+            onValueChange={setInputKeyword}
             placeholder="키워드를 입력하세요"
-            inputClassName="border-b border-stroke-brand-solid pb-2 pl-0 pr-36 pt-0 text-13 font-medium focus:border-stroke-brand-solid"
+            ariaLabel="큐레이션 검색"
+            clearable
+            inputClassName="border-b border-stroke-brand-solid pb-2 pl-0 pr-16 pt-0 text-13 font-medium focus:border-stroke-brand-solid"
             actionsClassName="-top-1 items-center"
-            renderActions={({ submit }) => (
-              <>
-                <List.OptionSelect
-                  options={CURATION_SORT_OPTIONS}
-                  currentValue={sortType}
-                  handleOptionCallback={handleSortType}
-                />
-                <button
-                  type="button"
-                  className="label-selected inline-flex h-7 items-center gap-1 text-13 font-medium leading-none"
-                  onClick={submit}
-                >
-                  <Search size={14} aria-hidden className="shrink-0" />
-                  <span>검색</span>
-                </button>
-              </>
+            renderActions={() => (
+              <button
+                type="button"
+                aria-label="필터메뉴"
+                className="rounded-sm text-fg-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
+                onClick={() => setIsOpenSideFilter(true)}
+              >
+                <ListFilter aria-hidden className="h-5 w-5" />
+              </button>
             )}
           />
         </div>
+
+        <SideFilterDrawer
+          isOpen={isOpenSideFilter}
+          onClose={() => setIsOpenSideFilter(false)}
+          resetFilter={resetFilter}
+        >
+          <Accordion title="정렬">
+            <Accordion.Grid cols={2}>
+              {CURATION_SORT_OPTIONS.map((option) => (
+                <Accordion.Content
+                  key={option.type}
+                  title={option.name}
+                  value={option.type}
+                  isSelected={sortType === option.type}
+                  onClick={handleSortType}
+                />
+              ))}
+            </Accordion.Grid>
+          </Accordion>
+        </SideFilterDrawer>
 
         {activeQuery.isLoading && (
           <div className="space-y-7 px-5 pb-navbar">
