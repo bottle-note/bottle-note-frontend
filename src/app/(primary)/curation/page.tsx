@@ -3,14 +3,20 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
-import { CURATION_V2_SPEC_CODES } from '@/api/curation-v2/constants';
+import {
+  CURATION_V2_SORT_TYPES,
+  CURATION_V2_SPEC_CODES,
+  type CurationV2SortType,
+} from '@/api/curation-v2/constants';
 import { isWhiskyPairingFeedItem } from '@/api/curation-v2/guards';
+import { SORT_ORDER } from '@/api/_shared/types';
 import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useTab } from '@/hooks/useTab';
 import { useCurationsQuery } from '@/queries/useCurationsQuery';
 import { useProgramsQuery } from '@/queries/useProgramsQuery';
 import { useTastingEventsQuery } from '@/queries/useTastingEventsQuery';
+import List from '@/components/feature/List/List';
 import UnderlineSearchBar from '@/components/feature/Search/UnderlineSearchBar';
 import Tab from '@/components/ui/Navigation/Tab';
 import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
@@ -38,6 +44,16 @@ const DEFAULT_TAB_ID =
 
 const GUEST_PREVIEW_ITEM_COUNT = 3;
 
+const CURATION_SORT_OPTIONS = [
+  { name: '최신순', type: CURATION_V2_SORT_TYPES.EXPOSURE_START_DATE },
+  { name: '추천순', type: CURATION_V2_SORT_TYPES.DISPLAY_ORDER },
+] satisfies { name: string; type: CurationV2SortType }[];
+
+const SORT_ORDER_BY_TYPE: Record<CurationV2SortType, SORT_ORDER> = {
+  [CURATION_V2_SORT_TYPES.EXPOSURE_START_DATE]: SORT_ORDER.DESC,
+  [CURATION_V2_SORT_TYPES.DISPLAY_ORDER]: SORT_ORDER.ASC,
+};
+
 const isCurationTabId = (value: string | null): value is CurationTabId => {
   return tabList.some((tab) => tab.id === value);
 };
@@ -49,6 +65,9 @@ export default function CurationPage() {
   const { isNavigationVisible } = useNavLayout();
   const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [sortType, setSortType] = useState<CurationV2SortType>(
+    CURATION_V2_SORT_TYPES.EXPOSURE_START_DATE,
+  );
   const [isGuestGateActive, setIsGuestGateActive] = useState(false);
   const guestGateRef = useRef<HTMLDivElement>(null);
   const tabParam = searchParams.get('tab');
@@ -87,6 +106,15 @@ export default function CurationPage() {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
+  const handleSortType = (value: string) => {
+    if (
+      value === CURATION_V2_SORT_TYPES.EXPOSURE_START_DATE ||
+      value === CURATION_V2_SORT_TYPES.DISPLAY_ORDER
+    ) {
+      setSortType(value);
+    }
+  };
+
   const handleGuestLogin = () => {
     const returnTo = `${pathname}?${new URLSearchParams({
       tab: currentTab.id,
@@ -101,22 +129,29 @@ export default function CurationPage() {
   const isProgramTab = currentTab.id === CURATION_V2_SPEC_CODES.PROGRAM;
   const isRecommendedTab =
     currentTab.id === CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY;
+  const sortOrder = SORT_ORDER_BY_TYPE[sortType];
   const curationsQuery = useCurationsQuery(
     10,
     trimmedSearchKeyword,
     isRecommendedTab,
+    sortType,
+    sortOrder,
   );
   const programsQuery = useProgramsQuery(
     10,
     trimmedSearchKeyword,
     CURATION_V2_SPEC_CODES.PROGRAM,
     isProgramTab,
+    sortType,
+    sortOrder,
   );
   const tastingEventsQuery = useTastingEventsQuery(
     10,
     trimmedSearchKeyword,
     CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT,
     isTastingEventTab,
+    sortType,
+    sortOrder,
   );
 
   const activeTabState = (() => {
@@ -268,6 +303,16 @@ export default function CurationPage() {
               </button>
             )}
           />
+        </div>
+
+        <div className="px-5 pb-5">
+          <List>
+            <List.OptionSelect
+              options={CURATION_SORT_OPTIONS}
+              currentValue={sortType}
+              handleOptionCallback={handleSortType}
+            />
+          </List>
         </div>
 
         {activeQuery.isLoading && (

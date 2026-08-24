@@ -7,3 +7,11 @@ export const CURATION_V2_SPEC_CODES = {
 
 export type CurationV2SpecCode =
   (typeof CURATION_V2_SPEC_CODES)[keyof typeof CURATION_V2_SPEC_CODES];
+
+export const CURATION_V2_SORT_TYPES = {
+  EXPOSURE_START_DATE: 'EXPOSURE_START_DATE',
+  DISPLAY_ORDER: 'DISPLAY_ORDER',
+} as const;
+
+export type CurationV2SortType =
+  (typeof CURATION_V2_SORT_TYPES)[keyof typeof CURATION_V2_SORT_TYPES];
