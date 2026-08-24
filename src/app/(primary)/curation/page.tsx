@@ -290,29 +290,28 @@ export default function CurationPage() {
           <UnderlineSearchBar
             onSearch={setSearchKeyword}
             placeholder="키워드를 입력하세요"
-            inputClassName="border-b border-stroke-brand-solid pb-2 pl-0 pr-20 pt-0 text-13 font-medium focus:border-stroke-brand-solid"
-            actionsClassName="-top-1"
+            inputClassName="h-11 border-b border-stroke-brand-solid py-0 pl-0 pr-28 text-13 font-medium focus:border-stroke-brand-solid"
+            actionsClassName="top-0 h-11 items-center"
             renderActions={({ submit }) => (
-              <button
-                type="button"
-                className="label-selected inline-flex h-7 items-center gap-1 text-13 font-medium leading-none"
-                onClick={submit}
-              >
-                <Search size={14} aria-hidden className="shrink-0" />
-                <span>검색</span>
-              </button>
+              <>
+                <div className="[&>button]:h-11 [&>button]:text-12 [&>button]:font-medium">
+                  <List.OptionSelect
+                    options={CURATION_SORT_OPTIONS}
+                    currentValue={sortType}
+                    handleOptionCallback={handleSortType}
+                  />
+                </div>
+                <button
+                  type="button"
+                  aria-label="검색"
+                  className="label-selected inline-flex h-11 w-11 shrink-0 items-center justify-center leading-none"
+                  onClick={submit}
+                >
+                  <Search size={16} aria-hidden />
+                </button>
+              </>
             )}
           />
-        </div>
-
-        <div className="px-5 pb-5">
-          <List>
-            <List.OptionSelect
-              options={CURATION_SORT_OPTIONS}
-              currentValue={sortType}
-              handleOptionCallback={handleSortType}
-            />
-          </List>
         </div>
 
         {activeQuery.isLoading && (
