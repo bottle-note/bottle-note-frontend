@@ -9,6 +9,7 @@ import {
   type CurationV2SortType,
 } from '@/api/curation-v2/constants';
 import { isWhiskyPairingFeedItem } from '@/api/curation-v2/guards';
+import type { CurationV2FeedItem } from '@/api/curation-v2/types';
 import { SORT_ORDER } from '@/api/_shared/types';
 import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
@@ -58,6 +59,17 @@ const SORT_ORDER_BY_TYPE: Record<CurationV2SortType, SORT_ORDER> = {
 
 const isCurationTabId = (value: string | null): value is CurationTabId => {
   return tabList.some((tab) => tab.id === value);
+};
+
+const matchesGuestSearchKeyword = (
+  item: CurationV2FeedItem,
+  keyword: string,
+) => {
+  const normalizedKeyword = keyword.toLocaleLowerCase();
+
+  return [item.name, item.description].some((value) =>
+    value.toLocaleLowerCase().includes(normalizedKeyword),
+  );
 };
 
 export default function CurationPage() {
@@ -147,17 +159,22 @@ export default function CurationPage() {
   const isProgramTab = currentTab.id === CURATION_V2_SPEC_CODES.PROGRAM;
   const isRecommendedTab =
     currentTab.id === CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY;
+  const isGuest = !isAuthLoading && !isLoggedIn;
+  const shouldLimitGuestPreview = !isLoggedIn;
+  const apiSearchKeyword = shouldLimitGuestPreview
+    ? undefined
+    : trimmedSearchKeyword;
   const sortOrder = SORT_ORDER_BY_TYPE[sortType];
   const curationsQuery = useCurationsQuery(
     10,
-    trimmedSearchKeyword,
+    apiSearchKeyword,
     isRecommendedTab,
     sortType,
     sortOrder,
   );
   const programsQuery = useProgramsQuery(
     10,
-    trimmedSearchKeyword,
+    apiSearchKeyword,
     CURATION_V2_SPEC_CODES.PROGRAM,
     isProgramTab,
     sortType,
@@ -165,19 +182,40 @@ export default function CurationPage() {
   );
   const tastingEventsQuery = useTastingEventsQuery(
     10,
-    trimmedSearchKeyword,
+    apiSearchKeyword,
     CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT,
     isTastingEventTab,
     sortType,
     sortOrder,
   );
 
+  const getVisibleData = <T extends CurationV2FeedItem>(data?: T[]) => {
+    if (!shouldLimitGuestPreview) {
+      return data;
+    }
+
+    const guestPreviewData = data?.slice(0, GUEST_PREVIEW_ITEM_COUNT);
+
+    if (!trimmedSearchKeyword) {
+      return guestPreviewData;
+    }
+
+    return guestPreviewData?.filter((item) =>
+      matchesGuestSearchKeyword(item, trimmedSearchKeyword),
+    );
+  };
+
+  const visibleCurationsData = getVisibleData(curationsQuery.data);
+  const visibleProgramsData = getVisibleData(programsQuery.data);
+  const visibleTastingEventsData = getVisibleData(tastingEventsQuery.data);
+
   const activeTabState = (() => {
     switch (currentTab.id) {
       case CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT:
         return {
           query: tastingEventsQuery,
-          data: tastingEventsQuery.data,
+          data: visibleTastingEventsData,
+          sourceData: tastingEventsQuery.data,
           emptyMessage: '진행 중인 시음회가 없어요.',
           errorMessage: '시음회 정보를 불러오지 못했어요.',
           skeletonHeight: 'h-[390px]',
@@ -185,7 +223,8 @@ export default function CurationPage() {
       case CURATION_V2_SPEC_CODES.PROGRAM:
         return {
           query: programsQuery,
-          data: programsQuery.data,
+          data: visibleProgramsData,
+          sourceData: programsQuery.data,
           emptyMessage: '등록된 프로그램이 없어요.',
           errorMessage: '프로그램 정보를 불러오지 못했어요.',
           skeletonHeight: 'h-[248px]',
@@ -193,7 +232,8 @@ export default function CurationPage() {
       case CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY:
         return {
           query: curationsQuery,
-          data: curationsQuery.data,
+          data: visibleCurationsData,
+          sourceData: curationsQuery.data,
           emptyMessage: '등록된 큐레이션이 없어요.',
           errorMessage: '큐레이션 정보를 불러오지 못했어요.',
           skeletonHeight: 'h-[157px]',
@@ -203,6 +243,7 @@ export default function CurationPage() {
   const {
     query: activeQuery,
     data: activeData,
+    sourceData: activeSourceData,
     errorMessage,
     skeletonHeight,
   } = activeTabState;
@@ -210,11 +251,12 @@ export default function CurationPage() {
     ? '검색 결과가 없어요.'
     : activeTabState.emptyMessage;
   const shouldGateGuestFeed =
-    !isAuthLoading &&
-    !isLoggedIn &&
+    isGuest &&
     !activeQuery.isLoading &&
     !activeQuery.error &&
-    Boolean(activeData && activeData.length > GUEST_PREVIEW_ITEM_COUNT);
+    Boolean(
+      activeSourceData && activeSourceData.length > GUEST_PREVIEW_ITEM_COUNT,
+    );
 
   useEffect(() => {
     setIsGuestGateActive(false);
@@ -237,10 +279,19 @@ export default function CurationPage() {
     return () => observer.disconnect();
   }, [currentTab.id, shouldGateGuestFeed, trimmedSearchKeyword]);
 
-  const renderFeedItems = (startIndex = 0, endIndex?: number) => {
+  const renderFeedItems = (
+    startIndex = 0,
+    endIndex?: number,
+    source: 'visible' | 'original' = 'visible',
+  ) => {
     switch (currentTab.id) {
-      case CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT:
-        return tastingEventsQuery.data
+      case CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT: {
+        const data =
+          source === 'original'
+            ? tastingEventsQuery.data
+            : visibleTastingEventsData;
+
+        return data
           ?.slice(startIndex, endIndex)
           .map((event, index) => (
             <TastingEventFeedCard
@@ -249,8 +300,12 @@ export default function CurationPage() {
               priority={startIndex + index === 0}
             />
           ));
-      case CURATION_V2_SPEC_CODES.PROGRAM:
-        return programsQuery.data
+      }
+      case CURATION_V2_SPEC_CODES.PROGRAM: {
+        const data =
+          source === 'original' ? programsQuery.data : visibleProgramsData;
+
+        return data
           ?.slice(startIndex, endIndex)
           .map((program, index) => (
             <ProgramFeedCard
@@ -259,8 +314,12 @@ export default function CurationPage() {
               priority={startIndex + index === 0}
             />
           ));
-      case CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY:
-        return curationsQuery.data
+      }
+      case CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY: {
+        const data =
+          source === 'original' ? curationsQuery.data : visibleCurationsData;
+
+        return data
           ?.slice(startIndex, endIndex)
           .map((curation, index) => (
             <CurationFeedCard
@@ -272,6 +331,7 @@ export default function CurationPage() {
               priority={startIndex + index === 0}
             />
           ));
+      }
     }
   };
 
@@ -365,7 +425,7 @@ export default function CurationPage() {
         {!activeQuery.isLoading &&
           !activeQuery.error &&
           (!activeData || activeData.length === 0) &&
-          !activeQuery.hasNextPage && (
+          (shouldLimitGuestPreview || !activeQuery.hasNextPage) && (
             <p className="px-5 pb-navbar text-13 font-medium text-fg-neutral-muted">
               {emptyMessage}
             </p>
@@ -373,6 +433,7 @@ export default function CurationPage() {
 
         {!activeQuery.isLoading &&
           !activeQuery.error &&
+          !shouldLimitGuestPreview &&
           activeData &&
           activeData.length === 0 &&
           activeQuery.hasNextPage && (
@@ -386,27 +447,23 @@ export default function CurationPage() {
 
         {!activeQuery.isLoading &&
           !activeQuery.error &&
-          activeData &&
-          activeData.length > 0 && (
+          ((activeData && activeData.length > 0) || shouldGateGuestFeed) && (
             <div
               className={`space-y-7 px-5 ${shouldGateGuestFeed ? 'pb-0' : 'pb-navbar'}`}
             >
-              {shouldGateGuestFeed ? (
-                <>
-                  {renderFeedItems(0, GUEST_PREVIEW_ITEM_COUNT)}
-                  <div
-                    ref={guestGateRef}
-                    aria-hidden="true"
-                    className="pointer-events-none h-24 select-none overflow-hidden"
-                  >
-                    {renderFeedItems(
-                      GUEST_PREVIEW_ITEM_COUNT,
-                      GUEST_PREVIEW_ITEM_COUNT + 1,
-                    )}
-                  </div>
-                </>
-              ) : (
-                renderFeedItems()
+              {activeData && activeData.length > 0 && renderFeedItems()}
+              {shouldGateGuestFeed && (
+                <div
+                  ref={guestGateRef}
+                  aria-hidden="true"
+                  className="pointer-events-none h-24 select-none overflow-hidden"
+                >
+                  {renderFeedItems(
+                    GUEST_PREVIEW_ITEM_COUNT,
+                    GUEST_PREVIEW_ITEM_COUNT + 1,
+                    'original',
+                  )}
+                </div>
               )}
               {activeQuery.hasNextPage && !shouldGateGuestFeed && (
                 <div ref={activeQuery.targetRef} className="h-1" />
