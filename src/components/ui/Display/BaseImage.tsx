@@ -1,6 +1,12 @@
 'use client';
 
-import { Component, useState, type ReactNode } from 'react';
+import {
+  Component,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import Image from 'next/image';
 import Fallback from 'public/bottle.svg';
 
@@ -53,6 +59,15 @@ const BaseImage = ({
 }: Props) => {
   const [imgSrc, setImgSrc] = useState(src || Fallback);
   const [isLoading, setIsLoading] = useState(true);
+  const imageRef = useRef<HTMLImageElement>(null);
+
+  useLayoutEffect(() => {
+    const image = imageRef.current;
+
+    if (image?.complete && image.naturalWidth > 0) {
+      setIsLoading(false);
+    }
+  }, [imgSrc]);
 
   const handleError = () => {
     setImgSrc(Fallback);
@@ -94,6 +109,7 @@ const BaseImage = ({
           />
         )}
         <Image
+          ref={imageRef}
           priority={priority}
           src={imgSrc}
           alt={alt}
