@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ListFilter } from 'lucide-react';
 import {
@@ -17,7 +17,7 @@ import { useTab } from '@/hooks/useTab';
 import { useCurationsQuery } from '@/queries/useCurationsQuery';
 import { useProgramsQuery } from '@/queries/useProgramsQuery';
 import { useTastingEventsQuery } from '@/queries/useTastingEventsQuery';
-import UnderlineSearchBar from '@/components/feature/Search/UnderlineSearchBar';
+import StickySearchBar from '@/components/feature/Search/StickySearchBar';
 import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
 import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
 import Tab from '@/components/ui/Navigation/Tab';
@@ -76,10 +76,11 @@ export default function CurationPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { isNavigationVisible } = useNavLayout();
+  const { isNavigationVisible, setNavbarSuppressed } = useNavLayout();
   const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
   const [inputKeyword, setInputKeyword] = useState('');
   const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState('');
+  const [isSearchActive, setIsSearchActive] = useState(false);
   const [sortType, setSortType] = useState<CurationV2SortType>(
     CURATION_V2_SORT_TYPES.EXPOSURE_START_DATE,
   );
@@ -94,11 +95,31 @@ export default function CurationPage() {
     scroll: true,
     initialTab,
   });
+  const isHeaderCollapsed = isSearchActive || !isNavigationVisible;
+  const handleSearchActiveChange = useCallback(
+    (active: boolean) => {
+      setIsSearchActive(active);
+      setNavbarSuppressed(active);
+    },
+    [setNavbarSuppressed],
+  );
+
   useEffect(() => {
     if (currentTab.id !== tabFromUrl) {
       handleTab(tabFromUrl);
     }
   }, [currentTab.id, handleTab, tabFromUrl]);
+
+  useEffect(() => {
+    handleSearchActiveChange(false);
+  }, [currentTab.id, handleSearchActiveChange]);
+
+  useEffect(
+    () => () => {
+      setNavbarSuppressed(false);
+    },
+    [setNavbarSuppressed],
+  );
 
   const normalizedSearchKeyword = inputKeyword.trim().replace(/\s+/g, ' ');
 
@@ -338,13 +359,13 @@ export default function CurationPage() {
   return (
     <>
       <div className="fixed-content top-0 z-10 bg-bg-layer-default">
-        <AutoHideLogoHeader sticky={false} />
+        <AutoHideLogoHeader isVisible={!isHeaderCollapsed} sticky={false} />
         <div
           className="scroll-navigation-motion absolute inset-x-0 top-[var(--header-height-with-safe)] transition-transform"
           style={{
-            transform: isNavigationVisible
-              ? 'translateY(var(--logo-header-slide-distance))'
-              : 'translateY(0)',
+            transform: isHeaderCollapsed
+              ? 'translateY(0)'
+              : 'translateY(var(--logo-header-slide-distance))',
           }}
         >
           <Tab
@@ -364,26 +385,28 @@ export default function CurationPage() {
           marginTop: 'var(--logo-header-expanded-height)',
         }}
       >
-        <div className="px-5 pb-7 pt-7">
-          <UnderlineSearchBar
-            onValueChange={setInputKeyword}
-            placeholder="키워드를 입력하세요"
-            ariaLabel="큐레이션 검색"
-            clearable
-            inputClassName="border-b border-stroke-brand-solid pb-2 pl-0 pr-16 pt-0 text-13 font-medium focus:border-stroke-brand-solid"
-            actionsClassName="-top-1 items-center"
-            renderActions={() => (
-              <button
-                type="button"
-                aria-label="필터메뉴"
-                className="rounded-sm text-fg-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
-                onClick={() => setIsOpenSideFilter(true)}
-              >
-                <ListFilter aria-hidden className="h-5 w-5" />
-              </button>
-            )}
-          />
-        </div>
+        <StickySearchBar
+          testId="curation-search-bar"
+          containerClassName="px-5 pb-7 pt-7"
+          isSearchActive={isSearchActive}
+          onSearchActiveChange={handleSearchActiveChange}
+          onValueChange={setInputKeyword}
+          placeholder="키워드를 입력하세요"
+          ariaLabel="큐레이션 검색"
+          clearable
+          inputClassName="border-b border-stroke-brand-solid pb-2 pl-0 pr-16 pt-0 text-13 font-medium focus:border-stroke-brand-solid"
+          actionsClassName="-top-1 items-center"
+          renderActions={() => (
+            <button
+              type="button"
+              aria-label="필터메뉴"
+              className="rounded-sm text-fg-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
+              onClick={() => setIsOpenSideFilter(true)}
+            >
+              <ListFilter aria-hidden className="h-5 w-5" />
+            </button>
+          )}
+        />
 
         <SideFilterDrawer
           isOpen={isOpenSideFilter}

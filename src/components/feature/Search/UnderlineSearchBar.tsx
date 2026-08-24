@@ -5,12 +5,12 @@ import { X } from 'lucide-react';
 import { useSearchInput } from '@/hooks/useSearchInput';
 import { cn } from '@/lib/utils';
 
-interface UnderlineSearchBarActions {
+export interface UnderlineSearchBarActions {
   searchText: string;
   submit: () => void;
 }
 
-interface Props {
+export interface UnderlineSearchBarProps {
   onSearch?: (value: string) => void;
   onValueChange?: (value: string) => void;
   onFocusChange?: (isFocused: boolean) => void;
@@ -36,7 +36,7 @@ export default function UnderlineSearchBar({
   actionsClassName = '',
   clearable = false,
   renderActions,
-}: Props) {
+}: UnderlineSearchBarProps) {
   const {
     searchText,
     inputRef,
