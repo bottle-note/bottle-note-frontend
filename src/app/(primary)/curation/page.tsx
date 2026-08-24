@@ -387,15 +387,14 @@ export default function CurationPage() {
       >
         <StickySearchBar
           testId="curation-search-bar"
-          containerClassName="px-5 pb-7 pt-7"
+          containerClassName="px-4 pt-[5px]"
           isSearchActive={isSearchActive}
           onSearchActiveChange={handleSearchActiveChange}
           onValueChange={setInputKeyword}
           placeholder="키워드를 입력하세요"
           ariaLabel="큐레이션 검색"
           clearable
-          inputClassName="border-b border-stroke-brand-solid pb-2 pl-0 pr-16 pt-0 text-13 font-medium focus:border-stroke-brand-solid"
-          actionsClassName="-top-1 items-center"
+          inputClassName="pr-16"
           renderActions={() => (
             <button
               type="button"
