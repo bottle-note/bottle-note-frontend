@@ -32,7 +32,7 @@ export const WhiskeyExplorerList = ({
     useModalStore();
   const { inputKeyword, debouncedKeyword, isTyping, setInputKeyword } =
     useWhiskeyExploreSearch();
-  const { regionIds, category } = useExploreFilters();
+  const { regionIds, category, rating } = useExploreFilters();
 
   const {
     data: alcoholList,
@@ -50,6 +50,7 @@ export const WhiskeyExplorerList = ({
       'explore.alcohols',
       category || 'all',
       regionIds.join(',') || 'all',
+      rating ?? 'all',
       debouncedKeyword,
       user?.userId ?? null,
     ],
@@ -60,6 +61,8 @@ export const WhiskeyExplorerList = ({
         category: category || undefined,
         sortType: 'POPULAR',
         sortOrder: 'DESC',
+        ratingFrom: rating,
+        ratingTo: rating,
         cursor: pageParam,
         size: 10,
         signal,
@@ -150,7 +153,7 @@ export const WhiskeyExplorerList = ({
         isSearchActive={isSearchActive}
         onSearchActiveChange={onSearchActiveChange}
         description="이름이나 플레이버 태그를 입력해 검색해보세요."
-        isFilter
+        filterTarget="whiskey"
       />
       <div className="border-b border-stroke-neutral-subtle" />
 

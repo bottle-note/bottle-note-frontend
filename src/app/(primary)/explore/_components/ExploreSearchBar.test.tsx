@@ -3,6 +3,9 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ExploreSearchBar } from './ExploreSearchBar';
 
 const mockUseNavLayout = jest.fn();
+const mockSelectRating = jest.fn();
+const mockClearRating = jest.fn();
+const mockClearWhiskeyFilters = jest.fn();
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -29,16 +32,28 @@ jest.mock('../_hooks/useExploreFilters', () => ({
   useExploreFilters: () => ({
     regionIds: [],
     category: '',
+    rating: undefined,
     toggleRegionId: jest.fn(),
     clearRegionIds: jest.fn(),
     toggleCategory: jest.fn(),
     clearCategory: jest.fn(),
+    selectRating: mockSelectRating,
+    clearRating: mockClearRating,
+    clearWhiskeyFilters: mockClearWhiskeyFilters,
   }),
 }));
 
 describe('ExploreSearchBar', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
     mockUseNavLayout.mockReturnValue({ isNavigationVisible: true });
+    const modalRoot = document.createElement('div');
+    modalRoot.id = 'modal';
+    document.body.appendChild(modalRoot);
+  });
+
+  afterEach(() => {
+    document.getElementById('modal')?.remove();
   });
 
   it('realtime 모드에서는 검색어 추가 버튼 없이 입력 변경을 전달한다', () => {
@@ -53,7 +68,7 @@ describe('ExploreSearchBar', () => {
         isSearchActive={false}
         onSearchActiveChange={onSearchActiveChange}
         description="이름이나 플레이버 태그를 입력해 검색해보세요."
-        isFilter
+        filterTarget="whiskey"
       />,
     );
 
@@ -172,5 +187,29 @@ describe('ExploreSearchBar', () => {
 
     fireEvent.blur(input);
     expect(onSearchActiveChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it('리뷰 검색 input 우측 필터에는 별점 옵션만 노출한다', () => {
+    render(
+      <ExploreSearchBar
+        mode="chip"
+        handleAddKeyword={jest.fn()}
+        handleSearch={jest.fn()}
+        isSearchActive={false}
+        onSearchActiveChange={jest.fn()}
+        description="검색어를 추가해보세요."
+        filterTarget="review"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: '필터메뉴' }));
+
+    expect(screen.getByText('별점 전체')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '0.5' })).toBeInTheDocument();
+    expect(screen.queryByText('카테고리')).not.toBeInTheDocument();
+    expect(screen.queryByText('지역')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: '0.5' }));
+    expect(mockSelectRating).toHaveBeenCalledWith(0.5);
   });
 });

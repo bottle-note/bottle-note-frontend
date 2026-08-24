@@ -21,6 +21,8 @@ export type ExploreListParams = InfiniteListParams & {
   category?: string;
   sortType?: ExploreSortType;
   sortOrder?: ExploreSortOrder;
+  ratingFrom?: number;
+  ratingTo?: number;
   signal?: AbortSignal;
 };
 

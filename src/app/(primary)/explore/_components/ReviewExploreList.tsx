@@ -27,6 +27,7 @@ import { DEBOUNCE_DELAY } from '@/constants/common';
 import ReviewCard from './ReviewListItem';
 import { ExploreSearchBar } from './ExploreSearchBar';
 import { ExploreKeywordChip } from './ExploreKeywordChip';
+import { useExploreFilters } from '../_hooks/useExploreFilters';
 import { useExploreKeywords } from '../_hooks/useExploreKeywords';
 import { REVIEW_EXPLORE_TAB_ID } from '../_constants/exploreTabs';
 
@@ -63,14 +64,16 @@ export const ReviewExplorerList = ({
   const { user } = useAuthSession();
   const { keywords, keywordValues, handleAddKeyword, handleRemoveKeyword } =
     useExploreKeywords({ tabId: REVIEW_EXPLORE_TAB_ID });
+  const { rating } = useExploreFilters();
 
   const queryKey = useMemo(
     () => [
       'explore.reviews',
       user?.userId ?? null,
+      rating ?? 'all',
       ...keywords.map((keyword) => keyword.value),
     ],
-    [keywords, user?.userId],
+    [keywords, rating, user?.userId],
   );
   const measurementCacheKey = JSON.stringify(queryKey);
 
@@ -83,12 +86,15 @@ export const ReviewExplorerList = ({
     refetch,
   } = usePaginatedQuery<ReviewListData>({
     queryKey,
-    queryFn: ({ pageParam }) => {
+    queryFn: ({ pageParam, signal }) => {
       return ExploreApi.getReviews({
         keywords: keywordValues,
+        ratingFrom: rating,
+        ratingTo: rating,
         ...{
           cursor: pageParam,
           size: 10,
+          signal,
         },
       });
     },
@@ -300,6 +306,7 @@ export const ReviewExplorerList = ({
         isSearchActive={isSearchActive}
         onSearchActiveChange={onSearchActiveChange}
         description={`보고싶은 리뷰의 내용, 플레이버태그, 작성자, 위스키이름을\n 추가하여 검색해보세요.`}
+        filterTarget="review"
       />
       <article className="flex flex-wrap gap-x-1 gap-y-1.5">
         {keywords.map((keyword) => (
