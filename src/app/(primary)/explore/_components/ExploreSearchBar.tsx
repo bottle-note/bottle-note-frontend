@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import { CircleHelp, ListFilter } from 'lucide-react';
+import { ListFilter } from 'lucide-react';
 import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
 import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
-import UnderlineSearchBar from '@/components/feature/Search/UnderlineSearchBar';
-import { useNavLayout } from '@/components/ui/Layout/NavLayout';
+import StickySearchBar from '@/components/feature/Search/StickySearchBar';
 import { CATEGORY_MENUS_LIST } from '@/constants/common';
-import { cn } from '@/lib/utils';
 import { useRegionsQuery } from '@/queries/useRegionsQuery';
 import type { SearchKeyword } from './types';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
@@ -34,14 +32,6 @@ type Props = ChipSearchProps | RealtimeSearchProps;
 export const ExploreSearchBar = (props: Props) => {
   const { description, isFilter = false } = props;
   const isRealtime = props.mode === 'realtime';
-  const { isNavigationVisible } = useNavLayout();
-  const isSearchActive = props.isSearchActive;
-  const shouldShowSearchBar = isSearchActive || isNavigationVisible;
-  const searchBarTransform = isSearchActive
-    ? 'translateY(calc(-1 * var(--logo-header-slide-distance)))'
-    : isNavigationVisible
-      ? 'translateY(0)'
-      : 'translateY(calc(-100% - var(--logo-header-slide-distance)))';
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const { regions } = useRegionsQuery();
   const {
@@ -72,68 +62,47 @@ export const ExploreSearchBar = (props: Props) => {
   };
 
   return (
-    <section
-      data-testid="explore-search-bar"
-      className={cn(
-        'scroll-navigation-motion sticky z-[9] -mx-4 bg-bg-layer-default px-4 pt-[5px] text-fg-neutral transition-[transform,opacity]',
-        {
-          'pointer-events-auto opacity-100': shouldShowSearchBar,
-          'pointer-events-none opacity-0': !shouldShowSearchBar,
-        },
-      )}
-      style={{
-        top: 'var(--logo-header-expanded-height)',
-        transform: searchBarTransform,
-      }}
-    >
-      <article className="relative w-full">
-        <UnderlineSearchBar
-          onSearch={isRealtime ? undefined : onAddKeyword}
-          onValueChange={isRealtime ? props.onValueChange : undefined}
-          onFocusChange={props.onSearchActiveChange}
-          initialValue={isRealtime ? props.initialValue : undefined}
-          ariaLabel={isRealtime ? '위스키 검색' : '검색어 입력'}
-          inputClassName={isRealtime ? 'pr-16' : 'pr-[140px]'}
-          clearable
-          renderActions={
-            !isRealtime || isFilter
-              ? ({ submit }) => (
-                  <>
-                    {!isRealtime && (
-                      <button
-                        type="button"
-                        className="label-selected text-13 text-nowrap flex items-center gap-[2px]"
-                        onClick={submit}
-                      >
-                        <span>+ 검색어 추가</span>
-                      </button>
-                    )}
-                    {isFilter && (
-                      <button
-                        type="button"
-                        aria-label="필터메뉴"
-                        className="rounded-sm text-fg-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
-                        onClick={() => setIsOpenSideFilter(true)}
-                      >
-                        <ListFilter aria-hidden className="h-5 w-5" />
-                      </button>
-                    )}
-                  </>
-                )
-              : undefined
-          }
-        />
-
-        <div className="flex items-start gap-[2px] py-[10px]">
-          <CircleHelp
-            aria-hidden
-            className="mt-[1px] h-3.5 w-3.5 shrink-0 text-fg-brand"
-          />
-          <p className="whitespace-pre-line text-12 text-fg-neutral-muted">
-            {description}
-          </p>
-        </div>
-      </article>
+    <>
+      <StickySearchBar
+        testId="explore-search-bar"
+        containerClassName="-mx-4 px-4 pt-[5px]"
+        isSearchActive={props.isSearchActive}
+        onSearchActiveChange={props.onSearchActiveChange}
+        description={description}
+        onSearch={isRealtime ? undefined : onAddKeyword}
+        onValueChange={isRealtime ? props.onValueChange : undefined}
+        initialValue={isRealtime ? props.initialValue : undefined}
+        ariaLabel={isRealtime ? '위스키 검색' : '검색어 입력'}
+        inputClassName={isRealtime ? 'pr-16' : 'pr-[140px]'}
+        clearable
+        renderActions={
+          !isRealtime || isFilter
+            ? ({ submit }) => (
+                <>
+                  {!isRealtime && (
+                    <button
+                      type="button"
+                      className="label-selected text-13 text-nowrap flex items-center gap-[2px]"
+                      onClick={submit}
+                    >
+                      <span>+ 검색어 추가</span>
+                    </button>
+                  )}
+                  {isFilter && (
+                    <button
+                      type="button"
+                      aria-label="필터메뉴"
+                      className="rounded-sm text-fg-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
+                      onClick={() => setIsOpenSideFilter(true)}
+                    >
+                      <ListFilter aria-hidden className="h-5 w-5" />
+                    </button>
+                  )}
+                </>
+              )
+            : undefined
+        }
+      />
 
       {isFilter && (
         <SideFilterDrawer
@@ -193,6 +162,6 @@ export const ExploreSearchBar = (props: Props) => {
           </Accordion>
         </SideFilterDrawer>
       )}
-    </section>
+    </>
   );
 };

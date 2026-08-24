@@ -1,4 +1,8 @@
-import type { CurationV2SpecCode } from '@/api/curation-v2/constants';
+import type {
+  CurationV2SortType,
+  CurationV2SpecCode,
+} from '@/api/curation-v2/constants';
+import type { SORT_ORDER } from '@/api/_shared/types';
 
 export const curationV2Keys = {
   all: ['curation-v2'] as const,
@@ -6,11 +10,20 @@ export const curationV2Keys = {
     size,
     keyword,
     code,
+    sortType,
+    sortOrder,
   }: {
     size: number;
     keyword?: string;
     code: CurationV2SpecCode | readonly CurationV2SpecCode[];
-  }) => [...curationV2Keys.all, 'feed', { size, keyword, code }] as const,
+    sortType?: CurationV2SortType;
+    sortOrder?: SORT_ORDER;
+  }) =>
+    [
+      ...curationV2Keys.all,
+      'feed',
+      { size, keyword, code, sortType, sortOrder },
+    ] as const,
   curations: (
     size: number,
     keyword: string | undefined,

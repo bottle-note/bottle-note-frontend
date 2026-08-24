@@ -59,6 +59,7 @@ describe('ExploreSearchBar', () => {
 
     const input = screen.getByRole('textbox', { name: '위스키 검색' });
     expect(input).toHaveValue('mac');
+    expect(input).toHaveAttribute('placeholder', '키워드를 입력하세요');
     expect(screen.queryByText('+ 검색어 추가')).not.toBeInTheDocument();
     expect(
       screen.getByText('이름이나 플레이버 태그를 입력해 검색해보세요.'),
@@ -105,13 +106,14 @@ describe('ExploreSearchBar', () => {
     const searchBar = screen.getByTestId('explore-search-bar');
     expect(searchBar).toHaveClass(
       'sticky',
-      'transition-[transform,opacity]',
+      'transition-[transform,opacity,margin-bottom]',
       'scroll-navigation-motion',
       'opacity-100',
     );
     expect(searchBar).toHaveStyle({
       top: 'var(--logo-header-expanded-height)',
       transform: 'translateY(0)',
+      marginBottom: '0px',
     });
 
     mockUseNavLayout.mockReturnValue({ isNavigationVisible: false });
@@ -119,7 +121,7 @@ describe('ExploreSearchBar', () => {
 
     expect(searchBar).toHaveClass(
       'pointer-events-none',
-      'transition-[transform,opacity]',
+      'transition-[transform,opacity,margin-bottom]',
       'scroll-navigation-motion',
       'opacity-0',
     );
@@ -132,6 +134,7 @@ describe('ExploreSearchBar', () => {
     expect(searchBar).toHaveClass('pointer-events-auto', 'opacity-100');
     expect(searchBar).toHaveStyle({
       transform: 'translateY(calc(-1 * var(--logo-header-slide-distance)))',
+      marginBottom: 'calc(-1 * var(--logo-header-slide-distance))',
     });
   });
 

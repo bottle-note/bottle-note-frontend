@@ -1,13 +1,19 @@
 import { apiClient } from '@/shared/api/apiClient';
-import { ApiResponse, InfiniteListParams } from '@/api/_shared/types';
+import {
+  ApiResponse,
+  InfiniteListParams,
+  SORT_ORDER,
+} from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
-import type { CurationV2SpecCode } from './constants';
+import type { CurationV2SortType, CurationV2SpecCode } from './constants';
 import type { CurationV2DetailItem, CurationV2FeedData } from './types';
 
 interface CurationV2FeedParams extends InfiniteListParams {
   keyword?: string;
   code: CurationV2SpecCode[];
+  sortType?: CurationV2SortType;
+  sortOrder?: SORT_ORDER;
 }
 
 export const CurationV2Api = {
@@ -20,7 +26,7 @@ export const CurationV2Api = {
   async getFeed(
     params: CurationV2FeedParams,
   ): Promise<ApiResponse<CurationV2FeedData>> {
-    const { cursor, size = 10, keyword, code } = params;
+    const { cursor, size = 10, keyword, code, sortType, sortOrder } = params;
 
     if (code.length === 0) {
       throw new Error('At least one curation spec code is required.');
@@ -31,6 +37,8 @@ export const CurationV2Api = {
       size,
       keyword,
       code,
+      sortType,
+      sortOrder,
     });
 
     const response = await apiClient.get<ApiResponse<CurationV2FeedData>>(

@@ -1,6 +1,7 @@
 import { apiClient } from '@/shared/api/apiClient';
 import { CurationV2Api } from './curation-v2.api';
-import { CURATION_V2_SPEC_CODES } from './constants';
+import { SORT_ORDER } from '@/api/_shared/types';
+import { CURATION_V2_SORT_TYPES, CURATION_V2_SPEC_CODES } from './constants';
 
 jest.mock('@/shared/api/apiClient', () => ({
   apiClient: {
@@ -64,6 +65,18 @@ describe('CurationV2Api.getFeed', () => {
     } as never);
 
     expect(getSearchParams().get('cursor')).toBe(cursor);
+  });
+
+  it('정렬 기준과 방향을 전달한다', async () => {
+    await CurationV2Api.getFeed({
+      size: 10,
+      code: [CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY],
+      sortType: CURATION_V2_SORT_TYPES.DISPLAY_ORDER,
+      sortOrder: SORT_ORDER.ASC,
+    });
+
+    expect(getSearchParams().get('sortType')).toBe('DISPLAY_ORDER');
+    expect(getSearchParams().get('sortOrder')).toBe('ASC');
   });
 
   it('빈 code 배열은 요청 전에 거부한다', async () => {

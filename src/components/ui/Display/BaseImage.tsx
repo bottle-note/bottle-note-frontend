@@ -1,8 +1,16 @@
 'use client';
 
-import { Component, useState, type ReactNode } from 'react';
+import {
+  Component,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import Image from 'next/image';
 import Fallback from 'public/bottle.svg';
+
+const LOADING_EFFECT_DELAY_MS = 100;
 
 class ImageErrorBoundary extends Component<
   { fallback: ReactNode; children: ReactNode },
@@ -53,6 +61,23 @@ const BaseImage = ({
 }: Props) => {
   const [imgSrc, setImgSrc] = useState(src || Fallback);
   const [isLoading, setIsLoading] = useState(true);
+  const [showLoadingEffect, setShowLoadingEffect] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
+
+  useLayoutEffect(() => {
+    const image = imageRef.current;
+
+    if (image?.complete && image.naturalWidth > 0) {
+      setIsLoading(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setShowLoadingEffect(true);
+    }, LOADING_EFFECT_DELAY_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [imgSrc, isLoading]);
 
   const handleError = () => {
     setImgSrc(Fallback);
@@ -88,18 +113,19 @@ const BaseImage = ({
           />
         }
       >
-        {isLoading && (
+        {isLoading && showLoadingEffect && (
           <div
             className={`absolute inset-0 animate-pulse ${backgroundClassName || 'bg-bg-neutral-weak'}`}
           />
         )}
         <Image
+          ref={imageRef}
           priority={priority}
           src={imgSrc}
           alt={alt}
           width={fill ? undefined : width}
           height={fill ? undefined : height}
-          className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+          className={`${className} ${isLoading && showLoadingEffect ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
           fill={fill}
           sizes={sizes}
           onError={handleError}
