@@ -72,6 +72,17 @@ export interface ExploreAlcohol {
   alcoholsTastingTags: string[];
 }
 
+export interface ExploreLocationInfo {
+  locationName?: string | null;
+  zipCode?: string | null;
+  address?: string | null;
+  detailAddress?: string | null;
+  category?: string | null;
+  mapUrl?: string | null;
+  latitude?: string | null;
+  longitude?: string | null;
+}
+
 export interface ExploreReview {
   userInfo: ExploreUserInfo;
   isMyReview: boolean;
@@ -85,6 +96,7 @@ export interface ExploreReview {
   modifiedAt: string;
   totalImageCount: number;
   reviewImages: string[];
+  locationInfo?: ExploreLocationInfo | null;
   isBestReview: boolean;
   likeCount: number;
   isLikedByMe: boolean;
