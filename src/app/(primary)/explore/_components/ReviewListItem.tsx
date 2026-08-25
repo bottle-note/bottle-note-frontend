@@ -1,9 +1,10 @@
 import { memo, useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Ellipsis, ThumbsUp, UserRound } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 import { LABEL_NAMES } from '@/constants/common';
-import { ExploreReview } from '@/types/Explore';
+import { ExploreReview } from '@/api/explore/types';
 import UserInfoDisplay from '@/components/domain/user/UserInfoDisplay';
 import Star from '@/components/ui/Display/Star';
 import useModalStore from '@/store/modalStore';
@@ -35,6 +36,7 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
     '리뷰 이미지',
   );
   const reviewTags = [...new Set(content.reviewTags)];
+  const locationName = content.locationInfo?.locationName?.trim();
 
   useEffect(() => {
     setIsLiked(content.isLikedByMe);
@@ -46,55 +48,76 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
       <article className="flex w-full flex-col pt-[30px] text-fg-neutral">
         {/* 유저 정보 */}
         <div className="flex flex-col gap-[9px] mb-5">
-          <div className="flex justify-between items-center w-full">
-            <UserInfoDisplay
-              userId={content.userInfo.userId}
-              nickName={content.userInfo.nickName}
-              userImageProps={{
-                imgSrc: content.userInfo.userProfileImage,
-                size: 30,
-              }}
-              userNickNameProps={{
-                size: 13,
-                color: 'mainGray',
-                className: 'text-fg-neutral-muted',
-              }}
-            />
-            <Star
-              rating={content.reviewRating ?? 0}
-              size={21}
-              textStyle="w-7 text-20 font-semibold text-fg-rating"
-            />
+          <div className="flex w-full min-w-0 items-center justify-between gap-2">
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <UserInfoDisplay
+                userId={content.userInfo.userId}
+                nickName={content.userInfo.nickName}
+                className="flex min-w-0 items-center space-x-[7px]"
+                userImageProps={{
+                  imgSrc: content.userInfo.userProfileImage,
+                  size: 30,
+                }}
+                userNickNameProps={{
+                  size: 13,
+                  color: 'mainGray',
+                  className: 'min-w-0 truncate text-fg-neutral-muted',
+                }}
+              />
+            </div>
+
+            <div className="flex flex-shrink-0 items-center gap-2">
+              <div className="flex gap-1">
+                {content.isBestReview && (
+                  <Label
+                    name={LABEL_NAMES.BEST}
+                    icon={
+                      <ThumbsUp
+                        aria-hidden
+                        className="h-2.5 w-2.5 fill-current"
+                      />
+                    }
+                    styleClass="rounded border-stroke-brand-primary-solid bg-bg-brand-primary-solid px-2 py-[0.1rem] text-10 text-fg-brand-contrast"
+                  />
+                )}
+                {content.isMyReview && (
+                  <Label
+                    name={LABEL_NAMES.MY_REVIEW}
+                    icon={<UserRound aria-hidden className="h-2.5 w-2.5" />}
+                    styleClass="rounded border-stroke-brand-primary-solid bg-transparent px-2 py-[0.1rem] text-10 text-fg-brand-primary"
+                  />
+                )}
+              </div>
+              <Star
+                rating={content.reviewRating ?? 0}
+                size={21}
+                textStyle="w-7 text-20 font-semibold text-fg-rating"
+              />
+            </div>
           </div>
-          <div className="flex justify-between items-start w-full gap-2">
+          <div className="flex w-full min-w-0 items-center justify-between gap-3">
             <Link
               href={ROUTES.SEARCH.ALL(content.alcoholId)}
               className="min-w-0 flex-1"
             >
-              <p className="break-words text-13 text-fg-neutral">{`${content.alcoholName}  >`}</p>
+              <p className="truncate text-13 text-fg-neutral">{`${content.alcoholName}  >`}</p>
             </Link>
 
-            <div className="flex gap-1 flex-shrink-0">
-              {content.isBestReview && (
-                <Label
-                  name={LABEL_NAMES.BEST}
-                  icon={
-                    <ThumbsUp
-                      aria-hidden
-                      className="h-2.5 w-2.5 fill-current"
-                    />
-                  }
-                  styleClass="rounded border-stroke-brand-primary-solid bg-bg-brand-primary-solid px-2 py-[0.1rem] text-10 text-fg-brand-contrast"
+            {locationName && (
+              <div className="flex max-w-[45%] flex-shrink-0 items-center gap-0.5">
+                <Image
+                  aria-hidden
+                  src="/icon/placepoint-subcoral.svg"
+                  width={15}
+                  height={15}
+                  alt=""
+                  className="flex-shrink-0"
                 />
-              )}
-              {content.isMyReview && (
-                <Label
-                  name={LABEL_NAMES.MY_REVIEW}
-                  icon={<UserRound aria-hidden className="h-2.5 w-2.5" />}
-                  styleClass="rounded border-stroke-brand-primary-solid bg-transparent px-2 py-[0.1rem] text-10 text-fg-brand-primary"
-                />
-              )}
-            </div>
+                <p className="min-w-0 truncate text-13 text-fg-neutral-muted">
+                  {locationName}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
