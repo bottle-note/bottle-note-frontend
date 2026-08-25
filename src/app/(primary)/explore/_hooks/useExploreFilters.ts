@@ -7,8 +7,8 @@ import {
 
 /**
  * explore 페이지 sidebar 필터 (regionIds, category, rating) URL 동기화 훅.
- * keywords는 useExploreKeywords가 별도로 관리하며, 두 훅은 같은 URL을
- * 공유하지만 서로의 파라미터는 보존한다.
+ * 검색어와 정렬은 각각의 전용 훅이 관리하며, 모든 훅은 같은 URL을
+ * 공유하면서 서로의 파라미터를 보존한다.
  */
 export const useExploreFilters = () => {
   const router = useRouter();
@@ -96,6 +96,16 @@ export const useExploreFilters = () => {
       params.delete('regionIds');
       params.delete('category');
       params.delete('rating');
+      params.delete('sortType');
+      params.delete('sortOrder');
+    });
+  }, [updateUrl]);
+
+  const clearReviewFilters = useCallback(() => {
+    updateUrl((params) => {
+      params.delete('rating');
+      params.delete('sortType');
+      params.delete('sortOrder');
     });
   }, [updateUrl]);
 
@@ -110,5 +120,6 @@ export const useExploreFilters = () => {
     selectRating,
     clearRating,
     clearWhiskeyFilters,
+    clearReviewFilters,
   };
 };

@@ -26,9 +26,9 @@ import useModalStore from '@/store/modalStore';
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import ReviewCard from './ReviewListItem';
 import { ExploreSearchBar } from './ExploreSearchBar';
-import { ExploreKeywordChip } from './ExploreKeywordChip';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
-import { useExploreKeywords } from '../_hooks/useExploreKeywords';
+import { useExploreSearch } from '../_hooks/useExploreSearch';
+import { useExploreSort } from '../_hooks/useExploreSort';
 import { REVIEW_EXPLORE_TAB_ID } from '../_constants/exploreTabs';
 
 interface ReviewExplorerListProps {
@@ -62,8 +62,11 @@ export const ReviewExplorerList = ({
   const queryClient = useQueryClient();
   const { handleModalState } = useModalStore();
   const { user } = useAuthSession();
-  const { keywords, keywordValues, handleAddKeyword, handleRemoveKeyword } =
-    useExploreKeywords({ tabId: REVIEW_EXPLORE_TAB_ID });
+  const { inputKeyword, debouncedKeyword, isTyping, setInputKeyword } =
+    useExploreSearch({ tabId: REVIEW_EXPLORE_TAB_ID });
+  const { sortPresets, selectedSort, selectSort } = useExploreSort({
+    tabId: REVIEW_EXPLORE_TAB_ID,
+  });
   const { rating } = useExploreFilters();
 
   const queryKey = useMemo(
@@ -71,9 +74,17 @@ export const ReviewExplorerList = ({
       'explore.reviews',
       user?.userId ?? null,
       rating ?? 'all',
-      ...keywords.map((keyword) => keyword.value),
+      debouncedKeyword,
+      selectedSort.sortType,
+      selectedSort.sortOrder,
     ],
-    [keywords, rating, user?.userId],
+    [
+      debouncedKeyword,
+      rating,
+      selectedSort.sortOrder,
+      selectedSort.sortType,
+      user?.userId,
+    ],
   );
   const measurementCacheKey = JSON.stringify(queryKey);
 
@@ -81,14 +92,17 @@ export const ReviewExplorerList = ({
     data: reviewList,
     isLoading: isFirstLoading,
     isFetching,
+    isFetchingNextPage,
+    isPlaceholderData,
     targetRef,
     error,
-    refetch,
   } = usePaginatedQuery<ReviewListData>({
     queryKey,
     queryFn: ({ pageParam, signal }) => {
       return ExploreApi.getReviews({
-        keywords: keywordValues,
+        keyword: debouncedKeyword || undefined,
+        sortType: selectedSort.sortType,
+        sortOrder: selectedSort.sortOrder,
         ratingFrom: rating,
         ratingTo: rating,
         ...{
@@ -143,7 +157,7 @@ export const ReviewExplorerList = ({
     return () => {
       window.removeEventListener('resize', updateListOffset);
     };
-  }, [keywords]);
+  }, [debouncedKeyword, rating, selectedSort.id]);
 
   useLayoutEffect(
     () => () => {
@@ -301,30 +315,26 @@ export const ReviewExplorerList = ({
   return (
     <section className="pb-20">
       <ExploreSearchBar
-        handleSearch={refetch}
-        handleAddKeyword={handleAddKeyword}
+        mode="realtime"
+        initialValue={inputKeyword}
+        onValueChange={setInputKeyword}
         isSearchActive={isSearchActive}
         onSearchActiveChange={onSearchActiveChange}
-        description={`보고싶은 리뷰의 내용, 플레이버태그, 작성자, 위스키이름을\n 추가하여 검색해보세요.`}
+        description="리뷰 내용, 플레이버 태그, 작성자, 위스키 이름을 입력해 검색해보세요."
         filterTarget="review"
+        sortPresets={sortPresets}
+        selectedSortId={selectedSort.id}
+        onSelectSort={selectSort}
       />
-      <article className="flex flex-wrap gap-x-1 gap-y-1.5">
-        {keywords.map((keyword) => (
-          <div key={keyword.value} className="flex-shrink-0 overflow-hidden">
-            <ExploreKeywordChip
-              keyword={keyword}
-              onRemove={handleRemoveKeyword}
-              textClassName="text-12"
-            />
-          </div>
-        ))}
-      </article>
       <List
         isListFirstLoading={isFirstLoading}
         isError={!!error}
-        isScrollLoading={isFetching}
+        isScrollLoading={isFetchingNextPage}
         isEmpty={
-          !isFirstLoading &&
+          !error &&
+          !isTyping &&
+          !(isFetching && !isFetchingNextPage) &&
+          !isPlaceholderData &&
           (!reviewList || reviewList[0]?.data.items.length === 0)
         }
       >

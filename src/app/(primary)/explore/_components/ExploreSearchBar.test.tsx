@@ -6,6 +6,7 @@ const mockUseNavLayout = jest.fn();
 const mockSelectRating = jest.fn();
 const mockClearRating = jest.fn();
 const mockClearWhiskeyFilters = jest.fn();
+const mockClearReviewFilters = jest.fn();
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -40,6 +41,7 @@ jest.mock('../_hooks/useExploreFilters', () => ({
     selectRating: mockSelectRating,
     clearRating: mockClearRating,
     clearWhiskeyFilters: mockClearWhiskeyFilters,
+    clearReviewFilters: mockClearReviewFilters,
   }),
 }));
 
@@ -115,6 +117,7 @@ describe('ExploreSearchBar', () => {
       isSearchActive: false,
       onSearchActiveChange: jest.fn(),
       description: '검색어를 입력해보세요.',
+      filterTarget: 'whiskey' as const,
     };
     const { rerender } = render(<ExploreSearchBar {...props} />);
 
@@ -153,63 +156,80 @@ describe('ExploreSearchBar', () => {
     });
   });
 
-  it('chip 모드에서는 기존 검색어 추가 동작을 유지한다', () => {
-    const handleAddKeyword = jest.fn();
-    const handleSearch = jest.fn();
-    const onSearchActiveChange = jest.fn();
+  it('리뷰도 검색어 추가 버튼 없이 실시간 입력 변경을 전달한다', () => {
+    const onValueChange = jest.fn();
 
     render(
       <ExploreSearchBar
-        mode="chip"
-        handleAddKeyword={handleAddKeyword}
-        handleSearch={handleSearch}
+        mode="realtime"
+        initialValue="peaty"
+        onValueChange={onValueChange}
         isSearchActive={false}
-        onSearchActiveChange={onSearchActiveChange}
-        description="검색어를 추가해보세요."
+        onSearchActiveChange={jest.fn()}
+        description="리뷰 내용, 플레이버 태그, 작성자, 위스키 이름을 입력해 검색해보세요."
+        filterTarget="review"
       />,
     );
 
-    const input = screen.getByRole('textbox', { name: '검색어 입력' });
+    const input = screen.getByRole('textbox', { name: '리뷰 검색' });
+    expect(input).toHaveValue('peaty');
+    expect(screen.queryByText('+ 검색어 추가')).not.toBeInTheDocument();
 
-    fireEvent.focus(input);
-    expect(onSearchActiveChange).toHaveBeenLastCalledWith(true);
-
-    fireEvent.change(input, {
-      target: { value: ' peaty ' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: '+ 검색어 추가' }));
-
-    expect(handleAddKeyword).toHaveBeenCalledWith({
-      label: 'peaty',
-      value: 'peaty',
-    });
-    expect(handleSearch).toHaveBeenCalledTimes(1);
-
-    fireEvent.blur(input);
-    expect(onSearchActiveChange).toHaveBeenLastCalledWith(false);
+    fireEvent.change(input, { target: { value: 'smoky' } });
+    expect(onValueChange).toHaveBeenCalledWith('smoky');
   });
 
-  it('리뷰 검색 input 우측 필터에는 별점 옵션만 노출한다', () => {
+  it('리뷰 Drawer 최상단에 정렬 preset을 표시하고 선택·초기화를 전달한다', () => {
+    const onSelectSort = jest.fn();
+
     render(
       <ExploreSearchBar
-        mode="chip"
-        handleAddKeyword={jest.fn()}
-        handleSearch={jest.fn()}
+        mode="realtime"
+        initialValue=""
+        onValueChange={jest.fn()}
         isSearchActive={false}
         onSearchActiveChange={jest.fn()}
-        description="검색어를 추가해보세요."
+        description="리뷰를 검색해보세요."
         filterTarget="review"
+        sortPresets={[
+          {
+            id: 'LATEST_DESC',
+            label: '최신순',
+            sortType: 'LATEST',
+            sortOrder: 'DESC',
+          },
+          {
+            id: 'POPULAR_DESC',
+            label: '인기순',
+            sortType: 'POPULAR',
+            sortOrder: 'DESC',
+          },
+        ]}
+        selectedSortId="LATEST_DESC"
+        onSelectSort={onSelectSort}
       />,
     );
 
     fireEvent.click(screen.getByRole('button', { name: '필터메뉴' }));
 
+    const sortHeading = screen.getByText('정렬');
+    const ratingHeading = screen.getByText('별점');
+    expect(
+      sortHeading.compareDocumentPosition(ratingHeading) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(screen.getByRole('button', { name: '최신순' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
     expect(screen.getByText('별점 전체')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '0.5' })).toBeInTheDocument();
     expect(screen.queryByText('카테고리')).not.toBeInTheDocument();
     expect(screen.queryByText('지역')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: '0.5' }));
-    expect(mockSelectRating).toHaveBeenCalledWith(0.5);
+    fireEvent.click(screen.getByRole('button', { name: '인기순' }));
+    expect(onSelectSort).toHaveBeenCalledWith('POPULAR_DESC');
+
+    fireEvent.click(screen.getByRole('button', { name: '초기화' }));
+    expect(mockClearReviewFilters).toHaveBeenCalledTimes(1);
   });
 });

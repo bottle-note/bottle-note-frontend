@@ -86,21 +86,27 @@ describe('ExploreApi.getReviews', () => {
     });
   });
 
-  it('선택 작성 별점과 AbortSignal을 요청에 전달한다', async () => {
+  it('단일 keyword·정렬·작성 별점과 AbortSignal을 요청에 전달한다', async () => {
     const controller = new AbortController();
 
     await ExploreApi.getReviews({
-      keywords: ['peaty'],
+      keyword: 'peaty',
+      sortType: 'RATING',
+      sortOrder: 'ASC',
       ratingFrom: 3,
       ratingTo: 3,
       size: 10,
       signal: controller.signal,
-    } as never);
+    });
 
     expect(mockGet).toHaveBeenCalledWith(
       expect.stringContaining('/reviews/explore/standard?'),
       { authRequired: false, signal: controller.signal },
     );
+    expect(getSearchParams().get('keyword')).toBe('peaty');
+    expect(getSearchParams().has('keywords')).toBe(false);
+    expect(getSearchParams().get('sortType')).toBe('RATING');
+    expect(getSearchParams().get('sortOrder')).toBe('ASC');
     expect(getSearchParams().get('ratingFrom')).toBe('3');
     expect(getSearchParams().get('ratingTo')).toBe('3');
   });

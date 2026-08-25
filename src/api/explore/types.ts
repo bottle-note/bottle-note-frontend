@@ -13,6 +13,14 @@ export type ExploreSortType =
   | 'REVIEW'
   | 'RANDOM';
 
+export type ReviewExploreSortType =
+  | 'LATEST'
+  | 'POPULAR'
+  | 'LIKES'
+  | 'RATING'
+  | 'BOTTLE_PRICE'
+  | 'GLASS_PRICE';
+
 export type ExploreSortOrder = 'DESC' | 'ASC';
 
 export type ExploreListParams = InfiniteListParams & {
@@ -21,6 +29,15 @@ export type ExploreListParams = InfiniteListParams & {
   category?: string;
   sortType?: ExploreSortType;
   sortOrder?: ExploreSortOrder;
+  ratingFrom?: number;
+  ratingTo?: number;
+  signal?: AbortSignal;
+};
+
+export type ExploreReviewsParams = InfiniteListParams & {
+  keyword?: string;
+  sortType: ReviewExploreSortType;
+  sortOrder: ExploreSortOrder;
   ratingFrom?: number;
   ratingTo?: number;
   signal?: AbortSignal;

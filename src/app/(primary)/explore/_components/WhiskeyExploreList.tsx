@@ -12,7 +12,9 @@ import { ROUTES } from '@/constants/routes';
 import WhiskeyListItem from './WhiskeyListItem';
 import { ExploreSearchBar } from './ExploreSearchBar';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
-import { useWhiskeyExploreSearch } from '../_hooks/useWhiskeyExploreSearch';
+import { useExploreSearch } from '../_hooks/useExploreSearch';
+import { useExploreSort } from '../_hooks/useExploreSort';
+import { WHISKEY_EXPLORE_TAB_ID } from '../_constants/exploreTabs';
 
 interface WhiskeyExplorerListProps {
   isSearchActive: boolean;
@@ -31,7 +33,10 @@ export const WhiskeyExplorerList = ({
   const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
   const { inputKeyword, debouncedKeyword, isTyping, setInputKeyword } =
-    useWhiskeyExploreSearch();
+    useExploreSearch({ tabId: WHISKEY_EXPLORE_TAB_ID });
+  const { sortPresets, selectedSort, selectSort } = useExploreSort({
+    tabId: WHISKEY_EXPLORE_TAB_ID,
+  });
   const { regionIds, category, rating } = useExploreFilters();
 
   const {
@@ -52,6 +57,8 @@ export const WhiskeyExplorerList = ({
       regionIds.join(',') || 'all',
       rating ?? 'all',
       debouncedKeyword,
+      selectedSort.sortType,
+      selectedSort.sortOrder,
       user?.userId ?? null,
     ],
     queryFn: ({ pageParam, signal }) => {
@@ -59,8 +66,8 @@ export const WhiskeyExplorerList = ({
         keywords: debouncedKeyword ? [debouncedKeyword] : [],
         regionIds: regionIds.length > 0 ? regionIds : undefined,
         category: category || undefined,
-        sortType: 'POPULAR',
-        sortOrder: 'DESC',
+        sortType: selectedSort.sortType,
+        sortOrder: selectedSort.sortOrder,
         ratingFrom: rating,
         ratingTo: rating,
         cursor: pageParam,
@@ -154,6 +161,9 @@ export const WhiskeyExplorerList = ({
         onSearchActiveChange={onSearchActiveChange}
         description="이름이나 플레이버 태그를 입력해 검색해보세요."
         filterTarget="whiskey"
+        sortPresets={sortPresets}
+        selectedSortId={selectedSort.id}
+        onSelectSort={selectSort}
       />
       <div className="border-b border-stroke-neutral-subtle" />
 

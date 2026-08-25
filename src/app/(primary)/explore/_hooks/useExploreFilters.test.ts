@@ -260,7 +260,7 @@ describe('useExploreFilters 훅', () => {
     });
 
     it('별점을 선택하면 다른 검색 조건을 보존하고 rating을 설정한다', () => {
-      setupSearchParams('tab=REVIEW_WHISKEY&keywords=peaty');
+      setupSearchParams('tab=REVIEW_WHISKEY&keyword=peaty');
 
       const { result } = renderHook(() => useExploreFilters());
 
@@ -269,12 +269,12 @@ describe('useExploreFilters 훅', () => {
       const replaced = parseReplacedQuery(mockReplace);
       expect(replaced.get('rating')).toBe('3.5');
       expect(replaced.get('tab')).toBe('REVIEW_WHISKEY');
-      expect(replaced.get('keywords')).toBe('peaty');
+      expect(replaced.get('keyword')).toBe('peaty');
     });
 
     it('위스키 필터 초기화는 카테고리, 지역, 별점을 한 번에 제거한다', () => {
       setupSearchParams(
-        'tab=EXPLORER_WHISKEY&keywords=macallan&category=SINGLE_MALT&regionIds=12&rating=4.5',
+        'tab=EXPLORER_WHISKEY&keywords=macallan&category=SINGLE_MALT&regionIds=12&rating=4.5&sortType=RATING&sortOrder=DESC',
       );
 
       const { result } = renderHook(() => useExploreFilters());
@@ -286,7 +286,26 @@ describe('useExploreFilters 훅', () => {
       expect(replaced.has('category')).toBe(false);
       expect(replaced.has('regionIds')).toBe(false);
       expect(replaced.has('rating')).toBe(false);
+      expect(replaced.has('sortType')).toBe(false);
+      expect(replaced.has('sortOrder')).toBe(false);
       expect(replaced.get('keywords')).toBe('macallan');
+    });
+
+    it('리뷰 필터 초기화는 별점과 정렬만 제거하고 검색 키워드는 유지한다', () => {
+      setupSearchParams(
+        'tab=REVIEW_WHISKEY&keyword=peaty&rating=4.5&sortType=RATING&sortOrder=ASC',
+      );
+
+      const { result } = renderHook(() => useExploreFilters());
+
+      act(() => result.current.clearReviewFilters());
+
+      const replaced = parseReplacedQuery(mockReplace);
+      expect(mockReplace).toHaveBeenCalledTimes(1);
+      expect(replaced.has('rating')).toBe(false);
+      expect(replaced.has('sortType')).toBe(false);
+      expect(replaced.has('sortOrder')).toBe(false);
+      expect(replaced.get('keyword')).toBe('peaty');
     });
   });
 });

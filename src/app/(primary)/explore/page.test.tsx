@@ -6,9 +6,11 @@ const mockUseNavLayout = jest.fn();
 const mockSetNavbarSuppressed = jest.fn();
 const mockSetTabParam = jest.fn();
 const mockRouterReplace = jest.fn();
+let mockSearchParams = 'tab=REVIEW_WHISKEY';
+let mockCurrentTab = { name: '리뷰 둘러보기', id: 'REVIEW_WHISKEY' };
 
 jest.mock('next/navigation', () => ({
-  useSearchParams: () => new URLSearchParams('tab=REVIEW_WHISKEY'),
+  useSearchParams: () => new URLSearchParams(mockSearchParams),
   useRouter: () => ({ replace: mockRouterReplace }),
 }));
 
@@ -19,7 +21,7 @@ jest.mock('@/hooks/useStatefulSearchParams', () => ({
 
 jest.mock('@/hooks/useTab', () => ({
   useTab: () => ({
-    currentTab: { name: '리뷰 둘러보기', id: 'REVIEW_WHISKEY' },
+    currentTab: mockCurrentTab,
     handleTab: jest.fn(),
     refs: { scrollContainerRef: { current: null } },
     registerTab: jest.fn(),
@@ -67,6 +69,8 @@ jest.mock('./_components/WhiskeyExploreList', () => ({
 describe('ExplorePage scroll header', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockSearchParams = 'tab=REVIEW_WHISKEY';
+    mockCurrentTab = { name: '리뷰 둘러보기', id: 'REVIEW_WHISKEY' };
     window.scrollTo = jest.fn();
     mockUseNavLayout.mockReturnValue({
       isNavigationVisible: true,
@@ -152,5 +156,26 @@ describe('ExplorePage scroll header', () => {
     unmount();
 
     expect(mockSetNavbarSuppressed).toHaveBeenLastCalledWith(false);
+  });
+
+  it('탭 전환 시 키워드와 정렬만 초기화하고 공통 필터는 보존한다', () => {
+    mockSearchParams =
+      'tab=REVIEW_WHISKEY&keyword=peaty&sortType=RATING&sortOrder=ASC&rating=4.5';
+    const { rerender } = render(<ExplorePage />);
+
+    mockCurrentTab = {
+      name: '위스키 둘러보기',
+      id: 'EXPLORER_WHISKEY',
+    };
+    rerender(<ExplorePage />);
+
+    const [url] = mockRouterReplace.mock.calls.at(-1);
+    const params = new URLSearchParams(url.split('?')[1]);
+    expect(params.get('tab')).toBe('EXPLORER_WHISKEY');
+    expect(params.get('rating')).toBe('4.5');
+    expect(params.has('keyword')).toBe(false);
+    expect(params.has('keywords')).toBe(false);
+    expect(params.has('sortType')).toBe(false);
+    expect(params.has('sortOrder')).toBe(false);
   });
 });
