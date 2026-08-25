@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { render, screen, within } from '@testing-library/react';
+import { ExploreApi } from '@/api/explore/explore.api';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ReviewExplorerList } from './ReviewExploreList';
 
@@ -47,6 +48,10 @@ jest.mock('@/queries/usePaginatedQuery', () => ({
   usePaginatedQuery: jest.fn(),
 }));
 
+jest.mock('@/api/explore/explore.api', () => ({
+  ExploreApi: { getReviews: jest.fn() },
+}));
+
 jest.mock('@/hooks/auth/useAuthSession', () => ({
   useAuthSession: () => ({ user: { userId: 1 } }),
 }));
@@ -60,8 +65,14 @@ jest.mock('../_hooks/useExploreKeywords', () => ({
   }),
 }));
 
+jest.mock('../_hooks/useExploreFilters', () => ({
+  useExploreFilters: () => ({ rating: 3.5 }),
+}));
+
 jest.mock('./ExploreSearchBar', () => ({
-  ExploreSearchBar: () => <div>review-search</div>,
+  ExploreSearchBar: ({ filterTarget }: { filterTarget: string }) => (
+    <div data-filter-target={filterTarget}>review-search</div>
+  ),
 }));
 
 jest.mock('./ExploreKeywordChip', () => ({
@@ -79,10 +90,52 @@ jest.mock('./ReviewListItem', () => {
 });
 
 const mockUsePaginatedQuery = usePaginatedQuery as jest.Mock;
+const mockGetReviews = ExploreApi.getReviews as jest.Mock;
 
 describe('ReviewExplorerList', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it('작성 별점을 query key와 리뷰 API의 동일한 상하한으로 전달한다', async () => {
+    mockUsePaginatedQuery.mockReturnValue({
+      data: [{ data: { items: [] } }],
+      isLoading: false,
+      isFetching: false,
+      targetRef: { current: null },
+      error: null,
+      refetch: jest.fn(),
+    });
+
+    render(
+      <ReviewExplorerList
+        isSearchActive={false}
+        onSearchActiveChange={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByText('review-search')).toHaveAttribute(
+      'data-filter-target',
+      'review',
+    );
+
+    const [config] = mockUsePaginatedQuery.mock.calls[0];
+    expect(config.queryKey).toEqual(['explore.reviews', 1, 3.5]);
+
+    const controller = new AbortController();
+    await config.queryFn({
+      pageParam: 'opaque-review-cursor',
+      signal: controller.signal,
+    });
+
+    expect(mockGetReviews).toHaveBeenCalledWith({
+      keywords: [],
+      ratingFrom: 3.5,
+      ratingTo: 3.5,
+      cursor: 'opaque-review-cursor',
+      size: 10,
+      signal: controller.signal,
+    });
   });
 
   it('결과가 많아도 현재 화면 주변의 리뷰만 DOM에 표시한다', () => {

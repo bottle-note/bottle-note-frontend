@@ -17,17 +17,19 @@ export const ExploreApi = {
   async getReviews(
     params: ExploreListParams,
   ): Promise<ApiResponse<ExploreReviewsResponse>> {
-    const { keywords, cursor, size } = params;
+    const { keywords, ratingFrom, ratingTo, cursor, size, signal } = params;
 
     const queryString = buildQueryParams({
       keywords,
+      ratingFrom,
+      ratingTo,
       cursor,
       size,
     });
 
     const response = await apiClient.get<ApiResponse<ExploreReviewsResponse>>(
       `/reviews/explore/standard?${queryString}`,
-      { authRequired: false },
+      { authRequired: false, signal },
     );
 
     if (response.errors.length !== 0) {
@@ -51,6 +53,8 @@ export const ExploreApi = {
       category,
       sortType,
       sortOrder,
+      ratingFrom,
+      ratingTo,
       cursor,
       size,
       signal,
@@ -62,6 +66,8 @@ export const ExploreApi = {
       category,
       sortType,
       sortOrder,
+      ratingFrom,
+      ratingTo,
       cursor,
       size,
     });

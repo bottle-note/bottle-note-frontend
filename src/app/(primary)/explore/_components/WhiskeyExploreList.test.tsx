@@ -149,6 +149,7 @@ describe('WhiskeyExplorerList realtime search', () => {
     mockUseExploreFilters.mockReturnValue({
       regionIds: [12],
       category: 'SINGLE_MALT',
+      rating: 4.5,
     });
     mockUseAuth.mockReturnValue({
       isLoggedIn: true,
@@ -195,6 +196,7 @@ describe('WhiskeyExplorerList realtime search', () => {
       'explore.alcohols',
       'SINGLE_MALT',
       '12',
+      4.5,
       'macallan',
       101,
     ]);
@@ -213,6 +215,8 @@ describe('WhiskeyExplorerList realtime search', () => {
       category: 'SINGLE_MALT',
       sortType: 'POPULAR',
       sortOrder: 'DESC',
+      ratingFrom: 4.5,
+      ratingTo: 4.5,
       cursor: opaqueCursor,
       size: 10,
       signal: controller.signal,

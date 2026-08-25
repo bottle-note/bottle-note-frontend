@@ -1,8 +1,12 @@
 import { useCallback, useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import {
+  isExploreRating,
+  type ExploreRating,
+} from '../_constants/exploreFilters';
 
 /**
- * explore 페이지 sidebar 필터 (regionIds, category) URL 동기화 훅.
+ * explore 페이지 sidebar 필터 (regionIds, category, rating) URL 동기화 훅.
  * keywords는 useExploreKeywords가 별도로 관리하며, 두 훅은 같은 URL을
  * 공유하지만 서로의 파라미터는 보존한다.
  */
@@ -21,6 +25,13 @@ export const useExploreFilters = () => {
   );
 
   const category = searchParams.get('category') ?? '';
+  const rating = useMemo(() => {
+    const rawRating = searchParams.get('rating');
+    if (!rawRating) return undefined;
+
+    const parsedRating = Number(rawRating);
+    return isExploreRating(parsedRating) ? parsedRating : undefined;
+  }, [searchParams]);
 
   const updateUrl = useCallback(
     (mutate: (params: URLSearchParams) => void) => {
@@ -69,12 +80,35 @@ export const useExploreFilters = () => {
     updateUrl((params) => params.delete('category'));
   }, [updateUrl]);
 
+  const selectRating = useCallback(
+    (value: ExploreRating) => {
+      updateUrl((params) => params.set('rating', String(value)));
+    },
+    [updateUrl],
+  );
+
+  const clearRating = useCallback(() => {
+    updateUrl((params) => params.delete('rating'));
+  }, [updateUrl]);
+
+  const clearWhiskeyFilters = useCallback(() => {
+    updateUrl((params) => {
+      params.delete('regionIds');
+      params.delete('category');
+      params.delete('rating');
+    });
+  }, [updateUrl]);
+
   return {
     regionIds,
     category,
+    rating,
     toggleRegionId,
     clearRegionIds,
     toggleCategory,
     clearCategory,
+    selectRating,
+    clearRating,
+    clearWhiskeyFilters,
   };
 };
