@@ -69,7 +69,10 @@ export default function ExplorePage() {
     }
 
     previousTabIdRef.current = currentTab.id as ExploreTabId;
+    params.delete('keyword');
     params.delete('keywords');
+    params.delete('sortType');
+    params.delete('sortOrder');
     params.set('tab', currentTab.id);
 
     router.replace(`/explore?${params.toString()}`, {

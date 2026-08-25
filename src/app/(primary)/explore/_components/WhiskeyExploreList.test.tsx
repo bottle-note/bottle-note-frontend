@@ -8,7 +8,8 @@ import { ROUTES } from '@/constants/routes';
 import type { LinkData } from '@/types/LinkButton';
 import { WhiskeyExplorerList } from './WhiskeyExploreList';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
-import { useWhiskeyExploreSearch } from '../_hooks/useWhiskeyExploreSearch';
+import { useExploreSearch } from '../_hooks/useExploreSearch';
+import { useExploreSort } from '../_hooks/useExploreSort';
 
 const mockPush = jest.fn();
 
@@ -28,8 +29,12 @@ jest.mock('../_hooks/useExploreFilters', () => ({
   useExploreFilters: jest.fn(),
 }));
 
-jest.mock('../_hooks/useWhiskeyExploreSearch', () => ({
-  useWhiskeyExploreSearch: jest.fn(),
+jest.mock('../_hooks/useExploreSearch', () => ({
+  useExploreSearch: jest.fn(),
+}));
+
+jest.mock('../_hooks/useExploreSort', () => ({
+  useExploreSort: jest.fn(),
 }));
 
 jest.mock('@/hooks/auth/useAuthSession', () => ({
@@ -128,7 +133,8 @@ jest.mock('@/components/feature/List/List', () => {
 
 const mockUsePaginatedQuery = usePaginatedQuery as jest.Mock;
 const mockUseExploreFilters = useExploreFilters as jest.Mock;
-const mockUseWhiskeyExploreSearch = useWhiskeyExploreSearch as jest.Mock;
+const mockUseExploreSearch = useExploreSearch as jest.Mock;
+const mockUseExploreSort = useExploreSort as jest.Mock;
 const mockGetAlcohols = ExploreApi.getAlcohols as jest.Mock;
 const mockUseAuth = useAuthSession as jest.Mock;
 const mockUseModalStore = useModalStore as unknown as jest.Mock;
@@ -140,11 +146,21 @@ const mockHandleLoginState = jest.fn();
 describe('WhiskeyExplorerList realtime search', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseWhiskeyExploreSearch.mockReturnValue({
+    mockUseExploreSearch.mockReturnValue({
       inputKeyword: 'macallan',
       debouncedKeyword: 'macallan',
       isTyping: false,
       setInputKeyword: jest.fn(),
+    });
+    mockUseExploreSort.mockReturnValue({
+      sortPresets: [],
+      selectedSort: {
+        id: 'RANDOM_DESC',
+        label: '랜덤',
+        sortType: 'RANDOM',
+        sortOrder: 'DESC',
+      },
+      selectSort: jest.fn(),
     });
     mockUseExploreFilters.mockReturnValue({
       regionIds: [12],
@@ -198,6 +214,8 @@ describe('WhiskeyExplorerList realtime search', () => {
       '12',
       4.5,
       'macallan',
+      'RANDOM',
+      'DESC',
       101,
     ]);
     expect(config.keepPreviousData).toBeUndefined();
@@ -213,7 +231,7 @@ describe('WhiskeyExplorerList realtime search', () => {
       keywords: ['macallan'],
       regionIds: [12],
       category: 'SINGLE_MALT',
-      sortType: 'POPULAR',
+      sortType: 'RANDOM',
       sortOrder: 'DESC',
       ratingFrom: 4.5,
       ratingTo: 4.5,

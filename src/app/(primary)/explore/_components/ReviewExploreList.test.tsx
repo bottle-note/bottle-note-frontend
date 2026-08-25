@@ -3,6 +3,9 @@ import { render, screen, within } from '@testing-library/react';
 import { ExploreApi } from '@/api/explore/explore.api';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { ReviewExplorerList } from './ReviewExploreList';
+import { useExploreFilters } from '../_hooks/useExploreFilters';
+import { useExploreSearch } from '../_hooks/useExploreSearch';
+import { useExploreSort } from '../_hooks/useExploreSort';
 
 const mockSetQueryData = jest.fn();
 
@@ -56,27 +59,30 @@ jest.mock('@/hooks/auth/useAuthSession', () => ({
   useAuthSession: () => ({ user: { userId: 1 } }),
 }));
 
-jest.mock('../_hooks/useExploreKeywords', () => ({
-  useExploreKeywords: () => ({
-    keywords: [],
-    keywordValues: [],
-    handleAddKeyword: jest.fn(),
-    handleRemoveKeyword: jest.fn(),
-  }),
+jest.mock('../_hooks/useExploreFilters', () => ({
+  useExploreFilters: jest.fn(),
 }));
 
-jest.mock('../_hooks/useExploreFilters', () => ({
-  useExploreFilters: () => ({ rating: 3.5 }),
+jest.mock('../_hooks/useExploreSearch', () => ({
+  useExploreSearch: jest.fn(),
+}));
+
+jest.mock('../_hooks/useExploreSort', () => ({
+  useExploreSort: jest.fn(),
 }));
 
 jest.mock('./ExploreSearchBar', () => ({
-  ExploreSearchBar: ({ filterTarget }: { filterTarget: string }) => (
-    <div data-filter-target={filterTarget}>review-search</div>
+  ExploreSearchBar: ({
+    filterTarget,
+    initialValue,
+  }: {
+    filterTarget: string;
+    initialValue: string;
+  }) => (
+    <div data-filter-target={filterTarget} data-initial-value={initialValue}>
+      review-search
+    </div>
   ),
-}));
-
-jest.mock('./ExploreKeywordChip', () => ({
-  ExploreKeywordChip: () => <div>keyword</div>,
 }));
 
 jest.mock('./ReviewListItem', () => {
@@ -91,21 +97,46 @@ jest.mock('./ReviewListItem', () => {
 
 const mockUsePaginatedQuery = usePaginatedQuery as jest.Mock;
 const mockGetReviews = ExploreApi.getReviews as jest.Mock;
+const mockUseExploreFilters = useExploreFilters as jest.Mock;
+const mockUseExploreSearch = useExploreSearch as jest.Mock;
+const mockUseExploreSort = useExploreSort as jest.Mock;
+
+const setupPaginatedQuery = (items: { reviewId: number }[]) => {
+  mockUsePaginatedQuery.mockReturnValue({
+    data: [{ data: { items } }],
+    isLoading: false,
+    isFetching: false,
+    isFetchingNextPage: false,
+    isPlaceholderData: false,
+    targetRef: { current: null },
+    error: null,
+  });
+};
 
 describe('ReviewExplorerList', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseExploreFilters.mockReturnValue({ rating: 3.5 });
+    mockUseExploreSearch.mockReturnValue({
+      inputKeyword: 'peaty',
+      debouncedKeyword: 'peaty',
+      isTyping: false,
+      setInputKeyword: jest.fn(),
+    });
+    mockUseExploreSort.mockReturnValue({
+      sortPresets: [],
+      selectedSort: {
+        id: 'RATING_ASC',
+        label: '별점 낮은순',
+        sortType: 'RATING',
+        sortOrder: 'ASC',
+      },
+      selectSort: jest.fn(),
+    });
   });
 
-  it('작성 별점을 query key와 리뷰 API의 동일한 상하한으로 전달한다', async () => {
-    mockUsePaginatedQuery.mockReturnValue({
-      data: [{ data: { items: [] } }],
-      isLoading: false,
-      isFetching: false,
-      targetRef: { current: null },
-      error: null,
-      refetch: jest.fn(),
-    });
+  it('단일 검색어·정렬·별점을 query key와 리뷰 API 요청에 전달한다', async () => {
+    setupPaginatedQuery([]);
 
     render(
       <ReviewExplorerList
@@ -118,9 +149,20 @@ describe('ReviewExplorerList', () => {
       'data-filter-target',
       'review',
     );
+    expect(screen.getByText('review-search')).toHaveAttribute(
+      'data-initial-value',
+      'peaty',
+    );
 
     const [config] = mockUsePaginatedQuery.mock.calls[0];
-    expect(config.queryKey).toEqual(['explore.reviews', 1, 3.5]);
+    expect(config.queryKey).toEqual([
+      'explore.reviews',
+      1,
+      3.5,
+      'peaty',
+      'RATING',
+      'ASC',
+    ]);
 
     const controller = new AbortController();
     await config.queryFn({
@@ -129,7 +171,9 @@ describe('ReviewExplorerList', () => {
     });
 
     expect(mockGetReviews).toHaveBeenCalledWith({
-      keywords: [],
+      keyword: 'peaty',
+      sortType: 'RATING',
+      sortOrder: 'ASC',
       ratingFrom: 3.5,
       ratingTo: 3.5,
       cursor: 'opaque-review-cursor',
@@ -142,14 +186,7 @@ describe('ReviewExplorerList', () => {
     const items = Array.from({ length: 100 }, (_, index) => ({
       reviewId: index + 1,
     }));
-    mockUsePaginatedQuery.mockReturnValue({
-      data: [{ data: { items } }],
-      isLoading: false,
-      isFetching: false,
-      targetRef: { current: null },
-      error: null,
-      refetch: jest.fn(),
-    });
+    setupPaginatedQuery(items);
 
     render(
       <ReviewExplorerList

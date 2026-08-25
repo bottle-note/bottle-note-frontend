@@ -4,6 +4,7 @@ import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import type {
   ExploreListParams,
+  ExploreReviewsParams,
   ExploreReviewsResponse,
   ExploreAlcoholsResponse,
 } from './types';
@@ -15,12 +16,23 @@ export const ExploreApi = {
    * @returns 리뷰 목록
    */
   async getReviews(
-    params: ExploreListParams,
+    params: ExploreReviewsParams,
   ): Promise<ApiResponse<ExploreReviewsResponse>> {
-    const { keywords, ratingFrom, ratingTo, cursor, size, signal } = params;
+    const {
+      keyword,
+      sortType,
+      sortOrder,
+      ratingFrom,
+      ratingTo,
+      cursor,
+      size,
+      signal,
+    } = params;
 
     const queryString = buildQueryParams({
-      keywords,
+      keyword,
+      sortType,
+      sortOrder,
       ratingFrom,
       ratingTo,
       cursor,
@@ -85,4 +97,9 @@ export const ExploreApi = {
   },
 };
 
-export type { ExploreListParams, ExploreAlcohol, ExploreReview } from './types';
+export type {
+  ExploreListParams,
+  ExploreReviewsParams,
+  ExploreAlcohol,
+  ExploreReview,
+} from './types';
