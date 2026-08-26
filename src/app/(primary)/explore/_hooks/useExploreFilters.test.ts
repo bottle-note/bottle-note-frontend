@@ -243,15 +243,15 @@ describe('useExploreFilters 훅', () => {
   });
 
   describe('별점 필터', () => {
-    it('유효한 별점 프리셋을 범위와 함께 읽는다', () => {
-      setupSearchParams('rating=AT_LEAST_4_5');
+    it('유효한 단일 별점 프리셋을 동일한 상·하한으로 읽는다', () => {
+      setupSearchParams('rating=EXACT_5_0');
 
       const { result } = renderHook(() => useExploreFilters());
 
       expect(result.current.ratingPreset).toEqual({
-        id: 'AT_LEAST_4_5',
-        label: '4.5점 이상',
-        ratingFrom: 4.5,
+        id: 'EXACT_5_0',
+        label: '5.0점',
+        ratingFrom: 5,
         ratingTo: 5,
       });
     });

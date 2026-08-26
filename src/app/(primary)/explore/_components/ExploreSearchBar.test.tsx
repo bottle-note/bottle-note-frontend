@@ -223,6 +223,7 @@ describe('ExploreSearchBar', () => {
       'true',
     );
     expect(screen.getByText('별점 전체')).toBeInTheDocument();
+    expect(screen.getByText('5.0점')).toBeInTheDocument();
     expect(screen.getByText('4.5점 이상')).toBeInTheDocument();
     expect(screen.getByText('4.0점 이상')).toBeInTheDocument();
     expect(screen.getByText('3.5점 이상')).toBeInTheDocument();

@@ -1,5 +1,11 @@
 export const EXPLORE_RATING_PRESETS = [
   {
+    id: 'EXACT_5_0',
+    label: '5.0점',
+    ratingFrom: 5,
+    ratingTo: 5,
+  },
+  {
     id: 'AT_LEAST_4_5',
     label: '4.5점 이상',
     ratingFrom: 4.5,
