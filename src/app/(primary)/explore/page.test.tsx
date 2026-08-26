@@ -158,9 +158,9 @@ describe('ExplorePage scroll header', () => {
     expect(mockSetNavbarSuppressed).toHaveBeenLastCalledWith(false);
   });
 
-  it('탭 전환 시 키워드와 정렬만 초기화하고 공통 필터는 보존한다', () => {
+  it('리뷰에서 위스키 탭으로 전환하면 모든 검색·필터·정렬 조건을 초기화한다', () => {
     mockSearchParams =
-      'tab=REVIEW_WHISKEY&keyword=peaty&sortType=RATING&sortOrder=ASC&rating=4.5';
+      'tab=REVIEW_WHISKEY&keyword=peaty&keywords=legacy&sortType=RATING&sortOrder=ASC&rating=EXACT_5_0&category=SINGLE_MALT&regionIds=12';
     const { rerender } = render(<ExplorePage />);
 
     mockCurrentTab = {
@@ -172,10 +172,39 @@ describe('ExplorePage scroll header', () => {
     const [url] = mockRouterReplace.mock.calls.at(-1);
     const params = new URLSearchParams(url.split('?')[1]);
     expect(params.get('tab')).toBe('EXPLORER_WHISKEY');
-    expect(params.get('rating')).toBe('4.5');
     expect(params.has('keyword')).toBe(false);
     expect(params.has('keywords')).toBe(false);
     expect(params.has('sortType')).toBe(false);
     expect(params.has('sortOrder')).toBe(false);
+    expect(params.has('rating')).toBe(false);
+    expect(params.has('category')).toBe(false);
+    expect(params.has('regionIds')).toBe(false);
+  });
+
+  it('위스키에서 리뷰 탭으로 전환해도 모든 검색·필터·정렬 조건을 초기화한다', () => {
+    mockSearchParams =
+      'tab=EXPLORER_WHISKEY&keywords=macallan&sortType=RATING&sortOrder=DESC&rating=AT_LEAST_4_5&category=SINGLE_MALT&regionIds=12&regionIds=34';
+    mockCurrentTab = {
+      name: '위스키 둘러보기',
+      id: 'EXPLORER_WHISKEY',
+    };
+    const { rerender } = render(<ExplorePage />);
+
+    mockCurrentTab = {
+      name: '리뷰 둘러보기',
+      id: 'REVIEW_WHISKEY',
+    };
+    rerender(<ExplorePage />);
+
+    const [url] = mockRouterReplace.mock.calls.at(-1);
+    const params = new URLSearchParams(url.split('?')[1]);
+    expect(params.get('tab')).toBe('REVIEW_WHISKEY');
+    expect(params.has('keyword')).toBe(false);
+    expect(params.has('keywords')).toBe(false);
+    expect(params.has('sortType')).toBe(false);
+    expect(params.has('sortOrder')).toBe(false);
+    expect(params.has('rating')).toBe(false);
+    expect(params.has('category')).toBe(false);
+    expect(params.has('regionIds')).toBe(false);
   });
 });

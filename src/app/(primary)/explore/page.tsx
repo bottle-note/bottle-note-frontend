@@ -73,6 +73,9 @@ export default function ExplorePage() {
     params.delete('keywords');
     params.delete('sortType');
     params.delete('sortOrder');
+    params.delete('rating');
+    params.delete('category');
+    params.delete('regionIds');
     params.set('tab', currentTab.id);
 
     router.replace(`/explore?${params.toString()}`, {
