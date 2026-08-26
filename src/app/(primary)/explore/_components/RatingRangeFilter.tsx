@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Check, Star } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Star } from 'lucide-react';
+import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
 import {
   EXPLORE_RATING_VALUES,
   formatExploreRating,
@@ -52,104 +52,60 @@ export const RatingRangeFilter = ({
     onClear();
   };
 
-  const isAllSelected = ratingRange === undefined;
-  const selectedRangeText = !ratingRange
-    ? '별점 전체가 선택됐어요.'
-    : ratingRange.ratingFrom === ratingRange.ratingTo
-      ? `${formatExploreRating(ratingRange.ratingFrom)}점만 선택됐어요.`
-      : `${formatExploreRating(ratingRange.ratingFrom)}점부터 ${formatExploreRating(ratingRange.ratingTo)}점까지 선택됐어요.`;
-
-  const boundaryClassName = (boundary: ActiveBoundary) =>
-    cn(
-      'flex h-10 flex-1 items-center justify-center gap-1 rounded border text-12 font-semibold',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring',
-      activeBoundary === boundary
-        ? 'border-stroke-brand-solid bg-bg-brand-weak text-fg-brand'
-        : 'border-stroke-neutral-subtle bg-bg-layer-default text-fg-neutral-muted',
-    );
-
   return (
-    <div>
-      <button
-        type="button"
-        aria-pressed={isAllSelected}
-        className={cn(
-          'mb-2 flex h-9 w-full items-center justify-center gap-2 rounded border text-11 font-semibold',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring',
-          isAllSelected
-            ? 'border-stroke-brand-solid bg-bg-brand-solid text-fg-brand-contrast'
-            : 'border-stroke-neutral-subtle bg-bg-layer-default text-fg-neutral-muted',
-        )}
-        onClick={clearRating}
-      >
-        별점 전체
-        {isAllSelected && <Check aria-hidden className="h-4 w-4" />}
-      </button>
+    <>
+      <Accordion.Single>
+        <Accordion.Content
+          title="별점 전체"
+          value="all"
+          isSelected={ratingRange === undefined}
+          onClick={clearRating}
+        />
+      </Accordion.Single>
 
-      <div
-        role="group"
-        aria-label="별점 범위 경계"
-        className="mb-2 flex items-center gap-2"
-      >
-        <button
-          type="button"
-          aria-pressed={activeBoundary === 'from'}
-          className={boundaryClassName('from')}
+      <Accordion.Grid cols={2}>
+        <Accordion.Content
+          title={
+            ratingRange
+              ? `최소 ${formatExploreRating(ratingRange.ratingFrom)}점`
+              : '최소'
+          }
+          value="from"
+          IconComponent={Star}
+          isSelected={ratingRange !== undefined && activeBoundary === 'from'}
           onClick={() => setActiveBoundary('from')}
-        >
-          <Star aria-hidden className="h-3.5 w-3.5 fill-current" />
-          {ratingRange ? formatExploreRating(ratingRange.ratingFrom) : '최소'}
-        </button>
-        <span aria-hidden className="text-12 text-fg-neutral-subtle">
-          ~
-        </span>
-        <button
-          type="button"
-          aria-pressed={activeBoundary === 'to'}
-          className={boundaryClassName('to')}
+        />
+        <Accordion.Content
+          title={
+            ratingRange
+              ? `최대 ${formatExploreRating(ratingRange.ratingTo)}점`
+              : '최대'
+          }
+          value="to"
+          IconComponent={Star}
+          isSelected={ratingRange !== undefined && activeBoundary === 'to'}
           onClick={() => setActiveBoundary('to')}
-        >
-          <Star aria-hidden className="h-3.5 w-3.5 fill-current" />
-          {ratingRange ? formatExploreRating(ratingRange.ratingTo) : '최대'}
-        </button>
-      </div>
+        />
+      </Accordion.Grid>
 
-      <div
-        role="group"
-        aria-label="별점 점수"
-        className="grid grid-cols-5 gap-1"
-      >
-        {EXPLORE_RATING_VALUES.map((rating) => {
-          const isSelected =
-            ratingRange !== undefined &&
-            rating >= ratingRange.ratingFrom &&
-            rating <= ratingRange.ratingTo;
-
-          return (
-            <button
-              type="button"
-              aria-label={`${formatExploreRating(rating)}점`}
-              aria-pressed={isSelected}
-              className={cn(
-                'flex h-11 min-w-0 items-center justify-center gap-0.5 rounded border px-1 text-10 font-semibold',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring',
-                isSelected
-                  ? 'border-stroke-brand-solid bg-bg-brand-solid text-fg-brand-contrast'
-                  : 'border-stroke-neutral-subtle bg-bg-layer-default text-fg-rating hover:bg-bg-layer-default-pressed',
-              )}
+      <div className="mt-1">
+        <Accordion.Grid cols={2}>
+          {EXPLORE_RATING_VALUES.map((rating) => (
+            <Accordion.Content
+              title={`${formatExploreRating(rating)}점`}
+              value={String(rating)}
+              IconComponent={Star}
+              isSelected={
+                ratingRange !== undefined &&
+                rating >= ratingRange.ratingFrom &&
+                rating <= ratingRange.ratingTo
+              }
               onClick={() => selectRating(rating)}
               key={rating}
-            >
-              <Star aria-hidden className="h-3 w-3 shrink-0 fill-current" />
-              <span>{formatExploreRating(rating)}</span>
-            </button>
-          );
-        })}
+            />
+          ))}
+        </Accordion.Grid>
       </div>
-
-      <p aria-live="polite" className="mt-2 text-11 text-fg-neutral-subtle">
-        {selectedRangeText}
-      </p>
-    </div>
+    </>
   );
 };

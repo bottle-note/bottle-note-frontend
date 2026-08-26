@@ -99,11 +99,7 @@ const AccordionItemGridContainer = ({
 interface AccordionContentProps {
   title: string;
   value: string;
-  IconComponent?: React.FC<{
-    color?: string;
-    className?: string;
-    size?: number;
-  }>;
+  IconComponent?: React.ElementType;
   isSelected: boolean;
   onClick?: (name: string) => void;
 }
