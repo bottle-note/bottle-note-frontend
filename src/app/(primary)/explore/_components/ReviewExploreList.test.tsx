@@ -116,7 +116,14 @@ const setupPaginatedQuery = (items: { reviewId: number }[]) => {
 describe('ReviewExplorerList', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseExploreFilters.mockReturnValue({ rating: 3.5 });
+    mockUseExploreFilters.mockReturnValue({
+      ratingPreset: {
+        id: 'AT_MOST_2_5',
+        label: '2.5점 이하',
+        ratingFrom: 0.5,
+        ratingTo: 2.5,
+      },
+    });
     mockUseExploreSearch.mockReturnValue({
       inputKeyword: 'peaty',
       debouncedKeyword: 'peaty',
@@ -158,7 +165,7 @@ describe('ReviewExplorerList', () => {
     expect(config.queryKey).toEqual([
       'explore.reviews',
       1,
-      3.5,
+      'AT_MOST_2_5',
       'peaty',
       'RATING',
       'ASC',
@@ -174,8 +181,8 @@ describe('ReviewExplorerList', () => {
       keyword: 'peaty',
       sortType: 'RATING',
       sortOrder: 'ASC',
-      ratingFrom: 3.5,
-      ratingTo: 3.5,
+      ratingFrom: 0.5,
+      ratingTo: 2.5,
       cursor: 'opaque-review-cursor',
       size: 10,
       signal: controller.signal,

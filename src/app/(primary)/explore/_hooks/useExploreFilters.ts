@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
-  isExploreRating,
-  type ExploreRating,
+  getExploreRatingPreset,
+  type ExploreRatingPresetId,
 } from '../_constants/exploreFilters';
 
 /**
@@ -25,13 +25,10 @@ export const useExploreFilters = () => {
   );
 
   const category = searchParams.get('category') ?? '';
-  const rating = useMemo(() => {
-    const rawRating = searchParams.get('rating');
-    if (!rawRating) return undefined;
-
-    const parsedRating = Number(rawRating);
-    return isExploreRating(parsedRating) ? parsedRating : undefined;
-  }, [searchParams]);
+  const ratingPreset = useMemo(
+    () => getExploreRatingPreset(searchParams.get('rating')),
+    [searchParams],
+  );
 
   const updateUrl = useCallback(
     (mutate: (params: URLSearchParams) => void) => {
@@ -80,8 +77,8 @@ export const useExploreFilters = () => {
     updateUrl((params) => params.delete('category'));
   }, [updateUrl]);
 
-  const selectRating = useCallback(
-    (value: ExploreRating) => {
+  const selectRatingPreset = useCallback(
+    (value: ExploreRatingPresetId) => {
       updateUrl((params) => params.set('rating', String(value)));
     },
     [updateUrl],
@@ -112,12 +109,12 @@ export const useExploreFilters = () => {
   return {
     regionIds,
     category,
-    rating,
+    ratingPreset,
     toggleRegionId,
     clearRegionIds,
     toggleCategory,
     clearCategory,
-    selectRating,
+    selectRatingPreset,
     clearRating,
     clearWhiskeyFilters,
     clearReviewFilters,
