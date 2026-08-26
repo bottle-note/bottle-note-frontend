@@ -74,6 +74,8 @@ export default function ExplorePage() {
     params.delete('sortType');
     params.delete('sortOrder');
     params.delete('rating');
+    params.delete('ratingFrom');
+    params.delete('ratingTo');
     params.delete('category');
     params.delete('regionIds');
     params.set('tab', currentTab.id);

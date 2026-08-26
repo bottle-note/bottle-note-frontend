@@ -160,7 +160,7 @@ describe('ExplorePage scroll header', () => {
 
   it('리뷰에서 위스키 탭으로 전환하면 모든 검색·필터·정렬 조건을 초기화한다', () => {
     mockSearchParams =
-      'tab=REVIEW_WHISKEY&keyword=peaty&keywords=legacy&sortType=RATING&sortOrder=ASC&rating=EXACT_5_0&category=SINGLE_MALT&regionIds=12';
+      'tab=REVIEW_WHISKEY&keyword=peaty&keywords=legacy&sortType=RATING&sortOrder=ASC&ratingFrom=3&ratingTo=4.5&category=SINGLE_MALT&regionIds=12';
     const { rerender } = render(<ExplorePage />);
 
     mockCurrentTab = {
@@ -176,14 +176,15 @@ describe('ExplorePage scroll header', () => {
     expect(params.has('keywords')).toBe(false);
     expect(params.has('sortType')).toBe(false);
     expect(params.has('sortOrder')).toBe(false);
-    expect(params.has('rating')).toBe(false);
+    expect(params.has('ratingFrom')).toBe(false);
+    expect(params.has('ratingTo')).toBe(false);
     expect(params.has('category')).toBe(false);
     expect(params.has('regionIds')).toBe(false);
   });
 
   it('위스키에서 리뷰 탭으로 전환해도 모든 검색·필터·정렬 조건을 초기화한다', () => {
     mockSearchParams =
-      'tab=EXPLORER_WHISKEY&keywords=macallan&sortType=RATING&sortOrder=DESC&rating=AT_LEAST_4_5&category=SINGLE_MALT&regionIds=12&regionIds=34';
+      'tab=EXPLORER_WHISKEY&keywords=macallan&sortType=RATING&sortOrder=DESC&ratingFrom=4.5&ratingTo=5&category=SINGLE_MALT&regionIds=12&regionIds=34';
     mockCurrentTab = {
       name: '위스키 둘러보기',
       id: 'EXPLORER_WHISKEY',
@@ -203,7 +204,8 @@ describe('ExplorePage scroll header', () => {
     expect(params.has('keywords')).toBe(false);
     expect(params.has('sortType')).toBe(false);
     expect(params.has('sortOrder')).toBe(false);
-    expect(params.has('rating')).toBe(false);
+    expect(params.has('ratingFrom')).toBe(false);
+    expect(params.has('ratingTo')).toBe(false);
     expect(params.has('category')).toBe(false);
     expect(params.has('regionIds')).toBe(false);
   });

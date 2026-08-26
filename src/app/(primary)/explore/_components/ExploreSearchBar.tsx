@@ -5,8 +5,8 @@ import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
 import StickySearchBar from '@/components/feature/Search/StickySearchBar';
 import { CATEGORY_MENUS_LIST } from '@/constants/common';
 import { useRegionsQuery } from '@/queries/useRegionsQuery';
+import { RatingRangeFilter } from './RatingRangeFilter';
 import type { ExploreSortPreset } from '../_constants/exploreSorts';
-import { EXPLORE_RATING_PRESETS } from '../_constants/exploreFilters';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
 
 interface Props {
@@ -38,12 +38,12 @@ export const ExploreSearchBar = ({
   const {
     regionIds: selectedRegionIds,
     category: selectedCategory,
-    ratingPreset: selectedRatingPreset,
+    ratingRange,
     toggleRegionId,
     clearRegionIds,
     toggleCategory,
     clearCategory,
-    selectRatingPreset,
+    selectRatingRange,
     clearRating,
     clearWhiskeyFilters,
     clearReviewFilters,
@@ -160,25 +160,11 @@ export const ExploreSearchBar = ({
         )}
 
         <Accordion title="별점">
-          <Accordion.Single>
-            <Accordion.Content
-              title="별점 전체"
-              value="all"
-              isSelected={selectedRatingPreset === undefined}
-              onClick={clearRating}
-            />
-          </Accordion.Single>
-          <Accordion.Grid cols={2}>
-            {EXPLORE_RATING_PRESETS.map((preset) => (
-              <Accordion.Content
-                title={preset.label}
-                value={preset.id}
-                isSelected={selectedRatingPreset?.id === preset.id}
-                onClick={() => selectRatingPreset(preset.id)}
-                key={preset.id}
-              />
-            ))}
-          </Accordion.Grid>
+          <RatingRangeFilter
+            ratingRange={ratingRange}
+            onSelectRatingRange={selectRatingRange}
+            onClear={clearRating}
+          />
         </Accordion>
       </SideFilterDrawer>
     </>

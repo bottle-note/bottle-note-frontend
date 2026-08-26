@@ -243,43 +243,47 @@ describe('useExploreFilters 훅', () => {
   });
 
   describe('별점 필터', () => {
-    it('유효한 단일 별점 프리셋을 동일한 상·하한으로 읽는다', () => {
-      setupSearchParams('rating=EXACT_5_0');
+    it('0.5 단위의 유효한 별점 범위를 URL에서 읽는다', () => {
+      setupSearchParams('ratingFrom=3&ratingTo=4.5');
 
       const { result } = renderHook(() => useExploreFilters());
 
-      expect(result.current.ratingPreset).toEqual({
-        id: 'EXACT_5_0',
-        label: '5.0점',
-        ratingFrom: 5,
-        ratingTo: 5,
+      expect(result.current.ratingRange).toEqual({
+        ratingFrom: 3,
+        ratingTo: 4.5,
       });
     });
 
-    it('지원하지 않는 값과 기존 단일 별점 값은 무시한다', () => {
-      setupSearchParams('rating=4.5');
+    it.each([
+      'ratingFrom=3',
+      'ratingTo=4',
+      'ratingFrom=3.1&ratingTo=4',
+      'ratingFrom=4.5&ratingTo=3',
+    ])('불완전하거나 유효하지 않은 별점 범위는 무시한다: %s', (query) => {
+      setupSearchParams(query);
 
       const { result } = renderHook(() => useExploreFilters());
 
-      expect(result.current.ratingPreset).toBeUndefined();
+      expect(result.current.ratingRange).toBeUndefined();
     });
 
-    it('별점 프리셋을 선택하면 다른 검색 조건을 보존하고 rating을 설정한다', () => {
+    it('별점 범위를 선택하면 순서를 정규화하고 다른 검색 조건을 보존한다', () => {
       setupSearchParams('tab=REVIEW_WHISKEY&keyword=peaty');
 
       const { result } = renderHook(() => useExploreFilters());
 
-      act(() => result.current.selectRatingPreset('AT_LEAST_3_5'));
+      act(() => result.current.selectRatingRange(4.5, 3));
 
       const replaced = parseReplacedQuery(mockReplace);
-      expect(replaced.get('rating')).toBe('AT_LEAST_3_5');
+      expect(replaced.get('ratingFrom')).toBe('3');
+      expect(replaced.get('ratingTo')).toBe('4.5');
       expect(replaced.get('tab')).toBe('REVIEW_WHISKEY');
       expect(replaced.get('keyword')).toBe('peaty');
     });
 
     it('위스키 필터 초기화는 카테고리, 지역, 별점을 한 번에 제거한다', () => {
       setupSearchParams(
-        'tab=EXPLORER_WHISKEY&keywords=macallan&category=SINGLE_MALT&regionIds=12&rating=AT_LEAST_4_5&sortType=RATING&sortOrder=DESC',
+        'tab=EXPLORER_WHISKEY&keywords=macallan&category=SINGLE_MALT&regionIds=12&ratingFrom=4.5&ratingTo=5&sortType=RATING&sortOrder=DESC',
       );
 
       const { result } = renderHook(() => useExploreFilters());
@@ -290,7 +294,8 @@ describe('useExploreFilters 훅', () => {
       expect(mockReplace).toHaveBeenCalledTimes(1);
       expect(replaced.has('category')).toBe(false);
       expect(replaced.has('regionIds')).toBe(false);
-      expect(replaced.has('rating')).toBe(false);
+      expect(replaced.has('ratingFrom')).toBe(false);
+      expect(replaced.has('ratingTo')).toBe(false);
       expect(replaced.has('sortType')).toBe(false);
       expect(replaced.has('sortOrder')).toBe(false);
       expect(replaced.get('keywords')).toBe('macallan');
@@ -298,7 +303,7 @@ describe('useExploreFilters 훅', () => {
 
     it('리뷰 필터 초기화는 별점과 정렬만 제거하고 검색 키워드는 유지한다', () => {
       setupSearchParams(
-        'tab=REVIEW_WHISKEY&keyword=peaty&rating=AT_MOST_2_5&sortType=RATING&sortOrder=ASC',
+        'tab=REVIEW_WHISKEY&keyword=peaty&ratingFrom=0.5&ratingTo=2.5&sortType=RATING&sortOrder=ASC',
       );
 
       const { result } = renderHook(() => useExploreFilters());
@@ -307,7 +312,8 @@ describe('useExploreFilters 훅', () => {
 
       const replaced = parseReplacedQuery(mockReplace);
       expect(mockReplace).toHaveBeenCalledTimes(1);
-      expect(replaced.has('rating')).toBe(false);
+      expect(replaced.has('ratingFrom')).toBe(false);
+      expect(replaced.has('ratingTo')).toBe(false);
       expect(replaced.has('sortType')).toBe(false);
       expect(replaced.has('sortOrder')).toBe(false);
       expect(replaced.get('keyword')).toBe('peaty');

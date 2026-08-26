@@ -117,9 +117,7 @@ describe('ReviewExplorerList', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseExploreFilters.mockReturnValue({
-      ratingPreset: {
-        id: 'AT_MOST_2_5',
-        label: '2.5점 이하',
+      ratingRange: {
         ratingFrom: 0.5,
         ratingTo: 2.5,
       },
@@ -165,7 +163,8 @@ describe('ReviewExplorerList', () => {
     expect(config.queryKey).toEqual([
       'explore.reviews',
       1,
-      'AT_MOST_2_5',
+      0.5,
+      2.5,
       'peaty',
       'RATING',
       'ASC',

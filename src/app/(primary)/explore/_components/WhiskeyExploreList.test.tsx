@@ -165,11 +165,9 @@ describe('WhiskeyExplorerList realtime search', () => {
     mockUseExploreFilters.mockReturnValue({
       regionIds: [12],
       category: 'SINGLE_MALT',
-      ratingPreset: {
-        id: 'EXACT_5_0',
-        label: '5.0점',
-        ratingFrom: 5,
-        ratingTo: 5,
+      ratingRange: {
+        ratingFrom: 3,
+        ratingTo: 4.5,
       },
     });
     mockUseAuth.mockReturnValue({
@@ -217,7 +215,8 @@ describe('WhiskeyExplorerList realtime search', () => {
       'explore.alcohols',
       'SINGLE_MALT',
       '12',
-      'EXACT_5_0',
+      3,
+      4.5,
       'macallan',
       'RANDOM',
       'DESC',
@@ -238,8 +237,8 @@ describe('WhiskeyExplorerList realtime search', () => {
       category: 'SINGLE_MALT',
       sortType: 'RANDOM',
       sortOrder: 'DESC',
-      ratingFrom: 5,
-      ratingTo: 5,
+      ratingFrom: 3,
+      ratingTo: 4.5,
       cursor: opaqueCursor,
       size: 10,
       signal: controller.signal,

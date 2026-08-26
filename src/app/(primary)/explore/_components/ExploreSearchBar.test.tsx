@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ExploreSearchBar } from './ExploreSearchBar';
 
 const mockUseNavLayout = jest.fn();
-const mockSelectRatingPreset = jest.fn();
+const mockSelectRatingRange = jest.fn();
 const mockClearRating = jest.fn();
 const mockClearWhiskeyFilters = jest.fn();
 const mockClearReviewFilters = jest.fn();
@@ -33,12 +33,12 @@ jest.mock('../_hooks/useExploreFilters', () => ({
   useExploreFilters: () => ({
     regionIds: [],
     category: '',
-    ratingPreset: undefined,
+    ratingRange: undefined,
     toggleRegionId: jest.fn(),
     clearRegionIds: jest.fn(),
     toggleCategory: jest.fn(),
     clearCategory: jest.fn(),
-    selectRatingPreset: mockSelectRatingPreset,
+    selectRatingRange: mockSelectRatingRange,
     clearRating: mockClearRating,
     clearWhiskeyFilters: mockClearWhiskeyFilters,
     clearReviewFilters: mockClearReviewFilters,
@@ -223,23 +223,16 @@ describe('ExploreSearchBar', () => {
       'true',
     );
     expect(screen.getByText('별점 전체')).toBeInTheDocument();
-    expect(screen.getByText('5.0점')).toBeInTheDocument();
-    expect(screen.getByText('4.5점 이상')).toBeInTheDocument();
-    expect(screen.getByText('4.0점 이상')).toBeInTheDocument();
-    expect(screen.getByText('3.5점 이상')).toBeInTheDocument();
-    expect(screen.getByText('3.0점 이상')).toBeInTheDocument();
-    expect(screen.getByText('2.5점 이하')).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: '0.5' }),
-    ).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '0.5점' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '5.0점' })).toBeInTheDocument();
     expect(screen.queryByText('카테고리')).not.toBeInTheDocument();
     expect(screen.queryByText('지역')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: '인기순' }));
     expect(onSelectSort).toHaveBeenCalledWith('POPULAR_DESC');
 
-    fireEvent.click(screen.getByRole('button', { name: '2.5점 이하' }));
-    expect(mockSelectRatingPreset).toHaveBeenCalledWith('AT_MOST_2_5');
+    fireEvent.click(screen.getByRole('button', { name: '2.5점' }));
+    expect(mockSelectRatingRange).toHaveBeenCalledWith(2.5, 2.5);
 
     fireEvent.click(screen.getByRole('button', { name: '초기화' }));
     expect(mockClearReviewFilters).toHaveBeenCalledTimes(1);

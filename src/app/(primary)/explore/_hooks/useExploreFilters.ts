@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
-  getExploreRatingPreset,
-  type ExploreRatingPresetId,
+  getExploreRatingRange,
+  type ExploreRating,
 } from '../_constants/exploreFilters';
 
 /**
- * explore 페이지 sidebar 필터 (regionIds, category, rating) URL 동기화 훅.
+ * explore 페이지 sidebar 필터 (regionIds, category, ratingFrom/ratingTo) URL 동기화 훅.
  * 검색어와 정렬은 각각의 전용 훅이 관리하며, 모든 훅은 같은 URL을
  * 공유하면서 서로의 파라미터를 보존한다.
  */
@@ -25,8 +25,12 @@ export const useExploreFilters = () => {
   );
 
   const category = searchParams.get('category') ?? '';
-  const ratingPreset = useMemo(
-    () => getExploreRatingPreset(searchParams.get('rating')),
+  const ratingRange = useMemo(
+    () =>
+      getExploreRatingRange(
+        searchParams.get('ratingFrom'),
+        searchParams.get('ratingTo'),
+      ),
     [searchParams],
   );
 
@@ -77,15 +81,25 @@ export const useExploreFilters = () => {
     updateUrl((params) => params.delete('category'));
   }, [updateUrl]);
 
-  const selectRatingPreset = useCallback(
-    (value: ExploreRatingPresetId) => {
-      updateUrl((params) => params.set('rating', String(value)));
+  const selectRatingRange = useCallback(
+    (firstRating: ExploreRating, secondRating: ExploreRating) => {
+      updateUrl((params) => {
+        const ratingFrom = Math.min(firstRating, secondRating);
+        const ratingTo = Math.max(firstRating, secondRating);
+        params.delete('rating');
+        params.set('ratingFrom', String(ratingFrom));
+        params.set('ratingTo', String(ratingTo));
+      });
     },
     [updateUrl],
   );
 
   const clearRating = useCallback(() => {
-    updateUrl((params) => params.delete('rating'));
+    updateUrl((params) => {
+      params.delete('rating');
+      params.delete('ratingFrom');
+      params.delete('ratingTo');
+    });
   }, [updateUrl]);
 
   const clearWhiskeyFilters = useCallback(() => {
@@ -93,6 +107,8 @@ export const useExploreFilters = () => {
       params.delete('regionIds');
       params.delete('category');
       params.delete('rating');
+      params.delete('ratingFrom');
+      params.delete('ratingTo');
       params.delete('sortType');
       params.delete('sortOrder');
     });
@@ -101,6 +117,8 @@ export const useExploreFilters = () => {
   const clearReviewFilters = useCallback(() => {
     updateUrl((params) => {
       params.delete('rating');
+      params.delete('ratingFrom');
+      params.delete('ratingTo');
       params.delete('sortType');
       params.delete('sortOrder');
     });
@@ -109,12 +127,12 @@ export const useExploreFilters = () => {
   return {
     regionIds,
     category,
-    ratingPreset,
+    ratingRange,
     toggleRegionId,
     clearRegionIds,
     toggleCategory,
     clearCategory,
-    selectRatingPreset,
+    selectRatingRange,
     clearRating,
     clearWhiskeyFilters,
     clearReviewFilters,

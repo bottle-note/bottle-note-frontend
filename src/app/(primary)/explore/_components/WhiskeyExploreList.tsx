@@ -37,7 +37,7 @@ export const WhiskeyExplorerList = ({
   const { sortPresets, selectedSort, selectSort } = useExploreSort({
     tabId: WHISKEY_EXPLORE_TAB_ID,
   });
-  const { regionIds, category, ratingPreset } = useExploreFilters();
+  const { regionIds, category, ratingRange } = useExploreFilters();
 
   const {
     data: alcoholList,
@@ -55,7 +55,8 @@ export const WhiskeyExplorerList = ({
       'explore.alcohols',
       category || 'all',
       regionIds.join(',') || 'all',
-      ratingPreset?.id ?? 'all',
+      ratingRange?.ratingFrom ?? 'all',
+      ratingRange?.ratingTo ?? 'all',
       debouncedKeyword,
       selectedSort.sortType,
       selectedSort.sortOrder,
@@ -68,8 +69,8 @@ export const WhiskeyExplorerList = ({
         category: category || undefined,
         sortType: selectedSort.sortType,
         sortOrder: selectedSort.sortOrder,
-        ratingFrom: ratingPreset?.ratingFrom,
-        ratingTo: ratingPreset?.ratingTo,
+        ratingFrom: ratingRange?.ratingFrom,
+        ratingTo: ratingRange?.ratingTo,
         cursor: pageParam,
         size: 10,
         signal,
