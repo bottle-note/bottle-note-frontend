@@ -243,38 +243,43 @@ describe('useExploreFilters 훅', () => {
   });
 
   describe('별점 필터', () => {
-    it('0.5 단위의 유효한 rating만 읽는다', () => {
+    it('유효한 별점 프리셋을 범위와 함께 읽는다', () => {
+      setupSearchParams('rating=AT_LEAST_4_5');
+
+      const { result } = renderHook(() => useExploreFilters());
+
+      expect(result.current.ratingPreset).toEqual({
+        id: 'AT_LEAST_4_5',
+        label: '4.5점 이상',
+        ratingFrom: 4.5,
+        ratingTo: 5,
+      });
+    });
+
+    it('지원하지 않는 값과 기존 단일 별점 값은 무시한다', () => {
       setupSearchParams('rating=4.5');
 
       const { result } = renderHook(() => useExploreFilters());
 
-      expect(result.current.rating).toBe(4.5);
+      expect(result.current.ratingPreset).toBeUndefined();
     });
 
-    it('범위를 벗어나거나 0.5 단위가 아닌 rating은 무시한다', () => {
-      setupSearchParams('rating=4.2');
-
-      const { result } = renderHook(() => useExploreFilters());
-
-      expect(result.current.rating).toBeUndefined();
-    });
-
-    it('별점을 선택하면 다른 검색 조건을 보존하고 rating을 설정한다', () => {
+    it('별점 프리셋을 선택하면 다른 검색 조건을 보존하고 rating을 설정한다', () => {
       setupSearchParams('tab=REVIEW_WHISKEY&keyword=peaty');
 
       const { result } = renderHook(() => useExploreFilters());
 
-      act(() => result.current.selectRating(3.5));
+      act(() => result.current.selectRatingPreset('AT_LEAST_3_5'));
 
       const replaced = parseReplacedQuery(mockReplace);
-      expect(replaced.get('rating')).toBe('3.5');
+      expect(replaced.get('rating')).toBe('AT_LEAST_3_5');
       expect(replaced.get('tab')).toBe('REVIEW_WHISKEY');
       expect(replaced.get('keyword')).toBe('peaty');
     });
 
     it('위스키 필터 초기화는 카테고리, 지역, 별점을 한 번에 제거한다', () => {
       setupSearchParams(
-        'tab=EXPLORER_WHISKEY&keywords=macallan&category=SINGLE_MALT&regionIds=12&rating=4.5&sortType=RATING&sortOrder=DESC',
+        'tab=EXPLORER_WHISKEY&keywords=macallan&category=SINGLE_MALT&regionIds=12&rating=AT_LEAST_4_5&sortType=RATING&sortOrder=DESC',
       );
 
       const { result } = renderHook(() => useExploreFilters());
@@ -293,7 +298,7 @@ describe('useExploreFilters 훅', () => {
 
     it('리뷰 필터 초기화는 별점과 정렬만 제거하고 검색 키워드는 유지한다', () => {
       setupSearchParams(
-        'tab=REVIEW_WHISKEY&keyword=peaty&rating=4.5&sortType=RATING&sortOrder=ASC',
+        'tab=REVIEW_WHISKEY&keyword=peaty&rating=AT_MOST_2_5&sortType=RATING&sortOrder=ASC',
       );
 
       const { result } = renderHook(() => useExploreFilters());

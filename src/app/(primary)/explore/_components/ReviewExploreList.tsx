@@ -67,20 +67,20 @@ export const ReviewExplorerList = ({
   const { sortPresets, selectedSort, selectSort } = useExploreSort({
     tabId: REVIEW_EXPLORE_TAB_ID,
   });
-  const { rating } = useExploreFilters();
+  const { ratingPreset } = useExploreFilters();
 
   const queryKey = useMemo(
     () => [
       'explore.reviews',
       user?.userId ?? null,
-      rating ?? 'all',
+      ratingPreset?.id ?? 'all',
       debouncedKeyword,
       selectedSort.sortType,
       selectedSort.sortOrder,
     ],
     [
       debouncedKeyword,
-      rating,
+      ratingPreset?.id,
       selectedSort.sortOrder,
       selectedSort.sortType,
       user?.userId,
@@ -103,8 +103,8 @@ export const ReviewExplorerList = ({
         keyword: debouncedKeyword || undefined,
         sortType: selectedSort.sortType,
         sortOrder: selectedSort.sortOrder,
-        ratingFrom: rating,
-        ratingTo: rating,
+        ratingFrom: ratingPreset?.ratingFrom,
+        ratingTo: ratingPreset?.ratingTo,
         ...{
           cursor: pageParam,
           size: 10,
@@ -157,7 +157,7 @@ export const ReviewExplorerList = ({
     return () => {
       window.removeEventListener('resize', updateListOffset);
     };
-  }, [debouncedKeyword, rating, selectedSort.id]);
+  }, [debouncedKeyword, ratingPreset?.id, selectedSort.id]);
 
   useLayoutEffect(
     () => () => {

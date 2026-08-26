@@ -1,8 +1,40 @@
-export const EXPLORE_RATING_VALUES = [
-  0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5,
+export const EXPLORE_RATING_PRESETS = [
+  {
+    id: 'AT_LEAST_4_5',
+    label: '4.5점 이상',
+    ratingFrom: 4.5,
+    ratingTo: 5,
+  },
+  {
+    id: 'AT_LEAST_4_0',
+    label: '4.0점 이상',
+    ratingFrom: 4,
+    ratingTo: 5,
+  },
+  {
+    id: 'AT_LEAST_3_5',
+    label: '3.5점 이상',
+    ratingFrom: 3.5,
+    ratingTo: 5,
+  },
+  {
+    id: 'AT_LEAST_3_0',
+    label: '3.0점 이상',
+    ratingFrom: 3,
+    ratingTo: 5,
+  },
+  {
+    id: 'AT_MOST_2_5',
+    label: '2.5점 이하',
+    ratingFrom: 0.5,
+    ratingTo: 2.5,
+  },
 ] as const;
 
-export type ExploreRating = (typeof EXPLORE_RATING_VALUES)[number];
+export type ExploreRatingPreset = (typeof EXPLORE_RATING_PRESETS)[number];
+export type ExploreRatingPresetId = ExploreRatingPreset['id'];
 
-export const isExploreRating = (value: number): value is ExploreRating =>
-  EXPLORE_RATING_VALUES.some((rating) => rating === value);
+export const getExploreRatingPreset = (
+  value: string | null,
+): ExploreRatingPreset | undefined =>
+  EXPLORE_RATING_PRESETS.find((preset) => preset.id === value);
