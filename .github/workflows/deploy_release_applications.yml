@@ -165,7 +165,7 @@ jobs:
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
           image-name: ${{ env.IMAGE_NAME }}
           image-tag: ${{ needs.release-gate.outputs.image-tag }}
-          additional-tags: ${{ needs.release-gate.outputs.deployment-source == 'release-pr' && 'frontend_latest_production' || '' }}
+          promote-tags: ${{ needs.release-gate.outputs.deployment-source == 'release-pr' && 'frontend_latest_production' || '' }}
           cache-scope: frontend-production
           sops-age-key: ${{ secrets.SOPS_AGE_SECRET_KEY }}
           env-file: git.environment-variables/application.next-js/prod.sops.env

@@ -42,7 +42,7 @@ jobs:
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
           image-name: bottlenote-frontend
           image-tag: ${{ steps.image-tag.outputs.tag }}
-          additional-tags: frontend_latest_development
+          promote-tags: frontend_latest_development
           cache-scope: frontend-development
           sops-age-key: ${{ secrets.SOPS_AGE_SECRET_KEY }}
           env-file: git.environment-variables/application.next-js/dev.sops.env
