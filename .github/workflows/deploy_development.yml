@@ -42,10 +42,13 @@ jobs:
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
           image-name: bottlenote-frontend
           image-tag: ${{ steps.image-tag.outputs.tag }}
-          additional-tags: frontend_latest_development
+          promote-tags: frontend_latest_development
+          source-sha: ${{ github.sha }}
           cache-scope: frontend-development
+          cache-export: 'true'
           sops-age-key: ${{ secrets.SOPS_AGE_SECRET_KEY }}
           env-file: git.environment-variables/application.next-js/dev.sops.env
           sign-image: 'true'
           cosign-key-path: git.environment-variables/storage/docker-registry/cosign.key
+          cosign-public-key-path: git.environment-variables/storage/docker-registry/cosign.pub
           cosign-password: ${{ secrets.COSIGN_PASSWORD }}

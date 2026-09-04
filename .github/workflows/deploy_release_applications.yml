@@ -36,6 +36,7 @@ jobs:
       release-key: ${{ steps.release.outputs.release-key }}
       image-tag: ${{ steps.release.outputs.image-tag }}
       source-sha: ${{ steps.release.outputs.source-sha }}
+      source-ref: ${{ steps.release.outputs.source-ref }}
       deployment-source: ${{ steps.release.outputs.deployment-source }}
     steps:
       - name: checkout repository
@@ -63,6 +64,7 @@ jobs:
             release_key="$version"
             image_tag="frontend_${version}"
             deployment_source="github-release"
+            source_ref="$RELEASE_TAG"
 
             git fetch --tags origin
             git rev-parse -q --verify "refs/tags/${RELEASE_TAG}" >/dev/null || {
@@ -117,6 +119,7 @@ jobs:
             image_version="${release_date//-/.}.${sequence}"
             image_tag="frontend_${image_version}"
             deployment_source="release-pr"
+            source_ref="main"
             RELEASE_TAG=""
 
             git cat-file -e "${source_sha}^{commit}"
@@ -131,6 +134,7 @@ jobs:
             echo "release-key=$release_key"
             echo "image-tag=$image_tag"
             echo "source-sha=$source_sha"
+            echo "source-ref=$source_ref"
             echo "deployment-source=$deployment_source"
           } >> "$GITHUB_OUTPUT"
 
@@ -140,6 +144,7 @@ jobs:
             echo "- Source: \`${deployment_source}\`"
             echo "- Image tag: \`${image_tag}\`"
             echo "- Source SHA: \`${source_sha}\`"
+            echo "- Source ref: \`${source_ref}\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
   build-frontend-image:
@@ -148,6 +153,8 @@ jobs:
     runs-on: ubuntu-24.04-arm
     outputs:
       image-digest: ${{ steps.build.outputs.image-digest }}
+      promoted-tags: ${{ steps.build.outputs.promoted-tags }}
+      previous-digest: ${{ steps.build.outputs.previous-digest }}
     steps:
       - name: checkout release source with submodules
         uses: actions/checkout@v7
@@ -155,6 +162,14 @@ jobs:
           ref: ${{ needs.release-gate.outputs.source-sha }}
           submodules: true
           token: ${{ secrets.GIT_ACCESS_TOKEN }}
+
+      # 릴리즈 소스는 과거 커밋이라 구 action 스냅샷을 들고 온다.
+      # 원자화된 action 이 항상 쓰이도록 main 의 action 디렉터리로 덮어쓴다.
+      - name: refresh docker build action from main
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main'
+          git checkout origin/main -- .github/actions/docker-build-push
 
       - name: build and push docker image
         id: build
@@ -165,12 +180,16 @@ jobs:
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
           image-name: ${{ env.IMAGE_NAME }}
           image-tag: ${{ needs.release-gate.outputs.image-tag }}
-          additional-tags: ${{ needs.release-gate.outputs.deployment-source == 'release-pr' && 'frontend_latest_production' || '' }}
+          promote-tags: ${{ needs.release-gate.outputs.deployment-source == 'release-pr' && 'frontend_latest_production' || '' }}
+          source-sha: ${{ needs.release-gate.outputs.source-sha }}
+          source-ref: ${{ needs.release-gate.outputs.source-ref }}
           cache-scope: frontend-production
+          cache-export: 'false'
           sops-age-key: ${{ secrets.SOPS_AGE_SECRET_KEY }}
           env-file: git.environment-variables/application.next-js/prod.sops.env
           sign-image: 'true'
           cosign-key-path: git.environment-variables/storage/docker-registry/cosign.key
+          cosign-public-key-path: git.environment-variables/storage/docker-registry/cosign.pub
           cosign-password: ${{ secrets.COSIGN_PASSWORD }}
 
   handoff-to-image-updater:
@@ -180,13 +199,49 @@ jobs:
       - release-gate
       - build-frontend-image
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CHANNEL_TAG: frontend_latest_production
     steps:
-      - name: summarize image updater handoff
+      - name: login to private registry
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ secrets.REGISTRY_ADDRESS }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      # 승격된 채널 태그가 build job 이 서명·검증한 digest 를 가리키는지 독립적으로 재확인한다.
+      - name: verify promoted channel digest
+        env:
+          IMAGE: ${{ secrets.REGISTRY_ADDRESS }}/${{ env.IMAGE_NAME }}
+          EXPECTED_DIGEST: ${{ needs.build-frontend-image.outputs.image-digest }}
+          PROMOTED_TAGS: ${{ needs.build-frontend-image.outputs.promoted-tags }}
+          PREVIOUS_DIGEST: ${{ needs.build-frontend-image.outputs.previous-digest }}
+          RELEASE_KEY: ${{ needs.release-gate.outputs.release-key }}
+          SOURCE_SHA: ${{ needs.release-gate.outputs.source-sha }}
         run: |
+          set -euo pipefail
+          [[ "$EXPECTED_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || {
+            echo "::error::build job did not report a valid image digest: ${EXPECTED_DIGEST}"
+            exit 1
+          }
+          [[ "$PROMOTED_TAGS" == "$CHANNEL_TAG" ]] || {
+            echo "::error::build job promoted '${PROMOTED_TAGS}', expected '${CHANNEL_TAG}'"
+            exit 1
+          }
+          channel_digest="$(docker buildx imagetools inspect "${IMAGE}:${CHANNEL_TAG}" --format '{{json .Manifest.Digest}}' | tr -d '"')"
+          [[ "$channel_digest" == "$EXPECTED_DIGEST" ]] || {
+            echo "::error::${CHANNEL_TAG} points to ${channel_digest}, expected ${EXPECTED_DIGEST}"
+            exit 1
+          }
           {
             echo "## Frontend image updater handoff"
-            echo "- Channel: \`frontend_latest_production\`"
-            echo "- Digest: \`${{ needs.build-frontend-image.outputs.image-digest }}\`"
+            echo "- Release key: \`${RELEASE_KEY}\`"
+            echo "- Source SHA: \`${SOURCE_SHA}\`"
+            echo "- Channel: \`${CHANNEL_TAG}\`"
+            echo "- Digest: \`${EXPECTED_DIGEST}\`"
+            echo "- Previous digest: \`${PREVIOUS_DIGEST:-none}\`"
+            echo "- Channel digest re-check: \`passed\`"
             echo "- GitOps update: \`Argo CD Image Updater\`"
           } >> "$GITHUB_STEP_SUMMARY"
 

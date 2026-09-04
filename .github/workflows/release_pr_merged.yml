@@ -1,7 +1,8 @@
 name: release PR deployment
 
+# 표준 릴리즈 전용 게이트. 이 레포는 핫픽스 흐름이 없어 releases/** 네임스페이스만 다룬다.
 on:
-  pull_request:
+  pull_request_target:
     types: [closed]
     branches:
       - 'releases/**'
@@ -12,7 +13,7 @@ permissions:
   actions: read
 
 jobs:
-  verify-merged-empty-release-pr:
+  verify-merged-release-pr:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -143,16 +144,16 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   deploy-release-applications:
-    needs: verify-merged-empty-release-pr
+    needs: verify-merged-release-pr
     uses: ./.github/workflows/deploy_release_applications.yml
     with:
-      source_sha: ${{ needs.verify-merged-empty-release-pr.outputs.source-sha }}
-      release_key: ${{ needs.verify-merged-empty-release-pr.outputs.release-key }}
+      source_sha: ${{ needs.verify-merged-release-pr.outputs.source-sha }}
+      release_key: ${{ needs.verify-merged-release-pr.outputs.release-key }}
     secrets: inherit
 
   delete-release-branch:
     needs:
-      - verify-merged-empty-release-pr
+      - verify-merged-release-pr
       - deploy-release-applications
     runs-on: ubuntu-latest
     steps:
@@ -160,7 +161,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY: ${{ github.repository }}
-          RELEASE_BRANCH: ${{ needs.verify-merged-empty-release-pr.outputs.release-branch }}
+          RELEASE_BRANCH: ${{ needs.verify-merged-release-pr.outputs.release-branch }}
         run: |
           set -euo pipefail
           encoded_branch="$(RELEASE_BRANCH="$RELEASE_BRANCH" python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["RELEASE_BRANCH"], safe=""))')"
