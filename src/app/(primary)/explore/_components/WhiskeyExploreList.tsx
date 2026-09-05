@@ -63,7 +63,7 @@ export const WhiskeyExplorerList = ({
     ],
     queryFn: ({ pageParam, signal }) => {
       return ExploreApi.getAlcohols({
-        keywords: debouncedKeyword ? [debouncedKeyword] : [],
+        keyword: debouncedKeyword || undefined,
         regionIds: regionIds.length > 0 ? regionIds : undefined,
         category: category || undefined,
         sortType: selectedSort.sortType,

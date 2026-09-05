@@ -28,7 +28,7 @@ describe('ExploreApi.getAlcohols', () => {
     const controller = new AbortController();
 
     await ExploreApi.getAlcohols({
-      keywords: ['macallan'],
+      keyword: '글렌 모렌지',
       sortType: 'POPULAR',
       sortOrder: 'DESC',
       size: 10,
@@ -47,13 +47,15 @@ describe('ExploreApi.getAlcohols', () => {
     expect(getSearchParams().has('pageSize')).toBe(false);
     expect(getSearchParams().has('ratingFrom')).toBe(false);
     expect(getSearchParams().has('ratingTo')).toBe(false);
+    expect(getSearchParams().get('keyword')).toBe('글렌 모렌지');
+    expect(getSearchParams().has('keywords')).toBe(false);
   });
 
   it('다음 요청은 opaque cursor를 원문 그대로 전달한다', async () => {
     const cursor = 'eyJpZCI6MzcLCJzb3J0IjoiLz8rPSJ9';
 
     await ExploreApi.getAlcohols({
-      keywords: ['macallan'],
+      keyword: 'macallan',
       cursor,
       size: 10,
     } as never);
@@ -63,7 +65,6 @@ describe('ExploreApi.getAlcohols', () => {
 
   it('선택 별점을 동일한 포함 상하한으로 전달한다', async () => {
     await ExploreApi.getAlcohols({
-      keywords: [],
       ratingFrom: 4.5,
       ratingTo: 4.5,
       size: 10,

@@ -98,10 +98,10 @@ describe('useExploreSearch', () => {
     expect(params.get('sortOrder')).toBe('ASC');
   });
 
-  it('위스키 검색은 기존 repeated keywords URL 계약을 유지한다', () => {
+  it('위스키 검색도 단일 keyword URL을 복원한다', () => {
     mockUseSearchParams.mockReturnValue(
       new URLSearchParams(
-        'tab=EXPLORER_WHISKEY&keywords=macallan&sortType=RATING&sortOrder=DESC',
+        'tab=EXPLORER_WHISKEY&keyword=macallan&sortType=RATING&sortOrder=DESC',
       ),
     );
 
@@ -113,9 +113,22 @@ describe('useExploreSearch', () => {
     expect(result.current.debouncedKeyword).toBe('macallan');
   });
 
+  it('legacy keywords는 검색어로 복원하지 않는다', () => {
+    mockUseSearchParams.mockReturnValue(
+      new URLSearchParams('tab=EXPLORER_WHISKEY&keywords=legacy'),
+    );
+
+    const { result } = renderHook(() =>
+      useExploreSearch({ tabId: WHISKEY_EXPLORE_TAB_ID }),
+    );
+
+    expect(result.current.inputKeyword).toBe('');
+    expect(result.current.debouncedKeyword).toBe('');
+  });
+
   it('다른 탭의 검색어는 현재 탭 입력값으로 복원하지 않는다', () => {
     mockUseSearchParams.mockReturnValue(
-      new URLSearchParams('tab=EXPLORER_WHISKEY&keywords=stale-whiskey'),
+      new URLSearchParams('tab=EXPLORER_WHISKEY&keyword=stale-whiskey'),
     );
 
     const { result } = renderHook(() =>

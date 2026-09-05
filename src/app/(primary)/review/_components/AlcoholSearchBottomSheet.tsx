@@ -82,7 +82,7 @@ export default function AlcoholSearchBottomSheet({
     ],
     queryFn: async ({ pageParam, signal }) => {
       return ExploreApi.getAlcohols({
-        keywords: debouncedKeyword ? [debouncedKeyword] : [],
+        keyword: debouncedKeyword || undefined,
         category: selectedCategory,
         sortType: SORT_TYPE.POPULAR,
         sortOrder: SORT_ORDER.DESC,

@@ -72,9 +72,9 @@ describe('useExploreFilters 훅', () => {
       expect(result.current.regionIds).toEqual([12]);
     });
 
-    it('A6: keywords/tab 등 다른 파라미터는 무시하고 regionIds/category만 읽는다', () => {
+    it('A6: keyword/tab 등 다른 파라미터는 무시하고 regionIds/category만 읽는다', () => {
       setupSearchParams(
-        'regionIds=12&category=BOURBON&keywords=peaty&tab=EXPLORER_WHISKEY',
+        'regionIds=12&category=BOURBON&keyword=peaty&tab=EXPLORER_WHISKEY',
       );
 
       const { result } = renderHook(() => useExploreFilters());
@@ -121,15 +121,15 @@ describe('useExploreFilters 훅', () => {
       ]);
     });
 
-    it('B4: keywords/tab 등 다른 파라미터를 보존한다', () => {
-      setupSearchParams('keywords=foo&tab=EXPLORER_WHISKEY');
+    it('B4: keyword/tab 등 다른 파라미터를 보존한다', () => {
+      setupSearchParams('keyword=foo&tab=EXPLORER_WHISKEY');
 
       const { result } = renderHook(() => useExploreFilters());
 
       act(() => result.current.toggleRegionId(12));
 
       const replaced = parseReplacedQuery(mockReplace);
-      expect(replaced.get('keywords')).toBe('foo');
+      expect(replaced.get('keyword')).toBe('foo');
       expect(replaced.get('tab')).toBe('EXPLORER_WHISKEY');
       expect(replaced.getAll('regionIds')).toEqual(['12']);
     });
@@ -149,7 +149,7 @@ describe('useExploreFilters 훅', () => {
 
   describe('clearRegionIds', () => {
     it('C1: regionIds만 제거하고 다른 파라미터는 유지한다', () => {
-      setupSearchParams('regionIds=12&regionIds=34&keywords=foo');
+      setupSearchParams('regionIds=12&regionIds=34&keyword=foo');
 
       const { result } = renderHook(() => useExploreFilters());
 
@@ -157,11 +157,11 @@ describe('useExploreFilters 훅', () => {
 
       const replaced = parseReplacedQuery(mockReplace);
       expect(replaced.getAll('regionIds')).toEqual([]);
-      expect(replaced.get('keywords')).toBe('foo');
+      expect(replaced.get('keyword')).toBe('foo');
     });
 
     it('C2: regionIds가 원래 없으면 router.replace를 호출하지 않는다', () => {
-      setupSearchParams('keywords=foo');
+      setupSearchParams('keyword=foo');
 
       const { result } = renderHook(() => useExploreFilters());
 
@@ -204,8 +204,8 @@ describe('useExploreFilters 훅', () => {
       expect(parseReplacedQuery(mockReplace).get('category')).toBe('BLENDED');
     });
 
-    it('D4: regionIds/keywords 등 다른 파라미터를 보존한다', () => {
-      setupSearchParams('regionIds=12&keywords=foo');
+    it('D4: regionIds/keyword 등 다른 파라미터를 보존한다', () => {
+      setupSearchParams('regionIds=12&keyword=foo');
 
       const { result } = renderHook(() => useExploreFilters());
 
@@ -214,7 +214,7 @@ describe('useExploreFilters 훅', () => {
       const replaced = parseReplacedQuery(mockReplace);
       expect(replaced.get('category')).toBe('BOURBON');
       expect(replaced.getAll('regionIds')).toEqual(['12']);
-      expect(replaced.get('keywords')).toBe('foo');
+      expect(replaced.get('keyword')).toBe('foo');
     });
   });
 
@@ -279,7 +279,7 @@ describe('useExploreFilters 훅', () => {
 
     it('위스키 필터 초기화는 카테고리, 지역, 별점을 한 번에 제거한다', () => {
       setupSearchParams(
-        'tab=EXPLORER_WHISKEY&keywords=macallan&category=SINGLE_MALT&regionIds=12&rating=AT_LEAST_4_5&sortType=RATING&sortOrder=DESC',
+        'tab=EXPLORER_WHISKEY&keyword=macallan&category=SINGLE_MALT&regionIds=12&rating=AT_LEAST_4_5&sortType=RATING&sortOrder=DESC',
       );
 
       const { result } = renderHook(() => useExploreFilters());
@@ -293,7 +293,7 @@ describe('useExploreFilters 훅', () => {
       expect(replaced.has('rating')).toBe(false);
       expect(replaced.has('sortType')).toBe(false);
       expect(replaced.has('sortOrder')).toBe(false);
-      expect(replaced.get('keywords')).toBe('macallan');
+      expect(replaced.get('keyword')).toBe('macallan');
     });
 
     it('리뷰 필터 초기화는 별점과 정렬만 제거하고 검색 키워드는 유지한다', () => {
