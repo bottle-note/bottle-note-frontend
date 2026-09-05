@@ -233,7 +233,7 @@ describe('WhiskeyExplorerList realtime search', () => {
     });
 
     expect(mockGetAlcohols).toHaveBeenCalledWith({
-      keywords: ['macallan'],
+      keyword: 'macallan',
       regionIds: [12],
       category: 'SINGLE_MALT',
       sortType: 'RANDOM',

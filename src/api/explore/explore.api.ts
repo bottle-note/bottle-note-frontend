@@ -60,7 +60,7 @@ export const ExploreApi = {
     params: ExploreListParams,
   ): Promise<ApiResponse<ExploreAlcoholsResponse>> {
     const {
-      keywords,
+      keyword,
       regionIds,
       category,
       sortType,
@@ -73,7 +73,7 @@ export const ExploreApi = {
     } = params;
 
     const queryString = buildQueryParams({
-      keywords,
+      keyword,
       regionIds,
       category,
       sortType,

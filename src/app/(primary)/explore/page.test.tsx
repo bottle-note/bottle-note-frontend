@@ -183,7 +183,7 @@ describe('ExplorePage scroll header', () => {
 
   it('위스키에서 리뷰 탭으로 전환해도 모든 검색·필터·정렬 조건을 초기화한다', () => {
     mockSearchParams =
-      'tab=EXPLORER_WHISKEY&keywords=macallan&sortType=RATING&sortOrder=DESC&rating=AT_LEAST_4_5&category=SINGLE_MALT&regionIds=12&regionIds=34';
+      'tab=EXPLORER_WHISKEY&keyword=macallan&sortType=RATING&sortOrder=DESC&rating=AT_LEAST_4_5&category=SINGLE_MALT&regionIds=12&regionIds=34';
     mockCurrentTab = {
       name: '위스키 둘러보기',
       id: 'EXPLORER_WHISKEY',

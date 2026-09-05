@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   parseExploreTabId,
-  REVIEW_EXPLORE_TAB_ID,
   type ExploreTabId,
 } from '../_constants/exploreTabs';
 
@@ -20,15 +19,8 @@ export const useExploreSearch = ({ tabId }: UseExploreSearchOptions) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const sourceTabId = parseExploreTabId(searchParams.get('tab'));
-  const isReviewTab = tabId === REVIEW_EXPLORE_TAB_ID;
   const initialKeyword =
-    sourceTabId === tabId
-      ? isReviewTab
-        ? searchParams.get('keyword') ??
-          searchParams.getAll('keywords')[0] ??
-          ''
-        : searchParams.getAll('keywords')[0] ?? ''
-      : '';
+    sourceTabId === tabId ? searchParams.get('keyword') ?? '' : '';
 
   const [inputKeyword, setInputKeyword] = useState(initialKeyword);
   const normalizedKeyword = useMemo(
@@ -56,18 +48,14 @@ export const useExploreSearch = ({ tabId }: UseExploreSearchOptions) => {
     params.delete('keywords');
 
     if (debouncedKeyword) {
-      if (isReviewTab) {
-        params.set('keyword', debouncedKeyword);
-      } else {
-        params.append('keywords', debouncedKeyword);
-      }
+      params.set('keyword', debouncedKeyword);
     }
 
     const nextQuery = params.toString();
     if (nextQuery === searchParams.toString()) return;
 
     router.replace(`${pathname}?${nextQuery}`, { scroll: false });
-  }, [debouncedKeyword, isReviewTab, pathname, router, searchParams, tabId]);
+  }, [debouncedKeyword, pathname, router, searchParams, tabId]);
 
   return {
     inputKeyword,

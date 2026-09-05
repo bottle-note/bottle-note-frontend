@@ -78,7 +78,7 @@ export default function Search() {
     ],
     queryFn: async ({ pageParam }) => {
       return ExploreApi.getAlcohols({
-        keywords: filterState.keyword ? [filterState.keyword] : [],
+        keyword: filterState.keyword || undefined,
         category:
           filterState.category === 'ALL' ? undefined : filterState.category,
         regionIds:

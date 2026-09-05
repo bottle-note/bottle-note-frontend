@@ -24,7 +24,7 @@ export type ReviewExploreSortType =
 export type ExploreSortOrder = 'DESC' | 'ASC';
 
 export type ExploreListParams = InfiniteListParams & {
-  keywords: string[];
+  keyword?: string;
   regionIds?: number[];
   category?: string;
   sortType?: ExploreSortType;
