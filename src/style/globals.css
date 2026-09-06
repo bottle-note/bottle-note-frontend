@@ -175,7 +175,7 @@
     --search-bar-height: 56px;
     --search-fixed-area-height: 70px;
     --tab-height: 81px;
-    --logo-header-expanded-height: calc(93px + var(--safe-area-top));
+    --logo-header-expanded-height: calc(91px + var(--safe-area-top));
     --logo-header-collapsed-height: calc(var(--header-height-with-safe) + 32px);
     --logo-header-slide-distance: calc(
       var(--logo-header-expanded-height) - var(--logo-header-collapsed-height)
