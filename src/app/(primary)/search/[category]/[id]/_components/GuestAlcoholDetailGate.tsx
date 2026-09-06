@@ -37,7 +37,7 @@ export function GuestAlcoholDetailGate({
       <div
         ref={contentRef}
         aria-hidden="true"
-        className="pointer-events-none select-none blur-[3px]"
+        className="pointer-events-none select-none blur-[1px]"
       >
         {children}
       </div>
