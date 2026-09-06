@@ -10,7 +10,8 @@ export type LoginTrigger =
   | 'comment'
   | 'picks'
   | 'mypage'
-  | 'review_write';
+  | 'review_write'
+  | 'whisky_detail';
 
 export type LoginMethod = 'kakao' | 'apple';
 

@@ -17,7 +17,6 @@ import Star from '@/components/ui/Display/Star';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import ReviewListItem from '@/app/(primary)/search/[category]/[id]/_components/ReviewListItem';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
-import NavLayout from '@/components/ui/Layout/NavLayout';
 import StarRating from '@/components/ui/Form/StarRating';
 import EmptyView from '@/components/ui/Display/EmptyView';
 import List from '@/components/feature/List/List';
@@ -42,6 +41,7 @@ import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import type { ShareConfig, ShareChannel } from '@/types/share';
 import FloatingReviewButton from './_components/FloatingReviewButton';
 import AlcoholDetailHeader from './_components/AlcoholDetailHeader';
+import { GuestAlcoholDetailPrompt } from './_components/GuestAlcoholDetailPrompt';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 interface DetailItem {
@@ -52,10 +52,10 @@ interface DetailItem {
 export default function SearchAlcohol() {
   const router = useRouter();
   const params = useParams();
-  const { isLoggedIn } = useAuthSession();
+  const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
   const { id: alcoholId } = params;
   const { handleModalState } = useModalStore();
-  const { bridgeToLogin } = useLoginBridge();
+  const { bridgeToLogin, navigateToLogin } = useLoginBridge();
   // 연속 입력은 2초 동안 묶되, 상세 화면 이탈 시 마지막 별점은 즉시 전송한다.
   const { debounce } = useDebounceAction(DEBOUNCE_DELAY, {
     flushOnUnmount: true,
@@ -67,6 +67,8 @@ export default function SearchAlcohol() {
   const [rate, setRate] = useState(0);
   const [userNickName, setUserNickName] = useState<string>('');
   const [isShareOpen, setIsShareOpen] = useState(false);
+
+  const isGuest = !isAuthLoading && !isLoggedIn;
 
   const viewTrackedAlcoholIdRef = useRef<string | null>(null);
 
@@ -240,15 +242,44 @@ export default function SearchAlcohol() {
     // TODO: Analytics tracking
   };
 
+  const getCurrentDetailUrl = () =>
+    `${window.location.pathname}${window.location.search}`;
+
+  const handleGuestLogin = () =>
+    navigateToLogin('whisky_detail', getCurrentDetailUrl());
+
   const reviewList = data?.reviewInfo?.reviewList ?? [];
   const reviewTotalCount = data?.reviewInfo?.totalCount;
+  const alcoholMetadataAndTags = (
+    <>
+      <section className="mx-5 border-y border-stroke-neutral-subtle py-[21px]">
+        <div className="grid gap-2">
+          {alcoholDetails.map((item: DetailItem) => (
+            <div key={item.content} className="flex items-start gap-2 text-12">
+              <div className="min-w-14 font-semibold text-fg-neutral-muted">
+                {item.title}
+              </div>
+              <div className="flex-1 break-words font-normal text-fg-neutral">
+                {item.content}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+      {data?.alcohols?.alcoholsTastingTags && (
+        <FlavorTags tagList={data.alcohols.alcoholsTastingTags} />
+      )}
+    </>
+  );
 
   return (
     <>
-      {alcoholSchema && <JsonLd data={alcoholSchema} />}
-      <NavLayout>
-        {!data || !data.alcohols ? (
+      {!isGuest && alcoholSchema && <JsonLd data={alcoholSchema} />}
+      <>
+        {!data || !data.alcohols || isAuthLoading ? (
           <AlcoholDetailsSkeleton />
+        ) : isGuest ? (
+          <GuestAlcoholDetailPrompt onLogin={handleGuestLogin} />
         ) : (
           <>
             <div className="relative">
@@ -298,26 +329,7 @@ export default function SearchAlcohol() {
                   <StarRating rate={rate} size={42} handleRate={handleRate} />
                 </div>
               </article>
-              <section className="mx-5 border-y border-stroke-neutral-subtle py-[21px]">
-                <div className="grid gap-2">
-                  {alcoholDetails.map((item: DetailItem) => (
-                    <div
-                      key={item.content}
-                      className="flex items-start gap-2 text-12"
-                    >
-                      <div className="min-w-14 font-semibold text-fg-neutral-muted">
-                        {item.title}
-                      </div>
-                      <div className="flex-1 break-words font-normal text-fg-neutral">
-                        {item.content}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-              {data?.alcohols?.alcoholsTastingTags && (
-                <FlavorTags tagList={data.alcohols.alcoholsTastingTags} />
-              )}
+              {alcoholMetadataAndTags}
               {data?.friendsInfo && data.friendsInfo.followerCount !== 0 && (
                 <section className="mx-5 space-y-2 border-b border-stroke-neutral-subtle py-5">
                   <div className="flex items-end space-x-1 text-13 text-fg-neutral">
@@ -353,10 +365,10 @@ export default function SearchAlcohol() {
                 </section>
               )}
             </div>
-            <>
-              {reviewList.length > 0 ? (
+            {reviewList.length > 0 ? (
+              <>
+                <div className="h-4 bg-bg-layer-basement" />
                 <>
-                  <div className="h-4 bg-bg-layer-basement" />
                   <section className="mx-5 pt-[34px] pb-[20px]">
                     {typeof reviewTotalCount === 'number' && (
                       <div className="mb-[10px]">
@@ -397,15 +409,15 @@ export default function SearchAlcohol() {
                     />
                   </section>
                 </>
-              ) : (
-                <>
-                  <div className="h-4 bg-bg-layer-basement" />
-                  <section className="py-5">
-                    <EmptyView text="아직 리뷰가 없어요!" />
-                  </section>
-                </>
-              )}
-            </>
+              </>
+            ) : (
+              <>
+                <div className="h-4 bg-bg-layer-basement" />
+                <section className="py-5">
+                  <EmptyView text="아직 리뷰가 없어요!" />
+                </section>
+              </>
+            )}
           </>
         )}
         {shareConfig && (
@@ -416,10 +428,10 @@ export default function SearchAlcohol() {
             onShare={handleShare}
           />
         )}
-        {data?.alcohols?.alcoholId && (
+        {isLoggedIn && data?.alcohols?.alcoholId && (
           <FloatingReviewButton alcoholId={String(data.alcohols.alcoholId)} />
         )}
-      </NavLayout>
+      </>
     </>
   );
 }

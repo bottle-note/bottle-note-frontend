@@ -1,4 +1,4 @@
-import Button from '@/components/ui/Button/Button';
+import { GuestLoginPrompt } from '@/components/feature/auth/GuestLoginPrompt';
 import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 
 interface GuestCurationLoginPromptProps {
@@ -21,8 +21,7 @@ export function GuestCurationLoginPrompt({
             'linear-gradient(to bottom, transparent 0%, var(--color-bg-layer-default) 58%, var(--color-bg-layer-default) 100%)',
         }}
       />
-      <section
-        aria-labelledby="guest-curation-login-title"
+      <div
         className="fixed-content pointer-events-none z-20 px-5 text-center transition-[bottom] duration-300"
         style={{
           bottom: isNavbarVisible
@@ -38,19 +37,13 @@ export function GuestCurationLoginPrompt({
               'linear-gradient(to bottom, transparent 0%, var(--color-bg-layer-default) 48px, var(--color-bg-layer-default) 100%)',
           }}
         />
-        <h2
-          id="guest-curation-login-title"
-          className="text-20 font-bold text-fg-neutral"
-        >
-          더 많은 이야기가 궁금하신가요?
-        </h2>
-        <p className="mt-2 text-13 font-medium text-fg-neutral-muted">
-          로그인하고 보틀노트의 시음회와 큐레이션을 만나보세요.
-        </p>
-        <div className="pointer-events-auto mt-5">
-          <Button btnName="로그인하고 더 보기" onClick={onLogin} />
-        </div>
-      </section>
+        <GuestLoginPrompt
+          title="더 많은 이야기가 궁금하신가요?"
+          description="로그인하고 보틀노트의 시음회와 큐레이션을 만나보세요."
+          buttonLabel="로그인하고 더 보기"
+          onLogin={onLogin}
+        />
+      </div>
     </>
   );
 }
