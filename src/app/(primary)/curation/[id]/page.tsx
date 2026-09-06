@@ -14,6 +14,8 @@ import type {
 } from '@/api/curation-v2/types';
 import Button from '@/components/ui/Button/Button';
 import BaseImage from '@/components/ui/Display/BaseImage';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useLoginBridge } from '@/hooks/useLoginBridge';
 import {
   Carousel,
   CarouselContent,
@@ -33,6 +35,8 @@ import { WhiskyPairingDetail } from './_components/WhiskyPairingDetail';
 
 function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
   const router = useRouter();
+  const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
+  const { bridgeToLogin } = useLoginBridge();
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
   const { payload } = event;
@@ -45,6 +49,9 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
   const isEventPast = isBeforeToday(payload.eventDate);
   const shouldShowCta = Boolean(applicationLink);
   const canApply = shouldShowCta && payload.isRecruiting && !isEventPast;
+  const shouldShowGuestLoginCta = canApply && !isAuthLoading && !isLoggedIn;
+  const shouldShowApplicationCta = canApply && isLoggedIn;
+  const shouldShowClosedCta = shouldShowCta && !canApply;
   const summaryItems = [
     tastingEvent.eventDateLabel,
     tastingEvent.placeLabel,
@@ -182,12 +189,20 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
         </section>
       )}
 
-      {shouldShowCta && (
+      {(shouldShowGuestLoginCta ||
+        shouldShowApplicationCta ||
+        shouldShowClosedCta) && (
         <div
           className="fixed-content z-20 px-5"
           style={{ bottom: 'var(--navbar-margin-bottom)' }}
         >
-          {canApply ? (
+          {shouldShowGuestLoginCta && (
+            <Button
+              btnName="로그인 후 신청하기"
+              onClick={() => bridgeToLogin()}
+            />
+          )}
+          {shouldShowApplicationCta && (
             <a
               href={applicationLink}
               target="_blank"
@@ -198,7 +213,8 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
                 시음회 신청하기
               </span>
             </a>
-          ) : (
+          )}
+          {shouldShowClosedCta && (
             <Button btnName="모집 마감" onClick={() => undefined} disabled />
           )}
         </div>
