@@ -42,6 +42,7 @@ import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import type { ShareConfig, ShareChannel } from '@/types/share';
 import FloatingReviewButton from './_components/FloatingReviewButton';
 import AlcoholDetailHeader from './_components/AlcoholDetailHeader';
+import { GuestAlcoholDetailGate } from './_components/GuestAlcoholDetailGate';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 interface DetailItem {
@@ -52,7 +53,7 @@ interface DetailItem {
 export default function SearchAlcohol() {
   const router = useRouter();
   const params = useParams();
-  const { isLoggedIn } = useAuthSession();
+  const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
   const { id: alcoholId } = params;
   const { handleModalState } = useModalStore();
   const { bridgeToLogin } = useLoginBridge();
@@ -242,12 +243,80 @@ export default function SearchAlcohol() {
 
   const reviewList = data?.reviewInfo?.reviewList ?? [];
   const reviewTotalCount = data?.reviewInfo?.totalCount;
+  const isGuest = !isAuthLoading && !isLoggedIn;
+
+  const handleGuestLogin = (returnTo: string) => {
+    router.push(`/login?returnTo=${encodeURIComponent(returnTo)}`);
+  };
+
+  const detailReturnTo =
+    typeof window === 'undefined'
+      ? ''
+      : `${window.location.pathname}${window.location.search}`;
+
+  const alcoholMetadataAndTags = (
+    <>
+      <section className="mx-5 border-y border-stroke-neutral-subtle py-[21px]">
+        <div className="grid gap-2">
+          {alcoholDetails.map((item: DetailItem) => (
+            <div key={item.content} className="flex items-start gap-2 text-12">
+              <div className="min-w-14 font-semibold text-fg-neutral-muted">
+                {item.title}
+              </div>
+              <div className="flex-1 break-words font-normal text-fg-neutral">
+                {item.content}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+      {data?.alcohols?.alcoholsTastingTags && (
+        <FlavorTags tagList={data.alcohols.alcoholsTastingTags} />
+      )}
+    </>
+  );
+
+  const friendsRating =
+    data?.friendsInfo && data.friendsInfo.followerCount !== 0 ? (
+      <section className="mx-5 space-y-2 border-b border-stroke-neutral-subtle py-5">
+        <div className="flex items-end space-x-1 text-13 text-fg-neutral">
+          <div>마셔본 친구</div>
+          <div className="font-extralight">
+            {data.friendsInfo.followerCount}
+          </div>
+        </div>
+        <div className="whitespace-nowrap overflow-x-auto flex space-x-5 scrollbar-hide">
+          {data.friendsInfo.friends?.map((user) => (
+            <div
+              key={user.userId}
+              className="flex-shrink-0 flex flex-col items-center space-y-1"
+            >
+              <Link href={ROUTES.USER.BASE(user.userId)}>
+                <div className="h-14 w-14 overflow-hidden rounded-full border border-stroke-neutral-basement">
+                  <Image
+                    className="object-cover"
+                    src={user.userImageUrl ?? ProfileDefaultImg}
+                    alt="user_img"
+                    width={59}
+                    height={59}
+                  />
+                </div>
+              </Link>
+              <p className="text-11 text-fg-neutral-muted">
+                {truncStr(user.nickName, 4)}
+              </p>
+              <Star rating={user.rating} size={14} />
+            </div>
+          ))}
+        </div>
+      </section>
+    ) : null;
 
   return (
     <>
       {alcoholSchema && <JsonLd data={alcoholSchema} />}
       <NavLayout>
-        {!data || !data.alcohols ? (
+        {!data || !data.alcohols || isAuthLoading ? (
           <AlcoholDetailsSkeleton />
         ) : (
           <>
@@ -298,114 +367,75 @@ export default function SearchAlcohol() {
                   <StarRating rate={rate} size={42} handleRate={handleRate} />
                 </div>
               </article>
-              <section className="mx-5 border-y border-stroke-neutral-subtle py-[21px]">
-                <div className="grid gap-2">
-                  {alcoholDetails.map((item: DetailItem) => (
-                    <div
-                      key={item.content}
-                      className="flex items-start gap-2 text-12"
-                    >
-                      <div className="min-w-14 font-semibold text-fg-neutral-muted">
-                        {item.title}
-                      </div>
-                      <div className="flex-1 break-words font-normal text-fg-neutral">
-                        {item.content}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-              {data?.alcohols?.alcoholsTastingTags && (
-                <FlavorTags tagList={data.alcohols.alcoholsTastingTags} />
-              )}
-              {data?.friendsInfo && data.friendsInfo.followerCount !== 0 && (
-                <section className="mx-5 space-y-2 border-b border-stroke-neutral-subtle py-5">
-                  <div className="flex items-end space-x-1 text-13 text-fg-neutral">
-                    <div>마셔본 친구</div>
-                    <div className="font-extralight">
-                      {data.friendsInfo.followerCount}
-                    </div>
-                  </div>
-                  <div className="whitespace-nowrap overflow-x-auto flex space-x-5 scrollbar-hide">
-                    {data.friendsInfo.friends?.map((user) => (
-                      <div
-                        key={user.userId}
-                        className="flex-shrink-0 flex flex-col items-center space-y-1"
-                      >
-                        <Link href={ROUTES.USER.BASE(user.userId)}>
-                          <div className="h-14 w-14 overflow-hidden rounded-full border border-stroke-neutral-basement">
-                            <Image
-                              className="object-cover"
-                              src={user.userImageUrl ?? ProfileDefaultImg}
-                              alt="user_img"
-                              width={59}
-                              height={59}
-                            />
-                          </div>
-                        </Link>
-                        <p className="text-11 text-fg-neutral-muted">
-                          {truncStr(user.nickName, 4)}
-                        </p>
-                        <Star rating={user.rating} size={14} />
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-            </div>
-            <>
-              {reviewList.length > 0 ? (
-                <>
-                  <div className="h-4 bg-bg-layer-basement" />
-                  <section className="mx-5 pt-[34px] pb-[20px]">
-                    {typeof reviewTotalCount === 'number' && (
-                      <div className="mb-[10px]">
-                        <List.Total total={reviewTotalCount} />
-                      </div>
-                    )}
-                    <div className="border-b border-stroke-neutral-subtle" />
-                    {reviewList.map((review) => (
-                      <React.Fragment key={review.reviewId}>
-                        <ReviewListItem
-                          data={review}
-                          onRefresh={refreshAlcoholDetails}
-                        />
-                      </React.Fragment>
-                    ))}
-                  </section>
-                  <section className="mx-5 mb-24">
-                    <PrimaryLinkButton
-                      data={{
-                        engName: 'MORE COMMENTS',
-                        korName: '리뷰 더 보기',
-                        icon: true,
-                        linkSrc: {
-                          pathname: `/search/${data?.alcohols?.engCategory}/${data?.alcohols?.alcoholId}/reviews`,
-                          query: {
-                            name: data?.alcohols?.korName,
-                          },
-                        },
-                        handleBeforeRouteChange: (
-                          e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-                        ) => {
-                          if (!isLoggedIn) {
-                            e.preventDefault();
-                            bridgeToLogin('comment');
-                          }
-                        },
-                      }}
-                    />
-                  </section>
-                </>
+              {isGuest ? (
+                <GuestAlcoholDetailGate
+                  title="지금 보고 계신 위스키, 관심있으신가요?"
+                  description="보틀노트에 기록하고 나만의 취향 노트를 쌓아보세요!"
+                  buttonLabel="로그인하고 기록 시작하기"
+                  onLogin={() => handleGuestLogin(detailReturnTo)}
+                >
+                  {alcoholMetadataAndTags}
+                  {friendsRating}
+                </GuestAlcoholDetailGate>
               ) : (
                 <>
-                  <div className="h-4 bg-bg-layer-basement" />
+                  {alcoholMetadataAndTags}
+                  {friendsRating}
+                </>
+              )}
+            </div>
+            {!isGuest && (
+              <>
+                <div className="h-4 bg-bg-layer-basement" />
+                {reviewList.length > 0 ? (
+                  <>
+                    <section id="reviews" className="mx-5 pt-[34px] pb-[20px]">
+                      {typeof reviewTotalCount === 'number' && (
+                        <div className="mb-[10px]">
+                          <List.Total total={reviewTotalCount} />
+                        </div>
+                      )}
+                      <div className="border-b border-stroke-neutral-subtle" />
+                      {reviewList.map((review) => (
+                        <React.Fragment key={review.reviewId}>
+                          <ReviewListItem
+                            data={review}
+                            onRefresh={refreshAlcoholDetails}
+                          />
+                        </React.Fragment>
+                      ))}
+                    </section>
+                    <section className="mx-5 mb-24">
+                      <PrimaryLinkButton
+                        data={{
+                          engName: 'MORE COMMENTS',
+                          korName: '리뷰 더 보기',
+                          icon: true,
+                          linkSrc: {
+                            pathname: `/search/${data?.alcohols?.engCategory}/${data?.alcohols?.alcoholId}/reviews`,
+                            query: {
+                              name: data?.alcohols?.korName,
+                            },
+                          },
+                          handleBeforeRouteChange: (
+                            e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+                          ) => {
+                            if (!isLoggedIn) {
+                              e.preventDefault();
+                              bridgeToLogin('comment');
+                            }
+                          },
+                        }}
+                      />
+                    </section>
+                  </>
+                ) : (
                   <section className="py-5">
                     <EmptyView text="아직 리뷰가 없어요!" />
                   </section>
-                </>
-              )}
-            </>
+                )}
+              </>
+            )}
           </>
         )}
         {shareConfig && (
@@ -416,7 +446,7 @@ export default function SearchAlcohol() {
             onShare={handleShare}
           />
         )}
-        {data?.alcohols?.alcoholId && (
+        {isLoggedIn && data?.alcohols?.alcoholId && (
           <FloatingReviewButton alcoholId={String(data.alcohols.alcoholId)} />
         )}
       </NavLayout>
