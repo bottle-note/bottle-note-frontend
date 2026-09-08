@@ -76,7 +76,7 @@ export const useReviewSubmission = ({
   const handleRatingUpdate = async (rating: number) => {
     if (initialRating === rating) return null;
     return RateApi.postRating({
-      alcoholId,
+      alcoholId: Number(alcoholId),
       rating: rating ?? 0,
     });
   };
