@@ -34,7 +34,7 @@ const ListItemRating = ({ data }: Props) => {
     if (!isLoggedIn) return handleLoginModal();
     setRate(selectedRate);
     await RateApi.postRating({
-      alcoholId: String(alcoholId),
+      alcoholId,
       rating: selectedRate,
     });
   };

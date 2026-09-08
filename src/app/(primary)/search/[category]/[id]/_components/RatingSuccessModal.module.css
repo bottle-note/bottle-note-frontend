@@ -1,0 +1,227 @@
+.backdrop {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  overflow: hidden;
+}
+
+.card {
+  width: min(320px, calc(100vw - 52px));
+  padding: 28px 22px 20px;
+  color: var(--color-fg-neutral);
+  text-align: center;
+  background: var(--color-bg-layer-floating);
+  border-radius: 26px;
+  box-shadow: 0 18px 55px rgb(65 39 27 / 22%);
+  animation: card-pop 0.72s cubic-bezier(0.18, 1.25, 0.32, 1) forwards;
+}
+
+.heroStar {
+  display: grid;
+  width: 86px;
+  height: 86px;
+  margin: -2px auto 10px;
+  font-size: 58px;
+  line-height: 1;
+  color: var(--color-fg-rating);
+  place-items: center;
+  background: var(--color-bg-brand-weak);
+  border-radius: 9999px;
+  transform: scale(0.2) rotate(-18deg);
+  animation: star-boom 0.82s cubic-bezier(0.14, 1.5, 0.3, 1) 0.05s forwards;
+}
+
+.kicker {
+  margin: 0 0 2px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--color-fg-brand);
+  opacity: 0;
+  animation: fade-up 0.35s ease 0.28s forwards;
+}
+
+.score {
+  margin: 5px 0 7px;
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  opacity: 0;
+  transform: translateY(10px) scale(0.8);
+  animation: score-pop 0.45s cubic-bezier(0.2, 1.25, 0.3, 1) 0.32s forwards;
+}
+
+.message {
+  margin: 0 0 18px;
+  font-size: 15px;
+  color: var(--color-fg-neutral-muted);
+  opacity: 0;
+  animation: fade-up 0.35s ease 0.42s forwards;
+}
+
+.confirmButton {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fade-up 0.35s ease 0.52s forwards;
+}
+
+.ring {
+  position: absolute;
+  width: 92px;
+  height: 92px;
+  border: 3px solid rgb(var(--palette-coral-600) / 62%);
+  border-radius: 9999px;
+  opacity: 0;
+}
+
+.ring1 {
+  animation: ring-burst 0.72s ease-out 0.07s forwards;
+}
+
+.ring2 {
+  animation: ring-burst 0.72s ease-out 0.18s forwards;
+}
+
+.confetti {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.confettiPiece {
+  position: absolute;
+  top: -7px;
+  left: -4px;
+  width: 9px;
+  height: 14px;
+  background: var(--color-bg-brand-solid);
+  border-radius: 3px;
+  opacity: 0;
+  transform: translate(0, 0) rotate(0deg) scale(0.8);
+  animation: confetti-boom 0.8s cubic-bezier(0.18, 0.72, 0.28, 1) var(--d)
+    forwards;
+}
+
+.confettiPiece:nth-child(3n + 2) {
+  background: rgb(var(--palette-coral-300));
+}
+
+.confettiPiece:nth-child(3n + 3) {
+  background: rgb(var(--palette-amber-500));
+}
+
+@keyframes card-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.72) translateY(18px);
+  }
+
+  58% {
+    opacity: 1;
+    transform: scale(1.04) translateY(-2px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes star-boom {
+  0% {
+    transform: scale(0.2) rotate(-18deg);
+  }
+
+  55% {
+    transform: scale(1.22) rotate(7deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes score-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.8);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.06);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fade-up {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ring-burst {
+  0% {
+    opacity: 0.72;
+    transform: scale(0.65);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(2.3);
+  }
+}
+
+@keyframes confetti-boom {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg) scale(0.7);
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) rotate(var(--r)) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .heroStar,
+  .kicker,
+  .score,
+  .message,
+  .confirmButton,
+  .ring,
+  .confettiPiece {
+    animation: none;
+  }
+
+  .heroStar,
+  .kicker,
+  .score,
+  .message,
+  .confirmButton {
+    opacity: 1;
+    transform: none;
+  }
+
+  .ring,
+  .confettiPiece {
+    display: none;
+  }
+}

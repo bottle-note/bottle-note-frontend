@@ -15,7 +15,7 @@ export type RateListParams = InfiniteListParams & {
 };
 
 export interface RatePostParams {
-  alcoholId: string;
+  alcoholId: number;
   rating: number;
 }
 

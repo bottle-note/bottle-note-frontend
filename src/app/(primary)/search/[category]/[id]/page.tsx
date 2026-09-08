@@ -18,7 +18,6 @@ import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import ReviewListItem from '@/app/(primary)/search/[category]/[id]/_components/ReviewListItem';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import NavLayout from '@/components/ui/Layout/NavLayout';
-import StarRating from '@/components/ui/Form/StarRating';
 import EmptyView from '@/components/ui/Display/EmptyView';
 import List from '@/components/feature/List/List';
 import { truncStr } from '@/utils/truncStr';
@@ -35,14 +34,14 @@ import { trackGA4Event } from '@/utils/analytics/ga4';
 import { ROUTES } from '@/constants/routes';
 import AlcoholDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/AlcoholDetailsSkeleton';
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
-import { DEBOUNCE_DELAY } from '@/constants/common';
-import useDebounceAction from '@/hooks/useDebounceAction';
 import ShareDropdown from '@/components/share/ShareDropdown';
 import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import type { ShareConfig, ShareChannel } from '@/types/share';
 import FloatingReviewButton from './_components/FloatingReviewButton';
 import AlcoholDetailHeader from './_components/AlcoholDetailHeader';
 import { GuestAlcoholDetailGate } from './_components/GuestAlcoholDetailGate';
+import AlcoholRatingInput from './_components/AlcoholRatingInput';
+import RatingSuccessModal from './_components/RatingSuccessModal';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 interface DetailItem {
@@ -57,19 +56,28 @@ export default function SearchAlcohol() {
   const { id: alcoholId } = params;
   const { handleModalState } = useModalStore();
   const { bridgeToLogin } = useLoginBridge();
-  // 연속 입력은 2초 동안 묶되, 상세 화면 이탈 시 마지막 별점은 즉시 전송한다.
-  const { debounce } = useDebounceAction(DEBOUNCE_DELAY, {
-    flushOnUnmount: true,
-  });
-
   const [data, setData] = useState<AlcoholDetailsResponse | null>(null);
   const [alcoholDetails, setAlcoholDetails] = useState<DetailItem[]>([]);
   const [isPicked, setIsPicked] = useState<boolean>(false);
   const [rate, setRate] = useState(0);
   const [userNickName, setUserNickName] = useState<string>('');
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isRatingSuccessOpen, setIsRatingSuccessOpen] = useState(false);
+  const [successfulRating, setSuccessfulRating] = useState(0);
 
   const viewTrackedAlcoholIdRef = useRef<string | null>(null);
+  const currentRateRef = useRef(0);
+  const latestRatingRequestIdRef = useRef(0);
+  const ratingRequestQueueRef = useRef<Promise<void>>(Promise.resolve());
+
+  const setCurrentRate = useCallback((nextRate: number) => {
+    currentRateRef.current = nextRate;
+    setRate(nextRate);
+  }, []);
+
+  const handleRatingSuccessClose = useCallback(() => {
+    setIsRatingSuccessOpen(false);
+  }, []);
 
   const fetchAlcoholDetails = async (id: string) => {
     try {
@@ -120,7 +128,7 @@ export default function SearchAlcohol() {
   const fetchUserRating = async (alcohol: string): Promise<boolean> => {
     try {
       const ratingResult = await RateApi.getUserRating(alcohol);
-      setRate(ratingResult.data.rating);
+      setCurrentRate(ratingResult.data.rating);
       return true;
     } catch (error) {
       console.error('Failed to fetch user rating:', error);
@@ -141,35 +149,54 @@ export default function SearchAlcohol() {
   }, [alcoholId, isLoggedIn]);
 
   const handleRate = useCallback(
-    async (selectedRate: number) => {
+    (selectedRate: number) => {
       if (!isLoggedIn) return bridgeToLogin('rating');
+      if (currentRateRef.current === selectedRate) return;
 
-      setRate(selectedRate);
+      setCurrentRate(selectedRate);
+      const requestId = ++latestRatingRequestIdRef.current;
 
-      debounce(async () => {
-        try {
-          await RateApi.postRating({
-            alcoholId: String(alcoholId),
-            rating: selectedRate,
-          });
-          trackGA4Event('rate_alcohol', {
-            alcohol_id: String(alcoholId),
-            alcohol_name: data?.alcohols.korName ?? '',
-          });
-        } catch (error) {
-          const isRecovered = await fetchUserRating(alcoholId.toString());
-          handleModalState({
-            isShowModal: true,
-            mainText: ERROR_MESSAGES.RATE_CREATE_FAILED,
-            subText: isRecovered
-              ? '저장된 별점으로 복구했습니다. 다시 시도해주세요.'
-              : '저장 상태를 확인하지 못했습니다. 다시 시도해주세요.',
-          });
-          console.error(error);
-        }
-      });
+      ratingRequestQueueRef.current = ratingRequestQueueRef.current
+        .catch(() => undefined)
+        .then(async () => {
+          try {
+            await RateApi.postRating({
+              alcoholId: Number(alcoholId),
+              rating: selectedRate,
+            });
+
+            if (requestId !== latestRatingRequestIdRef.current) return;
+
+            trackGA4Event('rate_alcohol', {
+              alcohol_id: String(alcoholId),
+              alcohol_name: data?.alcohols.korName ?? '',
+            });
+            setSuccessfulRating(selectedRate);
+            setIsRatingSuccessOpen(true);
+            void fetchAlcoholDetails(String(alcoholId));
+          } catch (error) {
+            if (requestId !== latestRatingRequestIdRef.current) return;
+
+            const isRecovered = await fetchUserRating(String(alcoholId));
+            handleModalState({
+              isShowModal: true,
+              mainText: ERROR_MESSAGES.RATE_CREATE_FAILED,
+              subText: isRecovered
+                ? '저장된 별점으로 복구했습니다. 다시 시도해주세요.'
+                : '저장 상태를 확인하지 못했습니다. 다시 시도해주세요.',
+            });
+            console.error(error);
+          }
+        });
     },
-    [isLoggedIn, alcoholId, debounce, data],
+    [
+      alcoholId,
+      bridgeToLogin,
+      data?.alcohols.korName,
+      handleModalState,
+      isLoggedIn,
+      setCurrentRate,
+    ],
   );
 
   const getRatingMessage = (myAvgRating: number, myRating: number) => {
@@ -364,7 +391,7 @@ export default function SearchAlcohol() {
                   data?.alcohols?.myRating,
                 )}
                 <div>
-                  <StarRating rate={rate} size={42} handleRate={handleRate} />
+                  <AlcoholRatingInput value={rate} onCommit={handleRate} />
                 </div>
               </article>
               {isGuest ? (
@@ -449,6 +476,11 @@ export default function SearchAlcohol() {
         {isLoggedIn && data?.alcohols?.alcoholId && (
           <FloatingReviewButton alcoholId={String(data.alcohols.alcoholId)} />
         )}
+        <RatingSuccessModal
+          isOpen={isRatingSuccessOpen}
+          rating={successfulRating}
+          onClose={handleRatingSuccessClose}
+        />
       </NavLayout>
     </>
   );
