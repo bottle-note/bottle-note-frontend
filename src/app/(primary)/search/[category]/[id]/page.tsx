@@ -384,95 +384,58 @@ export default function SearchAlcohol() {
                 </>
               )}
             </div>
-            <>
-              {reviewList.length > 0 ? (
-                <>
-                  <div className="h-4 bg-bg-layer-basement" />
-                  {isGuest ? (
-                    <GuestAlcoholDetailGate
-                      id="reviews"
-                      title="다른 사람들의 리뷰가 궁금하신가요?"
-                      description="로그인하고 더 많은 테이스팅 경험을 확인해보세요!"
-                      buttonLabel="로그인하고 리뷰 보기"
-                      onLogin={() =>
-                        handleGuestLogin(`${detailReturnTo}#reviews`)
-                      }
-                    >
-                      <section className="mx-5 pt-[34px] pb-[20px]">
-                        {typeof reviewTotalCount === 'number' && (
-                          <div className="mb-[10px]">
-                            <List.Total total={reviewTotalCount} />
-                          </div>
-                        )}
-                        <div className="border-b border-stroke-neutral-subtle" />
-                        {reviewList.slice(0, 2).map((review) => (
+            {!isGuest && (
+              <>
+                <div className="h-4 bg-bg-layer-basement" />
+                {reviewList.length > 0 ? (
+                  <>
+                    <section id="reviews" className="mx-5 pt-[34px] pb-[20px]">
+                      {typeof reviewTotalCount === 'number' && (
+                        <div className="mb-[10px]">
+                          <List.Total total={reviewTotalCount} />
+                        </div>
+                      )}
+                      <div className="border-b border-stroke-neutral-subtle" />
+                      {reviewList.map((review) => (
+                        <React.Fragment key={review.reviewId}>
                           <ReviewListItem
-                            key={review.reviewId}
                             data={review}
                             onRefresh={refreshAlcoholDetails}
                           />
-                        ))}
-                      </section>
-                    </GuestAlcoholDetailGate>
-                  ) : (
-                    <>
-                      <section
-                        id="reviews"
-                        className="mx-5 pt-[34px] pb-[20px]"
-                      >
-                        {typeof reviewTotalCount === 'number' && (
-                          <div className="mb-[10px]">
-                            <List.Total total={reviewTotalCount} />
-                          </div>
-                        )}
-                        <div className="border-b border-stroke-neutral-subtle" />
-                        {reviewList.map((review) => (
-                          <React.Fragment key={review.reviewId}>
-                            <ReviewListItem
-                              data={review}
-                              onRefresh={refreshAlcoholDetails}
-                            />
-                          </React.Fragment>
-                        ))}
-                      </section>
-                      <section className="mx-5 mb-24">
-                        <PrimaryLinkButton
-                          data={{
-                            engName: 'MORE COMMENTS',
-                            korName: '리뷰 더 보기',
-                            icon: true,
-                            linkSrc: {
-                              pathname: `/search/${data?.alcohols?.engCategory}/${data?.alcohols?.alcoholId}/reviews`,
-                              query: {
-                                name: data?.alcohols?.korName,
-                              },
+                        </React.Fragment>
+                      ))}
+                    </section>
+                    <section className="mx-5 mb-24">
+                      <PrimaryLinkButton
+                        data={{
+                          engName: 'MORE COMMENTS',
+                          korName: '리뷰 더 보기',
+                          icon: true,
+                          linkSrc: {
+                            pathname: `/search/${data?.alcohols?.engCategory}/${data?.alcohols?.alcoholId}/reviews`,
+                            query: {
+                              name: data?.alcohols?.korName,
                             },
-                            handleBeforeRouteChange: (
-                              e: React.MouseEvent<
-                                HTMLAnchorElement,
-                                MouseEvent
-                              >,
-                            ) => {
-                              if (!isLoggedIn) {
-                                e.preventDefault();
-                                bridgeToLogin('comment');
-                              }
-                            },
-                          }}
-                        />
-                      </section>
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div className="h-4 bg-bg-layer-basement" />
+                          },
+                          handleBeforeRouteChange: (
+                            e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+                          ) => {
+                            if (!isLoggedIn) {
+                              e.preventDefault();
+                              bridgeToLogin('comment');
+                            }
+                          },
+                        }}
+                      />
+                    </section>
+                  </>
+                ) : (
                   <section className="py-5">
                     <EmptyView text="아직 리뷰가 없어요!" />
                   </section>
-                </>
-              )}
-            </>
+                )}
+              </>
+            )}
           </>
         )}
         {shareConfig && (

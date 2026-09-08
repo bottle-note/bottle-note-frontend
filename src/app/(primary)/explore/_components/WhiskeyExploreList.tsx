@@ -11,6 +11,7 @@ import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import WhiskeyListItem from './WhiskeyListItem';
 import { ExploreSearchBar } from './ExploreSearchBar';
+import { GuestExploreGate } from './GuestExploreGate';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
 import { useExploreSearch } from '../_hooks/useExploreSearch';
 import { useExploreSort } from '../_hooks/useExploreSort';
@@ -23,13 +24,14 @@ interface WhiskeyExplorerListProps {
 
 const ESTIMATED_WHISKEY_ITEM_HEIGHT = 177;
 const WHISKEY_LIST_OVERSCAN = 5;
+const GUEST_PREVIEW_ITEM_COUNT = 3;
 
 export const WhiskeyExplorerList = ({
   isSearchActive,
   onSearchActiveChange,
 }: WhiskeyExplorerListProps) => {
   const router = useRouter();
-  const { isLoggedIn, user } = useAuthSession();
+  const { isLoggedIn, isLoading: isAuthLoading, user } = useAuthSession();
   const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
   const { inputKeyword, debouncedKeyword, isTyping, setInputKeyword } =
@@ -91,6 +93,18 @@ export const WhiskeyExplorerList = ({
     [alcoholList],
   );
   const alcoholCount = alcohols.length;
+  const shouldGateGuestList =
+    !isAuthLoading &&
+    !isLoggedIn &&
+    (alcoholCount > GUEST_PREVIEW_ITEM_COUNT || hasNextPage === true);
+  const visibleAlcohols = useMemo(
+    () =>
+      shouldGateGuestList
+        ? alcohols.slice(0, GUEST_PREVIEW_ITEM_COUNT)
+        : alcohols,
+    [alcohols, shouldGateGuestList],
+  );
+  const visibleAlcoholCount = visibleAlcohols.length;
   const hasReachedEnd =
     !isFirstLoading &&
     !isFetching &&
@@ -98,15 +112,16 @@ export const WhiskeyExplorerList = ({
     !error &&
     alcoholList !== undefined &&
     hasNextPage === false;
-  const showInquireButton = isEmpty || (hasReachedEnd && alcoholCount > 0);
+  const showInquireButton =
+    isEmpty || (!shouldGateGuestList && hasReachedEnd && alcoholCount > 0);
   const listRef = useRef<HTMLDivElement>(null);
   const [listOffset, setListOffset] = useState(0);
   const getItemKey = useCallback(
-    (index: number) => alcohols[index]?.alcoholId ?? index,
-    [alcohols],
+    (index: number) => visibleAlcohols[index]?.alcoholId ?? index,
+    [visibleAlcohols],
   );
   const virtualizer = useWindowVirtualizer<HTMLDivElement>({
-    count: alcoholCount,
+    count: visibleAlcoholCount,
     estimateSize: () => ESTIMATED_WHISKEY_ITEM_HEIGHT,
     getItemKey,
     overscan: WHISKEY_LIST_OVERSCAN,
@@ -183,7 +198,7 @@ export const WhiskeyExplorerList = ({
               style={{ height: virtualizer.getTotalSize() }}
             >
               {virtualizer.getVirtualItems().map((virtualItem) => {
-                const alcohol = alcohols[virtualItem.index];
+                const alcohol = visibleAlcohols[virtualItem.index];
 
                 return (
                   <div
@@ -191,7 +206,7 @@ export const WhiskeyExplorerList = ({
                     ref={virtualizer.measureElement}
                     role="listitem"
                     aria-posinset={virtualItem.index + 1}
-                    aria-setsize={alcoholCount}
+                    aria-setsize={visibleAlcoholCount}
                     data-index={virtualItem.index}
                     className={`absolute left-0 top-0 w-full ${
                       virtualItem.index === 0
@@ -213,7 +228,20 @@ export const WhiskeyExplorerList = ({
           </div>
         </List.Section>
       </List>
-      <div ref={targetRef} />
+      {isLoggedIn && <div ref={targetRef} />}
+      {shouldGateGuestList && (
+        <GuestExploreGate
+          key={JSON.stringify([
+            category,
+            regionIds,
+            ratingPreset?.id,
+            debouncedKeyword,
+            selectedSort.id,
+          ])}
+          title="더 많은 위스키가 궁금하신가요?"
+          description="로그인하고 나에게 맞는 위스키를 더 찾아보세요."
+        />
+      )}
       {showInquireButton && (
         <div className="pt-7 pb-20">
           <PrimaryLinkButton

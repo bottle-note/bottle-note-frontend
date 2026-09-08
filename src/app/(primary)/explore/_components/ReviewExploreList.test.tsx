@@ -56,7 +56,11 @@ jest.mock('@/api/explore/explore.api', () => ({
 }));
 
 jest.mock('@/hooks/auth/useAuthSession', () => ({
-  useAuthSession: () => ({ user: { userId: 1 } }),
+  useAuthSession: () => ({
+    isLoggedIn: true,
+    isLoading: false,
+    user: { userId: 1 },
+  }),
 }));
 
 jest.mock('../_hooks/useExploreFilters', () => ({
@@ -108,6 +112,7 @@ const setupPaginatedQuery = (items: { reviewId: number }[]) => {
     isFetching: false,
     isFetchingNextPage: false,
     isPlaceholderData: false,
+    hasNextPage: true,
     targetRef: { current: null },
     error: null,
   });
