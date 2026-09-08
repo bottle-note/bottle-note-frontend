@@ -100,7 +100,7 @@ function BannerImage({
         fill
         sizes="(max-width: 430px) 100vw, 430px"
         priority={isPriority}
-        quality={75}
+        quality={100}
         onLoad={() => setIsLoaded(true)}
         style={{ objectFit: 'cover' }}
         className="w-full h-full object-cover"
