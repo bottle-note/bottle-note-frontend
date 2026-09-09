@@ -1,7 +1,15 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { isAfter, isBefore, parseISO } from 'date-fns';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+  type CSSProperties,
+} from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { format, isAfter, isBefore, isValid, parseISO } from 'date-fns';
 import EmptyView from '@/components/ui/Display/EmptyView';
 import List from '@/components/feature/List/List';
 import { useNavLayout } from '@/components/ui/Layout/NavLayout';
@@ -13,13 +21,76 @@ import ImportClearanceListItem from './ImportClearanceListItem';
 import { importClearanceItems } from '../_data/importClearanceItems';
 
 export default function ImportClearanceList() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { isNavigationVisible, setNavbarSuppressed } = useNavLayout();
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const [keyword, setKeyword] = useState('');
-  const [sort, setSort] = useState<ImportClearanceSort>('latest');
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [inputKeyword, setInputKeyword] = useState(() =>
+    normalizeKeyword(searchParams.get('keyword') ?? ''),
+  );
+  const [keyword, setKeyword] = useState(inputKeyword);
+  const [sort, setSort] = useState<ImportClearanceSort>(() =>
+    searchParams.get('sort') === 'oldest' ? 'oldest' : 'latest',
+  );
+  const [startDate, setStartDate] = useState(() =>
+    parseQueryDate(searchParams.get('startDate')),
+  );
+  const [endDate, setEndDate] = useState(() =>
+    parseQueryDate(searchParams.get('endDate')),
+  );
+  const urlKeyword = normalizeKeyword(searchParams.get('keyword') ?? '');
+  const syncedKeywordRef = useRef(urlKeyword);
   const isHeaderCollapsed = isSearchActive || !isNavigationVisible;
+
+  const updateSearchParams = useCallback(
+    (updates: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value) {
+          params.set(key, value);
+        } else {
+          params.delete(key);
+        }
+      });
+
+      const query = params.toString();
+      if (query === searchParams.toString()) return;
+
+      router.replace(query ? `${pathname}?${query}` : pathname, {
+        scroll: false,
+      });
+    },
+    [pathname, router, searchParams],
+  );
+
+  useEffect(() => {
+    const normalizedKeyword = normalizeKeyword(inputKeyword);
+    const timer = window.setTimeout(() => {
+      setKeyword(normalizedKeyword);
+      updateSearchParams({ keyword: normalizedKeyword || null });
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [inputKeyword, updateSearchParams]);
+
+  useEffect(() => {
+    const keywordFromUrl = urlKeyword;
+    const sortFromUrl =
+      searchParams.get('sort') === 'oldest' ? 'oldest' : 'latest';
+    const startDateFromUrl = parseQueryDate(searchParams.get('startDate'));
+    const endDateFromUrl = parseQueryDate(searchParams.get('endDate'));
+
+    if (syncedKeywordRef.current !== keywordFromUrl) {
+      syncedKeywordRef.current = keywordFromUrl;
+      setInputKeyword(keywordFromUrl);
+      setKeyword(keywordFromUrl);
+    }
+    setSort(sortFromUrl);
+    setStartDate(startDateFromUrl);
+    setEndDate(endDateFromUrl);
+  }, [searchParams, urlKeyword]);
 
   useEffect(
     () => () => {
@@ -59,44 +130,68 @@ export default function ImportClearanceList() {
     setSort('latest');
     setStartDate(null);
     setEndDate(null);
+    updateSearchParams({ sort: null, startDate: null, endDate: null });
+  };
+
+  const handleSortChange = (nextSort: ImportClearanceSort) => {
+    setSort(nextSort);
+    updateSearchParams({ sort: nextSort === 'latest' ? null : nextSort });
+  };
+
+  const handleDateChange = (
+    nextStartDate: Date | null,
+    nextEndDate: Date | null,
+  ) => {
+    setStartDate(nextStartDate);
+    setEndDate(nextEndDate);
+    updateSearchParams({
+      startDate: nextStartDate ? format(nextStartDate, 'yyyy-MM-dd') : null,
+      endDate: nextEndDate ? format(nextEndDate, 'yyyy-MM-dd') : null,
+    });
   };
 
   return (
-    <div className="min-h-safe-screen bg-bg-layer-default text-fg-neutral">
-      <div className="fixed-content top-0 z-10 bg-bg-layer-default">
-        <AutoHideLogoHeader isVisible={!isHeaderCollapsed} sticky={false} />
+    <div
+      className="min-h-safe-screen bg-bg-layer-default text-fg-neutral"
+      style={
+        {
+          '--import-clearance-header-height':
+            'var(--logo-header-collapsed-height)',
+        } as CSSProperties
+      }
+    >
+      <div
+        className={`fixed-content top-0 z-10 ${isHeaderCollapsed ? 'pointer-events-none' : ''}`}
+      >
+        <AutoHideLogoHeader
+          isVisible={!isHeaderCollapsed}
+          sticky={false}
+          title="수입통관"
+        />
       </div>
       <section
         className="w-full pb-navbar"
-        style={{ marginTop: 'var(--logo-header-expanded-height)' }}
+        style={{ marginTop: 'var(--import-clearance-header-height)' }}
       >
-        <h1
-          className={
-            isSearchActive ? 'sr-only' : 'px-5 pb-3 pt-5 text-24 font-bold'
-          }
-        >
-          수입통관
-        </h1>
+        <h1 className="sr-only">수입통관</h1>
         <ImportClearanceFilter
           items={importClearanceItems}
           isSearchActive={isSearchActive}
           onSearchActiveChange={handleSearchActiveChange}
-          onKeywordChange={setKeyword}
+          keyword={inputKeyword}
+          onKeywordChange={setInputKeyword}
           sort={sort}
-          onSortChange={setSort}
+          onSortChange={handleSortChange}
           startDate={startDate}
           endDate={endDate}
-          onDateChange={(nextStartDate, nextEndDate) => {
-            setStartDate(nextStartDate);
-            setEndDate(nextEndDate);
-          }}
+          onDateChange={handleDateChange}
           onReset={handleReset}
         />
         {filteredItems.length === 0 ? (
           <EmptyView text="조건에 맞는 수입통관 내역이 없어요." />
         ) : (
           <List>
-            <List.Section>
+            <List.Section className="px-4">
               {filteredItems.map((item) => (
                 <ImportClearanceListItem key={item.id} item={item} />
               ))}
@@ -106,4 +201,15 @@ export default function ImportClearanceList() {
       </section>
     </div>
   );
+}
+
+function normalizeKeyword(value: string) {
+  return value.trim().replace(/\s+/g, ' ');
+}
+
+function parseQueryDate(value: string | null) {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+
+  const date = parseISO(value);
+  return isValid(date) ? date : null;
 }

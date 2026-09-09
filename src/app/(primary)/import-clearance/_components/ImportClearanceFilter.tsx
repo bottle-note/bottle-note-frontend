@@ -15,6 +15,7 @@ interface Props {
   items: ImportClearanceItem[];
   isSearchActive: boolean;
   onSearchActiveChange: (active: boolean) => void;
+  keyword: string;
   onKeywordChange: (keyword: string) => void;
   sort: ImportClearanceSort;
   onSortChange: (sort: ImportClearanceSort) => void;
@@ -28,6 +29,7 @@ export default function ImportClearanceFilter({
   items,
   isSearchActive,
   onSearchActiveChange,
+  keyword,
   onKeywordChange,
   sort,
   onSortChange,
@@ -45,10 +47,13 @@ export default function ImportClearanceFilter({
     <>
       <StickySearchBar
         testId="import-clearance-search-bar"
-        containerClassName="px-5 pt-[5px]"
+        containerClassName="px-4 pt-[5px]"
         isSearchActive={isSearchActive}
         onSearchActiveChange={onSearchActiveChange}
         onValueChange={onKeywordChange}
+        value={keyword}
+        headerExpandedHeight="var(--import-clearance-header-height)"
+        headerSlideDistance="32px"
         ariaLabel="수입통관 검색"
         placeholder="품목명, 수입사 검색"
         inputClassName="pr-16"

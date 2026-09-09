@@ -6,6 +6,7 @@ interface UseSearchInputOptions {
   onSearch?: (value: string) => void;
   onFocusChange?: (isFocused: boolean) => void;
   initialValue?: string;
+  value?: string;
   syncWithUrlParams?: boolean;
 }
 
@@ -13,6 +14,7 @@ export const useSearchInput = ({
   onSearch,
   onFocusChange,
   initialValue = '',
+  value,
   syncWithUrlParams = false,
 }: UseSearchInputOptions = {}) => {
   const searchParams = useSearchParams();
@@ -38,6 +40,12 @@ export const useSearchInput = ({
       }
     }
   }, [urlKeyword, urlQuery, syncWithUrlParams]);
+
+  useEffect(() => {
+    if (value !== undefined) {
+      setSearchText(value);
+    }
+  }, [value]);
 
   // 검색 실행 (엔터 또는 버튼 클릭)
   const handleSubmit = useCallback(() => {
