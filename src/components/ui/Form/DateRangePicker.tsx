@@ -71,7 +71,7 @@ export default function DateRangePicker({
               <Image src={CalendarSubcoralIcon} alt="calendar" />
             </button>
           </div>
-          <span className="text-black text-12">~</span>
+          <span className="text-12 text-fg-neutral">~</span>
           <div className="flex items-center">
             <span className="text-mainCoral text-12">
               {endDate ? format(endDate, 'yy.MM.dd') : 'YY.MM.DD'}
