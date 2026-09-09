@@ -1,4 +1,5 @@
 import List from '@/components/feature/List/List';
+import ItemInfo from '@/components/feature/List/_components/ItemInfo';
 
 export interface ImportClearanceItem {
   id: string;
@@ -18,7 +19,7 @@ interface Props {
 
 export default function ImportClearanceListItem({ item }: Props) {
   return (
-    <List.ItemLayout className="gap-3 px-5">
+    <List.ItemLayout className="gap-3 px-0">
       {item.imageUrl && (
         <List.ItemImage
           src={item.imageUrl}
@@ -29,12 +30,13 @@ export default function ImportClearanceListItem({ item }: Props) {
       )}
       <div className="min-w-0 flex-1">
         <p className="text-12 text-fg-brand">통관일 {item.clearanceDate}</p>
-        <h2 className="mt-1 line-clamp-1 text-15 font-bold leading-[1.3] text-fg-neutral">
-          {item.korName}
-        </h2>
-        <p className="mt-1 line-clamp-1 text-13 text-fg-neutral-muted">
-          {item.engName}
-        </p>
+        <div className="mt-1">
+          <ItemInfo
+            korName={item.korName}
+            engName={item.engName}
+            length={null}
+          />
+        </div>
         <p className="mt-1 text-12 text-fg-neutral-muted">
           {item.importerName} · {item.exportCountry} · {item.category}
         </p>

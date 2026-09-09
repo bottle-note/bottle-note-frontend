@@ -14,6 +14,8 @@ interface StickySearchBarProps
   description?: string;
   containerClassName?: string;
   testId?: string;
+  headerExpandedHeight?: string;
+  headerSlideDistance?: string;
 }
 
 export default function StickySearchBar({
@@ -22,16 +24,18 @@ export default function StickySearchBar({
   description,
   containerClassName,
   testId,
+  headerExpandedHeight = 'var(--logo-header-expanded-height)',
+  headerSlideDistance = 'var(--logo-header-slide-distance)',
   placeholder = '키워드를 입력하세요',
   ...searchBarProps
 }: StickySearchBarProps) {
   const { isNavigationVisible } = useNavLayout();
   const shouldShowSearchBar = isSearchActive || isNavigationVisible;
   const searchBarTransform = isSearchActive
-    ? 'translateY(calc(-1 * var(--logo-header-slide-distance)))'
+    ? `translateY(calc(-1 * ${headerSlideDistance}))`
     : isNavigationVisible
       ? 'translateY(0)'
-      : 'translateY(calc(-100% - var(--logo-header-slide-distance)))';
+      : `translateY(calc(-100% - ${headerSlideDistance}))`;
 
   return (
     <section
@@ -44,10 +48,10 @@ export default function StickySearchBar({
         containerClassName,
       )}
       style={{
-        top: 'var(--logo-header-expanded-height)',
+        top: headerExpandedHeight,
         transform: searchBarTransform,
         marginBottom: isSearchActive
-          ? 'calc(-1 * var(--logo-header-slide-distance))'
+          ? `calc(-1 * ${headerSlideDistance})`
           : '0px',
       }}
     >
