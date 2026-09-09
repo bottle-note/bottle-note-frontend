@@ -74,8 +74,8 @@ export const programTagSchema = z.enum([
 const programFeedItemSchema = z.object({
   name: z.string(),
   type: programTypeSchema,
-  programDate: z.string(),
-  startTime: z.string(),
+  programDate: z.string().nullish(),
+  startTime: z.string().nullish(),
 });
 
 export const programFeedPayloadSchema = z.object({
@@ -84,7 +84,7 @@ export const programFeedPayloadSchema = z.object({
   placeName: z.string(),
   entryFee: z.number().nullable().optional(),
   programTags: z.array(programTagSchema).optional(),
-  programs: z.array(programFeedItemSchema).min(1),
+  programs: z.array(programFeedItemSchema).optional(),
 });
 
 const programScheduleSchema = programFeedItemSchema.extend({
@@ -110,7 +110,7 @@ export const programPayloadSchema = z.object({
   officialUrl: z.string().nullish(),
   registrationUrl: z.string().nullish(),
   programTags: z.array(programTagSchema).optional(),
-  programs: z.array(programScheduleSchema),
+  programs: z.array(programScheduleSchema).optional(),
 });
 
 export type CurationAlcohol = z.infer<typeof curationAlcoholSchema>;

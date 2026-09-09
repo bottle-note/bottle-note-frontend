@@ -222,6 +222,7 @@ describe('WhiskeyExplorerList realtime search', () => {
       'RANDOM',
       'DESC',
       101,
+      10,
     ]);
     expect(config.keepPreviousData).toBeUndefined();
 

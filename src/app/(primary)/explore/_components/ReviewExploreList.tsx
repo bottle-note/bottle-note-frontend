@@ -21,12 +21,15 @@ import { ReviewApi } from '@/api/review/review.api';
 import { ExploreReview } from '@/api/explore/types';
 import type { ApiResponse } from '@/api/_shared/types';
 import List from '@/components/feature/List/List';
+import {
+  GUEST_LIST_PAGE_SIZE,
+  GuestListGate,
+} from '@/components/feature/auth/GuestListGate';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import useModalStore from '@/store/modalStore';
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import ReviewCard from './ReviewListItem';
 import { ExploreSearchBar } from './ExploreSearchBar';
-import { GuestExploreGate } from './GuestExploreGate';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
 import { useExploreSearch } from '../_hooks/useExploreSearch';
 import { useExploreSort } from '../_hooks/useExploreSort';
@@ -52,7 +55,6 @@ interface PendingReviewLike {
 
 const ESTIMATED_REVIEW_ITEM_HEIGHT = 320;
 const REVIEW_LIST_OVERSCAN = 3;
-const GUEST_PREVIEW_ITEM_COUNT = 3;
 let reviewMeasurementCache:
   | { queryKey: string; measurements: VirtualItem[] }
   | undefined;
@@ -70,6 +72,8 @@ export const ReviewExplorerList = ({
     tabId: REVIEW_EXPLORE_TAB_ID,
   });
   const { ratingPreset } = useExploreFilters();
+  const isGuest = !isAuthLoading && !isLoggedIn;
+  const pageSize = isGuest ? GUEST_LIST_PAGE_SIZE : 10;
 
   const queryKey = useMemo(
     () => [
@@ -79,6 +83,7 @@ export const ReviewExplorerList = ({
       debouncedKeyword,
       selectedSort.sortType,
       selectedSort.sortOrder,
+      pageSize,
     ],
     [
       debouncedKeyword,
@@ -86,6 +91,7 @@ export const ReviewExplorerList = ({
       selectedSort.sortOrder,
       selectedSort.sortType,
       user?.userId,
+      pageSize,
     ],
   );
   const measurementCacheKey = JSON.stringify(queryKey);
@@ -96,7 +102,6 @@ export const ReviewExplorerList = ({
     isFetching,
     isFetchingNextPage,
     isPlaceholderData,
-    hasNextPage,
     targetRef,
     error,
   } = usePaginatedQuery<ReviewListData>({
@@ -110,7 +115,7 @@ export const ReviewExplorerList = ({
         ratingTo: ratingPreset?.ratingTo,
         ...{
           cursor: pageParam,
-          size: 10,
+          size: pageSize,
           signal,
         },
       });
@@ -122,28 +127,17 @@ export const ReviewExplorerList = ({
     [reviewList],
   );
   const reviewCount = reviews.length;
-  const shouldGateGuestList =
-    !isAuthLoading &&
-    !isLoggedIn &&
-    (reviewCount > GUEST_PREVIEW_ITEM_COUNT || hasNextPage === true);
-  const visibleReviews = useMemo(
-    () =>
-      shouldGateGuestList
-        ? reviews.slice(0, GUEST_PREVIEW_ITEM_COUNT)
-        : reviews,
-    [reviews, shouldGateGuestList],
-  );
-  const visibleReviewCount = visibleReviews.length;
+  const shouldGateGuestList = isGuest && reviewCount > 0;
   const listRef = useRef<HTMLDivElement>(null);
   const isMountedRef = useRef(true);
   const pendingLikesRef = useRef(new Map<number, PendingReviewLike>());
   const [listOffset, setListOffset] = useState(0);
   const getItemKey = useCallback(
-    (index: number) => visibleReviews[index]?.reviewId ?? index,
-    [visibleReviews],
+    (index: number) => reviews[index]?.reviewId ?? index,
+    [reviews],
   );
   const virtualizer = useWindowVirtualizer<HTMLDivElement>({
-    count: visibleReviewCount,
+    count: reviewCount,
     estimateSize: () => ESTIMATED_REVIEW_ITEM_HEIGHT,
     getItemKey,
     initialMeasurementsCache:
@@ -362,7 +356,7 @@ export const ReviewExplorerList = ({
               style={{ height: virtualizer.getTotalSize() }}
             >
               {virtualizer.getVirtualItems().map((virtualItem) => {
-                const review = visibleReviews[virtualItem.index];
+                const review = reviews[virtualItem.index];
 
                 return (
                   <div
@@ -370,7 +364,7 @@ export const ReviewExplorerList = ({
                     ref={virtualizer.measureElement}
                     role="listitem"
                     aria-posinset={virtualItem.index + 1}
-                    aria-setsize={visibleReviewCount}
+                    aria-setsize={reviewCount}
                     data-index={virtualItem.index}
                     className={`absolute left-0 top-0 w-full pb-[30px] ${
                       virtualItem.index === 0
@@ -393,7 +387,7 @@ export const ReviewExplorerList = ({
           </div>
           {isLoggedIn && <div ref={targetRef} className="h-10" />}
           {shouldGateGuestList && (
-            <GuestExploreGate
+            <GuestListGate
               key={measurementCacheKey}
               title="더 많은 리뷰가 궁금하신가요?"
               description="로그인하고 다양한 테이스팅 경험을 더 만나보세요."

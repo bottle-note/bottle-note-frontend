@@ -3,19 +3,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { GuestLoginPrompt } from '@/components/feature/auth/GuestLoginPrompt';
-import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import { ROUTES } from '@/constants/routes';
+import { useNavLayout } from '@/components/ui/Layout/NavLayout';
+import { GuestLoginPrompt } from './GuestLoginPrompt';
 
-interface GuestExploreGateProps {
+export const GUEST_LIST_PAGE_SIZE = 3;
+
+interface GuestListGateProps {
   title: string;
   description: string;
 }
 
-export function GuestExploreGate({
-  title,
-  description,
-}: GuestExploreGateProps) {
+export function GuestListGate({ title, description }: GuestListGateProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

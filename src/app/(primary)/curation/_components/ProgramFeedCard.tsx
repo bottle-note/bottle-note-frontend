@@ -16,7 +16,7 @@ export function ProgramFeedCard({
   const { dateLabel, entryFeeLabel, tagLabels } = getProgramSummary(
     program.payload,
   );
-  const programCountLabel = `프로그램 ${program.payload.programs.length}개`;
+  const programCountLabel = `프로그램 ${program.payload.programs?.length ?? 0}개`;
 
   return (
     <Link href={ROUTES.CURATION.DETAIL(program.id)} className="block">

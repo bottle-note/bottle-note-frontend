@@ -1,17 +1,10 @@
 import {
-  isProgramDetailItem,
-  isProgramFeedItem,
-  isRecommendedWhiskyDetailItem,
-  isWhiskyPairingDetailItem,
-  isWhiskyPairingFeedItem,
-} from './guards';
-import {
   programFeedPayloadSchema,
   programPayloadSchema,
+  recommendedWhiskyPayloadSchema,
   tastingEventPayloadSchema,
   whiskyPairingPayloadSchema,
 } from './schema';
-import type { CurationV2DetailItem, CurationV2FeedItem } from './types';
 
 const programFeedPayload = {
   eventStartDate: '2026-07-24',
@@ -50,19 +43,6 @@ const programPayload = {
   ],
 };
 
-const feedItem: CurationV2FeedItem = {
-  id: 1,
-  name: '2026 바앤스피릿쇼',
-  description: '행사 설명',
-  coverImageUrl: 'https://example.com/cover.jpg',
-  imageUrls: [],
-  exposureStartDate: '2026-07-24',
-  exposureEndDate: '2026-07-26',
-  displayOrder: 1,
-  createAt: '2026-07-01',
-  payload: programFeedPayload,
-};
-
 describe('WHISKY_TASTING_EVENT payload contract', () => {
   const tastingEventPayload = {
     capacity: 20,
@@ -94,24 +74,43 @@ describe('PROGRAM payload contract', () => {
     expect(programFeedPayloadSchema.safeParse(programFeedPayload).success).toBe(
       true,
     );
-    expect(isProgramFeedItem(feedItem)).toBe(true);
+  });
+
+  it.each([
+    {
+      name: '일정이 미정인 프로그램',
+      payload: {
+        eventStartDate: '2026-12-10',
+        eventEndDate: '2027-01-13',
+        placeName: '우리집',
+        programs: [{ name: '산들쇼', type: 'TASTING' }],
+      },
+    },
+    {
+      name: '라인업을 아직 등록하지 않은 행사',
+      payload: {
+        eventStartDate: '2026-09-16',
+        eventEndDate: '2026-09-16',
+        placeName: '코엑스',
+      },
+    },
+  ])('$name도 feed payload로 허용한다', ({ payload }) => {
+    expect(programFeedPayloadSchema.safeParse(payload).success).toBe(true);
   });
 
   it('detail payload는 행사 정보와 프로그램별 상세 정보를 포함한다', () => {
-    const detailItem: CurationV2DetailItem = {
-      ...feedItem,
-      payload: programPayload,
-      spec: {
-        id: 1,
-        code: 'PROGRAM',
-        name: '프로그램',
-        container: 'object',
-        responseSpec: {},
-      },
-    };
-
     expect(programPayloadSchema.safeParse(programPayload).success).toBe(true);
-    expect(isProgramDetailItem(detailItem)).toBe(true);
+  });
+
+  it('라인업이 없는 프로그램 상세 payload도 허용한다', () => {
+    expect(
+      programPayloadSchema.safeParse({
+        eventStartDate: '2026-09-16',
+        eventEndDate: '2026-09-16',
+        placeName: '코엑스',
+        address: '서울 강남구 영동대로 513',
+      }).success,
+    ).toBe(true);
   });
 });
 
@@ -135,42 +134,17 @@ describe('WHISKY_PAIRING payload contract', () => {
     },
   ];
 
-  const pairingFeedItem: CurationV2FeedItem = {
-    ...feedItem,
-    id: 18,
-    name: '위스키와 잘 어울리는 디저트',
-    payload: pairingPayload,
-  };
-
-  it('페어링 음식 목록을 포함한 payload를 판별한다', () => {
+  it('페어링 음식 목록을 포함한 payload를 허용한다', () => {
     expect(whiskyPairingPayloadSchema.safeParse(pairingPayload).success).toBe(
       true,
     );
-    expect(isWhiskyPairingFeedItem(pairingFeedItem)).toBe(true);
-  });
-
-  it('상세 응답은 WHISKY_PAIRING spec code까지 확인한다', () => {
-    const detailItem: CurationV2DetailItem = {
-      ...pairingFeedItem,
-      spec: {
-        id: 2,
-        code: 'WHISKY_PAIRING',
-        name: '위스키 페어링',
-        container: 'array',
-        responseSpec: {},
-      },
-    };
-
-    expect(isWhiskyPairingDetailItem(detailItem)).toBe(true);
-    expect(isRecommendedWhiskyDetailItem(detailItem)).toBe(false);
   });
 });
 
 describe('RECOMMENDED_WHISKY detail contract', () => {
-  it('상세 응답은 RECOMMENDED_WHISKY spec code까지 확인한다', () => {
-    const detailItem: CurationV2DetailItem = {
-      ...feedItem,
-      payload: [
+  it('추천 위스키 배열 payload를 허용한다', () => {
+    expect(
+      recommendedWhiskyPayloadSchema.safeParse([
         {
           source: 'BOTTLE_NOTE',
           alcohol: {
@@ -178,17 +152,7 @@ describe('RECOMMENDED_WHISKY detail contract', () => {
             korName: 'TSC 2013 글렌오드 8년',
           },
         },
-      ],
-      spec: {
-        id: 3,
-        code: 'RECOMMENDED_WHISKY',
-        name: '추천 위스키',
-        container: 'array',
-        responseSpec: {},
-      },
-    };
-
-    expect(isRecommendedWhiskyDetailItem(detailItem)).toBe(true);
-    expect(isWhiskyPairingDetailItem(detailItem)).toBe(false);
+      ]).success,
+    ).toBe(true);
   });
 });
