@@ -70,7 +70,7 @@ export function ProgramEventInfoCard({
     {
       key: 'programs',
       Icon: Users,
-      title: `프로그램 ${payload.programs.length}개`,
+      title: `프로그램 ${payload.programs?.length ?? 0}개`,
     },
   ];
 

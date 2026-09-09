@@ -3,6 +3,7 @@ import type {
   CurationV2DetailItem,
   CurationV2Payload,
 } from '@/api/curation-v2/types';
+import { CURATION_V2_SPEC_CODES } from '@/api/curation-v2/constants';
 import { getCurationAlcohols } from './getCurationAlcohols';
 
 const curationAlcohol: CurationAlcohol = {
@@ -12,7 +13,10 @@ const curationAlcohol: CurationAlcohol = {
   },
 };
 
-const createCuration = (payload: CurationV2Payload): CurationV2DetailItem => ({
+const createCuration = (
+  payload: CurationV2Payload,
+  code?: string,
+): CurationV2DetailItem => ({
   id: 1,
   name: '테스트 큐레이션',
   description: '',
@@ -23,13 +27,26 @@ const createCuration = (payload: CurationV2Payload): CurationV2DetailItem => ({
   displayOrder: 1,
   createAt: '2026-01-01',
   payload,
+  spec: code
+    ? {
+        id: 1,
+        code,
+        name: '테스트',
+        container: 'object',
+        responseSpec: {},
+      }
+    : undefined,
 });
 
 describe('getCurationAlcohols', () => {
   it('추천 위스키 배열 payload를 그대로 반환한다', () => {
     const payload = [curationAlcohol];
 
-    expect(getCurationAlcohols(createCuration(payload))).toEqual(payload);
+    expect(
+      getCurationAlcohols(
+        createCuration(payload, CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY),
+      ),
+    ).toEqual(payload);
   });
 
   it('시음회 payload의 alcohols를 반환한다', () => {
@@ -46,9 +63,11 @@ describe('getCurationAlcohols', () => {
       alcohols: [curationAlcohol],
     };
 
-    expect(getCurationAlcohols(createCuration(payload))).toEqual([
-      curationAlcohol,
-    ]);
+    expect(
+      getCurationAlcohols(
+        createCuration(payload, CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT),
+      ),
+    ).toEqual([curationAlcohol]);
   });
 
   it('프로그램 payload의 각 회차 whiskies를 한 목록으로 반환한다', () => {
@@ -91,10 +110,11 @@ describe('getCurationAlcohols', () => {
       ],
     };
 
-    expect(getCurationAlcohols(createCuration(payload))).toEqual([
-      curationAlcohol,
-      secondAlcohol,
-    ]);
+    expect(
+      getCurationAlcohols(
+        createCuration(payload, CURATION_V2_SPEC_CODES.PROGRAM),
+      ),
+    ).toEqual([curationAlcohol, secondAlcohol]);
   });
 
   it('지원하지 않는 payload는 빈 목록으로 처리한다', () => {

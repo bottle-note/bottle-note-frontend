@@ -5,13 +5,16 @@ import { ExploreApi } from '@/api/explore/explore.api';
 import type { ExploreAlcohol } from '@/api/explore/types';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import List from '@/components/feature/List/List';
+import {
+  GUEST_LIST_PAGE_SIZE,
+  GuestListGate,
+} from '@/components/feature/auth/GuestListGate';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import WhiskeyListItem from './WhiskeyListItem';
 import { ExploreSearchBar } from './ExploreSearchBar';
-import { GuestExploreGate } from './GuestExploreGate';
 import { useExploreFilters } from '../_hooks/useExploreFilters';
 import { useExploreSearch } from '../_hooks/useExploreSearch';
 import { useExploreSort } from '../_hooks/useExploreSort';
@@ -24,7 +27,6 @@ interface WhiskeyExplorerListProps {
 
 const ESTIMATED_WHISKEY_ITEM_HEIGHT = 177;
 const WHISKEY_LIST_OVERSCAN = 5;
-const GUEST_PREVIEW_ITEM_COUNT = 3;
 
 export const WhiskeyExplorerList = ({
   isSearchActive,
@@ -40,6 +42,8 @@ export const WhiskeyExplorerList = ({
     tabId: WHISKEY_EXPLORE_TAB_ID,
   });
   const { regionIds, category, ratingPreset } = useExploreFilters();
+  const isGuest = !isAuthLoading && !isLoggedIn;
+  const pageSize = isGuest ? GUEST_LIST_PAGE_SIZE : 10;
 
   const {
     data: alcoholList,
@@ -62,6 +66,7 @@ export const WhiskeyExplorerList = ({
       selectedSort.sortType,
       selectedSort.sortOrder,
       user?.userId ?? null,
+      pageSize,
     ],
     queryFn: ({ pageParam, signal }) => {
       return ExploreApi.getAlcohols({
@@ -73,7 +78,7 @@ export const WhiskeyExplorerList = ({
         ratingFrom: ratingPreset?.ratingFrom,
         ratingTo: ratingPreset?.ratingTo,
         cursor: pageParam,
-        size: 10,
+        size: pageSize,
         signal,
       });
     },
@@ -93,18 +98,7 @@ export const WhiskeyExplorerList = ({
     [alcoholList],
   );
   const alcoholCount = alcohols.length;
-  const shouldGateGuestList =
-    !isAuthLoading &&
-    !isLoggedIn &&
-    (alcoholCount > GUEST_PREVIEW_ITEM_COUNT || hasNextPage === true);
-  const visibleAlcohols = useMemo(
-    () =>
-      shouldGateGuestList
-        ? alcohols.slice(0, GUEST_PREVIEW_ITEM_COUNT)
-        : alcohols,
-    [alcohols, shouldGateGuestList],
-  );
-  const visibleAlcoholCount = visibleAlcohols.length;
+  const shouldGateGuestList = isGuest && alcoholCount > 0;
   const hasReachedEnd =
     !isFirstLoading &&
     !isFetching &&
@@ -117,11 +111,11 @@ export const WhiskeyExplorerList = ({
   const listRef = useRef<HTMLDivElement>(null);
   const [listOffset, setListOffset] = useState(0);
   const getItemKey = useCallback(
-    (index: number) => visibleAlcohols[index]?.alcoholId ?? index,
-    [visibleAlcohols],
+    (index: number) => alcohols[index]?.alcoholId ?? index,
+    [alcohols],
   );
   const virtualizer = useWindowVirtualizer<HTMLDivElement>({
-    count: visibleAlcoholCount,
+    count: alcoholCount,
     estimateSize: () => ESTIMATED_WHISKEY_ITEM_HEIGHT,
     getItemKey,
     overscan: WHISKEY_LIST_OVERSCAN,
@@ -198,7 +192,7 @@ export const WhiskeyExplorerList = ({
               style={{ height: virtualizer.getTotalSize() }}
             >
               {virtualizer.getVirtualItems().map((virtualItem) => {
-                const alcohol = visibleAlcohols[virtualItem.index];
+                const alcohol = alcohols[virtualItem.index];
 
                 return (
                   <div
@@ -206,7 +200,7 @@ export const WhiskeyExplorerList = ({
                     ref={virtualizer.measureElement}
                     role="listitem"
                     aria-posinset={virtualItem.index + 1}
-                    aria-setsize={visibleAlcoholCount}
+                    aria-setsize={alcoholCount}
                     data-index={virtualItem.index}
                     className={`absolute left-0 top-0 w-full ${
                       virtualItem.index === 0
@@ -230,7 +224,7 @@ export const WhiskeyExplorerList = ({
       </List>
       {isLoggedIn && <div ref={targetRef} />}
       {shouldGateGuestList && (
-        <GuestExploreGate
+        <GuestListGate
           key={JSON.stringify([
             category,
             regionIds,

@@ -4,7 +4,7 @@ import {
   type CurationV2SpecCode,
 } from '@/api/curation-v2/constants';
 import type { SORT_ORDER } from '@/api/_shared/types';
-import { isTastingEventFeedItem } from '@/api/curation-v2/guards';
+import type { TastingEventFeedItem } from '@/api/curation-v2/types';
 import { curationV2Keys } from '@/queries/curationV2Keys';
 import { useCurationFeedQuery } from '@/queries/useCurationFeedQuery';
 
@@ -26,9 +26,9 @@ export const useTastingEventsQuery = (
     sortOrder,
     enabled,
   });
-  const data = query.data
-    ?.flatMap((page) => page.data.items)
-    .filter(isTastingEventFeedItem);
+  const data = query.data?.flatMap((page) => page.data.items) as
+    | TastingEventFeedItem[]
+    | undefined;
 
   return { ...query, data };
 };

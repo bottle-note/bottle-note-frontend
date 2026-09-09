@@ -4,7 +4,7 @@ import {
   type CurationV2SpecCode,
 } from '@/api/curation-v2/constants';
 import type { SORT_ORDER } from '@/api/_shared/types';
-import { isProgramFeedItem } from '@/api/curation-v2/guards';
+import type { ProgramFeedItem } from '@/api/curation-v2/types';
 import { curationV2Keys } from '@/queries/curationV2Keys';
 import { useCurationFeedQuery } from '@/queries/useCurationFeedQuery';
 
@@ -26,9 +26,9 @@ export const useProgramsQuery = (
     sortOrder,
     enabled,
   });
-  const data = query.data
-    ?.flatMap((page) => page.data.items)
-    .filter(isProgramFeedItem);
+  const data = query.data?.flatMap((page) => page.data.items) as
+    | ProgramFeedItem[]
+    | undefined;
 
   return { ...query, data };
 };

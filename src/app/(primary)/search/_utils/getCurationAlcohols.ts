@@ -1,11 +1,9 @@
-import {
-  programPayloadSchema,
-  recommendedWhiskyPayloadSchema,
-  tastingEventPayloadSchema,
-} from '@/api/curation-v2/schema';
+import { CURATION_V2_SPEC_CODES } from '@/api/curation-v2/constants';
 import type {
   CurationAlcohol,
   CurationV2DetailItem,
+  ProgramPayload,
+  TastingEventPayload,
 } from '@/api/curation-v2/types';
 
 /**
@@ -15,22 +13,17 @@ import type {
 export const getCurationAlcohols = (
   curation: CurationV2DetailItem,
 ): CurationAlcohol[] => {
-  const recommendedWhiskies = recommendedWhiskyPayloadSchema.safeParse(
-    curation.payload,
-  );
-  if (recommendedWhiskies.success) {
-    return recommendedWhiskies.data;
+  switch (curation.spec?.code) {
+    case CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT:
+      return (curation.payload as TastingEventPayload).alcohols ?? [];
+    case CURATION_V2_SPEC_CODES.PROGRAM:
+      return ((curation.payload as ProgramPayload).programs ?? []).flatMap(
+        (item) => item.whiskies ?? [],
+      );
+    case CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY:
+    case CURATION_V2_SPEC_CODES.WHISKY_PAIRING:
+      return curation.payload as CurationAlcohol[];
+    default:
+      return [];
   }
-
-  const tastingEvent = tastingEventPayloadSchema.safeParse(curation.payload);
-  if (tastingEvent.success) {
-    return tastingEvent.data.alcohols ?? [];
-  }
-
-  const program = programPayloadSchema.safeParse(curation.payload);
-  if (program.success) {
-    return program.data.programs.flatMap((item) => item.whiskies ?? []);
-  }
-
-  return [];
 };

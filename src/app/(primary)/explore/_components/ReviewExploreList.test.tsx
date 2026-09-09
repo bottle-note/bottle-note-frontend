@@ -174,6 +174,7 @@ describe('ReviewExplorerList', () => {
       'peaty',
       'RATING',
       'ASC',
+      10,
     ]);
 
     const controller = new AbortController();

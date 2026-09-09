@@ -2,15 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import {
-  isProgramDetailItem,
-  isRecommendedWhiskyDetailItem,
-  isTastingEventFeedItem,
-  isWhiskyPairingDetailItem,
-} from '@/api/curation-v2/guards';
+import { CURATION_V2_SPEC_CODES } from '@/api/curation-v2/constants';
 import type {
+  ProgramDetailItem,
   RecommendedWhiskyDetailItem,
   TastingEventDetailItem,
+  WhiskyPairingDetailItem,
 } from '@/api/curation-v2/types';
 import Button from '@/components/ui/Button/Button';
 import BaseImage from '@/components/ui/Display/BaseImage';
@@ -387,20 +384,15 @@ export default function CurationDetailPage() {
     );
   }
 
-  if (isTastingEventFeedItem(data)) {
-    return <TastingEventDetail event={data} />;
-  }
-
-  if (isProgramDetailItem(data)) {
-    return <ProgramDetail program={data} />;
-  }
-
-  if (isWhiskyPairingDetailItem(data)) {
-    return <WhiskyPairingDetail pairing={data} />;
-  }
-
-  if (isRecommendedWhiskyDetailItem(data)) {
-    return <CurationDetail curation={data} />;
+  switch (data.spec?.code) {
+    case CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT:
+      return <TastingEventDetail event={data as TastingEventDetailItem} />;
+    case CURATION_V2_SPEC_CODES.PROGRAM:
+      return <ProgramDetail program={data as ProgramDetailItem} />;
+    case CURATION_V2_SPEC_CODES.WHISKY_PAIRING:
+      return <WhiskyPairingDetail pairing={data as WhiskyPairingDetailItem} />;
+    case CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY:
+      return <CurationDetail curation={data as RecommendedWhiskyDetailItem} />;
   }
 
   return (

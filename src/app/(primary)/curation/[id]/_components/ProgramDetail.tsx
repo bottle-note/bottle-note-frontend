@@ -31,6 +31,7 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
   );
   const registrationUrl = payload.registrationUrl?.trim();
   const officialUrl = payload.officialUrl?.trim();
+  const programs = payload.programs ?? [];
 
   useEffect(() => {
     if (!carouselApi) {
@@ -160,13 +161,13 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
         </section>
       )}
 
-      {payload.programs.length > 0 && (
+      {programs.length > 0 && (
         <section className="px-5 py-7">
           <h2 className="text-16 font-extrabold text-fg-neutral">
             프로그램 및 이벤트 라인업
           </h2>
           <div className="mt-4 space-y-4">
-            {payload.programs.map((item, index) => (
+            {programs.map((item, index) => (
               <ProgramScheduleItem
                 key={`${item.name}-${index}`}
                 program={item}
