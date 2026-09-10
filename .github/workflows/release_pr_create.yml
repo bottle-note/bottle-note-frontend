@@ -11,14 +11,27 @@ on:
         description: Positive release sequence number
         required: true
         type: string
+      release_type:
+        description: standard creates releases/<key> from main with a release PR; hotfix creates hotfixes/<key> at the deployed production source
+        required: false
+        default: standard
+        type: choice
+        options:
+          - standard
+          - hotfix
 
 permissions:
   contents: write
   pull-requests: write
+  actions: read
 
 concurrency:
   group: release-pr-${{ inputs.release_date }}-${{ inputs.sequence }}
   cancel-in-progress: false
+
+env:
+  IMAGE_NAME: bottlenote-frontend
+  RELEASE_SERVICE: frontend
 
 jobs:
   create-release-pr:
@@ -28,6 +41,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       RELEASE_DATE: ${{ inputs.release_date }}
       SEQUENCE: ${{ inputs.sequence }}
+      RELEASE_TYPE: ${{ inputs.release_type }}
       REPOSITORY: ${{ github.repository }}
       REPOSITORY_OWNER: ${{ github.repository_owner }}
       DISPATCH_REF: ${{ github.ref }}
@@ -40,8 +54,13 @@ jobs:
           token: ${{ secrets.GIT_ACCESS_TOKEN }}
           persist-credentials: true
 
-      - name: validate inputs and create release PR
+      - name: validate inputs and reserve release key
+        id: reserve
         shell: bash
+        env:
+          REGISTRY_ADDRESS: ${{ secrets.REGISTRY_ADDRESS }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
         run: |
           set -euo pipefail
 
@@ -65,9 +84,89 @@ jobs:
             echo "::error::sequence must be a positive integer"
             exit 1
           }
+          [[ "$RELEASE_TYPE" == "standard" || "$RELEASE_TYPE" == "hotfix" ]] || {
+            echo "::error::release_type must be standard or hotfix"
+            exit 1
+          }
 
           release_key="${RELEASE_DATE}/${SEQUENCE}"
-          release_branch="releases/${release_key}"
+          image_tag="frontend_${RELEASE_DATE//-/.}.${SEQUENCE}"
+          standard_branch="releases/${release_key}"
+          hotfix_branch="hotfixes/${release_key}"
+
+          url_encode() {
+            python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["VALUE"], safe=""))'
+          }
+
+          require_missing_remote_ref() {
+            local ref_name="$1"
+            local encoded response
+            encoded="$(VALUE="$ref_name" url_encode)"
+            if response="$(gh api --include "repos/${REPOSITORY}/git/ref/heads/${encoded}" 2>&1)"; then
+              echo "::error::remote ref already exists: ${ref_name}"
+              exit 1
+            fi
+            if [[ "$response" != *" 404 "* ]]; then
+              echo "::error::unable to confirm remote ref is absent: ${ref_name}"
+              exit 1
+            fi
+          }
+
+          # 배포 태그는 브랜치와 달리 삭제되지 않으므로 릴리즈 키 재사용의 최종 방어선이다.
+          require_missing_deployed_tag() {
+            local service="$1" key="$2"
+            local tag_name encoded response
+            tag_name="deployed/${service}/${key}"
+            encoded="$(VALUE="$tag_name" url_encode)"
+            if response="$(gh api --include "repos/${REPOSITORY}/git/ref/tags/${encoded}" 2>&1)"; then
+              echo "::error::release key was already deployed: ${tag_name}"
+              exit 1
+            fi
+            if [[ "$response" != *" 404 "* ]]; then
+              echo "::error::unable to confirm deployed tag is absent: ${tag_name}"
+              exit 1
+            fi
+          }
+
+          # 표준과 핫픽스는 같은 릴리즈 키에서 같은 immutable 이미지 태그를 만든다.
+          # 두 네임스페이스의 브랜치와 레지스트리 태그가 모두 비어 있어야 키를 예약할 수 있다.
+          require_missing_remote_ref "$standard_branch"
+          require_missing_remote_ref "$hotfix_branch"
+          require_missing_deployed_tag "$RELEASE_SERVICE" "$release_key"
+
+          image="${REGISTRY_ADDRESS}/${IMAGE_NAME}:${image_tag}"
+          echo "$REGISTRY_PASSWORD" | docker login "$REGISTRY_ADDRESS" \
+            --username "$REGISTRY_USERNAME" --password-stdin
+          manifest_error_log="${RUNNER_TEMP}/manifest-error.log"
+          if docker manifest inspect "$image" >/dev/null 2>"$manifest_error_log"; then
+            echo "::error::image tag already exists for release key ${release_key}: ${image}"
+            exit 1
+          fi
+          if ! grep -Eqi 'manifest unknown|no such manifest|not found' "$manifest_error_log"; then
+            cat "$manifest_error_log" >&2
+            echo "::error::failed to verify whether image tag exists: ${image}"
+            exit 1
+          fi
+
+          release_branch="$standard_branch"
+          [[ "$RELEASE_TYPE" != "hotfix" ]] || release_branch="$hotfix_branch"
+          {
+            echo "release-key=${release_key}"
+            echo "image-tag=${image_tag}"
+            echo "release-branch=${release_branch}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: create standard release PR
+        if: env.RELEASE_TYPE == 'standard'
+        shell: bash
+        env:
+          RELEASE_KEY: ${{ steps.reserve.outputs.release-key }}
+          RELEASE_BRANCH: ${{ steps.reserve.outputs.release-branch }}
+        run: |
+          set -euo pipefail
+
+          release_key="$RELEASE_KEY"
+          release_branch="$RELEASE_BRANCH"
           release_branch_pushed=false
           main_pushed=false
           created_pr_url=""
@@ -104,26 +203,6 @@ jobs:
 
           trap 'handle_partial_failure "$?"' ERR
           trap cleanup_body_file EXIT
-
-          url_encode() {
-            python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["VALUE"], safe=""))'
-          }
-
-          require_missing_remote_ref() {
-            local ref_name="$1"
-            local encoded response
-            encoded="$(VALUE="$ref_name" url_encode)"
-            if response="$(gh api --include "repos/${REPOSITORY}/git/ref/heads/${encoded}" 2>&1)"; then
-              echo "::error::remote ref already exists: ${ref_name}"
-              exit 1
-            fi
-            if [[ "$response" != *" 404 "* ]]; then
-              echo "::error::unable to confirm remote ref is absent: ${ref_name}"
-              exit 1
-            fi
-          }
-
-          require_missing_remote_ref "$release_branch"
 
           open_pr_count="$(gh api -X GET "repos/${REPOSITORY}/pulls" \
             -f state=open \
@@ -228,4 +307,111 @@ jobs:
             echo "- Base ref: \`${release_branch}\`"
             echo "- Head ref: \`main\`"
             echo "- Post-create validation: \`passed\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # 핫픽스 릴리즈 브랜치는 직전 운영 배포 소스에서만 잘린다. 핫픽스 PR(hotfix/** -> hotfixes/<key>) 자체는
+      # 사람이 만들고, 여기서 출력한 본문 마커를 PR 본문에 그대로 넣는다.
+      - name: create hotfix release branch
+        if: env.RELEASE_TYPE == 'hotfix'
+        shell: bash
+        env:
+          RELEASE_KEY: ${{ steps.reserve.outputs.release-key }}
+          RELEASE_BRANCH: ${{ steps.reserve.outputs.release-branch }}
+        run: |
+          set -euo pipefail
+
+          release_key="$RELEASE_KEY"
+          hotfix_branch="$RELEASE_BRANCH"
+
+          # >>> common deployed tag lookup (keep byte-identical across all release workflows and repositories)
+          # 직전 운영 배포 소스는 deployed 태그가 보관한다. run 이력이 아니라 태그가 단일 기준이다.
+          latest_deployed_key() {
+            local service="$1" refs
+            refs="$(gh api --paginate --slurp "repos/${REPOSITORY}/git/matching-refs/tags/deployed/${service}/")"
+            MATCHING_REFS="$refs" DEPLOYED_SERVICE="$service" python3 - <<'PY'
+          import json
+          import os
+          import re
+          import sys
+
+          pages = json.loads(os.environ['MATCHING_REFS'])
+          service = re.escape(os.environ['DEPLOYED_SERVICE'])
+          pattern = re.compile(rf'^refs/tags/deployed/{service}/(\d{{4}}-\d{{2}}-\d{{2}})/([1-9]\d*)$')
+          keys = []
+          for page in pages:
+              for item in page:
+                  matched = pattern.match(item.get('ref') or '')
+                  if matched:
+                      keys.append(((matched.group(1), int(matched.group(2))),
+                                   f'{matched.group(1)}/{matched.group(2)}'))
+          if not keys:
+              print(f'::error::no deployed tag exists for {os.environ["DEPLOYED_SERVICE"]} yet', file=sys.stderr)
+              sys.exit(1)
+          keys.sort()
+          print(keys[-1][1])
+          PY
+          }
+
+          resolve_deployed_sha() {
+            local service="$1" key="$2"
+            local tag encoded ref_json object_type object_sha resolved
+            tag="deployed/${service}/${key}"
+            encoded="$(VALUE="$tag" python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["VALUE"], safe=""))')"
+            ref_json="$(gh api "repos/${REPOSITORY}/git/ref/tags/${encoded}")"
+            read -r object_type object_sha <<< "$(REF_JSON="$ref_json" python3 -c '
+          import json, os
+          obj = json.loads(os.environ["REF_JSON"]).get("object") or {}
+          print(obj.get("type") or "-", obj.get("sha") or "-")
+          ')"
+            resolved="$object_sha"
+            [[ "$object_type" != "tag" ]] || \
+              resolved="$(gh api "repos/${REPOSITORY}/git/tags/${object_sha}" --jq '.object.sha')"
+            [[ "$resolved" =~ ^[0-9a-f]{40}$ ]] || {
+              echo "::error::deployed tag ${tag} does not resolve to a commit SHA" >&2
+              return 1
+            }
+            printf '%s' "$resolved"
+          }
+          # <<< common deployed tag lookup
+
+          base_key="$(latest_deployed_key "$RELEASE_SERVICE")"
+          base_tag="deployed/${RELEASE_SERVICE}/${base_key}"
+          base_source_sha="$(resolve_deployed_sha "$RELEASE_SERVICE" "$base_key")"
+          [[ "$base_key" != "$release_key" ]] || {
+            echo "::error::hotfix release key must differ from the deployed base release key: ${base_key}"
+            exit 1
+          }
+
+          git fetch --no-tags origin "$base_source_sha"
+          git cat-file -e "${base_source_sha}^{commit}"
+          # 정보성 경고(대안 A 생성 가드): 운영 소스 스냅샷에 pull_request 트리거가 남아 있어도
+          # hotfixes/** 네임스페이스는 그 스냅샷의 releases/** 필터에 걸리지 않는다.
+          if git show "${base_source_sha}:.github/workflows/release_pr_merged.yml" 2>/dev/null | grep -Eq '^  pull_request:'; then
+            echo "::warning::production source ${base_source_sha} still carries an on.pull_request release workflow snapshot; hotfixes/** is filtered out of it"
+          fi
+
+          git push origin "${base_source_sha}:refs/heads/${hotfix_branch}"
+          git fetch --no-tags origin "+refs/heads/${hotfix_branch}:refs/remotes/origin/${hotfix_branch}"
+          remote_hotfix_sha="$(git rev-parse "origin/${hotfix_branch}")"
+          [[ "$remote_hotfix_sha" == "$base_source_sha" ]] || {
+            echo "::error::hotfix branch ${hotfix_branch} does not point to the deployed production source ${base_source_sha}. Manual cleanup is required."
+            exit 1
+          }
+
+          {
+            echo "## Frontend hotfix release branch created"
+            echo "- Release key: \`${release_key}\`"
+            echo "- Hotfix base ref: \`${hotfix_branch}\` at \`${base_source_sha}\`"
+            echo "- Base release: \`${base_key}\` (tag \`${base_tag}\`)"
+            echo "- Next: open a PR from \`hotfix/<name>\` to \`${hotfix_branch}\` and paste the markers below into the PR body"
+            echo "- Replace \`<reviewed-head-sha>\` with the final reviewed PR head SHA before merging"
+            echo
+            echo '```'
+            echo "<!-- release-source-sha:<reviewed-head-sha> -->"
+            echo "<!-- release-key:${release_key} -->"
+            echo "<!-- release-service:frontend -->"
+            echo "<!-- release-type:hotfix -->"
+            echo "<!-- release-base-key:${base_key} -->"
+            echo "<!-- release-base-source-sha:${base_source_sha} -->"
+            echo '```'
           } >> "$GITHUB_STEP_SUMMARY"

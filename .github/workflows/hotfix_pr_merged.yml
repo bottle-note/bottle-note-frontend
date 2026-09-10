@@ -1,11 +1,12 @@
-name: release PR deployment
+name: hotfix PR deployment
 
-# 표준 릴리즈 전용 게이트. 핫픽스는 hotfix_pr_merged.yml 이 hotfixes/** 네임스페이스에서 소유한다.
+# 핫픽스 릴리즈 전용 게이트. hotfixes/** 네임스페이스는 과거 릴리즈 브랜치의 워크플로 스냅샷이
+# 필터하지 않으므로 표준 게이트(release_pr_merged.yml)와 나란히 실행되지 않는다.
 on:
   pull_request_target:
     types: [closed]
     branches:
-      - 'releases/**'
+      - 'hotfixes/**'
 
 permissions:
   contents: write
@@ -14,15 +15,20 @@ permissions:
 
 env:
   RELEASE_SERVICE: frontend
+  REQUIRED_CI_CHECKS: |
+    빌드 체크
+    테스트 체크
 
 jobs:
-  verify-merged-release-pr:
+  verify-merged-hotfix-pr:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
       release-key: ${{ steps.release.outputs.release-key }}
       source-sha: ${{ steps.release.outputs.source-sha }}
+      candidate-sha: ${{ steps.release.outputs.candidate-sha }}
+      base-source-sha: ${{ steps.release.outputs.base-source-sha }}
       release-branch: ${{ steps.release.outputs.release-branch }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -39,14 +45,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: verify release PR
+      - name: verify hotfix PR
         id: release
         shell: bash
         run: |
           set -euo pipefail
 
-          [[ "$PR_BASE_REF" =~ ^releases/([0-9]{4}-[0-9]{2}-[0-9]{2})/([1-9][0-9]*)$ ]] || {
-            echo "::error::base ref is not a standard release ref: $PR_BASE_REF"
+          [[ "$PR_BASE_REF" =~ ^hotfixes/([0-9]{4}-[0-9]{2}-[0-9]{2})/([1-9][0-9]*)$ ]] || {
+            echo "::error::base ref is not a hotfix release ref: $PR_BASE_REF"
             exit 1
           }
           release_date="${BASH_REMATCH[1]}"
@@ -97,7 +103,7 @@ jobs:
           PY
           # <<< common PR metadata verification
 
-          candidate_sha="$(PR_JSON="$pr_json" EXPECTED_KEY="$release_key" python3 - <<'PY'
+          release_values="$(PR_JSON="$pr_json" EXPECTED_KEY="$release_key" python3 - <<'PY'
           import json
           import os
           import re
@@ -108,26 +114,33 @@ jobs:
           def one(name, pattern):
               values = re.findall(rf'<!--\s*{name}:\s*({pattern})\s*-->', body)
               if len(values) != 1:
-                  print(f'::error::release PR body {name} marker is missing or invalid', file=sys.stderr)
+                  print(f'::error::hotfix PR body {name} marker is missing or invalid', file=sys.stderr)
                   sys.exit(1)
               return values[0]
 
           candidate_sha = one('release-source-sha', r'[0-9a-f]{40}')
           key = one('release-key', r'[0-9]{4}-[0-9]{2}-[0-9]{2}/[1-9][0-9]*')
           service = one('release-service', r'frontend')
-          if key != os.environ['EXPECTED_KEY'] or service != 'frontend':
-              print('::error::release PR body markers do not match the release target', file=sys.stderr)
-              sys.exit(1)
+          release_type = one('release-type', r'hotfix')
+          base_key = one('release-base-key', r'[0-9]{4}-[0-9]{2}-[0-9]{2}/[1-9][0-9]*')
+          base_source_sha = one('release-base-source-sha', r'[0-9a-f]{40}')
 
-          # releases/** 는 표준 전용이다. 핫픽스 마커가 보이면 잘못된 네임스페이스로 들어온 PR 이므로 거부한다.
-          hotfix_markers = ('release-type', 'release-base-key', 'release-base-source-sha')
-          if any(re.search(rf'<!--\s*{name}:', body) for name in hotfix_markers):
-              print('::error::standard release PR must not contain hotfix markers', file=sys.stderr)
+          if key != os.environ['EXPECTED_KEY'] or service != 'frontend' or release_type != 'hotfix':
+              print('::error::hotfix PR body markers do not match the release target', file=sys.stderr)
+              sys.exit(1)
+          if base_key == key:
+              print('::error::hotfix base release key must differ from the hotfix release key', file=sys.stderr)
               sys.exit(1)
 
           print(candidate_sha)
+          print(base_key)
+          print(base_source_sha)
           PY
           )"
+          mapfile -t release_fields <<< "$release_values"
+          candidate_sha="${release_fields[0]}"
+          base_key="${release_fields[1]}"
+          base_source_sha="${release_fields[2]}"
 
           PR_JSON="$pr_json" python3 - <<'PY'
           import json
@@ -137,10 +150,10 @@ jobs:
           pr = json.loads(os.environ['PR_JSON'])
           head = pr.get('head') or {}
           errors = []
-          if head.get('ref') != 'main':
-              errors.append('standard release PR head must be main')
-          if any(pr.get(field) != 0 for field in ('changed_files', 'additions', 'deletions')):
-              errors.append('standard release PR must contain no file changes')
+          if not (head.get('ref') or '').startswith('hotfix/'):
+              errors.append('hotfix release PR head must match hotfix/**')
+          if not isinstance(pr.get('changed_files'), int) or pr['changed_files'] < 1:
+              errors.append('hotfix release PR must contain reviewed file changes')
 
           if errors:
               for error in errors:
@@ -152,65 +165,157 @@ jobs:
             echo "::error::release source marker must equal the reviewed PR head SHA"
             exit 1
           }
+          [[ "$base_source_sha" == "$PR_BASE_SHA" ]] || {
+            echo "::error::hotfix branch does not point to the declared production source"
+            exit 1
+          }
 
           git fetch --no-tags origin "$PR_BASE_SHA" "$PR_HEAD_SHA" "$PR_MERGE_SHA"
-          base_tree="$(git show -s --format=%T "$PR_BASE_SHA")"
-          candidate_tree="$(git show -s --format=%T "$PR_HEAD_SHA")"
           merge_tree="$(git show -s --format=%T "$PR_MERGE_SHA")"
 
-          release_parent="$(git rev-parse "${PR_HEAD_SHA}^")"
-          release_subject="$(git show -s --format=%s "$PR_HEAD_SHA")"
-          [[ "$release_parent" == "$PR_BASE_SHA" ]] || {
-            echo "::error::release commit parent does not equal the release base SHA"
+          # >>> common deployed tag lookup (keep byte-identical across all release workflows and repositories)
+          # 직전 운영 배포 소스는 deployed 태그가 보관한다. run 이력이 아니라 태그가 단일 기준이다.
+          latest_deployed_key() {
+            local service="$1" refs
+            refs="$(gh api --paginate --slurp "repos/${REPOSITORY}/git/matching-refs/tags/deployed/${service}/")"
+            MATCHING_REFS="$refs" DEPLOYED_SERVICE="$service" python3 - <<'PY'
+          import json
+          import os
+          import re
+          import sys
+
+          pages = json.loads(os.environ['MATCHING_REFS'])
+          service = re.escape(os.environ['DEPLOYED_SERVICE'])
+          pattern = re.compile(rf'^refs/tags/deployed/{service}/(\d{{4}}-\d{{2}}-\d{{2}})/([1-9]\d*)$')
+          keys = []
+          for page in pages:
+              for item in page:
+                  matched = pattern.match(item.get('ref') or '')
+                  if matched:
+                      keys.append(((matched.group(1), int(matched.group(2))),
+                                   f'{matched.group(1)}/{matched.group(2)}'))
+          if not keys:
+              print(f'::error::no deployed tag exists for {os.environ["DEPLOYED_SERVICE"]} yet', file=sys.stderr)
+              sys.exit(1)
+          keys.sort()
+          print(keys[-1][1])
+          PY
+          }
+
+          resolve_deployed_sha() {
+            local service="$1" key="$2"
+            local tag encoded ref_json object_type object_sha resolved
+            tag="deployed/${service}/${key}"
+            encoded="$(VALUE="$tag" python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["VALUE"], safe=""))')"
+            ref_json="$(gh api "repos/${REPOSITORY}/git/ref/tags/${encoded}")"
+            read -r object_type object_sha <<< "$(REF_JSON="$ref_json" python3 -c '
+          import json, os
+          obj = json.loads(os.environ["REF_JSON"]).get("object") or {}
+          print(obj.get("type") or "-", obj.get("sha") or "-")
+          ')"
+            resolved="$object_sha"
+            [[ "$object_type" != "tag" ]] || \
+              resolved="$(gh api "repos/${REPOSITORY}/git/tags/${object_sha}" --jq '.object.sha')"
+            [[ "$resolved" =~ ^[0-9a-f]{40}$ ]] || {
+              echo "::error::deployed tag ${tag} does not resolve to a commit SHA" >&2
+              return 1
+            }
+            printf '%s' "$resolved"
+          }
+          # <<< common deployed tag lookup
+
+          latest_key="$(latest_deployed_key "$RELEASE_SERVICE")"
+          [[ "$latest_key" == "$base_key" ]] || {
+            echo "::error::hotfix base key ${base_key} is not the latest deployed release ${latest_key}"
             exit 1
           }
-          [[ "$release_subject" == "release(frontend): ${release_key}" ]] || {
-            echo "::error::release commit subject does not match the release key"
+
+          base_tag="deployed/${RELEASE_SERVICE}/${base_key}"
+          resolved_base="$(resolve_deployed_sha "$RELEASE_SERVICE" "$base_key")"
+          [[ "$resolved_base" == "$base_source_sha" ]] || {
+            echo "::error::deployed tag ${base_tag} resolves to ${resolved_base}, expected ${base_source_sha}"
             exit 1
           }
-          [[ "$candidate_tree" == "$base_tree" && "$merge_tree" == "$candidate_tree" ]] || {
-            echo "::error::standard release PR is not tree-empty"
+
+          # >>> common candidate CI verification (keep byte-identical across all hotfix gates and repositories)
+          # 필요한 체크 이름은 레포마다 다르므로 REQUIRED_CI_CHECKS 로만 분리하고 검증 로직은 공유한다.
+          checks_json="$(gh api --paginate --slurp "repos/${REPOSITORY}/commits/${PR_HEAD_SHA}/check-runs")"
+          CHECKS_JSON="$checks_json" REQUIRED_CI_CHECKS="$REQUIRED_CI_CHECKS" python3 - <<'PY'
+          import json
+          import os
+          import sys
+
+          pages = json.loads(os.environ['CHECKS_JSON'])
+          runs = [run for page in pages for run in (page.get('check_runs') or [])]
+          passed = {run.get('name') for run in runs
+                    if run.get('status') == 'completed' and run.get('conclusion') == 'success'}
+          required = [line.strip() for line in os.environ['REQUIRED_CI_CHECKS'].splitlines() if line.strip()]
+          if not required:
+              print('::error::REQUIRED_CI_CHECKS must list at least one check', file=sys.stderr)
+              sys.exit(1)
+          missing = [name for name in required if name not in passed]
+          if missing:
+              print(f'::error::hotfix candidate is missing successful CI checks: {", ".join(missing)}',
+                    file=sys.stderr)
+              sys.exit(1)
+          PY
+          # <<< common candidate CI verification
+
+          read -r merge_sha first_parent second_parent extra_parent <<< "$(git rev-list --parents -n 1 "$PR_MERGE_SHA")"
+          [[ "$merge_sha" == "$PR_MERGE_SHA" && "$first_parent" == "$PR_BASE_SHA" && \
+             "$second_parent" == "$PR_HEAD_SHA" && -z "${extra_parent:-}" ]] || {
+            echo "::error::hotfix release must use a two-parent merge commit with base and reviewed head"
             exit 1
           }
-          source_sha="$candidate_sha"
+          expected_merge_tree="$(git merge-tree --write-tree "$PR_BASE_SHA" "$PR_HEAD_SHA")"
+          [[ "$merge_tree" == "$expected_merge_tree" ]] || {
+            echo "::error::hotfix merge tree differs from the deterministic base-plus-candidate merge"
+            exit 1
+          }
+          source_sha="$PR_MERGE_SHA"
 
           {
             echo "release-key=${release_key}"
             echo "source-sha=${source_sha}"
+            echo "candidate-sha=${candidate_sha}"
+            echo "base-source-sha=${base_source_sha}"
             echo "release-branch=${PR_BASE_REF}"
           } >> "$GITHUB_OUTPUT"
 
           {
-            echo "## Frontend release PR verified"
+            echo "## Frontend hotfix PR verified"
             echo "- Release key: \`${release_key}\`"
-            echo "- Release type: \`standard\`"
+            echo "- Release type: \`hotfix\`"
             echo "- Candidate SHA: \`${candidate_sha}\`"
             echo "- Deployment SHA: \`${source_sha}\`"
+            echo "- Base release: \`${base_key}\` at \`${base_source_sha}\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
   deploy-release-applications:
-    needs: verify-merged-release-pr
+    needs: verify-merged-hotfix-pr
     uses: ./.github/workflows/deploy_release_applications.yml
     with:
-      source_sha: ${{ needs.verify-merged-release-pr.outputs.source-sha }}
-      release_key: ${{ needs.verify-merged-release-pr.outputs.release-key }}
-      release_type: standard
+      source_sha: ${{ needs.verify-merged-hotfix-pr.outputs.source-sha }}
+      release_key: ${{ needs.verify-merged-hotfix-pr.outputs.release-key }}
+      release_type: hotfix
+      candidate_sha: ${{ needs.verify-merged-hotfix-pr.outputs.candidate-sha }}
+      base_source_sha: ${{ needs.verify-merged-hotfix-pr.outputs.base-source-sha }}
     secrets: inherit
 
   finalize-release:
     name: seal deployed source
     needs:
-      - verify-merged-release-pr
+      - verify-merged-hotfix-pr
       - deploy-release-applications
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       REPOSITORY: ${{ github.repository }}
-      RELEASE_KEY: ${{ needs.verify-merged-release-pr.outputs.release-key }}
-      SOURCE_SHA: ${{ needs.verify-merged-release-pr.outputs.source-sha }}
-      RELEASE_BRANCH: ${{ needs.verify-merged-release-pr.outputs.release-branch }}
-      RELEASE_TYPE: standard
+      RELEASE_KEY: ${{ needs.verify-merged-hotfix-pr.outputs.release-key }}
+      SOURCE_SHA: ${{ needs.verify-merged-hotfix-pr.outputs.source-sha }}
+      RELEASE_BRANCH: ${{ needs.verify-merged-hotfix-pr.outputs.release-branch }}
+      RELEASE_TYPE: hotfix
       RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       DEPLOYED_SERVICES: frontend
     steps:
@@ -289,14 +394,14 @@ jobs:
           done
       # <<< common deployed tag creation
 
-      - name: delete one-time release branch
+      - name: delete one-time hotfix release branch
         shell: bash
         run: |
           set -euo pipefail
-          [[ "$RELEASE_BRANCH" == releases/* ]] || {
-            echo "::error::refusing to delete a non-release branch: ${RELEASE_BRANCH}"
+          [[ "$RELEASE_BRANCH" == hotfixes/* ]] || {
+            echo "::error::refusing to delete a non-hotfix branch: ${RELEASE_BRANCH}"
             exit 1
           }
           encoded_branch="$(VALUE="$RELEASE_BRANCH" python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["VALUE"], safe=""))')"
           gh api -X DELETE "repos/${REPOSITORY}/git/refs/heads/${encoded_branch}"
-          echo "[release-pr] deleted release_branch=${RELEASE_BRANCH}"
+          echo "[hotfix-pr] deleted release_branch=${RELEASE_BRANCH}"
