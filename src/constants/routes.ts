@@ -27,6 +27,9 @@ export const ROUTES = {
   HISTORY: {
     BASE: '/history',
   },
+  IMPORT_CLEARANCE: {
+    BASE: '/import-clearance',
+  },
   REVIEW: {
     BASE: '/review',
     REGISTER_BASE: '/review/register',

@@ -15,6 +15,7 @@ export interface UnderlineSearchBarProps {
   onValueChange?: (value: string) => void;
   onFocusChange?: (isFocused: boolean) => void;
   initialValue?: string;
+  value?: string;
   placeholder?: string;
   ariaLabel?: string;
   className?: string;
@@ -29,6 +30,7 @@ export default function UnderlineSearchBar({
   onValueChange,
   onFocusChange,
   initialValue = '',
+  value,
   placeholder = '입력...',
   ariaLabel,
   className = '',
@@ -49,6 +51,7 @@ export default function UnderlineSearchBar({
     onSearch,
     onFocusChange,
     initialValue,
+    value,
   });
 
   const clearSearchText = () => {
@@ -67,7 +70,7 @@ export default function UnderlineSearchBar({
           'w-full appearance-none rounded-none border-b-2 border-stroke-neutral-subtle bg-transparent px-2 py-2.5 text-base outline-none transition-colors placeholder:text-fg-neutral-muted focus:border-stroke-focus-ring',
           inputClassName,
         )}
-        value={searchText}
+        value={value ?? searchText}
         onChange={(event) => {
           const value = event.target.value;
           handleChange(value);
