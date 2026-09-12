@@ -17,12 +17,18 @@ import LogoWhite from 'public/bottle_note_logo_white.svg';
 export default function Login() {
   const router = useRouter();
   const [returnToParam] = useStatefulSearchParams<string | null>('returnTo');
-  const { startKakaoLogin, startAppleLogin, continueAuthenticatedSession } =
-    useSocialLogin();
+  const {
+    startKakaoLogin,
+    startAppleLogin,
+    continueAuthenticatedSession,
+    cancelMbtiLogin,
+  } = useSocialLogin();
   const { isLoggedIn, isLoading } = useAuthSession();
   const hasCheckedInitialSession = useRef(false);
 
   const handleBack = () => {
+    if (cancelMbtiLogin(returnToParam)) return;
+
     const returnTo =
       returnToParam && isValidReturnUrl(returnToParam)
         ? returnToParam
