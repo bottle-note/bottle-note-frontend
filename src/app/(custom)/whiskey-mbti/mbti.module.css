@@ -79,13 +79,6 @@
   width: 116px;
   height: auto;
 }
-.stepLabel {
-  color: var(--muted);
-  font:
-    14px 'WhiskySerif',
-    serif;
-  white-space: nowrap;
-}
 .main {
   padding: 30px 0 40px;
 }

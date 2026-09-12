@@ -71,15 +71,6 @@ export default function MbtiExperience() {
             />
             <span>× WHISKY MBTI</span>
           </div>
-          <span className={styles.stepLabel}>
-            {phase === 'result'
-              ? 'YOUR RESULT'
-              : phase === 'quiz'
-                ? 'WHISKY MBTI TEST'
-                : phase === 'complete'
-                  ? 'WHISKY MBTI COMPLETE'
-                  : 'WHISKY MBTI'}
-          </span>
         </div>
       </header>
 
