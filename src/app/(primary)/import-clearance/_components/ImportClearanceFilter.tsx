@@ -52,8 +52,6 @@ export default function ImportClearanceFilter({
         onSearchActiveChange={onSearchActiveChange}
         onValueChange={onKeywordChange}
         value={keyword}
-        headerExpandedHeight="var(--import-clearance-header-height)"
-        headerSlideDistance="32px"
         ariaLabel="수입통관 검색"
         placeholder="품목명, 수입사 검색"
         inputClassName="pr-16"

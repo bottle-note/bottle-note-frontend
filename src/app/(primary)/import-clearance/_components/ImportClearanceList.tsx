@@ -1,26 +1,24 @@
 'use client';
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useRef,
-  type CSSProperties,
-} from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { format, isAfter, isBefore, isValid, parseISO } from 'date-fns';
 import EmptyView from '@/components/ui/Display/EmptyView';
 import List from '@/components/feature/List/List';
 import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
+import Tab from '@/components/ui/Navigation/Tab';
+import { useTab } from '@/hooks/useTab';
 import ImportClearanceFilter, {
   type ImportClearanceSort,
 } from './ImportClearanceFilter';
 import ImportClearanceListItem from './ImportClearanceListItem';
 import { importClearanceItems } from '../_data/importClearanceItems';
 
+const tabList = [{ id: 'clearance', name: '수입통관' }];
+
 export default function ImportClearanceList() {
+  const { currentTab, handleTab, refs, registerTab } = useTab({ tabList });
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -151,27 +149,30 @@ export default function ImportClearanceList() {
   };
 
   return (
-    <div
-      className="min-h-safe-screen bg-bg-layer-default text-fg-neutral"
-      style={
-        {
-          '--import-clearance-header-height':
-            'var(--logo-header-collapsed-height)',
-        } as CSSProperties
-      }
-    >
-      <div
-        className={`fixed-content top-0 z-10 ${isHeaderCollapsed ? 'pointer-events-none' : ''}`}
-      >
-        <AutoHideLogoHeader
-          isVisible={!isHeaderCollapsed}
-          sticky={false}
-          title="수입통관"
-        />
+    <div className="min-h-safe-screen bg-bg-layer-default text-fg-neutral">
+      <div className="fixed-content top-0 z-10 bg-bg-layer-default">
+        <AutoHideLogoHeader isVisible={!isHeaderCollapsed} sticky={false} />
+        <div
+          className="scroll-navigation-motion absolute inset-x-0 top-[var(--header-height-with-safe)] transition-transform"
+          style={{
+            transform: isHeaderCollapsed
+              ? 'translateY(0)'
+              : 'translateY(var(--logo-header-slide-distance))',
+          }}
+        >
+          <Tab
+            variant="bookmark"
+            tabList={tabList}
+            currentTab={currentTab}
+            handleTab={handleTab}
+            scrollContainerRef={refs.scrollContainerRef}
+            registerTab={registerTab}
+          />
+        </div>
       </div>
       <section
         className="w-full pb-navbar"
-        style={{ marginTop: 'var(--import-clearance-header-height)' }}
+        style={{ marginTop: 'var(--logo-header-expanded-height)' }}
       >
         <h1 className="sr-only">수입통관</h1>
         <ImportClearanceFilter
