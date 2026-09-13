@@ -16,7 +16,7 @@ type Profile = {
 };
 type WhiskyMatch = {
   id: number | null;
-  // 생략하면 개발 DB에서도 같은 ID, null이면 동일 제품을 확인하지 못한 경우다.
+  // 생략하면 개발 DB에서도 같은 ID, null이면 공통 개발용 위스키로 대체한다.
   devId?: number | null;
   name: string;
 };
@@ -252,11 +252,13 @@ export function getResultMatch(code: MbtiCode, isDevelopmentApi: boolean) {
     type,
     taste,
     profile: profiles[type],
-    whisky: {
-      id:
-        isDevelopmentApi && match.devId !== undefined ? match.devId : match.id,
-      name: match.name,
-    },
+    whisky:
+      isDevelopmentApi && match.devId === null
+        ? { id: 318, name: '딘스톤 12년' }
+        : {
+            id: isDevelopmentApi ? match.devId ?? match.id : match.id,
+            name: match.name,
+          },
     isOriginal: originalTaste[type] === taste,
   };
 }
