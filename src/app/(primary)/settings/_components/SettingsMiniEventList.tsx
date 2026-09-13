@@ -4,8 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ROUTES } from '@/constants/routes';
 
-const EVENT_NAME_MAX_LENGTH = 6;
-
 interface MiniEvent {
   id: string;
   name: string;
@@ -32,12 +30,6 @@ const MINI_EVENTS: MiniEvent[] = [
     isActive: true,
   },
 ];
-
-export const truncateMiniEventName = (name: string) => {
-  if (name.length <= EVENT_NAME_MAX_LENGTH) return name;
-
-  return `${name.slice(0, EVENT_NAME_MAX_LENGTH)}...`;
-};
 
 interface SettingsMiniEventListProps {
   events?: MiniEvent[];
@@ -76,7 +68,7 @@ export function SettingsMiniEventList({
                 />
               </div>
               <span className="w-full text-center text-12 font-medium leading-none text-fg-neutral">
-                {truncateMiniEventName(event.name)}
+                {event.name}
               </span>
             </Link>
           </li>

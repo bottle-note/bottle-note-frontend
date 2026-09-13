@@ -86,7 +86,16 @@ export async function GET(request: NextRequest) {
       { status: 400 },
     );
 
-  const { type, taste, profile, whisky, isOriginal } = getResultMatch(code);
+  // 개발 배포도 NODE_ENV=production이고 내부 API 주소도 운영과 같으므로
+  // 배포 환경별로 설정된 공개 API 호스트로 구분한다.
+  const publicApiUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+  const isDevelopmentApi =
+    !!publicApiUrl &&
+    new URL(publicApiUrl).hostname === 'api.development.bottle-note.com';
+  const { type, taste, profile, whisky, isOriginal } = getResultMatch(
+    code,
+    isDevelopmentApi,
+  );
   if (!profile || !whisky)
     return NextResponse.json(
       { error: '결과를 찾을 수 없습니다.' },

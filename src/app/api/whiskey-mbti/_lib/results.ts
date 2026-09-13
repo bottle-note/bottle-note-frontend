@@ -14,7 +14,12 @@ type Profile = {
   reason: string;
   dramCopy: string;
 };
-type WhiskyMatch = { id: number | null; name: string };
+type WhiskyMatch = {
+  id: number | null;
+  // 생략하면 개발 DB에서도 같은 ID, null이면 공통 개발용 위스키로 대체한다.
+  devId?: number | null;
+  name: string;
+};
 
 export const TASTE_LABELS: Record<MbtiTaste, string> = {
   A: '과실·산뜻',
@@ -137,6 +142,7 @@ const profiles: Record<MbtiType, Profile> = {
   },
 };
 
+// 개발 ID는 개발 Product API에서 제품명·연산·배치를 확인한 값이다.
 const matches: Record<MbtiType, Record<MbtiTaste, WhiskyMatch>> = {
   INTJ: {
     A: { id: 318, name: '딘스톤 12년' },
@@ -144,13 +150,13 @@ const matches: Record<MbtiType, Record<MbtiTaste, WhiskyMatch>> = {
     C: { id: 600, name: '라프로익 10년' },
   },
   INTP: {
-    A: { id: 8364, name: '브룩라디 클래식 라디 10년' },
+    A: { id: 8364, devId: null, name: '브룩라디 클래식 라디 10년' },
     B: { id: 518, name: '부나하벤 12년' },
     C: { id: 482, name: '스프링뱅크 10년' },
   },
   ENTJ: {
-    A: { id: 5586, name: '글렌모렌지 18년' },
-    B: { id: 8959, name: '맥캘란 18년 셰리 오크 2026' },
+    A: { id: 5586, devId: 210, name: '글렌모렌지 18년' },
+    B: { id: 8959, devId: null, name: '맥캘란 18년 셰리 오크 2026' },
     C: { id: 604, name: '라가불린 16년' },
   },
   ENTP: {
@@ -161,17 +167,17 @@ const matches: Record<MbtiType, Record<MbtiTaste, WhiskyMatch>> = {
   INFJ: {
     A: { id: 196, name: '하쿠슈 12년' },
     B: { id: 589, name: '로얄 브라클라 18년' },
-    C: { id: 8872, name: '하이랜드 파크 12년' },
+    C: { id: 8872, devId: 179, name: '하이랜드 파크 12년' },
   },
   INFP: {
     A: { id: 462, name: '아란 10년' },
     B: { id: 5587, name: '글렌모렌지 넥타 16년' },
-    C: { id: 543, name: '벤로막 10년' },
+    C: { id: 543, devId: null, name: '벤로막 10년' },
   },
   ENFJ: {
     A: { id: 299, name: '글렌그란트 12년' },
     B: { id: 566, name: '발베니 캐리비안 캐스크 14년' },
-    C: { id: 9146, name: '보모어 12년' },
+    C: { id: 9146, devId: 528, name: '보모어 12년' },
   },
   ENFP: {
     A: { id: 6540, name: '기원 호랑이' },
@@ -180,7 +186,7 @@ const matches: Record<MbtiType, Record<MbtiTaste, WhiskyMatch>> = {
   },
   ISTJ: {
     A: { id: 5588, name: '글렌모렌지 디 오리지널 12년' },
-    B: { id: 8842, name: '글렌피딕 15년' },
+    B: { id: 8842, devId: 245, name: '글렌피딕 15년' },
     C: { id: 381, name: '쿨일라 12년' },
   },
   ISFJ: {
@@ -189,8 +195,8 @@ const matches: Record<MbtiType, Record<MbtiTaste, WhiskyMatch>> = {
     C: { id: 119, name: '링크우드 12년' },
   },
   ESTJ: {
-    A: { id: 8840, name: '글렌피딕 12년' },
-    B: { id: 9148, name: '시바스 리갈 18년' },
+    A: { id: 8840, devId: 247, name: '글렌피딕 12년' },
+    B: { id: 9148, devId: 476, name: '시바스 리갈 18년' },
     C: { id: 140, name: '조니워커 블랙' },
   },
   ESFJ: {
@@ -204,19 +210,19 @@ const matches: Record<MbtiType, Record<MbtiTaste, WhiskyMatch>> = {
     C: { id: 6273, name: '탈리스커 10년' },
   },
   ISFP: {
-    A: { id: 8849, name: '글렌카담 15년' },
+    A: { id: 8849, devId: 270, name: '글렌카담 15년' },
     B: { id: 6330, name: '더 글렌드로낙 12년' },
-    C: { id: 5787, name: '킬커란 12년' },
+    C: { id: 5787, devId: 124, name: '킬커란 12년' },
   },
   ESTP: {
-    A: { id: 8980, name: '아벨라워 아부나흐 배치 85' },
-    B: { id: 7857, name: '스태그 배치 18' },
+    A: { id: 8980, devId: null, name: '아벨라워 아부나흐 배치 85' },
+    B: { id: 7857, devId: null, name: '스태그 배치 18' },
     C: { id: 464, name: '아드벡 코리브레칸' },
   },
   ESFP: {
     A: { id: 8200, name: '몽키 숄더' },
     B: { id: 155, name: '잭다니엘스 Old No. 7' },
-    C: { id: 9101, name: '옥토모어 17.1' },
+    C: { id: 9101, devId: null, name: '옥토모어 17.1' },
   },
 };
 
@@ -239,13 +245,20 @@ const originalTaste: Record<MbtiType, MbtiTaste> = {
   ESFP: 'B',
 };
 
-export function getResultMatch(code: MbtiCode) {
+export function getResultMatch(code: MbtiCode, isDevelopmentApi: boolean) {
   const [type, taste] = code.split('-') as [MbtiType, MbtiTaste];
+  const match = matches[type][taste];
   return {
     type,
     taste,
     profile: profiles[type],
-    whisky: matches[type]?.[taste],
+    whisky:
+      isDevelopmentApi && match.devId === null
+        ? { id: 318, name: '딘스톤 12년' }
+        : {
+            id: isDevelopmentApi ? match.devId ?? match.id : match.id,
+            name: match.name,
+          },
     isOriginal: originalTaste[type] === taste,
   };
 }
