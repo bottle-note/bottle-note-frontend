@@ -1,4 +1,3 @@
-import { getServerApiUrl } from '@/api/_shared/serverApiUrl.mjs';
 import HomeCarousel from '@/components/feature/home/HomeCarousel';
 import NavLayout from '@/components/ui/Layout/NavLayout';
 import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
@@ -12,7 +11,7 @@ import type { ApiResponse } from '@/api/_shared/types';
 
 async function getBanners(): Promise<Banner[]> {
   try {
-    const baseUrl = getServerApiUrl('v1');
+    const baseUrl = `${process.env.INTERNAL_SERVER_URL}/api/v1`;
     const res = await fetch(`${baseUrl}/banners?limit=10`, {
       next: { revalidate: 300 },
     });

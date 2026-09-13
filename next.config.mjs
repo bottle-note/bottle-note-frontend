@@ -1,5 +1,3 @@
-import { getServerApiUrl } from './src/api/_shared/serverApiUrl.mjs';
-
 const buildTime = new Date().toLocaleString('ko-KR', {
   timeZone: 'Asia/Seoul',
   year: 'numeric',
@@ -21,12 +19,25 @@ const nextConfig = {
     missingSuspenseWithCSRBailout: false,
   },
   async rewrites() {
-    const baseUrlV1 = getServerApiUrl('v1');
-    const baseUrlV2 = getServerApiUrl('v2');
+    const serverUrl = process.env.INTERNAL_SERVER_URL;
+    if (!serverUrl) {
+      throw new Error('INTERNAL_SERVER_URL is required');
+    }
+    if (serverUrl !== new URL(serverUrl).origin) {
+      throw new Error(
+        'INTERNAL_SERVER_URL must be an origin without a path or trailing slash',
+      );
+    }
 
     return [
-      { source: '/bottle-api/v1/:path*', destination: `${baseUrlV1}/:path*` },
-      { source: '/bottle-api/v2/:path*', destination: `${baseUrlV2}/:path*` },
+      {
+        source: '/bottle-api/v1/:path*',
+        destination: `${serverUrl}/api/v1/:path*`,
+      },
+      {
+        source: '/bottle-api/v2/:path*',
+        destination: `${serverUrl}/api/v2/:path*`,
+      },
     ];
   },
   images: {

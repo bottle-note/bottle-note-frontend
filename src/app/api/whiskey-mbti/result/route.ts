@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerApiUrl } from '@/api/_shared/serverApiUrl.mjs';
 
 import type { MbtiResultDetail } from '@/app/(custom)/whiskey-mbti/_types';
 import { calculateMbtiResult } from '../_lib/calculate';
@@ -25,7 +24,7 @@ type AlcoholDetail = {
 
 async function fetchAlcohol(id: number) {
   try {
-    const baseUrl = getServerApiUrl('v1');
+    const baseUrl = `${process.env.INTERNAL_SERVER_URL}/api/v1`;
     const response = await fetch(`${baseUrl}/alcohols/${id}`, {
       headers: { Accept: 'application/json' },
       cache: 'no-store',

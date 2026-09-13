@@ -1,5 +1,4 @@
 import { MetadataRoute } from 'next';
-import { getServerApiUrl } from '@/api/_shared/serverApiUrl.mjs';
 import { ApiResponse } from '@/api/_shared/types';
 import type { ExploreAlcohol, ExploreReview } from '@/api/explore/types';
 import { BASE_URL } from '@/constants/common';
@@ -16,7 +15,7 @@ function parseDate(dateString: string | undefined | null): Date {
 }
 
 async function fetchFromAPI<T>(endpoint: string): Promise<T> {
-  const serverUrl = getServerApiUrl('v1');
+  const serverUrl = `${process.env.INTERNAL_SERVER_URL}/api/v1`;
 
   const url = `${serverUrl}${endpoint}`;
 

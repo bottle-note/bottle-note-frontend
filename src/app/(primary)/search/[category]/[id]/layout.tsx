@@ -1,6 +1,5 @@
 import React from 'react';
 import { Metadata } from 'next';
-import { getServerApiUrl } from '@/api/_shared/serverApiUrl.mjs';
 import { ROUTES } from '@/constants/routes';
 
 export async function generateMetadata({
@@ -9,7 +8,7 @@ export async function generateMetadata({
   params: { id: string; category: string };
 }): Promise<Metadata> {
   try {
-    const serverUrl = getServerApiUrl('v1');
+    const serverUrl = `${process.env.INTERNAL_SERVER_URL}/api/v1`;
     const response = await fetch(`${serverUrl}/alcohols/${params.id}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
