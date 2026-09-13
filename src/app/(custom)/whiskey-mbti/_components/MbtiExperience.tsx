@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { ROUTES } from '@/constants/routes';
@@ -65,10 +66,12 @@ export default function MbtiExperience() {
       <header className={styles.header}>
         <div className={`${styles.wrap} ${styles.nav}`}>
           <div className={styles.brand}>
-            <img
-              src="/images/whiskey-mbti/bottle-note-logo.svg"
-              alt="보틀노트"
-            />
+            <Link href={ROUTES.HOME} aria-label="보틀노트 홈으로 이동">
+              <img
+                src="/images/whiskey-mbti/bottle-note-logo.svg"
+                alt="보틀노트"
+              />
+            </Link>
             <span>× WHISKY MBTI</span>
           </div>
         </div>
