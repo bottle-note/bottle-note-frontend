@@ -101,7 +101,14 @@ export default function MbtiResult({
           <small>다음 바에서 마실 한 잔</small>
           <h2>{data.whisky.name}</h2>
           <div className={styles.rating}>
-            {!data.whisky.detailAvailable ? (
+            {data.whisky.id === null ? (
+              <span>
+                테스트 결과는 정상입니다.
+                <br />
+                개발 환경에 해당 위스키 정보가 없어 사진·별점·상세보기를
+                제공하지 않아요.
+              </span>
+            ) : !data.whisky.detailAvailable ? (
               <>
                 <span>보틀노트 정보를 불러오지 못했어요.</span>
                 <button
