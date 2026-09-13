@@ -17,7 +17,7 @@ const MINI_EVENTS: MiniEvent[] = [
   {
     id: 'whiskey-mbti',
     name: '위스키 MBTI',
-    thumbnailUrl: '/images/whiskey-mbti/thumbnail.webp',
+    thumbnailUrl: '/images/whiskey-mbti/thumbnail-taste-cards.webp',
     targetUrl: ROUTES.WHISKEY_MBTI,
     isActive: true,
     prefetch: false,
