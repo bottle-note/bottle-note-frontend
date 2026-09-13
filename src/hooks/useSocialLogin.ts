@@ -13,7 +13,6 @@ import {
   getPendingReturnToUrl,
   getReturnToUrl,
   isWhiskeyMbtiReturnUrl,
-  normalizeWhiskeyMbtiReturnUrl,
   setReturnToUrl,
   WHISKEY_MBTI_INTRO_PATH,
 } from '@/utils/loginRedirect';
@@ -81,7 +80,7 @@ export const useSocialLogin = () => {
     const returnTo = getReturnToUrl();
 
     if (result.agreementRequired) {
-      setReturnToUrl(normalizeWhiskeyMbtiReturnUrl(returnTo));
+      setReturnToUrl(returnTo);
       router.replace(ROUTES.AGREEMENTS);
       return result;
     }

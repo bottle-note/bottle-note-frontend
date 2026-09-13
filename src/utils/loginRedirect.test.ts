@@ -3,7 +3,6 @@ import {
   getReturnToUrl,
   getPendingReturnToUrl,
   isWhiskeyMbtiReturnUrl,
-  normalizeWhiskeyMbtiReturnUrl,
   setReturnToUrl,
   LOGIN_RETURN_TO_KEY,
 } from './loginRedirect';
@@ -182,16 +181,12 @@ describe('loginRedirect 유틸리티', () => {
       );
     });
 
-    it('MBTI 결과 주소는 식별하고 약관 동의 후 첫 화면 주소로 정리한다', () => {
+    it('MBTI 결과 주소를 식별한다', () => {
       expect(isWhiskeyMbtiReturnUrl('/whiskey-mbti?result=INTJ-A')).toBe(true);
-      expect(normalizeWhiskeyMbtiReturnUrl('/whiskey-mbti?result=INTJ-A')).toBe(
-        '/whiskey-mbti',
-      );
     });
 
     it('다른 경로는 MBTI 취소 정책에 포함하지 않는다', () => {
       expect(isWhiskeyMbtiReturnUrl('/explore')).toBe(false);
-      expect(normalizeWhiskeyMbtiReturnUrl('/explore')).toBe('/explore');
     });
   });
 

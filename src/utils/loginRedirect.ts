@@ -72,9 +72,6 @@ export const isWhiskeyMbtiReturnUrl = (url: string | null): boolean => {
   );
 };
 
-export const normalizeWhiskeyMbtiReturnUrl = (url: string): string =>
-  isWhiskeyMbtiReturnUrl(url) ? WHISKEY_MBTI_INTRO_PATH : url;
-
 /**
  * returnTo URL을 sessionStorage에 저장
  */

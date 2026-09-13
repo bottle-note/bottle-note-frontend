@@ -148,7 +148,7 @@ describe('useSocialLogin', () => {
     expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe('/history');
   });
 
-  it('MBTI에서 약관 동의가 필요하면 결과 주소 없이 첫 화면으로 복귀하도록 저장한다', async () => {
+  it('MBTI에서 약관 동의가 필요하면 결과 주소를 유지한다', async () => {
     loginAuthSessionMock.mockResolvedValueOnce(loginResult(true));
     setReturnToUrl('/whiskey-mbti?result=INTJ-A');
     const { result } = renderHook(() => useSocialLogin());
@@ -158,7 +158,9 @@ describe('useSocialLogin', () => {
     });
 
     expect(routerReplace).toHaveBeenCalledWith(ROUTES.AGREEMENTS);
-    expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe('/whiskey-mbti');
+    expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(
+      '/whiskey-mbti?result=INTJ-A',
+    );
   });
 
   it('MBTI 앱 로그인 오류는 첫 화면으로 돌아가고 실패 모달을 열지 않는다', () => {
