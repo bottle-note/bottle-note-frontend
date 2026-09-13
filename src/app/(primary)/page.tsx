@@ -3,7 +3,7 @@ import NavLayout from '@/components/ui/Layout/NavLayout';
 import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
 import JsonLd from '@/components/seo/JsonLd';
 import { generateWebSiteSchema } from '@/utils/seo/generateWebSiteSchema';
-import { TarotPromoCard } from '@/components/feature/home/TarotPromoCard';
+import { MbtiPromoCard } from '@/components/feature/home/MbtiPromoCard';
 import HomeFeaturedSection from '@/components/feature/home/HomeFeaturedSection';
 import HomeCategorySection from '@/components/feature/home/HomeCategorySection';
 import type { Banner } from '@/api/banner/types';
@@ -43,7 +43,7 @@ export default async function Home() {
       <NavLayout>
         <AutoHideLogoHeader />
 
-        <TarotPromoCard />
+        <MbtiPromoCard />
 
         <HomeCarousel banners={banners} />
 

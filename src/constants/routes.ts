@@ -3,6 +3,7 @@ export const ROUTES = {
   LOGIN: '/login',
   SIGNUP: '/signup',
   WHISKEY_TAROT: '/whiskey-tarot',
+  WHISKEY_MBTI: '/whiskey-mbti',
   OAUTH: {
     KAKAO: '/oauth/kakao',
   },

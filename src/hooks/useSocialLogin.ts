@@ -8,7 +8,15 @@ import { loadKakaoSDK } from '@/lib/kakao/kakaoSDK';
 import useModalStore from '@/store/modalStore';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { handleWebViewMessage, sendLogToFlutter } from '@/utils/flutterUtil';
-import { getReturnToUrl, setReturnToUrl } from '@/utils/loginRedirect';
+import {
+  clearReturnToUrl,
+  getPendingReturnToUrl,
+  getReturnToUrl,
+  isWhiskeyMbtiReturnUrl,
+  normalizeWhiskeyMbtiReturnUrl,
+  setReturnToUrl,
+  WHISKEY_MBTI_INTRO_PATH,
+} from '@/utils/loginRedirect';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
 
 type SocialLoginMethod = 'kakao' | 'apple';
@@ -26,6 +34,17 @@ export const useSocialLogin = () => {
       mainText: '로그인 실패',
       subText: getErrorMessage(error),
     });
+  };
+
+  const cancelMbtiLogin = (returnTo?: string | null) => {
+    if (!isWhiskeyMbtiReturnUrl(returnTo ?? getPendingReturnToUrl())) {
+      return false;
+    }
+
+    clearReturnToUrl();
+    consumeLoginTrigger();
+    router.replace(WHISKEY_MBTI_INTRO_PATH);
+    return true;
   };
 
   const sendDeviceInfoIfNeeded = async () => {
@@ -62,7 +81,7 @@ export const useSocialLogin = () => {
     const returnTo = getReturnToUrl();
 
     if (result.agreementRequired) {
-      setReturnToUrl(returnTo);
+      setReturnToUrl(normalizeWhiskeyMbtiReturnUrl(returnTo));
       router.replace(ROUTES.AGREEMENTS);
       return result;
     }
@@ -72,27 +91,35 @@ export const useSocialLogin = () => {
   };
 
   const startKakaoLogin = async () => {
-    if (window.isInApp) {
-      handleWebViewMessage('loginWithKakao');
-      return;
+    try {
+      if (window.isInApp) {
+        handleWebViewMessage('loginWithKakao');
+        return;
+      }
+
+      const isLoaded = await loadKakaoSDK();
+
+      if (!isLoaded) {
+        throw new Error('Kakao SDK initialization failed');
+      }
+
+      window.Kakao.Auth.authorize({
+        redirectUri: `${process.env.NEXT_PUBLIC_CLIENT_URL}/oauth/kakao`,
+      });
+    } catch (error) {
+      if (!cancelMbtiLogin()) throw error;
     }
-
-    const isLoaded = await loadKakaoSDK();
-
-    if (!isLoaded) {
-      throw new Error('Kakao SDK initialization failed');
-    }
-
-    window.Kakao.Auth.authorize({
-      redirectUri: `${process.env.NEXT_PUBLIC_CLIENT_URL}/oauth/kakao`,
-    });
   };
 
   const startAppleLogin = async () => {
-    if (!window.isInApp) return;
+    try {
+      if (!window.isInApp) return;
 
-    const nonce = await AuthApi.client.getAppleNonce();
-    handleWebViewMessage('loginWithApple', { nonce });
+      const nonce = await AuthApi.client.getAppleNonce();
+      handleWebViewMessage('loginWithApple', { nonce });
+    } catch (error) {
+      if (!cancelMbtiLogin()) throw error;
+    }
   };
 
   const completeKakaoWebLogin = (authorizationCode: string) =>
@@ -108,7 +135,7 @@ export const useSocialLogin = () => {
         accessToken,
       });
     } catch (error) {
-      showLoginError(error);
+      if (!cancelMbtiLogin()) showLoginError(error);
     }
   };
 
@@ -126,7 +153,7 @@ export const useSocialLogin = () => {
       });
     } catch (error) {
       sendLogToFlutter(`onAppleLoginError:${getErrorMessage(error)}`);
-      showLoginError(error);
+      if (!cancelMbtiLogin()) showLoginError(error);
     }
   };
 
@@ -140,9 +167,14 @@ export const useSocialLogin = () => {
     startAppleLogin,
     completeKakaoWebLogin,
     onKakaoAppLoginSuccess,
-    onKakaoAppLoginError: showLoginError,
+    onKakaoAppLoginError: (error: unknown) => {
+      if (!cancelMbtiLogin()) showLoginError(error);
+    },
     onAppleAppLoginSuccess,
-    onAppleAppLoginError: showLoginError,
+    onAppleAppLoginError: (error: unknown) => {
+      if (!cancelMbtiLogin()) showLoginError(error);
+    },
     continueAuthenticatedSession,
+    cancelMbtiLogin,
   };
 };

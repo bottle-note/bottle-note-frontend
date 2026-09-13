@@ -10,21 +10,24 @@ export default function OauthKakaoCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const authCode = searchParams.get('code');
-  const { completeKakaoWebLogin } = useSocialLogin();
+  const { completeKakaoWebLogin, cancelMbtiLogin } = useSocialLogin();
 
   const loginHandler = async (code: string) => {
     try {
       await completeKakaoWebLogin(code);
     } catch (e) {
       console.error(e);
-      router.push(ROUTES.ERROR);
+      if (!cancelMbtiLogin()) router.replace(ROUTES.ERROR);
     }
   };
 
   useEffect(() => {
     if (authCode) {
       loginHandler(authCode);
+      return;
     }
+
+    if (!cancelMbtiLogin()) router.replace(ROUTES.ERROR);
   }, [authCode]);
 
   return <Loading />;

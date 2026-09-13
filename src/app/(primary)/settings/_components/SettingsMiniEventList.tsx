@@ -12,9 +12,18 @@ interface MiniEvent {
   thumbnailUrl: string;
   targetUrl: string;
   isActive: boolean;
+  prefetch?: boolean;
 }
 
 const MINI_EVENTS: MiniEvent[] = [
+  {
+    id: 'whiskey-mbti',
+    name: '위스키 MBTI',
+    thumbnailUrl: '/images/whiskey-mbti/thumbnail.webp',
+    targetUrl: ROUTES.WHISKEY_MBTI,
+    isActive: true,
+    prefetch: false,
+  },
   {
     id: 'whiskey-tarot',
     name: '위스키 타로',
@@ -48,10 +57,16 @@ export function SettingsMiniEventList({
           <li key={event.id}>
             <Link
               href={event.targetUrl}
+              prefetch={event.prefetch}
               className="flex flex-col items-center gap-2"
               aria-label={event.name}
             >
               <div className="relative h-14 w-14 overflow-hidden rounded-lg bg-palette-static-white">
+                {event.id === 'whiskey-mbti' && (
+                  <span className="pointer-events-none absolute left-0 top-0 z-10 rounded-br-md bg-bg-brand-solid px-1 py-0.5 text-9 font-bold leading-none text-fg-brand-contrast">
+                    NEW
+                  </span>
+                )}
                 <Image
                   src={event.thumbnailUrl}
                   alt=""
