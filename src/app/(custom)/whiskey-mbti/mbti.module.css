@@ -1,36 +1,30 @@
 @font-face {
   font-family: 'WhiskyNoto';
-  src: url('/images/whiskey-mbti/fonts/noto-sans-kr-400.ttf') format('truetype');
+  src: url('/images/whiskey-mbti/fonts/noto-sans-kr-400.woff2') format('woff2');
   font-weight: 400;
   font-display: swap;
 }
 @font-face {
   font-family: 'WhiskyNoto';
-  src: url('/images/whiskey-mbti/fonts/noto-sans-kr-500.ttf') format('truetype');
-  font-weight: 500;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'WhiskyNoto';
-  src: url('/images/whiskey-mbti/fonts/noto-sans-kr-600.ttf') format('truetype');
+  src: url('/images/whiskey-mbti/fonts/noto-sans-kr-600.woff2') format('woff2');
   font-weight: 600;
   font-display: swap;
 }
 @font-face {
   font-family: 'WhiskyNoto';
-  src: url('/images/whiskey-mbti/fonts/noto-sans-kr-700.ttf') format('truetype');
+  src: url('/images/whiskey-mbti/fonts/noto-sans-kr-700.woff2') format('woff2');
   font-weight: 700;
   font-display: swap;
 }
 @font-face {
   font-family: 'WhiskyNoto';
-  src: url('/images/whiskey-mbti/fonts/noto-sans-kr-800.ttf') format('truetype');
+  src: url('/images/whiskey-mbti/fonts/noto-sans-kr-800.woff2') format('woff2');
   font-weight: 800;
   font-display: swap;
 }
 @font-face {
   font-family: 'WhiskySerif';
-  src: url('/images/whiskey-mbti/fonts/dm-serif-display.ttf') format('truetype');
+  src: url('/images/whiskey-mbti/fonts/dm-serif-display.woff2') format('woff2');
   font-weight: 400;
   font-display: swap;
 }
