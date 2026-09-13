@@ -9,7 +9,7 @@ interface AlcoholRatingInputProps {
   onCommit: (rating: number) => void;
 }
 
-const MIN_RATING = 0.5;
+const MIN_RATING = 0;
 const MAX_RATING = 5;
 const RATING_STEP = 0.5;
 const STAR_SIZE = 42;
@@ -114,13 +114,13 @@ export default function AlcoholRatingInput({
     event.preventDefault();
 
     const currentRating = keyboardRateRef.current ?? previewRate ?? value;
-    let nextRating = currentRating || MIN_RATING;
+    let nextRating = currentRating;
 
     if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
       nextRating = Math.max(MIN_RATING, nextRating - RATING_STEP);
     }
     if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
-      nextRating = currentRating === 0 ? MIN_RATING : nextRating + RATING_STEP;
+      nextRating += RATING_STEP;
     }
     if (event.key === 'Home') nextRating = MIN_RATING;
     if (event.key === 'End') nextRating = MAX_RATING;
@@ -129,7 +129,7 @@ export default function AlcoholRatingInput({
   };
 
   const handleKeyUp = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!keyboardRateRef.current) return;
+    if (keyboardRateRef.current === null) return;
     if (
       ![
         'ArrowLeft',
@@ -203,7 +203,7 @@ export default function AlcoholRatingInput({
         }
         className="absolute inset-0 z-10 h-full w-full cursor-pointer appearance-none opacity-0 touch-pan-y"
         max={MAX_RATING}
-        min={0}
+        min={MIN_RATING}
         onBlur={resetInteraction}
         onChange={() => {}}
         onKeyDown={handleKeyDown}
