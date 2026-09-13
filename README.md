@@ -69,37 +69,7 @@
 
 ## API 연결 환경
 
-로컬 개발은 `pnpm dev:local`로 실행합니다. 서버의 API 호출과 Next.js rewrite는
-`INTERNAL_SERVER_URL` 하나를 공통으로 사용합니다.
-
-| 환경파일                        | `INTERNAL_SERVER_URL` 정리 후 값          |
-| ------------------------------- | ----------------------------------------- |
-| `local.sops.env`                | `https://api.development.bottle-note.com` |
-| `dev.sops.env`, `prod.sops.env` | `http://product-api`                      |
-
-각 호출부에서 `${process.env.INTERNAL_SERVER_URL}/api/v1` 또는 `/api/v2`로 주소를 구성합니다.
-인증은 v2, 나머지 현재 서버 조회는 v1을 사용합니다.
-환경값에는 경로나 마지막 `/` 없이 origin만 넣어야 합니다. 기존 `/api/v1` 포함 값은 지원하지 않습니다.
-`INTERNAL_SERVER_URL`이 없으면 개발 서버 시작·빌드를 실패시키며 공개 URL로 대체하지 않습니다.
-브라우저는 기존 `/bottle-api/v1/*`, `/bottle-api/v2/*` 경로를 사용합니다.
-버전 없는 `/bottle-api/*` 레거시 rewrite는 지원하지 않습니다.
-`NEXT_PUBLIC_SERVER_URL`은 MBTI의 개발·운영 데이터 구분에 사용하며, 서버 API 호출 대상으로 사용하지 않습니다.
-
-Docker 빌드는 선택한 환경파일을 `.env`로 복호화한 뒤 `next build`를 실행하고,
-같은 `.env`를 실행 이미지에 포함합니다. rewrite 대상은 빌드 결과에 저장되므로
-대상 URL을 바꿀 때는 이미지를 다시 빌드해야 합니다.
-
-### 환경파일 정리 항목
-
-이 코드를 빌드·실행하기 전에 `application.next-js`의 local/dev/prod 파일에서 `INTERNAL_SERVER_URL`을 위 표의 origin으로 정리해야 합니다.
-배포 빌드에는 변경된 코드와 환경파일 revision을 함께 반영합니다. 기존 코드에 origin 변경만 먼저 적용하면 API 경로가 깨집니다.
-미사용 변수 삭제는 기존 코드를 사용하는 빌드에 영향이 없도록 이 코드 반영 이후에 진행합니다.
-환경파일 자체는 이번 변경에서 수정하지 않습니다.
-
-| 변수                        | 정리                                                    |
-| --------------------------- | ------------------------------------------------------- |
-| `INTERNAL_SERVER_URL`       | 유지. 위 표처럼 `/api/v1`을 제거한 origin으로 변경 필수 |
-| `INTERNAL_SERVER_URL_V2`    | 삭제 가능. v2 경로는 코드에서 생성                      |
-| `SERVER_URL_V2`             | 삭제 가능. 서버 인증도 공통 주소 사용                   |
-| `NEXT_PUBLIC_SERVER_URL_V2` | 삭제 가능. 브라우저는 상대 경로 사용                    |
-| `NEXT_PUBLIC_SERVER_URL`    | 유지. MBTI의 개발·운영 데이터 구분에 아직 사용          |
+- 서버 API 주소는 `INTERNAL_SERVER_URL` 하나로 관리하며, 경로나 마지막 `/` 없이 지정합니다.
+- 각 호출부에서 `/api/v1` 또는 `/api/v2`를 붙입니다.
+- 브라우저 요청은 `/bottle-api/v1/*`, `/bottle-api/v2/*` rewrite로 전달합니다.
+- 로컬은 공개 API 주소, 개발·운영 배포는 `http://product-api`를 사용합니다.
