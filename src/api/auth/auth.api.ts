@@ -1,3 +1,4 @@
+import { getServerApiUrl } from '@/api/_shared/serverApiUrl.mjs';
 import { apiClient } from '@/shared/api/apiClient';
 import { ApiResponse } from '@/api/_shared/types';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
@@ -21,7 +22,7 @@ export const AuthApi = {
      * Apple 로그인을 수행합니다.
      */
     async appleLogin(body: AppleLoginParams): Promise<LoginTokenData> {
-      const response = await fetch(`${process.env.SERVER_URL_V2}/auth/apple`, {
+      const response = await fetch(`${getServerApiUrl('v2')}/auth/apple`, {
         method: 'POST',
         body: JSON.stringify(body),
         headers: {
@@ -59,7 +60,7 @@ export const AuthApi = {
      * Kakao 로그인을 수행합니다.
      */
     async kakaoLogin(body: KakaoLoginParams): Promise<LoginTokenData> {
-      const response = await fetch(`${process.env.SERVER_URL_V2}/auth/kakao`, {
+      const response = await fetch(`${getServerApiUrl('v2')}/auth/kakao`, {
         method: 'POST',
         body: JSON.stringify(body),
         headers: {
@@ -97,16 +98,13 @@ export const AuthApi = {
      * 토큰을 갱신합니다 (서버사이드).
      */
     async renewToken(refreshToken: string): Promise<TokenData> {
-      const response = await fetch(
-        `${process.env.SERVER_URL_V2}/auth/reissue`,
-        {
-          method: 'POST',
-          headers: {
-            'refresh-token': refreshToken,
-            'Content-Type': 'application/json',
-          },
+      const response = await fetch(`${getServerApiUrl('v2')}/auth/reissue`, {
+        method: 'POST',
+        headers: {
+          'refresh-token': refreshToken,
+          'Content-Type': 'application/json',
         },
-      );
+      });
 
       if (!response.ok) {
         throw new Error(ERROR_MESSAGES.TOKEN_REFRESH_FAILED);

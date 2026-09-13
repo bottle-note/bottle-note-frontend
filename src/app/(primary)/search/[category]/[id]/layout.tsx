@@ -1,5 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
+import { getServerApiUrl } from '@/api/_shared/serverApiUrl.mjs';
 import { ROUTES } from '@/constants/routes';
 
 export async function generateMetadata({
@@ -7,13 +8,8 @@ export async function generateMetadata({
 }: {
   params: { id: string; category: string };
 }): Promise<Metadata> {
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
-
   try {
-    if (!serverUrl) {
-      throw new Error('NEXT_PUBLIC_SERVER_URL is not set');
-    }
-
+    const serverUrl = getServerApiUrl('v1');
     const response = await fetch(`${serverUrl}/alcohols/${params.id}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },

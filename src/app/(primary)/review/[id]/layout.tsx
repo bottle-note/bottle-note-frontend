@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { getServerApiUrl } from '@/api/_shared/serverApiUrl.mjs';
 import { ROUTES } from '@/constants/routes';
 
 interface Props {
@@ -8,13 +9,8 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = params;
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
-
   try {
-    if (!serverUrl) {
-      throw new Error('NEXT_PUBLIC_SERVER_URL is not set');
-    }
-
+    const serverUrl = getServerApiUrl('v1');
     const response = await fetch(`${serverUrl}/reviews/detail/${id}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },

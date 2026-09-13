@@ -35,7 +35,7 @@ describe('카카오 v2 로그인 API 계약', () => {
 
   beforeEach(() => {
     fetchMock.mockReset();
-    process.env.SERVER_URL_V2 = 'https://api-v2.example.com';
+    process.env.INTERNAL_SERVER_URL = 'https://api.example.com';
   });
 
   it('카카오 SDK access token을 v2 검증 API로 보내고 Bottle Note 토큰을 반환한다', async () => {
@@ -56,7 +56,7 @@ describe('카카오 v2 로그인 API 계약', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://api-v2.example.com/auth/kakao',
+      'https://api.example.com/api/v2/auth/kakao',
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
@@ -194,7 +194,7 @@ describe('AuthApi.server.renewToken', () => {
 
   beforeEach(() => {
     fetchMock.mockReset();
-    process.env.SERVER_URL_V2 = 'https://api-v2.example.com';
+    process.env.INTERNAL_SERVER_URL = 'https://api.example.com';
   });
 
   it('v2 /auth/reissue에 refresh-token 헤더로 요청한다', async () => {
@@ -216,7 +216,7 @@ describe('AuthApi.server.renewToken', () => {
     const tokens = await AuthApi.server.renewToken('current-refresh-token');
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://api-v2.example.com/auth/reissue',
+      'https://api.example.com/api/v2/auth/reissue',
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({

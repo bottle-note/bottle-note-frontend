@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerApiUrl } from '@/api/_shared/serverApiUrl.mjs';
 
 import type { MbtiResultDetail } from '@/app/(custom)/whiskey-mbti/_types';
 import { calculateMbtiResult } from '../_lib/calculate';
@@ -23,19 +24,13 @@ type AlcoholDetail = {
 };
 
 async function fetchAlcohol(id: number) {
-  const baseUrl =
-    process.env.INTERNAL_SERVER_URL ?? process.env.NEXT_PUBLIC_SERVER_URL;
-  if (!baseUrl) return null;
-
   try {
-    const response = await fetch(
-      `${baseUrl.replace(/\/$/, '')}/alcohols/${id}`,
-      {
-        headers: { Accept: 'application/json' },
-        cache: 'no-store',
-        signal: AbortSignal.timeout(8000),
-      },
-    );
+    const baseUrl = getServerApiUrl('v1');
+    const response = await fetch(`${baseUrl}/alcohols/${id}`, {
+      headers: { Accept: 'application/json' },
+      cache: 'no-store',
+      signal: AbortSignal.timeout(8000),
+    });
     if (!response.ok) return null;
     const body: unknown = await response.json();
     const alcohol = (body as { data?: AlcoholResponse }).data?.alcohols;

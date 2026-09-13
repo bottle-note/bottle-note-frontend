@@ -66,3 +66,38 @@
 ## 🤖 AI 개발 도구 가이드
 
 프로젝트 공통 에이전트 지침은 `AGENTS.md`에서 관리합니다.
+
+## API 연결 환경
+
+로컬 개발은 `pnpm dev:local`로 실행합니다. 서버의 API 호출과 Next.js rewrite는
+`INTERNAL_SERVER_URL` 하나를 공통으로 사용합니다.
+
+| 환경파일                        | `INTERNAL_SERVER_URL` 정리 후 값          |
+| ------------------------------- | ----------------------------------------- |
+| `local.sops.env`                | `https://api.development.bottle-note.com` |
+| `dev.sops.env`, `prod.sops.env` | `http://product-api`                      |
+
+`src/api/_shared/serverApiUrl.mjs`에서 서버 origin에 `/api/v1` 또는 `/api/v2`를 붙입니다.
+호출하는 서비스가 버전을 지정하며, 인증은 v2, 나머지 현재 서버 조회는 v1을 사용합니다.
+기존 환경값의 `/api/v1`은 무시하므로 환경파일을 나중에 정리해도 동작합니다.
+`INTERNAL_SERVER_URL`이 없으면 개발 서버 시작·빌드를 실패시키며 공개 URL로 대체하지 않습니다.
+브라우저는 기존 `/bottle-api/v1/*`, `/bottle-api/v2/*` 경로를 사용합니다.
+버전 없는 `/bottle-api/*` 레거시 rewrite는 지원하지 않습니다.
+`NEXT_PUBLIC_SERVER_URL`은 MBTI의 개발·운영 데이터 구분에 사용하며, 서버 API 호출 대상으로 사용하지 않습니다.
+
+Docker 빌드는 선택한 환경파일을 `.env`로 복호화한 뒤 `next build`를 실행하고,
+같은 `.env`를 실행 이미지에 포함합니다. rewrite 대상은 빌드 결과에 저장되므로
+대상 URL을 바꿀 때는 이미지를 다시 빌드해야 합니다.
+
+### 환경파일 정리 항목
+
+이 코드가 반영된 뒤 `application.next-js`의 local/dev/prod 파일에서 정리합니다.
+환경파일 자체는 이번 변경에서 수정하지 않습니다.
+
+| 변수                        | 정리                                                    |
+| --------------------------- | ------------------------------------------------------- |
+| `INTERNAL_SERVER_URL`       | 유지. 위 표처럼 `/api/v1`을 제거한 origin으로 정리 가능 |
+| `INTERNAL_SERVER_URL_V2`    | 삭제 가능. v2 경로는 코드에서 생성                      |
+| `SERVER_URL_V2`             | 삭제 가능. 서버 인증도 공통 주소 사용                   |
+| `NEXT_PUBLIC_SERVER_URL_V2` | 삭제 가능. 브라우저는 상대 경로 사용                    |
+| `NEXT_PUBLIC_SERVER_URL`    | 유지. MBTI의 개발·운영 데이터 구분에 아직 사용          |
