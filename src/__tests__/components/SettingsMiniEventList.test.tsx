@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { SettingsMiniEventList } from '@/app/(primary)/settings/_components/SettingsMiniEventList';
 
 describe('SettingsMiniEventList', () => {
-  it('활성 이벤트만 4열 그리드에 렌더링하고 이름은 6자 초과 시 말줄임한다', () => {
+  it('활성 이벤트만 4열 그리드에 렌더링하고 이름을 전체 표시한다', () => {
     render(
       <SettingsMiniEventList
         events={[
@@ -29,7 +29,7 @@ describe('SettingsMiniEventList', () => {
       'href',
       '/active-event',
     );
-    expect(screen.getByText('123456...')).toBeInTheDocument();
+    expect(screen.getByText('1234567')).toBeInTheDocument();
     expect(screen.queryByText('비활성 이벤트')).not.toBeInTheDocument();
   });
 });
