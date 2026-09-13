@@ -21,13 +21,16 @@ export const AuthApi = {
      * Apple 로그인을 수행합니다.
      */
     async appleLogin(body: AppleLoginParams): Promise<LoginTokenData> {
-      const response = await fetch(`${process.env.SERVER_URL_V2}/auth/apple`, {
-        method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${process.env.INTERNAL_SERVER_URL}/api/v2/auth/apple`,
+        {
+          method: 'POST',
+          body: JSON.stringify(body),
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`Apple login failed (status=${response.status})`);
@@ -59,13 +62,16 @@ export const AuthApi = {
      * Kakao 로그인을 수행합니다.
      */
     async kakaoLogin(body: KakaoLoginParams): Promise<LoginTokenData> {
-      const response = await fetch(`${process.env.SERVER_URL_V2}/auth/kakao`, {
-        method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${process.env.INTERNAL_SERVER_URL}/api/v2/auth/kakao`,
+        {
+          method: 'POST',
+          body: JSON.stringify(body),
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`Kakao login failed (status=${response.status})`);
@@ -98,7 +104,7 @@ export const AuthApi = {
      */
     async renewToken(refreshToken: string): Promise<TokenData> {
       const response = await fetch(
-        `${process.env.SERVER_URL_V2}/auth/reissue`,
+        `${process.env.INTERNAL_SERVER_URL}/api/v2/auth/reissue`,
         {
           method: 'POST',
           headers: {

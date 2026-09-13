@@ -8,13 +8,8 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = params;
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
-
   try {
-    if (!serverUrl) {
-      throw new Error('NEXT_PUBLIC_SERVER_URL is not set');
-    }
-
+    const serverUrl = `${process.env.INTERNAL_SERVER_URL}/api/v1`;
     const response = await fetch(`${serverUrl}/reviews/detail/${id}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },

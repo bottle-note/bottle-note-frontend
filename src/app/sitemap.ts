@@ -15,11 +15,7 @@ function parseDate(dateString: string | undefined | null): Date {
 }
 
 async function fetchFromAPI<T>(endpoint: string): Promise<T> {
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
-
-  if (!serverUrl) {
-    throw new Error('NEXT_PUBLIC_SERVER_URL is not set');
-  }
+  const serverUrl = `${process.env.INTERNAL_SERVER_URL}/api/v1`;
 
   const url = `${serverUrl}${endpoint}`;
 

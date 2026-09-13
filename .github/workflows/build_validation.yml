@@ -15,6 +15,9 @@ jobs:
   build:
     name: 빌드 체크
     runs-on: ubuntu-latest
+    env:
+      # DEV_ENV와 별도로 빌드·시작 검증에 사용할 서버 API 주소를 지정한다.
+      INTERNAL_SERVER_URL: http://product-api
 
     steps:
       - name: 소스 코드 체크아웃

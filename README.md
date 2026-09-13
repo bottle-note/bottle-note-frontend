@@ -66,3 +66,10 @@
 ## 🤖 AI 개발 도구 가이드
 
 프로젝트 공통 에이전트 지침은 `AGENTS.md`에서 관리합니다.
+
+## API 연결 환경
+
+- 서버 API 주소는 `INTERNAL_SERVER_URL` 하나로 관리하며, 경로나 마지막 `/` 없이 지정합니다.
+- 각 호출부에서 `/api/v1` 또는 `/api/v2`를 붙입니다.
+- 브라우저 요청은 `/bottle-api/v1/*`, `/bottle-api/v2/*` rewrite로 전달합니다.
+- 로컬은 공개 API 주소, 개발·운영 배포는 `http://product-api`를 사용합니다.

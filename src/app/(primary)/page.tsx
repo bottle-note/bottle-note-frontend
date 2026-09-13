@@ -11,7 +11,7 @@ import type { ApiResponse } from '@/api/_shared/types';
 
 async function getBanners(): Promise<Banner[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+    const baseUrl = `${process.env.INTERNAL_SERVER_URL}/api/v1`;
     const res = await fetch(`${baseUrl}/banners?limit=10`, {
       next: { revalidate: 300 },
     });
