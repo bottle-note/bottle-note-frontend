@@ -61,7 +61,7 @@ export default function MbtiResult({
   const origin = typeof window === 'undefined' ? '' : window.location.origin;
   const isInApp = typeof window !== 'undefined' && window.isInApp;
   const shareUrl = `${origin}/whiskey-mbti?result=${data.code}&shared=1`;
-  const shareImageUrl = `${origin}${data.characterImage}`;
+  const shareImageUrl = `${origin}/images/whiskey-mbti/share/${data.code}.jpg`;
 
   return (
     <section
@@ -188,6 +188,8 @@ export default function MbtiResult({
             title: 'WHISKY MBTI: 나를 닮은 한 잔',
             description: data.title,
             imageUrl: shareImageUrl,
+            imageWidth: 850,
+            imageHeight: 760,
             linkUrl: shareUrl,
             buttonTitle: '결과 보러 가기',
           }}

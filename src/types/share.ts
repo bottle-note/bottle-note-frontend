@@ -19,6 +19,8 @@ export interface ShareConfig {
   description: string;
   /** OG 이미지 URL */
   imageUrl: string;
+  imageWidth?: number;
+  imageHeight?: number;
   /** 공유될 링크 URL */
   linkUrl: string;
   /** 카카오톡 버튼 텍스트 (기본값: '자세히 보기') */

@@ -59,6 +59,8 @@ export interface KakaoShareOptions {
   title: string;
   description: string;
   imageUrl: string;
+  imageWidth?: number;
+  imageHeight?: number;
   linkUrl: string;
   buttonTitle?: string;
 }

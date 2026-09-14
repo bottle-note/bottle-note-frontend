@@ -111,6 +111,8 @@ export default function ShareDropdown({
       title: config.title,
       description: config.description,
       imageUrl: config.imageUrl,
+      imageWidth: config.imageWidth,
+      imageHeight: config.imageHeight,
       linkUrl: config.linkUrl,
       buttonTitle: config.buttonTitle,
     });
