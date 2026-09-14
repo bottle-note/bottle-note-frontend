@@ -89,6 +89,8 @@ export function useKakaoShare(
             title,
             description,
             imageUrl,
+            imageWidth: shareOptions.imageWidth,
+            imageHeight: shareOptions.imageHeight,
             link: {
               mobileWebUrl: linkUrl,
               webUrl: linkUrl,
