@@ -53,3 +53,6 @@ export const LABEL_NAMES = {
 } as const;
 
 export const BASE_URL = 'https://bottle-note.com';
+
+// 서버 측 fetch에는 브라우저 쿠키·UA가 없으므로, product-api가 방문자 통계에서 제외하도록 식별 헤더를 붙인다.
+export const SSR_CALLER_HEADER = { 'X-Bottlenote-Caller': 'ssr' } as const;

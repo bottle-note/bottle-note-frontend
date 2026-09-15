@@ -1,6 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { ROUTES } from '@/constants/routes';
+import { SSR_CALLER_HEADER } from '@/constants/common';
 
 export async function generateMetadata({
   params,
@@ -11,7 +12,7 @@ export async function generateMetadata({
     const serverUrl = `${process.env.INTERNAL_SERVER_URL}/api/v1`;
     const response = await fetch(`${serverUrl}/alcohols/${params.id}`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...SSR_CALLER_HEADER },
       cache: 'no-store',
     });
 

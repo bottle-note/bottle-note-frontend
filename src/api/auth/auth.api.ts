@@ -4,6 +4,7 @@ import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import { ApiError } from '@/utils/ApiError';
 import { extractRefreshToken } from '@/utils/cookieUtils';
 import useModalStore from '@/store/modalStore';
+import { SSR_CALLER_HEADER } from '@/constants/common';
 import { clearAuthSession, refreshAuthSession } from '@/lib/auth/session-store';
 import type {
   AppleLoginParams,
@@ -28,6 +29,7 @@ export const AuthApi = {
           body: JSON.stringify(body),
           headers: {
             'Content-Type': 'application/json',
+            ...SSR_CALLER_HEADER,
           },
         },
       );
@@ -69,6 +71,7 @@ export const AuthApi = {
           body: JSON.stringify(body),
           headers: {
             'Content-Type': 'application/json',
+            ...SSR_CALLER_HEADER,
           },
         },
       );
@@ -110,6 +113,7 @@ export const AuthApi = {
           headers: {
             'refresh-token': refreshToken,
             'Content-Type': 'application/json',
+            ...SSR_CALLER_HEADER,
           },
         },
       );
