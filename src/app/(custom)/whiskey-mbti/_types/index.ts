@@ -36,11 +36,6 @@ export type MbtiResultResponse =
 export interface WhiskyResult {
   id: number | null;
   name: string;
-  imageUrl: string | null;
-  rating: number | null;
-  ratingCount: number | null;
-  tags: string[];
-  detailAvailable: boolean;
 }
 
 export interface MbtiResultDetail {

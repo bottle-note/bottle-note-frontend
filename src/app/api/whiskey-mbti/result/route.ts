@@ -4,54 +4,6 @@ import type { MbtiResultDetail } from '@/app/(custom)/whiskey-mbti/_types';
 import { calculateMbtiResult } from '../_lib/calculate';
 import { getResultMatch, isMbtiCode, TASTE_LABELS } from '../_lib/results';
 
-type AlcoholResponse = {
-  alcohols?: {
-    alcoholUrlImg?: unknown;
-    korName?: unknown;
-    rating?: unknown;
-    totalRatingsCount?: unknown;
-    alcoholsTastingTags?: unknown;
-  };
-};
-
-type AlcoholDetail = {
-  alcoholUrlImg?: unknown;
-  korName: string;
-  rating?: unknown;
-  totalRatingsCount?: unknown;
-  alcoholsTastingTags?: unknown;
-};
-
-async function fetchAlcohol(id: number) {
-  try {
-    const baseUrl = `${process.env.INTERNAL_SERVER_URL}/api/v1`;
-    const response = await fetch(`${baseUrl}/alcohols/${id}`, {
-      headers: { Accept: 'application/json' },
-      cache: 'no-store',
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!response.ok) return null;
-    const body: unknown = await response.json();
-    const alcohol = (body as { data?: AlcoholResponse }).data?.alcohols;
-    if (!alcohol || typeof alcohol.korName !== 'string') return null;
-    return alcohol as AlcoholDetail;
-  } catch {
-    return null;
-  }
-}
-
-function unavailableWhisky(id: number | null, name: string) {
-  return {
-    id,
-    name,
-    imageUrl: null,
-    rating: null,
-    ratingCount: null,
-    tags: [],
-    detailAvailable: false,
-  };
-}
-
 export async function POST(request: NextRequest) {
   try {
     const body: unknown = await request.json();
@@ -96,7 +48,6 @@ export async function GET(request: NextRequest) {
       { status: 404 },
     );
 
-  const alcohol = whisky.id === null ? null : await fetchAlcohol(whisky.id);
   const tasteCopy = {
     A: '맛에서는 과실과 산뜻한 향 쪽에 마음이 기웁니다.',
     B: '맛에서는 달콤함과 풍부한 풍미 쪽에 마음이 기웁니다.',
@@ -114,27 +65,7 @@ export async function GET(request: NextRequest) {
       : `${profile.dramCopy} ${tasteCopy[taste]} 이번 조합으로 추천하는 한 잔은 ${whisky.name}입니다.`,
     dramCopy: `${profile.dramCopy} ${tasteCopy[taste]}`,
     characterImage: `/images/whiskey-mbti/characters/${code}.webp`,
-    whisky: alcohol
-      ? {
-          id: whisky.id,
-          name: alcohol.korName,
-          imageUrl:
-            typeof alcohol.alcoholUrlImg === 'string'
-              ? alcohol.alcoholUrlImg
-              : null,
-          rating: typeof alcohol.rating === 'number' ? alcohol.rating : null,
-          ratingCount:
-            typeof alcohol.totalRatingsCount === 'number'
-              ? alcohol.totalRatingsCount
-              : null,
-          tags:
-            Array.isArray(alcohol.alcoholsTastingTags) &&
-            alcohol.alcoholsTastingTags.every((tag) => typeof tag === 'string')
-              ? alcohol.alcoholsTastingTags
-              : [],
-          detailAvailable: true,
-        }
-      : unavailableWhisky(whisky.id, whisky.name),
+    whisky: { id: whisky.id, name: whisky.name },
   };
   return NextResponse.json(response);
 }
