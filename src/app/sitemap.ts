@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import { ApiResponse } from '@/api/_shared/types';
 import type { ExploreAlcohol, ExploreReview } from '@/api/explore/types';
-import { BASE_URL } from '@/constants/common';
+import { BASE_URL, SSR_CALLER_HEADER } from '@/constants/common';
 
 const SITEMAP_CONFIG = {
   PAGE_SIZE: 100,
@@ -23,6 +23,7 @@ async function fetchFromAPI<T>(endpoint: string): Promise<T> {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
+      ...SSR_CALLER_HEADER,
     },
     cache: SITEMAP_CONFIG.CACHE_POLICY,
   });

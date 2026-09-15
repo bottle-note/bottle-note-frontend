@@ -62,6 +62,9 @@ describe('카카오 v2 로그인 API 계약', () => {
         body: JSON.stringify({
           accessToken: 'kakao-sdk-access-token',
         }),
+        headers: expect.objectContaining({
+          'X-Bottlenote-Caller': 'ssr',
+        }),
       }),
     );
     expect(tokens).toEqual({
@@ -222,6 +225,7 @@ describe('AuthApi.server.renewToken', () => {
         headers: expect.objectContaining({
           'refresh-token': 'current-refresh-token',
           'Content-Type': 'application/json',
+          'X-Bottlenote-Caller': 'ssr',
         }),
       }),
     );

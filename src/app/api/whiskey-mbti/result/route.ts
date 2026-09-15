@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import type { MbtiResultDetail } from '@/app/(custom)/whiskey-mbti/_types';
+import { SSR_CALLER_HEADER } from '@/constants/common';
 import { calculateMbtiResult } from '../_lib/calculate';
 import { getResultMatch, isMbtiCode, TASTE_LABELS } from '../_lib/results';
 
@@ -26,7 +27,7 @@ async function fetchAlcohol(id: number) {
   try {
     const baseUrl = `${process.env.INTERNAL_SERVER_URL}/api/v1`;
     const response = await fetch(`${baseUrl}/alcohols/${id}`, {
-      headers: { Accept: 'application/json' },
+      headers: { Accept: 'application/json', ...SSR_CALLER_HEADER },
       cache: 'no-store',
       signal: AbortSignal.timeout(8000),
     });
