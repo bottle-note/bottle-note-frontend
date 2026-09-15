@@ -4,6 +4,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useQuery } from '@tanstack/react-query';
 
+import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { ROUTES } from '@/constants/routes';
 
 import styles from '../mbti.module.css';
@@ -43,6 +44,20 @@ export default function MbtiResult({
     queryKey: ['whiskey-mbti-result', code],
     queryFn: () => fetchResult(code),
   });
+  const whiskyId = data?.whisky.id;
+  const {
+    data: alcohol,
+    isLoading: isAlcoholLoading,
+    refetch: refetchAlcohol,
+  } = useQuery({
+    queryKey: ['whiskey-mbti-alcohol', whiskyId],
+    queryFn: async () => {
+      if (whiskyId == null) return null;
+      const response = await AlcoholsApi.getAlcoholDetails(String(whiskyId));
+      return response.data.alcohols;
+    },
+    enabled: whiskyId != null,
+  });
   const [isShareOpen, setIsShareOpen] = useState(false);
 
   if (isLoading)
@@ -57,6 +72,15 @@ export default function MbtiResult({
       </section>
     );
   }
+
+  const whisky = {
+    ...data.whisky,
+    name: alcohol?.korName ?? data.whisky.name,
+    imageUrl: alcohol?.alcoholUrlImg,
+    rating: alcohol?.rating,
+    ratingCount: alcohol?.totalRatingsCount,
+    tags: alcohol?.alcoholsTastingTags ?? [],
+  };
 
   const origin = typeof window === 'undefined' ? '' : window.location.origin;
   const isInApp = typeof window !== 'undefined' && window.isInApp;
@@ -83,39 +107,40 @@ export default function MbtiResult({
           <div className={styles.portrait}>
             <img
               src={data.characterImage}
-              alt={`${data.type} · ${data.whisky.name} 캐릭터 이미지`}
+              alt={`${data.type} · ${whisky.name} 캐릭터 이미지`}
             />
           </div>
           <h1>{data.title}</h1>
           <p>{data.reason}</p>
         </div>
         <aside className={styles.dram}>
-          {data.whisky.imageUrl && (
+          {whisky.imageUrl && (
             <div className={styles.dramMedia}>
-              <img
-                src={data.whisky.imageUrl}
-                alt={`${data.whisky.name} 제품 이미지`}
-              />
+              <img src={whisky.imageUrl} alt={`${whisky.name} 제품 이미지`} />
             </div>
           )}
           <small>다음 바에서 마실 한 잔</small>
-          <h2>{data.whisky.name}</h2>
+          <h2>{whisky.name}</h2>
           <div className={styles.rating}>
-            {!data.whisky.detailAvailable ? (
+            {isAlcoholLoading ? (
+              <span>보틀노트 정보를 불러오는 중이에요.</span>
+            ) : whisky.id === null ? (
+              <span>보틀노트 정보를 준비 중이에요.</span>
+            ) : !alcohol ? (
               <>
                 <span>보틀노트 정보를 불러오지 못했어요.</span>
                 <button
                   className={styles.retryDetail}
-                  onClick={() => refetch()}
+                  onClick={() => refetchAlcohol()}
                 >
                   다시 시도
                 </button>
               </>
-            ) : data.whisky.rating !== null &&
-              data.whisky.ratingCount &&
-              data.whisky.ratingCount > 0 ? (
+            ) : whisky.rating != null &&
+              whisky.ratingCount &&
+              whisky.ratingCount > 0 ? (
               <>
-                ★ {data.whisky.rating.toFixed(1)} <span>보틀노트 점수</span>
+                ★ {whisky.rating.toFixed(1)} <span>보틀노트 점수</span>
               </>
             ) : (
               <>
@@ -124,18 +149,18 @@ export default function MbtiResult({
             )}
           </div>
           <p>{data.dramCopy}</p>
-          {data.whisky.id !== null && (
-            <a className={styles.cta} href={ROUTES.SEARCH.ALL(data.whisky.id)}>
-              <span>{data.whisky.name} 상세보기</span>
+          {whisky.id !== null && (
+            <a className={styles.cta} href={ROUTES.SEARCH.ALL(whisky.id)}>
+              <span>{whisky.name} 상세보기</span>
               <b>↗</b>
             </a>
           )}
         </aside>
-        {!!data.whisky.tags.length && (
+        {!!whisky.tags.length && (
           <div className={styles.flavorBlock}>
             <b>테이스팅 태그</b>
             <div className={styles.notes}>
-              {data.whisky.tags.map((tag) => (
+              {whisky.tags.map((tag) => (
                 <span key={tag}>{tag}</span>
               ))}
             </div>
