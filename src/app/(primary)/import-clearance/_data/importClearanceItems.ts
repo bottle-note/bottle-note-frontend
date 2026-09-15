@@ -1,0 +1,68 @@
+import type { ImportClearanceItem } from '../_components/ImportClearanceListItem';
+
+export const importClearanceItems: ImportClearanceItem[] = [
+  {
+    id: 'mfds-20260908-01',
+    clearanceDate: '2026-09-08',
+    korName: '로얄 브라클라 12년',
+    engName: 'ROYAL BRACKLA 12 YEARS OLD',
+    importerName: '바카디코리아',
+    exportCountry: '영국',
+    category: '위스키',
+    alcoholId: 590,
+    imageUrl:
+      'https://dzjkrmkt5t9bn.cloudfront.net/alcohols/migration/590.webp',
+  },
+  {
+    id: 'mfds-20260906-01',
+    clearanceDate: '2026-09-06',
+    korName: '아드벡 우거다일',
+    engName: 'ARDBEG UIGEADAIL',
+    importerName: '모엣헤네시코리아',
+    exportCountry: '영국',
+    category: '위스키',
+    alcoholId: null,
+  },
+  {
+    id: 'mfds-20260904-01',
+    clearanceDate: '2026-09-04',
+    korName: '스프링뱅크 10년',
+    engName: 'SPRINGBANK 10 YEARS OLD',
+    importerName: '맥키스컴퍼니',
+    exportCountry: '영국',
+    category: '위스키',
+    alcoholId: 482,
+    imageUrl:
+      'https://dzjkrmkt5t9bn.cloudfront.net/admin/alcohol/20260601/1-9b068f11-75ef-48fa-bfc3-74ba10ef6f32.jpg',
+  },
+  {
+    id: 'mfds-20260901-01',
+    clearanceDate: '2026-09-01',
+    korName: '라가불린 16년',
+    engName: 'LAGAVULIN 16 YEARS OLD',
+    importerName: '디아지오코리아',
+    exportCountry: '영국',
+    category: '위스키',
+    alcoholId: null,
+  },
+  {
+    id: 'mfds-20260828-01',
+    clearanceDate: '2026-08-28',
+    korName: '맥캘란 더블 캐스크 12년',
+    engName: 'THE MACALLAN DOUBLE CASK 12 YEARS OLD',
+    importerName: '에드링턴코리아',
+    exportCountry: '영국',
+    category: '위스키',
+    alcoholId: null,
+  },
+  {
+    id: 'mfds-20260825-01',
+    clearanceDate: '2026-08-25',
+    korName: '닛카 프롬 더 배럴',
+    engName: 'NIKKA FROM THE BARREL',
+    importerName: '비노에이치',
+    exportCountry: '일본',
+    category: '위스키',
+    alcoholId: null,
+  },
+];
