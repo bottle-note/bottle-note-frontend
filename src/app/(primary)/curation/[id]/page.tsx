@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { BadgeCheck } from 'lucide-react';
 import { CURATION_V2_SPEC_CODES } from '@/api/curation-v2/constants';
 import type {
   ProgramDetailItem,
@@ -29,6 +30,9 @@ import { CurationDetailHeader } from '@/app/(primary)/curation/_components/Curat
 import { parseTastingEventPayload } from '@/app/(primary)/curation/_utils/parseTastingEventPayload';
 import { ProgramDetail } from './_components/ProgramDetail';
 import { WhiskyPairingDetail } from './_components/WhiskyPairingDetail';
+
+const TASTING_EVENT_PERMISSION_NOTICE =
+  '보틀노트의 모든 시음회는 호스트의 허가를 받아 게시됩니다.';
 
 function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
   const router = useRouter();
@@ -112,6 +116,12 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
           textBehavior="wrap"
           className="bg-bg-neutral-weak"
         />
+        <div className="mt-3 flex items-center gap-2 rounded-xl bg-bg-brand-weak px-3 py-2.5">
+          <BadgeCheck aria-hidden className="h-4 w-4 shrink-0 text-fg-brand" />
+          <p className="text-12 font-medium text-fg-neutral-muted">
+            {TASTING_EVENT_PERMISSION_NOTICE}
+          </p>
+        </div>
       </section>
 
       {/* 시음회 설명 */}
