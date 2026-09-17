@@ -70,6 +70,11 @@ export const ERROR_MESSAGES = {
   // 큐레이션
   CURATION_FETCH_FAILED: '큐레이션을 불러오는데 실패했습니다.',
 
+  // 수입 정보
+  IMPORT_CLEARANCE_FETCH_FAILED: '수입 정보를 불러오는데 실패했습니다.',
+  IMPORT_CLEARANCE_LIST_FETCH_FAILED:
+    '수입 정보 목록을 불러오는데 실패했습니다.',
+
   // 탐색
   EXPLORE_FETCH_FAILED: '탐색 결과를 불러오는데 실패했습니다.',
 

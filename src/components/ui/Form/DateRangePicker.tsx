@@ -10,8 +10,8 @@ interface Props {
   startDate: Date | null;
   endDate: Date | null;
   onChange: (start: Date | null, end: Date | null) => void;
-  minDate: Date;
-  maxDate: Date;
+  minDate?: Date;
+  maxDate?: Date;
   description?: string;
 }
 

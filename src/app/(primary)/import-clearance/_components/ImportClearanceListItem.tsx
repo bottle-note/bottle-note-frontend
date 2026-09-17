@@ -1,43 +1,37 @@
+import Link from 'next/link';
 import List from '@/components/feature/List/List';
 import ItemInfo from '@/components/feature/List/_components/ItemInfo';
-
-export interface ImportClearanceItem {
-  id: string;
-  clearanceDate: string;
-  korName: string;
-  engName: string;
-  importerName: string;
-  exportCountry: string;
-  category: string;
-  alcoholId: number | null;
-  imageUrl?: string;
-}
+import { ROUTES } from '@/constants/routes';
+import type { MfdsAlcoholListItem } from '@/api/mfds/types';
+import { declarationName, processedDateText } from '../_lib/declaration';
 
 interface Props {
-  item: ImportClearanceItem;
+  item: MfdsAlcoholListItem;
 }
 
 export default function ImportClearanceListItem({ item }: Props) {
+  const { korName, engName } = declarationName(item);
+  const meta = [
+    item.importerBaseName,
+    item.exportCountryNameKo,
+    item.alcoholCategoryKo,
+  ].filter(Boolean);
+
   return (
-    <List.ItemLayout className="gap-3 px-0">
-      <List.ItemImage
-        src={item.imageUrl ?? ''}
-        alt={`${item.korName} 이미지`}
-        className="rounded-sm"
-      />
-      <div className="min-w-0 flex-1">
-        <p className="text-12 text-fg-brand">통관일 {item.clearanceDate}</p>
-        <div className="mt-1">
-          <ItemInfo
-            korName={item.korName}
-            engName={item.engName}
-            length={null}
-          />
-        </div>
-        <p className="mt-1 text-12 text-fg-neutral-muted">
-          {item.importerName} · {item.exportCountry} · {item.category}
+    <Link href={ROUTES.IMPORT_CLEARANCE.DETAIL(item.id)} className="block">
+      <List.ItemLayout className="flex-col items-start px-0">
+        <p className="text-12 text-fg-brand">
+          처리일자 {processedDateText(item.processedDate)}
         </p>
-      </div>
-    </List.ItemLayout>
+        <div className="mt-1 w-full">
+          <ItemInfo korName={korName} engName={engName} length={null} />
+        </div>
+        {meta.length > 0 && (
+          <p className="mt-1 text-12 text-fg-neutral-muted">
+            {meta.join(' · ')}
+          </p>
+        )}
+      </List.ItemLayout>
+    </Link>
   );
 }

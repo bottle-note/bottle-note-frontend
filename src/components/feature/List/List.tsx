@@ -11,7 +11,6 @@ import OptionSelect from './OptionSelect';
 import Title from './Title';
 import ListSection from './ListSection';
 import ListItemLayout from './ListItemLayout';
-import ItemImage from './_components/ItemImage';
 
 interface ListMainProps {
   children: React.ReactNode;
@@ -106,7 +105,6 @@ const List = Object.assign(ListMain, {
   OptionSelect,
   Item: ListItem,
   ItemLayout: ListItemLayout,
-  ItemImage,
   Rating: ListItemRating,
   Section: ListSection,
 });

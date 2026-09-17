@@ -30,6 +30,7 @@ export const ROUTES = {
   },
   IMPORT_CLEARANCE: {
     BASE: '/import-clearance',
+    DETAIL: (id: string | number) => `/import-clearance/${id}`,
   },
   REVIEW: {
     BASE: '/review',

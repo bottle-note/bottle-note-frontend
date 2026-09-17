@@ -1,0 +1,59 @@
+import { apiClient } from '@/shared/api/apiClient';
+import { ApiResponse } from '@/api/_shared/types';
+import { buildQueryParams } from '@/api/_shared/queryBuilder';
+import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
+import type {
+  MfdsAlcoholDetail,
+  MfdsAlcoholListItem,
+  MfdsAlcoholListParams,
+} from './types';
+
+export const MfdsApi = {
+  /**
+   * 수입 주류 목록을 조회합니다. 처리일자 내림차순이며 처리일자가 없는 항목은 뒤에 옵니다.
+   * 다음 페이지는 meta.pagination.nextCursor를 cursor로 넘겨 조회합니다.
+   */
+  async getAlcohols(
+    params: MfdsAlcoholListParams = {},
+  ): Promise<ApiResponse<MfdsAlcoholListItem[]>> {
+    const { signal, ...queryParams } = params;
+    const queryString = buildQueryParams({ ...queryParams });
+
+    const response = await apiClient.get<ApiResponse<MfdsAlcoholListItem[]>>(
+      `/mfds/alcohols?${queryString}`,
+      { authRequired: false, signal },
+    );
+
+    if (response.errors.length !== 0) {
+      throw new Error(ERROR_MESSAGES.IMPORT_CLEARANCE_LIST_FETCH_FAILED);
+    }
+
+    return response;
+  },
+
+  /**
+   * 수입 주류 상세를 조회합니다.
+   * @param id 수입 신고 레코드 ID (BottleNote 주류 ID가 아닙니다)
+   */
+  async getAlcohol(
+    id: string | number,
+  ): Promise<ApiResponse<MfdsAlcoholDetail>> {
+    const response = await apiClient.get<ApiResponse<MfdsAlcoholDetail>>(
+      `/mfds/alcohols/${id}`,
+      { authRequired: false },
+    );
+
+    if (response.errors.length !== 0) {
+      throw new Error(ERROR_MESSAGES.IMPORT_CLEARANCE_FETCH_FAILED);
+    }
+
+    return response;
+  },
+};
+
+export type {
+  MfdsAlcoholDetail,
+  MfdsAlcoholListItem,
+  MfdsAlcoholListParams,
+  MfdsImporter,
+} from './types';

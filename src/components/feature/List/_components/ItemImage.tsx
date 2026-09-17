@@ -8,21 +8,13 @@ interface Props {
   alt: string;
   className?: string;
   priority?: boolean;
-  size?: 'default' | 'sm';
 }
 
-const ItemImage = ({
-  src,
-  alt,
-  className,
-  priority = false,
-  size = 'default',
-}: Props) => {
+const ItemImage = ({ src, alt, className, priority = false }: Props) => {
   return (
     <div
       className={cn(
-        'flex shrink-0 items-center justify-center bg-palette-static-white',
-        size === 'sm' ? 'h-14 w-14 p-0' : 'h-[89px] w-[89px] p-2',
+        `w-[89px] h-[89px] flex shrink-0 bg-palette-static-white p-2 justify-center items-center`,
         className,
       )}
     >
@@ -34,7 +26,7 @@ const ItemImage = ({
           className="object-contain w-auto h-auto"
           backgroundClassName="bg-palette-static-white"
           fill
-          sizes={size === 'sm' ? '56px' : '85px'}
+          sizes="85px"
         />
       </div>
     </div>
