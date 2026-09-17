@@ -6,7 +6,8 @@ import { handleWebViewMessage } from '@/utils/flutterUtil';
 
 interface AlcoholRatingInputProps {
   value: number;
-  onCommit: (rating: number) => void;
+  onChange: (rating: number) => void;
+  onCommit?: (rating: number) => void;
 }
 
 const MIN_RATING = 0;
@@ -27,6 +28,7 @@ const getFillRatio = (rating: number, index: number) =>
 
 export default function AlcoholRatingInput({
   value,
+  onChange,
   onCommit,
 }: AlcoholRatingInputProps) {
   const [previewRate, setPreviewRate] = useState<number | null>(null);
@@ -71,7 +73,10 @@ export default function AlcoholRatingInput({
 
   const finishInteraction = (rating: number) => {
     resetInteraction();
-    onCommit(rating);
+    if (rating === value) return;
+
+    onChange(rating);
+    onCommit?.(rating);
   };
 
   const handlePointerDown = (event: React.PointerEvent<HTMLInputElement>) => {

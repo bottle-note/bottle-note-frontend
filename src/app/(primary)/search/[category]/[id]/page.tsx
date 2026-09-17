@@ -34,13 +34,13 @@ import { trackGA4Event } from '@/utils/analytics/ga4';
 import { ROUTES } from '@/constants/routes';
 import AlcoholDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/AlcoholDetailsSkeleton';
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
+import AlcoholRatingInput from '@/components/domain/alcohol/AlcoholRatingInput';
 import ShareDropdown from '@/components/share/ShareDropdown';
 import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import type { ShareConfig, ShareChannel } from '@/types/share';
 import FloatingReviewButton from './_components/FloatingReviewButton';
 import AlcoholDetailHeader from './_components/AlcoholDetailHeader';
 import { GuestAlcoholDetailGate } from './_components/GuestAlcoholDetailGate';
-import AlcoholRatingInput from './_components/AlcoholRatingInput';
 import RatingSuccessModal from './_components/RatingSuccessModal';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
@@ -148,12 +148,17 @@ export default function SearchAlcohol() {
     }
   }, [alcoholId, isLoggedIn]);
 
-  const handleRate = useCallback(
+  const handleRateChange = useCallback(
+    (selectedRate: number) => {
+      if (!isLoggedIn) return;
+      setCurrentRate(selectedRate);
+    },
+    [isLoggedIn, setCurrentRate],
+  );
+
+  const handleRateCommit = useCallback(
     (selectedRate: number) => {
       if (!isLoggedIn) return bridgeToLogin('rating');
-      if (currentRateRef.current === selectedRate) return;
-
-      setCurrentRate(selectedRate);
       const requestId = ++latestRatingRequestIdRef.current;
 
       ratingRequestQueueRef.current = ratingRequestQueueRef.current
@@ -195,7 +200,6 @@ export default function SearchAlcohol() {
       data?.alcohols.korName,
       handleModalState,
       isLoggedIn,
-      setCurrentRate,
     ],
   );
 
@@ -391,7 +395,11 @@ export default function SearchAlcohol() {
                   data?.alcohols?.myRating,
                 )}
                 <div>
-                  <AlcoholRatingInput value={rate} onCommit={handleRate} />
+                  <AlcoholRatingInput
+                    value={rate}
+                    onChange={handleRateChange}
+                    onCommit={handleRateCommit}
+                  />
                 </div>
               </article>
               {isGuest ? (
