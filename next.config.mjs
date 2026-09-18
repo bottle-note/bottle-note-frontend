@@ -19,24 +19,40 @@ const nextConfig = {
     missingSuspenseWithCSRBailout: false,
   },
   async rewrites() {
-    const serverUrl = process.env.INTERNAL_SERVER_URL;
-    if (!serverUrl) {
+    const rawServerUrl =
+      process.env.API_SERVER_WARP_URL || process.env.INTERNAL_SERVER_URL;
+    if (!rawServerUrl) {
       throw new Error('INTERNAL_SERVER_URL is required');
     }
-    if (serverUrl !== new URL(serverUrl).origin) {
-      throw new Error(
-        'INTERNAL_SERVER_URL must be an origin without a path or trailing slash',
-      );
+
+    const serverUrl = new URL(rawServerUrl).origin;
+
+    // Browser Bearer tokens stay on Authorization; Warpgate ticket goes on the query.
+    let ticket = null;
+    for (const raw of [
+      process.env.API_SERVER_WARP_URL,
+      process.env.INTERNAL_SERVER_URL,
+    ]) {
+      if (!raw) continue;
+      try {
+        ticket = new URL(raw).searchParams.get('warpgate-ticket');
+        if (ticket) break;
+      } catch {
+        ticket = null;
+      }
     }
+    const ticketQuery = ticket
+      ? `?warpgate-ticket=${encodeURIComponent(ticket)}`
+      : '';
 
     return [
       {
         source: '/bottle-api/v1/:path*',
-        destination: `${serverUrl}/api/v1/:path*`,
+        destination: `${serverUrl}/api/v1/:path*${ticketQuery}`,
       },
       {
         source: '/bottle-api/v2/:path*',
-        destination: `${serverUrl}/api/v2/:path*`,
+        destination: `${serverUrl}/api/v2/:path*${ticketQuery}`,
       },
     ];
   },

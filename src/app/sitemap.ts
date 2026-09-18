@@ -2,6 +2,10 @@ import { MetadataRoute } from 'next';
 import { ApiResponse } from '@/api/_shared/types';
 import type { ExploreAlcohol, ExploreReview } from '@/api/explore/types';
 import { BASE_URL, SSR_CALLER_HEADER } from '@/constants/common';
+import {
+  getInternalServerOrigin,
+  internalApiHeaders,
+} from '@/shared/api/internalApi';
 
 const SITEMAP_CONFIG = {
   PAGE_SIZE: 100,
@@ -15,16 +19,16 @@ function parseDate(dateString: string | undefined | null): Date {
 }
 
 async function fetchFromAPI<T>(endpoint: string): Promise<T> {
-  const serverUrl = `${process.env.INTERNAL_SERVER_URL}/api/v1`;
+  const serverUrl = `${getInternalServerOrigin()}/api/v1`;
 
   const url = `${serverUrl}${endpoint}`;
 
   const response = await fetch(url, {
     method: 'GET',
-    headers: {
+    headers: internalApiHeaders({
       'Content-Type': 'application/json',
       ...SSR_CALLER_HEADER,
-    },
+    }),
     cache: SITEMAP_CONFIG.CACHE_POLICY,
   });
 
