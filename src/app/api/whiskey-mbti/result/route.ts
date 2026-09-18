@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import type { MbtiResultDetail } from '@/app/(custom)/whiskey-mbti/_types';
 import { SSR_CALLER_HEADER } from '@/constants/common';
+import {
+  getInternalServerOrigin,
+  internalApiHeaders,
+} from '@/shared/api/internalApi';
 import { calculateMbtiResult } from '../_lib/calculate';
 import { getResultMatch, isMbtiCode, TASTE_LABELS } from '../_lib/results';
 
@@ -25,9 +29,12 @@ type AlcoholDetail = {
 
 async function fetchAlcohol(id: number) {
   try {
-    const baseUrl = `${process.env.INTERNAL_SERVER_URL}/api/v1`;
+    const baseUrl = `${getInternalServerOrigin()}/api/v1`;
     const response = await fetch(`${baseUrl}/alcohols/${id}`, {
-      headers: { Accept: 'application/json', ...SSR_CALLER_HEADER },
+      headers: internalApiHeaders({
+        Accept: 'application/json',
+        ...SSR_CALLER_HEADER,
+      }),
       cache: 'no-store',
       signal: AbortSignal.timeout(8000),
     });

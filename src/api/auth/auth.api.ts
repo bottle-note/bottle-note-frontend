@@ -5,6 +5,10 @@ import { ApiError } from '@/utils/ApiError';
 import { extractRefreshToken } from '@/utils/cookieUtils';
 import useModalStore from '@/store/modalStore';
 import { SSR_CALLER_HEADER } from '@/constants/common';
+import {
+  getInternalServerOrigin,
+  internalApiHeaders,
+} from '@/shared/api/internalApi';
 import { clearAuthSession, refreshAuthSession } from '@/lib/auth/session-store';
 import type {
   AppleLoginParams,
@@ -23,14 +27,14 @@ export const AuthApi = {
      */
     async appleLogin(body: AppleLoginParams): Promise<LoginTokenData> {
       const response = await fetch(
-        `${process.env.INTERNAL_SERVER_URL}/api/v2/auth/apple`,
+        `${getInternalServerOrigin()}/api/v2/auth/apple`,
         {
           method: 'POST',
           body: JSON.stringify(body),
-          headers: {
+          headers: internalApiHeaders({
             'Content-Type': 'application/json',
             ...SSR_CALLER_HEADER,
-          },
+          }),
         },
       );
 
@@ -65,14 +69,14 @@ export const AuthApi = {
      */
     async kakaoLogin(body: KakaoLoginParams): Promise<LoginTokenData> {
       const response = await fetch(
-        `${process.env.INTERNAL_SERVER_URL}/api/v2/auth/kakao`,
+        `${getInternalServerOrigin()}/api/v2/auth/kakao`,
         {
           method: 'POST',
           body: JSON.stringify(body),
-          headers: {
+          headers: internalApiHeaders({
             'Content-Type': 'application/json',
             ...SSR_CALLER_HEADER,
-          },
+          }),
         },
       );
 
@@ -107,14 +111,14 @@ export const AuthApi = {
      */
     async renewToken(refreshToken: string): Promise<TokenData> {
       const response = await fetch(
-        `${process.env.INTERNAL_SERVER_URL}/api/v2/auth/reissue`,
+        `${getInternalServerOrigin()}/api/v2/auth/reissue`,
         {
           method: 'POST',
-          headers: {
+          headers: internalApiHeaders({
             'refresh-token': refreshToken,
             'Content-Type': 'application/json',
             ...SSR_CALLER_HEADER,
-          },
+          }),
         },
       );
 

@@ -9,12 +9,16 @@ import HomeCategorySection from '@/components/feature/home/HomeCategorySection';
 import type { Banner } from '@/api/banner/types';
 import type { ApiResponse } from '@/api/_shared/types';
 import { SSR_CALLER_HEADER } from '@/constants/common';
+import {
+  getInternalServerOrigin,
+  internalApiHeaders,
+} from '@/shared/api/internalApi';
 
 async function getBanners(): Promise<Banner[]> {
   try {
-    const baseUrl = `${process.env.INTERNAL_SERVER_URL}/api/v1`;
+    const baseUrl = `${getInternalServerOrigin()}/api/v1`;
     const res = await fetch(`${baseUrl}/banners?limit=10`, {
-      headers: { ...SSR_CALLER_HEADER },
+      headers: internalApiHeaders({ ...SSR_CALLER_HEADER }),
       next: { revalidate: 300 },
     });
 
