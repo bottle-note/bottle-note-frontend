@@ -22,10 +22,9 @@ import { ExploreReview } from '@/api/explore/types';
 import type { ApiResponse } from '@/api/_shared/types';
 import List from '@/components/feature/List/List';
 import {
-  GUEST_LIST_PAGE_SIZE,
   GuestListGate,
+  useGuestPageSize,
 } from '@/components/feature/auth/GuestListGate';
-import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import useModalStore from '@/store/modalStore';
 import { DEBOUNCE_DELAY } from '@/constants/common';
 import ReviewCard from './ReviewListItem';
@@ -65,15 +64,13 @@ export const ReviewExplorerList = ({
 }: ReviewExplorerListProps) => {
   const queryClient = useQueryClient();
   const { handleModalState } = useModalStore();
-  const { isLoggedIn, isLoading: isAuthLoading, user } = useAuthSession();
+  const { isLoggedIn, user, isGuest, pageSize } = useGuestPageSize(10);
   const { inputKeyword, debouncedKeyword, isTyping, setInputKeyword } =
     useExploreSearch({ tabId: REVIEW_EXPLORE_TAB_ID });
   const { sortPresets, selectedSort, selectSort } = useExploreSort({
     tabId: REVIEW_EXPLORE_TAB_ID,
   });
   const { ratingPreset } = useExploreFilters();
-  const isGuest = !isAuthLoading && !isLoggedIn;
-  const pageSize = isGuest ? GUEST_LIST_PAGE_SIZE : 10;
 
   const queryKey = useMemo(
     () => [

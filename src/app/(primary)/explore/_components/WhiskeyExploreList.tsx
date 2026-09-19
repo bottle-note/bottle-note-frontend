@@ -6,11 +6,10 @@ import type { ExploreAlcohol } from '@/api/explore/types';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import List from '@/components/feature/List/List';
 import {
-  GUEST_LIST_PAGE_SIZE,
   GuestListGate,
+  useGuestPageSize,
 } from '@/components/feature/auth/GuestListGate';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
-import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import WhiskeyListItem from './WhiskeyListItem';
@@ -33,7 +32,7 @@ export const WhiskeyExplorerList = ({
   onSearchActiveChange,
 }: WhiskeyExplorerListProps) => {
   const router = useRouter();
-  const { isLoggedIn, isLoading: isAuthLoading, user } = useAuthSession();
+  const { isLoggedIn, user, isGuest, pageSize } = useGuestPageSize(10);
   const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
   const { inputKeyword, debouncedKeyword, isTyping, setInputKeyword } =
@@ -42,8 +41,6 @@ export const WhiskeyExplorerList = ({
     tabId: WHISKEY_EXPLORE_TAB_ID,
   });
   const { regionIds, category, ratingPreset } = useExploreFilters();
-  const isGuest = !isAuthLoading && !isLoggedIn;
-  const pageSize = isGuest ? GUEST_LIST_PAGE_SIZE : 10;
 
   const {
     data: alcoholList,
