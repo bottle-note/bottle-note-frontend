@@ -6,6 +6,7 @@ import type {
   MfdsAlcoholDetail,
   MfdsAlcoholListItem,
   MfdsAlcoholListParams,
+  MfdsCountry,
 } from './types';
 
 export const MfdsApi = {
@@ -49,11 +50,27 @@ export const MfdsApi = {
 
     return response;
   },
+
+  /** 원장에 등장한 수출국 목록을 조회합니다. exportCountry 필터 옵션으로 씁니다. */
+  async getCountries(): Promise<ApiResponse<MfdsCountry[]>> {
+    const response = await apiClient.get<ApiResponse<MfdsCountry[]>>(
+      '/mfds/countries',
+      { authRequired: false },
+    );
+
+    if (response.errors.length !== 0) {
+      throw new Error(ERROR_MESSAGES.IMPORT_CLEARANCE_COUNTRY_FETCH_FAILED);
+    }
+
+    return response;
+  },
 };
 
 export type {
   MfdsAlcoholDetail,
   MfdsAlcoholListItem,
   MfdsAlcoholListParams,
+  MfdsAlcoholType,
+  MfdsCountry,
   MfdsImporter,
 } from './types';

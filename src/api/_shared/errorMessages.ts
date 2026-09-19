@@ -74,6 +74,8 @@ export const ERROR_MESSAGES = {
   IMPORT_CLEARANCE_FETCH_FAILED: '수입 정보를 불러오는데 실패했습니다.',
   IMPORT_CLEARANCE_LIST_FETCH_FAILED:
     '수입 정보 목록을 불러오는데 실패했습니다.',
+  IMPORT_CLEARANCE_COUNTRY_FETCH_FAILED:
+    '수출국 목록을 불러오는데 실패했습니다.',
 
   // 탐색
   EXPLORE_FETCH_FAILED: '탐색 결과를 불러오는데 실패했습니다.',

@@ -2,10 +2,14 @@
 
 import { useState } from 'react';
 import { ListFilter } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
 import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
 import StickySearchBar from '@/components/feature/Search/StickySearchBar';
 import DateRangePicker from '@/components/ui/Form/DateRangePicker';
+import { MfdsApi } from '@/api/mfds/mfds.api';
+import type { MfdsAlcoholType } from '@/api/mfds/types';
+import { ALCOHOL_TYPE_OPTIONS } from '../_lib/declaration';
 
 interface Props {
   isSearchActive: boolean;
@@ -15,6 +19,10 @@ interface Props {
   startDate: Date | null;
   endDate: Date | null;
   onDateChange: (startDate: Date | null, endDate: Date | null) => void;
+  exportCountry: string | null;
+  onExportCountryChange: (exportCountry: string | null) => void;
+  alcoholType: MfdsAlcoholType | null;
+  onAlcoholTypeChange: (alcoholType: MfdsAlcoholType | null) => void;
   onReset: () => void;
 }
 
@@ -26,9 +34,20 @@ export default function ImportClearanceFilter({
   startDate,
   endDate,
   onDateChange,
+  exportCountry,
+  onExportCountryChange,
+  alcoholType,
+  onAlcoholTypeChange,
   onReset,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: countries } = useQuery({
+    queryKey: ['mfds.countries'],
+    queryFn: async () => (await MfdsApi.getCountries()).data,
+    staleTime: 1000 * 60 * 60 * 24,
+    gcTime: 1000 * 60 * 60 * 24,
+    retry: false,
+  });
 
   return (
     <>
@@ -61,13 +80,65 @@ export default function ImportClearanceFilter({
         onClose={() => setIsOpen(false)}
         resetFilter={onReset}
       >
-        <Accordion title="처리일자">
+        <Accordion title="통관일자">
           <DateRangePicker
             startDate={startDate}
             endDate={endDate}
             onChange={onDateChange}
-            description="처리일자 기준으로 조회할 수 있어요."
+            description="통관일자 기준으로 조회할 수 있어요."
           />
+        </Accordion>
+
+        <Accordion title="주종">
+          <Accordion.Single>
+            <Accordion.Content
+              title="전체"
+              value="all"
+              isSelected={!alcoholType}
+              onClick={() => onAlcoholTypeChange(null)}
+            />
+          </Accordion.Single>
+          <Accordion.Grid cols={3}>
+            {ALCOHOL_TYPE_OPTIONS.map((option) => (
+              <Accordion.Content
+                key={option.id}
+                title={option.name}
+                value={option.id}
+                isSelected={alcoholType === option.id}
+                onClick={() =>
+                  onAlcoholTypeChange(
+                    alcoholType === option.id ? null : option.id,
+                  )
+                }
+              />
+            ))}
+          </Accordion.Grid>
+        </Accordion>
+
+        <Accordion title="수출국">
+          <Accordion.Single>
+            <Accordion.Content
+              title="전체"
+              value="all"
+              isSelected={!exportCountry}
+              onClick={() => onExportCountryChange(null)}
+            />
+          </Accordion.Single>
+          <Accordion.Grid cols={3}>
+            {(countries ?? []).map((country) => (
+              <Accordion.Content
+                key={country.alpha2}
+                title={country.nameKo ?? country.alpha2}
+                value={country.alpha2}
+                isSelected={exportCountry === country.alpha2}
+                onClick={() =>
+                  onExportCountryChange(
+                    exportCountry === country.alpha2 ? null : country.alpha2,
+                  )
+                }
+              />
+            ))}
+          </Accordion.Grid>
         </Accordion>
       </SideFilterDrawer>
     </>

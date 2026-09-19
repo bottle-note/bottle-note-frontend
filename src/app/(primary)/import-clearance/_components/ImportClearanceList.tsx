@@ -10,9 +10,10 @@ import Tab from '@/components/ui/Navigation/Tab';
 import { useTab } from '@/hooks/useTab';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { MfdsApi } from '@/api/mfds/mfds.api';
-import type { MfdsAlcoholListItem } from '@/api/mfds/types';
+import type { MfdsAlcoholListItem, MfdsAlcoholType } from '@/api/mfds/types';
 import ImportClearanceFilter from './ImportClearanceFilter';
 import ImportClearanceListItem from './ImportClearanceListItem';
+import { ALCOHOL_TYPE_OPTIONS } from '../_lib/declaration';
 
 const tabList = [{ id: 'clearance', name: '수입통관' }];
 const PAGE_SIZE = 20;
@@ -33,6 +34,12 @@ export default function ImportClearanceList() {
   );
   const [endDate, setEndDate] = useState(() =>
     parseQueryDate(searchParams.get('endDate')),
+  );
+  const [exportCountry, setExportCountry] = useState(() =>
+    searchParams.get('country'),
+  );
+  const [alcoholType, setAlcoholType] = useState(() =>
+    parseAlcoholType(searchParams.get('alcoholType')),
   );
   const urlKeyword = normalizeKeyword(searchParams.get('keyword') ?? '');
   const syncedKeywordRef = useRef(urlKeyword);
@@ -85,6 +92,8 @@ export default function ImportClearanceList() {
     }
     setStartDate(startDateFromUrl);
     setEndDate(endDateFromUrl);
+    setExportCountry(searchParams.get('country'));
+    setAlcoholType(parseAlcoholType(searchParams.get('alcoholType')));
   }, [searchParams, urlKeyword]);
 
   useEffect(
@@ -111,6 +120,8 @@ export default function ImportClearanceList() {
       keyword,
       processedDateFrom,
       processedDateTo,
+      exportCountry,
+      alcoholType,
       PAGE_SIZE,
     ],
     queryFn: ({ pageParam, signal }) =>
@@ -118,6 +129,8 @@ export default function ImportClearanceList() {
         keyword: keyword || undefined,
         processedDateFrom: processedDateFrom || undefined,
         processedDateTo: processedDateTo || undefined,
+        exportCountry: exportCountry || undefined,
+        alcoholType: alcoholType || undefined,
         cursor: pageParam,
         size: PAGE_SIZE,
         signal,
@@ -141,7 +154,14 @@ export default function ImportClearanceList() {
   const handleReset = () => {
     setStartDate(null);
     setEndDate(null);
-    updateSearchParams({ startDate: null, endDate: null });
+    setExportCountry(null);
+    setAlcoholType(null);
+    updateSearchParams({
+      startDate: null,
+      endDate: null,
+      country: null,
+      alcoholType: null,
+    });
   };
 
   const handleDateChange = (
@@ -154,6 +174,16 @@ export default function ImportClearanceList() {
       startDate: nextStartDate ? format(nextStartDate, 'yyyy-MM-dd') : null,
       endDate: nextEndDate ? format(nextEndDate, 'yyyy-MM-dd') : null,
     });
+  };
+
+  const handleExportCountryChange = (nextExportCountry: string | null) => {
+    setExportCountry(nextExportCountry);
+    updateSearchParams({ country: nextExportCountry });
+  };
+
+  const handleAlcoholTypeChange = (nextAlcoholType: MfdsAlcoholType | null) => {
+    setAlcoholType(nextAlcoholType);
+    updateSearchParams({ alcoholType: nextAlcoholType });
   };
 
   return (
@@ -191,6 +221,10 @@ export default function ImportClearanceList() {
           startDate={startDate}
           endDate={endDate}
           onDateChange={handleDateChange}
+          exportCountry={exportCountry}
+          onExportCountryChange={handleExportCountryChange}
+          alcoholType={alcoholType}
+          onAlcoholTypeChange={handleAlcoholTypeChange}
           onReset={handleReset}
         />
         <List
@@ -246,3 +280,13 @@ function parseQueryDate(value: string | null) {
   const date = parseISO(value);
   return isValid(date) ? date : null;
 }
+
+function parseAlcoholType(value: string | null): MfdsAlcoholType | null {
+  return value && ALCOHOL_TYPE_VALUES.has(value)
+    ? (value as MfdsAlcoholType)
+    : null;
+}
+
+const ALCOHOL_TYPE_VALUES = new Set<string>(
+  ALCOHOL_TYPE_OPTIONS.map((option) => option.id),
+);

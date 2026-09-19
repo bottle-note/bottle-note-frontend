@@ -1,4 +1,8 @@
-import type { MfdsAlcoholDetail, MfdsAlcoholListItem } from '@/api/mfds/types';
+import type {
+  MfdsAlcoholDetail,
+  MfdsAlcoholListItem,
+  MfdsAlcoholType,
+} from '@/api/mfds/types';
 
 type Declaration = MfdsAlcoholListItem | MfdsAlcoholDetail;
 
@@ -20,4 +24,20 @@ export const processedDateText = (processedDate: string | null) =>
   processedDate ?? '미상';
 
 export const PROCESSED_DATE_NOTICE =
-  '처리일자는 수집 사이트에 표시된 날짜예요. 세관 통관 완료일과 다를 수 있어요.';
+  '통관일자는 수집 사이트에 표시된 날짜예요. 실제 통관 완료 시점과 다를 수 있어요.';
+
+/**
+ * alcoholType 필터 표시용 한글 라벨. API는 이 키 자체(WHISKY 등)를 받고
+ * 서버 내부에서 alcoholCategoryKo로 변환하므로, 여기 라벨은 화면 표시 전용이다.
+ */
+export const ALCOHOL_TYPE_OPTIONS: { id: MfdsAlcoholType; name: string }[] = [
+  { id: 'WHISKY', name: '위스키' },
+  { id: 'WINE', name: '와인' },
+  { id: 'BEER', name: '맥주' },
+  { id: 'RUM', name: '럼' },
+  { id: 'VODKA', name: '보드카' },
+  { id: 'GIN', name: '진' },
+  { id: 'TEQUILA', name: '데킬라' },
+  { id: 'BRANDY', name: '브랜디' },
+  { id: 'ETC', name: '기타' },
+];

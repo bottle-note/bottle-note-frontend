@@ -110,7 +110,7 @@ export default function ImportClearanceDetail() {
   const { korName, engName } = declarationName(data);
   const importerName = data.importer?.businessName ?? data.importerBaseName;
   const rows = [
-    { title: '처리일자', content: processedDateText(data.processedDate) },
+    { title: '통관일자', content: processedDateText(data.processedDate) },
     { title: '수입사', content: importerName },
     { title: '제조국', content: data.manufactureCountryNameKo },
     { title: '수출국', content: data.exportCountryNameKo },

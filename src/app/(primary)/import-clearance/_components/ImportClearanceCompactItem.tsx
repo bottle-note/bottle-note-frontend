@@ -27,7 +27,7 @@ export default function ImportClearanceCompactItem({ item }: Props) {
         )}
       </div>
       <span className="shrink-0 text-12 text-fg-brand">
-        {item.processedDate ?? '처리일자 미상'}
+        {item.processedDate ?? '통관일자 미상'}
       </span>
     </Link>
   );
