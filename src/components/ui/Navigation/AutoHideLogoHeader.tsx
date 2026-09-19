@@ -50,7 +50,10 @@ export default function AutoHideLogoHeader({
         </SubHeader.Left>
         {title && <SubHeader.Center>{title}</SubHeader.Center>}
         <SubHeader.Right>
-          <SubHeader.Menu />
+          <div className="flex items-center gap-x-3">
+            <SubHeader.Profile />
+            <SubHeader.Menu />
+          </div>
         </SubHeader.Right>
       </SubHeader>
     </header>
