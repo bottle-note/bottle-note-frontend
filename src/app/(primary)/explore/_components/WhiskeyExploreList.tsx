@@ -7,7 +7,7 @@ import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import List from '@/components/feature/List/List';
 import {
   GuestListGate,
-  useGuestPageSize,
+  useGuestPagedSession,
 } from '@/components/feature/auth/GuestListGate';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import useModalStore from '@/store/modalStore';
@@ -32,7 +32,7 @@ export const WhiskeyExplorerList = ({
   onSearchActiveChange,
 }: WhiskeyExplorerListProps) => {
   const router = useRouter();
-  const { isLoggedIn, user, isGuest, pageSize } = useGuestPageSize(10);
+  const { isLoggedIn, user, isGuest, pageSize } = useGuestPagedSession(10);
   const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
   const { inputKeyword, debouncedKeyword, isTyping, setInputKeyword } =

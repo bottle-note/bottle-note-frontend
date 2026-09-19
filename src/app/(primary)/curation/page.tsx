@@ -16,7 +16,7 @@ import { useProgramsQuery } from '@/queries/useProgramsQuery';
 import { useTastingEventsQuery } from '@/queries/useTastingEventsQuery';
 import {
   GuestListGate,
-  useGuestPageSize,
+  useGuestPagedSession,
 } from '@/components/feature/auth/GuestListGate';
 import StickySearchBar from '@/components/feature/Search/StickySearchBar';
 import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
@@ -79,7 +79,7 @@ export default function CurationPage() {
     isLoading: isAuthLoading,
     isGuest,
     pageSize,
-  } = useGuestPageSize(10);
+  } = useGuestPagedSession(10);
   const [inputKeyword, setInputKeyword] = useState('');
   const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState('');
   const [isSearchActive, setIsSearchActive] = useState(false);

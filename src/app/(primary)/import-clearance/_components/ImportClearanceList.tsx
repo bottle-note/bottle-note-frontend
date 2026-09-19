@@ -6,7 +6,7 @@ import { format, isValid, parseISO } from 'date-fns';
 import List from '@/components/feature/List/List';
 import {
   GuestListGate,
-  useGuestPageSize,
+  useGuestPagedSession,
 } from '@/components/feature/auth/GuestListGate';
 import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
@@ -28,7 +28,7 @@ export default function ImportClearanceList() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isNavigationVisible, setNavbarSuppressed } = useNavLayout();
-  const { isLoggedIn, isGuest, pageSize } = useGuestPageSize(PAGE_SIZE);
+  const { isLoggedIn, isGuest, pageSize } = useGuestPagedSession(PAGE_SIZE);
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [inputKeyword, setInputKeyword] = useState(() =>
     normalizeKeyword(searchParams.get('keyword') ?? ''),

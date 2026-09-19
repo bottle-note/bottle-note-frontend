@@ -23,7 +23,7 @@ import type { ApiResponse } from '@/api/_shared/types';
 import List from '@/components/feature/List/List';
 import {
   GuestListGate,
-  useGuestPageSize,
+  useGuestPagedSession,
 } from '@/components/feature/auth/GuestListGate';
 import useModalStore from '@/store/modalStore';
 import { DEBOUNCE_DELAY } from '@/constants/common';
@@ -64,7 +64,7 @@ export const ReviewExplorerList = ({
 }: ReviewExplorerListProps) => {
   const queryClient = useQueryClient();
   const { handleModalState } = useModalStore();
-  const { isLoggedIn, user, isGuest, pageSize } = useGuestPageSize(10);
+  const { isLoggedIn, user, isGuest, pageSize } = useGuestPagedSession(10);
   const { inputKeyword, debouncedKeyword, isTyping, setInputKeyword } =
     useExploreSearch({ tabId: REVIEW_EXPLORE_TAB_ID });
   const { sortPresets, selectedSort, selectSort } = useExploreSort({
