@@ -21,6 +21,7 @@ import { ALCOHOL_TYPE_OPTIONS } from '../_lib/declaration';
 
 const tabList = [{ id: 'clearance', name: '수입통관' }];
 const PAGE_SIZE = 20;
+const GUEST_PAGE_SIZE = 12;
 
 export default function ImportClearanceList() {
   const { currentTab, handleTab, refs, registerTab } = useTab({ tabList });
@@ -28,7 +29,10 @@ export default function ImportClearanceList() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isNavigationVisible, setNavbarSuppressed } = useNavLayout();
-  const { isLoggedIn, isGuest, pageSize } = useGuestPagedSession(PAGE_SIZE);
+  const { isLoggedIn, isGuest, pageSize } = useGuestPagedSession(
+    PAGE_SIZE,
+    GUEST_PAGE_SIZE,
+  );
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [inputKeyword, setInputKeyword] = useState(() =>
     normalizeKeyword(searchParams.get('keyword') ?? ''),

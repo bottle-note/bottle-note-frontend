@@ -12,16 +12,20 @@ export const GUEST_LIST_PAGE_SIZE = 3;
 
 /**
  * useAuthSession()에 게스트 판정과 페이지 크기를 얹은 상위집합. 비로그인
- * 사용자는 GUEST_LIST_PAGE_SIZE만큼만 불러오도록 pageSize를 낮춘다.
+ * 사용자는 guestPageSize(기본 GUEST_LIST_PAGE_SIZE)만큼만 불러오도록
+ * pageSize를 낮춘다.
  */
-export const useGuestPagedSession = (defaultPageSize: number) => {
+export const useGuestPagedSession = (
+  defaultPageSize: number,
+  guestPageSize: number = GUEST_LIST_PAGE_SIZE,
+) => {
   const auth = useAuthSession();
   const isGuest = !auth.isLoading && !auth.isLoggedIn;
 
   return {
     ...auth,
     isGuest,
-    pageSize: isGuest ? GUEST_LIST_PAGE_SIZE : defaultPageSize,
+    pageSize: isGuest ? guestPageSize : defaultPageSize,
   };
 };
 
