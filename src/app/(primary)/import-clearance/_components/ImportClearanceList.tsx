@@ -4,6 +4,10 @@ import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { format, isValid, parseISO } from 'date-fns';
 import List from '@/components/feature/List/List';
+import {
+  GuestListGate,
+  useGuestPageSize,
+} from '@/components/feature/auth/GuestListGate';
 import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
 import Tab from '@/components/ui/Navigation/Tab';
@@ -24,6 +28,7 @@ export default function ImportClearanceList() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isNavigationVisible, setNavbarSuppressed } = useNavLayout();
+  const { isLoggedIn, isGuest, pageSize } = useGuestPageSize(PAGE_SIZE);
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [inputKeyword, setInputKeyword] = useState(() =>
     normalizeKeyword(searchParams.get('keyword') ?? ''),
@@ -122,7 +127,7 @@ export default function ImportClearanceList() {
       processedDateTo,
       exportCountry,
       alcoholType,
-      PAGE_SIZE,
+      pageSize,
     ],
     queryFn: ({ pageParam, signal }) =>
       MfdsApi.getAlcohols({
@@ -132,7 +137,7 @@ export default function ImportClearanceList() {
         exportCountry: exportCountry || undefined,
         alcoholType: alcoholType || undefined,
         cursor: pageParam,
-        size: PAGE_SIZE,
+        size: pageSize,
         signal,
       }),
     staleTime: 1000 * 60 * 5,
@@ -145,6 +150,7 @@ export default function ImportClearanceList() {
   const hasLoadedFirstPage = pages !== undefined;
   const isEmpty = hasLoadedFirstPage && !error && items.length === 0;
   const hasNextPageError = Boolean(error) && items.length > 0;
+  const shouldGateGuestList = isGuest && items.length > 0;
 
   const handleSearchActiveChange = (active: boolean) => {
     setIsSearchActive(active);
@@ -253,7 +259,13 @@ export default function ImportClearanceList() {
             </button>
           </div>
         ) : (
-          <div ref={targetRef} />
+          isLoggedIn && <div ref={targetRef} />
+        )}
+        {shouldGateGuestList && (
+          <GuestListGate
+            title="더 많은 수입 정보가 궁금하신가요?"
+            description="로그인하고 전체 수입통관 내역을 더 확인해보세요."
+          />
         )}
         {isFetchingNextPage && (
           <p className="py-4 text-center text-13 text-fg-neutral-muted">
