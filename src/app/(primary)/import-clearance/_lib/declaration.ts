@@ -19,13 +19,6 @@ export const declarationName = (item: Declaration) => ({
   engName: item.skuDisplayNameEn ?? item.baseProductNameEn ?? '',
 });
 
-/** 처리일자는 수집 사이트 기준이며 null일 수 있다. */
-export const processedDateText = (processedDate: string | null) =>
-  processedDate ?? '미상';
-
-export const PROCESSED_DATE_NOTICE =
-  '통관일자는 수집 사이트에 표시된 날짜예요. 실제 통관 완료 시점과 다를 수 있어요.';
-
 /**
  * alcoholType 필터 표시용 한글 라벨. API는 이 키 자체(WHISKY 등)를 받고
  * 서버 내부에서 alcoholCategoryKo로 변환하므로, 여기 라벨은 화면 표시 전용이다.

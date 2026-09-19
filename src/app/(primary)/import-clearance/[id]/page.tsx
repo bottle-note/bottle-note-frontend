@@ -1,25 +1,51 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
+import {
+  Building2,
+  Calendar,
+  CalendarCheck,
+  CalendarRange,
+  ChevronRight,
+  Factory,
+  Hash,
+  MapPin,
+  Package,
+  Phone,
+  Ship,
+  Sparkles,
+  User,
+  HashIcon,
+  type LucideIcon,
+} from 'lucide-react';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
-import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import Label from '@/components/ui/Display/Label';
 import ErrorFallback from '@/components/ui/Display/ErrorFallback';
-import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import { MfdsApi } from '@/api/mfds/mfds.api';
 import { parseApiError } from '@/hooks/parseApiError';
+import { formatDate } from '@/utils/formatDate';
 import { ROUTES } from '@/constants/routes';
+import InfoRow from './_components/InfoRow';
 import ImportClearanceCompactItem from '../_components/ImportClearanceCompactItem';
-import {
-  PROCESSED_DATE_NOTICE,
-  declarationName,
-  processedDateText,
-} from '../_lib/declaration';
+import { declarationName } from '../_lib/declaration';
 
 const OTHER_DECLARATIONS_LIMIT = 5;
+
+interface Row {
+  icon: LucideIcon;
+  label: string;
+  value: string | null;
+}
+
+const withValue = (rows: Row[]) =>
+  rows.filter(
+    (row): row is Row & { value: string } =>
+      row.value !== null && row.value !== '',
+  );
 
 export default function ImportClearanceDetail() {
   const router = useRouter();
@@ -108,21 +134,52 @@ export default function ImportClearanceDetail() {
   }
 
   const { korName, engName } = declarationName(data);
-  const importerName = data.importer?.businessName ?? data.importerBaseName;
-  const rows = [
-    { title: '통관일자', content: processedDateText(data.processedDate) },
-    { title: '수입사', content: importerName },
-    { title: '제조국', content: data.manufactureCountryNameKo },
-    { title: '수출국', content: data.exportCountryNameKo },
+
+  const specText = [
+    data.abvPercent !== null ? `도수 ${data.abvPercent}%` : null,
+    data.volumeMl !== null ? `용량 ${data.volumeMl}ml` : null,
+  ]
+    .filter((part): part is string => part !== null)
+    .join(' · ');
+
+  const productionRows = withValue([
+    { icon: Factory, label: '제조사', value: data.manufacturerName },
+    { icon: MapPin, label: '제조국', value: data.manufactureCountryNameKo },
     {
-      title: '제품 용량',
-      content: data.volumeMl ? `${data.volumeMl}ml` : null,
+      icon: Calendar,
+      label: '빈티지',
+      value: data.vintageYear !== null ? `${data.vintageYear}년` : null,
     },
+    { icon: Sparkles, label: '에디션', value: data.editionName },
+    { icon: Hash, label: '캐스크 번호', value: data.caskNumber },
+    { icon: Hash, label: '배치 번호', value: data.batchNumber },
     {
-      title: '도수',
-      content: data.abvPercent !== null ? `${data.abvPercent}%` : null,
+      icon: Package,
+      label: '포장 수량',
+      value: data.packageCount !== null ? `${data.packageCount}개입` : null,
     },
-  ].filter((row) => Boolean(row.content));
+  ]);
+
+  const customsRows = withValue([
+    {
+      icon: CalendarCheck,
+      label: '통관일자',
+      value: data.processedDate
+        ? (formatDate(data.processedDate, 'FULL_DATE') as string)
+        : null,
+    },
+    { icon: Ship, label: '수출국', value: data.exportCountryNameKo },
+    {
+      icon: CalendarRange,
+      label: '유효기간',
+      value:
+        data.expiryStart && data.expiryEnd
+          ? `${formatDate(data.expiryStart, 'FULL_DATE') as string} ~ ${
+              formatDate(data.expiryEnd, 'FULL_DATE') as string
+            }`
+          : null,
+    },
+  ]);
 
   const others =
     otherDeclarations
@@ -147,22 +204,15 @@ export default function ImportClearanceDetail() {
               수입 정보
             </SubHeader.Center>
           </SubHeader>
-          <section className="flex space-x-[22px] px-5 pb-6 pt-[6px]">
-            <AlcoholImage
-              imageUrl=""
-              outerWidthClass="w-[73px]"
-              outerHeightClass="h-[120px]"
-              innerWidthClass="w-[53px]"
-              innerHeightClass="h-[104px]"
-            />
-            <article className="w-2/3 space-y-2 overflow-x-hidden pb-[9.15px] pt-[5px] text-white">
+          <section className="space-y-2.5 px-5 pb-6 pt-1 text-white">
+            <div className="space-y-1.5">
               {data.alcoholCategoryKo && (
                 <Label
                   name={data.alcoholCategoryKo}
                   styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
                 />
               )}
-              <h1 className="whitespace-normal break-words text-15 font-semibold">
+              <h1 className="whitespace-normal break-words text-20 font-bold">
                 {korName}
               </h1>
               {engName && (
@@ -170,24 +220,129 @@ export default function ImportClearanceDetail() {
                   {engName.toUpperCase()}
                 </p>
               )}
-            </article>
+            </div>
+            {specText && (
+              <>
+                <div className="border-[0.5px] border-white" />
+                <p className="text-11 text-white/85">{specText}</p>
+              </>
+            )}
           </section>
         </div>
       </div>
 
-      <section className="mx-5 space-y-2 border-b border-stroke-neutral-subtle py-5 text-13.5">
-        {rows.map((row) => (
-          <div key={row.title} className="flex items-start gap-2">
-            <p className="min-w-16 font-bold text-fg-neutral">{row.title}</p>
-            <p className="flex-1 break-words font-normal text-fg-neutral">
-              {row.content}
-            </p>
+      {productionRows.length > 0 && (
+        <section className="mx-5 space-y-3 border-b border-stroke-neutral-subtle py-4">
+          <p className="text-12 font-bold tracking-wide text-fg-neutral-subtle">
+            제품 정보
+          </p>
+          {productionRows.map((row) => (
+            <InfoRow key={row.label} {...row} />
+          ))}
+        </section>
+      )}
+
+      {data.importer ? (
+        <section className="mx-5 py-4">
+          <p className="mb-2 text-12 font-bold tracking-wide text-fg-neutral-subtle">
+            수입사 정보
+          </p>
+          <div className="space-y-3 rounded-xl bg-bg-neutral-weak p-4">
+            <div className="flex items-center gap-2">
+              <Building2
+                size={16}
+                className="shrink-0 text-fg-neutral-subtle"
+                aria-hidden
+              />
+              <p className="flex-1 break-words text-13.5 font-bold text-fg-neutral">
+                {data.importer.businessName}
+              </p>
+              {data.importer.operatingStatus && (
+                <span className="shrink-0 rounded-full border border-stroke-neutral-subtle px-2 py-0.5 text-10 text-fg-neutral-muted">
+                  {data.importer.operatingStatus}
+                </span>
+              )}
+            </div>
+            {(data.importer.representativeName ||
+              data.importer.industryName) && (
+              <div className="flex items-start gap-2">
+                <User
+                  size={14}
+                  className="mt-0.5 shrink-0 text-fg-neutral-subtle"
+                  aria-hidden
+                />
+                <p className="text-12 text-fg-neutral-muted">
+                  {[
+                    data.importer.representativeName &&
+                      `대표 ${data.importer.representativeName}`,
+                    data.importer.industryName,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </p>
+              </div>
+            )}
+            {data.importer.primaryAddress && (
+              <div className="flex items-start gap-2">
+                <MapPin
+                  size={14}
+                  className="mt-0.5 shrink-0 text-fg-neutral-subtle"
+                  aria-hidden
+                />
+                <p className="break-words text-12 text-fg-neutral-muted">
+                  {data.importer.primaryAddress}
+                </p>
+              </div>
+            )}
+            {data.importer.telephoneNo && (
+              <div className="flex items-start gap-2">
+                <Phone
+                  size={14}
+                  className="mt-0.5 shrink-0 text-fg-neutral-subtle"
+                  aria-hidden
+                />
+                <p className="text-12 text-fg-neutral-muted">
+                  {data.importer.telephoneNo}
+                </p>
+              </div>
+            )}
+            {(data.importer.officialBusinessCode ||
+              data.importer.licenseNo) && (
+              <p className="border-t border-stroke-neutral-subtle pt-3 font-mono text-10 text-fg-neutral-subtle">
+                {[
+                  data.importer.officialBusinessCode &&
+                    `사업자등록번호 ${data.importer.officialBusinessCode}`,
+                  data.importer.licenseNo &&
+                    `면허번호 ${data.importer.licenseNo}`,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </p>
+            )}
           </div>
-        ))}
-        <p className="pt-1 text-11 text-fg-neutral-muted">
-          {PROCESSED_DATE_NOTICE}
-        </p>
-      </section>
+        </section>
+      ) : (
+        data.importerBaseName && (
+          <section className="mx-5 border-b border-stroke-neutral-subtle py-4">
+            <InfoRow
+              icon={Building2}
+              label="수입사"
+              value={data.importerBaseName}
+            />
+          </section>
+        )
+      )}
+
+      {customsRows.length > 0 && (
+        <section className="mx-5 space-y-3 border-b border-stroke-neutral-subtle py-4">
+          <p className="text-12 font-bold tracking-wide text-fg-neutral-subtle">
+            통관 내역
+          </p>
+          {customsRows.map((row) => (
+            <InfoRow key={row.label} {...row} />
+          ))}
+        </section>
+      )}
 
       {others.length > 0 && (
         <section className="mx-5 py-5">
@@ -202,14 +357,13 @@ export default function ImportClearanceDetail() {
 
       {data.alcoholId !== null && (
         <section className="mx-5 mb-6 mt-2">
-          <PrimaryLinkButton
-            data={{
-              engName: 'VIEW WHISKY',
-              korName: '보틀노트에서 위스키 보기',
-              icon: true,
-              linkSrc: ROUTES.SEARCH.ALL(data.alcoholId),
-            }}
-          />
+          <Link
+            href={ROUTES.SEARCH.ALL(data.alcoholId)}
+            className="flex items-center justify-center gap-1 rounded-lg border-[1.5px] border-fg-brand px-4 py-3 text-13 font-bold text-fg-brand"
+          >
+            보틀노트에서 위스키 보기
+            <ChevronRight size={16} aria-hidden />
+          </Link>
         </section>
       )}
     </div>

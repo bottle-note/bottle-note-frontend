@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 import type { MfdsAlcoholListItem } from '@/api/mfds/types';
+import { formatDate } from '@/utils/formatDate';
 import { declarationName } from '../_lib/declaration';
 
 interface Props {
@@ -12,6 +14,9 @@ export default function ImportClearanceCompactItem({ item }: Props) {
   const meta = [item.importerBaseName, item.exportCountryNameKo].filter(
     Boolean,
   );
+  const processedDateLabel = item.processedDate
+    ? (formatDate(item.processedDate, 'FULL_DATE') as string)
+    : '통관일자 미상';
 
   return (
     <Link
@@ -26,8 +31,13 @@ export default function ImportClearanceCompactItem({ item }: Props) {
           </p>
         )}
       </div>
-      <span className="shrink-0 text-12 text-fg-brand">
-        {item.processedDate ?? '통관일자 미상'}
+      <span className="flex shrink-0 items-center gap-1 text-12 text-fg-brand">
+        {processedDateLabel}
+        <ChevronRight
+          size={14}
+          className="text-fg-neutral-subtle"
+          aria-hidden
+        />
       </span>
     </Link>
   );
