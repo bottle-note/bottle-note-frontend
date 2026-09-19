@@ -179,7 +179,7 @@ export default function ImportClearanceList() {
         </div>
       </div>
       <section
-        className="w-full pb-navbar"
+        className="w-full px-4 pb-navbar"
         style={{ marginTop: 'var(--logo-header-expanded-height)' }}
       >
         <h1 className="sr-only">수입통관</h1>
@@ -199,14 +199,14 @@ export default function ImportClearanceList() {
           isError={Boolean(error) && items.length === 0}
           isEmpty={isEmpty}
         >
-          <List.Section className="px-4">
+          <List.Section>
             {items.map((item) => (
               <ImportClearanceListItem key={item.id} item={item} />
             ))}
           </List.Section>
         </List>
         {hasNextPageError ? (
-          <div className="flex flex-col items-center gap-3 px-4 py-6">
+          <div className="flex flex-col items-center gap-3 py-6">
             <p className="text-13 text-fg-neutral-muted">
               목록을 더 불러오지 못했어요.
             </p>
@@ -227,7 +227,7 @@ export default function ImportClearanceList() {
           </p>
         )}
         {hasNextPage === false && items.length > 0 && !isFetching && (
-          <p className="px-4 pb-6 pt-4 text-center text-11 text-fg-neutral-muted">
+          <p className="pb-6 pt-4 text-center text-11 text-fg-neutral-muted">
             식약처 수입 원장에서 수집·정제한 정보예요.
           </p>
         )}

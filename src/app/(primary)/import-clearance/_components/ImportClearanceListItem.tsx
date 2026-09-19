@@ -19,7 +19,7 @@ export default function ImportClearanceListItem({ item }: Props) {
 
   return (
     <Link href={ROUTES.IMPORT_CLEARANCE.DETAIL(item.id)} className="block">
-      <List.ItemLayout className="flex-col items-start px-0">
+      <List.ItemLayout className="flex-col items-start px-0 py-2">
         <p className="text-12 text-fg-brand">
           처리일자 {processedDateText(item.processedDate)}
         </p>

@@ -34,7 +34,7 @@ export default function ImportClearanceFilter({
     <>
       <StickySearchBar
         testId="import-clearance-search-bar"
-        containerClassName="px-4 pt-[5px]"
+        containerClassName="-mx-4 px-4 pt-[5px]"
         isSearchActive={isSearchActive}
         onSearchActiveChange={onSearchActiveChange}
         onValueChange={onKeywordChange}
