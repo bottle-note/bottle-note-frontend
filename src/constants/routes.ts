@@ -28,6 +28,10 @@ export const ROUTES = {
   HISTORY: {
     BASE: '/history',
   },
+  IMPORT_CLEARANCE: {
+    BASE: '/import-clearance',
+    DETAIL: (id: string | number) => `/import-clearance/${id}`,
+  },
   REVIEW: {
     BASE: '/review',
     REGISTER_BASE: '/review/register',

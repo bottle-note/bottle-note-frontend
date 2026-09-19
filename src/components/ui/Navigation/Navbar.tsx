@@ -29,7 +29,7 @@ function Navbar({
 }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user: userData, isLoggedIn } = useAuthSession();
+  const { isLoggedIn } = useAuthSession();
   const { handleLoginModal } = useModalStore();
   const [isMounted, setIsMounted] = useState(false);
   const [lastTapTime, setLastTapTime] = useState<{ [key: string]: number }>({});
@@ -64,10 +64,10 @@ function Navbar({
       icon: '/icon/navbar/explorer.svg',
     },
     {
-      name: '마이',
-      link: userData?.userId ? ROUTES.USER.BASE(userData.userId) : ROUTES.LOGIN,
-      icon: '/icon/navbar/user.svg',
-      requiresAuth: true,
+      name: '수입통관',
+      // ponytail: 전용 아이콘 자산이 없어 자체 제작한 임시 상자 아이콘. 디자인 확정 전 placeholder.
+      link: ROUTES.IMPORT_CLEARANCE.BASE,
+      icon: '/icon/navbar/import-clearance.svg',
     },
   ];
 

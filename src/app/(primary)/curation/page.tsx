@@ -10,14 +10,13 @@ import {
 } from '@/api/curation-v2/constants';
 import type { CurationV2FeedItem } from '@/api/curation-v2/types';
 import { SORT_ORDER } from '@/api/_shared/types';
-import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useTab } from '@/hooks/useTab';
 import { useCurationsQuery } from '@/queries/useCurationsQuery';
 import { useProgramsQuery } from '@/queries/useProgramsQuery';
 import { useTastingEventsQuery } from '@/queries/useTastingEventsQuery';
 import {
-  GUEST_LIST_PAGE_SIZE,
   GuestListGate,
+  useGuestPagedSession,
 } from '@/components/feature/auth/GuestListGate';
 import StickySearchBar from '@/components/feature/Search/StickySearchBar';
 import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
@@ -75,7 +74,12 @@ export default function CurationPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { isNavigationVisible, setNavbarSuppressed } = useNavLayout();
-  const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
+  const {
+    isLoggedIn,
+    isLoading: isAuthLoading,
+    isGuest,
+    pageSize,
+  } = useGuestPagedSession(10);
   const [inputKeyword, setInputKeyword] = useState('');
   const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState('');
   const [isSearchActive, setIsSearchActive] = useState(false);
@@ -168,8 +172,6 @@ export default function CurationPage() {
   const isProgramTab = currentTab.id === CURATION_V2_SPEC_CODES.PROGRAM;
   const isRecommendedTab =
     currentTab.id === CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY;
-  const isGuest = !isAuthLoading && !isLoggedIn;
-  const pageSize = isGuest ? GUEST_LIST_PAGE_SIZE : 10;
   const sortOrder = SORT_ORDER_BY_TYPE[sortType];
   const curationsQuery = useCurationsQuery(
     pageSize,
@@ -233,10 +235,7 @@ export default function CurationPage() {
     ? '검색 결과가 없어요.'
     : activeTabState.emptyMessage;
   const shouldGateGuestFeed =
-    isGuest &&
-    !activeQuery.isLoading &&
-    !activeQuery.error &&
-    Boolean(activeData && activeData.length > 0);
+    isGuest && Boolean(activeData && activeData.length > 0);
 
   const renderFeedItems = () => {
     switch (currentTab.id) {

@@ -41,6 +41,7 @@ import type { ShareConfig, ShareChannel } from '@/types/share';
 import FloatingReviewButton from './_components/FloatingReviewButton';
 import AlcoholDetailHeader from './_components/AlcoholDetailHeader';
 import { GuestAlcoholDetailGate } from './_components/GuestAlcoholDetailGate';
+import AlcoholImportClearance from './_components/AlcoholImportClearance';
 import RatingSuccessModal from './_components/RatingSuccessModal';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
@@ -470,6 +471,9 @@ export default function SearchAlcohol() {
                   </section>
                 )}
               </>
+            )}
+            {data.alcohols.alcoholId && (
+              <AlcoholImportClearance alcoholId={data.alcohols.alcoholId} />
             )}
           </>
         )}

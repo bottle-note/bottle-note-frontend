@@ -9,12 +9,14 @@ interface AutoHideLogoHeaderProps {
   isVisible?: boolean;
   sticky?: boolean;
   className?: string;
+  title?: string;
 }
 
 export default function AutoHideLogoHeader({
   isVisible,
   sticky = true,
   className,
+  title,
 }: AutoHideLogoHeaderProps) {
   const { isNavigationVisible } = useNavLayout();
   const shouldShowHeader = isVisible ?? isNavigationVisible;
@@ -46,8 +48,12 @@ export default function AutoHideLogoHeader({
         <SubHeader.Left>
           <SubHeader.Logo />
         </SubHeader.Left>
+        {title && <SubHeader.Center>{title}</SubHeader.Center>}
         <SubHeader.Right>
-          <SubHeader.Menu />
+          <div className="flex items-center gap-x-3">
+            <SubHeader.Profile />
+            <SubHeader.Menu />
+          </div>
         </SubHeader.Right>
       </SubHeader>
     </header>
