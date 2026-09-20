@@ -47,6 +47,7 @@ jest.mock('@/components/ui/Navigation/SubHeader', () => {
       Right: ({ children }: { children: ReactNode }) => <div>{children}</div>,
       Logo: () => <span>logo</span>,
       Menu: () => <span>menu</span>,
+      Profile: () => <span>profile</span>,
     },
   );
 

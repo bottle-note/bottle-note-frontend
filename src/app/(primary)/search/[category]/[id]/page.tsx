@@ -41,6 +41,8 @@ import type { ShareConfig, ShareChannel } from '@/types/share';
 import FloatingReviewButton from './_components/FloatingReviewButton';
 import AlcoholDetailHeader from './_components/AlcoholDetailHeader';
 import { GuestAlcoholDetailGate } from './_components/GuestAlcoholDetailGate';
+import AlcoholImportClearance from './_components/AlcoholImportClearance';
+import { useAlcoholImportClearanceItems } from './_components/useAlcoholImportClearanceItems';
 import RatingSuccessModal from './_components/RatingSuccessModal';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
@@ -285,9 +287,19 @@ export default function SearchAlcohol() {
       ? ''
       : `${window.location.pathname}${window.location.search}`;
 
+  const hasFlavorTags = Boolean(data?.alcohols?.alcoholsTastingTags?.length);
+  const { items: importClearanceItems } = useAlcoholImportClearanceItems(
+    data?.alcohols?.alcoholId ?? null,
+  );
+  const hasImportInfo = Boolean(importClearanceItems?.length);
+
   const alcoholMetadataAndTags = (
     <>
-      <section className="mx-5 border-y border-stroke-neutral-subtle py-[21px]">
+      <section
+        className={`mx-5 border-t border-stroke-neutral-subtle py-[21px] ${
+          hasFlavorTags || hasImportInfo ? 'border-b' : ''
+        }`}
+      >
         <div className="grid gap-2">
           {alcoholDetails.map((item: DetailItem) => (
             <div key={item.content} className="flex items-start gap-2 text-12">
@@ -302,7 +314,16 @@ export default function SearchAlcohol() {
         </div>
       </section>
       {data?.alcohols?.alcoholsTastingTags && (
-        <FlavorTags tagList={data.alcohols.alcoholsTastingTags} />
+        <FlavorTags
+          tagList={data.alcohols.alcoholsTastingTags}
+          showBottomBorder={hasImportInfo}
+        />
+      )}
+      {data?.alcohols?.alcoholId && (
+        <AlcoholImportClearance
+          alcoholId={data.alcohols.alcoholId}
+          korName={data.alcohols.korName}
+        />
       )}
     </>
   );

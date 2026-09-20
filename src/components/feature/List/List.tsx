@@ -10,6 +10,7 @@ import SortOrderSwitch from './SortOrderSwitch';
 import OptionSelect from './OptionSelect';
 import Title from './Title';
 import ListSection from './ListSection';
+import ListItemLayout from './ListItemLayout';
 
 interface ListMainProps {
   children: React.ReactNode;
@@ -37,6 +38,7 @@ const ListMain = ({
   const optionSelect = filterChildComponent(children, OptionSelect);
   const items = filterChildComponent(children, ListItem);
   const ratingItems = filterChildComponent(children, ListItemRating);
+  const itemLayouts = filterChildComponent(children, ListItemLayout);
   const listSection: React.ReactNode[] = filterChildComponent(
     children,
     ListSection,
@@ -79,6 +81,7 @@ const ListMain = ({
           <>
             {items}
             {ratingItems}
+            {itemLayouts}
             {listSection}
           </>
         )}
@@ -101,6 +104,7 @@ const List = Object.assign(ListMain, {
   SortOrderSwitch,
   OptionSelect,
   Item: ListItem,
+  ItemLayout: ListItemLayout,
   Rating: ListItemRating,
   Section: ListSection,
 });

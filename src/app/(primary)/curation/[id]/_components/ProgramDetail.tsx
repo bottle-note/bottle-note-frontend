@@ -11,6 +11,10 @@ import {
   CarouselItem,
   type CarouselApi,
 } from '@/components/ui/Display/carousel';
+import {
+  STICKY_BOTTOM_CTA_PADDING_CLASS,
+  StickyBottomCta,
+} from '@/components/ui/Layout/StickyBottomCta';
 import { CurationDetailHeader } from '@/app/(primary)/curation/_components/CurationDetailHeader';
 import { ProgramEventInfoCard } from '@/app/(primary)/curation/_components/ProgramEventInfoCard';
 import { ProgramScheduleItem } from '@/app/(primary)/curation/_components/ProgramScheduleItem';
@@ -53,7 +57,7 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
   return (
     <div
       className={`min-h-safe-screen bg-bg-layer-default text-fg-neutral ${
-        registrationUrl ? 'pb-[var(--sticky-cta-space)]' : 'pb-8'
+        registrationUrl ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-8'
       }`}
     >
       <CurationDetailHeader title={program.name} onBack={() => router.back()} />
@@ -178,21 +182,7 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
       )}
 
       {registrationUrl && (
-        <div
-          className="fixed-content z-20 px-5"
-          style={{ bottom: 'var(--navbar-margin-bottom)' }}
-        >
-          <a
-            href={registrationUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="flex h-[52px] w-full items-center justify-center rounded-xl bg-bg-brand-solid active:bg-bg-brand-solid-pressed"
-          >
-            <span className="text-15 font-bold text-fg-brand-contrast">
-              행사 참가 신청
-            </span>
-          </a>
-        </div>
+        <StickyBottomCta label="행사 참가 신청" href={registrationUrl} />
       )}
     </div>
   );

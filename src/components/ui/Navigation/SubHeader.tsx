@@ -9,9 +9,13 @@ import React, {
 } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import Logo from 'public/bottle_note_Icon_logo.svg';
 import Menu from 'public/icon/menu-subcoral.svg';
+import UserIcon from 'public/icon/user-outlined-subcoral.svg';
 
 interface HeaderLeftProps {
   children?: ReactNode;
@@ -107,6 +111,31 @@ const HeaderMenu = () => {
   );
 };
 
+const HeaderProfile = () => {
+  const router = useRouter();
+  const { user, isLoggedIn } = useAuthSession();
+  const { handleLoginModal } = useModalStore();
+
+  const handleClick = () => {
+    if (isLoggedIn && user?.userId) {
+      router.push(ROUTES.USER.BASE(user.userId));
+      return;
+    }
+    handleLoginModal();
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      aria-label="마이"
+      className="pt-2"
+    >
+      <Image src={UserIcon} alt="" width={22} height={22} />
+    </button>
+  );
+};
+
 interface SubHeaderMainProps {
   children?: ReactNode;
   bgColor?: string;
@@ -155,4 +184,5 @@ export const SubHeader = Object.assign(SubHeaderMain, {
   Right: HeaderRight,
   Logo: HeaderLogo,
   Menu: HeaderMenu,
+  Profile: HeaderProfile,
 });
