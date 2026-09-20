@@ -6,6 +6,7 @@ import { ChevronRight } from 'lucide-react';
 import { MfdsApi } from '@/api/mfds/mfds.api';
 import { ROUTES } from '@/constants/routes';
 import ImportClearanceCompactItem from '@/app/(primary)/import-clearance/_components/ImportClearanceCompactItem';
+import { SECTION_HEADING_GAP_CLASS } from '../_constants';
 
 const LIMIT = 3;
 
@@ -36,7 +37,7 @@ export default function AlcoholImportClearance({ alcoholId, korName }: Props) {
   return (
     <section className="mx-5 border-b border-stroke-neutral-subtle py-[20px]">
       <h2 className="text-11 font-bold text-fg-neutral">수입 정보</h2>
-      <div className="mt-1.5">
+      <div className={SECTION_HEADING_GAP_CLASS}>
         {items.map((item) => (
           <ImportClearanceCompactItem key={item.id} item={item} />
         ))}

@@ -21,7 +21,7 @@ export default function ImportClearanceCompactItem({ item }: Props) {
   return (
     <Link
       href={ROUTES.IMPORT_CLEARANCE.DETAIL(item.id)}
-      className="flex items-center justify-between gap-3 border-b border-stroke-neutral-subtle py-3"
+      className="flex items-center justify-between gap-3 border-b border-stroke-neutral-subtle py-3 last:border-b-0"
     >
       <div className="min-w-0">
         <p className="truncate text-13 text-fg-neutral">{korName}</p>
