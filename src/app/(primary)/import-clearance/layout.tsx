@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import NavLayout from '@/components/ui/Layout/NavLayout';
+import { ImportClearanceNavLayout } from './_components/ImportClearanceNavLayout';
 
 export const metadata: Metadata = {
   title: '수입통관',
@@ -13,5 +13,5 @@ export const metadata: Metadata = {
 export default function ImportClearanceLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  return <NavLayout>{children}</NavLayout>;
+  return <ImportClearanceNavLayout>{children}</ImportClearanceNavLayout>;
 }

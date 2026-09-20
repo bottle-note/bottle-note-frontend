@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -9,7 +8,6 @@ import {
   Calendar,
   CalendarCheck,
   CalendarRange,
-  ChevronRight,
   Factory,
   Hash,
   MapPin,
@@ -23,6 +21,10 @@ import {
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import Label from '@/components/ui/Display/Label';
 import ErrorFallback from '@/components/ui/Display/ErrorFallback';
+import {
+  STICKY_BOTTOM_CTA_PADDING_CLASS,
+  StickyBottomCta,
+} from '@/components/ui/Layout/StickyBottomCta';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
 import { MfdsApi } from '@/api/mfds/mfds.api';
 import { parseApiError } from '@/hooks/parseApiError';
@@ -186,7 +188,11 @@ export default function ImportClearanceDetail() {
       .slice(0, OTHER_DECLARATIONS_LIMIT) ?? [];
 
   return (
-    <div className="pb-navbar">
+    <div
+      className={
+        data.alcoholId !== null ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-navbar'
+      }
+    >
       <div className="relative">
         <div className="absolute inset-0 bg-bg-brand-primary-solid" />
         <div className="relative z-10">
@@ -355,15 +361,10 @@ export default function ImportClearanceDetail() {
       )}
 
       {data.alcoholId !== null && (
-        <section className="mx-5 mb-6 mt-2">
-          <Link
-            href={ROUTES.SEARCH.ALL(data.alcoholId)}
-            className="flex items-center justify-center gap-1 rounded-lg border-[1.5px] border-fg-brand px-4 py-3 text-13 font-bold text-fg-brand"
-          >
-            보틀노트에서 위스키 보기
-            <ChevronRight size={16} aria-hidden />
-          </Link>
-        </section>
+        <StickyBottomCta
+          label="보틀노트에서 위스키 보기"
+          onClick={() => router.push(ROUTES.SEARCH.ALL(data.alcoholId!))}
+        />
       )}
     </div>
   );
