@@ -305,6 +305,12 @@ export default function SearchAlcohol() {
       {data?.alcohols?.alcoholsTastingTags && (
         <FlavorTags tagList={data.alcohols.alcoholsTastingTags} />
       )}
+      {data?.alcohols?.alcoholId && (
+        <AlcoholImportClearance
+          alcoholId={data.alcohols.alcoholId}
+          korName={data.alcohols.korName}
+        />
+      )}
     </>
   );
 
@@ -471,9 +477,6 @@ export default function SearchAlcohol() {
                   </section>
                 )}
               </>
-            )}
-            {data.alcohols.alcoholId && (
-              <AlcoholImportClearance alcoholId={data.alcohols.alcoholId} />
             )}
           </>
         )}
