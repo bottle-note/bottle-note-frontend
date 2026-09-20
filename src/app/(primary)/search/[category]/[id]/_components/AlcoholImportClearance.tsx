@@ -3,7 +3,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { MfdsApi } from '@/api/mfds/mfds.api';
 import ImportClearanceCompactItem from '@/app/(primary)/import-clearance/_components/ImportClearanceCompactItem';
-import { PROCESSED_DATE_NOTICE } from '@/app/(primary)/import-clearance/_lib/declaration';
 
 const LIMIT = 3;
 
@@ -35,9 +34,6 @@ export default function AlcoholImportClearance({ alcoholId }: Props) {
           <ImportClearanceCompactItem key={item.id} item={item} />
         ))}
       </div>
-      <p className="pt-2 text-11 text-fg-neutral-muted">
-        {PROCESSED_DATE_NOTICE}
-      </p>
     </section>
   );
 }

@@ -18,7 +18,6 @@ import {
   Ship,
   Sparkles,
   User,
-  HashIcon,
   type LucideIcon,
 } from 'lucide-react';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
