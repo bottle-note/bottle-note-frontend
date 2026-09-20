@@ -276,11 +276,6 @@ export default function ImportClearanceList() {
             불러오는 중…
           </p>
         )}
-        {hasNextPage === false && items.length > 0 && !isFetching && (
-          <p className="pb-6 pt-4 text-center text-11 text-fg-neutral-muted">
-            식약처 수입 원장에서 수집·정제한 정보예요.
-          </p>
-        )}
       </section>
     </div>
   );
