@@ -10,8 +10,11 @@ import type {
   TastingEventDetailItem,
   WhiskyPairingDetailItem,
 } from '@/api/curation-v2/types';
-import Button from '@/components/ui/Button/Button';
 import BaseImage from '@/components/ui/Display/BaseImage';
+import {
+  STICKY_BOTTOM_CTA_PADDING_CLASS,
+  StickyBottomCta,
+} from '@/components/ui/Layout/StickyBottomCta';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useLoginBridge } from '@/hooks/useLoginBridge';
 import {
@@ -79,7 +82,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
   return (
     <div
       className={`min-h-safe-screen bg-bg-layer-default text-fg-neutral ${
-        shouldShowCta ? 'pb-[var(--sticky-cta-space)]' : 'pb-8'
+        shouldShowCta ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-8'
       }`}
     >
       <CurationDetailHeader title={event.name} onBack={() => router.back()} />
@@ -196,35 +199,17 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
         </section>
       )}
 
-      {(shouldShowGuestLoginCta ||
-        shouldShowApplicationCta ||
-        shouldShowClosedCta) && (
-        <div
-          className="fixed-content z-20 px-5"
-          style={{ bottom: 'var(--navbar-margin-bottom)' }}
-        >
-          {shouldShowGuestLoginCta && (
-            <Button
-              btnName="로그인 후 신청하기"
-              onClick={() => bridgeToLogin()}
-            />
-          )}
-          {shouldShowApplicationCta && (
-            <a
-              href={applicationLink}
-              target="_blank"
-              rel="noreferrer"
-              className="flex h-[52px] w-full items-center justify-center rounded-xl bg-bg-brand-solid active:bg-bg-brand-solid-pressed"
-            >
-              <span className="text-15 font-bold text-fg-brand-contrast">
-                시음회 신청하기
-              </span>
-            </a>
-          )}
-          {shouldShowClosedCta && (
-            <Button btnName="모집 마감" onClick={() => undefined} disabled />
-          )}
-        </div>
+      {shouldShowGuestLoginCta && (
+        <StickyBottomCta
+          label="로그인 후 신청하기"
+          onClick={() => bridgeToLogin()}
+        />
+      )}
+      {shouldShowApplicationCta && (
+        <StickyBottomCta label="시음회 신청하기" href={applicationLink} />
+      )}
+      {shouldShowClosedCta && (
+        <StickyBottomCta label="모집 마감" onClick={() => undefined} disabled />
       )}
     </div>
   );
