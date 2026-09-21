@@ -62,7 +62,7 @@ export default function ImportClearanceDetail() {
 
   // 정제명(alcoholNameKo) 기반으로 같은 위스키의 수입 내역을 조회한다.
   // 수입사·용량이 달라도 동일 명칭 계열이 함께 노출된다.
-  const alcoholNameForMatching = data?.alcoholNameKo ?? null;
+  const alcoholNameForMatching = data?.alcoholNameKo || undefined;
   const { data: otherDeclarations } = useQuery({
     queryKey: [
       'mfds.alcohols',
@@ -77,7 +77,7 @@ export default function ImportClearanceDetail() {
           size: OTHER_DECLARATIONS_LIMIT + 1,
         })
       ).data,
-    enabled: alcoholNameForMatching !== null,
+    enabled: alcoholNameForMatching !== undefined,
     retry: false,
   });
 
