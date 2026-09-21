@@ -18,6 +18,8 @@ import {
   User,
   type LucideIcon,
 } from 'lucide-react';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useLoginBridge } from '@/hooks/useLoginBridge';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import Label from '@/components/ui/Display/Label';
 import ErrorFallback from '@/components/ui/Display/ErrorFallback';
@@ -30,6 +32,7 @@ import { MfdsApi } from '@/api/mfds/mfds.api';
 import { parseApiError } from '@/hooks/parseApiError';
 import { formatDate } from '@/utils/formatDate';
 import { ROUTES } from '@/constants/routes';
+import { GuestAlcoholDetailGate } from '@/app/(primary)/search/[category]/[id]/_components/GuestAlcoholDetailGate';
 import InfoRow from './_components/InfoRow';
 import ImportClearanceCompactItem from '../_components/ImportClearanceCompactItem';
 import { declarationName } from '../_lib/declaration';
@@ -52,6 +55,8 @@ export default function ImportClearanceDetail() {
   const router = useRouter();
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
+  const { bridgeToLogin } = useLoginBridge();
 
   const { data, error, isLoading, refetch } = useQuery({
     queryKey: ['mfds.alcohol', id],
@@ -187,12 +192,8 @@ export default function ImportClearanceDetail() {
       ?.filter((item) => item.id !== data.id)
       .slice(0, OTHER_DECLARATIONS_LIMIT) ?? [];
 
-  return (
-    <div
-      className={
-        data.alcoholId !== null ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-navbar'
-      }
-    >
+  const renderPageContent = () => (
+    <>
       <div className="relative">
         <div className="absolute inset-0 bg-bg-brand-primary-solid" />
         <div className="relative z-10">
@@ -348,6 +349,37 @@ export default function ImportClearanceDetail() {
           onClick={() => router.push(ROUTES.SEARCH.ALL(data.alcoholId!))}
         />
       )}
+    </>
+  );
+
+  const mainContent = (
+    <div
+      className={
+        data.alcoholId !== null ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-navbar'
+      }
+    >
+      {renderPageContent()}
     </div>
   );
+
+  if (!isLoggedIn && !isAuthLoading) {
+    return (
+      <GuestAlcoholDetailGate
+        title="이 수입 정보를 저장하시겠어요?"
+        description="보틀노트에 로그인하고 수입 정보를 기록해보세요"
+        buttonLabel="로그인하기"
+        onLogin={() => bridgeToLogin()}
+      >
+        <div
+          className={
+            data.alcoholId !== null ? STICKY_BOTTOM_CTA_PADDING_CLASS : ''
+          }
+        >
+          {renderPageContent()}
+        </div>
+      </GuestAlcoholDetailGate>
+    );
+  }
+
+  return mainContent;
 }
