@@ -262,11 +262,6 @@ export default function ImportClearanceDetail() {
               <p className="flex-1 break-words text-13.5 font-bold text-fg-neutral">
                 {data.importer.businessName}
               </p>
-              {data.importer.operatingStatus && (
-                <span className="shrink-0 rounded-full border border-stroke-neutral-subtle px-2 py-0.5 text-10 text-fg-neutral-muted">
-                  {data.importer.operatingStatus}
-                </span>
-              )}
             </div>
             {(data.importer.representativeName ||
               data.importer.industryName) && (
@@ -310,19 +305,6 @@ export default function ImportClearanceDetail() {
                   {data.importer.telephoneNo}
                 </p>
               </div>
-            )}
-            {(data.importer.officialBusinessCode ||
-              data.importer.licenseNo) && (
-              <p className="border-t border-stroke-neutral-subtle pt-3 font-mono text-10 text-fg-neutral-subtle">
-                {[
-                  data.importer.officialBusinessCode &&
-                    `사업자등록번호 ${data.importer.officialBusinessCode}`,
-                  data.importer.licenseNo &&
-                    `면허번호 ${data.importer.licenseNo}`,
-                ]
-                  .filter(Boolean)
-                  .join(' · ')}
-              </p>
             )}
           </div>
         </section>
