@@ -60,24 +60,24 @@ export default function ImportClearanceDetail() {
     retry: false,
   });
 
-  // 매칭이 확정된 신고만 같은 위스키의 내역으로 묶는다.
-  // alcoholNameKo를 함께 넘기면 AND 조건이라 정제 명칭이 다른 행이 빠진다.
-  const matchedAlcoholId = data?.alcoholId ?? null;
+  // 정제명(alcoholNameKo) 기반으로 같은 위스키의 수입 내역을 조회한다.
+  // 수입사·용량이 달라도 동일 명칭 계열이 함께 노출된다.
+  const alcoholNameForMatching = data?.alcoholNameKo ?? null;
   const { data: otherDeclarations } = useQuery({
     queryKey: [
       'mfds.alcohols',
-      'byAlcohol',
-      matchedAlcoholId,
+      'byAlcoholName',
+      alcoholNameForMatching,
       OTHER_DECLARATIONS_LIMIT + 1,
     ],
     queryFn: async () =>
       (
         await MfdsApi.getAlcohols({
-          alcoholId: matchedAlcoholId as number,
+          alcoholNameKo: alcoholNameForMatching,
           size: OTHER_DECLARATIONS_LIMIT + 1,
         })
       ).data,
-    enabled: matchedAlcoholId !== null,
+    enabled: alcoholNameForMatching !== null,
     retry: false,
   });
 
