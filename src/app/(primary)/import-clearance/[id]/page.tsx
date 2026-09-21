@@ -18,6 +18,8 @@ import {
   User,
   type LucideIcon,
 } from 'lucide-react';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useLoginBridge } from '@/hooks/useLoginBridge';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import Label from '@/components/ui/Display/Label';
 import ErrorFallback from '@/components/ui/Display/ErrorFallback';
@@ -25,7 +27,8 @@ import {
   STICKY_BOTTOM_CTA_PADDING_CLASS,
   StickyBottomCta,
 } from '@/components/ui/Layout/StickyBottomCta';
-import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
+import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
+import { LoginGate } from '@/components/feature/auth/LoginGate';
 import { MfdsApi } from '@/api/mfds/mfds.api';
 import { parseApiError } from '@/hooks/parseApiError';
 import { formatDate } from '@/utils/formatDate';
@@ -52,6 +55,8 @@ export default function ImportClearanceDetail() {
   const router = useRouter();
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
+  const { bridgeToLogin } = useLoginBridge();
 
   const { data, error, isLoading, refetch } = useQuery({
     queryKey: ['mfds.alcohol', id],
@@ -60,24 +65,24 @@ export default function ImportClearanceDetail() {
     retry: false,
   });
 
-  // 매칭이 확정된 신고만 같은 위스키의 내역으로 묶는다.
-  // alcoholNameKo를 함께 넘기면 AND 조건이라 정제 명칭이 다른 행이 빠진다.
-  const matchedAlcoholId = data?.alcoholId ?? null;
+  // 정제명(alcoholNameKo) 기반으로 같은 위스키의 수입 내역을 조회한다.
+  // 수입사·용량이 달라도 동일 명칭 계열이 함께 노출된다.
+  const alcoholNameForMatching = data?.alcoholNameKo || undefined;
   const { data: otherDeclarations } = useQuery({
     queryKey: [
       'mfds.alcohols',
-      'byAlcohol',
-      matchedAlcoholId,
+      'byAlcoholName',
+      alcoholNameForMatching,
       OTHER_DECLARATIONS_LIMIT + 1,
     ],
     queryFn: async () =>
       (
         await MfdsApi.getAlcohols({
-          alcoholId: matchedAlcoholId as number,
+          alcoholNameKo: alcoholNameForMatching,
           size: OTHER_DECLARATIONS_LIMIT + 1,
         })
       ).data,
-    enabled: matchedAlcoholId !== null,
+    enabled: alcoholNameForMatching !== undefined,
     retry: false,
   });
 
@@ -113,21 +118,40 @@ export default function ImportClearanceDetail() {
   if (isLoading || !data) {
     return (
       <>
-        <SubHeader>
-          <SubHeader.Left onClick={() => router.back()}>
-            <Image
-              src="/icon/arrow-left-subcoral.svg"
-              alt="뒤로가기"
-              width={23}
-              height={23}
-            />
-          </SubHeader.Left>
-          <SubHeader.Center>수입 정보</SubHeader.Center>
-        </SubHeader>
-        <div className="px-5">
-          {Array.from({ length: 4 }).map((_, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <ListItemSkeleton key={index} />
+        <div className="relative">
+          <div className="absolute inset-0 bg-bg-brand-primary-solid dark:bg-palette-oak-950" />
+          <div className="relative z-10">
+            <SubHeader bgColor="bg-none">
+              <SubHeader.Left onClick={() => router.back()}>
+                <Image
+                  src="/icon/arrow-left-white.svg"
+                  alt="뒤로가기"
+                  width={23}
+                  height={23}
+                />
+              </SubHeader.Left>
+              <SubHeader.Center textColor="text-white dark:text-palette-oak-50">
+                수입 정보
+              </SubHeader.Center>
+            </SubHeader>
+            <section className="space-y-2.5 px-5 pb-6 pt-1">
+              <SkeletonBase width={60} height={14} />
+              <SkeletonBase width="70%" height={20} />
+              <SkeletonBase width="100%" height={12} />
+            </section>
+          </div>
+        </div>
+
+        <div className="mx-5 space-y-4 py-4">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <section
+              key={index}
+              className="space-y-3 border-b border-stroke-neutral-subtle py-4"
+            >
+              <SkeletonBase width={80} height={14} />
+              <SkeletonBase width="100%" height={12} />
+              <SkeletonBase width="80%" height={12} />
+            </section>
           ))}
         </div>
       </>
@@ -187,55 +211,53 @@ export default function ImportClearanceDetail() {
       ?.filter((item) => item.id !== data.id)
       .slice(0, OTHER_DECLARATIONS_LIMIT) ?? [];
 
-  return (
-    <div
-      className={
-        data.alcoholId !== null ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-navbar'
-      }
-    >
-      <div className="relative">
-        <div className="absolute inset-0 bg-bg-brand-primary-solid" />
-        <div className="relative z-10">
-          <SubHeader bgColor="bg-none">
-            <SubHeader.Left onClick={() => router.back()}>
-              <Image
-                src="/icon/arrow-left-white.svg"
-                alt="뒤로가기"
-                width={23}
-                height={23}
+  const heroSection = (
+    <div className="relative">
+      <div className="absolute inset-0 bg-bg-brand-primary-solid dark:bg-palette-oak-950" />
+      <div className="relative z-10">
+        <SubHeader bgColor="bg-none">
+          <SubHeader.Left onClick={() => router.back()}>
+            <Image
+              src="/icon/arrow-left-white.svg"
+              alt="뒤로가기"
+              width={23}
+              height={23}
+            />
+          </SubHeader.Left>
+          <SubHeader.Center textColor="text-white dark:text-palette-oak-50">
+            수입 정보
+          </SubHeader.Center>
+        </SubHeader>
+        <section className="space-y-2.5 px-5 pb-6 pt-1 text-white dark:text-palette-oak-50">
+          <div className="space-y-1.5">
+            {data.alcoholCategoryKo && (
+              <Label
+                name={data.alcoholCategoryKo}
+                styleClass="border-white dark:border-palette-oak-50 px-2 py-[0.15rem] rounded-md text-10 dark:text-palette-oak-50"
               />
-            </SubHeader.Left>
-            <SubHeader.Center textColor="text-white">
-              수입 정보
-            </SubHeader.Center>
-          </SubHeader>
-          <section className="space-y-2.5 px-5 pb-6 pt-1 text-white">
-            <div className="space-y-1.5">
-              {data.alcoholCategoryKo && (
-                <Label
-                  name={data.alcoholCategoryKo}
-                  styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
-                />
-              )}
-              <h1 className="whitespace-normal break-words text-20 font-bold">
-                {korName}
-              </h1>
-              {engName && (
-                <p className="whitespace-normal break-words text-12 font-normal">
-                  {engName.toUpperCase()}
-                </p>
-              )}
-            </div>
-            {specText && (
-              <>
-                <div className="border-[0.5px] border-white" />
-                <p className="text-11 text-white/85">{specText}</p>
-              </>
             )}
-          </section>
-        </div>
+            <h1 className="whitespace-normal break-words text-20 font-bold">
+              {korName}
+            </h1>
+            {engName && (
+              <p className="whitespace-normal break-words text-12 font-normal">
+                {engName.toUpperCase()}
+              </p>
+            )}
+          </div>
+          {specText && (
+            <>
+              <div className="border-[0.5px] border-white dark:border-palette-oak-50" />
+              <p className="text-11 text-white/85">{specText}</p>
+            </>
+          )}
+        </section>
       </div>
+    </div>
+  );
 
+  const renderPageContent = () => (
+    <>
       {productionRows.length > 0 && (
         <section className="mx-5 space-y-3 border-b border-stroke-neutral-subtle py-4">
           <p className="text-12 font-bold tracking-wide text-fg-neutral-subtle">
@@ -262,11 +284,6 @@ export default function ImportClearanceDetail() {
               <p className="flex-1 break-words text-13.5 font-bold text-fg-neutral">
                 {data.importer.businessName}
               </p>
-              {data.importer.operatingStatus && (
-                <span className="shrink-0 rounded-full border border-stroke-neutral-subtle px-2 py-0.5 text-10 text-fg-neutral-muted">
-                  {data.importer.operatingStatus}
-                </span>
-              )}
             </div>
             {(data.importer.representativeName ||
               data.importer.industryName) && (
@@ -311,19 +328,6 @@ export default function ImportClearanceDetail() {
                 </p>
               </div>
             )}
-            {(data.importer.officialBusinessCode ||
-              data.importer.licenseNo) && (
-              <p className="border-t border-stroke-neutral-subtle pt-3 font-mono text-10 text-fg-neutral-subtle">
-                {[
-                  data.importer.officialBusinessCode &&
-                    `사업자등록번호 ${data.importer.officialBusinessCode}`,
-                  data.importer.licenseNo &&
-                    `면허번호 ${data.importer.licenseNo}`,
-                ]
-                  .filter(Boolean)
-                  .join(' · ')}
-              </p>
-            )}
           </div>
         </section>
       ) : (
@@ -366,6 +370,61 @@ export default function ImportClearanceDetail() {
           onClick={() => router.push(ROUTES.SEARCH.ALL(data.alcoholId!))}
         />
       )}
+    </>
+  );
+
+  const contentSkeleton = (
+    <div className="mx-5 space-y-4 py-4">
+      {Array.from({ length: 2 }).map((_, index) => (
+        <section
+          key={index}
+          className="space-y-3 border-b border-stroke-neutral-subtle py-4"
+        >
+          <SkeletonBase width={80} height={14} />
+          <SkeletonBase width="100%" height={12} />
+          <SkeletonBase width="80%" height={12} />
+        </section>
+      ))}
+    </div>
+  );
+
+  if (!isLoggedIn && !isAuthLoading) {
+    return (
+      <div
+        className={
+          data?.alcoholId !== null
+            ? STICKY_BOTTOM_CTA_PADDING_CLASS
+            : 'pb-navbar'
+        }
+      >
+        {heroSection}
+        {isLoading || !data ? (
+          contentSkeleton
+        ) : (
+          <LoginGate
+            variant="blur"
+            title="더 알고 싶으신가요?"
+            description="로그인하고 이 수입 정보를 무료로 확인하세요"
+            buttonLabel="로그인하고 보기"
+            onLogin={() => bridgeToLogin()}
+            visibleHeight="min-h-[70vh]"
+            gradientStartPercent={80}
+          >
+            {renderPageContent()}
+          </LoginGate>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={
+        data.alcoholId !== null ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-navbar'
+      }
+    >
+      {heroSection}
+      {isLoading || !data ? contentSkeleton : renderPageContent()}
     </div>
   );
 }

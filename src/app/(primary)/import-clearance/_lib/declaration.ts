@@ -6,17 +6,10 @@ import type {
 
 type Declaration = MfdsAlcoholListItem | MfdsAlcoholDetail;
 
-/** 신고에 담긴 이름 중 가장 구체적인 것을 고른다. 모두 없으면 빈 문자열. */
+/** 정제명(alcoholName)을 우선 사용하고, 없을 때만 기본 제품명(baseProductName)으로 fallback. */
 export const declarationName = (item: Declaration) => ({
-  korName:
-    item.skuDisplayNameKo ??
-    item.baseProductNameKo ??
-    item.alcoholNameKo ??
-    item.skuDisplayNameEn ??
-    item.baseProductNameEn ??
-    item.alcoholNameEn ??
-    '',
-  engName: item.skuDisplayNameEn ?? item.baseProductNameEn ?? '',
+  korName: item.alcoholNameKo ?? item.baseProductNameKo ?? '',
+  engName: item.alcoholNameEn ?? item.baseProductNameEn ?? '',
 });
 
 /**

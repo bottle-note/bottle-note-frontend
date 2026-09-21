@@ -11,6 +11,7 @@ interface GuestAlcoholDetailGateProps {
   onLogin: () => void;
   children: ReactNode;
   id?: string;
+  minHeight?: string;
 }
 
 export function GuestAlcoholDetailGate({
@@ -20,6 +21,7 @@ export function GuestAlcoholDetailGate({
   onLogin,
   children,
   id,
+  minHeight = 'min-h-[260px]',
 }: GuestAlcoholDetailGateProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -34,7 +36,7 @@ export function GuestAlcoholDetailGate({
 
   return (
     <div className="pb-navbar">
-      <section id={id} className="relative min-h-[260px] overflow-hidden">
+      <section id={id} className={`relative ${minHeight} overflow-hidden`}>
         <div
           ref={contentRef}
           aria-hidden="true"

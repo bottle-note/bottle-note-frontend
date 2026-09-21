@@ -9,6 +9,7 @@ interface SkeletonBaseProps {
   className?: string;
   circle?: boolean;
   borderRadius?: string;
+  variant?: 'default' | 'light';
 }
 
 const SkeletonBase = ({
@@ -18,7 +19,16 @@ const SkeletonBase = ({
   className = '',
   circle = false,
   borderRadius,
+  variant = 'default',
 }: SkeletonBaseProps) => {
+  const isLight = variant === 'light';
+  const baseColor = isLight
+    ? 'rgb(var(--palette-neutral-200))'
+    : 'var(--color-bg-skeleton-base)';
+  const highlightColor = isLight
+    ? 'rgb(var(--palette-neutral-50))'
+    : 'var(--color-bg-skeleton-highlight)';
+
   return (
     <Skeleton
       width={width}
@@ -27,8 +37,8 @@ const SkeletonBase = ({
       className={className}
       circle={circle}
       borderRadius={borderRadius}
-      baseColor="var(--color-bg-skeleton-base)"
-      highlightColor="var(--color-bg-skeleton-highlight)"
+      baseColor={baseColor}
+      highlightColor={highlightColor}
     />
   );
 };
