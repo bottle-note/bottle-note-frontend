@@ -368,7 +368,7 @@ export default function ImportClearanceDetail() {
           description="보틀노트에 로그인하고 수입 정보를 기록해보세요"
           buttonLabel="로그인하기"
           onLogin={() => bridgeToLogin()}
-          visibleHeight="min-h-[300px]"
+          visibleHeight="min-h-[40vh]"
         >
           {renderPageContent()}
         </LoginGate>
