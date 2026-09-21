@@ -34,8 +34,8 @@ import { parseApiError } from '@/hooks/parseApiError';
 import { formatDate } from '@/utils/formatDate';
 import { ROUTES } from '@/constants/routes';
 import InfoRow from './_components/InfoRow';
-import ImportClearanceCompactItem from '../_components/ImportClearanceCompactItem';
-import { declarationName } from '../_lib/declaration';
+import ImportClearanceCompactItem from '../../_components/ImportClearanceCompactItem';
+import { declarationName } from '../../_lib/declaration';
 
 const OTHER_DECLARATIONS_LIMIT = 5;
 

@@ -7,6 +7,8 @@ import type {
   MfdsAlcoholListItem,
   MfdsAlcoholListParams,
   MfdsCountry,
+  MfdsImporter,
+  MfdsImporterListParams,
 } from './types';
 
 export const MfdsApi = {
@@ -46,6 +48,28 @@ export const MfdsApi = {
 
     if (response.errors.length !== 0) {
       throw new Error(ERROR_MESSAGES.IMPORT_CLEARANCE_FETCH_FAILED);
+    }
+
+    return response;
+  },
+
+  /**
+   * 수입사 목록을 조회합니다.
+   * 다음 페이지는 meta.pagination.nextCursor를 cursor로 넘겨 조회합니다.
+   */
+  async getImporters(
+    params: MfdsImporterListParams = {},
+  ): Promise<ApiResponse<MfdsImporter[]>> {
+    const { signal, ...queryParams } = params;
+    const queryString = buildQueryParams({ ...queryParams });
+
+    const response = await apiClient.get<ApiResponse<MfdsImporter[]>>(
+      `/mfds/importers?${queryString}`,
+      { authRequired: false, signal },
+    );
+
+    if (response.errors.length !== 0) {
+      throw new Error(ERROR_MESSAGES.IMPORT_CLEARANCE_LIST_FETCH_FAILED);
     }
 
     return response;

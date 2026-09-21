@@ -19,7 +19,7 @@ export default function ImportClearanceListItem({ item }: Props) {
     : '통관일자 미상';
 
   return (
-    <Link href={ROUTES.IMPORT_CLEARANCE.DETAIL(item.id)} className="block">
+    <Link href={ROUTES.IMPORT_CLEARANCE.ALCOHOL(item.id)} className="block">
       <List.ItemLayout className="justify-between gap-2 px-0 py-3">
         <div className="min-w-0 flex-1">
           {hasTags && (

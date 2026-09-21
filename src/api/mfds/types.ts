@@ -35,6 +35,11 @@ export type MfdsAlcoholListParams = InfiniteListParams & {
   signal?: AbortSignal;
 };
 
+export type MfdsImporterListParams = InfiniteListParams & {
+  keyword?: string;
+  signal?: AbortSignal;
+};
+
 // --------------- Response Types ---------------
 
 /** 원장에 등장한 수출국. alpha2를 exportCountry 파라미터에 그대로 사용한다. */
