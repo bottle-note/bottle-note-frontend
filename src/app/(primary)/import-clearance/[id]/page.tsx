@@ -27,7 +27,7 @@ import {
   STICKY_BOTTOM_CTA_PADDING_CLASS,
   StickyBottomCta,
 } from '@/components/ui/Layout/StickyBottomCta';
-import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
+import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import { LoginGate } from '@/components/feature/auth/LoginGate';
 import { MfdsApi } from '@/api/mfds/mfds.api';
 import { parseApiError } from '@/hooks/parseApiError';
@@ -118,21 +118,40 @@ export default function ImportClearanceDetail() {
   if (isLoading || !data) {
     return (
       <>
-        <SubHeader>
-          <SubHeader.Left onClick={() => router.back()}>
-            <Image
-              src="/icon/arrow-left-subcoral.svg"
-              alt="뒤로가기"
-              width={23}
-              height={23}
-            />
-          </SubHeader.Left>
-          <SubHeader.Center>수입 정보</SubHeader.Center>
-        </SubHeader>
-        <div className="px-5">
-          {Array.from({ length: 4 }).map((_, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <ListItemSkeleton key={index} />
+        <div className="relative">
+          <div className="absolute inset-0 bg-bg-brand-primary-solid dark:bg-palette-oak-950" />
+          <div className="relative z-10">
+            <SubHeader bgColor="bg-none">
+              <SubHeader.Left onClick={() => router.back()}>
+                <Image
+                  src="/icon/arrow-left-white.svg"
+                  alt="뒤로가기"
+                  width={23}
+                  height={23}
+                />
+              </SubHeader.Left>
+              <SubHeader.Center textColor="text-white dark:text-palette-oak-50">
+                수입 정보
+              </SubHeader.Center>
+            </SubHeader>
+            <section className="space-y-2.5 px-5 pb-6 pt-1">
+              <SkeletonBase width={60} height={14} />
+              <SkeletonBase width="70%" height={20} />
+              <SkeletonBase width="100%" height={12} />
+            </section>
+          </div>
+        </div>
+
+        <div className="mx-5 space-y-4 py-4">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <section
+              key={index}
+              className="space-y-3 border-b border-stroke-neutral-subtle py-4"
+            >
+              <SkeletonBase width={80} height={14} />
+              <SkeletonBase width="100%" height={12} />
+              <SkeletonBase width="80%" height={12} />
+            </section>
           ))}
         </div>
       </>
@@ -194,7 +213,7 @@ export default function ImportClearanceDetail() {
 
   const heroSection = (
     <div className="relative">
-      <div className="absolute inset-0 bg-bg-brand-primary-solid" />
+      <div className="absolute inset-0 bg-bg-brand-primary-solid dark:bg-palette-oak-950" />
       <div className="relative z-10">
         <SubHeader bgColor="bg-none">
           <SubHeader.Left onClick={() => router.back()}>
@@ -205,14 +224,16 @@ export default function ImportClearanceDetail() {
               height={23}
             />
           </SubHeader.Left>
-          <SubHeader.Center textColor="text-white">수입 정보</SubHeader.Center>
+          <SubHeader.Center textColor="text-white dark:text-palette-oak-50">
+            수입 정보
+          </SubHeader.Center>
         </SubHeader>
-        <section className="space-y-2.5 px-5 pb-6 pt-1 text-white">
+        <section className="space-y-2.5 px-5 pb-6 pt-1 text-white dark:text-palette-oak-50">
           <div className="space-y-1.5">
             {data.alcoholCategoryKo && (
               <Label
                 name={data.alcoholCategoryKo}
-                styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
+                styleClass="border-white dark:border-palette-oak-50 px-2 py-[0.15rem] rounded-md text-10 dark:text-palette-oak-50"
               />
             )}
             <h1 className="whitespace-normal break-words text-20 font-bold">
@@ -226,7 +247,7 @@ export default function ImportClearanceDetail() {
           </div>
           {specText && (
             <>
-              <div className="border-[0.5px] border-white" />
+              <div className="border-[0.5px] border-white dark:border-palette-oak-50" />
               <p className="text-11 text-white/85">{specText}</p>
             </>
           )}
@@ -352,26 +373,46 @@ export default function ImportClearanceDetail() {
     </>
   );
 
+  const contentSkeleton = (
+    <div className="mx-5 space-y-4 py-4">
+      {Array.from({ length: 2 }).map((_, index) => (
+        <section
+          key={index}
+          className="space-y-3 border-b border-stroke-neutral-subtle py-4"
+        >
+          <SkeletonBase width={80} height={14} />
+          <SkeletonBase width="100%" height={12} />
+          <SkeletonBase width="80%" height={12} />
+        </section>
+      ))}
+    </div>
+  );
+
   if (!isLoggedIn && !isAuthLoading) {
     return (
       <div
         className={
-          data.alcoholId !== null
+          data?.alcoholId !== null
             ? STICKY_BOTTOM_CTA_PADDING_CLASS
             : 'pb-navbar'
         }
       >
         {heroSection}
-        <LoginGate
-          variant="blur"
-          title="이 수입 정보를 저장하시겠어요?"
-          description="보틀노트에 로그인하고 수입 정보를 기록해보세요"
-          buttonLabel="로그인하기"
-          onLogin={() => bridgeToLogin()}
-          visibleHeight="min-h-[40vh]"
-        >
-          {renderPageContent()}
-        </LoginGate>
+        {isLoading || !data ? (
+          contentSkeleton
+        ) : (
+          <LoginGate
+            variant="blur"
+            title="더 알고 싶으신가요?"
+            description="로그인하고 이 수입 정보를 무료로 확인하세요"
+            buttonLabel="로그인하고 보기"
+            onLogin={() => bridgeToLogin()}
+            visibleHeight="min-h-[70vh]"
+            gradientStartPercent={80}
+          >
+            {renderPageContent()}
+          </LoginGate>
+        )}
       </div>
     );
   }
@@ -383,7 +424,7 @@ export default function ImportClearanceDetail() {
       }
     >
       {heroSection}
-      {renderPageContent()}
+      {isLoading || !data ? contentSkeleton : renderPageContent()}
     </div>
   );
 }
