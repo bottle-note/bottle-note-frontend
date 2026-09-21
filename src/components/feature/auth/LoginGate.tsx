@@ -15,6 +15,7 @@ type LoginGateProps = {
       description: string;
       buttonLabel?: string;
       visibleHeight?: string;
+      gradientStartPercent?: number;
     }
   | {
       variant?: 'clear';
@@ -55,22 +56,23 @@ export function LoginGate(props: LoginGateProps) {
     description,
     buttonLabel = '로그인하기',
     visibleHeight = 'min-h-[260px]',
+    gradientStartPercent = 42,
   } = blurProps;
 
   return (
     <section id={id} className={`relative ${visibleHeight} overflow-hidden`}>
-      <div
-        aria-hidden="true"
-        className="pointer-events-none select-none blur-[1px]"
-      >
+      <div aria-hidden="true" className="pointer-events-none select-none">
         {children}
       </div>
       <div
         className="pointer-events-none absolute inset-0 z-10 flex items-end px-5 pb-5"
-        style={{
-          background:
-            'linear-gradient(to bottom, transparent 0%, var(--color-bg-layer-default) 42%, var(--color-bg-layer-default) 100%)',
-        }}
+        style={
+          {
+            '--gradient-start': `${gradientStartPercent}%`,
+            background:
+              'linear-gradient(to bottom, transparent 0%, var(--color-bg-layer-default) var(--gradient-start), var(--color-bg-layer-default) 100%)',
+          } as React.CSSProperties
+        }
       >
         <div className="w-full">
           <GuestLoginPrompt
