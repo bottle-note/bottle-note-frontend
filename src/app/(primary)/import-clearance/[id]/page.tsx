@@ -28,11 +28,11 @@ import {
   StickyBottomCta,
 } from '@/components/ui/Layout/StickyBottomCta';
 import ListItemSkeleton from '@/components/ui/Loading/Skeletons/ListItemSkeleton';
+import { LoginGate } from '@/components/feature/auth/LoginGate';
 import { MfdsApi } from '@/api/mfds/mfds.api';
 import { parseApiError } from '@/hooks/parseApiError';
 import { formatDate } from '@/utils/formatDate';
 import { ROUTES } from '@/constants/routes';
-import { GuestAlcoholDetailGate } from '@/app/(primary)/search/[category]/[id]/_components/GuestAlcoholDetailGate';
 import InfoRow from './_components/InfoRow';
 import ImportClearanceCompactItem from '../_components/ImportClearanceCompactItem';
 import { declarationName } from '../_lib/declaration';
@@ -362,15 +362,16 @@ export default function ImportClearanceDetail() {
         }
       >
         {heroSection}
-        <GuestAlcoholDetailGate
+        <LoginGate
+          variant="blur"
           title="이 수입 정보를 저장하시겠어요?"
           description="보틀노트에 로그인하고 수입 정보를 기록해보세요"
           buttonLabel="로그인하기"
           onLogin={() => bridgeToLogin()}
-          minHeight="min-h-[300px]"
+          visibleHeight="min-h-[300px]"
         >
           {renderPageContent()}
-        </GuestAlcoholDetailGate>
+        </LoginGate>
       </div>
     );
   }
