@@ -192,51 +192,51 @@ export default function ImportClearanceDetail() {
       ?.filter((item) => item.id !== data.id)
       .slice(0, OTHER_DECLARATIONS_LIMIT) ?? [];
 
+  const heroSection = (
+    <div className="relative">
+      <div className="absolute inset-0 bg-bg-brand-primary-solid" />
+      <div className="relative z-10">
+        <SubHeader bgColor="bg-none">
+          <SubHeader.Left onClick={() => router.back()}>
+            <Image
+              src="/icon/arrow-left-white.svg"
+              alt="뒤로가기"
+              width={23}
+              height={23}
+            />
+          </SubHeader.Left>
+          <SubHeader.Center textColor="text-white">수입 정보</SubHeader.Center>
+        </SubHeader>
+        <section className="space-y-2.5 px-5 pb-6 pt-1 text-white">
+          <div className="space-y-1.5">
+            {data.alcoholCategoryKo && (
+              <Label
+                name={data.alcoholCategoryKo}
+                styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
+              />
+            )}
+            <h1 className="whitespace-normal break-words text-20 font-bold">
+              {korName}
+            </h1>
+            {engName && (
+              <p className="whitespace-normal break-words text-12 font-normal">
+                {engName.toUpperCase()}
+              </p>
+            )}
+          </div>
+          {specText && (
+            <>
+              <div className="border-[0.5px] border-white" />
+              <p className="text-11 text-white/85">{specText}</p>
+            </>
+          )}
+        </section>
+      </div>
+    </div>
+  );
+
   const renderPageContent = () => (
     <>
-      <div className="relative">
-        <div className="absolute inset-0 bg-bg-brand-primary-solid" />
-        <div className="relative z-10">
-          <SubHeader bgColor="bg-none">
-            <SubHeader.Left onClick={() => router.back()}>
-              <Image
-                src="/icon/arrow-left-white.svg"
-                alt="뒤로가기"
-                width={23}
-                height={23}
-              />
-            </SubHeader.Left>
-            <SubHeader.Center textColor="text-white">
-              수입 정보
-            </SubHeader.Center>
-          </SubHeader>
-          <section className="space-y-2.5 px-5 pb-6 pt-1 text-white">
-            <div className="space-y-1.5">
-              {data.alcoholCategoryKo && (
-                <Label
-                  name={data.alcoholCategoryKo}
-                  styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
-                />
-              )}
-              <h1 className="whitespace-normal break-words text-20 font-bold">
-                {korName}
-              </h1>
-              {engName && (
-                <p className="whitespace-normal break-words text-12 font-normal">
-                  {engName.toUpperCase()}
-                </p>
-              )}
-            </div>
-            {specText && (
-              <>
-                <div className="border-[0.5px] border-white" />
-                <p className="text-11 text-white/85">{specText}</p>
-              </>
-            )}
-          </section>
-        </div>
-      </div>
-
       {productionRows.length > 0 && (
         <section className="mx-5 space-y-3 border-b border-stroke-neutral-subtle py-4">
           <p className="text-12 font-bold tracking-wide text-fg-neutral-subtle">
@@ -352,35 +352,37 @@ export default function ImportClearanceDetail() {
     </>
   );
 
-  const mainContent = (
+  if (!isLoggedIn && !isAuthLoading) {
+    return (
+      <div
+        className={
+          data.alcoholId !== null
+            ? STICKY_BOTTOM_CTA_PADDING_CLASS
+            : 'pb-navbar'
+        }
+      >
+        {heroSection}
+        <GuestAlcoholDetailGate
+          title="이 수입 정보를 저장하시겠어요?"
+          description="보틀노트에 로그인하고 수입 정보를 기록해보세요"
+          buttonLabel="로그인하기"
+          onLogin={() => bridgeToLogin()}
+          minHeight="min-h-[300px]"
+        >
+          {renderPageContent()}
+        </GuestAlcoholDetailGate>
+      </div>
+    );
+  }
+
+  return (
     <div
       className={
         data.alcoholId !== null ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-navbar'
       }
     >
+      {heroSection}
       {renderPageContent()}
     </div>
   );
-
-  if (!isLoggedIn && !isAuthLoading) {
-    return (
-      <GuestAlcoholDetailGate
-        title="이 수입 정보를 저장하시겠어요?"
-        description="보틀노트에 로그인하고 수입 정보를 기록해보세요"
-        buttonLabel="로그인하기"
-        onLogin={() => bridgeToLogin()}
-        minHeight="min-h-[150px]"
-      >
-        <div
-          className={
-            data.alcoholId !== null ? STICKY_BOTTOM_CTA_PADDING_CLASS : ''
-          }
-        >
-          {renderPageContent()}
-        </div>
-      </GuestAlcoholDetailGate>
-    );
-  }
-
-  return mainContent;
 }
