@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -8,6 +9,7 @@ import {
   Calendar,
   CalendarCheck,
   CalendarRange,
+  ChevronRight,
   Factory,
   Hash,
   MapPin,
@@ -67,19 +69,20 @@ export default function ImportClearanceDetail() {
 
   // 정제명(alcoholNameKo) 기반으로 같은 위스키의 수입 내역을 조회한다.
   // 수입사·용량이 달라도 동일 명칭 계열이 함께 노출된다.
+  // 현재 내역을 제외하고도 더보기 여부를 판단하도록 두 건을 더 조회한다.
   const alcoholNameForMatching = data?.alcoholNameKo || undefined;
   const { data: otherDeclarations } = useQuery({
     queryKey: [
       'mfds.alcohols',
       'byAlcoholName',
       alcoholNameForMatching,
-      OTHER_DECLARATIONS_LIMIT + 1,
+      OTHER_DECLARATIONS_LIMIT + 2,
     ],
     queryFn: async () =>
       (
         await MfdsApi.getAlcohols({
           alcoholNameKo: alcoholNameForMatching,
-          size: OTHER_DECLARATIONS_LIMIT + 1,
+          size: OTHER_DECLARATIONS_LIMIT + 2,
         })
       ).data,
     enabled: alcoholNameForMatching !== undefined,
@@ -206,10 +209,10 @@ export default function ImportClearanceDetail() {
     },
   ]);
 
-  const others =
-    otherDeclarations
-      ?.filter((item) => item.id !== data.id)
-      .slice(0, OTHER_DECLARATIONS_LIMIT) ?? [];
+  const otherItems =
+    otherDeclarations?.filter((item) => item.id !== data.id) ?? [];
+  const others = otherItems.slice(0, OTHER_DECLARATIONS_LIMIT);
+  const hasMoreOthers = otherItems.length > OTHER_DECLARATIONS_LIMIT;
 
   const heroSection = (
     <div className="relative">
@@ -361,6 +364,15 @@ export default function ImportClearanceDetail() {
           {others.map((item) => (
             <ImportClearanceCompactItem key={item.id} item={item} />
           ))}
+          {hasMoreOthers && alcoholNameForMatching && (
+            <Link
+              href={`${ROUTES.IMPORT_CLEARANCE.BASE}?keyword=${encodeURIComponent(alcoholNameForMatching)}`}
+              className="mt-2 flex items-center justify-center gap-1 py-2 text-12 font-semibold text-fg-brand"
+            >
+              전체 수입 내역 보기
+              <ChevronRight size={14} aria-hidden />
+            </Link>
+          )}
         </section>
       )}
 

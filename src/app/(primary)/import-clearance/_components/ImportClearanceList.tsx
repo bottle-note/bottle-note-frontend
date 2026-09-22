@@ -14,6 +14,7 @@ import { MfdsApi } from '@/api/mfds/mfds.api';
 import type { MfdsAlcoholListItem, MfdsAlcoholType } from '@/api/mfds/types';
 import ImportClearanceFilter from './ImportClearanceFilter';
 import ImportClearanceListItem from './ImportClearanceListItem';
+import { useImportClearanceSearchNavigation } from './ImportClearanceNavLayout';
 import { ALCOHOL_TYPE_OPTIONS } from '../_lib/declaration';
 
 const PAGE_SIZE = 20;
@@ -24,6 +25,8 @@ export default function ImportClearanceList() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setNavbarSuppressed } = useNavLayout();
+  const { setIsSearchActive: setNavigationSearchActive } =
+    useImportClearanceSearchNavigation();
   const { isLoggedIn, isGuest, pageSize } = useGuestPagedSession(
     PAGE_SIZE,
     GUEST_PAGE_SIZE,
@@ -102,8 +105,9 @@ export default function ImportClearanceList() {
   useEffect(
     () => () => {
       setNavbarSuppressed(false);
+      setNavigationSearchActive(false);
     },
-    [setNavbarSuppressed],
+    [setNavbarSuppressed, setNavigationSearchActive],
   );
 
   // 검색어·기간이 바뀌면 queryKey가 바뀌어 첫 페이지부터 다시 조회한다.
@@ -152,6 +156,7 @@ export default function ImportClearanceList() {
 
   const handleSearchActiveChange = (active: boolean) => {
     setIsSearchActive(active);
+    setNavigationSearchActive(active);
     setNavbarSuppressed(active);
   };
 

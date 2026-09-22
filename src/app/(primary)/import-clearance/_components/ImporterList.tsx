@@ -13,6 +13,7 @@ import { MfdsApi } from '@/api/mfds/mfds.api';
 import type { MfdsImporter } from '@/api/mfds/types';
 import ImporterFilter from './ImporterFilter';
 import ImporterListItem from './ImporterListItem';
+import { useImportClearanceSearchNavigation } from './ImportClearanceNavLayout';
 
 const PAGE_SIZE = 20;
 const GUEST_PAGE_SIZE = 12;
@@ -22,6 +23,8 @@ export default function ImporterList() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setNavbarSuppressed } = useNavLayout();
+  const { setIsSearchActive: setNavigationSearchActive } =
+    useImportClearanceSearchNavigation();
   const { isLoggedIn, isGuest, pageSize } = useGuestPagedSession(
     PAGE_SIZE,
     GUEST_PAGE_SIZE,
@@ -79,8 +82,9 @@ export default function ImporterList() {
   useEffect(
     () => () => {
       setNavbarSuppressed(false);
+      setNavigationSearchActive(false);
     },
-    [setNavbarSuppressed],
+    [setNavbarSuppressed, setNavigationSearchActive],
   );
 
   const {
@@ -115,6 +119,7 @@ export default function ImporterList() {
 
   const handleSearchActiveChange = (active: boolean) => {
     setIsSearchActive(active);
+    setNavigationSearchActive(active);
     setNavbarSuppressed(active);
   };
 

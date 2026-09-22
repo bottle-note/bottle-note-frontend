@@ -1,10 +1,12 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import {
   Building2,
+  ChevronRight,
   User,
   MapPin,
   Phone,
@@ -21,6 +23,7 @@ import { MfdsApi } from '@/api/mfds/mfds.api';
 import { formatDate } from '@/utils/formatDate';
 import ErrorFallback from '@/components/ui/Display/ErrorFallback';
 import { parseApiError } from '@/hooks/parseApiError';
+import { ROUTES } from '@/constants/routes';
 import ImportClearanceCompactItem from '../../_components/ImportClearanceCompactItem';
 import InfoRow from '../../alcohol/[id]/_components/InfoRow';
 
@@ -29,6 +32,8 @@ interface Row {
   label: string;
   value: string | null;
 }
+
+const RECENT_DECLARATIONS_LIMIT = 5;
 
 const withValue = (rows: Row[]) =>
   rows.filter(
@@ -61,9 +66,19 @@ export default function ImporterDetail() {
     isError: isAlcoholsError,
     refetch: refetchAlcohols,
   } = useQuery({
-    queryKey: ['mfds.alcohols', 'byImporterId', importer?.id, 5],
+    queryKey: [
+      'mfds.alcohols',
+      'byImporterId',
+      importer?.id,
+      RECENT_DECLARATIONS_LIMIT + 1,
+    ],
     queryFn: async () =>
-      (await MfdsApi.getAlcohols({ importerId: importer!.id, size: 5 })).data,
+      (
+        await MfdsApi.getAlcohols({
+          importerId: importer!.id,
+          size: RECENT_DECLARATIONS_LIMIT + 1,
+        })
+      ).data,
     enabled: Boolean(importer),
     retry: false,
   });
@@ -140,6 +155,10 @@ export default function ImporterDetail() {
   }
 
   const importerName = importer.businessName || '수입사명 미상';
+  const recentDeclarations =
+    alcoholsByImporter?.slice(0, RECENT_DECLARATIONS_LIMIT) ?? [];
+  const hasMoreRecentDeclarations =
+    (alcoholsByImporter?.length ?? 0) > RECENT_DECLARATIONS_LIMIT;
   const sections = [
     {
       title: '기본 정보',
@@ -250,14 +269,23 @@ export default function ImporterDetail() {
               다시 시도
             </button>
           </div>
-        ) : alcoholsByImporter?.length ? (
-          alcoholsByImporter.map((item) => (
+        ) : recentDeclarations.length ? (
+          recentDeclarations.map((item) => (
             <ImportClearanceCompactItem key={item.id} item={item} />
           ))
         ) : (
           <p className="py-3 text-12 text-fg-neutral-muted">
             등록된 수입 내역이 없어요.
           </p>
+        )}
+        {hasMoreRecentDeclarations && (
+          <Link
+            href={`${ROUTES.IMPORT_CLEARANCE.BASE}?keyword=${encodeURIComponent(importerName)}`}
+            className="mt-2 flex items-center justify-center gap-1 py-2 text-12 font-semibold text-fg-brand"
+          >
+            전체 수입 내역 보기
+            <ChevronRight size={14} aria-hidden />
+          </Link>
         )}
       </section>
     </>
