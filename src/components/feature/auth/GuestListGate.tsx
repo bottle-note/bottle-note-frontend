@@ -63,7 +63,7 @@ export function GuestListGate({ title, description }: GuestListGateProps) {
     const query = searchParams.toString();
     const returnTo = query ? `${pathname}?${query}` : pathname;
 
-    router.push(`${ROUTES.LOGIN}?returnTo=${encodeURIComponent(returnTo)}`);
+    router.replace(`${ROUTES.LOGIN}?returnTo=${encodeURIComponent(returnTo)}`);
   };
 
   return (

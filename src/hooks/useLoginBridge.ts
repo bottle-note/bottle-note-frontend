@@ -20,7 +20,7 @@ export const useLoginBridge = () => {
       trackGA4Event('login_prompt_shown', { trigger });
     }
     const returnTo = `${pathname}${searchParams?.toString() ? `?${searchParams.toString()}` : ''}`;
-    router.push(`/login?returnTo=${encodeURIComponent(returnTo)}`);
+    router.replace(`/login?returnTo=${encodeURIComponent(returnTo)}`);
   };
 
   return { bridgeToLogin };

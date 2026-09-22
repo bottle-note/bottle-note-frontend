@@ -279,7 +279,7 @@ export default function SearchAlcohol() {
   const isGuest = !isAuthLoading && !isLoggedIn;
 
   const handleGuestLogin = (returnTo: string) => {
-    router.push(`/login?returnTo=${encodeURIComponent(returnTo)}`);
+    router.replace(`/login?returnTo=${encodeURIComponent(returnTo)}`);
   };
 
   const detailReturnTo =
