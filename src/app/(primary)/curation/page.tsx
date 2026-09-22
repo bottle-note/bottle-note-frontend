@@ -1,7 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { ListFilter } from 'lucide-react';
 import {
   CURATION_V2_SORT_TYPES,
@@ -10,7 +9,8 @@ import {
 } from '@/api/curation-v2/constants';
 import type { CurationV2FeedItem } from '@/api/curation-v2/types';
 import { SORT_ORDER } from '@/api/_shared/types';
-import { useTab } from '@/hooks/useTab';
+import TabbedListPageHeader from '@/components/feature/TabbedListPage/TabbedListPageHeader';
+import { useTabbedListNavigation } from '@/hooks/useTabbedListNavigation';
 import { useCurationsQuery } from '@/queries/useCurationsQuery';
 import { useProgramsQuery } from '@/queries/useProgramsQuery';
 import { useTastingEventsQuery } from '@/queries/useTastingEventsQuery';
@@ -21,9 +21,6 @@ import {
 import StickySearchBar from '@/components/feature/Search/StickySearchBar';
 import SideFilterDrawer from '@/components/feature/SideFilterDrawer';
 import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
-import Tab from '@/components/ui/Navigation/Tab';
-import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
-import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import { CurationFeedCard } from './_components/CurationFeedCard';
 import { ProgramFeedCard } from './_components/ProgramFeedCard';
 import { TastingEventFeedCard } from './_components/TastingEventFeedCard';
@@ -56,10 +53,6 @@ const SORT_ORDER_BY_TYPE: Record<CurationV2SortType, SORT_ORDER> = {
   [CURATION_V2_SORT_TYPES.DISPLAY_ORDER]: SORT_ORDER.ASC,
 };
 
-const isCurationTabId = (value: string | null): value is CurationTabId => {
-  return tabList.some((tab) => tab.id === value);
-};
-
 const hasPairingPayload = (item: CurationV2FeedItem) =>
   Array.isArray(item.payload) &&
   item.payload.some(
@@ -70,10 +63,6 @@ const hasPairingPayload = (item: CurationV2FeedItem) =>
   );
 
 export default function CurationPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const { isNavigationVisible, setNavbarSuppressed } = useNavLayout();
   const {
     isLoggedIn,
     isLoading: isAuthLoading,
@@ -82,44 +71,21 @@ export default function CurationPage() {
   } = useGuestPagedSession(10);
   const [inputKeyword, setInputKeyword] = useState('');
   const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState('');
-  const [isSearchActive, setIsSearchActive] = useState(false);
   const [sortType, setSortType] = useState<CurationV2SortType>(
     CURATION_V2_SORT_TYPES.EXPOSURE_START_DATE,
   );
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
-  const tabParam = searchParams.get('tab');
-  const tabFromUrl = isCurationTabId(tabParam) ? tabParam : DEFAULT_TAB_ID;
-  const initialTab = tabList.find((tab) => tab.id === tabFromUrl) ?? tabList[0];
-  const { currentTab, handleTab, refs, registerTab } = useTab({
+  const { currentTab, handleTabChange } = useTabbedListNavigation({
     tabList,
-    scroll: true,
-    initialTab,
+    defaultTabId: DEFAULT_TAB_ID,
+    resetSearchParams: ['keyword'],
+    writeDefaultTabParam: true,
+    navigation: 'push',
+    onTabChange: () => {
+      setInputKeyword('');
+      setDebouncedSearchKeyword('');
+    },
   });
-  const isHeaderCollapsed = isSearchActive || !isNavigationVisible;
-  const handleSearchActiveChange = useCallback(
-    (active: boolean) => {
-      setIsSearchActive(active);
-      setNavbarSuppressed(active);
-    },
-    [setNavbarSuppressed],
-  );
-
-  useEffect(() => {
-    if (currentTab.id !== tabFromUrl) {
-      handleTab(tabFromUrl);
-    }
-  }, [currentTab.id, handleTab, tabFromUrl]);
-
-  useEffect(() => {
-    handleSearchActiveChange(false);
-  }, [currentTab.id, handleSearchActiveChange]);
-
-  useEffect(
-    () => () => {
-      setNavbarSuppressed(false);
-    },
-    [setNavbarSuppressed],
-  );
 
   const normalizedSearchKeyword = inputKeyword.trim().replace(/\s+/g, ' ');
 
@@ -130,31 +96,6 @@ export default function CurationPage() {
 
     return () => window.clearTimeout(timer);
   }, [normalizedSearchKeyword]);
-
-  useEffect(() => {
-    if (tabParam === tabFromUrl) {
-      return;
-    }
-
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('tab', tabFromUrl);
-
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [pathname, router, searchParams, tabFromUrl, tabParam]);
-
-  const handleCurationTab = (id: string) => {
-    if (!isCurationTabId(id) || searchParams.get('tab') === id) {
-      return;
-    }
-
-    setInputKeyword('');
-    setDebouncedSearchKeyword('');
-
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('tab', id);
-
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  };
 
   const handleSortType = (value: string) => {
     if (
@@ -271,144 +212,129 @@ export default function CurationPage() {
   };
 
   return (
-    <>
-      <div className="fixed-content top-0 z-10 bg-bg-layer-default">
-        <AutoHideLogoHeader isVisible={!isHeaderCollapsed} sticky={false} />
-        <div
-          className="scroll-navigation-motion absolute inset-x-0 top-[var(--header-height-with-safe)] transition-transform"
+    <TabbedListPageHeader
+      tabList={tabList}
+      currentTab={currentTab}
+      onTabChange={handleTabChange}
+    >
+      {({ isSearchActive, onSearchActiveChange }) => (
+        <section
+          className="w-full bg-bg-layer-default text-fg-neutral"
           style={{
-            transform: isHeaderCollapsed
-              ? 'translateY(0)'
-              : 'translateY(var(--logo-header-slide-distance))',
+            marginTop: 'var(--logo-header-expanded-height)',
           }}
         >
-          <Tab
-            variant="bookmark"
-            tabList={tabList}
-            handleTab={handleCurationTab}
-            currentTab={currentTab}
-            scrollContainerRef={refs.scrollContainerRef}
-            registerTab={registerTab}
+          <StickySearchBar
+            testId="curation-search-bar"
+            containerClassName="px-4 pb-7 pt-[5px]"
+            isSearchActive={isSearchActive}
+            onSearchActiveChange={onSearchActiveChange}
+            value={inputKeyword}
+            onValueChange={setInputKeyword}
+            placeholder="키워드를 입력하세요"
+            ariaLabel="큐레이션 검색"
+            clearable
+            inputClassName="pr-16"
+            renderActions={() => (
+              <button
+                type="button"
+                aria-label="필터메뉴"
+                className="rounded-sm text-fg-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
+                onClick={() => setIsOpenSideFilter(true)}
+              >
+                <ListFilter aria-hidden className="h-5 w-5" />
+              </button>
+            )}
           />
-        </div>
-      </div>
 
-      <section
-        className="w-full bg-bg-layer-default text-fg-neutral"
-        style={{
-          marginTop: 'var(--logo-header-expanded-height)',
-        }}
-      >
-        <StickySearchBar
-          testId="curation-search-bar"
-          containerClassName="px-4 pb-7 pt-[5px]"
-          isSearchActive={isSearchActive}
-          onSearchActiveChange={handleSearchActiveChange}
-          value={inputKeyword}
-          onValueChange={setInputKeyword}
-          placeholder="키워드를 입력하세요"
-          ariaLabel="큐레이션 검색"
-          clearable
-          inputClassName="pr-16"
-          renderActions={() => (
-            <button
-              type="button"
-              aria-label="필터메뉴"
-              className="rounded-sm text-fg-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
-              onClick={() => setIsOpenSideFilter(true)}
-            >
-              <ListFilter aria-hidden className="h-5 w-5" />
-            </button>
+          <SideFilterDrawer
+            isOpen={isOpenSideFilter}
+            onClose={() => setIsOpenSideFilter(false)}
+            resetFilter={resetFilter}
+          >
+            <Accordion title="정렬">
+              <Accordion.Grid cols={2}>
+                {CURATION_SORT_OPTIONS.map((option) => (
+                  <Accordion.Content
+                    key={option.type}
+                    title={option.name}
+                    value={option.type}
+                    isSelected={sortType === option.type}
+                    onClick={handleSortType}
+                  />
+                ))}
+              </Accordion.Grid>
+            </Accordion>
+          </SideFilterDrawer>
+
+          {activeQuery.isLoading && (
+            <div className="space-y-7 px-5 pb-navbar">
+              <div
+                className={`animate-pulse rounded-lg bg-bg-neutral-weak ${skeletonHeight}`}
+              />
+              <div
+                className={`animate-pulse rounded-lg bg-bg-neutral-weak ${skeletonHeight}`}
+              />
+            </div>
           )}
-        />
 
-        <SideFilterDrawer
-          isOpen={isOpenSideFilter}
-          onClose={() => setIsOpenSideFilter(false)}
-          resetFilter={resetFilter}
-        >
-          <Accordion title="정렬">
-            <Accordion.Grid cols={2}>
-              {CURATION_SORT_OPTIONS.map((option) => (
-                <Accordion.Content
-                  key={option.type}
-                  title={option.name}
-                  value={option.type}
-                  isSelected={sortType === option.type}
-                  onClick={handleSortType}
-                />
-              ))}
-            </Accordion.Grid>
-          </Accordion>
-        </SideFilterDrawer>
-
-        {activeQuery.isLoading && (
-          <div className="space-y-7 px-5 pb-navbar">
-            <div
-              className={`animate-pulse rounded-lg bg-bg-neutral-weak ${skeletonHeight}`}
-            />
-            <div
-              className={`animate-pulse rounded-lg bg-bg-neutral-weak ${skeletonHeight}`}
-            />
-          </div>
-        )}
-
-        {activeQuery.error && (
-          <p className="px-5 pb-navbar text-13 font-medium text-fg-neutral-muted">
-            {errorMessage}
-          </p>
-        )}
-
-        {!activeQuery.isLoading &&
-          !activeQuery.error &&
-          (!activeData || activeData.length === 0) &&
-          !isAuthLoading &&
-          (isGuest || !activeQuery.hasNextPage) && (
+          {activeQuery.error && (
             <p className="px-5 pb-navbar text-13 font-medium text-fg-neutral-muted">
-              {emptyMessage}
+              {errorMessage}
             </p>
           )}
 
-        {!activeQuery.isLoading &&
-          !activeQuery.error &&
-          isLoggedIn &&
-          activeData &&
-          activeData.length === 0 &&
-          activeQuery.hasNextPage && (
-            <div className="px-5 pb-navbar">
-              <div ref={activeQuery.targetRef} className="h-1" />
-              <p className="py-2 text-center text-12 font-medium text-fg-neutral-muted">
-                불러오는 중...
+          {!activeQuery.isLoading &&
+            !activeQuery.error &&
+            (!activeData || activeData.length === 0) &&
+            !isAuthLoading &&
+            (isGuest || !activeQuery.hasNextPage) && (
+              <p className="px-5 pb-navbar text-13 font-medium text-fg-neutral-muted">
+                {emptyMessage}
               </p>
-            </div>
-          )}
+            )}
 
-        {!activeQuery.isLoading &&
-          !activeQuery.error &&
-          activeData &&
-          activeData.length > 0 && (
-            <div
-              className={`space-y-7 px-5 ${shouldGateGuestFeed ? 'pb-0' : 'pb-navbar'}`}
-            >
-              {activeData && activeData.length > 0 && renderFeedItems()}
-              {shouldGateGuestFeed && (
-                <GuestListGate
-                  key={`${currentTab.id}-${trimmedSearchKeyword}-${sortType}`}
-                  title="더 많은 이야기가 궁금하신가요?"
-                  description="로그인하고 보틀노트의 시음회와 큐레이션을 만나보세요."
-                />
-              )}
-              {activeQuery.hasNextPage && isLoggedIn && (
+          {!activeQuery.isLoading &&
+            !activeQuery.error &&
+            isLoggedIn &&
+            activeData &&
+            activeData.length === 0 &&
+            activeQuery.hasNextPage && (
+              <div className="px-5 pb-navbar">
                 <div ref={activeQuery.targetRef} className="h-1" />
-              )}
-              {activeQuery.isFetchingNextPage && isLoggedIn && (
                 <p className="py-2 text-center text-12 font-medium text-fg-neutral-muted">
                   불러오는 중...
                 </p>
-              )}
-            </div>
-          )}
-      </section>
-    </>
+              </div>
+            )}
+
+          {!activeQuery.isLoading &&
+            !activeQuery.error &&
+            activeData &&
+            activeData.length > 0 && (
+              <div
+                className={`space-y-7 px-5 ${shouldGateGuestFeed ? 'pb-0' : 'pb-navbar'}`}
+              >
+                {activeData && activeData.length > 0 && renderFeedItems()}
+                {shouldGateGuestFeed && (
+                  <GuestListGate
+                    key={`${currentTab.id}-${trimmedSearchKeyword}-${sortType}`}
+                    title="더 많은 이야기가 궁금하신가요?"
+                    description="로그인하고 보틀노트의 시음회와 큐레이션을 만나보세요."
+                  />
+                )}
+                {activeQuery.hasNextPage && isLoggedIn && (
+                  <div ref={activeQuery.targetRef} className="h-1" />
+                )}
+                {activeQuery.isFetchingNextPage && isLoggedIn && (
+                  <p className="py-2 text-center text-12 font-medium text-fg-neutral-muted">
+                    불러오는 중...
+                  </p>
+                )}
+              </div>
+            )}
+        </section>
+      )}
+    </TabbedListPageHeader>
   );
 }

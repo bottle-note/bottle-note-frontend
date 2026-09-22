@@ -8,13 +8,12 @@ import {
   GuestListGate,
   useGuestPagedSession,
 } from '@/components/feature/auth/GuestListGate';
-import { useNavLayout } from '@/components/ui/Layout/NavLayout';
+import { useTabbedListPageSearch } from '@/components/feature/TabbedListPage/TabbedListPageHeader';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { MfdsApi } from '@/api/mfds/mfds.api';
 import type { MfdsAlcoholListItem, MfdsAlcoholType } from '@/api/mfds/types';
 import ImportClearanceFilter from './ImportClearanceFilter';
 import ImportClearanceListItem from './ImportClearanceListItem';
-import { useImportClearanceSearchNavigation } from './ImportClearanceNavLayout';
 import { ALCOHOL_TYPE_OPTIONS } from '../_lib/declaration';
 
 const PAGE_SIZE = 20;
@@ -24,14 +23,11 @@ export default function ImportClearanceList() {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setNavbarSuppressed } = useNavLayout();
-  const { setIsSearchActive: setNavigationSearchActive } =
-    useImportClearanceSearchNavigation();
+  const { isSearchActive, onSearchActiveChange } = useTabbedListPageSearch();
   const { isLoggedIn, isGuest, pageSize } = useGuestPagedSession(
     PAGE_SIZE,
     GUEST_PAGE_SIZE,
   );
-  const [isSearchActive, setIsSearchActive] = useState(false);
   const [inputKeyword, setInputKeyword] = useState(() =>
     normalizeKeyword(searchParams.get('keyword') ?? ''),
   );
@@ -102,18 +98,6 @@ export default function ImportClearanceList() {
     setAlcoholType(parseAlcoholType(searchParams.get('alcoholType')));
   }, [searchParams, urlKeyword]);
 
-  useEffect(
-    () => () => {
-      setNavbarSuppressed(false);
-      setNavigationSearchActive(false);
-    },
-    [setNavbarSuppressed, setNavigationSearchActive],
-  );
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   // 검색어·기간이 바뀌면 queryKey가 바뀌어 첫 페이지부터 다시 조회한다.
   // 커서는 조회 조건에 묶여 서명되므로 조건을 유지한 채로만 이어 쓸 수 있다.
   const {
@@ -157,12 +141,6 @@ export default function ImportClearanceList() {
   const isEmpty = hasLoadedFirstPage && !error && items.length === 0;
   const hasNextPageError = Boolean(error) && items.length > 0;
   const shouldGateGuestList = isGuest && items.length > 0;
-
-  const handleSearchActiveChange = (active: boolean) => {
-    setIsSearchActive(active);
-    setNavigationSearchActive(active);
-    setNavbarSuppressed(active);
-  };
 
   const handleReset = () => {
     setStartDate(null);
@@ -208,7 +186,7 @@ export default function ImportClearanceList() {
         <h1 className="sr-only">수입통관</h1>
         <ImportClearanceFilter
           isSearchActive={isSearchActive}
-          onSearchActiveChange={handleSearchActiveChange}
+          onSearchActiveChange={onSearchActiveChange}
           keyword={inputKeyword}
           onKeywordChange={setInputKeyword}
           startDate={startDate}

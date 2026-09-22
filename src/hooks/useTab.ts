@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface Props<T> {
   tabList: T[];
@@ -6,6 +6,7 @@ interface Props<T> {
   offset?: number;
   align?: 'center' | 'left';
   initialTab?: T;
+  activeTab?: T;
 }
 
 export const useTab = <T extends { name: string; id: string }>({
@@ -14,18 +15,25 @@ export const useTab = <T extends { name: string; id: string }>({
   offset = 0,
   align = 'center',
   initialTab,
+  activeTab,
 }: Props<T>) => {
-  const [currentTab, setCurrentTab] = useState(initialTab || tabList[0]);
+  const [selectedTab, setSelectedTab] = useState(initialTab || tabList[0]);
+  const currentTab = activeTab || selectedTab;
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<
     Record<string, HTMLDivElement | HTMLButtonElement | null>
   >({});
 
-  const handleTab = (id: string) => {
-    const selected = tabList.find((item) => item.id === id);
+  const handleTab = useCallback(
+    (id: string) => {
+      const selected = tabList.find((item) => item.id === id);
 
-    setCurrentTab((prev) => selected ?? prev);
-  };
+      if (!selected || selected.id === currentTab.id) return;
+
+      setSelectedTab(selected);
+    },
+    [currentTab.id, tabList],
+  );
 
   const registerTab =
     (id: string) => (el: HTMLDivElement | HTMLButtonElement | null) => {
