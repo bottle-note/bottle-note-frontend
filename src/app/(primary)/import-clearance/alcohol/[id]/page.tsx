@@ -236,7 +236,7 @@ export default function ImportClearanceDetail() {
             {data.alcoholCategoryKo && (
               <Label
                 name={data.alcoholCategoryKo}
-                styleClass="border-white dark:border-palette-oak-50 px-2 py-[0.15rem] rounded-md text-10 dark:text-palette-oak-50"
+                styleClass="label-default px-2 py-[0.15rem] text-10"
               />
             )}
             <h1 className="whitespace-normal break-words text-20 font-bold">
