@@ -147,6 +147,9 @@ export default function CurationPage() {
       return;
     }
 
+    setInputKeyword('');
+    setDebouncedSearchKeyword('');
+
     const params = new URLSearchParams(searchParams.toString());
     params.set('tab', id);
 
@@ -301,6 +304,7 @@ export default function CurationPage() {
           containerClassName="px-4 pb-7 pt-[5px]"
           isSearchActive={isSearchActive}
           onSearchActiveChange={handleSearchActiveChange}
+          value={inputKeyword}
           onValueChange={setInputKeyword}
           placeholder="키워드를 입력하세요"
           ariaLabel="큐레이션 검색"

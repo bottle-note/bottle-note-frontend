@@ -87,6 +87,10 @@ export default function ImporterList() {
     [setNavbarSuppressed, setNavigationSearchActive],
   );
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const {
     data: pages = [],
     error,

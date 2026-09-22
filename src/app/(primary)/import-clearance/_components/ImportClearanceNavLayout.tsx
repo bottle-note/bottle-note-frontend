@@ -7,11 +7,20 @@ import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
 import Tab from '@/components/ui/Navigation/Tab';
 import { useTab } from '@/hooks/useTab';
 import { ROUTES } from '@/constants/routes';
+import { clearSearchParams } from '@/utils/clearSearchParams';
 
 const tabList = [
   { id: 'clearance', name: '수입통관' },
   { id: 'importer', name: '수입사' },
 ];
+
+const TAB_SCOPED_SEARCH_PARAMS = [
+  'keyword',
+  'startDate',
+  'endDate',
+  'country',
+  'alcoholType',
+] as const;
 
 interface ImportClearanceSearchContextValue {
   setIsSearchActive: (active: boolean) => void;
@@ -67,7 +76,11 @@ export function ImportClearanceNavLayout({
   const { refs, registerTab } = useTab({ tabList });
 
   const handleTab = (tabId: string) => {
+    if (tabId === currentTabId) return;
+
     const params = new URLSearchParams(searchParams.toString());
+    clearSearchParams(params, TAB_SCOPED_SEARCH_PARAMS);
+
     if (tabId === 'importer') {
       params.set('tab', 'importer');
     } else {

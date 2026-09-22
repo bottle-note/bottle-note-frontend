@@ -110,6 +110,10 @@ export default function ImportClearanceList() {
     [setNavbarSuppressed, setNavigationSearchActive],
   );
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // 검색어·기간이 바뀌면 queryKey가 바뀌어 첫 페이지부터 다시 조회한다.
   // 커서는 조회 조건에 묶여 서명되므로 조건을 유지한 채로만 이어 쓸 수 있다.
   const {
