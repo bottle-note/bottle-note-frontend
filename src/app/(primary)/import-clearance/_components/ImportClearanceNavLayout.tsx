@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
-import NavLayout, { useNavLayout } from '@/components/ui/Layout/NavLayout';
+import NavLayout from '@/components/ui/Layout/NavLayout';
 import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
 import Tab from '@/components/ui/Navigation/Tab';
 import { useTab } from '@/hooks/useTab';
@@ -41,28 +41,32 @@ export function ImportClearanceNavLayout({
 
   const isHeaderVisible = !searchParams.has('keyword');
 
+  const isListPage = pathname === ROUTES.IMPORT_CLEARANCE.BASE;
+
   return (
-    <NavLayout showNavbar={pathname === ROUTES.IMPORT_CLEARANCE.BASE}>
-      <div className="fixed-content top-0 z-10 bg-bg-layer-default">
-        <AutoHideLogoHeader isVisible={isHeaderVisible} sticky={false} />
-        <div
-          className="scroll-navigation-motion absolute inset-x-0 top-[var(--header-height-with-safe)] transition-transform"
-          style={{
-            transform: isHeaderVisible
-              ? 'translateY(var(--logo-header-slide-distance))'
-              : 'translateY(0)',
-          }}
-        >
-          <Tab
-            variant="bookmark"
-            tabList={tabList}
-            currentTab={currentTabObj}
-            handleTab={handleTab}
-            scrollContainerRef={refs.scrollContainerRef}
-            registerTab={registerTab}
-          />
+    <NavLayout showNavbar={isListPage}>
+      {isListPage && (
+        <div className="fixed-content top-0 z-10 bg-bg-layer-default">
+          <AutoHideLogoHeader isVisible={isHeaderVisible} sticky={false} />
+          <div
+            className="scroll-navigation-motion absolute inset-x-0 top-[var(--header-height-with-safe)] transition-transform"
+            style={{
+              transform: isHeaderVisible
+                ? 'translateY(var(--logo-header-slide-distance))'
+                : 'translateY(0)',
+            }}
+          >
+            <Tab
+              variant="bookmark"
+              tabList={tabList}
+              currentTab={currentTabObj}
+              handleTab={handleTab}
+              scrollContainerRef={refs.scrollContainerRef}
+              registerTab={registerTab}
+            />
+          </div>
         </div>
-      </div>
+      )}
       {children}
     </NavLayout>
   );

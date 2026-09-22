@@ -75,6 +75,20 @@ export const MfdsApi = {
     return response;
   },
 
+  /** 공개 대상 수입사 상세를 조회합니다. */
+  async getImporter(id: string | number): Promise<ApiResponse<MfdsImporter>> {
+    const response = await apiClient.get<ApiResponse<MfdsImporter>>(
+      `/mfds/importers/${id}`,
+      { authRequired: false },
+    );
+
+    if (response.errors.length !== 0) {
+      throw new Error('수입사 정보를 불러오는데 실패했습니다.');
+    }
+
+    return response;
+  },
+
   /** 원장에 등장한 수출국 목록을 조회합니다. exportCountry 필터 옵션으로 씁니다. */
   async getCountries(): Promise<ApiResponse<MfdsCountry[]>> {
     const response = await apiClient.get<ApiResponse<MfdsCountry[]>>(
