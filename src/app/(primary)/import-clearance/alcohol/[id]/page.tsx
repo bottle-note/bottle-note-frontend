@@ -236,7 +236,7 @@ export default function ImportClearanceDetail() {
             {data.alcoholCategoryKo && (
               <Label
                 name={data.alcoholCategoryKo}
-                styleClass="border-white dark:border-palette-oak-50 px-2 py-[0.15rem] rounded-md text-10 dark:text-palette-oak-50"
+                styleClass="label-default px-2 py-[0.15rem] text-10"
               />
             )}
             <h1 className="whitespace-normal break-words text-20 font-bold">
@@ -277,7 +277,10 @@ export default function ImportClearanceDetail() {
           <p className="mb-2 text-12 font-bold tracking-wide text-fg-neutral-subtle">
             수입사 정보
           </p>
-          <div className="space-y-3 rounded-xl bg-bg-neutral-weak p-4">
+          <Link
+            href={ROUTES.IMPORT_CLEARANCE.IMPORTER(data.importer.id)}
+            className="block space-y-3 rounded-xl bg-bg-neutral-weak p-4"
+          >
             <div className="flex items-center gap-2">
               <Building2
                 size={16}
@@ -287,6 +290,11 @@ export default function ImportClearanceDetail() {
               <p className="flex-1 break-words text-13.5 font-bold text-fg-neutral">
                 {data.importer.businessName}
               </p>
+              <ChevronRight
+                size={16}
+                className="shrink-0 text-fg-neutral-subtle"
+                aria-hidden
+              />
             </div>
             {(data.importer.representativeName ||
               data.importer.industryName) && (
@@ -331,7 +339,7 @@ export default function ImportClearanceDetail() {
                 </p>
               </div>
             )}
-          </div>
+          </Link>
         </section>
       ) : (
         data.importerBaseName && (
