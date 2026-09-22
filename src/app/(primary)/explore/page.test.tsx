@@ -4,28 +4,13 @@ import ExplorePage from './page';
 
 const mockUseNavLayout = jest.fn();
 const mockSetNavbarSuppressed = jest.fn();
-const mockSetTabParam = jest.fn();
 const mockRouterReplace = jest.fn();
 let mockSearchParams = 'tab=REVIEW_WHISKEY';
-let mockCurrentTab = { name: '리뷰 둘러보기', id: 'REVIEW_WHISKEY' };
 
 jest.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(mockSearchParams),
   useRouter: () => ({ replace: mockRouterReplace }),
-}));
-
-jest.mock('@/hooks/useStatefulSearchParams', () => ({
-  __esModule: true,
-  default: () => [null, mockSetTabParam],
-}));
-
-jest.mock('@/hooks/useTab', () => ({
-  useTab: () => ({
-    currentTab: mockCurrentTab,
-    handleTab: jest.fn(),
-    refs: { scrollContainerRef: { current: null } },
-    registerTab: jest.fn(),
-  }),
+  usePathname: () => '/explore',
 }));
 
 jest.mock('@/components/ui/Layout/NavLayout', () => ({
@@ -34,7 +19,21 @@ jest.mock('@/components/ui/Layout/NavLayout', () => ({
 
 jest.mock('@/components/ui/Navigation/Tab', () => ({
   __esModule: true,
-  default: () => <div data-testid="explore-tabs">tabs</div>,
+  default: ({
+    tabList,
+    handleTab,
+  }: {
+    tabList: { id: string; name: string }[];
+    handleTab: (id: string) => void;
+  }) => (
+    <div data-testid="explore-tabs">
+      {tabList.map((tab) => (
+        <button key={tab.id} type="button" onClick={() => handleTab(tab.id)}>
+          {tab.name}
+        </button>
+      ))}
+    </div>
+  ),
 }));
 
 jest.mock('@/components/ui/Navigation/AutoHideLogoHeader', () => ({
@@ -70,7 +69,6 @@ describe('ExplorePage scroll header', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockSearchParams = 'tab=REVIEW_WHISKEY';
-    mockCurrentTab = { name: '리뷰 둘러보기', id: 'REVIEW_WHISKEY' };
     window.scrollTo = jest.fn();
     mockUseNavLayout.mockReturnValue({
       isNavigationVisible: true,
@@ -85,7 +83,7 @@ describe('ExplorePage scroll header', () => {
       'bg-bg-layer-default',
       'text-fg-neutral',
     );
-    expect(screen.getByTestId('explore-page')).toHaveAttribute(
+    expect(screen.getByTestId('tabbed-list-page')).toHaveAttribute(
       'data-header-collapsed',
       'false',
     );
@@ -104,7 +102,7 @@ describe('ExplorePage scroll header', () => {
 
     render(<ExplorePage />);
 
-    expect(screen.getByTestId('explore-page')).toHaveAttribute(
+    expect(screen.getByTestId('tabbed-list-page')).toHaveAttribute(
       'data-header-collapsed',
       'true',
     );
@@ -122,11 +120,11 @@ describe('ExplorePage scroll header', () => {
       screen.getByRole('button', { name: 'focus review search' }),
     );
 
-    expect(screen.getByTestId('explore-page')).toHaveAttribute(
+    expect(screen.getByTestId('tabbed-list-page')).toHaveAttribute(
       'data-search-active',
       'true',
     );
-    expect(screen.getByTestId('explore-page')).toHaveAttribute(
+    expect(screen.getByTestId('tabbed-list-page')).toHaveAttribute(
       'data-header-collapsed',
       'true',
     );
@@ -138,7 +136,7 @@ describe('ExplorePage scroll header', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'blur review search' }));
 
-    expect(screen.getByTestId('explore-page')).toHaveAttribute(
+    expect(screen.getByTestId('tabbed-list-page')).toHaveAttribute(
       'data-search-active',
       'false',
     );
@@ -161,13 +159,8 @@ describe('ExplorePage scroll header', () => {
   it('리뷰에서 위스키 탭으로 전환하면 모든 검색·필터·정렬 조건을 초기화한다', () => {
     mockSearchParams =
       'tab=REVIEW_WHISKEY&keyword=peaty&keywords=legacy&sortType=RATING&sortOrder=ASC&rating=EXACT_5_0&category=SINGLE_MALT&regionIds=12';
-    const { rerender } = render(<ExplorePage />);
-
-    mockCurrentTab = {
-      name: '위스키 둘러보기',
-      id: 'EXPLORER_WHISKEY',
-    };
-    rerender(<ExplorePage />);
+    render(<ExplorePage />);
+    fireEvent.click(screen.getByRole('button', { name: '위스키 둘러보기' }));
 
     const [url] = mockRouterReplace.mock.calls.at(-1);
     const params = new URLSearchParams(url.split('?')[1]);
@@ -184,17 +177,8 @@ describe('ExplorePage scroll header', () => {
   it('위스키에서 리뷰 탭으로 전환해도 모든 검색·필터·정렬 조건을 초기화한다', () => {
     mockSearchParams =
       'tab=EXPLORER_WHISKEY&keyword=macallan&sortType=RATING&sortOrder=DESC&rating=AT_LEAST_4_5&category=SINGLE_MALT&regionIds=12&regionIds=34';
-    mockCurrentTab = {
-      name: '위스키 둘러보기',
-      id: 'EXPLORER_WHISKEY',
-    };
-    const { rerender } = render(<ExplorePage />);
-
-    mockCurrentTab = {
-      name: '리뷰 둘러보기',
-      id: 'REVIEW_WHISKEY',
-    };
-    rerender(<ExplorePage />);
+    render(<ExplorePage />);
+    fireEvent.click(screen.getByRole('button', { name: '리뷰 둘러보기' }));
 
     const [url] = mockRouterReplace.mock.calls.at(-1);
     const params = new URLSearchParams(url.split('?')[1]);

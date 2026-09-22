@@ -7,13 +7,12 @@ import {
   GuestListGate,
   useGuestPagedSession,
 } from '@/components/feature/auth/GuestListGate';
-import { useNavLayout } from '@/components/ui/Layout/NavLayout';
+import { useTabbedListPageSearch } from '@/components/feature/TabbedListPage/TabbedListPageHeader';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { MfdsApi } from '@/api/mfds/mfds.api';
 import type { MfdsImporter } from '@/api/mfds/types';
 import ImporterFilter from './ImporterFilter';
 import ImporterListItem from './ImporterListItem';
-import { useImportClearanceSearchNavigation } from './ImportClearanceNavLayout';
 
 const PAGE_SIZE = 20;
 const GUEST_PAGE_SIZE = 12;
@@ -22,14 +21,11 @@ export default function ImporterList() {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setNavbarSuppressed } = useNavLayout();
-  const { setIsSearchActive: setNavigationSearchActive } =
-    useImportClearanceSearchNavigation();
+  const { isSearchActive, onSearchActiveChange } = useTabbedListPageSearch();
   const { isLoggedIn, isGuest, pageSize } = useGuestPagedSession(
     PAGE_SIZE,
     GUEST_PAGE_SIZE,
   );
-  const [isSearchActive, setIsSearchActive] = useState(false);
   const [inputKeyword, setInputKeyword] = useState(() =>
     normalizeKeyword(searchParams.get('keyword') ?? ''),
   );
@@ -79,18 +75,6 @@ export default function ImporterList() {
     }
   }, [searchParams, urlKeyword]);
 
-  useEffect(
-    () => () => {
-      setNavbarSuppressed(false);
-      setNavigationSearchActive(false);
-    },
-    [setNavbarSuppressed, setNavigationSearchActive],
-  );
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   const {
     data: pages = [],
     error,
@@ -121,12 +105,6 @@ export default function ImporterList() {
   const hasNextPageError = Boolean(error) && items.length > 0;
   const shouldGateGuestList = isGuest && items.length > 0;
 
-  const handleSearchActiveChange = (active: boolean) => {
-    setIsSearchActive(active);
-    setNavigationSearchActive(active);
-    setNavbarSuppressed(active);
-  };
-
   const handleReset = () => {
     updateSearchParams({ keyword: null });
   };
@@ -140,7 +118,7 @@ export default function ImporterList() {
         <h1 className="sr-only">수입사</h1>
         <ImporterFilter
           isSearchActive={isSearchActive}
-          onSearchActiveChange={handleSearchActiveChange}
+          onSearchActiveChange={onSearchActiveChange}
           keyword={inputKeyword}
           onKeywordChange={setInputKeyword}
           onReset={handleReset}
