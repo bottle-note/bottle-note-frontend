@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { format, isValid, parseISO } from 'date-fns';
 import List from '@/components/feature/List/List';
 import {
   GuestListGate,
@@ -11,16 +10,15 @@ import {
 import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { MfdsApi } from '@/api/mfds/mfds.api';
-import type { MfdsAlcoholListItem, MfdsAlcoholType } from '@/api/mfds/types';
-import ImportClearanceFilter from './ImportClearanceFilter';
-import ImportClearanceListItem from './ImportClearanceListItem';
+import type { MfdsImporter } from '@/api/mfds/types';
+import ImporterFilter from './ImporterFilter';
+import ImporterListItem from './ImporterListItem';
 import { useImportClearanceSearchNavigation } from './ImportClearanceNavLayout';
-import { ALCOHOL_TYPE_OPTIONS } from '../_lib/declaration';
 
 const PAGE_SIZE = 20;
 const GUEST_PAGE_SIZE = 12;
 
-export default function ImportClearanceList() {
+export default function ImporterList() {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -36,23 +34,8 @@ export default function ImportClearanceList() {
     normalizeKeyword(searchParams.get('keyword') ?? ''),
   );
   const [keyword, setKeyword] = useState(inputKeyword);
-  const [startDate, setStartDate] = useState(() =>
-    parseQueryDate(searchParams.get('startDate')),
-  );
-  const [endDate, setEndDate] = useState(() =>
-    parseQueryDate(searchParams.get('endDate')),
-  );
-  const [exportCountry, setExportCountry] = useState(() =>
-    searchParams.get('country'),
-  );
-  const [alcoholType, setAlcoholType] = useState(() =>
-    parseAlcoholType(searchParams.get('alcoholType')),
-  );
   const urlKeyword = normalizeKeyword(searchParams.get('keyword') ?? '');
   const syncedKeywordRef = useRef(urlKeyword);
-
-  const processedDateFrom = startDate ? format(startDate, 'yyyy-MM-dd') : '';
-  const processedDateTo = endDate ? format(endDate, 'yyyy-MM-dd') : '';
 
   const updateSearchParams = useCallback(
     (updates: Record<string, string | null>) => {
@@ -88,18 +71,12 @@ export default function ImportClearanceList() {
 
   useEffect(() => {
     const keywordFromUrl = urlKeyword;
-    const startDateFromUrl = parseQueryDate(searchParams.get('startDate'));
-    const endDateFromUrl = parseQueryDate(searchParams.get('endDate'));
 
     if (syncedKeywordRef.current !== keywordFromUrl) {
       syncedKeywordRef.current = keywordFromUrl;
       setInputKeyword(keywordFromUrl);
       setKeyword(keywordFromUrl);
     }
-    setStartDate(startDateFromUrl);
-    setEndDate(endDateFromUrl);
-    setExportCountry(searchParams.get('country'));
-    setAlcoholType(parseAlcoholType(searchParams.get('alcoholType')));
   }, [searchParams, urlKeyword]);
 
   useEffect(
@@ -114,10 +91,8 @@ export default function ImportClearanceList() {
     window.scrollTo(0, 0);
   }, []);
 
-  // 검색어·기간이 바뀌면 queryKey가 바뀌어 첫 페이지부터 다시 조회한다.
-  // 커서는 조회 조건에 묶여 서명되므로 조건을 유지한 채로만 이어 쓸 수 있다.
   const {
-    data: pages,
+    data: pages = [],
     error,
     isLoading,
     isFetching,
@@ -125,23 +100,11 @@ export default function ImportClearanceList() {
     hasNextPage,
     targetRef,
     refetch,
-  } = usePaginatedQuery<MfdsAlcoholListItem[]>({
-    queryKey: [
-      'mfds.alcohols',
-      keyword,
-      processedDateFrom,
-      processedDateTo,
-      exportCountry,
-      alcoholType,
-      pageSize,
-    ],
-    queryFn: ({ pageParam, signal }) =>
-      MfdsApi.getAlcohols({
+  } = usePaginatedQuery<MfdsImporter[]>({
+    queryKey: ['mfds.importers', keyword, pageSize],
+    queryFn: async ({ pageParam, signal }) =>
+      await MfdsApi.getImporters({
         keyword: keyword || undefined,
-        processedDateFrom: processedDateFrom || undefined,
-        processedDateTo: processedDateTo || undefined,
-        exportCountry: exportCountry || undefined,
-        alcoholType: alcoholType || undefined,
         cursor: pageParam,
         size: pageSize,
         signal,
@@ -165,38 +128,7 @@ export default function ImportClearanceList() {
   };
 
   const handleReset = () => {
-    setStartDate(null);
-    setEndDate(null);
-    setExportCountry(null);
-    setAlcoholType(null);
-    updateSearchParams({
-      startDate: null,
-      endDate: null,
-      country: null,
-      alcoholType: null,
-    });
-  };
-
-  const handleDateChange = (
-    nextStartDate: Date | null,
-    nextEndDate: Date | null,
-  ) => {
-    setStartDate(nextStartDate);
-    setEndDate(nextEndDate);
-    updateSearchParams({
-      startDate: nextStartDate ? format(nextStartDate, 'yyyy-MM-dd') : null,
-      endDate: nextEndDate ? format(nextEndDate, 'yyyy-MM-dd') : null,
-    });
-  };
-
-  const handleExportCountryChange = (nextExportCountry: string | null) => {
-    setExportCountry(nextExportCountry);
-    updateSearchParams({ country: nextExportCountry });
-  };
-
-  const handleAlcoholTypeChange = (nextAlcoholType: MfdsAlcoholType | null) => {
-    setAlcoholType(nextAlcoholType);
-    updateSearchParams({ alcoholType: nextAlcoholType });
+    updateSearchParams({ keyword: null });
   };
 
   return (
@@ -205,30 +137,23 @@ export default function ImportClearanceList() {
         className="w-full px-5 pb-navbar"
         style={{ marginTop: 'var(--logo-header-expanded-height)' }}
       >
-        <h1 className="sr-only">수입통관</h1>
-        <ImportClearanceFilter
+        <h1 className="sr-only">수입사</h1>
+        <ImporterFilter
           isSearchActive={isSearchActive}
           onSearchActiveChange={handleSearchActiveChange}
           keyword={inputKeyword}
           onKeywordChange={setInputKeyword}
-          startDate={startDate}
-          endDate={endDate}
-          onDateChange={handleDateChange}
-          exportCountry={exportCountry}
-          onExportCountryChange={handleExportCountryChange}
-          alcoholType={alcoholType}
-          onAlcoholTypeChange={handleAlcoholTypeChange}
           onReset={handleReset}
         />
         <List
-          emptyViewText="조건에 맞는 수입 정보가 없어요."
+          emptyViewText="조건에 맞는 수입사 정보가 없어요."
           isListFirstLoading={isLoading}
           isError={Boolean(error) && items.length === 0}
           isEmpty={isEmpty}
         >
           <List.Section>
             {items.map((item) => (
-              <ImportClearanceListItem key={item.id} item={item} />
+              <ImporterListItem key={item.id} item={item} />
             ))}
           </List.Section>
         </List>
@@ -250,8 +175,8 @@ export default function ImportClearanceList() {
         )}
         {shouldGateGuestList && (
           <GuestListGate
-            title="더 많은 수입 정보가 궁금하신가요?"
-            description="로그인하고 전체 수입통관 내역을 더 확인해보세요."
+            title="더 많은 수입사 정보가 궁금하신가요?"
+            description="로그인하고 전체 수입사 정보를 더 확인해보세요."
           />
         )}
         {isFetchingNextPage && (
@@ -267,20 +192,3 @@ export default function ImportClearanceList() {
 function normalizeKeyword(value: string) {
   return value.trim().replace(/\s+/g, ' ');
 }
-
-function parseQueryDate(value: string | null) {
-  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
-
-  const date = parseISO(value);
-  return isValid(date) ? date : null;
-}
-
-function parseAlcoholType(value: string | null): MfdsAlcoholType | null {
-  return value && ALCOHOL_TYPE_VALUES.has(value)
-    ? (value as MfdsAlcoholType)
-    : null;
-}
-
-const ALCOHOL_TYPE_VALUES = new Set<string>(
-  ALCOHOL_TYPE_OPTIONS.map((option) => option.id),
-);

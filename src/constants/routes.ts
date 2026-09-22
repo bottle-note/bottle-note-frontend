@@ -30,7 +30,10 @@ export const ROUTES = {
   },
   IMPORT_CLEARANCE: {
     BASE: '/import-clearance',
-    DETAIL: (id: string | number) => `/import-clearance/${id}`,
+    ALCOHOL: (id: string | number) => `/import-clearance/alcohol/${id}`,
+    IMPORTER: (id: string | number) => `/import-clearance/importer/${id}`,
+    // 기존 호환성
+    DETAIL: (id: string | number) => `/import-clearance/alcohol/${id}`,
   },
   REVIEW: {
     BASE: '/review',

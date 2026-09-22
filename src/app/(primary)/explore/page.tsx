@@ -7,6 +7,7 @@ import Tab from '@/components/ui/Navigation/Tab';
 import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
 import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
+import { clearSearchParams } from '@/utils/clearSearchParams';
 import {
   parseExploreTabId,
   REVIEW_EXPLORE_TAB_ID,
@@ -69,13 +70,15 @@ export default function ExplorePage() {
     }
 
     previousTabIdRef.current = currentTab.id as ExploreTabId;
-    params.delete('keyword');
-    params.delete('keywords');
-    params.delete('sortType');
-    params.delete('sortOrder');
-    params.delete('rating');
-    params.delete('category');
-    params.delete('regionIds');
+    clearSearchParams(params, [
+      'keyword',
+      'keywords',
+      'sortType',
+      'sortOrder',
+      'rating',
+      'category',
+      'regionIds',
+    ]);
     params.set('tab', currentTab.id);
 
     router.replace(`/explore?${params.toString()}`, {
