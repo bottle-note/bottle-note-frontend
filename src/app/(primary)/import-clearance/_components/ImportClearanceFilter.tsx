@@ -8,8 +8,12 @@ import { Accordion } from '@/components/feature/SideFilterDrawer/Accordion';
 import StickySearchBar from '@/components/feature/Search/StickySearchBar';
 import DateRangePicker from '@/components/ui/Form/DateRangePicker';
 import { MfdsApi } from '@/api/mfds/mfds.api';
-import type { MfdsAlcoholType } from '@/api/mfds/types';
-import { ALCOHOL_TYPE_OPTIONS } from '../_lib/declaration';
+
+// 필터 옵션은 원장 적재 때만 바뀌므로 하루 동안 재조회하지 않는다.
+const FILTER_OPTION_QUERY_CACHE = {
+  staleTime: 1000 * 60 * 60 * 24,
+  gcTime: 1000 * 60 * 60 * 24,
+} as const;
 
 interface Props {
   isSearchActive: boolean;
@@ -21,8 +25,8 @@ interface Props {
   onDateChange: (startDate: Date | null, endDate: Date | null) => void;
   exportCountry: string | null;
   onExportCountryChange: (exportCountry: string | null) => void;
-  alcoholType: MfdsAlcoholType | null;
-  onAlcoholTypeChange: (alcoholType: MfdsAlcoholType | null) => void;
+  alcoholCategory: string | null;
+  onAlcoholCategoryChange: (alcoholCategory: string | null) => void;
   onReset: () => void;
 }
 
@@ -36,18 +40,28 @@ export default function ImportClearanceFilter({
   onDateChange,
   exportCountry,
   onExportCountryChange,
-  alcoholType,
-  onAlcoholTypeChange,
+  alcoholCategory,
+  onAlcoholCategoryChange,
   onReset,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: countries } = useQuery({
+  const countriesQuery = useQuery({
     queryKey: ['mfds.countries'],
     queryFn: async () => (await MfdsApi.getCountries()).data,
-    staleTime: 1000 * 60 * 60 * 24,
-    gcTime: 1000 * 60 * 60 * 24,
-    retry: false,
+    ...FILTER_OPTION_QUERY_CACHE,
   });
+  const categoriesQuery = useQuery({
+    queryKey: ['mfds.alcohols.category'],
+    queryFn: async () => (await MfdsApi.getAlcoholCategories()).data,
+    ...FILTER_OPTION_QUERY_CACHE,
+  });
+
+  // 옵션 조회가 실패한 채로 남아 있으면 필터를 열 때 다시 요청한다.
+  const handleOpen = () => {
+    if (countriesQuery.isError) countriesQuery.refetch();
+    if (categoriesQuery.isError) categoriesQuery.refetch();
+    setIsOpen(true);
+  };
 
   return (
     <>
@@ -68,7 +82,7 @@ export default function ImportClearanceFilter({
             aria-label="필터메뉴"
             className="rounded-sm text-fg-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
             onMouseDown={(event) => event.preventDefault()}
-            onClick={() => setIsOpen(true)}
+            onClick={handleOpen}
           >
             <ListFilter aria-hidden className="h-5 w-5" />
           </button>
@@ -85,7 +99,6 @@ export default function ImportClearanceFilter({
             startDate={startDate}
             endDate={endDate}
             onChange={onDateChange}
-            description="통관일자 기준으로 조회할 수 있어요."
           />
         </Accordion>
 
@@ -94,24 +107,28 @@ export default function ImportClearanceFilter({
             <Accordion.Content
               title="전체"
               value="all"
-              isSelected={!alcoholType}
-              onClick={() => onAlcoholTypeChange(null)}
+              isSelected={!alcoholCategory}
+              onClick={() => onAlcoholCategoryChange(null)}
             />
           </Accordion.Single>
           <Accordion.Grid cols={3}>
-            {ALCOHOL_TYPE_OPTIONS.map((option) => (
-              <Accordion.Content
-                key={option.id}
-                title={option.name}
-                value={option.id}
-                isSelected={alcoholType === option.id}
-                onClick={() =>
-                  onAlcoholTypeChange(
-                    alcoholType === option.id ? null : option.id,
-                  )
-                }
-              />
-            ))}
+            {(categoriesQuery.data ?? []).map(({ alcoholCategoryKo }) =>
+              alcoholCategoryKo ? (
+                <Accordion.Content
+                  key={alcoholCategoryKo}
+                  title={alcoholCategoryKo}
+                  value={alcoholCategoryKo}
+                  isSelected={alcoholCategory === alcoholCategoryKo}
+                  onClick={() =>
+                    onAlcoholCategoryChange(
+                      alcoholCategory === alcoholCategoryKo
+                        ? null
+                        : alcoholCategoryKo,
+                    )
+                  }
+                />
+              ) : null,
+            )}
           </Accordion.Grid>
         </Accordion>
 
@@ -125,7 +142,7 @@ export default function ImportClearanceFilter({
             />
           </Accordion.Single>
           <Accordion.Grid cols={3}>
-            {(countries ?? []).map((country) => (
+            {(countriesQuery.data ?? []).map((country) => (
               <Accordion.Content
                 key={country.alpha2}
                 title={country.nameKo ?? country.alpha2}

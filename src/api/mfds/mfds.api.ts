@@ -3,6 +3,7 @@ import { ApiResponse } from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import type {
+  MfdsAlcoholCategory,
   MfdsAlcoholDetail,
   MfdsAlcoholListItem,
   MfdsAlcoholListParams,
@@ -102,13 +103,27 @@ export const MfdsApi = {
 
     return response;
   },
+
+  /** 원장에 등장한 카테고리 목록을 조회합니다. alcoholCategoryKo 필터 옵션으로 씁니다. */
+  async getAlcoholCategories(): Promise<ApiResponse<MfdsAlcoholCategory[]>> {
+    const response = await apiClient.get<ApiResponse<MfdsAlcoholCategory[]>>(
+      '/mfds/alcohols/category',
+      { authRequired: false },
+    );
+
+    if (response.errors.length !== 0) {
+      throw new Error(ERROR_MESSAGES.IMPORT_CLEARANCE_CATEGORY_FETCH_FAILED);
+    }
+
+    return response;
+  },
 };
 
 export type {
+  MfdsAlcoholCategory,
   MfdsAlcoholDetail,
   MfdsAlcoholListItem,
   MfdsAlcoholListParams,
-  MfdsAlcoholType,
   MfdsCountry,
   MfdsImporter,
 } from './types';

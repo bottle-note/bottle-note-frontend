@@ -6,18 +6,6 @@ import type { InfiniteListParams } from '@/api/_shared/types';
 
 // --------------- Request Types ---------------
 
-/** OpenAPI(MfdsPublicAlcoholSearchRequest)에 정의된 주종 값 그대로. */
-export type MfdsAlcoholType =
-  | 'WHISKY'
-  | 'RUM'
-  | 'VODKA'
-  | 'GIN'
-  | 'TEQUILA'
-  | 'BRANDY'
-  | 'BEER'
-  | 'WINE'
-  | 'ETC';
-
 export type MfdsAlcoholListParams = InfiniteListParams & {
   /** BottleNote 주류 한글명 정확 일치 */
   alcoholNameKo?: string;
@@ -26,7 +14,8 @@ export type MfdsAlcoholListParams = InfiniteListParams & {
   importerId?: number;
   /** ISO 3166-1 Alpha-2 */
   exportCountry?: string;
-  alcoholType?: MfdsAlcoholType;
+  /** 원장 카테고리 한글명 정확 일치. 후보는 GET /mfds/alcohols/category */
+  alcoholCategoryKo?: string;
   /** YYYY-MM-DD */
   processedDateFrom?: string;
   /** YYYY-MM-DD */
@@ -47,6 +36,14 @@ export interface MfdsCountry {
   alpha2: string;
   nameKo: string | null;
   nameEn: string | null;
+}
+
+/** 원장에 등장한 카테고리. alcoholCategoryKo를 같은 이름의 파라미터에 그대로 사용한다. */
+export interface MfdsAlcoholCategory {
+  alcoholCategoryKo: string | null;
+  alcoholCategoryEn: string | null;
+  /** 해당 카테고리의 공개 건수 */
+  count: number;
 }
 
 export interface MfdsImporter {

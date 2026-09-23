@@ -11,10 +11,9 @@ import {
 import { useTabbedListPageSearch } from '@/components/feature/TabbedListPage/TabbedListPageHeader';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { MfdsApi } from '@/api/mfds/mfds.api';
-import type { MfdsAlcoholListItem, MfdsAlcoholType } from '@/api/mfds/types';
+import type { MfdsAlcoholListItem } from '@/api/mfds/types';
 import ImportClearanceFilter from './ImportClearanceFilter';
 import ImportClearanceListItem from './ImportClearanceListItem';
-import { ALCOHOL_TYPE_OPTIONS } from '../_lib/declaration';
 
 const PAGE_SIZE = 20;
 const GUEST_PAGE_SIZE = 12;
@@ -32,17 +31,17 @@ export default function ImportClearanceList() {
     normalizeKeyword(searchParams.get('keyword') ?? ''),
   );
   const [keyword, setKeyword] = useState(inputKeyword);
-  const [startDate, setStartDate] = useState(() =>
-    parseQueryDate(searchParams.get('startDate')),
+  const [startDate, setStartDate] = useState(
+    () => parseQueryDateRange(searchParams).startDate,
   );
-  const [endDate, setEndDate] = useState(() =>
-    parseQueryDate(searchParams.get('endDate')),
+  const [endDate, setEndDate] = useState(
+    () => parseQueryDateRange(searchParams).endDate,
   );
   const [exportCountry, setExportCountry] = useState(() =>
     searchParams.get('country'),
   );
-  const [alcoholType, setAlcoholType] = useState(() =>
-    parseAlcoholType(searchParams.get('alcoholType')),
+  const [alcoholCategory, setAlcoholCategory] = useState(() =>
+    searchParams.get('category'),
   );
   const urlKeyword = normalizeKeyword(searchParams.get('keyword') ?? '');
   const syncedKeywordRef = useRef(urlKeyword);
@@ -84,8 +83,8 @@ export default function ImportClearanceList() {
 
   useEffect(() => {
     const keywordFromUrl = urlKeyword;
-    const startDateFromUrl = parseQueryDate(searchParams.get('startDate'));
-    const endDateFromUrl = parseQueryDate(searchParams.get('endDate'));
+    const { startDate: startDateFromUrl, endDate: endDateFromUrl } =
+      parseQueryDateRange(searchParams);
 
     if (syncedKeywordRef.current !== keywordFromUrl) {
       syncedKeywordRef.current = keywordFromUrl;
@@ -95,7 +94,7 @@ export default function ImportClearanceList() {
     setStartDate(startDateFromUrl);
     setEndDate(endDateFromUrl);
     setExportCountry(searchParams.get('country'));
-    setAlcoholType(parseAlcoholType(searchParams.get('alcoholType')));
+    setAlcoholCategory(searchParams.get('category'));
   }, [searchParams, urlKeyword]);
 
   // 검색어·기간이 바뀌면 queryKey가 바뀌어 첫 페이지부터 다시 조회한다.
@@ -116,7 +115,7 @@ export default function ImportClearanceList() {
       processedDateFrom,
       processedDateTo,
       exportCountry,
-      alcoholType,
+      alcoholCategory,
       pageSize,
     ],
     queryFn: ({ pageParam, signal }) =>
@@ -125,7 +124,7 @@ export default function ImportClearanceList() {
         processedDateFrom: processedDateFrom || undefined,
         processedDateTo: processedDateTo || undefined,
         exportCountry: exportCountry || undefined,
-        alcoholType: alcoholType || undefined,
+        alcoholCategoryKo: alcoholCategory || undefined,
         cursor: pageParam,
         size: pageSize,
         signal,
@@ -146,12 +145,12 @@ export default function ImportClearanceList() {
     setStartDate(null);
     setEndDate(null);
     setExportCountry(null);
-    setAlcoholType(null);
+    setAlcoholCategory(null);
     updateSearchParams({
       startDate: null,
       endDate: null,
       country: null,
-      alcoholType: null,
+      category: null,
     });
   };
 
@@ -172,9 +171,9 @@ export default function ImportClearanceList() {
     updateSearchParams({ country: nextExportCountry });
   };
 
-  const handleAlcoholTypeChange = (nextAlcoholType: MfdsAlcoholType | null) => {
-    setAlcoholType(nextAlcoholType);
-    updateSearchParams({ alcoholType: nextAlcoholType });
+  const handleAlcoholCategoryChange = (nextAlcoholCategory: string | null) => {
+    setAlcoholCategory(nextAlcoholCategory);
+    updateSearchParams({ category: nextAlcoholCategory });
   };
 
   return (
@@ -194,8 +193,8 @@ export default function ImportClearanceList() {
           onDateChange={handleDateChange}
           exportCountry={exportCountry}
           onExportCountryChange={handleExportCountryChange}
-          alcoholType={alcoholType}
-          onAlcoholTypeChange={handleAlcoholTypeChange}
+          alcoholCategory={alcoholCategory}
+          onAlcoholCategoryChange={handleAlcoholCategoryChange}
           onReset={handleReset}
         />
         <List
@@ -246,19 +245,20 @@ function normalizeKeyword(value: string) {
   return value.trim().replace(/\s+/g, ' ');
 }
 
+// 공유 링크 등으로 시작일이 종료일보다 늦게 들어오면 서버가 400을 주므로 순서를 바로잡는다.
+function parseQueryDateRange(searchParams: URLSearchParams) {
+  const startDate = parseQueryDate(searchParams.get('startDate'));
+  const endDate = parseQueryDate(searchParams.get('endDate'));
+
+  if (startDate && endDate && startDate > endDate) {
+    return { startDate: endDate, endDate: startDate };
+  }
+  return { startDate, endDate };
+}
+
 function parseQueryDate(value: string | null) {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
 
   const date = parseISO(value);
   return isValid(date) ? date : null;
 }
-
-function parseAlcoholType(value: string | null): MfdsAlcoholType | null {
-  return value && ALCOHOL_TYPE_VALUES.has(value)
-    ? (value as MfdsAlcoholType)
-    : null;
-}
-
-const ALCOHOL_TYPE_VALUES = new Set<string>(
-  ALCOHOL_TYPE_OPTIONS.map((option) => option.id),
-);
