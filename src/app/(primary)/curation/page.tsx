@@ -226,7 +226,7 @@ export default function CurationPage() {
         >
           <StickySearchBar
             testId="curation-search-bar"
-            containerClassName="px-4 pb-7 pt-[5px]"
+            containerClassName="px-5 pb-7 pt-[5px]"
             isSearchActive={isSearchActive}
             onSearchActiveChange={onSearchActiveChange}
             value={inputKeyword}
