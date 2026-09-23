@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import DatePicker from 'react-datepicker';
-import { format } from 'date-fns';
+import { format, isAfter, isSameDay } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import CalendarSubcoralIcon from 'public/icon/calendar-subcoral.svg';
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -21,13 +23,10 @@ export default function DateRangePicker({
   onChange,
   minDate,
   maxDate,
-  description = '최대 2년까지 기간 조회가 가능해요.',
+  description,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [selectingField, setSelectingField] = useState<'start' | 'end'>(
-    'start',
-  );
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -51,86 +50,122 @@ export default function DateRangePicker({
     };
   }, [isOpen]);
 
+  const hasDate = Boolean(startDate || endDate);
+  const isSelectingEnd = Boolean(startDate) && !endDate;
+
+  // 시작일이 없으면 시작일, 시작일만 있으면 종료일을 채운다.
+  // 시작일보다 앞선 날짜를 누르거나 두 날짜가 모두 있으면 새 시작일로 다시 고른다.
+  const handleSelect = (date: Date | null) => {
+    if (!date) return;
+
+    if (!startDate) {
+      onChange(
+        date,
+        endDate && isOnOrBeforeDay(date, endDate) ? endDate : null,
+      );
+      return;
+    }
+
+    if (!endDate && isOnOrBeforeDay(startDate, date)) {
+      onChange(startDate, date);
+      return;
+    }
+
+    onChange(date, null);
+  };
+
   return (
     <div className="relative" ref={ref}>
-      <div className="rounded-lg border border-mainCoral py-2 px-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center">
+      <div className="flex items-center gap-3 rounded-lg border border-mainCoral py-2 px-4">
+        <div className="flex flex-1 items-center justify-between gap-4">
+          <button
+            type="button"
+            onClick={() => setIsOpen(true)}
+            className="flex items-center"
+          >
             <span className="text-mainCoral text-12">
               {startDate ? format(startDate, 'yy.MM.dd') : 'YY.MM.DD'}
             </span>
-            <button
-              onClick={() => {
-                setSelectingField('start');
-                if (!isOpen) {
-                  setIsOpen(true);
-                }
-              }}
-              className="ml-2"
-            >
-              <Image src={CalendarSubcoralIcon} alt="calendar" />
-            </button>
-          </div>
+            <Image
+              src={CalendarSubcoralIcon}
+              alt=""
+              aria-hidden
+              className="ml-2 h-3.5 w-3.5 shrink-0"
+            />
+          </button>
           <span className="text-12 text-fg-neutral">~</span>
-          <div className="flex items-center">
+          <button
+            type="button"
+            onClick={() => setIsOpen(true)}
+            className="flex items-center"
+          >
             <span className="text-mainCoral text-12">
               {endDate ? format(endDate, 'yy.MM.dd') : 'YY.MM.DD'}
             </span>
-            <button
-              onClick={() => {
-                setSelectingField('end');
-                if (!isOpen) {
-                  setIsOpen(true);
-                }
-              }}
-              className="ml-2"
-            >
-              <Image src={CalendarSubcoralIcon} alt="calendar" />
-            </button>
-          </div>
+            <Image
+              src={CalendarSubcoralIcon}
+              alt=""
+              aria-hidden
+              className="ml-2 h-3.5 w-3.5 shrink-0"
+            />
+          </button>
         </div>
+        {/* 날짜가 없을 때도 자리를 유지해 날짜를 고를 때 입력칸 배치가 흔들리지 않게 한다. */}
+        <button
+          type="button"
+          aria-label="기간 지우기"
+          disabled={!hasDate}
+          onClick={() => onChange(null, null)}
+          className={cn(
+            'flex shrink-0 items-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring',
+            !hasDate && 'invisible',
+          )}
+        >
+          <X aria-hidden className="h-3.5 w-3.5 text-fg-neutral-muted" />
+        </button>
       </div>
 
-      <div className="text-10 text-brightGray text-center py-2">
-        {description}
-      </div>
+      {description && (
+        <div className="text-10 text-brightGray text-center py-2">
+          {description}
+        </div>
+      )}
 
       {isOpen && (
         <DatePicker
           locale={ko}
           monthClassName={() => '!text-white'}
           weekDayClassName={() => '!text-white'}
-          onChange={(date) => {
-            if (selectingField === 'start') {
-              onChange(date, endDate);
-            } else {
-              onChange(startDate, date);
-            }
-          }}
-          selected={selectingField === 'start' ? startDate : endDate}
+          onChange={handleSelect}
+          selected={startDate}
           startDate={startDate}
           endDate={endDate}
-          selectsStart={selectingField === 'start'}
-          selectsEnd={selectingField === 'end'}
+          selectsStart={!isSelectingEnd}
+          selectsEnd={isSelectingEnd}
+          allowSameDay
           inline
-          minDate={selectingField === 'start' ? minDate : startDate || minDate}
-          maxDate={selectingField === 'start' ? endDate || maxDate : maxDate}
+          minDate={minDate}
+          maxDate={maxDate}
           dateFormat="yy.MM.dd"
+          dateFormatCalendar="yyyy년 M월"
           wrapperClassName="w-full"
-          calendarClassName="bg-white !border-mainCoral rounded-lg shadow-lg"
+          calendarClassName={cn(
+            'bg-white !border-mainCoral rounded-lg shadow-lg',
+            !description && 'mt-2',
+          )}
           dayClassName={(date) => {
             if (!date) return '';
-            if (
-              startDate &&
-              format(startDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
-            ) {
-              return '!bg-mainCoral !text-white !rounded-l-full';
-            }
-            if (
-              endDate &&
-              format(endDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
-            ) {
-              return '!bg-mainCoral !text-white !rounded-r-full';
+            const isStart = startDate && isSameDay(date, startDate);
+            const isEnd = endDate && isSameDay(date, endDate);
+            // 기간이 이어지지 않는 날짜(시작일만 있거나 시작일과 종료일이 같은 날)는 원으로 표시한다.
+            const hasRange =
+              startDate && endDate && !isSameDay(startDate, endDate);
+
+            if (isStart || isEnd) {
+              if (!hasRange) return '!bg-mainCoral !text-white !rounded-full';
+              return isStart
+                ? '!bg-mainCoral !text-white !rounded-l-full'
+                : '!bg-mainCoral !text-white !rounded-r-full';
             }
             if (startDate && endDate && date > startDate && date < endDate) {
               return '!bg-mainCoral !text-white';
@@ -141,4 +176,9 @@ export default function DateRangePicker({
       )}
     </div>
   );
+}
+
+// 호출부가 시각이 포함된 날짜(예: 2년 전 현재 시각)를 넘길 수 있어 일 단위로 비교한다.
+function isOnOrBeforeDay(date: Date, target: Date) {
+  return isSameDay(date, target) || !isAfter(date, target);
 }

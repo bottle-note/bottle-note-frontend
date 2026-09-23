@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Check, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AccordionItemWrapperProps {
@@ -169,7 +169,6 @@ const AccordionItemContent = ({
           </div>
         )}
         {!IconComponent && renderTitle()}
-        {isSelected && <Check aria-hidden className="h-4 w-4" />}
       </div>
     </button>
   );

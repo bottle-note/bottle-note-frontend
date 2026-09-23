@@ -66,6 +66,7 @@ export default function HistoryFilterDateRange() {
       onChange={handleDate}
       minDate={getDateLimits().minDate}
       maxDate={getDateLimits().maxDate}
+      description="최대 2년까지 기간 조회가 가능해요."
     />
   );
 }
