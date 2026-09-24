@@ -1,22 +1,23 @@
 ---
 name: bottle-note-ga4
-description: Add or review GA4 events and GTM configuration in the Bottle Note frontend. Use for analytics instrumentation, event taxonomy, or GTM synchronization work in this repository.
+description: 보틀노트의 신규·기존 기능에 GA4 측정을 추가하거나 검토한다. 프론트엔드 이벤트, GTM 태그, GA4 보고용 매개변수, 배포 후 확인 작업에 사용한다.
 ---
 
-# Bottle Note GA4
+# 보틀노트 GA4
 
-Work from the repository root. Read `src/utils/analytics/types.ts`, `src/utils/analytics/ga4.ts`, `gtm.config.json`, and `docs/gtm-sync.md` before changing tracking. Follow nearby event call sites for naming and placement.
+저장소 루트에서 작업한다. 측정 코드를 변경하기 전에 `src/utils/analytics/types.ts`, `src/utils/analytics/ga4.ts`, `gtm.config.json`, `docs/gtm-sync.md`를 읽는다. 해당 기능의 실제 사용자 흐름과 인접한 이벤트 호출부를 확인하고, 대상 환경과 프론트엔드 배포 버전을 파악한다.
 
-## Event design
+## 전체 작업 흐름
 
-- Track a meaningful user action or a successfully loaded view. Fire view events after the relevant data and authentication state are ready; guard against query refetches and React effect reruns with a local ref keyed to the viewed record or page entry.
-- Send events through `trackGA4Event`, add their parameter types to `GA4EventMap`, and register the same event and parameter names in `gtm.config.json`. Keep the app and GTM contract in sync.
-- Prefer a few reusable, low-cardinality parameters for GA4 reports. Do not send raw search terms, personal information, or imported business contact fields. Record IDs can support event correlation, but do not register high-cardinality IDs as GA4 custom dimensions.
-- For link or CTA events, send the event in the user's click handler before navigation. Distinguish placements with one bounded `source` parameter when they share a destination.
-- Distinguish a matched declaration ID from a Bottle Note alcohol ID. The MFDS `id` and `alcoholId` fields represent different records.
+1. 측정으로 답하려는 질문을 정한다. 기존 기능은 현재 이벤트의 의미와 발생 시점을 확인해 재사용할 수 있으면 재사용한다. 새 이벤트마다 발생 조건, 매개변수, 사용자 행동 또는 화면 진입당 예상 횟수를 정한다.
+2. `GA4EventMap`에 이벤트 타입을 추가하고 `trackGA4Event`로 전송하며, 동일한 이벤트 이름과 매개변수를 `gtm.config.json`에 등록한다. 앱은 이미 `src/app/layout.tsx`에서 GTM 컨테이너를 로드한다. 기능 코드에서는 `trackGA4Event`를 통해 `dataLayer` 이벤트를 보낸다. 특정 환경에 컨테이너가 없는 경우에만 로더를 추가하거나 변경하고, 그 전에 GA4 태그 중복 여부를 확인한다.
+3. `docs/gtm-sync.md`의 명령으로 설정을 검사하고 대상 GTM 작업공간과 비교한다. 컨테이너 ID, GA4 측정 ID, 기본 Google 태그, 맞춤 이벤트 트리거, 데이터 영역 변수, 이벤트 태그를 확인한다. 적용 전에는 dry-run 또는 가져오기 미리보기 전체에서 무관한 수정·삭제가 없는지 살핀다. API 인증 정보가 없고 로그인된 GTM 화면에 접근할 수 있다면 UI에서 같은 구성을 반영하고 가져오기·제출 미리보기를 확인한다.
+4. 대상 사이트에서 GTM 미리보기로 행동당 이벤트 1회 발생, 매개변수 값, GA4 측정 ID를 확인한다. 작업공간에 적용하는 것만으로는 컨테이너가 게시되지 않는다. 사용자가 외부 반영을 승인한 범위라면 이름을 붙인 GTM 버전을 게시하고, 게시된 컨테이너와 해당 GA4 속성의 실시간 보고서 또는 DebugView에서 이벤트 유입을 확인한다. 새 프론트엔드 이벤트는 해당 코드가 환경에 배포된 뒤에만 관측할 수 있다.
+5. GA4 맞춤 측정기준은 보고서에 필요한 매개변수 중 값의 종류가 제한된 것만 등록한다. GTM에서 이벤트 매개변수를 전송하는 것과 GA4 보고용 측정기준을 등록하는 것은 별개다. 결과를 보고할 때 프론트엔드 코드, GTM 작업공간, 게시된 컨테이너, GA4 수신 상태를 구분한다.
 
-## GTM and rollout
+## 이벤트 설계
 
-- `pnpm gtm:validate` checks the local config. `pnpm run gtm:sync -- --env dev` or `--env prod` shows the workspace changes without applying them. See `docs/gtm-sync.md` for credentials and workspace behavior.
-- `--apply` changes a GTM workspace; it does not publish the container. Apply or publish when the task authorizes those external changes. Confirm the intended environment and compare the published container with the config before changing production.
-- Check a real page's `dataLayer`, GTM Preview, and GA4 DebugView for one event per action, parameter values, and the right dev/prod property. Confirm reportable custom dimensions in GA4 separately from sending parameters.
+- 의미 있는 사용자 행동이나 데이터 로드에 성공한 화면 진입을 측정한다. 화면 조회 이벤트는 관련 데이터와 인증 상태가 확정된 뒤 보낸다. 쿼리 재요청과 React effect 재실행으로 중복되지 않도록 조회 대상이나 화면 진입을 기준으로 로컬 ref를 사용한다.
+- GA4 보고에 사용할 매개변수는 값의 종류가 제한되고 재사용 가능한 소수의 항목을 우선한다. 검색어 원문, 개인정보, 수입업체 연락처는 보내지 않는다. 레코드 ID는 이벤트를 연결하는 데 쓸 수 있지만 값의 종류가 많은 ID를 GA4 맞춤 측정기준으로 등록하지 않는다.
+- 링크와 CTA 이벤트는 이동 전에 클릭 핸들러에서 보낸다. 같은 목적지로 향하는 여러 위치를 구분할 때는 값의 종류가 제한된 `source` 매개변수를 사용한다.
+- 수입 신고 ID와 보틀노트 주류 ID를 구분한다. MFDS의 `id`와 `alcoholId`는 서로 다른 레코드다.
