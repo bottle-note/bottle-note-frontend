@@ -11,7 +11,6 @@ interface GuestAlcoholDetailGateProps {
   onLogin: () => void;
   children: ReactNode;
   id?: string;
-  minHeight?: string;
 }
 
 export function GuestAlcoholDetailGate({
@@ -21,7 +20,6 @@ export function GuestAlcoholDetailGate({
   onLogin,
   children,
   id,
-  minHeight = 'min-h-[260px]',
 }: GuestAlcoholDetailGateProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -35,32 +33,32 @@ export function GuestAlcoholDetailGate({
   }, []);
 
   return (
-    <div className="pb-navbar">
-      <section id={id} className={`relative ${minHeight} overflow-hidden`}>
-        <div
-          ref={contentRef}
-          aria-hidden="true"
-          className="pointer-events-none select-none blur-[1px]"
-        >
-          {children}
-        </div>
-        <div
-          className="pointer-events-none absolute inset-0 z-10 flex items-end px-5 pb-5"
-          style={{
-            background:
-              'linear-gradient(to bottom, transparent 0%, var(--color-bg-layer-default) 42%, var(--color-bg-layer-default) 100%)',
-          }}
-        >
-          <div className="w-full">
-            <GuestLoginPrompt
-              title={title}
-              description={description}
-              buttonLabel={buttonLabel}
-              onLogin={onLogin}
-            />
-          </div>
-        </div>
-      </section>
-    </div>
+    <section
+      id={id}
+      className="relative flex min-h-0 flex-col justify-end overflow-hidden"
+    >
+      <div
+        ref={contentRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 select-none blur-[1px]"
+      >
+        {children}
+      </div>
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(to bottom, transparent 0%, var(--color-bg-layer-default) 42%, var(--color-bg-layer-default) 100%)',
+        }}
+      />
+      <div className="pointer-events-none relative z-10 w-full bg-bg-layer-default px-5 py-5">
+        <GuestLoginPrompt
+          title={title}
+          description={description}
+          buttonLabel={buttonLabel}
+          onLogin={onLogin}
+        />
+      </div>
+    </section>
   );
 }
