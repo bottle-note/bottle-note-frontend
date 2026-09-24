@@ -15,7 +15,7 @@ interface Props {
   onApiError?: () => void;
   handleNotLogin: () => void;
   pickBtnName?: string;
-  tone?: 'brand' | 'brandContrast';
+  tone?: 'brand' | 'neutral' | 'brandContrast';
   size?: number;
   alcoholId: number;
   alcoholName?: string;
@@ -72,7 +72,13 @@ const AlcoholPickButton = ({
 
   return (
     <button
-      className={`${tone === 'brand' ? 'text-fg-brand' : 'text-fg-brand-contrast'} ${
+      className={`${
+        tone === 'brand'
+          ? 'text-fg-brand'
+          : tone === 'neutral'
+            ? 'text-fg-neutral-muted'
+            : 'text-fg-brand-contrast'
+      } ${
         pickBtnName
           ? 'flex items-center space-x-[3px]'
           : 'justify-self-end row-start-3'

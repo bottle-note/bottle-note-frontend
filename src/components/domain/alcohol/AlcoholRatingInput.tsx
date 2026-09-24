@@ -8,6 +8,7 @@ interface AlcoholRatingInputProps {
   value: number;
   onChange: (rating: number) => void;
   onCommit?: (rating: number) => void;
+  tone?: 'rating' | 'brand';
 }
 
 const MIN_RATING = 0;
@@ -30,6 +31,7 @@ export default function AlcoholRatingInput({
   value,
   onChange,
   onCommit,
+  tone = 'rating',
 }: AlcoholRatingInputProps) {
   const [previewRate, setPreviewRate] = useState<number | null>(null);
   const [isInteracting, setIsInteracting] = useState(false);
@@ -177,7 +179,9 @@ export default function AlcoholRatingInput({
               }}
             >
               <div
-                className="relative text-fg-rating"
+                className={`relative ${
+                  tone === 'brand' ? 'text-fg-brand' : 'text-fg-rating'
+                }`}
                 style={{ width: `${STAR_SIZE}px`, height: `${STAR_SIZE}px` }}
               >
                 <SemanticIcon

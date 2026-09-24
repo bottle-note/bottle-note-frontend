@@ -17,7 +17,9 @@ export function generateAlcoholSchema(
     name: alcohol.korName,
     alternateName: [alcohol.engName],
     image: alcohol.alcoholUrlImg,
-    description: `${alcohol.korName} - ${alcohol.engCategory} | ${alcohol.engDistillery || '증류소 정보 없음'}에서 생산한 위스키입니다. 도수: ${alcohol.abv || '정보 없음'}, 지역: ${alcohol.korRegion || alcohol.engRegion || '정보 없음'}`,
+    description:
+      alcohol.description?.trim() ||
+      `${alcohol.korName} - ${alcohol.engCategory} | ${alcohol.engDistillery || '증류소 정보 없음'}에서 생산한 위스키입니다. 도수: ${alcohol.abv || '정보 없음'}, 지역: ${alcohol.korRegion || alcohol.engRegion || '정보 없음'}`,
     brand: {
       '@type': 'Brand',
       name: alcohol.korDistillery || alcohol.engDistillery || alcohol.korName,

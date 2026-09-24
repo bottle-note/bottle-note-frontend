@@ -45,6 +45,7 @@ export interface Alcohol {
 export interface AlcoholInfo {
   alcoholId: number;
   alcoholUrlImg: string;
+  description: string;
   korName: string;
   engName: string;
   korCategory: string;
@@ -60,7 +61,7 @@ export interface AlcoholInfo {
   myRating: number;
   totalRatingsCount: number;
   isPicked: boolean;
-  alcoholsTastingTags: string[];
+  alcoholsTastingTags: string[] | null;
 }
 
 export interface FriendsInfo {
