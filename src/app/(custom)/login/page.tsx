@@ -4,15 +4,26 @@ import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import Loading from '@/components/ui/Loading/Loading';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
 import { useSocialLogin } from '@/hooks/useSocialLogin';
 import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { restoreAuthSession } from '@/lib/auth/session-store';
 import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
-import { setReturnToUrl, isValidReturnUrl } from '@/utils/loginRedirect';
+import {
+  clearReturnToUrl,
+  getPendingReturnToUrl,
+  setReturnToUrl,
+  isValidReturnUrl,
+} from '@/utils/loginRedirect';
+import { getLoginHistoryDirection } from '@/utils/loginHistory';
+import { consumeLoginTrigger } from '@/utils/loginTrigger';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
+
+const LOGIN_HISTORY_STATE_KEY = '__bottleNoteLogin';
 
 export default function Login() {
   const router = useRouter();
@@ -27,32 +38,83 @@ export default function Login() {
   const hasCheckedInitialSession = useRef(false);
 
   const handleBack = () => {
-    if (cancelMbtiLogin(returnToParam)) return;
+    const entry = window.history.state?.[LOGIN_HISTORY_STATE_KEY];
+    const returnTo = entry?.returnTo ?? getPendingReturnToUrl();
+    if (cancelMbtiLogin(returnTo)) return;
 
-    const returnTo =
-      returnToParam && isValidReturnUrl(returnToParam)
-        ? returnToParam
-        : ROUTES.HOME;
-
-    router.replace(returnTo);
+    clearReturnToUrl();
+    consumeLoginTrigger();
+    // 쿼리 진입은 replace, 저장소를 사용하는 모달 진입은 push 방식이다.
+    if (returnToParam === null && entry?.hasPreviousPage) {
+      router.back();
+    } else {
+      router.replace(returnTo || ROUTES.HOME);
+    }
   };
 
   useEffect(() => {
-    if (returnToParam && isValidReturnUrl(returnToParam)) {
-      setReturnToUrl(returnToParam);
-    }
-  }, [returnToParam]);
-
-  // 이미 로그인된 상태면 리다이렉트 (session 로딩 완료 후에만 실행)
-  useEffect(() => {
     if (isLoading || hasCheckedInitialSession.current) return;
-
     hasCheckedInitialSession.current = true;
+
+    const entry = window.history.state?.[LOGIN_HISTORY_STATE_KEY];
+    if (isLoggedIn && entry) {
+      const direction = getLoginHistoryDirection();
+      if (direction === 'back') {
+        if (entry.hasPreviousPage) router.back();
+        else router.replace(ROUTES.HOME);
+        return;
+      }
+      if (direction === 'forward') {
+        window.history.forward();
+        return;
+      }
+    }
+
+    // 쿼리가 있으면 우선하며, 잘못된 쿼리로 과거 목적지가 재사용되지 않게 한다.
+    const returnTo =
+      returnToParam !== null
+        ? isValidReturnUrl(returnToParam)
+          ? returnToParam
+          : null
+        : entry?.returnTo ?? getPendingReturnToUrl();
+    clearReturnToUrl();
+    if (returnTo) setReturnToUrl(returnTo);
 
     if (isLoggedIn) {
       void continueAuthenticatedSession();
+      return;
     }
-  }, [continueAuthenticatedSession, isLoggedIn, isLoading]);
+
+    window.history.replaceState(
+      {
+        ...window.history.state,
+        [LOGIN_HISTORY_STATE_KEY]: {
+          returnTo,
+          hasPreviousPage: entry?.hasPreviousPage ?? window.history.length > 1,
+        },
+      },
+      '',
+    );
+  }, [
+    continueAuthenticatedSession,
+    isLoggedIn,
+    isLoading,
+    returnToParam,
+    router,
+  ]);
+
+  useEffect(() => {
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (!event.persisted) return;
+
+      // OAuth 이전 문서가 bfcache로 복원되면 로그인 전 메모리 상태도 복원된다.
+      hasCheckedInitialSession.current = false;
+      void restoreAuthSession();
+    };
+
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
 
   // 인앱 환경에서 초기화
   useEffect(() => {
@@ -61,6 +123,8 @@ export default function Login() {
       DeviceService.setIsInApp(window.isInApp);
     }
   }, []);
+
+  if (isLoading || isLoggedIn) return <Loading />;
 
   return (
     <>
