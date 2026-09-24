@@ -24,6 +24,7 @@ import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useLoginBridge } from '@/hooks/useLoginBridge';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import Label from '@/components/ui/Display/Label';
+import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import ErrorFallback from '@/components/ui/Display/ErrorFallback';
 import {
   STICKY_BOTTOM_CTA_PADDING_CLASS,
@@ -138,19 +139,19 @@ export default function ImportClearanceDetail() {
   if (isLoading || !data) {
     return (
       <>
-        <div className="relative">
-          <div className="absolute inset-0 bg-bg-brand-primary-solid dark:bg-palette-oak-950" />
+        <div className="relative border-b border-stroke-neutral-subtle bg-bg-neutral-weak">
           <div className="relative z-10">
-            <SubHeader bgColor="bg-none">
+            <SubHeader bgColor="bg-bg-transparent">
               <SubHeader.Left onClick={() => router.back()}>
-                <Image
+                <SemanticIcon
                   src="/icon/arrow-left-white.svg"
-                  alt="뒤로가기"
                   width={23}
                   height={23}
+                  className="text-fg-neutral"
+                  label="뒤로가기"
                 />
               </SubHeader.Left>
-              <SubHeader.Center textColor="text-white dark:text-palette-oak-50">
+              <SubHeader.Center textColor="text-fg-neutral">
                 수입 정보
               </SubHeader.Center>
             </SubHeader>
@@ -234,23 +235,23 @@ export default function ImportClearanceDetail() {
   const shouldShowBottleNoteCta = isLoggedIn && data.alcoholId !== null;
 
   const heroSection = (
-    <div className="relative">
-      <div className="absolute inset-0 bg-bg-brand-primary-solid dark:bg-palette-oak-950" />
+    <div className="relative border-b border-stroke-neutral-subtle bg-bg-neutral-weak">
       <div className="relative z-10">
-        <SubHeader bgColor="bg-none">
+        <SubHeader bgColor="bg-bg-transparent">
           <SubHeader.Left onClick={() => router.back()}>
-            <Image
+            <SemanticIcon
               src="/icon/arrow-left-white.svg"
-              alt="뒤로가기"
               width={23}
               height={23}
+              className="text-fg-neutral"
+              label="뒤로가기"
             />
           </SubHeader.Left>
-          <SubHeader.Center textColor="text-white dark:text-palette-oak-50">
+          <SubHeader.Center textColor="text-fg-neutral">
             수입 정보
           </SubHeader.Center>
         </SubHeader>
-        <section className="space-y-2.5 px-5 pb-6 pt-1 text-white dark:text-palette-oak-50">
+        <section className="space-y-2.5 px-5 pb-6 pt-1 text-fg-neutral">
           <div className="space-y-1.5">
             {data.alcoholCategoryKo && (
               <Label
@@ -262,15 +263,15 @@ export default function ImportClearanceDetail() {
               {korName}
             </h1>
             {engName && (
-              <p className="whitespace-normal break-words text-12 font-normal">
+              <p className="whitespace-normal break-words text-12 font-normal text-fg-neutral-muted">
                 {engName.toUpperCase()}
               </p>
             )}
           </div>
           {specText && (
             <>
-              <div className="border-[0.5px] border-white dark:border-palette-oak-50" />
-              <p className="text-11 text-white/85">{specText}</p>
+              <div className="border-[0.5px] border-stroke-neutral-subtle" />
+              <p className="text-11 text-fg-neutral-muted">{specText}</p>
             </>
           )}
         </section>
