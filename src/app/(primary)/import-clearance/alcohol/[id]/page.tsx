@@ -31,11 +31,16 @@ import {
 } from '@/components/ui/Layout/StickyBottomCta';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import { LoginGate } from '@/components/feature/auth/LoginGate';
+import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { MfdsApi } from '@/api/mfds/mfds.api';
 import { parseApiError } from '@/hooks/parseApiError';
 import { formatDate } from '@/utils/formatDate';
 import { ROUTES } from '@/constants/routes';
 import InfoRow from './_components/InfoRow';
+import {
+  MatchedAlcoholSummary,
+  MatchedAlcoholSummarySkeleton,
+} from './_components/MatchedAlcoholSummary';
 import ImportClearanceCompactItem from '../../_components/ImportClearanceCompactItem';
 import { declarationName } from '../../_lib/declaration';
 
@@ -88,6 +93,18 @@ export default function ImportClearanceDetail() {
     enabled: alcoholNameForMatching !== undefined,
     retry: false,
   });
+
+  const matchedAlcoholId = data?.alcoholId ?? null;
+  const { data: matchedAlcohol, isLoading: isMatchedAlcoholLoading } = useQuery(
+    {
+      queryKey: ['alcohol.details', matchedAlcoholId],
+      queryFn: async () =>
+        (await AlcoholsApi.getAlcoholDetails(String(matchedAlcoholId))).data
+          .alcohols,
+      enabled: matchedAlcoholId !== null,
+      retry: false,
+    },
+  );
 
   const errorInfo = parseApiError(error);
 
@@ -213,6 +230,8 @@ export default function ImportClearanceDetail() {
     otherDeclarations?.filter((item) => item.id !== data.id) ?? [];
   const others = otherItems.slice(0, OTHER_DECLARATIONS_LIMIT);
   const hasMoreOthers = otherItems.length > OTHER_DECLARATIONS_LIMIT;
+  const shouldShowGuestLoginCta = !isAuthLoading && !isLoggedIn;
+  const shouldShowBottleNoteCta = isLoggedIn && data.alcoholId !== null;
 
   const heroSection = (
     <div className="relative">
@@ -261,6 +280,12 @@ export default function ImportClearanceDetail() {
 
   const renderPageContent = () => (
     <>
+      {isMatchedAlcoholLoading && data.alcoholId !== null ? (
+        <MatchedAlcoholSummarySkeleton />
+      ) : matchedAlcohol ? (
+        <MatchedAlcoholSummary alcohol={matchedAlcohol} />
+      ) : null}
+
       {productionRows.length > 0 && (
         <section className="mx-5 space-y-3 border-b border-stroke-neutral-subtle py-4">
           <p className="text-12 font-bold tracking-wide text-fg-neutral-subtle">
@@ -383,13 +408,6 @@ export default function ImportClearanceDetail() {
           )}
         </section>
       )}
-
-      {data.alcoholId !== null && (
-        <StickyBottomCta
-          label="보틀노트에서 위스키 보기"
-          onClick={() => router.push(ROUTES.SEARCH.ALL(data.alcoholId!))}
-        />
-      )}
     </>
   );
 
@@ -408,43 +426,36 @@ export default function ImportClearanceDetail() {
     </div>
   );
 
-  if (!isLoggedIn && !isAuthLoading) {
-    return (
-      <div
-        className={
-          data?.alcoholId !== null
-            ? STICKY_BOTTOM_CTA_PADDING_CLASS
-            : 'pb-navbar'
-        }
-      >
-        {heroSection}
-        {isLoading || !data ? (
-          contentSkeleton
-        ) : (
-          <LoginGate
-            variant="blur"
-            title="더 알고 싶으신가요?"
-            description="로그인하고 이 수입 정보를 무료로 확인하세요"
-            buttonLabel="로그인하고 보기"
-            onLogin={() => bridgeToLogin()}
-            visibleHeight="min-h-[70vh]"
-            gradientStartPercent={80}
-          >
-            {renderPageContent()}
-          </LoginGate>
-        )}
-      </div>
-    );
-  }
-
   return (
     <div
       className={
-        data.alcoholId !== null ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-navbar'
+        shouldShowBottleNoteCta ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-navbar'
       }
     >
       {heroSection}
-      {isLoading || !data ? contentSkeleton : renderPageContent()}
+      {isAuthLoading ? (
+        contentSkeleton
+      ) : shouldShowGuestLoginCta ? (
+        <LoginGate
+          variant="blur"
+          title="더 알고 싶으신가요?"
+          description="로그인하고 이 수입 정보를 무료로 확인하세요"
+          buttonLabel="로그인하고 보기"
+          onLogin={() => bridgeToLogin()}
+          visibleHeight="min-h-[70vh]"
+          gradientStartPercent={80}
+        >
+          {renderPageContent()}
+        </LoginGate>
+      ) : (
+        renderPageContent()
+      )}
+      {shouldShowBottleNoteCta && (
+        <StickyBottomCta
+          label="보틀노트에서 위스키 보기"
+          onClick={() => router.push(ROUTES.SEARCH.ALL(data.alcoholId!))}
+        />
+      )}
     </div>
   );
 }
