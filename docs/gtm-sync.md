@@ -37,7 +37,7 @@ pnpm run gtm:sync -- --env dev --apply
 
 CLI는 작업공간까지만 변경하고 컨테이너를 게시하지 않는다. 적용 후 GTM 미리보기에서 이벤트와 매개변수를 확인하고 UI에서 게시한다.
 
-운영 환경은 `GTM_PROD_GA4_MEASUREMENT_ID`를 설정한 뒤 `--env prod`를 사용한다. 운영 컨테이너의 작업공간이 여러 개라면 `gtm.config.json`의 `prod.workspaceId`도 지정한다.
+운영 측정 ID는 `gtm.config.json`의 `prod.measurementId`에 설정한다. 운영 컨테이너의 작업공간이 여러 개라면 `gtm.config.json`의 `prod.workspaceId`도 지정한다. 운영 페이지에서 GTM 스크립트가 로드되는 것과 GA4 태그가 컨테이너에 게시된 것은 별개로 확인한다.
 
 ## 리뷰·검색 이벤트 기준
 
@@ -51,3 +51,14 @@ CLI는 작업공간까지만 변경하고 컨테이너를 게시하지 않는다
 | `search_no_results`     | 검색어의 첫 결과가 0건                   | `query_length`                  | `search`와 함께 검색어당 1회 |
 
 위 맞춤 이벤트의 매개변수에는 검색어 원문을 넣지 않고 길이만 넣는다.
+
+## 수입통관 이벤트 기준
+
+| 이벤트                            | 발화 조건                             | 매개변수                                         | 중복 방지       |
+| --------------------------------- | ------------------------------------- | ------------------------------------------------ | --------------- |
+| `view_import_clearance_list`      | 첫 목록 페이지 수신 및 인증 상태 확정 | `access_state`, `result_state`                   | 화면 진입당 1회 |
+| `select_import_clearance`         | 목록 또는 관련 수입 내역 링크 선택    | `declaration_id`, `source`                       | 클릭당 1회      |
+| `view_import_clearance_detail`    | 상세 응답 수신 및 인증 상태 확정      | `declaration_id`, `access_state`, `match_status` | 신고 ID당 1회   |
+| `select_import_clearance_alcohol` | 매칭 요약 링크 또는 하단 CTA 선택     | `declaration_id`, `alcohol_id`, `source`         | 클릭당 1회      |
+
+`declaration_id`는 수입 신고 레코드 ID이며 `alcohol_id`와 다르다. GA4 맞춤 측정기준에는 `access_state`, `result_state`, `match_status`, `source`처럼 값이 제한된 항목만 등록한다.
