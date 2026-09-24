@@ -5,12 +5,14 @@ import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import Label from '@/components/ui/Display/Label';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import { ROUTES } from '@/constants/routes';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 
 interface Props {
   alcohol: AlcoholInfo;
+  declarationId: number;
 }
 
-export function MatchedAlcoholSummary({ alcohol }: Props) {
+export function MatchedAlcoholSummary({ alcohol, declarationId }: Props) {
   const region = alcohol.korRegion.split('/').filter(Boolean).slice(-1)[0];
   const abv = alcohol.abv
     ? alcohol.abv.includes('%')
@@ -74,6 +76,13 @@ export function MatchedAlcoholSummary({ alcohol }: Props) {
       <Link
         href={ROUTES.SEARCH.ALL(alcohol.alcoholId)}
         className="inline-flex items-center gap-1 self-start text-12 font-medium text-fg-neutral-subtle"
+        onClick={() =>
+          trackGA4Event('select_import_clearance_alcohol', {
+            declaration_id: String(declarationId),
+            alcohol_id: String(alcohol.alcoholId),
+            source: 'summary',
+          })
+        }
       >
         보틀노트 정보
         <ChevronRight size={14} aria-hidden />

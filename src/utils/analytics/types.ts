@@ -61,6 +61,24 @@ export interface GA4EventMap {
     alcohol_id: string;
     alcohol_name: string;
   };
+  view_import_clearance_list: {
+    access_state: 'guest' | 'member';
+    result_state: 'results' | 'empty';
+  };
+  select_import_clearance: {
+    declaration_id: string;
+    source: 'list' | 'related';
+  };
+  view_import_clearance_detail: {
+    declaration_id: string;
+    access_state: 'guest' | 'member';
+    match_status: 'matched' | 'unmatched';
+  };
+  select_import_clearance_alcohol: {
+    declaration_id: string;
+    alcohol_id: string;
+    source: 'summary' | 'sticky_cta';
+  };
   login_prompt_shown: {
     trigger: LoginTrigger;
   };

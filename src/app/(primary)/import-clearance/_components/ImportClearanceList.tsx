@@ -12,6 +12,7 @@ import { useTabbedListPageSearch } from '@/components/feature/TabbedListPage/Tab
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import { MfdsApi } from '@/api/mfds/mfds.api';
 import type { MfdsAlcoholListItem } from '@/api/mfds/types';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 import ImportClearanceFilter from './ImportClearanceFilter';
 import ImportClearanceListItem from './ImportClearanceListItem';
 
@@ -23,10 +24,12 @@ export default function ImportClearanceList() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isSearchActive, onSearchActiveChange } = useTabbedListPageSearch();
-  const { isLoggedIn, isGuest, pageSize } = useGuestPagedSession(
-    PAGE_SIZE,
-    GUEST_PAGE_SIZE,
-  );
+  const {
+    isLoggedIn,
+    isGuest,
+    isLoading: isAuthLoading,
+    pageSize,
+  } = useGuestPagedSession(PAGE_SIZE, GUEST_PAGE_SIZE);
   const [inputKeyword, setInputKeyword] = useState(() =>
     normalizeKeyword(searchParams.get('keyword') ?? ''),
   );
@@ -45,6 +48,7 @@ export default function ImportClearanceList() {
   );
   const urlKeyword = normalizeKeyword(searchParams.get('keyword') ?? '');
   const syncedKeywordRef = useRef(urlKeyword);
+  const hasTrackedListViewRef = useRef(false);
 
   const processedDateFrom = startDate ? format(startDate, 'yyyy-MM-dd') : '';
   const processedDateTo = endDate ? format(endDate, 'yyyy-MM-dd') : '';
@@ -140,6 +144,16 @@ export default function ImportClearanceList() {
   const isEmpty = hasLoadedFirstPage && !error && items.length === 0;
   const hasNextPageError = Boolean(error) && items.length > 0;
   const shouldGateGuestList = isGuest && items.length > 0;
+
+  useEffect(() => {
+    if (hasTrackedListViewRef.current || isAuthLoading || !pages?.[0]) return;
+
+    hasTrackedListViewRef.current = true;
+    trackGA4Event('view_import_clearance_list', {
+      access_state: isLoggedIn ? 'member' : 'guest',
+      result_state: pages[0].data.length > 0 ? 'results' : 'empty',
+    });
+  }, [isAuthLoading, isLoggedIn, pages]);
 
   const handleReset = () => {
     setStartDate(null);

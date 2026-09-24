@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -37,6 +38,7 @@ import { MfdsApi } from '@/api/mfds/mfds.api';
 import { parseApiError } from '@/hooks/parseApiError';
 import { formatDate } from '@/utils/formatDate';
 import { ROUTES } from '@/constants/routes';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 import InfoRow from './_components/InfoRow';
 import {
   MatchedAlcoholSummary,
@@ -65,6 +67,7 @@ export default function ImportClearanceDetail() {
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
   const { bridgeToLogin } = useLoginBridge();
+  const trackedDeclarationIdRef = useRef<number | null>(null);
 
   const { data, error, isLoading, refetch } = useQuery({
     queryKey: ['mfds.alcohol', id],
@@ -106,6 +109,19 @@ export default function ImportClearanceDetail() {
       retry: false,
     },
   );
+
+  useEffect(() => {
+    if (!data || isAuthLoading || trackedDeclarationIdRef.current === data.id) {
+      return;
+    }
+
+    trackedDeclarationIdRef.current = data.id;
+    trackGA4Event('view_import_clearance_detail', {
+      declaration_id: String(data.id),
+      access_state: isLoggedIn ? 'member' : 'guest',
+      match_status: data.alcoholId === null ? 'unmatched' : 'matched',
+    });
+  }, [data, isAuthLoading, isLoggedIn]);
 
   const errorInfo = parseApiError(error);
 
@@ -284,7 +300,10 @@ export default function ImportClearanceDetail() {
       {isMatchedAlcoholLoading && data.alcoholId !== null ? (
         <MatchedAlcoholSummarySkeleton />
       ) : matchedAlcohol ? (
-        <MatchedAlcoholSummary alcohol={matchedAlcohol} />
+        <MatchedAlcoholSummary
+          alcohol={matchedAlcohol}
+          declarationId={data.id}
+        />
       ) : null}
 
       {productionRows.length > 0 && (
@@ -454,7 +473,14 @@ export default function ImportClearanceDetail() {
       {shouldShowBottleNoteCta && (
         <StickyBottomCta
           label="보틀노트에서 위스키 보기"
-          onClick={() => router.push(ROUTES.SEARCH.ALL(data.alcoholId!))}
+          onClick={() => {
+            trackGA4Event('select_import_clearance_alcohol', {
+              declaration_id: String(data.id),
+              alcohol_id: String(data.alcoholId),
+              source: 'sticky_cta',
+            });
+            router.push(ROUTES.SEARCH.ALL(data.alcoholId!));
+          }}
         />
       )}
     </div>
