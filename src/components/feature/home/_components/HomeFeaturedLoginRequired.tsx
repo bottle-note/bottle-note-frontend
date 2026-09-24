@@ -24,7 +24,11 @@ export function HomeFeaturedLoginRequired() {
         </p>
         <button
           className="w-[237px] rounded-[18px] border border-stroke-brand-solid py-[8.5px] text-16 font-bold text-fg-brand"
-          onClick={() => router.push(ROUTES.LOGIN)}
+          onClick={() =>
+            router.push(
+              `${ROUTES.LOGIN}?returnTo=${encodeURIComponent(ROUTES.HOME)}`,
+            )
+          }
         >
           로그인 하러가기
         </button>

@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
-import { setReturnToUrl, WHISKEY_MBTI_INTRO_PATH } from '@/utils/loginRedirect';
+import { WHISKEY_MBTI_INTRO_PATH } from '@/utils/loginRedirect';
 
 import styles from '../mbti.module.css';
 import type { MbtiCode } from '../_types';
@@ -140,8 +140,9 @@ export default function MbtiExperience() {
                 router.replace('/whiskey-mbti');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               } else {
-                setReturnToUrl(WHISKEY_MBTI_INTRO_PATH);
-                router.push(ROUTES.LOGIN);
+                router.push(
+                  `${ROUTES.LOGIN}?returnTo=${encodeURIComponent(WHISKEY_MBTI_INTRO_PATH)}`,
+                );
               }
             }}
             onRestart={() => {

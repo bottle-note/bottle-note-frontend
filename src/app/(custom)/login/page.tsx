@@ -14,7 +14,6 @@ import { restoreAuthSession } from '@/lib/auth/session-store';
 import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
 import {
   clearReturnToUrl,
-  getPendingReturnToUrl,
   setReturnToUrl,
   isValidReturnUrl,
 } from '@/utils/loginRedirect';
@@ -28,6 +27,13 @@ const LOGIN_HISTORY_STATE_KEY = '__bottleNoteLogin';
 export default function Login() {
   const router = useRouter();
   const [returnToParam] = useStatefulSearchParams<string | null>('returnTo');
+  const [cancelToParam] = useStatefulSearchParams<string | null>('cancelTo');
+  const returnTo =
+    returnToParam && isValidReturnUrl(returnToParam)
+      ? returnToParam
+      : ROUTES.HOME;
+  const cancelTo =
+    cancelToParam && isValidReturnUrl(cancelToParam) ? cancelToParam : null;
   const {
     startKakaoLogin,
     startAppleLogin,
@@ -39,16 +45,15 @@ export default function Login() {
 
   const handleBack = () => {
     const entry = window.history.state?.[LOGIN_HISTORY_STATE_KEY];
-    const returnTo = entry?.returnTo ?? getPendingReturnToUrl();
     if (cancelMbtiLogin(returnTo)) return;
 
     clearReturnToUrl();
     consumeLoginTrigger();
-    // 쿼리 진입은 replace, 저장소를 사용하는 모달 진입은 push 방식이다.
-    if (returnToParam === null && entry?.hasPreviousPage) {
+    // 모달은 출발 화면을 남겨 두므로 취소 시 그 기록으로 돌아간다.
+    if (cancelTo && entry?.hasPreviousPage) {
       router.back();
     } else {
-      router.replace(returnTo || ROUTES.HOME);
+      router.replace(cancelTo ?? returnTo);
     }
   };
 
@@ -70,15 +75,8 @@ export default function Login() {
       }
     }
 
-    // 쿼리가 있으면 우선하며, 잘못된 쿼리로 과거 목적지가 재사용되지 않게 한다.
-    const returnTo =
-      returnToParam !== null
-        ? isValidReturnUrl(returnToParam)
-          ? returnToParam
-          : null
-        : entry?.returnTo ?? getPendingReturnToUrl();
-    clearReturnToUrl();
-    if (returnTo) setReturnToUrl(returnTo);
+    // 로그인 목적지는 URL에서만 읽고 OAuth 왕복에 필요한 동안만 저장한다.
+    setReturnToUrl(returnTo);
 
     if (isLoggedIn) {
       void continueAuthenticatedSession();
@@ -89,19 +87,12 @@ export default function Login() {
       {
         ...window.history.state,
         [LOGIN_HISTORY_STATE_KEY]: {
-          returnTo,
           hasPreviousPage: entry?.hasPreviousPage ?? window.history.length > 1,
         },
       },
       '',
     );
-  }, [
-    continueAuthenticatedSession,
-    isLoggedIn,
-    isLoading,
-    returnToParam,
-    router,
-  ]);
+  }, [continueAuthenticatedSession, isLoggedIn, isLoading, returnTo, router]);
 
   useEffect(() => {
     const handlePageShow = (event: PageTransitionEvent) => {

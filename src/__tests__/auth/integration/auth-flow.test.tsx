@@ -542,7 +542,9 @@ describe('Auth business flows', () => {
       DeviceService.setDeviceToken('device-token');
       DeviceService.setPlatform('ios');
       (window as typeof window & { isInApp?: boolean }).isInApp = true;
-      setReturnToUrl('/explore');
+      (useSearchParams as jest.Mock).mockReturnValue(
+        new URLSearchParams({ returnTo: '/explore' }),
+      );
       fetchMock.mockResolvedValueOnce(
         createJsonResponse({
           errors: [],
@@ -568,7 +570,9 @@ describe('Auth business flows', () => {
 
     it('이미 로그인된 상태에서 /login 진입 시 returnTo 경로로 복귀한다', async () => {
       setAuthenticatedSession(sessionPayload);
-      setReturnToUrl('/explore');
+      (useSearchParams as jest.Mock).mockReturnValue(
+        new URLSearchParams({ returnTo: '/explore' }),
+      );
 
       render(React.createElement(LoginPage));
 
