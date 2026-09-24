@@ -106,7 +106,13 @@ module.exports = {
       // 프로젝트에서 필요한 의존성만을 import하도록 강제
       'error',
       {
-        devDependencies: ['**/*.stories.*', '**/.storybook/**/*.*'],
+        devDependencies: [
+          '**/*.stories.*',
+          '**/.storybook/**/*.*',
+          '**/*.test.{ts,tsx}',
+          'vitest.setup.ts',
+          'vitest.config.mts',
+        ],
         peerDependencies: true,
       },
     ],

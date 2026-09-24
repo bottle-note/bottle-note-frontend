@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { PropsWithChildren } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -6,14 +7,14 @@ import { AgreementApi } from '@/api/agreement/agreement.api';
 import type { AgreementStatusResponse } from '@/api/agreement/types';
 import { AgreementScreen } from './AgreementScreen';
 
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
 }));
 
-jest.mock('@/api/agreement/agreement.api', () => ({
+vi.mock('@/api/agreement/agreement.api', () => ({
   AgreementApi: {
-    getStatus: jest.fn(),
-    submit: jest.fn(),
+    getStatus: vi.fn(),
+    submit: vi.fn(),
   },
 }));
 
@@ -46,14 +47,14 @@ const createResponse = (data: AgreementStatusResponse) => ({
 });
 
 describe('AgreementScreen', () => {
-  const getStatusMock = jest.mocked(AgreementApi.getStatus);
-  const submitMock = jest.mocked(AgreementApi.submit);
-  const routerReplace = jest.fn();
+  const getStatusMock = vi.mocked(AgreementApi.getStatus);
+  const submitMock = vi.mocked(AgreementApi.submit);
+  const routerReplace = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     sessionStorage.clear();
-    (useRouter as jest.Mock).mockReturnValue({ replace: routerReplace });
+    (useRouter as Mock).mockReturnValue({ replace: routerReplace });
     getStatusMock.mockResolvedValue(createResponse(agreementStatus));
     submitMock.mockResolvedValue(
       createResponse({

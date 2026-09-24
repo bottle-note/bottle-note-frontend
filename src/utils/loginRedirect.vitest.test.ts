@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   isValidReturnUrl,
   getReturnToUrl,
@@ -127,7 +128,7 @@ describe('loginRedirect 유틸리티', () => {
     });
 
     it('이미 같은 값이 저장되어 있으면 다시 저장하지 않는다', () => {
-      const spy = jest.spyOn(Storage.prototype, 'setItem');
+      const spy = vi.spyOn(Storage.prototype, 'setItem');
 
       setReturnToUrl('/search');
       setReturnToUrl('/search');

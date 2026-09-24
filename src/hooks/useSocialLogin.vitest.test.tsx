@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import { AuthApi } from '@/api/auth/auth.api';
@@ -11,38 +12,38 @@ import { LOGIN_RETURN_TO_KEY, setReturnToUrl } from '@/utils/loginRedirect';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
 import { useSocialLogin } from './useSocialLogin';
 
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
 }));
 
-jest.mock('@/api/auth/auth.api', () => ({
+vi.mock('@/api/auth/auth.api', () => ({
   AuthApi: {
     client: {
-      getAppleNonce: jest.fn(),
+      getAppleNonce: vi.fn(),
     },
   },
 }));
 
-jest.mock('@/api/user/user.api', () => ({
+vi.mock('@/api/user/user.api', () => ({
   UserApi: {
-    sendDeviceInfo: jest.fn(),
+    sendDeviceInfo: vi.fn(),
   },
 }));
 
-jest.mock('@/lib/kakao/kakaoSDK', () => ({
-  loadKakaoSDK: jest.fn(),
+vi.mock('@/lib/kakao/kakaoSDK', () => ({
+  loadKakaoSDK: vi.fn(),
 }));
 
-jest.mock('@/lib/auth/session-store', () => ({
-  loginAuthSession: jest.fn(),
+vi.mock('@/lib/auth/session-store', () => ({
+  loginAuthSession: vi.fn(),
 }));
 
-jest.mock('@/utils/analytics/ga4', () => ({
-  trackGA4Event: jest.fn(),
+vi.mock('@/utils/analytics/ga4', () => ({
+  trackGA4Event: vi.fn(),
 }));
 
-jest.mock('@/utils/loginTrigger', () => ({
-  consumeLoginTrigger: jest.fn(),
+vi.mock('@/utils/loginTrigger', () => ({
+  consumeLoginTrigger: vi.fn(),
 }));
 
 const loginResult = (agreementRequired: boolean) => ({
@@ -59,29 +60,29 @@ const loginResult = (agreementRequired: boolean) => ({
 });
 
 describe('useSocialLogin', () => {
-  const routerReplace = jest.fn();
-  const loginAuthSessionMock = jest.mocked(loginAuthSession);
-  const loadKakaoSDKMock = jest.mocked(loadKakaoSDK);
-  const getAppleNonceMock = jest.mocked(AuthApi.client.getAppleNonce);
-  const sendDeviceInfoMock = jest.mocked(UserApi.sendDeviceInfo);
-  const consumeLoginTriggerMock = jest.mocked(consumeLoginTrigger);
+  const routerReplace = vi.fn();
+  const loginAuthSessionMock = vi.mocked(loginAuthSession);
+  const loadKakaoSDKMock = vi.mocked(loadKakaoSDK);
+  const getAppleNonceMock = vi.mocked(AuthApi.client.getAppleNonce);
+  const sendDeviceInfoMock = vi.mocked(UserApi.sendDeviceInfo);
+  const consumeLoginTriggerMock = vi.mocked(consumeLoginTrigger);
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     sessionStorage.clear();
     DeviceService.setIsInApp(false);
     DeviceService.setDeviceToken('');
     DeviceService.setPlatform('');
     window.isInApp = false;
     window.FlutterMessageQueue = {
-      postMessage: jest.fn(),
+      postMessage: vi.fn(),
     };
     window.Kakao = {
       Auth: {
-        authorize: jest.fn(),
+        authorize: vi.fn(),
       },
     } as unknown as typeof window.Kakao;
-    (useRouter as jest.Mock).mockReturnValue({
+    (useRouter as Mock).mockReturnValue({
       replace: routerReplace,
     });
     consumeLoginTriggerMock.mockReturnValue(null);

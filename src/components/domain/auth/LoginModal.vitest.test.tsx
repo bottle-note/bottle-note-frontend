@@ -1,29 +1,30 @@
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { render, screen } from '@testing-library/react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import LoginModal from './LoginModal';
 
-jest.mock('next/navigation', () => ({
-  usePathname: jest.fn(),
-  useRouter: jest.fn(),
-  useSearchParams: jest.fn(),
+vi.mock('next/navigation', () => ({
+  usePathname: vi.fn(),
+  useRouter: vi.fn(),
+  useSearchParams: vi.fn(),
 }));
 
-jest.mock('@/components/ui/Modal/BackDrop', () => ({
+vi.mock('@/components/ui/Modal/BackDrop', () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => (
     <div>{children}</div>
   ),
 }));
 
-const mockUsePathname = usePathname as jest.Mock;
-const mockUseRouter = useRouter as jest.Mock;
-const mockUseSearchParams = useSearchParams as jest.Mock;
-const mockPush = jest.fn();
+const mockUsePathname = usePathname as Mock;
+const mockUseRouter = useRouter as Mock;
+const mockUseSearchParams = useSearchParams as Mock;
+const mockPush = vi.fn();
 
 describe('LoginModal returnTo 사용자 시나리오', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     sessionStorage.clear();
     mockUseRouter.mockReturnValue({ push: mockPush });
     mockUsePathname.mockReturnValue('/explore');
@@ -35,7 +36,7 @@ describe('LoginModal returnTo 사용자 시나리오', () => {
   });
 
   it('일반 로그인은 현재 pathname과 search params 전체를 복귀 쿼리로 전달한다', () => {
-    const handleClose = jest.fn();
+    const handleClose = vi.fn();
 
     render(<LoginModal handleClose={handleClose} />);
 
@@ -51,7 +52,7 @@ describe('LoginModal returnTo 사용자 시나리오', () => {
   });
 
   it('명시적인 returnTo가 있으면 현재 URL보다 해당 경로를 복귀 쿼리로 전달한다', () => {
-    const handleClose = jest.fn();
+    const handleClose = vi.fn();
 
     render(
       <LoginModal handleClose={handleClose} returnTo="/inquire/register" />,
