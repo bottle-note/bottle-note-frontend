@@ -18,49 +18,49 @@ function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
   const { handleReviewWrite } = useNavigateReviewWrite();
 
   return (
-    <section className="relative z-20 flex px-5 pb-[23px] space-x-5">
+    <section className="relative z-20 flex gap-4 px-5 pb-4">
       <AlcoholImage
         imageUrl={data?.alcoholUrlImg}
-        outerHeightClass="h-[230px]"
-        outerWidthClass="w-[140px]"
-        innerHeightClass="h-[200px]"
-        innerWidthClass="w-[100px]"
+        outerHeightClass="h-[190px]"
+        outerWidthClass="w-[120px]"
+        innerHeightClass="h-[160px]"
+        innerWidthClass="w-[88px]"
         bgColor="bg-palette-static-white"
         priority
         enableModal={true}
       />
-      <article className="flex-1 overflow-x-hidden py-3 text-fg-brand-contrast">
+      <article className="flex min-w-0 flex-1 flex-col justify-center gap-4 overflow-x-hidden text-fg-neutral">
         {data && (
           <>
             <div className="space-y-[6px]">
               <Label
                 name={data.korCategory}
-                styleClass="rounded-[4.62px] border-stroke-brand-contrast px-[7.69px] py-[3.85px] text-10"
+                styleClass="rounded-[4.62px] border-stroke-neutral-weak px-[7.69px] py-[3.85px] text-10 text-fg-neutral-muted"
               />
               <h1 className="text-20 font-bold whitespace-normal break-words">
                 {data?.korName}
               </h1>
-              <p className="text-12 whitespace-normal break-words">
+              <p className="text-12 whitespace-normal break-words text-fg-neutral-muted">
                 {data?.engName.toUpperCase()}
               </p>
             </div>
-            <div className="space-y-[10px] pt-5">
+            <div className="space-y-[10px]">
               <div className="flex items-end gap-2">
                 <Star
                   rating={data?.rating}
                   size={27}
                   textStyle="text-27 font-extrabold leading-[27px]"
-                  tone="brandContrast"
+                  tone="brand"
                   align="end"
                 />
-                <div className="text-10">
+                <div className="text-10 text-fg-neutral-muted">
                   (유저평가 {data.totalRatingsCount})
                 </div>
               </div>
-              <div className="border-[0.5px] border-stroke-brand-contrast" />
-              <div className="flex space-x-3">
+              <div className="border-[0.5px] border-stroke-neutral-subtle" />
+              <div className="flex gap-3 text-fg-neutral-muted">
                 <button
-                  className="flex items-end space-x-[0.5px]"
+                  className="flex items-center gap-[3px]"
                   onClick={() => handleReviewWrite(data.alcoholId)}
                 >
                   <SemanticIcon
@@ -70,7 +70,7 @@ function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
                   />
                   <p className="text-12 font-normal">리뷰 작성</p>
                 </button>
-                <div className="my-[0.1rem] border-[0.5px] border-stroke-brand-contrast" />
+                <div className="my-[0.1rem] border-[0.5px] border-stroke-neutral-subtle" />
                 <AlcoholPickButton
                   size={16}
                   isPicked={isPicked}
@@ -79,6 +79,7 @@ function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
                   onApiError={() => setIsPicked(isPicked)}
                   handleNotLogin={handleLoginModal}
                   pickBtnName="찜하기"
+                  tone="neutral"
                 />
               </div>
             </div>

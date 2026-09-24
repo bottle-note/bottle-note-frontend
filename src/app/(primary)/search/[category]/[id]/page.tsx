@@ -10,6 +10,7 @@ import React, {
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ChevronDown } from 'lucide-react';
 
 import JsonLd from '@/components/seo/JsonLd';
 import { generateAlcoholSchema } from '@/utils/seo/generateAlcoholSchema';
@@ -37,6 +38,7 @@ import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import AlcoholRatingInput from '@/components/domain/alcohol/AlcoholRatingInput';
 import ShareDropdown from '@/components/share/ShareDropdown';
 import SemanticIcon from '@/components/ui/Display/SemanticIcon';
+import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
 import type { ShareConfig, ShareChannel } from '@/types/share';
 import FloatingReviewButton from './_components/FloatingReviewButton';
 import AlcoholDetailHeader from './_components/AlcoholDetailHeader';
@@ -66,7 +68,12 @@ export default function SearchAlcohol() {
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isRatingSuccessOpen, setIsRatingSuccessOpen] = useState(false);
   const [successfulRating, setSuccessfulRating] = useState(0);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [isDescriptionClamped, setIsDescriptionClamped] = useState(true);
+  const [collapsedDescriptionHeight, setCollapsedDescriptionHeight] =
+    useState(66);
 
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
   const viewTrackedAlcoholIdRef = useRef<string | null>(null);
   const currentRateRef = useRef(0);
   const latestRatingRequestIdRef = useRef(0);
@@ -288,6 +295,14 @@ export default function SearchAlcohol() {
       : `${window.location.pathname}${window.location.search}`;
 
   const hasFlavorTags = Boolean(data?.alcohols?.alcoholsTastingTags?.length);
+  const description = data?.alcohols?.description?.trim();
+  useEffect(() => {
+    if (descriptionRef.current && !isDescriptionExpanded) {
+      setCollapsedDescriptionHeight(
+        Math.min(66, descriptionRef.current.offsetHeight),
+      );
+    }
+  }, [description, isDescriptionExpanded]);
   const { items: importClearanceItems } = useAlcoholImportClearanceItems(
     data?.alcohols?.alcoholId ?? null,
   );
@@ -295,12 +310,48 @@ export default function SearchAlcohol() {
 
   const alcoholMetadataAndTags = (
     <>
+      {description && (
+        <section className="mx-5 flex flex-col gap-2 border-y border-stroke-neutral-subtle py-3">
+          <h2 className="text-16 font-bold text-fg-neutral">위스키 소개</h2>
+          <AnimatedCollapse
+            isOpen={isDescriptionExpanded}
+            collapsedHeight={collapsedDescriptionHeight}
+            onCollapseComplete={() => setIsDescriptionClamped(true)}
+          >
+            <p
+              ref={descriptionRef}
+              className={`whitespace-pre-line text-13 font-normal leading-[22px] text-fg-neutral-muted ${
+                isDescriptionClamped ? 'line-clamp-3' : ''
+              }`}
+            >
+              {description}
+            </p>
+          </AnimatedCollapse>
+          <button
+            type="button"
+            aria-expanded={isDescriptionExpanded}
+            onClick={() => {
+              if (!isDescriptionExpanded) setIsDescriptionClamped(false);
+              setIsDescriptionExpanded((prev) => !prev);
+            }}
+            className="inline-flex items-center gap-1 self-end text-12 font-medium text-fg-neutral-subtle"
+          >
+            {isDescriptionExpanded ? '접기' : '더보기'}
+            <ChevronDown
+              aria-hidden
+              className={`h-3.5 w-3.5 transition-transform ${
+                isDescriptionExpanded ? 'rotate-180' : ''
+              }`}
+            />
+          </button>
+        </section>
+      )}
       <section
-        className={`mx-5 border-t border-stroke-neutral-subtle py-[21px] ${
-          hasFlavorTags || hasImportInfo ? 'border-b' : ''
-        }`}
+        className={`mx-5 py-4 ${
+          description ? '' : 'border-t border-stroke-neutral-subtle'
+        } ${hasFlavorTags || hasImportInfo ? 'border-b' : ''}`}
       >
-        <div className="grid gap-2">
+        <div className="grid gap-1.5">
           {alcoholDetails.map((item: DetailItem) => (
             <div key={item.content} className="flex items-start gap-2 text-12">
               <div className="min-w-14 font-semibold text-fg-neutral-muted">
@@ -372,9 +423,7 @@ export default function SearchAlcohol() {
           <AlcoholDetailsSkeleton />
         ) : (
           <>
-            <div className="relative">
-              <div className="absolute inset-0 bg-bg-brand-primary-solid" />
-
+            <div className="relative border-b border-stroke-neutral-subtle bg-bg-neutral-weak">
               {/* 콘텐츠 레이어 */}
               <div className="relative z-10">
                 <SubHeader bgColor="bg-bg-transparent">
@@ -387,7 +436,7 @@ export default function SearchAlcohol() {
                       src="/icon/arrow-left-white.svg"
                       width={23}
                       height={23}
-                      className="text-fg-brand-contrast"
+                      className="text-fg-neutral"
                       label="뒤로가기"
                     />
                   </SubHeader.Left>
@@ -396,7 +445,7 @@ export default function SearchAlcohol() {
                       src="/icon/externallink-outlined-white.svg"
                       width={23}
                       height={23}
-                      className="text-fg-brand-contrast"
+                      className="text-fg-neutral"
                       label="공유하기"
                     />
                   </SubHeader.Right>
@@ -410,7 +459,7 @@ export default function SearchAlcohol() {
               </div>
             </div>
             <div className="mb-5">
-              <article className="grid place-items-center space-y-2 pt-[25px] pb-[21px]">
+              <article className="grid place-items-center space-y-2 py-4">
                 {getRatingMessage(
                   data?.alcohols?.myAvgRating,
                   data?.alcohols?.myRating,
@@ -420,6 +469,7 @@ export default function SearchAlcohol() {
                     value={rate}
                     onChange={handleRateChange}
                     onCommit={handleRateCommit}
+                    tone="brand"
                   />
                 </div>
               </article>

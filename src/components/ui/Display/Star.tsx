@@ -4,7 +4,7 @@ interface Props {
   rating: number;
   size?: number;
   textStyle?: string;
-  tone?: 'rating' | 'brandContrast';
+  tone?: 'rating' | 'brand' | 'brandContrast';
   align?: 'center' | 'end';
 }
 
@@ -16,8 +16,11 @@ const Star = ({
   align = 'center',
 }: Props) => {
   const hasRating = rating && rating > 0;
-  const colorClass =
-    tone === 'brandContrast' ? 'text-fg-brand-contrast' : 'text-fg-rating';
+  const colorClass = {
+    rating: 'text-fg-rating',
+    brand: 'text-fg-brand',
+    brandContrast: 'text-fg-brand-contrast',
+  }[tone];
   const iconSrc =
     tone === 'brandContrast'
       ? '/icon/star-filled-white.svg'
