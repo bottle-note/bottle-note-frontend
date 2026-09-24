@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
 
 interface AccordionItemWrapperProps {
   title: string;
@@ -53,19 +54,9 @@ const AccordionItemWrapper = ({
       </div>
 
       {/* 컨텐츠 */}
-      <div
-        className={`overflow-hidden transition-all duration-300 ease-out ${
-          isOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
-        }`}
-      >
-        <div
-          className={`transform transition-all duration-500 ease-out ${
-            isOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-          }`}
-        >
-          <div className="bg-bg-neutral-weak px-5 py-3">{children}</div>
-        </div>
-      </div>
+      <AnimatedCollapse isOpen={isOpen}>
+        <div className="bg-bg-neutral-weak px-5 py-3">{children}</div>
+      </AnimatedCollapse>
     </>
   );
 };

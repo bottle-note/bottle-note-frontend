@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useRegionsQuery } from '@/queries/useRegionsQuery';
 import { groupRegions } from '@/utils/regionGrouper';
 import { getRegionFlagUrl } from '@/constants/regionFlags';
@@ -11,6 +10,7 @@ import type { RegionGroup } from '@/utils/regionGrouper';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import SkeletonList from '@/components/ui/Loading/Skeletons/SkeletonList';
 import SemanticIcon from '@/components/ui/Display/SemanticIcon';
+import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
 
 const buildRegionHref = (regionId: number | '') =>
   `/explore?regionIds=${regionId}&tab=EXPLORER_WHISKEY`;
@@ -125,49 +125,40 @@ function RegionRow({
         />
       </button>
 
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.ul
-            key="content"
-            initial={{ height: 0, marginTop: 0 }}
-            animate={{ height: 'auto', marginTop: 10 }}
-            exit={{ height: 0, marginTop: 0 }}
-            transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-            className="overflow-hidden px-[8px] flex flex-col gap-[10px]"
-          >
-            {/* /전체 항목 */}
-            <li>
+      <AnimatedCollapse isOpen={isOpen}>
+        <ul className="flex flex-col gap-[10px] px-[8px] pt-[10px]">
+          {/* /전체 항목 */}
+          <li>
+            <Link
+              href={buildRegionHref(group.parent.regionId)}
+              className="flex items-center justify-between border-b border-dashed border-stroke-neutral-basement py-[8px]"
+            >
+              <span className="text-13 font-bold text-fg-neutral">
+                {group.parent.korName}
+              </span>
+            </Link>
+          </li>
+
+          {/* 하위 지역들 */}
+          {group.children.map((child) => (
+            <li key={child.regionId}>
               <Link
-                href={buildRegionHref(group.parent.regionId)}
+                href={buildRegionHref(child.regionId)}
                 className="flex items-center justify-between border-b border-dashed border-stroke-neutral-basement py-[8px]"
               >
-                <span className="text-13 font-bold text-fg-neutral">
-                  {group.parent.korName}
-                </span>
+                <div className="gap-[4px] flex items-center">
+                  <span className="text-13 font-bold text-fg-neutral">
+                    {child.korName}
+                  </span>
+                  <span className="text-11 text-fg-neutral-muted">
+                    {child.engName}
+                  </span>
+                </div>
               </Link>
             </li>
-
-            {/* 하위 지역들 */}
-            {group.children.map((child) => (
-              <li key={child.regionId}>
-                <Link
-                  href={buildRegionHref(child.regionId)}
-                  className="flex items-center justify-between border-b border-dashed border-stroke-neutral-basement py-[8px]"
-                >
-                  <div className="gap-[4px] flex items-center">
-                    <span className="text-13 font-bold text-fg-neutral">
-                      {child.korName}
-                    </span>
-                    <span className="text-11 text-fg-neutral-muted">
-                      {child.engName}
-                    </span>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </motion.ul>
-        )}
-      </AnimatePresence>
+          ))}
+        </ul>
+      </AnimatedCollapse>
     </li>
   );
 }

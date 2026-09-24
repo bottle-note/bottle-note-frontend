@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
 
 interface Props {
   iconSrc: string;
@@ -76,19 +77,7 @@ export default function OptionsContainer({
           />
         </div>
       </div>
-      <div
-        className={`overflow-hidden transition-all duration-300 ease-out ${
-          isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-        }`}
-      >
-        <div
-          className={`transform transition-all duration-500 ease-out ${
-            isOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-          }`}
-        >
-          {children}
-        </div>
-      </div>
+      <AnimatedCollapse isOpen={isOpen}>{children}</AnimatedCollapse>
     </article>
   );
 }
