@@ -308,7 +308,7 @@ export default function ImporterDetail() {
 
   if (!isLoggedIn && !isAuthLoading) {
     return (
-      <div className="pb-navbar">
+      <div className="grid h-dvh grid-rows-[auto_minmax(0,1fr)] pb-[var(--safe-area-bottom)]">
         {heroSection}
         <LoginGate
           variant="blur"
@@ -316,7 +316,7 @@ export default function ImporterDetail() {
           description="로그인하고 이 수입사 정보를 무료로 확인하세요"
           buttonLabel="로그인하고 보기"
           onLogin={() => bridgeToLogin()}
-          visibleHeight="min-h-[70vh]"
+          visibleHeight="min-h-0"
           gradientStartPercent={80}
         >
           {renderPageContent()}

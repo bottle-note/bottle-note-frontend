@@ -422,8 +422,16 @@ export default function SearchAlcohol() {
         {!data || !data.alcohols || isAuthLoading ? (
           <AlcoholDetailsSkeleton />
         ) : (
-          <>
-            <div className="relative border-b border-stroke-neutral-subtle bg-bg-neutral-weak">
+          <div
+            className={
+              isGuest
+                ? 'grid h-dvh grid-rows-[minmax(0,auto)_minmax(min-content,1fr)] pb-navbar'
+                : undefined
+            }
+          >
+            <div
+              className={`relative border-b border-stroke-neutral-subtle bg-bg-neutral-weak ${isGuest ? 'overflow-y-auto' : ''}`}
+            >
               {/* 콘텐츠 레이어 */}
               <div className="relative z-10">
                 <SubHeader bgColor="bg-bg-transparent">
@@ -458,7 +466,13 @@ export default function SearchAlcohol() {
                 />
               </div>
             </div>
-            <div className="mb-5">
+            <div
+              className={
+                isGuest
+                  ? 'grid min-h-0 grid-rows-[auto_minmax(min-content,1fr)]'
+                  : 'mb-5'
+              }
+            >
               <article className="grid place-items-center space-y-2 py-4">
                 {getRatingMessage(
                   data?.alcohols?.myAvgRating,
@@ -542,7 +556,7 @@ export default function SearchAlcohol() {
                 )}
               </>
             )}
-          </>
+          </div>
         )}
         {shareConfig && (
           <ShareDropdown
