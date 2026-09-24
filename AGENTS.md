@@ -27,6 +27,7 @@
 - 새 구조를 만들기 전에 인접한 코드와 기존 컴포넌트를 재사용한다. 다만 잘못된 레거시 패턴을 그대로 복제하지는 않는다.
 - 데이터 흐름을 숨기는 간접 호출보다 입력, 변환, 출력이 드러나는 코드를 선호한다.
 - 서버 상태를 Zustand에 복제하지 않는다. 파생 가능한 상태를 별도로 저장하지 않는다.
+- GA4 이벤트와 GTM 설정을 변경할 때는 `.agents/skills/bottle-note-ga4/SKILL.md`를 확인한다.
 - API 작업 전 [Bottle Note Product API OpenAPI 문서](https://bottle-note.github.io/workspace/#product)에서 경로, 메서드, 인증 여부와 요청·응답 스키마를 확인한다. 스펙에 없는 필드, 응답 래퍼, 기본값, 성공·오류 동작을 추측하지 않는다.
 - 변경과 직접 관련 없는 파일은 수정하지 않는다. 기존 사용자 변경을 덮어쓰지 않는다.
 - Bottle Note 제품 이슈의 원본 저장소는 `bottle-note/workspace`다. PR 전 `gh issue view <번호> --repo bottle-note/workspace`로 제목, 범위, 라벨, 완료 조건을 확인한다. 번호를 모르면 그 저장소에서 현재 사용자에게 할당된 프론트엔드 이슈를 찾는다.
