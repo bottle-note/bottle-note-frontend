@@ -250,6 +250,14 @@ export default function ImportClearanceDetail() {
   const shouldShowGuestLoginCta = !isAuthLoading && !isLoggedIn;
   const shouldShowBottleNoteCta = isLoggedIn && data.alcoholId !== null;
 
+  let pageClassName = 'pb-navbar';
+  if (shouldShowGuestLoginCta) {
+    pageClassName =
+      'grid h-dvh grid-rows-[auto_minmax(0,1fr)] pb-[var(--safe-area-bottom)]';
+  } else if (shouldShowBottleNoteCta) {
+    pageClassName = STICKY_BOTTOM_CTA_PADDING_CLASS;
+  }
+
   const heroSection = (
     <div className="relative border-b border-stroke-neutral-subtle bg-bg-neutral-weak">
       <div className="relative z-10">
@@ -447,11 +455,7 @@ export default function ImportClearanceDetail() {
   );
 
   return (
-    <div
-      className={
-        shouldShowBottleNoteCta ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-navbar'
-      }
-    >
+    <div className={pageClassName}>
       {heroSection}
       {isAuthLoading ? (
         contentSkeleton
@@ -462,7 +466,7 @@ export default function ImportClearanceDetail() {
           description="로그인하고 이 수입 정보를 무료로 확인하세요"
           buttonLabel="로그인하고 보기"
           onLogin={() => bridgeToLogin()}
-          visibleHeight="min-h-[70vh]"
+          visibleHeight="min-h-0"
           gradientStartPercent={80}
         >
           {renderPageContent()}
