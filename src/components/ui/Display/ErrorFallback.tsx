@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Button from '@/components/ui/Button/Button';
 
 interface Props {
   message?: string;
@@ -28,22 +29,19 @@ function ErrorFallback({
       {(onBack || onRetry) && (
         <div className="flex gap-3 mt-2">
           {onBack && (
-            <button
+            <Button
               type="button"
               onClick={onBack}
-              className="px-5 py-2 border border-stroke-neutral-weak text-fg-neutral-muted rounded-lg text-13 active:bg-bg-layer-default-pressed"
+              size="md"
+              variant="secondary"
             >
               뒤로 가기
-            </button>
+            </Button>
           )}
           {onRetry && (
-            <button
-              type="button"
-              onClick={onRetry}
-              className="px-5 py-2 bg-bg-brand-primary-solid text-fg-brand-contrast rounded-lg text-13"
-            >
+            <Button type="button" onClick={onRetry} size="md">
               다시 시도
-            </button>
+            </Button>
           )}
         </div>
       )}

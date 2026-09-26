@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import Button from '@/components/ui/Button/Button';
 import {
   isTastingNoteEmpty,
   DEFAULT_TASTING_NOTE,
@@ -37,23 +38,23 @@ export default function TastingNoteForm() {
                   size={180}
                 />
               </div>
-              <button
+              <Button
                 type="button"
                 onClick={() => setIsModalOpen(true)}
-                className="text-13 text-fg-brand underline underline-offset-2"
+                size="sm"
+                variant="text"
               >
                 수정하기
-              </button>
+              </Button>
             </div>
           ) : (
             // 미작성: CTA 버튼
-            <button
+            <Button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="w-full py-3 border border-dashed border-stroke-brand-weak rounded-lg
-                flex items-center justify-center gap-2
-                text-14 text-fg-brand
-                active:bg-bg-brand-weak transition-colors"
+              size="md"
+              variant="secondary"
+              fullWidth
             >
               <svg
                 width="16"
@@ -70,7 +71,7 @@ export default function TastingNoteForm() {
                 />
               </svg>
               그래프로 풍미 기록하기
-            </button>
+            </Button>
           )}
         </div>
       </OptionsContainer>

@@ -244,7 +244,6 @@ function ReviewRegister() {
         <Button
           onClick={handleSubmitClick}
           btnName="리뷰 등록"
-          btnTextStyles="text-16 font-bold"
           disabled={isProcessing}
         />
       </article>

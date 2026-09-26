@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Button from '@/components/ui/Button/Button';
 
 interface Props {
   onRetry?: () => void;
@@ -22,12 +23,14 @@ export function HomeFeaturedErrorState({ onRetry }: Props) {
         데이터를 불러오는데 실패했습니다.
       </p>
       {onRetry && (
-        <button
+        <Button
           onClick={onRetry}
-          className="mt-3 rounded-lg border border-stroke-brand-solid px-4 py-2 text-14 text-fg-brand"
+          size="md"
+          variant="secondary"
+          className="mt-3"
         >
           다시 시도
-        </button>
+        </Button>
       )}
     </div>
   );

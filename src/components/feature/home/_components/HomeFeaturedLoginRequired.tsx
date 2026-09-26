@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import Button from '@/components/ui/Button/Button';
 import { ROUTES } from '@/constants/routes';
 
 export function HomeFeaturedLoginRequired() {
@@ -22,12 +23,14 @@ export function HomeFeaturedLoginRequired() {
         <p className="text-16 text-fg-neutral-muted">
           로그인 후 확인 가능한 서비스 입니다.
         </p>
-        <button
-          className="w-[237px] rounded-[18px] border border-stroke-brand-solid py-[8.5px] text-16 font-bold text-fg-brand"
+        <Button
+          size="md"
+          variant="secondary"
+          className="w-[237px]"
           onClick={() => router.push(ROUTES.LOGIN)}
         >
           로그인 하러가기
-        </button>
+        </Button>
       </div>
     </div>
   );

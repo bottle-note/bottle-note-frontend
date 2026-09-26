@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { CircleHelp, CircleX } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
+import Button from '@/components/ui/Button/Button';
 import useModalStore from '@/store/modalStore';
 import HoverTouchBox from '@/components/ui/Interactive/HoverTouchBox';
 import { TAGS_LIMIT, validateTagText } from '@/constants/review';
@@ -103,14 +104,16 @@ export default function TagsForm() {
                 }
               }}
             />
-            <button
+            <Button
               type="button"
-              className={`w-24 shrink-0 text-15 ${watchTags?.length < TAGS_LIMIT ? 'label-selected' : 'label-disabled'}`}
+              size="sm"
+              variant="secondary"
+              className="w-24"
               disabled={watchTags?.length === TAGS_LIMIT}
               onClick={handleAddTag}
             >
               태그 등록
-            </button>
+            </Button>
           </div>
           {watchTags && watchTags.length !== 0 && (
             <div className="flex flex-wrap gap-1 pt-2">

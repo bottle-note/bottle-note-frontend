@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import Button from '@/components/ui/Button/Button';
 import { useBlockActions } from '@/hooks/useBlockActions';
 import { BlockApi } from '@/api/block/block.api';
 import type { BlockListResponse } from '@/api/block/types';
@@ -99,20 +100,17 @@ export default function BlockManagement() {
                         </span>
                       </div>
 
-                      <button
+                      <Button
                         onClick={() =>
                           isUnblocking
                             ? handleBlockUser(user.userId, user.userName)
                             : handleUnblockUser(user.userId, user.userName)
                         }
-                        className={`px-[10px] py-1 border border-subCoral rounded text-12 font-medium transition-colors flex-shrink-0 ${
-                          isUnblocking
-                            ? 'bg-bg-brand-solid text-fg-brand-contrast'
-                            : 'text-fg-brand'
-                        }`}
+                        size="sm"
+                        variant={isUnblocking ? 'primary' : 'secondary'}
                       >
                         {isUnblocking ? '차단하기' : '차단해제'}
-                      </button>
+                      </Button>
                     </div>
 
                     {isLast && (

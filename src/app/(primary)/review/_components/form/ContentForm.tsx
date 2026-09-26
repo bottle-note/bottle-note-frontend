@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import Button from '@/components/ui/Button/Button';
 import { TastingTagsApi } from '@/api/tasting-tags/tasting-tags.api';
 import useModalStore from '@/store/modalStore';
 import {
@@ -78,14 +79,16 @@ export default function ContentForm() {
       />
       <div className="flex justify-between items-center mt-1">
         <p className="text-13 text-fg-neutral-subtle">{review.length}/700</p>
-        <button
+        <Button
           type="button"
           onClick={handleExtractTags}
           disabled={isExtracting}
-          className={`w-24 shrink-0 text-15 ${isExtracting ? 'label-disabled' : 'label-selected'}`}
+          size="sm"
+          variant="secondary"
+          className="w-24"
         >
           {isExtracting ? '추출 중...' : '태그 추출'}
-        </button>
+        </Button>
       </div>
     </article>
   );

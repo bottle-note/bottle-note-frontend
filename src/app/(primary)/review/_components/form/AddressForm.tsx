@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { CircleX } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
+import Button from '@/components/ui/Button/Button';
 import SearchAddress from '../SearchAddress';
 import OptionsContainer from '../OptionsContainer';
 
@@ -83,15 +84,17 @@ export default function AddressForm() {
       >
         <article className="ml-7 mt-[6px] text-14">
           {!watch('address') ? (
-            <button
+            <Button
               type="button"
-              className="w-full rounded-lg border border-stroke-brand-solid py-2"
+              size="md"
+              variant="secondary"
+              fullWidth
               onClick={() => {
                 setSearchModal(true);
               }}
             >
-              <p className="text-fg-brand">장소 검색</p>
-            </button>
+              장소 검색
+            </Button>
           ) : (
             <div className="w-full space-y-1">
               <div className="pb-1">{watch('mapUrl') && ExtraButtons}</div>

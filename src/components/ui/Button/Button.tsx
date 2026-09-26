@@ -1,35 +1,52 @@
-import React from 'react';
+import type { ButtonHTMLAttributes } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
 
-interface ButtonProps {
-  btnName: string;
-  type?: 'button' | 'submit';
-  onClick: () => void;
-  btnStyles?: string;
-  btnTextStyles?: string;
-  disabled?: boolean;
+export const buttonVariants = cva(
+  'inline-flex shrink-0 items-center justify-center gap-1 whitespace-nowrap box-border font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:border-stroke-neutral-subtle disabled:bg-bg-neutral-weak disabled:text-fg-disabled disabled:active:bg-bg-neutral-weak aria-disabled:pointer-events-none aria-disabled:border-stroke-neutral-subtle aria-disabled:bg-bg-neutral-weak aria-disabled:text-fg-disabled',
+  {
+    variants: {
+      size: {
+        sm: 'h-7 rounded-md px-3 text-[13px] leading-[17px]',
+        md: 'h-10 rounded-lg px-4 text-[15px] leading-[19px]',
+        lg: 'h-[52px] rounded-xl px-4 text-[15px] leading-[19px]',
+      },
+      variant: {
+        primary:
+          'bg-bg-brand-solid text-palette-static-white active:bg-bg-brand-solid-pressed',
+        secondary:
+          'border border-stroke-brand-solid bg-bg-layer-default text-fg-brand active:bg-bg-layer-default-pressed',
+        text: 'bg-transparent text-fg-neutral-muted active:bg-bg-layer-default-pressed',
+      },
+      fullWidth: { true: 'w-full', false: '' },
+    },
+    defaultVariants: { size: 'lg', variant: 'primary', fullWidth: true },
+  },
+);
+
+interface ButtonProps
+  extends ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  btnName?: string;
 }
 
 export function Button({
   btnName,
+  children,
   type = 'button',
-  onClick,
-  btnStyles = 'bg-bg-brand-solid active:bg-bg-brand-solid-pressed',
-  btnTextStyles = 'font-bold text-15',
-  disabled = false,
+  size = 'lg',
+  variant = 'primary',
+  fullWidth = size === 'lg',
+  className,
+  ...props
 }: ButtonProps) {
   return (
     <button
       type={type}
-      onClick={onClick}
-      className={`flex justify-center items-center w-full h-[52px] rounded-xl transition-colors
-        ${
-          disabled
-            ? 'bg-bg-disabled text-fg-disabled cursor-not-allowed'
-            : `${btnStyles} text-fg-brand-contrast`
-        }`}
-      disabled={disabled}
+      className={cn(buttonVariants({ size, variant, fullWidth }), className)}
+      {...props}
     >
-      <span className={btnTextStyles}>{btnName}</span>
+      {children ?? btnName}
     </button>
   );
 }
@@ -39,10 +56,6 @@ interface DualButtonProps {
   cancelBtnName?: string;
   onClickOkay: () => void;
   onClickCancel: () => void;
-  okayBtnStyles?: string;
-  okayBtnTextStyles?: string;
-  cancelBtnStyles?: string;
-  cancelBtnTextStyles?: string;
 }
 
 export function DualButton({
@@ -50,24 +63,19 @@ export function DualButton({
   cancelBtnName = '아니요',
   onClickOkay,
   onClickCancel,
-  okayBtnStyles,
-  okayBtnTextStyles,
-  cancelBtnStyles = 'border border-stroke-brand-solid bg-bg-layer-default active:bg-bg-layer-default-pressed',
-  cancelBtnTextStyles = 'text-fg-brand font-bold text-base',
 }: DualButtonProps) {
   return (
     <div className="flex w-full gap-2">
       <Button
         btnName={cancelBtnName}
         onClick={onClickCancel}
-        btnStyles={cancelBtnStyles}
-        btnTextStyles={cancelBtnTextStyles}
+        variant="secondary"
+        className="min-w-0 flex-1"
       />
       <Button
         btnName={okayBtnName}
         onClick={onClickOkay}
-        btnStyles={okayBtnStyles}
-        btnTextStyles={okayBtnTextStyles}
+        className="min-w-0 flex-1"
       />
     </div>
   );

@@ -172,8 +172,7 @@ export function MarketingConsentSettings({
             {isAgreed ? (
               <Button
                 btnName={submitMutation.isPending ? '처리 중...' : '동의 철회'}
-                btnStyles="border border-stroke-neutral-weak bg-bg-layer-default active:bg-bg-layer-default-pressed"
-                btnTextStyles="text-15 font-bold text-fg-neutral-muted"
+                variant="secondary"
                 disabled={isStatusPending || submitMutation.isPending}
                 onClick={() => handleAgreementChange('REVOKE')}
               />

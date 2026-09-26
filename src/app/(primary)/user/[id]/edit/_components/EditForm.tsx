@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import Button from '@/components/ui/Button/Button';
 import { UserApi } from '@/api/user/user.api';
 import { validate } from '@/utils/validate';
 import useModalStore from '@/store/modalStore';
@@ -114,13 +115,14 @@ function EditForm({ userId }: Props) {
               ) : (
                 <></>
               )}
-              <button
-                className="label-selected text-12 font-normal disabled:label-disabled"
+              <Button
+                size="sm"
+                variant="secondary"
                 onClick={() => handelRegisterNickName(nickName)}
                 disabled={!nickName}
               >
                 변경
-              </button>
+              </Button>
             </div>
           </article>
           <div className="text-right clear-start text-fg-neutral-muted text-10 mt-1">{`${nickName.length}/20`}</div>

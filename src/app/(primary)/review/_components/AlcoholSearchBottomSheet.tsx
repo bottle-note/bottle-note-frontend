@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import BottomSheet from '@/components/ui/Modal/BottomSheet';
+import Button from '@/components/ui/Button/Button';
 import SearchBar from '@/components/feature/Search/SearchBar';
 import CategorySelector from '@/components/ui/Form/CategorySelector';
 import Tab from '@/components/ui/Navigation/Tab';
@@ -177,24 +178,21 @@ export default function AlcoholSearchBottomSheet({
         ) : error ? (
           <div className="flex h-full flex-col items-center justify-center gap-4 text-fg-neutral-muted">
             <p className="text-14">검색 중 문제가 발생했습니다.</p>
-            <button
-              type="button"
-              onClick={() => void refetch()}
-              className="rounded-lg bg-bg-brand-primary-solid px-5 py-2 text-13 text-fg-brand-contrast"
-            >
+            <Button type="button" onClick={() => void refetch()} size="md">
               다시 시도
-            </button>
+            </Button>
           </div>
         ) : showEmptySearch ? (
           <div className="flex h-full flex-col items-center justify-center gap-4 text-fg-neutral-muted">
             <p className="text-14">검색 결과가 없습니다.</p>
-            <button
+            <Button
               type="button"
               onClick={() => onRequestAlcohol(debouncedKeyword)}
-              className="rounded-lg border border-stroke-brand-solid px-5 py-2 text-13 text-fg-brand"
+              size="md"
+              variant="secondary"
             >
               위스키 등록 요청하기
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="flex h-full flex-col items-center justify-center text-fg-neutral-muted">

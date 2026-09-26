@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import Button from '@/components/ui/Button/Button';
 import { GuestLoginPrompt } from './GuestLoginPrompt';
 
 type LoginGateProps = {
@@ -38,12 +39,9 @@ export function LoginGate(props: LoginGateProps) {
       <>
         {children}
         <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-stroke-neutral-subtle bg-bg-layer-default px-5 py-4 safe-area-bottom">
-          <button
-            onClick={onLogin}
-            className="w-full rounded-lg bg-bg-brand-primary-solid py-3 text-center font-bold text-white"
-          >
+          <Button onClick={onLogin}>
             {label || buttonLabel || '로그인하기'}
-          </button>
+          </Button>
         </div>
       </>
     );

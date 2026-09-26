@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { format, isValid, parseISO } from 'date-fns';
 import List from '@/components/feature/List/List';
+import Button from '@/components/ui/Button/Button';
 import {
   GuestListGate,
   useGuestPagedSession,
@@ -228,13 +229,14 @@ export default function ImportClearanceList() {
             <p className="text-13 text-fg-neutral-muted">
               목록을 더 불러오지 못했어요.
             </p>
-            <button
+            <Button
               type="button"
               onClick={() => refetch()}
-              className="rounded-lg border border-stroke-neutral-weak px-5 py-2 text-13 text-fg-neutral-muted active:bg-bg-layer-default-pressed"
+              size="md"
+              variant="secondary"
             >
               다시 시도
-            </button>
+            </Button>
           </div>
         ) : (
           isLoggedIn && <div ref={targetRef} />

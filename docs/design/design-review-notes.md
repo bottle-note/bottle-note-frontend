@@ -11,6 +11,8 @@
 
 ## 문서 작성 참고
 
+- 2026-09-24: Google Labs의 공식 DESIGN.md **alpha 초안 명세**에 맞춰 문서를 Overview, Colors, Typography, Layout, Elevation & Depth, Shapes, Components, Do's and Don'ts 순으로 재구성했다. [공식 발표](https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-design-md/), [명세](https://github.com/google-labs-code/design.md/blob/main/docs/spec.md). Stitch 화면에서 문서를 추출하는 [5개 섹션 스킬 템플릿](https://github.com/google-labs-code/stitch-skills/blob/main/plugins/stitch-utilities/skills/design-md/SKILL.md)과 독립 포맷 명세를 구분했다.
+- 기존 규격은 보존하고 디자인 톤·정보 위계·화면 조합·컴포넌트 선택 기준을 검토용 초안으로 추가했다. 공통 글자 수치, 그림자·겹침 순서, 상태 색상은 여전히 미확정이다. 다음 작업은 대표 화면과 초안을 비교하고 역할별 수치와 공통 요소의 상태·사용 조건을 채우는 것이다.
 - [designmd.ai 안내](https://designmd.ai/what-is-design-md): 색·글자·간격·컴포넌트의 값과 사용법을 함께 설명한다. 커뮤니티 사례집이며 제품의 정답은 아니다.
 - [Google Labs 형식 문서](https://github.com/google-labs-code/design.md/blob/main/docs/spec.md): 토큰은 값, 본문은 적용 맥락을 담당한다. YAML 토큰 선언은 선택 사항이다.
 - [Genesis](https://designmd.ai/chef/genesis), [Flip7](https://designmd.ai/yiujc/flip7-card-game): 역할별 값·사용처와 금지사항을 묶는 구성 참고. 다른 제품의 수치나 분위기는 가져오지 않는다.
