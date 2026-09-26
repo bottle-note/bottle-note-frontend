@@ -6,14 +6,14 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/ui/Button/Button';
 import { ROUTES } from '@/constants/routes';
 import BackDrop from '@/components/ui/Modal/BackDrop';
-import { setReturnToUrl } from '@/utils/loginRedirect';
 
 interface Props {
   handleClose: () => void;
   returnTo?: string;
+  errorTo?: string;
 }
 
-function LoginModal({ handleClose, returnTo }: Props) {
+function LoginModal({ handleClose, returnTo, errorTo }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -23,8 +23,11 @@ function LoginModal({ handleClose, returnTo }: Props) {
     const currentUrl = `${pathname}${queryString ? `?${queryString}` : ''}`;
 
     handleClose();
-    setReturnToUrl(returnTo ?? currentUrl);
-    router.push(ROUTES.LOGIN);
+    const params = new URLSearchParams({
+      returnTo: returnTo ?? currentUrl,
+    });
+    if (errorTo) params.set('errorTo', errorTo);
+    router.push(`${ROUTES.LOGIN}?${params.toString()}`);
   };
 
   return (

@@ -52,7 +52,9 @@ export default function Settings() {
         confirmBtnName: '로그인',
         handleConfirm: () => {
           handleCloseModal();
-          route.push(ROUTES.LOGIN);
+          route.push(
+            `${ROUTES.LOGIN}?returnTo=${encodeURIComponent(ROUTES.HOME)}`,
+          );
         },
       });
       return;
@@ -78,7 +80,7 @@ export default function Settings() {
   };
 
   const handleLogin = () => {
-    route.push(ROUTES.LOGIN);
+    route.push(`${ROUTES.LOGIN}?returnTo=${encodeURIComponent(ROUTES.HOME)}`);
   };
 
   const signOutAndRedirect = async () => {

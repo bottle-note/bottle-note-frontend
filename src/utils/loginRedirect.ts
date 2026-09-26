@@ -2,9 +2,6 @@
  * 로그인 후 리다이렉트를 위한 유틸리티
  */
 
-export const LOGIN_RETURN_TO_KEY = 'login_return_to';
-export const WHISKEY_MBTI_INTRO_PATH = '/whiskey-mbti';
-
 // 리다이렉트 제외 경로 (무한 루프 방지)
 const BLOCKED_PATHS = ['/login', '/oauth'];
 
@@ -35,50 +32,6 @@ export const isValidReturnUrl = (url: string): boolean => {
   return true;
 };
 
-/**
- * returnTo URL을 안전하게 가져오고 sessionStorage에서 제거
- */
-export const getReturnToUrl = (): string => {
-  if (typeof window === 'undefined') return '/';
-
-  const returnTo = sessionStorage.getItem(LOGIN_RETURN_TO_KEY);
-  sessionStorage.removeItem(LOGIN_RETURN_TO_KEY);
-
-  return returnTo && isValidReturnUrl(returnTo) ? returnTo : '/';
-};
-
-/**
- * 로그인 화면에서 뒤로 가기처럼, 로그인 완료 전의 흐름을 확인할 때 사용한다.
- * 성공 경로는 getReturnToUrl만 소비해야 한다.
- */
-export const getPendingReturnToUrl = (): string | null => {
-  if (typeof window === 'undefined') return null;
-
-  const returnTo = sessionStorage.getItem(LOGIN_RETURN_TO_KEY);
-  return returnTo && isValidReturnUrl(returnTo) ? returnTo : null;
-};
-
-export const clearReturnToUrl = (): void => {
-  if (typeof window === 'undefined') return;
-  sessionStorage.removeItem(LOGIN_RETURN_TO_KEY);
-};
-
-export const isWhiskeyMbtiReturnUrl = (url: string | null): boolean => {
-  if (!url || !isValidReturnUrl(url)) return false;
-
-  return (
-    new URL(url, 'https://bottlenote.local').pathname ===
-    WHISKEY_MBTI_INTRO_PATH
-  );
-};
-
-/**
- * returnTo URL을 sessionStorage에 저장
- */
-export const setReturnToUrl = (url: string): void => {
-  if (typeof window === 'undefined') return;
-  if (!isValidReturnUrl(url)) return;
-  if (sessionStorage.getItem(LOGIN_RETURN_TO_KEY) === url) return;
-
-  sessionStorage.setItem(LOGIN_RETURN_TO_KEY, url);
-};
+/** 쿼리에서 전달받은 복귀 주소를 검증하고, 없거나 잘못된 경우 홈을 사용한다. */
+export const getReturnToUrl = (returnTo: string | null): string =>
+  returnTo && isValidReturnUrl(returnTo) ? returnTo : '/';

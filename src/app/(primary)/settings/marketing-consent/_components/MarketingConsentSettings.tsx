@@ -26,7 +26,9 @@ export function MarketingConsentSettings({
 
   useEffect(() => {
     if (!isAuthLoading && !isLoggedIn) {
-      router.replace(ROUTES.LOGIN);
+      router.replace(
+        `${ROUTES.LOGIN}?returnTo=${encodeURIComponent(ROUTES.HOME)}`,
+      );
     }
   }, [isAuthLoading, isLoggedIn, router]);
 

@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import { AuthApi } from '@/api/auth/auth.api';
@@ -7,42 +8,41 @@ import { DeviceService } from '@/lib/DeviceService';
 import { loadKakaoSDK } from '@/lib/kakao/kakaoSDK';
 import { loginAuthSession } from '@/lib/auth/session-store';
 import { trackGA4Event } from '@/utils/analytics/ga4';
-import { LOGIN_RETURN_TO_KEY, setReturnToUrl } from '@/utils/loginRedirect';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
 import { useSocialLogin } from './useSocialLogin';
 
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
 }));
 
-jest.mock('@/api/auth/auth.api', () => ({
+vi.mock('@/api/auth/auth.api', () => ({
   AuthApi: {
     client: {
-      getAppleNonce: jest.fn(),
+      getAppleNonce: vi.fn(),
     },
   },
 }));
 
-jest.mock('@/api/user/user.api', () => ({
+vi.mock('@/api/user/user.api', () => ({
   UserApi: {
-    sendDeviceInfo: jest.fn(),
+    sendDeviceInfo: vi.fn(),
   },
 }));
 
-jest.mock('@/lib/kakao/kakaoSDK', () => ({
-  loadKakaoSDK: jest.fn(),
+vi.mock('@/lib/kakao/kakaoSDK', () => ({
+  loadKakaoSDK: vi.fn(),
 }));
 
-jest.mock('@/lib/auth/session-store', () => ({
-  loginAuthSession: jest.fn(),
+vi.mock('@/lib/auth/session-store', () => ({
+  loginAuthSession: vi.fn(),
 }));
 
-jest.mock('@/utils/analytics/ga4', () => ({
-  trackGA4Event: jest.fn(),
+vi.mock('@/utils/analytics/ga4', () => ({
+  trackGA4Event: vi.fn(),
 }));
 
-jest.mock('@/utils/loginTrigger', () => ({
-  consumeLoginTrigger: jest.fn(),
+vi.mock('@/utils/loginTrigger', () => ({
+  consumeLoginTrigger: vi.fn(),
 }));
 
 const loginResult = (agreementRequired: boolean) => ({
@@ -58,30 +58,42 @@ const loginResult = (agreementRequired: boolean) => ({
   },
 });
 
+const prepareKakaoCallback = (returnTo: string) => {
+  const state = new URLSearchParams({ returnTo, nonce: 'test-nonce' });
+  const params = new URLSearchParams({
+    code: 'authorization-code',
+    state: state.toString(),
+  });
+  window.history.replaceState(null, '', `/oauth/kakao?${params.toString()}`);
+  document.cookie = 'bn_kakao_state=test-nonce; Path=/oauth/kakao';
+};
+
 describe('useSocialLogin', () => {
-  const routerReplace = jest.fn();
-  const loginAuthSessionMock = jest.mocked(loginAuthSession);
-  const loadKakaoSDKMock = jest.mocked(loadKakaoSDK);
-  const getAppleNonceMock = jest.mocked(AuthApi.client.getAppleNonce);
-  const sendDeviceInfoMock = jest.mocked(UserApi.sendDeviceInfo);
-  const consumeLoginTriggerMock = jest.mocked(consumeLoginTrigger);
+  const routerReplace = vi.fn();
+  const loginAuthSessionMock = vi.mocked(loginAuthSession);
+  const loadKakaoSDKMock = vi.mocked(loadKakaoSDK);
+  const getAppleNonceMock = vi.mocked(AuthApi.client.getAppleNonce);
+  const sendDeviceInfoMock = vi.mocked(UserApi.sendDeviceInfo);
+  const consumeLoginTriggerMock = vi.mocked(consumeLoginTrigger);
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     sessionStorage.clear();
+    window.history.replaceState(null, '', '/login');
+    document.cookie = 'bn_kakao_state=; Max-Age=0; Path=/oauth/kakao';
     DeviceService.setIsInApp(false);
     DeviceService.setDeviceToken('');
     DeviceService.setPlatform('');
     window.isInApp = false;
     window.FlutterMessageQueue = {
-      postMessage: jest.fn(),
+      postMessage: vi.fn(),
     };
     window.Kakao = {
       Auth: {
-        authorize: jest.fn(),
+        authorize: vi.fn(),
       },
     } as unknown as typeof window.Kakao;
-    (useRouter as jest.Mock).mockReturnValue({
+    (useRouter as Mock).mockReturnValue({
       replace: routerReplace,
     });
     consumeLoginTriggerMock.mockReturnValue(null);
@@ -90,11 +102,11 @@ describe('useSocialLogin', () => {
 
   it('웹 Kakao 로그인이 완료되면 authorization code로 로그인하고 returnTo로 이동한다', async () => {
     loginAuthSessionMock.mockResolvedValueOnce(loginResult(false));
-    setReturnToUrl('/explore');
+    prepareKakaoCallback('/explore');
     const { result } = renderHook(() => useSocialLogin());
 
     await act(async () => {
-      await result.current.completeKakaoWebLogin('authorization-code');
+      await result.current.handleKakaoCallback();
     });
 
     expect(loginAuthSessionMock).toHaveBeenCalledWith({
@@ -103,7 +115,6 @@ describe('useSocialLogin', () => {
     });
     expect(routerReplace).toHaveBeenCalledTimes(1);
     expect(routerReplace).toHaveBeenCalledWith('/explore');
-    expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBeNull();
   });
 
   it('필수 동의가 필요하면 agreements로 이동하고 returnTo를 유지한다', async () => {
@@ -128,7 +139,7 @@ describe('useSocialLogin', () => {
     DeviceService.setDeviceToken('device-token');
     DeviceService.setPlatform('ios');
     window.isInApp = true;
-    setReturnToUrl('/history');
+    window.history.replaceState(null, '', '/login?returnTo=%2Fhistory');
     const { result } = renderHook(() => useSocialLogin());
 
     await act(async () => {
@@ -144,27 +155,31 @@ describe('useSocialLogin', () => {
       platform: 'ios',
     });
     expect(routerReplace).toHaveBeenCalledTimes(1);
-    expect(routerReplace).toHaveBeenCalledWith(ROUTES.AGREEMENTS);
-    expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe('/history');
+    expect(routerReplace).toHaveBeenCalledWith(
+      `${ROUTES.AGREEMENTS}?returnTo=%2Fhistory`,
+    );
   });
 
   it('MBTI에서 약관 동의가 필요하면 결과 주소를 유지한다', async () => {
     loginAuthSessionMock.mockResolvedValueOnce(loginResult(true));
-    setReturnToUrl('/whiskey-mbti?result=INTJ-A');
+    prepareKakaoCallback('/whiskey-mbti?result=INTJ-A');
     const { result } = renderHook(() => useSocialLogin());
 
     await act(async () => {
-      await result.current.completeKakaoWebLogin('authorization-code');
+      await result.current.handleKakaoCallback();
     });
 
-    expect(routerReplace).toHaveBeenCalledWith(ROUTES.AGREEMENTS);
-    expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(
-      '/whiskey-mbti?result=INTJ-A',
+    expect(routerReplace).toHaveBeenCalledWith(
+      `${ROUTES.AGREEMENTS}?returnTo=%2Fwhiskey-mbti%3Fresult%3DINTJ-A`,
     );
   });
 
   it('MBTI 앱 로그인 오류는 첫 화면으로 돌아가고 실패 모달을 열지 않는다', () => {
-    setReturnToUrl('/whiskey-mbti?result=INTJ-A');
+    window.history.replaceState(
+      null,
+      '',
+      '/login?returnTo=%2Fwhiskey-mbti%3Fresult%3DINTJ-A&errorTo=%2Fwhiskey-mbti',
+    );
     const { result } = renderHook(() => useSocialLogin());
 
     act(() => {
@@ -172,7 +187,6 @@ describe('useSocialLogin', () => {
     });
 
     expect(routerReplace).toHaveBeenCalledWith('/whiskey-mbti');
-    expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBeNull();
   });
 
   it('브라우저에서 Kakao 로그인을 시작하면 SDK를 로드하고 authorize를 호출한다', async () => {
@@ -183,9 +197,12 @@ describe('useSocialLogin', () => {
     });
 
     expect(loadKakaoSDKMock).toHaveBeenCalledTimes(1);
-    expect(window.Kakao.Auth.authorize).toHaveBeenCalledWith({
-      redirectUri: `${process.env.NEXT_PUBLIC_CLIENT_URL}/oauth/kakao`,
-    });
+    expect(window.Kakao.Auth.authorize).toHaveBeenCalledWith(
+      expect.objectContaining({
+        redirectUri: `${process.env.NEXT_PUBLIC_CLIENT_URL}/oauth/kakao`,
+        state: expect.any(String),
+      }),
+    );
   });
 
   it('인앱에서 Kakao 로그인을 시작하면 Flutter에 로그인을 요청한다', async () => {
@@ -223,10 +240,11 @@ describe('useSocialLogin', () => {
   it('로그인이 완료되면 로그인 분석 이벤트를 기록한다', async () => {
     loginAuthSessionMock.mockResolvedValueOnce(loginResult(false));
     consumeLoginTriggerMock.mockReturnValueOnce('review_write');
+    prepareKakaoCallback('/');
     const { result } = renderHook(() => useSocialLogin());
 
     await act(async () => {
-      await result.current.completeKakaoWebLogin('authorization-code');
+      await result.current.handleKakaoCallback();
     });
 
     expect(trackGA4Event).toHaveBeenCalledWith('login', {

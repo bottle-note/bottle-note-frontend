@@ -1,3 +1,14 @@
+import {
+  describe,
+  it,
+  expect,
+  beforeEach,
+  afterEach,
+  beforeAll,
+  vi,
+  type Mock,
+  type MockInstance,
+} from 'vitest';
 import React, { PropsWithChildren } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
@@ -23,15 +34,14 @@ import { useSocialLogin } from '@/hooks/useSocialLogin';
 import OauthKakaoCallbackPage from '@/app/(custom)/oauth/kakao/page';
 import LoginPage from '@/app/(custom)/login/page';
 import { DeviceService } from '@/lib/DeviceService';
-import { setReturnToUrl } from '@/utils/loginRedirect';
 import SettingsPage from '@/app/(primary)/settings/page';
 import Modal from '@/components/ui/Modal/Modal';
 import { useSettingsStore } from '@/store/settingsStore';
 
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-  useSearchParams: jest.fn(),
-  usePathname: jest.fn(),
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
+  useSearchParams: vi.fn(),
+  usePathname: vi.fn(),
 }));
 
 const sessionPayload = {
@@ -71,22 +81,24 @@ function HomeRegressionHarness() {
 }
 
 describe('Auth business flows', () => {
-  const fetchMock = jest.fn();
-  let consoleErrorSpy: jest.SpyInstance;
-  const routerReplace = jest.fn();
-  const routerPush = jest.fn();
+  const fetchMock = vi.fn();
+  let consoleErrorSpy: MockInstance;
+  const routerReplace = vi.fn();
+  const routerPush = vi.fn();
 
   beforeAll(() => {
     global.fetch = fetchMock as typeof fetch;
   });
 
   beforeEach(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     fetchMock.mockReset();
     routerReplace.mockReset();
     routerPush.mockReset();
     resetAuthSessionForTest();
     sessionStorage.clear();
+    window.history.replaceState(null, '', '/login');
+    document.cookie = 'bn_kakao_state=; Max-Age=0; Path=/oauth/kakao';
     localStorage.clear();
     useSettingsStore.setState({ currentScreen: 'main' });
     DeviceService.setIsInApp(false);
@@ -95,30 +107,30 @@ describe('Auth business flows', () => {
     (window as typeof window & { isInApp?: boolean }).isInApp = false;
     Object.defineProperty(window, 'scrollTo', {
       writable: true,
-      value: jest.fn(),
+      value: vi.fn(),
     });
     document.body.innerHTML = '<div id="modal"></div>';
     (
       window as typeof window & {
-        FlutterMessageQueue?: { postMessage: jest.Mock };
-        LogToFlutter?: { postMessage: jest.Mock };
-        sendLogToFlutter?: jest.Mock;
+        FlutterMessageQueue?: { postMessage: Mock };
+        LogToFlutter?: { postMessage: Mock };
+        sendLogToFlutter?: Mock;
       }
     ).FlutterMessageQueue = {
-      postMessage: jest.fn(),
+      postMessage: vi.fn(),
     };
     (
       window as typeof window & {
-        LogToFlutter?: { postMessage: jest.Mock };
+        LogToFlutter?: { postMessage: Mock };
       }
     ).LogToFlutter = {
-      postMessage: jest.fn(),
+      postMessage: vi.fn(),
     };
     (
       window as typeof window & {
-        sendLogToFlutter?: jest.Mock;
+        sendLogToFlutter?: Mock;
       }
-    ).sendLogToFlutter = jest.fn();
+    ).sendLogToFlutter = vi.fn();
     useModalStore.setState({
       state: {
         isShowModal: false,
@@ -135,13 +147,13 @@ describe('Auth business flows', () => {
         isShowLoginModal: false,
       },
     });
-    (useRouter as jest.Mock).mockReturnValue({
+    (useRouter as Mock).mockReturnValue({
       replace: routerReplace,
       push: routerPush,
-      back: jest.fn(),
+      back: vi.fn(),
     });
-    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams());
-    (usePathname as jest.Mock).mockReturnValue('/login');
+    (useSearchParams as Mock).mockReturnValue(new URLSearchParams());
+    (usePathname as Mock).mockReturnValue('/login');
   });
 
   afterEach(() => {
@@ -267,7 +279,7 @@ describe('Auth business flows', () => {
 
     it('카카오 앱 로그인 성공 시 returnTo 경로로 이동한다', async () => {
       fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
-      setReturnToUrl('/explore');
+      window.history.replaceState(null, '', '/login?returnTo=%2Fexplore');
 
       const { result } = renderHook(() => useSocialLogin());
 
@@ -280,10 +292,20 @@ describe('Auth business flows', () => {
 
     it('카카오 웹 로그인 callback 페이지는 authorizationCode로 로그인 요청을 보낸다', async () => {
       fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
-      (useSearchParams as jest.Mock).mockReturnValue(
-        new URLSearchParams('code=oauth-code'),
+      const state = new URLSearchParams({
+        returnTo: '/history',
+        nonce: 'test-nonce',
+      });
+      const params = new URLSearchParams({
+        code: 'oauth-code',
+        state: state.toString(),
+      });
+      window.history.replaceState(
+        null,
+        '',
+        `/oauth/kakao?${params.toString()}`,
       );
-      setReturnToUrl('/history');
+      document.cookie = 'bn_kakao_state=test-nonce; Path=/oauth/kakao';
 
       render(React.createElement(OauthKakaoCallbackPage));
 
@@ -305,10 +327,20 @@ describe('Auth business flows', () => {
 
     it('카카오 웹 로그인 성공 시 returnTo 경로로 이동한다', async () => {
       fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
-      (useSearchParams as jest.Mock).mockReturnValue(
-        new URLSearchParams('code=oauth-code'),
+      const state = new URLSearchParams({
+        returnTo: '/history',
+        nonce: 'test-nonce',
+      });
+      const params = new URLSearchParams({
+        code: 'oauth-code',
+        state: state.toString(),
+      });
+      window.history.replaceState(
+        null,
+        '',
+        `/oauth/kakao?${params.toString()}`,
       );
-      setReturnToUrl('/history');
+      document.cookie = 'bn_kakao_state=test-nonce; Path=/oauth/kakao';
 
       render(React.createElement(OauthKakaoCallbackPage));
 
@@ -336,7 +368,7 @@ describe('Auth business flows', () => {
 
     it('애플 로그인 성공 시 returnTo 경로로 이동한다', async () => {
       fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
-      setReturnToUrl('/settings');
+      window.history.replaceState(null, '', '/login?returnTo=%2Fsettings');
 
       const { result } = renderHook(() => useSocialLogin());
 
@@ -542,7 +574,7 @@ describe('Auth business flows', () => {
       DeviceService.setDeviceToken('device-token');
       DeviceService.setPlatform('ios');
       (window as typeof window & { isInApp?: boolean }).isInApp = true;
-      setReturnToUrl('/explore');
+      window.history.replaceState(null, '', '/login?returnTo=%2Fexplore');
       fetchMock.mockResolvedValueOnce(
         createJsonResponse({
           errors: [],
@@ -568,7 +600,7 @@ describe('Auth business flows', () => {
 
     it('이미 로그인된 상태에서 /login 진입 시 returnTo 경로로 복귀한다', async () => {
       setAuthenticatedSession(sessionPayload);
-      setReturnToUrl('/explore');
+      window.history.replaceState(null, '', '/login?returnTo=%2Fexplore');
 
       render(React.createElement(LoginPage));
 
