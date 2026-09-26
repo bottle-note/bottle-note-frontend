@@ -210,14 +210,14 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
   };
 
   return (
-    <div className="p-5 min-h-screen">
+    <div className="p-20 min-h-screen">
       <form id="form" ref={formRef} onSubmit={(e) => e.preventDefault()}>
         <div className="relative flex">
           <input
             type="text"
             id="keyword"
             ref={keywordRef}
-            className="h-10 w-full rounded-lg border border-stroke-brand-solid bg-bg-layer-floating pl-4 pr-12 text-15 text-fg-brand placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
+            className="h-40 w-full rounded-lg border border-stroke-brand-solid bg-bg-layer-floating pl-16 pr-48 text-15 text-fg-brand placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
             placeholder="도로명 주소 혹은 상호명 입력"
             value={searchText}
             onChange={(e) => {
@@ -233,28 +233,28 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
                   keywordRef.current.value = '';
                 }
               }}
-              className="absolute right-11 top-1/2 transform -translate-y-1/2"
+              className="absolute right-44 top-1/2 transform -translate-y-1/2"
             >
               <CircleX
                 aria-label="검색어 삭제"
-                className="h-4 w-4 text-fg-neutral-muted"
+                className="h-16 w-16 text-fg-neutral-muted"
               />
             </button>
           )}
           <button
             type="submit"
-            className="px-2 w-10 absolute top-0 right-1 h-full"
+            className="px-8 w-40 absolute top-0 right-4 h-full"
           >
             <Image src={SearchIcon} alt="search" />
           </button>
         </div>
         {isOnSearch && (
-          <div className="h-full z-10 py-5">
+          <div className="h-full z-10 py-20">
             <RecentSearch handleSearch={onSearch} keyValue={searchHistoryKey} />
           </div>
         )}
       </form>
-      <ul id="placesList" className="my-5 overflow-auto h-dvh" />
+      <ul id="placesList" className="my-20 overflow-auto h-dvh" />
     </div>
   );
 }

@@ -15,22 +15,22 @@ export const FollowerListItem = ({ userInfo }: Props) => {
   return (
     <article
       key={userInfo.followUserId}
-      className="border-b border-brightGray py-3 flex justify-around"
+      className="border-b border-brightGray py-12 flex justify-around"
     >
       <Link
         className="grid grid-cols-[0.45fr_1fr]"
         href={ROUTES.USER.BASE(userInfo.userId)}
       >
         <ProfileImage profileImgSrc={userInfo.userProfileImage} size={36} />
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-4">
           <p className="text-12 font-bold">{userInfo.followUserNickname}</p>
-          <p className="text-10 text-brightGray font-semibold flex gap-2">
-            <span className="flex gap-1">
+          <p className="text-10 text-brightGray font-semibold flex gap-8">
+            <span className="flex gap-4">
               <Image src={CommentGray} alt="리뷰" width={12} height={12} />
               {`리뷰 ${userInfo.reviewCount}개`}
             </span>
             <span>|</span>
-            <span className="flex gap-1">
+            <span className="flex gap-4">
               <Image src={StarGray} alt="평가" width={13} height={13} />
               {`평가 ${userInfo.ratingCount}개`}
             </span>

@@ -8,9 +8,9 @@ export default function InquireForm() {
 
   return (
     <>
-      <article className="space-y-[10px]">
+      <article className="space-y-10">
         <label
-          className="block font-bold text-fg-neutral-muted text-13 mb-1"
+          className="block font-bold text-fg-neutral-muted text-13 mb-4"
           htmlFor="title"
         >
           문의 제목
@@ -19,14 +19,14 @@ export default function InquireForm() {
           id="title"
           type="text"
           placeholder=""
-          className="w-full h-9 bg-bg-layer-floating rounded-none px-3 text-14 text-fg-neutral outline-none focus:border focus:border-stroke-brand-solid"
+          className="w-full h-36 bg-bg-layer-floating rounded-none px-12 text-14 text-fg-neutral outline-none focus:border focus:border-stroke-brand-solid"
           {...register('title')}
         />
       </article>
 
-      <article className="space-y-[10px]">
+      <article className="space-y-10">
         <label
-          className="block font-bold text-fg-neutral-muted text-13 mb-1"
+          className="block font-bold text-fg-neutral-muted text-13 mb-4"
           htmlFor="contact"
         >
           <span className="font-bold">연락처 </span>
@@ -36,14 +36,14 @@ export default function InquireForm() {
           id="contact"
           type="text"
           placeholder=""
-          className="w-full h-9 bg-bg-layer-floating rounded-none px-3 text-14 text-fg-neutral outline-none focus:border focus:border-stroke-brand-solid"
+          className="w-full h-36 bg-bg-layer-floating rounded-none px-12 text-14 text-fg-neutral outline-none focus:border focus:border-stroke-brand-solid"
           {...register('contact')}
         />
       </article>
 
-      <article className="space-y-[10px]">
+      <article className="space-y-10">
         <label
-          className="block text-13 mb-1 text-fg-neutral-muted"
+          className="block text-13 mb-4 text-fg-neutral-muted"
           htmlFor="content"
         >
           <span className="font-bold">문의 내용 </span>
@@ -53,12 +53,12 @@ export default function InquireForm() {
           <textarea
             id="content"
             placeholder="문의 내용을 작성해주세요. (최소 10자)"
-            className="w-full h-56 bg-bg-layer-floating rounded-none px-3 py-3 pb-8 text-14 text-fg-neutral outline-none focus:border focus:border-stroke-brand-solid resize-none"
+            className="w-full h-224 bg-bg-layer-floating rounded-none px-12 py-12 pb-32 text-14 text-fg-neutral outline-none focus:border focus:border-stroke-brand-solid resize-none"
             minLength={10}
             maxLength={1000}
             {...register('content')}
           />
-          <div className="absolute bottom-[10px] right-[14px] text-fg-neutral-muted text-10">
+          <div className="absolute bottom-10 right-14 text-fg-neutral-muted text-10">
             ({watch('content')?.length} / 1000)
           </div>
         </div>

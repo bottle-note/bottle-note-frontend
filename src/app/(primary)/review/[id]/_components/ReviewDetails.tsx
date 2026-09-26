@@ -40,13 +40,13 @@ function ReviewDetails({
 
   return (
     <>
-      <section className="pt-[38px]">
-        <div className="mb-[10px]">
+      <section className="pt-38">
+        <div className="mb-10">
           <ReviewUserHeader data={data} onRefresh={onRefresh} />
         </div>
-        <section className="mx-5 border-b border-stroke-neutral-subtle pb-5">
+        <section className="mx-20 border-b border-stroke-neutral-subtle pb-20">
           {productImages?.length > 0 && (
-            <div className="mb-[22px]">
+            <div className="mb-22">
               <ReviewImageCarousel images={productImages} priority />
             </div>
           )}
@@ -56,7 +56,7 @@ function ReviewDetails({
               __html: data.reviewInfo?.reviewContent?.replace(/\n/g, '<br />'),
             }}
           />
-          <article className="flex items-center justify-between mt-[10px]">
+          <article className="flex items-center justify-between mt-10">
             {data.reviewInfo?.createAt && (
               <p className="text-13 text-fg-neutral-muted">
                 {formatDate(data.reviewInfo.createAt) as string}
@@ -68,7 +68,7 @@ function ReviewDetails({
             >
               <MoreVertical
                 aria-label="리뷰 메뉴"
-                className="h-[18px] w-[18px] text-fg-neutral-muted"
+                className="h-18 w-18 text-fg-neutral-muted"
               />
             </button>
           </article>
@@ -77,7 +77,7 @@ function ReviewDetails({
           data.reviewInfo.tastingTagList.length !== 0 && (
             <FlavorTags
               tagList={data.reviewInfo.tastingTagList}
-              styleClass="label-default py-[5px] px-[10px] rounded-md text-12"
+              styleClass="label-default py-5 px-10 rounded-md text-12"
             />
           )}
 

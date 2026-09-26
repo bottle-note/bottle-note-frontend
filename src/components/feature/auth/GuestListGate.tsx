@@ -68,7 +68,7 @@ export function GuestListGate({ title, description }: GuestListGateProps) {
 
   return (
     <>
-      <div ref={gateRef} aria-hidden="true" className="h-24" />
+      <div ref={gateRef} aria-hidden="true" className="h-96" />
       {isActive && (
         <>
           <div
@@ -80,7 +80,7 @@ export function GuestListGate({ title, description }: GuestListGateProps) {
             }}
           />
           <div
-            className="fixed-content pointer-events-none z-20 px-5 text-center transition-[bottom] duration-300"
+            className="fixed-content pointer-events-none z-20 px-20 text-center transition-[bottom] duration-300"
             style={{
               bottom: isNavbarVisible
                 ? 'calc(var(--navbar-total-space) + 16px)'
@@ -89,7 +89,7 @@ export function GuestListGate({ title, description }: GuestListGateProps) {
           >
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-x-0 -bottom-6 -top-16 -z-10"
+              className="pointer-events-none absolute inset-x-0 -bottom-24 -top-64 -z-10"
               style={{
                 background:
                   'linear-gradient(to bottom, transparent 0%, var(--color-bg-layer-default) 48px, var(--color-bg-layer-default) 100%)',

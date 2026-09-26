@@ -21,14 +21,14 @@ export default function ImporterFilter({
   return (
     <StickySearchBar
       testId="importer-search-bar"
-      containerClassName="-mx-5 px-5 pt-[5px]"
+      containerClassName="-mx-20 px-20 pt-5"
       isSearchActive={isSearchActive}
       onSearchActiveChange={onSearchActiveChange}
       onValueChange={onKeywordChange}
       value={keyword}
       ariaLabel="수입사 검색"
       placeholder="수입사명 검색"
-      inputClassName="pr-16"
+      inputClassName="pr-64"
       clearable
       renderActions={() => (
         <button
@@ -38,7 +38,7 @@ export default function ImporterFilter({
           className="rounded-sm text-fg-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring disabled:opacity-40"
           title="필터는 준비 중입니다"
         >
-          <ListFilter aria-hidden className="h-5 w-5" />
+          <ListFilter aria-hidden className="h-20 w-20" />
         </button>
       )}
     />

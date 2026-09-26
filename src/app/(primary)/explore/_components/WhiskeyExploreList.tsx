@@ -234,7 +234,7 @@ export const WhiskeyExplorerList = ({
         />
       )}
       {showInquireButton && (
-        <div className="pt-7 pb-20">
+        <div className="pt-28 pb-80">
           <PrimaryLinkButton
             data={{
               engName: 'NO RESULTS',

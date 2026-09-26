@@ -30,7 +30,7 @@ export default function HomeTabSection<T extends TabItem>({
   } = useTab({ tabList, scroll });
 
   return (
-    <article className="space-y-[30px]">
+    <article className="space-y-30">
       <Tab
         variant="bookmark"
         tabList={tabs}

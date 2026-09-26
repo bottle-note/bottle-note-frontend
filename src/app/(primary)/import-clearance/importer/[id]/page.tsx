@@ -130,7 +130,7 @@ export default function ImporterDetail() {
                 수입사
               </SubHeader.Center>
             </SubHeader>
-            <section className="space-y-2.5 px-5 pb-6 pt-1">
+            <section className="space-y-10 px-20 pb-24 pt-4">
               <SkeletonBase width={60} height={14} />
               <SkeletonBase width="70%" height={20} />
               <SkeletonBase width="100%" height={12} />
@@ -138,11 +138,11 @@ export default function ImporterDetail() {
           </div>
         </div>
 
-        <div className="mx-5 space-y-4 py-4">
+        <div className="mx-20 space-y-16 py-16">
           {Array.from({ length: 2 }).map((_, index) => (
             <section
               key={index}
-              className="space-y-3 border-b border-stroke-neutral-subtle py-4"
+              className="space-y-12 border-b border-stroke-neutral-subtle py-16"
             >
               <SkeletonBase width={80} height={14} />
               <SkeletonBase width="100%" height={12} />
@@ -213,7 +213,7 @@ export default function ImporterDetail() {
             수입사
           </SubHeader.Center>
         </SubHeader>
-        <section className="space-y-2.5 px-5 pb-6 pt-1 text-white dark:text-palette-oak-50">
+        <section className="space-y-10 px-20 pb-24 pt-4 text-white dark:text-palette-oak-50">
           <h1 className="whitespace-normal break-words text-20 font-bold">
             {importerName}
           </h1>
@@ -229,7 +229,7 @@ export default function ImporterDetail() {
         .map((section) => (
           <section
             key={section.title}
-            className="mx-5 space-y-3 border-b border-stroke-neutral-subtle py-4"
+            className="mx-20 space-y-12 border-b border-stroke-neutral-subtle py-16"
           >
             <h2 className="text-12 font-bold tracking-wide text-fg-neutral-subtle">
               {section.title}
@@ -240,7 +240,7 @@ export default function ImporterDetail() {
           </section>
         ))}
       {importer.description && (
-        <section className="mx-5 space-y-3 border-b border-stroke-neutral-subtle py-4">
+        <section className="mx-20 space-y-12 border-b border-stroke-neutral-subtle py-16">
           <h2 className="text-12 font-bold tracking-wide text-fg-neutral-subtle">
             수입사 소개
           </h2>
@@ -249,17 +249,17 @@ export default function ImporterDetail() {
           </p>
         </section>
       )}
-      <section className="mx-5 py-5">
-        <h2 className="pb-1 text-13 font-bold text-fg-neutral">
+      <section className="mx-20 py-20">
+        <h2 className="pb-4 text-13 font-bold text-fg-neutral">
           최근 수입 내역
         </h2>
         {isAlcoholsLoading ? (
-          <div className="space-y-3 py-3">
+          <div className="space-y-12 py-12">
             <SkeletonBase width="100%" height={12} />
             <SkeletonBase width="80%" height={12} />
           </div>
         ) : isAlcoholsError ? (
-          <div className="space-y-2 py-3 text-12 text-fg-neutral-muted">
+          <div className="space-y-8 py-12 text-12 text-fg-neutral-muted">
             <p>수입 내역을 불러오지 못했어요.</p>
             <button
               type="button"
@@ -274,14 +274,14 @@ export default function ImporterDetail() {
             <ImportClearanceCompactItem key={item.id} item={item} />
           ))
         ) : (
-          <p className="py-3 text-12 text-fg-neutral-muted">
+          <p className="py-12 text-12 text-fg-neutral-muted">
             등록된 수입 내역이 없어요.
           </p>
         )}
         {hasMoreRecentDeclarations && (
           <Link
             href={`${ROUTES.IMPORT_CLEARANCE.BASE}?keyword=${encodeURIComponent(importerName)}`}
-            className="mt-2 flex items-center justify-center gap-1 py-2 text-12 font-semibold text-fg-brand"
+            className="mt-8 flex items-center justify-center gap-4 py-8 text-12 font-semibold text-fg-brand"
           >
             전체 수입 내역 보기
             <ChevronRight size={14} aria-hidden />
@@ -292,11 +292,11 @@ export default function ImporterDetail() {
   );
 
   const contentSkeleton = (
-    <div className="mx-5 space-y-4 py-4">
+    <div className="mx-20 space-y-16 py-16">
       {Array.from({ length: 2 }).map((_, index) => (
         <section
           key={index}
-          className="space-y-3 border-b border-stroke-neutral-subtle py-4"
+          className="space-y-12 border-b border-stroke-neutral-subtle py-16"
         >
           <SkeletonBase width={80} height={14} />
           <SkeletonBase width="100%" height={12} />

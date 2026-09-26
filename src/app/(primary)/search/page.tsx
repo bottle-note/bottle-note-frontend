@@ -199,18 +199,18 @@ export default function Search() {
 
   return (
     <Suspense>
-      <main className="mb-24 w-full h-full">
+      <main className="mb-96 w-full h-full">
         {/* 고정 영역: SearchBar + (스크롤 시) CategorySelector */}
         <div className="fixed-content top-0 bg-white z-10">
           <SearchBarLink
-            className="px-5 pt-safe-header"
+            className="px-20 pt-safe-header"
             placeholder="어떤 술을 찾고 계신가요?"
             keyword={urlKeyword || undefined}
             onClear={() => router.replace('/search/input')}
           />
 
           {!showTab && (
-            <div className="px-5 pt-3 pb-3">
+            <div className="px-20 pt-12 pb-12">
               <CategorySelector
                 handleCategoryCallback={handleCategoryCallback}
               />
@@ -220,21 +220,21 @@ export default function Search() {
 
         {/* 스크롤 영역 */}
         <section
-          className="flex flex-col gap-7 pb-5"
+          className="flex flex-col gap-28 pb-20"
           style={{
             paddingTop:
               'calc(var(--header-height-with-safe) + var(--search-fixed-area-height))',
           }}
         >
           {showTab && (
-            <article className="space-y-4">
+            <article className="space-y-16">
               <Tab
                 variant="bookmark"
                 tabList={categoryList}
                 handleTab={handelCategory}
                 currentTab={categorySelectedTab}
               />
-              <div className="pl-5">
+              <div className="pl-20">
                 <CategorySelector
                   handleCategoryCallback={handleCategoryCallback}
                 />
@@ -250,9 +250,9 @@ export default function Search() {
                 handleTab={handelPopular}
                 currentTab={popularSelectedTab}
               />
-              <section className="px-5">
+              <section className="px-20">
                 {isFeaturedLoading ? (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-8">
                     {Array.from({ length: 5 }).map((_, index) => (
                       <ListItemSkeleton key={index} />
                     ))}
@@ -267,7 +267,7 @@ export default function Search() {
               </section>
             </>
           ) : (
-            <section className="px-5">
+            <section className="px-20">
               <List
                 isListFirstLoading={isFirstLoading}
                 isScrollLoading={isFetching}
@@ -302,7 +302,7 @@ export default function Search() {
                 )}
 
                 {isCurationSearch ? (
-                  <List.Section className="mt-4 divide-y divide-stroke-neutral-basement border-t border-stroke-neutral-basement">
+                  <List.Section className="mt-16 divide-y divide-stroke-neutral-basement border-t border-stroke-neutral-basement">
                     {curationAlcohols.map((item, index) => (
                       <TastingEventLineupItem
                         key={
@@ -338,7 +338,7 @@ export default function Search() {
           )}
 
           {!isEmptySearch && (
-            <div className="px-5">
+            <div className="px-20">
               <PrimaryLinkButton
                 data={{
                   engName: 'NO RESULTS',

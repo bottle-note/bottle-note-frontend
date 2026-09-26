@@ -1,4 +1,4 @@
-import Button from '@/components/ui/Button/Button';
+import Button, { buttonVariants } from '@/components/ui/Button/Button';
 
 /**
  * 이 컴포넌트를 렌더하는 화면의 스크롤 루트에는 반드시 이 클래스를 페어로
@@ -16,21 +16,19 @@ export function StickyBottomCta(props: StickyBottomCtaProps) {
 
   return (
     <div
-      className="fixed-content z-20 px-5"
+      className="fixed-content z-20 px-20"
       style={{ bottom: 'var(--navbar-margin-bottom)' }}
     >
-      {typeof props.href !== 'string' ? (
+      {typeof props.href !== 'string' || disabled ? (
         <Button btnName={label} onClick={props.onClick} disabled={disabled} />
       ) : (
         <a
           href={props.href}
           target="_blank"
           rel="noreferrer"
-          className="flex h-[52px] w-full items-center justify-center rounded-xl bg-bg-brand-solid active:bg-bg-brand-solid-pressed"
+          className={buttonVariants()}
         >
-          <span className="text-15 font-bold text-fg-brand-contrast">
-            {label}
-          </span>
+          {label}
         </a>
       )}
     </div>

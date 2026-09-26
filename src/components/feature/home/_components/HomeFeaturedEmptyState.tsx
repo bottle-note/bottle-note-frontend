@@ -13,7 +13,7 @@ export function HomeFeaturedEmptyState({ type }: Props) {
   const { emptyText } = HOME_FEATURED_CONFIG[type];
 
   return (
-    <div className="h-[225px] flex flex-col items-center justify-center">
+    <div className="h-225 flex flex-col items-center justify-center">
       <Image
         src="/icon/logo-subcoral.svg"
         alt="logo"
@@ -22,7 +22,7 @@ export function HomeFeaturedEmptyState({ type }: Props) {
         style={{ width: 30, height: 30 }}
         priority
       />
-      <p className="mt-5 text-15 text-fg-neutral-muted">{emptyText}</p>
+      <p className="mt-20 text-15 text-fg-neutral-muted">{emptyText}</p>
     </div>
   );
 }

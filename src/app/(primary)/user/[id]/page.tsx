@@ -79,10 +79,10 @@ export default function User({ params: { id } }: { params: { id: string } }) {
     <NavLayout>
       <main
         data-testid="user-profile-page"
-        className="mb-24 bg-bg-layer-default text-fg-neutral"
+        className="mb-96 bg-bg-layer-default text-fg-neutral"
       >
         <AutoHideLogoHeader />
-        <section className="bg-bg-layer-default px-5">
+        <section className="bg-bg-layer-default px-20">
           <section className="border-t border-stroke-brand-solid">
             <UserInfo
               profileImgSrc={userData?.imageUrl ?? null}
@@ -100,9 +100,9 @@ export default function User({ params: { id } }: { params: { id: string } }) {
             />
           </section>
         </section>
-        <section className="px-5 pt-8">
+        <section className="px-20 pt-32">
           <article>
-            <div className="mb-[26px]">
+            <div className="mb-26">
               <div className="font-semibold">
                 <p className="text-15 text-fg-brand">{historyTitle}</p>
                 <p className="text-10 text-fg-neutral-muted">

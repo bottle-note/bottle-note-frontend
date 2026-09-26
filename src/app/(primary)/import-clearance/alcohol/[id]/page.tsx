@@ -171,7 +171,7 @@ export default function ImportClearanceDetail() {
                 수입 정보
               </SubHeader.Center>
             </SubHeader>
-            <section className="space-y-2.5 px-5 pb-6 pt-1">
+            <section className="space-y-10 px-20 pb-24 pt-4">
               <SkeletonBase width={60} height={14} />
               <SkeletonBase width="70%" height={20} />
               <SkeletonBase width="100%" height={12} />
@@ -179,11 +179,11 @@ export default function ImportClearanceDetail() {
           </div>
         </div>
 
-        <div className="mx-5 space-y-4 py-4">
+        <div className="mx-20 space-y-16 py-16">
           {Array.from({ length: 2 }).map((_, index) => (
             <section
               key={index}
-              className="space-y-3 border-b border-stroke-neutral-subtle py-4"
+              className="space-y-12 border-b border-stroke-neutral-subtle py-16"
             >
               <SkeletonBase width={80} height={14} />
               <SkeletonBase width="100%" height={12} />
@@ -275,12 +275,12 @@ export default function ImportClearanceDetail() {
             수입 정보
           </SubHeader.Center>
         </SubHeader>
-        <section className="space-y-2.5 px-5 pb-6 pt-1 text-fg-neutral">
-          <div className="space-y-1.5">
+        <section className="space-y-10 px-20 pb-24 pt-4 text-fg-neutral">
+          <div className="space-y-6">
             {data.alcoholCategoryKo && (
               <Label
                 name={data.alcoholCategoryKo}
-                styleClass="label-default px-2 py-[0.15rem] text-10"
+                styleClass="label-default px-8 py-[2.4px] text-10"
               />
             )}
             <h1 className="whitespace-normal break-words text-20 font-bold">
@@ -315,7 +315,7 @@ export default function ImportClearanceDetail() {
       ) : null}
 
       {productionRows.length > 0 && (
-        <section className="mx-5 space-y-3 border-b border-stroke-neutral-subtle py-4">
+        <section className="mx-20 space-y-12 border-b border-stroke-neutral-subtle py-16">
           <p className="text-12 font-bold tracking-wide text-fg-neutral-subtle">
             제품 정보
           </p>
@@ -326,15 +326,15 @@ export default function ImportClearanceDetail() {
       )}
 
       {data.importer ? (
-        <section className="mx-5 py-4">
-          <p className="mb-2 text-12 font-bold tracking-wide text-fg-neutral-subtle">
+        <section className="mx-20 py-16">
+          <p className="mb-8 text-12 font-bold tracking-wide text-fg-neutral-subtle">
             수입사 정보
           </p>
           <Link
             href={ROUTES.IMPORT_CLEARANCE.IMPORTER(data.importer.id)}
-            className="block space-y-3 rounded-xl bg-bg-neutral-weak p-4"
+            className="block space-y-12 rounded-xl bg-bg-neutral-weak p-16"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-8">
               <Building2
                 size={16}
                 className="shrink-0 text-fg-neutral-subtle"
@@ -351,10 +351,10 @@ export default function ImportClearanceDetail() {
             </div>
             {(data.importer.representativeName ||
               data.importer.industryName) && (
-              <div className="flex items-start gap-2">
+              <div className="flex items-start gap-8">
                 <User
                   size={14}
-                  className="mt-0.5 shrink-0 text-fg-neutral-subtle"
+                  className="mt-2 shrink-0 text-fg-neutral-subtle"
                   aria-hidden
                 />
                 <p className="text-12 text-fg-neutral-muted">
@@ -369,10 +369,10 @@ export default function ImportClearanceDetail() {
               </div>
             )}
             {data.importer.primaryAddress && (
-              <div className="flex items-start gap-2">
+              <div className="flex items-start gap-8">
                 <MapPin
                   size={14}
-                  className="mt-0.5 shrink-0 text-fg-neutral-subtle"
+                  className="mt-2 shrink-0 text-fg-neutral-subtle"
                   aria-hidden
                 />
                 <p className="break-words text-12 text-fg-neutral-muted">
@@ -381,10 +381,10 @@ export default function ImportClearanceDetail() {
               </div>
             )}
             {data.importer.telephoneNo && (
-              <div className="flex items-start gap-2">
+              <div className="flex items-start gap-8">
                 <Phone
                   size={14}
-                  className="mt-0.5 shrink-0 text-fg-neutral-subtle"
+                  className="mt-2 shrink-0 text-fg-neutral-subtle"
                   aria-hidden
                 />
                 <p className="text-12 text-fg-neutral-muted">
@@ -396,7 +396,7 @@ export default function ImportClearanceDetail() {
         </section>
       ) : (
         data.importerBaseName && (
-          <section className="mx-5 border-b border-stroke-neutral-subtle py-4">
+          <section className="mx-20 border-b border-stroke-neutral-subtle py-16">
             <InfoRow
               icon={Building2}
               label="수입사"
@@ -407,7 +407,7 @@ export default function ImportClearanceDetail() {
       )}
 
       {customsRows.length > 0 && (
-        <section className="mx-5 space-y-3 border-b border-stroke-neutral-subtle py-4">
+        <section className="mx-20 space-y-12 border-b border-stroke-neutral-subtle py-16">
           <p className="text-12 font-bold tracking-wide text-fg-neutral-subtle">
             통관 내역
           </p>
@@ -418,8 +418,8 @@ export default function ImportClearanceDetail() {
       )}
 
       {others.length > 0 && (
-        <section className="mx-5 py-5">
-          <h2 className="pb-1 text-13 font-bold text-fg-neutral">
+        <section className="mx-20 py-20">
+          <h2 className="pb-4 text-13 font-bold text-fg-neutral">
             같은 위스키의 다른 수입 내역
           </h2>
           {others.map((item) => (
@@ -428,7 +428,7 @@ export default function ImportClearanceDetail() {
           {hasMoreOthers && alcoholNameForMatching && (
             <Link
               href={`${ROUTES.IMPORT_CLEARANCE.BASE}?keyword=${encodeURIComponent(alcoholNameForMatching)}`}
-              className="mt-2 flex items-center justify-center gap-1 py-2 text-12 font-semibold text-fg-brand"
+              className="mt-8 flex items-center justify-center gap-4 py-8 text-12 font-semibold text-fg-brand"
             >
               전체 수입 내역 보기
               <ChevronRight size={14} aria-hidden />
@@ -440,11 +440,11 @@ export default function ImportClearanceDetail() {
   );
 
   const contentSkeleton = (
-    <div className="mx-5 space-y-4 py-4">
+    <div className="mx-20 space-y-16 py-16">
       {Array.from({ length: 2 }).map((_, index) => (
         <section
           key={index}
-          className="space-y-3 border-b border-stroke-neutral-subtle py-4"
+          className="space-y-12 border-b border-stroke-neutral-subtle py-16"
         >
           <SkeletonBase width={80} height={14} />
           <SkeletonBase width="100%" height={12} />

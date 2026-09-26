@@ -62,13 +62,10 @@ function TimeLineItem(props: Props) {
   const dateTime = formatDate(date, 'MONTH_DATE_TIME') as TimeFormat;
 
   return (
-    <div
-      data-testid="timeline-item"
-      className="flex w-full items-start gap-2.5"
-    >
+    <div data-testid="timeline-item" className="flex w-full items-start gap-10">
       <div
         data-testid="timeline-date"
-        className="flex w-6 shrink-0 flex-col items-end text-fg-neutral-muted"
+        className="flex w-24 shrink-0 flex-col items-end text-fg-neutral-muted"
       >
         <p className="text-10 font-medium">{dateTime.date}</p>
         <p className="text-9 font-extralight">{dateTime.time}</p>
@@ -82,15 +79,12 @@ function TimeLineItem(props: Props) {
         style={{ width: 20, height: 20 }}
       />
       {isStart ? (
-        <div className="w-full max-w-[21rem] rounded-md bg-bg-brand-solid px-3 py-[0.65rem] text-12 font-bold text-fg-brand-contrast">
+        <div className="w-full max-w-336 rounded-md bg-bg-brand-solid px-12 py-[10.4px] text-12 font-bold text-fg-brand-contrast">
           보틀노트를 시작하신 날이에요.
         </div>
       ) : (
-        <Link
-          href={redirectUrl || '#'}
-          className="min-w-0 w-full max-w-[21rem]"
-        >
-          <div className="flex h-14 w-full justify-between rounded-md bg-bg-neutral-weak p-3">
+        <Link href={redirectUrl || '#'} className="min-w-0 w-full max-w-336">
+          <div className="flex h-56 w-full justify-between rounded-md bg-bg-neutral-weak p-12">
             <div>
               <p className="text-12 font-bold text-fg-neutral">
                 {truncStr(alcoholName, 23)}

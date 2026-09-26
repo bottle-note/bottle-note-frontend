@@ -40,15 +40,15 @@ const ListItemRating = ({ data }: Props) => {
   };
 
   return (
-    <article className="flex items-center space-x-2 text-mainBlack border-brightGray border-b h-[90px]">
+    <article className="flex items-center space-x-8 text-mainBlack border-brightGray border-b h-90">
       <Link href={ROUTES.SEARCH.ALL(alcoholId)}>
         <ItemImage src={imageUrl} alt="image" />
       </Link>
 
-      <section className="flex-1 space-y-1">
+      <section className="flex-1 space-y-4">
         <Link
           href={ROUTES.SEARCH.ALL(alcoholId)}
-          className="flex flex-col items-start justify-center space-y-1.5"
+          className="flex flex-col items-start justify-center space-y-6"
         >
           <ItemInfo
             korName={korName}
@@ -64,7 +64,7 @@ const ListItemRating = ({ data }: Props) => {
             outerHeightSize={36}
             outerWidthSize={34}
           />
-          <div className="space-x-1.5 flex items-end">
+          <div className="space-x-6 flex items-end">
             <AlcoholPickButton
               isPicked={isPicked}
               alcoholId={alcoholId}

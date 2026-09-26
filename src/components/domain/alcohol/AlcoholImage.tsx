@@ -19,10 +19,10 @@ interface Props {
 
 const AlcoholImage = ({
   imageUrl,
-  outerHeightClass = 'h-[171px]', // default height for the image of review
-  outerWidthClass = 'w-[99px]',
-  innerWidthClass = 'w-[70px]',
-  innerHeightClass = 'h-[141px]',
+  outerHeightClass = 'h-171', // default height for the image of review
+  outerWidthClass = 'w-99',
+  innerWidthClass = 'w-70',
+  innerHeightClass = 'h-141',
   bgColor = 'bg-palette-static-white',
   blendMode = '',
   rounded = 'rounded-lg',

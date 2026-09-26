@@ -236,7 +236,7 @@ function ReviewRegister() {
 
       <ReviewForm />
       <article
-        className={`sticky px-5 z-10 flex justify-center transition-opacity duration-200 ${
+        className={`sticky px-20 z-10 flex justify-center transition-opacity duration-200 ${
           isKeyboardVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'
         }`}
         style={{ bottom: 'var(--navbar-margin-bottom)' }}
@@ -244,7 +244,6 @@ function ReviewRegister() {
         <Button
           onClick={handleSubmitClick}
           btnName="리뷰 등록"
-          btnTextStyles="text-16 font-bold"
           disabled={isProcessing}
         />
       </article>

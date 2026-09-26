@@ -29,11 +29,11 @@ export function GuestLoginPrompt({
       </h2>
       <p
         id={descriptionId}
-        className="mt-2 text-13 font-medium text-fg-neutral-muted"
+        className="mt-8 text-13 font-medium text-fg-neutral-muted"
       >
         {description}
       </p>
-      <div className="pointer-events-auto mt-5">
+      <div className="pointer-events-auto mt-20">
         <Button btnName={buttonLabel} onClick={onLogin} />
       </div>
     </section>

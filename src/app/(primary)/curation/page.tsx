@@ -149,7 +149,7 @@ export default function CurationPage() {
           data: tastingEventsQuery.data,
           emptyMessage: '진행 중인 시음회가 없어요.',
           errorMessage: '시음회 정보를 불러오지 못했어요.',
-          skeletonHeight: 'h-[390px]',
+          skeletonHeight: 'h-390',
         };
       case CURATION_V2_SPEC_CODES.PROGRAM:
         return {
@@ -157,7 +157,7 @@ export default function CurationPage() {
           data: programsQuery.data,
           emptyMessage: '등록된 프로그램이 없어요.',
           errorMessage: '프로그램 정보를 불러오지 못했어요.',
-          skeletonHeight: 'h-[248px]',
+          skeletonHeight: 'h-248',
         };
       case CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY:
         return {
@@ -165,7 +165,7 @@ export default function CurationPage() {
           data: curationsQuery.data,
           emptyMessage: '등록된 큐레이션이 없어요.',
           errorMessage: '큐레이션 정보를 불러오지 못했어요.',
-          skeletonHeight: 'h-[157px]',
+          skeletonHeight: 'h-157',
         };
     }
   })();
@@ -226,7 +226,7 @@ export default function CurationPage() {
         >
           <StickySearchBar
             testId="curation-search-bar"
-            containerClassName="px-4 pb-7 pt-[5px]"
+            containerClassName="px-20 pb-28 pt-5"
             isSearchActive={isSearchActive}
             onSearchActiveChange={onSearchActiveChange}
             value={inputKeyword}
@@ -234,7 +234,7 @@ export default function CurationPage() {
             placeholder="키워드를 입력하세요"
             ariaLabel="큐레이션 검색"
             clearable
-            inputClassName="pr-16"
+            inputClassName="pr-64"
             renderActions={() => (
               <button
                 type="button"
@@ -242,7 +242,7 @@ export default function CurationPage() {
                 className="rounded-sm text-fg-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
                 onClick={() => setIsOpenSideFilter(true)}
               >
-                <ListFilter aria-hidden className="h-5 w-5" />
+                <ListFilter aria-hidden className="h-20 w-20" />
               </button>
             )}
           />
@@ -268,7 +268,7 @@ export default function CurationPage() {
           </SideFilterDrawer>
 
           {activeQuery.isLoading && (
-            <div className="space-y-7 px-5 pb-navbar">
+            <div className="space-y-28 px-20 pb-navbar">
               <div
                 className={`animate-pulse rounded-lg bg-bg-neutral-weak ${skeletonHeight}`}
               />
@@ -279,7 +279,7 @@ export default function CurationPage() {
           )}
 
           {activeQuery.error && (
-            <p className="px-5 pb-navbar text-13 font-medium text-fg-neutral-muted">
+            <p className="px-20 pb-navbar text-13 font-medium text-fg-neutral-muted">
               {errorMessage}
             </p>
           )}
@@ -289,7 +289,7 @@ export default function CurationPage() {
             (!activeData || activeData.length === 0) &&
             !isAuthLoading &&
             (isGuest || !activeQuery.hasNextPage) && (
-              <p className="px-5 pb-navbar text-13 font-medium text-fg-neutral-muted">
+              <p className="px-20 pb-navbar text-13 font-medium text-fg-neutral-muted">
                 {emptyMessage}
               </p>
             )}
@@ -300,9 +300,9 @@ export default function CurationPage() {
             activeData &&
             activeData.length === 0 &&
             activeQuery.hasNextPage && (
-              <div className="px-5 pb-navbar">
-                <div ref={activeQuery.targetRef} className="h-1" />
-                <p className="py-2 text-center text-12 font-medium text-fg-neutral-muted">
+              <div className="px-20 pb-navbar">
+                <div ref={activeQuery.targetRef} className="h-4" />
+                <p className="py-8 text-center text-12 font-medium text-fg-neutral-muted">
                   불러오는 중...
                 </p>
               </div>
@@ -313,7 +313,7 @@ export default function CurationPage() {
             activeData &&
             activeData.length > 0 && (
               <div
-                className={`space-y-7 px-5 ${shouldGateGuestFeed ? 'pb-0' : 'pb-navbar'}`}
+                className={`space-y-28 px-20 ${shouldGateGuestFeed ? 'pb-0' : 'pb-navbar'}`}
               >
                 {activeData && activeData.length > 0 && renderFeedItems()}
                 {shouldGateGuestFeed && (
@@ -324,10 +324,10 @@ export default function CurationPage() {
                   />
                 )}
                 {activeQuery.hasNextPage && isLoggedIn && (
-                  <div ref={activeQuery.targetRef} className="h-1" />
+                  <div ref={activeQuery.targetRef} className="h-4" />
                 )}
                 {activeQuery.isFetchingNextPage && isLoggedIn && (
-                  <p className="py-2 text-center text-12 font-medium text-fg-neutral-muted">
+                  <p className="py-8 text-center text-12 font-medium text-fg-neutral-muted">
                     불러오는 중...
                   </p>
                 )}

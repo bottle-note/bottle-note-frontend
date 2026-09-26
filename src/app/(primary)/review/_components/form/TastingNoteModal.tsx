@@ -96,11 +96,11 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
         >
           {/* 헤더 */}
-          <header className="flex items-center justify-between border-b border-stroke-neutral-basement px-5 py-3 pt-safe-header">
+          <header className="flex items-center justify-between border-b border-stroke-neutral-basement px-20 py-12 pt-safe-header">
             <button
               type="button"
               onClick={handleClose}
-              className="flex items-center gap-1 text-14 text-fg-neutral-muted"
+              className="flex items-center gap-4 text-14 text-fg-neutral-muted"
             >
               <Image
                 src="/icon/arrow-left-subcoral.svg"
@@ -120,10 +120,10 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
           </header>
 
           {/* 콘텐츠 */}
-          <div className="flex-1 overflow-y-auto px-5 pb-safe">
+          <div className="flex-1 overflow-y-auto px-20 pb-safe">
             {/* 안내 텍스트 */}
             <motion.div
-              className="pt-5 pb-2 text-center"
+              className="pt-20 pb-8 text-center"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
@@ -131,19 +131,19 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
               <p className="text-14 font-medium text-fg-neutral">
                 이 위스키에서 느낀 풍미를 기록해보세요
               </p>
-              <p className="mt-1 text-12 text-fg-neutral-muted">
+              <p className="mt-4 text-12 text-fg-neutral-muted">
                 차트를 터치하거나 원을 드래그해서 조절하세요
               </p>
             </motion.div>
 
             {/* 레이더 차트 */}
             <motion.div
-              className="flex justify-center py-4"
+              className="flex justify-center py-16"
               initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2, type: 'spring', damping: 20 }}
             >
-              <div className="w-[280px] h-[280px]">
+              <div className="w-280 h-280">
                 <TastingRadarChart
                   values={tastingNote}
                   size={280}
@@ -154,7 +154,7 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
             </motion.div>
 
             {/* 슬라이더 컨트롤들 */}
-            <div className="flex flex-col gap-2.5 mt-2">
+            <div className="flex flex-col gap-10 mt-8">
               {TASTING_AXES.map((axis, i) => (
                 <motion.div
                   key={axis.key}
@@ -175,7 +175,7 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
             </div>
 
             {/* 초기화 버튼 */}
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center mt-24">
               <button
                 type="button"
                 onClick={handleReset}

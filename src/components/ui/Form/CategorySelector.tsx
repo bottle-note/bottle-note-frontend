@@ -61,7 +61,7 @@ function CategorySelector({ handleCategoryCallback, selectedCategory }: Props) {
 
   return (
     <article
-      className="whitespace-nowrap overflow-x-auto flex space-x-1.5 scrollbar-hide pr-5"
+      className="whitespace-nowrap overflow-x-auto flex space-x-6 scrollbar-hide pr-20"
       ref={scrollContainerRef}
     >
       {categoryList.map((category) => {
@@ -71,7 +71,7 @@ function CategorySelector({ handleCategoryCallback, selectedCategory }: Props) {
             ref={registerTab(category.id)}
             key={category.id}
             className={clsx(
-              'px-2.5 py-1',
+              'px-10 py-4',
               isSelected ? 'label-selected' : 'label-default',
             )}
             onClick={() => handleCategory(category)}

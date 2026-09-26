@@ -24,14 +24,14 @@ const HistoryOverview = ({ rates, reviews, likes, id }: Props) => {
   ];
 
   return (
-    <article className="grid grid-cols-3 divide-x divide-stroke-neutral-weak border-t border-stroke-brand-solid pt-[22px] text-fg-neutral">
+    <article className="grid grid-cols-3 divide-x divide-stroke-neutral-weak border-t border-stroke-brand-solid pt-22 text-fg-neutral">
       {HISTORY_OVERVIEW.map((item) => (
         <button
           className="flex justify-center items-center"
           onClick={() => router.push(item.link)}
           key={item.name}
         >
-          <p className="flex flex-col items-center px-8.5" key={item.name}>
+          <p className="flex flex-col items-center px-34" key={item.name}>
             <span className="text-27 font-extrabold text-fg-brand">
               {item.value}
             </span>

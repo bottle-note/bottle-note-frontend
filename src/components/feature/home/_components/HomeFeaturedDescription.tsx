@@ -15,10 +15,10 @@ export function HomeFeaturedDescription({ type, nickname }: Props) {
 
   return (
     <>
-      <p className="pb-[10px] text-13 font-extrabold text-fg-brand-primary">
+      <p className="pb-10 text-13 font-extrabold text-fg-brand-primary">
         {config.titleLabel}
       </p>
-      <div className="text-20 font-bold space-y-[2px] pb-5">
+      <div className="text-20 font-bold space-y-2 pb-20">
         <p>{line1}</p>
         <p>{config.titleText[1]}</p>
       </div>

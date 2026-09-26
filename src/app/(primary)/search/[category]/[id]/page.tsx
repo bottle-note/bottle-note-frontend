@@ -215,7 +215,7 @@ export default function SearchAlcohol() {
   const getRatingMessage = (myAvgRating: number, myRating: number) => {
     if (myAvgRating !== 0 && myRating !== 0)
       return (
-        <div className="space-y-2 text-center text-12 text-fg-neutral">
+        <div className="space-y-8 text-center text-12 text-fg-neutral">
           <div>
             <p>{`${userNickName}`}님의</p>
             <p>
@@ -311,7 +311,7 @@ export default function SearchAlcohol() {
   const alcoholMetadataAndTags = (
     <>
       {description && (
-        <section className="mx-5 flex flex-col gap-2 border-y border-stroke-neutral-subtle py-3">
+        <section className="mx-20 flex flex-col gap-8 border-y border-stroke-neutral-subtle py-12">
           <h2 className="text-16 font-bold text-fg-neutral">위스키 소개</h2>
           <AnimatedCollapse
             isOpen={isDescriptionExpanded}
@@ -320,7 +320,7 @@ export default function SearchAlcohol() {
           >
             <p
               ref={descriptionRef}
-              className={`whitespace-pre-line text-13 font-normal leading-[22px] text-fg-neutral-muted ${
+              className={`whitespace-pre-line text-13 font-normal leading-22 text-fg-neutral-muted ${
                 isDescriptionClamped ? 'line-clamp-3' : ''
               }`}
             >
@@ -334,12 +334,12 @@ export default function SearchAlcohol() {
               if (!isDescriptionExpanded) setIsDescriptionClamped(false);
               setIsDescriptionExpanded((prev) => !prev);
             }}
-            className="inline-flex items-center gap-1 self-end text-12 font-medium text-fg-neutral-subtle"
+            className="inline-flex items-center gap-4 self-end text-12 font-medium text-fg-neutral-subtle"
           >
             {isDescriptionExpanded ? '접기' : '더보기'}
             <ChevronDown
               aria-hidden
-              className={`h-3.5 w-3.5 transition-transform ${
+              className={`h-14 w-14 transition-transform ${
                 isDescriptionExpanded ? 'rotate-180' : ''
               }`}
             />
@@ -347,14 +347,14 @@ export default function SearchAlcohol() {
         </section>
       )}
       <section
-        className={`mx-5 py-4 ${
+        className={`mx-20 py-16 ${
           description ? '' : 'border-t border-stroke-neutral-subtle'
         } ${hasFlavorTags || hasImportInfo ? 'border-b' : ''}`}
       >
-        <div className="grid gap-1.5">
+        <div className="grid gap-6">
           {alcoholDetails.map((item: DetailItem) => (
-            <div key={item.content} className="flex items-start gap-2 text-12">
-              <div className="min-w-14 font-semibold text-fg-neutral-muted">
+            <div key={item.content} className="flex items-start gap-8 text-12">
+              <div className="min-w-56 font-semibold text-fg-neutral-muted">
                 {item.title}
               </div>
               <div className="flex-1 break-words font-normal text-fg-neutral">
@@ -381,21 +381,21 @@ export default function SearchAlcohol() {
 
   const friendsRating =
     data?.friendsInfo && data.friendsInfo.followerCount !== 0 ? (
-      <section className="mx-5 space-y-2 border-b border-stroke-neutral-subtle py-5">
-        <div className="flex items-end space-x-1 text-13 text-fg-neutral">
+      <section className="mx-20 space-y-8 border-b border-stroke-neutral-subtle py-20">
+        <div className="flex items-end space-x-4 text-13 text-fg-neutral">
           <div>마셔본 친구</div>
           <div className="font-extralight">
             {data.friendsInfo.followerCount}
           </div>
         </div>
-        <div className="whitespace-nowrap overflow-x-auto flex space-x-5 scrollbar-hide">
+        <div className="whitespace-nowrap overflow-x-auto flex space-x-20 scrollbar-hide">
           {data.friendsInfo.friends?.map((user) => (
             <div
               key={user.userId}
-              className="flex-shrink-0 flex flex-col items-center space-y-1"
+              className="flex-shrink-0 flex flex-col items-center space-y-4"
             >
               <Link href={ROUTES.USER.BASE(user.userId)}>
-                <div className="h-14 w-14 overflow-hidden rounded-full border border-stroke-neutral-basement">
+                <div className="h-56 w-56 overflow-hidden rounded-full border border-stroke-neutral-basement">
                   <Image
                     className="object-cover"
                     src={user.userImageUrl ?? ProfileDefaultImg}
@@ -470,10 +470,10 @@ export default function SearchAlcohol() {
               className={
                 isGuest
                   ? 'grid min-h-0 grid-rows-[auto_minmax(min-content,1fr)]'
-                  : 'mb-5'
+                  : 'mb-20'
               }
             >
-              <article className="grid place-items-center space-y-2 py-4">
+              <article className="grid place-items-center space-y-8 py-16">
                 {getRatingMessage(
                   data?.alcohols?.myAvgRating,
                   data?.alcohols?.myRating,
@@ -506,12 +506,12 @@ export default function SearchAlcohol() {
             </div>
             {!isGuest && (
               <>
-                <div className="h-4 bg-bg-layer-basement" />
+                <div className="h-16 bg-bg-layer-basement" />
                 {reviewList.length > 0 ? (
                   <>
-                    <section id="reviews" className="mx-5 pt-[34px] pb-[20px]">
+                    <section id="reviews" className="mx-20 pt-34 pb-20">
                       {typeof reviewTotalCount === 'number' && (
-                        <div className="mb-[10px]">
+                        <div className="mb-10">
                           <List.Total total={reviewTotalCount} />
                         </div>
                       )}
@@ -525,7 +525,7 @@ export default function SearchAlcohol() {
                         </React.Fragment>
                       ))}
                     </section>
-                    <section className="mx-5 mb-24">
+                    <section className="mx-20 mb-96">
                       <PrimaryLinkButton
                         data={{
                           engName: 'MORE COMMENTS',
@@ -550,7 +550,7 @@ export default function SearchAlcohol() {
                     </section>
                   </>
                 ) : (
-                  <section className="py-5">
+                  <section className="py-20">
                     <EmptyView text="아직 리뷰가 없어요!" />
                   </section>
                 )}

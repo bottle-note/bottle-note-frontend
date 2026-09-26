@@ -31,16 +31,16 @@ const ListItem = ({ data }: Props) => {
   const [isPicked, setIsPicked] = useState(initialIsPicked);
 
   return (
-    <section className="flex items-center text-mainBlack border-brightGray border-b py-1">
+    <section className="flex items-center text-mainBlack border-brightGray border-b py-4">
       {/* image */}
-      <Link href={ROUTES.SEARCH.ALL(alcoholId)} className="mr-3 shrink-0">
+      <Link href={ROUTES.SEARCH.ALL(alcoholId)} className="mr-12 shrink-0">
         <ItemImage src={imageUrl} alt="image" />
       </Link>
 
       {/* info */}
       <Link
         href={ROUTES.SEARCH.ALL(alcoholId)}
-        className="flex-1 flex flex-col items-start justify-center space-y-1.5 pr-2"
+        className="flex-1 flex flex-col items-start justify-center space-y-6 pr-8"
       >
         <ItemInfo
           korName={korName}
@@ -49,24 +49,24 @@ const ListItem = ({ data }: Props) => {
         />
       </Link>
 
-      <article className="ml-auto  pr-1 flex flex-col items-end">
+      <article className="ml-auto  pr-4 flex flex-col items-end">
         {/* rating */}
         <Star rating={rating} />
         {/* count */}
-        <p className="flex text-10 mt-1.5">
+        <p className="flex text-10 mt-6">
           (
           <>
             <Image
               src={RatingCountIcon}
               alt="평가 참여자 수"
-              className="pb-[2px]"
+              className="pb-2"
             />
             <span>{ratingCount ?? 0}</span>
           </>
           )
         </p>
 
-        <div className="flex justify-end mt-3">
+        <div className="flex justify-end mt-12">
           <AlcoholPickButton
             isPicked={isPicked}
             alcoholId={alcoholId}

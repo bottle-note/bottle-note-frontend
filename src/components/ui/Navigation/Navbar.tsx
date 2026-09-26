@@ -118,7 +118,7 @@ function Navbar({
     <nav
       aria-hidden={!shouldShowNavbar}
       className={cn(
-        `scroll-navigation-motion fixed left-0 right-0 mx-auto w-full px-4 z-10 transition-transform`,
+        `scroll-navigation-motion fixed left-0 right-0 mx-auto w-full px-16 z-10 transition-transform`,
         shouldShowNavbar
           ? 'translate-y-0'
           : 'pointer-events-none translate-y-[calc(100%+var(--navbar-margin-bottom))]',
@@ -126,18 +126,18 @@ function Navbar({
       )}
       style={{ bottom: 'var(--navbar-margin-bottom)' }}
     >
-      <section className="h-[70px] flex justify-between bg-bg-layer-floating text-fg-neutral py-4 px-[26px] rounded-[13px] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
+      <section className="h-70 flex justify-between bg-bg-layer-floating text-fg-neutral py-16 px-26 rounded-[13px] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
         {navItems.map((menu, index) => (
           <React.Fragment key={menu.link}>
             <button
-              className={`flex flex-col items-center space-y-1 ${isMounted && !isActive(menu.link) ? 'opacity-40' : ''}`}
+              className={`flex flex-col items-center space-y-4 ${isMounted && !isActive(menu.link) ? 'opacity-40' : ''}`}
               tabIndex={shouldShowNavbar ? undefined : -1}
               onClick={() => handleNavigation(menu)}
               onTouchEnd={() =>
                 handleWebViewMessage('triggerHaptic', { type: 'light' })
               }
             >
-              <div className="flex flex-col items-center justify-center space-y-[2px]">
+              <div className="flex flex-col items-center justify-center space-y-2">
                 <Image
                   src={menu.icon}
                   alt={menu.name}

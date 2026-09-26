@@ -165,7 +165,7 @@ export default function History() {
       </SubHeader>
       <main>
         <SearchBarLink
-          className="px-5"
+          className="px-20"
           placeholder="위스키 이름 검색"
           keyword={urlKeyword}
           returnUrl={urlKeyword ? `/history?keyword=${urlKeyword}` : '/history'}

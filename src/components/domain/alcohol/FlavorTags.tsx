@@ -10,17 +10,17 @@ interface Props {
 
 function FlavorTags({
   tagList,
-  styleClass = 'label-default px-[10px] py-[5px] rounded-md text-12',
+  styleClass = 'label-default px-10 py-5 rounded-md text-12',
   showBottomBorder = true,
 }: Props) {
   return (
     <section
-      className={`mx-5 space-y-[10px] py-[20px] ${
+      className={`mx-20 space-y-10 py-20 ${
         showBottomBorder ? 'border-b border-stroke-neutral-subtle' : ''
       }`}
     >
       <div className="text-11 font-bold text-fg-neutral">FLAVOR TAG</div>
-      <div className="flex flex-wrap gap-1">
+      <div className="flex flex-wrap gap-4">
         {tagList.map((tag) => (
           <div key={tag} className="overflow-hidden flex-shrink-0">
             <Label name={tag} styleClass={styleClass} />

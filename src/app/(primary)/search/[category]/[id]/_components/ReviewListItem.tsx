@@ -49,7 +49,7 @@ function ReviewListItem({ data, onRefresh }: Props) {
 
   return (
     <>
-      <div className="space-y-[10px] border-b border-stroke-neutral-subtle py-[35px]">
+      <div className="space-y-10 border-b border-stroke-neutral-subtle py-35">
         <ReviewListUserInfo
           userInfo={data.userInfo}
           rating={data.rating}
@@ -58,7 +58,7 @@ function ReviewListItem({ data, onRefresh }: Props) {
           userImageSize={22}
           userNameSize="text-12"
           starSize={22}
-          starTextStyle="min-w-5 text-20 font-semibold text-fg-rating"
+          starTextStyle="min-w-20 text-20 font-semibold text-fg-rating"
         />
         {isUserBlocked(String(data.userInfo.userId)) ? (
           <div className="flex items-center justify-between text-fg-neutral-muted">
@@ -77,7 +77,7 @@ function ReviewListItem({ data, onRefresh }: Props) {
           </div>
         ) : (
           <>
-            <div className="flex items-center space-x-1 text-13">
+            <div className="flex items-center space-x-4 text-13">
               <SemanticIcon
                 src={priceIconSrc}
                 width={23}
@@ -100,7 +100,7 @@ function ReviewListItem({ data, onRefresh }: Props) {
                 }}
                 prefetch={false}
               >
-                <div className="flex space-x-2">
+                <div className="flex space-x-8">
                   <div className="flex-1 min-w-0">
                     <p className="break-words text-13.5 text-fg-neutral">
                       {truncStr(data.reviewContent, 135)}
@@ -112,7 +112,7 @@ function ReviewListItem({ data, onRefresh }: Props) {
                   {data.reviewImageUrl && (
                     <div className="flex-shrink-0 bg-palette-static-white">
                       <Image
-                        className="w-[68px] h-[68px] bg-palette-static-white object-cover"
+                        className="w-68 h-68 bg-palette-static-white object-cover"
                         src={data.reviewImageUrl}
                         alt="content_img"
                         width={68}

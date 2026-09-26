@@ -1,430 +1,141 @@
-# BottleNote Frontend Design Guide
+# Bottle Note 디자인 기준
 
-이 문서는 Figma 디자인을 BottleNote Frontend 코드로 옮길 때의 기준이다. 현재 코드베이스의 `tailwind.config.ts`, `src/style/globals.css`, 기존 UI 컴포넌트 사용례를 기준으로 작성했다.
+신규 화면이 기존 보틀노트와 같은 제품으로 이어지게 하는 디자인 기준이다. 구현·테스트는 [AGENTS.md](AGENTS.md)를 따른다.
 
-## 1. 원칙
+## Overview
 
-- UI 작업 전 이 문서와 대상 화면의 기존 컴포넌트를 먼저 확인한다.
-- Figma의 hex 값을 그대로 하드코딩하지 않고, 가능한 Tailwind 토큰 또는 CSS 변수로 치환한다.
-- 새 컴포넌트를 만들기 전 `src/components/ui`, `src/components/feature`, 해당 route의 `_components` 재사용 가능성을 확인한다.
-- 모바일 WebView 중심으로 구현한다. safe-area, 고정 헤더, 하단 네비게이션 공간을 고려한다.
-- 신규 패키지는 승인 전 설치하지 않는다.
+보틀노트는 주류를 탐색하고 별점·리뷰로 취향을 기록하는 모바일 제품이다. 주류 사진과 사용자의 기록이 중심이며, 따뜻하고 차분한 톤을 유지한다. 코랄은 브랜드와 행동을 드러내고, 본문과 넓은 표면은 중립색으로 받친다.
 
-## 2. 코드베이스 기준 토큰
+기존 화면과의 연결은 다음 표현을 기준으로 잡는다.
 
-### 2.1 Color
+- **탐색:** 병 이미지, 한글 주명과 영문 보조명, 별점이 반복되는 정보 중심 목록.
+- **큐레이션:** 이미지와 제목이 중심인 커버 카드. 상세 정보까지 같은 커버 형태로 감싸지 않는다.
+- **마이보틀:** 사용자가 쌓은 별점·리뷰·찜 기록이 중심인 구성.
+- **리뷰 작성:** 주류 식별, 별점, 리뷰, 풍미 기록을 연결하고 코랄 제출 버튼으로 마무리하는 구성.
 
-색상은 `Palette → Semantic role → Component`의 세 단계로 관리한다.
+새 화면은 가장 가까운 제품 흐름의 제목·정렬·이미지·행동 표현을 이어받는다. 화면 전용 높이와 패딩까지 다른 용도의 표준으로 복사하지 않는다.
 
-- Palette는 색상 값 자체만 나타낸다. 테마나 사용 목적을 담지 않는다.
-- Semantic role은 `fg`, `bg`, `stroke`처럼 UI에서 맡는 역할을 나타낸다.
-- Component token은 꼭 필요한 컴포넌트 상태에만 둔다.
+## Colors
 
-Palette 원본 값은 `src/style/tokens/colors.css`, Semantic role은 `src/style/tokens/semantic-colors.css`에서 관리한다. `tailwind.config.ts`는 해당 CSS 변수를 Tailwind class로 연결만 한다. Palette를 화면에 직접 사용하는 것은 토큰 작업이나 예외적인 장식 표현으로 제한하고, 일반 화면은 Semantic role을 사용한다.
+밝은 테마는 흰색·중립 회색 표면에 코랄을, 어두운 테마는 오크 계열의 짙은 갈색 표면에 코랄을 사용한다. 다크 테마를 임의의 검정·차가운 회색 팔레트로 새로 만들지 않는다. 실제 색상은 [의미별 토큰](src/style/tokens/semantic-colors.css)을 따른다.
 
-#### Primitive palette
+| 사용처                        | 토큰                                                           |
+| ----------------------------- | -------------------------------------------------------------- |
+| 본문 / 보조 설명              | `fg-neutral` / `fg-neutral-muted`                              |
+| 브랜드 / 별점                 | `fg-brand` / `fg-rating`                                       |
+| 화면 / 떠 있는 표면 / 앱 바깥 | `bg-layer-default` / `bg-layer-floating` / `bg-layer-basement` |
+| 주요 버튼 배경 / 글자         | `bg-brand-solid` / `palette-static-white`                      |
+| 보조 버튼 테두리·글자         | `stroke-brand-solid` / `fg-brand`                              |
+| 입력 경계 / 포커스            | `stroke-neutral-weak` / `stroke-focus-ring`                    |
 
-| Group   | Token / Hex                                                                                                                                                                                                                                            |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Neutral | `neutral-0` `#FFFFFF`, `neutral-50` `#F7F7F7`, `neutral-200` `#E6E6DD`, `neutral-500` `#C6C6C6`, `neutral-600` `#BFBFBF`, `neutral-700` `#6F6F6F`, `neutral-800` `#666666`, `neutral-900` `#2B2B2B`, `neutral-950` `#252525`, `neutral-1000` `#101010` |
-| Oak     | `oak-50` `#F5EFE5`, `oak-200` `#C9BCA9`, `oak-500` `#8D7E6A`, `oak-600` `#75624B`, `oak-800` `#3B3228`, `oak-900` `#27211A`, `oak-950` `#1A1612`, `oak-1000` `#100E0C`                                                                                 |
-| Coral   | `coral-50` `#FFF0E9`, `coral-300` `#F2AD8D`, `coral-400` `#EF9A6E`, `coral-500` `#E99670`, `coral-600` `#E58257`, `coral-700` `#B15025`, `coral-900` `#38261B`, `coral-1000` `#1E1209`                                                                 |
-| Amber   | `amber-500` `#D9A45B`, `amber-700` `#956523`                                                                                                                                                                                                           |
-| Static  | `static-white` `#FFFFFF`, `static-black` `#000000`, `static-transparent`                                                                                                                                                                               |
+사용 시 글자는 `text-`, 배경은 `bg-`, 경계는 `border-`, 포커스 링은 `ring-`을 붙인다.
 
-Tailwind에서는 `bg-palette-coral-600`, `text-palette-oak-50`, `border-palette-neutral-600`처럼 사용한다. `/50` 같은 투명도 modifier와 `dark:bg-palette-oak-1000` 같은 dark variant도 지원한다.
+- 주요 버튼은 두 테마 모두 **코랄 배경·흰 글자**다. 보조 버튼은 기본 표면에 코랄 테두리와 글자를 쓴다. 코랄 채움은 핵심 행동에 제한한다.
+- 별점은 밝은 테마에서 코랄, 어두운 테마에서 앰버다. `fg-rating`을 브랜드색으로 대체하지 않는다.
+- 의미별 토큰에 임의 투명도를 붙여 새로운 강조색을 만들지 않는다. 로고·사진과 사진 위 표현은 테마와 독립적으로 유지할 수 있다.
 
-#### Semantic color roles
+## Typography
 
-Semantic role은 `.dark`에서 값이 자동으로 전환된다. 일반 화면에서는 `dark:` variant를 반복하지 않고 `text-fg-neutral`, `bg-bg-layer-default`, `border-stroke-neutral-subtle`처럼 역할 class 하나만 사용한다.
+- 화면과 입력창에 **SUIT**를 사용한다.
+- 제목의 크기·굵기는 페이지별 기존 값을 유지한다. 신규 화면은 유사한 화면의 제목 스타일을 참고하며, 모든 제목을 하나의 크기로 통일하지 않는다.
+- `text-N`은 Npx다. 1~100px 범위에서 0.5px 단위를 지원하며, 크기별 토큰을 따로 추가하지 않는다.
+- 크기와 굵기를 분리한다. `text-15 font-bold`는 15px·700이며, `text-N`은 굵기를 설정하지 않는다. 굵기는 `font-normal`(400), `font-medium`(500), `font-semibold`(600), `font-bold`(700), `font-extrabold`(800)를 사용한다.
+- 기본 줄 높이는 공통 설정을 사용하고 같은 값의 `leading-*`를 중복 지정하지 않는다. 기존 콘텐츠의 별도 줄 높이는 유지한다.
 
-역할 토큰에는 `/50` 같은 임의 투명도를 붙이지 않는다. 다른 강조도가 필요하면 `muted`, `subtle`, `weak`, `pressed`처럼 의도를 나타내는 역할 variant를 추가한다. 테마와 무관하게 같은 색이어야 하는 이미지 overlay 등의 예외는 Palette의 Static 색상을 사용한다.
+신규 화면의 본문·입력·보조 설명은 다음 크기를 기본으로 사용한다. 기존 화면의 개별 규격을 일괄 치환하지 않는다.
 
-##### Foreground
+| 역할                | 크기·클래스      | 사용 예                                  |
+| ------------------- | ---------------- | ---------------------------------------- |
+| 본문                | 15px · `text-15` | 리뷰 내용, 일반 설명                     |
+| 입력값              | 16px · `text-16` | 검색어, 입력창, 리뷰 본문 작성           |
+| 보조 설명·부가 정보 | 13px · `text-13` | 영문 보조명, 작성 날짜, 짧은 입력 도움말 |
 
-| Role                  | Light / Dark            | Usage                       |
-| --------------------- | ----------------------- | --------------------------- |
-| `fg-neutral`          | neutral-1000 / oak-50   | 기본 제목, 본문, 아이콘     |
-| `fg-neutral-muted`    | neutral-800 / oak-200   | 설명과 메타 정보            |
-| `fg-neutral-subtle`   | neutral-700 / oak-500   | 낮은 강조의 도움말          |
-| `fg-neutral-inverted` | static-white / oak-1000 | 반전된 중립 배경 위 콘텐츠  |
-| `fg-placeholder`      | neutral-700 / oak-500   | 입력 placeholder            |
-| `fg-disabled`         | neutral-600 / oak-500   | 비활성 콘텐츠               |
-| `fg-brand`            | coral-700 / coral-500   | 브랜드 글자와 아이콘        |
-| `fg-brand-contrast`   | coral-1000 / coral-1000 | 브랜드 solid 배경 위 콘텐츠 |
-| `fg-rating`           | amber-700 / amber-500   | 별점과 평점                 |
+신청 조건·환불 안내·입력 오류처럼 판단이나 작업 완료에 필요한 문구는 보조 설명으로 축소하지 않고 본문 크기와 색상(`text-15 text-fg-neutral`)을 사용한다. 버튼의 글자 크기는 공통 Button의 size 규격을 따른다.
 
-##### Background
+## Layout
 
-| Role                       | Light / Dark            | Usage                          |
-| -------------------------- | ----------------------- | ------------------------------ |
-| `bg-layer-basement`        | neutral-200 / oak-1000  | 가장 깊은 앱 배경              |
-| `bg-layer-default`         | neutral-0 / oak-950     | 일반 화면과 콘텐츠 표면        |
-| `bg-layer-default-pressed` | neutral-50 / oak-900    | 눌린 리스트와 컨트롤           |
-| `bg-layer-floating`        | neutral-0 / oak-900     | 모달, 바텀시트, 팝오버         |
-| `bg-neutral-weak`          | neutral-50 / oak-900    | 섹션, 카드, 이미지 placeholder |
-| `bg-neutral-solid`         | neutral-1000 / oak-50   | 토스트 등의 반전 배경          |
-| `bg-disabled`              | neutral-200 / oak-800   | 비활성 버튼과 필드             |
-| `bg-brand-solid`           | coral-600 / coral-500   | 주요 CTA와 선택 상태           |
-| `bg-brand-solid-pressed`   | coral-500 / coral-600   | 브랜드 solid의 pressed 상태    |
-| `bg-brand-weak`            | coral-50 / coral-900    | 낮은 강조의 브랜드 배경        |
-| `bg-overlay`               | static-black 60% / same | 모달 backdrop                  |
-| `bg-overlay-muted`         | static-black 30% / same | 이미지와 카드 overlay          |
-| `bg-transparent`           | transparent / same      | 투명 배경                      |
+모바일 콘텐츠는 **최대 468px·가운데 정렬**, 일반 본문은 **좌우 20px**를 기준으로 한다. 전체 폭 이미지·배너는 본문 여백과 분리한다. 페이지 또는 페이지 셸이 바깥 여백을 담당하고 내부 컴포넌트는 자신의 콘텐츠 간격을 담당한다.
 
-##### Stroke
+신규 화면의 기본 간격은 다음과 같다. 기존 화면의 전용 간격을 일괄 치환하는 기준은 아니다.
 
-| Role                      | Light / Dark          | Usage                     |
-| ------------------------- | --------------------- | ------------------------- |
-| `stroke-neutral-subtle`   | neutral-200 / oak-800 | 장식성 구분선             |
-| `stroke-neutral-weak`     | neutral-700 / oak-600 | 입력창과 컨트롤 경계      |
-| `stroke-neutral-contrast` | neutral-1000 / oak-50 | 강한 중립 테두리          |
-| `stroke-brand-solid`      | coral-700 / coral-500 | 선택과 활성 테두리        |
-| `stroke-brand-weak`       | coral-400 / coral-300 | 낮은 강조의 브랜드 구분선 |
-| `stroke-focus-ring`       | coral-700 / coral-500 | 키보드 focus ring         |
+| 관계                          | 간격 |
+| ----------------------------- | ---- |
+| 한 정보의 세부 요소           | 4px  |
+| 이름·영문명·평가 등 관련 정보 | 8px  |
+| 병 이미지와 설명              | 12px |
+| 제목과 내용·일반 카드 사이    | 16px |
+| 독립된 정보 묶음              | 32px |
 
-#### 기존 색상 호환
+여백·크기·위치의 숫자 클래스는 1px 단위다. `mt-16`은 16px, `px-20`은 좌우 20px, `h-40`은 40px이다. 0~1024px에서 0.5px 단위를 지원하고, 그 밖의 값은 `w-[1200px]`처럼 지정한다. 숫자형 `leading-20`도 20px이다. `full`, `auto`, `1/2`, `%`, `vh`와 안전 영역 계산은 유지한다.
 
-기존 `mainCoral`, `subCoral`, `bgGray`, `brightGray`, `mainGray`, `textGray`, `gray`, `mainBlack`, `mainDarkGray`, `sectionWhite`는 화면 회귀를 막기 위해 유지한다. shadcn 계열 CSS variable은 별도 색상 체계가 아니라 Semantic role의 호환 별칭으로 사용한다. 기존 화면은 공용 컴포넌트부터 점진적으로 옮긴다.
+## Elevation & Depth
 
-#### 테마 동작
+일반 목록과 본문은 여백·구분선·중립 표면으로 나누는 차분한 표현을 유지한다. 신규 카드마다 그림자나 별도 색상 표면을 추가하지 않는다.
 
-- 테마 선택값은 `system`, `light`, `dark` 세 가지다.
-- 저장된 선택이 없거나 `system`이면 기기의 `prefers-color-scheme`을 따르고, 시스템 테마가 바뀌면 화면도 즉시 전환한다.
-- `light` 또는 `dark`를 직접 고르면 해당 선택을 브라우저에 저장하고 시스템 설정보다 우선한다.
-- 초기 화면이 반대 테마로 잠깐 보이지 않도록 React hydration 전에 루트의 `.dark` class를 설정한다.
-- 컴포넌트에서 현재 테마나 선택값이 필요하면 `useTheme`을 사용한다. 색상만 바꾸기 위해 테마를 읽고 조건부 class를 만들지 않는다.
+떠 있는 하단 메뉴·모달·시트는 기존 `Navbar`, `Modal`, `BottomSheet`의 표면과 그림자 표현을 사용한다. 겹침 순서와 안전 여백은 해당 컴포넌트와 [전역 스타일](src/style/globals.css)에 연결하고, 화면마다 별도 레이어 체계를 만들지 않는다.
 
-### 2.2 Typography
+## Shapes
 
-- 기본 폰트: `Suit`, `sans-serif`
-- `input`, `textarea`: 현재 global css에서 `Noto Sans`, `sans-serif`로 지정되어 있다.
-- Tailwind 확장 font size:
+- 탐색·큐레이션의 **폴더 탭 윤곽**은 기존 `BookmarkTab`을 사용한다. 일반 탭이나 버튼에 같은 윤곽을 확대 적용하지 않는다.
+- 병 이미지는 **병과 라벨 전체가 보이게** 표시한다. 기존 병 이미지의 흰 표면은 다크 테마에서도 유지한다. 커버·배너는 이미지가 영역을 채우는 기존 표현을 따른다.
+- 버튼·입력·카드의 모서리는 해당 컴포넌트의 표현을 사용한다. 모든 요소를 같은 둥근 카드나 캡슐 형태로 통일하지 않는다.
+- 로고와 기존 아이콘 자산을 재사용한다. 단색 아이콘은 의미별 테마색을 따르고, 인접한 같은 역할의 아이콘과 크기를 맞춘다.
 
-| Class       | Size / Line-height | 권장 용도                      |
-| ----------- | ------------------ | ------------------------------ |
-| `text-9`    | 9 / 9px            | 매우 작은 보조 표기            |
-| `text-10`   | 10 / 14px          | nav label, 작은 chip           |
-| `text-11`   | 11 / 15px          | 보조 메타                      |
-| `text-12`   | 12 / 16px          | 설명, helper text              |
-| `text-13`   | 13 / 17px          | 본문/label/chip                |
-| `text-13.5` | 13.5 / 17.5px      | 중간 본문                      |
-| `text-14`   | 14 / 18px          | 일반 본문                      |
-| `text-15`   | 15 / 19px          | tab, button text               |
-| `text-16`   | 16 / 20px          | header/modal body              |
-| `text-20`   | 20 / 24px          | modal main text, section title |
-| `text-24`   | 24 / 28px          | 큰 타이틀                      |
-| `text-27`   | 27 / 31px          | 히어로 타이틀                  |
+## Components
 
-Figma 매핑 기본값:
+### 기존 디자인과의 연결
 
-- 13pt Figma text style은 별도 지시가 없으면 모두 `text-13 font-medium`으로 매핑한다.
-- 10~12px 본문: `text-10`~`text-12` + `font-normal|font-medium`
-- 14~16px 강조: `text-14`~`text-16` + `font-bold`
-- 20px 이상 타이틀: `text-20|text-24|text-27` + `font-bold|font-extrabold`
-- Figma의 미세한 letter spacing은 기존 토큰으로 표현하기 어려우면 우선 생략하고, 시각 차이가 크면 임시 arbitrary class 예: `tracking-[-0.02em]`를 사용한다.
+공용 컴포넌트의 크기·패딩·글자·모서리·상태 표현은 코드에서 관리한다. 사용처에서 모양을 다시 만들지 않고 제공된 옵션으로 조합한다. 화면 전용 컴포넌트는 같은 제품 맥락의 참조로 사용하며, 새로운 범용 규격으로 간주하지 않는다.
 
-### 2.3 Spacing
+| 만들려는 영역                     | 먼저 확인할 기존 구현                                   |
+| --------------------------------- | ------------------------------------------------------- |
+| 뒤로 가기·제목 헤더               | `SubHeader`                                             |
+| 로고·전역 행동 헤더               | `AutoHideLogoHeader`                                    |
+| 탐색·큐레이션 상위 탭             | `TabbedListPageHeader`, `BookmarkTab`                   |
+| 검색                              | `src/components/feature/Search/`의 테두리형·밑줄형 검색 |
+| 선택 태그·정보 배지               | `Label`과 각 선택 상태 호출부                           |
+| 주류·리뷰 목록                    | 탐색, 주류 상세, 마이보틀의 동일 역할 목록              |
+| 큐레이션 커버·행사 정보           | `src/app/(primary)/curation/_components/`               |
+| 리뷰 입력·풍미 기록               | `src/app/(primary)/review/_components/form/`            |
+| 하단 메뉴·고정 행동               | `Navbar`, `StickyBottomCta`                             |
+| 확인·알림 / 선택 시트 / 복합 필터 | `Modal` / `BottomSheet` / `SideFilterDrawer`            |
 
-Tailwind 기본 spacing과 아래 확장 spacing을 사용한다.
+### 버튼
 
-| Class  | rem   | px    |
-| ------ | ----- | ----- |
-| `1.5`  | 0.375 | 6     |
-| `2.5`  | 0.625 | 10    |
-| `2.75` | 0.688 | 약 11 |
-| `3.25` | 0.813 | 약 13 |
-| `3.5`  | 0.875 | 14    |
-| `3.75` | 0.938 | 약 15 |
-| `4.5`  | 1.125 | 18    |
-| `5.25` | 1.313 | 약 21 |
-| `7.5`  | 1.875 | 30    |
-| `8.5`  | 2.125 | 34    |
-| `8.75` | 2.188 | 약 35 |
-| `11.5` | 2.875 | 46    |
+일반 행동 버튼은 [Button](src/components/ui/Button/Button.tsx)을 사용한다. `className`은 너비·바깥 여백 등 배치에만 사용하고, 높이·패딩·글자·모서리·상태색을 덮어쓰지 않는다.
 
-Figma px → Tailwind 변환:
+| 크기 | 높이 | 사용 상황                                             |
+| ---- | ---- | ----------------------------------------------------- |
+| `sm` | 28px | 태그 추출·등록, 팔로우, 닉네임 변경 등 짧은 보조 행동 |
+| `md` | 40px | 장소 검색, 콘텐츠 내 재시도·로그인 등 독립된 행동     |
+| `lg` | 52px | 화면 하단 저장·등록·신청, 모달 확인·취소              |
 
-- 4, 8, 12, 16, 20, 24px 등 기본 scale은 Tailwind 기본 class 사용
-- 6, 10, 14, 18, 30px 등은 확장 spacing 우선 사용
-- 토큰이 없고 시각 재현에 중요한 값만 arbitrary class 예: `px-[17px]`, `gap-[7px]` 허용
+| 강조 방식   | 표현                         |
+| ----------- | ---------------------------- |
+| `primary`   | 코랄 배경·흰 글자            |
+| `secondary` | 기본 표면·코랄 테두리와 글자 |
+| `text`      | 채움·테두리 없는 중립색 글자 |
 
-### 2.4 Border / Shadow
+크기와 강조 방식은 독립적으로 선택한다. 리뷰 등록은 `lg + primary`, 모달 취소는 `lg + secondary`, 태그 추출은 `sm + secondary`를 사용한다.
 
-- 중립 구분선은 `border-stroke-neutral-subtle`, 입력 경계는 `border-stroke-neutral-weak`, 선택 테두리는 `border-stroke-brand-solid`을 우선 사용한다.
-- shadow는 반복 사용되는 표준이 아직 없으므로 기존 컴포넌트 사용례를 먼저 따른다.
-
-## 3. Layout 기준
-
-### 3.1 화면 폭
-
-- 최대 콘텐츠 폭: `max-w-content = 468px`
-- 고정/중앙 정렬 유틸리티:
-  - `.content-container`: `max-w-content mx-auto w-full`
-  - `.fixed-content`: `fixed left-0 right-0 max-w-content mx-auto`
-- 기본 페이지는 모바일 폭 기준 `w-full mx-auto`로 작성하고, 전역 layout은 `min-h-safe-screen`을 사용한다.
-
-### 3.2 Safe area / fixed 영역
-
-`globals.css`의 CSS 변수를 사용한다.
-
-- `--safe-area-top`, `--safe-area-bottom`
-- `--header-height: 20px`
-- `--header-height-with-safe`
-- `--search-bar-height: 56px`
-- `--search-fixed-area-height: 70px`
-- `--tab-height: 81px`
-- `--navbar-height: 70px`
-- `--navbar-margin-bottom`
-- `--navbar-total-space`
-- `--sticky-cta-space`
-
-관련 utility:
-
-- `pt-safe`, `pt-safe-header`
-- `pb-safe`, `pb-safe-lg`
-- `pb-navbar`
-- `min-h-safe-screen`
-
-고정 상단 헤더 + 탭 아래 콘텐츠는 기존 Explore처럼 `marginTop: calc(var(--header-height-with-safe) + var(--tab-height))` 패턴을 사용할 수 있다.
-
-### 3.3 페이지 padding
-
-- 일반 모바일 콘텐츠 좌우 여백: `px-5`를 기본으로 한다. 현재 Search/User 계열 페이지의 주요 콘텐츠와 리스트 영역이 이 기준을 사용한다.
-- Figma 375px 화면에서 카드 폭을 맞춰야 하거나 Explore처럼 기존 화면이 `px-4`로 구성된 경우에는 해당 화면 기준을 유지한다.
-- 헤더 내부 좌우: 기존 `SubHeader`는 `px-[17px]` 사용.
-- 고정 상단 검색/필터 영역 내부 여백은 `px-5`를 우선한다.
-- 카드 리스트는 화면 폭에서 좌우 `16px~20px` 정도를 기준으로 Figma와 기존 화면을 맞춘다.
-
-### 3.4 페이지/섹션 spacing
-
-- 하단 navbar가 있는 페이지는 콘텐츠가 겹치지 않도록 `mb-24`, `pb-20`, `pb-navbar` 중 기존 layout에 맞는 방식을 사용한다.
-- 고정 상단 영역 아래 콘텐츠 시작점은 CSS 변수 기반 계산을 우선한다.
-  - 검색 고정 영역 아래: `paddingTop: calc(var(--header-height-with-safe) + var(--search-fixed-area-height))`
-  - 헤더 + 탭 아래: `marginTop: calc(var(--header-height-with-safe) + var(--tab-height))`
-- 주요 섹션 간 큰 간격은 `gap-7`, `pt-8`, `pb-5`를 우선 검토한다.
-- 섹션 내부 묶음 간격은 `space-y-4`, `mb-[26px]`, `pt-[22px]` 등 기존 화면 맥락을 따른다.
-- 리스트/반복 아이템 내부의 작은 간격은 `gap-2`, `space-y-1.5`, `mt-1.5`, `mt-3` 등 기존 List/Home 패턴을 우선한다.
-
-## 4. 기존 컴포넌트 패턴
-
-### 4.1 Button
-
-파일: `src/components/ui/Button/Button.tsx`
-
-- 기본 CTA: `bg-bg-brand-solid`, `text-fg-brand-contrast`, `h-[52px]`, `rounded-xl`, `w-full`
-- pressed: `active:bg-bg-brand-solid-pressed`
-- disabled: `bg-bg-disabled text-fg-disabled cursor-not-allowed`
-- secondary/cancel: `border-stroke-brand-solid`, `text-fg-brand`, `bg-bg-layer-default`
-
-새 CTA가 위 구조와 같으면 `Button` 또는 `DualButton` 재사용을 우선한다.
-
-버튼 네이밍은 색상과 위계를 고정해서 묶지 않고, 아래 세 축을 분리해서 판단한다.
-
-- `priority`: 화면 내 행동 위계. `primary` / `secondary` / `tertiary`를 기본으로 사용한다.
-- `appearance`: 시각적 표현. `solid` / `outline` / `ghost` / `text`를 기본으로 사용한다.
-  - `ghost`는 배경과 테두리를 최소화하고 hover/focus/active 상태에서만 영역감이 드러나는 버튼에 사용한다.
-- `tone`: 의미/색상 계열. `brand` / `neutral` / `danger`를 기본으로 사용한다.
-
-예시:
+기본값은 `lg + primary`다. `lg`는 부모 폭을 채우고 `sm`·`md`는 내용에 맞춘다. `fullWidth`로 폭을 조절한다. 문구는 `children`, 비활성은 `disabled`로 전달하며 기존 `btnName`도 지원한다.
 
 ```tsx
-<Button priority="secondary" appearance="ghost" tone="brand">
-  취소
+<Button size="sm" variant="secondary" onClick={handleExtractTags}>
+  태그 추출
+</Button>
+<Button size="md" variant="secondary" fullWidth onClick={handleSearch}>
+  장소 검색
 </Button>
 ```
 
-단, 현재 구현처럼 API를 단순하게 유지하는 단계에서는 `variant`로 시작해도 된다. 이 경우에도 `ghost`, `outline`, `solid`, `text`처럼 표현 중심 이름을 우선하고, 색상 차이는 `tone` 또는 별도 prop으로 분리할 수 있을 때 분리한다.
+취소·확인 쌍은 `DualButton`, 하단 고정 행동은 `StickyBottomCta`를 사용한다. 이동용 링크는 링크 의미를 유지하고 `buttonVariants`로 표현을 맞춘다. 탭·선택 칩·아이콘 전용 행동·이미지 선택·카드 링크는 일반 버튼 크기를 일괄 적용하지 않는다.
 
-### 4.2 Label / Chip
+## Do's and Don'ts
 
-파일: `src/components/ui/Display/Label.tsx`, global component classes
+- 한글 주명과 영문 보조명, 내 별점과 전체 평점을 구분한다.
+- 미평가를 0점으로, 가격 미정을 무료로 표시하지 않는다. 리뷰 공개 범위와 병·잔 가격 단위의 의미를 유지한다.
+- 일반 화면에 콘텐츠 전용 연출을 확장하지 않는다. 신규 화면에서도 병 사진·기록·코랄 행동이 중심인 제품 톤을 유지한다.
+- 공통 기준과 기존 화면이 다르면 차이를 확인한다. 기존의 개별 예외를 새 표준으로 확대하지 않는다.
 
-- `.label-default`: 기본 layer bg + brand text/border + `rounded-md py-1 px-3`
-- `.label-selected`: brand solid bg + brand contrast text
-- `.label-disabled`: disabled bg/text/border
-- 검색 키워드 chip은 `label-default inline-flex h-7 items-center gap-1 text-13` 패턴 사용.
-
-### 4.3 Tab
-
-파일: `src/components/ui/Navigation/Tab`
-
-- Default tab: `font-bold`, 약 15px, `pb-2`, bottom border
-- active: `.tab-selected` = `text-fg-brand border-stroke-brand-solid border-b`
-- inactive: `.tab-default` = `text-fg-neutral-subtle border-stroke-brand-weak border-b`
-- 가로 스크롤/북마크형 tab은 `variant="bookmark"`를 우선 검토한다.
-
-### 4.4 Header / Navbar
-
-파일: `src/components/ui/Navigation/SubHeader.tsx`, `Navbar.tsx`
-
-- `SubHeader`: left/center/right 슬롯 구조, `pt-safe-header`, `px-[17px]`, `pb-[15px]`
-- center title: `text-fg-brand`, `font-bold`, responsive clamp
-- bottom navbar:
-  - fixed, `max-w-content`, `bottom: var(--navbar-margin-bottom)`
-  - inner height `70px`, `bg-bg-layer-floating`, `py-4`, `px-[26px]`, `rounded-[13px]`
-  - inactive item opacity `40%`
-
-### 4.5 Search
-
-파일: `src/components/feature/Search/SearchBar.tsx`, `src/app/(primary)/explore/_components/ExploreSearchBar.tsx`
-
-- 일반 검색 input:
-  - `h-10`, `rounded-lg`, `bg-white`
-  - `text-mainDarkGray`, `placeholder-mainCoral`, `text-15`
-  - `border border-mainCoral`
-- Explore keyword search:
-  - border-bottom input, transparent bg
-  - helper text는 `text-12 text-mainGray`
-  - keyword 추가 버튼은 `.label-selected text-13`
-
-### 4.6 Modal / Bottom Sheet
-
-- `BottomSheet`: `vaul` Drawer 사용, overlay `bg-black/60`, content `rounded-t-2xl bg-white max-w-content mx-auto`
-- modal text classes:
-  - `.modal-mainText`: `text-20 text-subCoral font-medium whitespace-pre-wrap mb-2`
-  - `.modal-subText`: `text-16 text-mainDarkGray whitespace-pre-wrap mb-3`
-
-### 4.7 List item / Card
-
-- List item은 `border-brightGray border-b`, `text-mainBlack`, vertical padding을 자주 사용한다.
-- 이미지가 포함된 카드는 기존 `BaseImage`, `ItemImage`, domain/feature 컴포넌트 재사용 여부를 먼저 확인한다.
-- 신규 카드가 특정 화면에만 쓰이면 해당 route의 `_components`에 둔다. 여러 화면 재사용 가능성이 높으면 `src/components/feature` 또는 `src/components/ui`로 승격한다.
-
-## 5. 컴포넌트 설계 원칙
-
-이 섹션은 Figma 화면을 코드로 옮길 때의 컴포넌트 책임, 위치, props 전달 기준이다. 디자인 토큰과 함께 `DESIGN.md`에서 관리한다. 별도 agent skill은 보조 기억으로만 사용하고, 프로젝트 기준의 SSoT는 이 문서로 둔다.
-
-### 5.1 분리 기준
-
-- 한 컴포넌트 파일에는 하나의 모듈만 둔다.
-- 불필요하게 많이 쪼개지 않는다. 우선 하나의 개념적 단위가 한 컴포넌트로 구성되도록 한다.
-- Figma layer/frame 구조를 그대로 파일 분리 기준으로 삼지 않는다.
-- 컴포넌트가 명확히 다른 책임을 갖거나, 재사용/테스트/가독성 측면에서 이득이 분명할 때만 분리한다.
-- 단순 wrapper, adapter, 스타일 전달만 하는 얇은 컴포넌트는 만들지 않는다.
-
-### 5.2 컴포넌트 위치 기준
-
-- `src/components/ui`
-  - 가장 작은 단위의 atom 성격 컴포넌트
-  - 도메인 지식이나 비즈니스 로직을 갖지 않는다.
-  - 예: button, label, primitive display, basic input 등
-- `src/components/feature`
-  - atom 조합으로 만들어진 기능 단위 컴포넌트
-  - 특정 도메인에 묶이지 않는 기능을 담당한다.
-  - 예: 검색, 모달, 공통 필터 UI 등
-- `src/components/domain`
-  - BottleNote 비즈니스 로직과 연결된 컴포넌트
-  - `alcohol`, `review`, `user`, `explore` 등 도메인 모델/행동에 의존할 수 있다.
-- route 내부 `_components`
-  - 해당 페이지 전용 컴포넌트
-  - 처음에는 화면 전용이면 `_components`에 둔다.
-  - 도메인 경계를 벗어나 재사용되기 시작하면 `feature` 또는 `domain`으로 이동한다.
-
-### 5.3 Props / 데이터 전달 기준
-
-- props drilling은 최대 2단계까지만 허용한다.
-- API response 전체 객체를 깊게 전달하지 않는다.
-- API response를 props로 넘겨야 하는 경우, 하위 컴포넌트가 필요한 최소 정보만 추려서 전달한다.
-- 깊은 하위 컴포넌트에서 서버 데이터가 필요하면 `useQuery` 등으로 직접 가져올 수 있도록 식별자/필터 등 필요한 정보만 전달하는 방식을 우선 검토한다.
-- UI atom은 데이터 fetch를 직접 하지 않는다. domain/route 계층에서 data fetching 책임을 갖는다.
-
-### 5.4 개념적 단위와 분리 시점
-
-현재 코드베이스는 `HomeFeaturedList`, `ReviewDetails`, `AlcoholItem`처럼 하나의 화면 섹션/카드/기능 블록을 먼저 하나의 개념적 단위로 구현하고, 필요한 경우 하위 표시 컴포넌트를 둔다.
-
-- 기본 개념적 단위 예시
-  - 페이지의 한 섹션: 홈 피처드 리스트, 리뷰 상세 본문, 탐색 검색 영역
-  - 하나의 카드/아이템: 위스키 카드, 리뷰 리스트 아이템, 유저 정보 표시
-  - 하나의 입력/상호작용 블록: 검색바, 필터 드로어, 바텀시트, 댓글 입력
-- 분리를 검토하는 경우
-  - data fetching/loading/error/empty 분기와 실제 list/item 렌더링이 섞여 읽기 어려워질 때
-  - form 상태/submit 로직과 순수 표시 UI가 함께 커질 때
-  - 같은 UI 조각이 같은 화면 안에서 반복되거나 다른 화면에서도 재사용되기 시작할 때
-  - JSX가 길어져 핵심 흐름이 보이지 않을 때
-- 분리하지 않는 경우
-  - 단순히 Figma layer가 나뉘어 있다는 이유만 있는 경우
-  - props를 그대로 전달만 하는 얇은 wrapper가 되는 경우
-  - 한 화면에서만 쓰이고 책임이 하나로 읽히는 경우
-
-### 5.5 Route 전용 → feature/domain 승격 기준
-
-- 신규 화면 구현은 우선 route 내부 `_components`에 둔다.
-- 아래 조건 중 하나가 생기면 승격을 검토한다.
-  - 동일 UI/행동이 2개 이상의 route에서 재사용된다.
-  - 특정 도메인 모델과 강하게 결합되어 다른 route에서도 의미가 유지된다. 예: `review`, `alcohol`, `user`, `history`
-  - 도메인과 무관한 기능 조합으로 재사용된다. 예: search, modal, filter drawer, list layout
-- 승격 위치
-  - 비즈니스 모델/행동 의존이 있으면 `src/components/domain/{domain}`
-  - 도메인 독립 기능이면 `src/components/feature/{feature}`
-  - atom 수준 primitive면 `src/components/ui/{category}`
-- 기존 코드에 여러 컴포넌트를 한 파일에 둔 사례가 있어도, 신규 작성은 “한 컴포넌트 파일 = 하나의 모듈” 원칙을 따른다.
-
-### 5.6 Container / Presentational 분리
-
-컨테이너/프레젠테이션 분리는 기본값이 아니라, 복잡도가 생겼을 때 적용한다.
-
-- route page 또는 feature/domain container가 담당할 수 있는 것
-  - `useQuery`, `useMutation`, `useForm`, route params/search params, auth/modal store 연결
-  - loading/error/empty 분기
-  - API response를 화면에 필요한 형태로 최소 가공
-- presentational component가 담당할 수 있는 것
-  - 이미 준비된 props 기반 렌더링
-  - click/change 등 UI 이벤트를 callback으로 노출
-  - 디자인 토큰 기반 스타일링
-- 한 파일 안에서 충분히 읽히면 억지로 container/presenter를 만들지 않는다.
-- 분리 후 하위 컴포넌트가 props 전달 통로만 되면 잘못 분리한 것으로 본다.
-
-### 5.7 Query hook 위치 기준
-
-- 여러 화면/컴포넌트에서 재사용되는 서버 상태는 `src/queries/useXxxQuery.ts`에 둔다.
-- query hook은 가능하면 query key factory, `enabled`, `staleTime`, `gcTime`, `retry` 등 정책을 함께 정의한다.
-- route 전용 데이터이지만 페이지가 복잡하면 route container에서 query hook을 호출하고, 하위 컴포넌트에는 필요한 데이터만 전달한다.
-- 무한 스크롤/페이지네이션은 기존 `usePaginatedQuery` + `useInfiniteScroll` 패턴을 먼저 검토한다.
-- UI atom은 query hook을 직접 호출하지 않는다.
-- domain/feature 컴포넌트는 그 컴포넌트가 독립적으로 완결되는 재사용 기능일 때만 query hook 호출을 허용한다. 그렇지 않으면 route/container에서 데이터를 받아 렌더링한다.
-
-### 5.8 Variant / className override 기준
-
-- `variant`는 시각/동작 차이가 명확하고 반복되는 경우에만 둔다.
-  - 예: `Tab`의 default/bookmark처럼 variant에 따라 필요한 props가 달라지는 경우는 discriminated union으로 타입을 나눈다.
-- 단순 색상/간격 차이만으로 variant를 늘리지 않는다. 우선 토큰 class 조합 또는 기존 컴포넌트 재사용으로 해결한다.
-- 신규 컴포넌트는 `className`을 override 이름으로 우선 사용한다.
-  - 기존 코드의 `styleClass`, `btnStyles`, `textSize` 등은 legacy 패턴으로 보고 새 API에서는 남발하지 않는다.
-- `className` 허용 대상
-  - layout 조정이 필요한 container/primitive
-  - 아이콘/이미지 크기처럼 호출부 맥락에 따라 달라지는 atom
-- `className` 지양 대상
-  - 도메인 컴포넌트 내부의 핵심 색상/spacing을 외부에서 무제한 덮어써야 하는 구조
-  - 컴포넌트 책임을 흐리는 다수의 `xxxClassName` props
-- class 병합이 필요한 경우 `src/lib/utils.ts`의 `cn` 사용을 우선한다.
-
-## 6. 이미지 / 아이콘
-
-- 정적 자산은 `public/` 아래 기존 구조를 우선 사용한다.
-  - 예: `public/icon/...`, `public/bottle_note_Icon_logo.svg`
-- SVG 아이콘은 기존 파일이 있으면 재사용한다.
-- Figma에서 새 아이콘/이미지를 export할 때는 중복 자산 여부를 먼저 확인한다.
-- `next/image` 사용을 기본으로 한다. remote 이미지/동적 이미지는 기존 `BaseImage`/도메인 이미지 컴포넌트 패턴을 확인한다.
-
-## 7. Figma → Code 변환 규칙
-
-1. Figma MCP에서 frame/node 구조와 텍스트, 이미지, 스타일을 확인한다.
-2. Figma 색상은 이 문서의 Color token으로 먼저 매핑한다.
-3. Figma typography는 `text-*`, `font-*`, 필요 시 `tracking-*`으로 매핑한다.
-4. Figma Auto Layout은 Tailwind `flex`, `grid`, `gap`, `items-*`, `justify-*`로 매핑한다.
-5. Figma spacing은 Tailwind scale 우선, 필요 시 arbitrary value를 최소 사용한다.
-6. 복잡한 gradient/blur/shadow는 기존 토큰이 없으면 arbitrary class를 허용하되, 반복 사용될 가능성이 있으면 토큰화 후보로 남긴다.
-7. 구현 후 lint/build 또는 최소 타입 체크 가능한 검증을 수행한다.
-
-## 8. 새 화면 구현 체크리스트
-
-- [ ] 기존 route/layout/header/navbar 구조와 충돌하지 않는가?
-- [ ] `content-container`, `fixed-content`, safe-area utility를 적절히 사용했는가?
-- [ ] 색상을 hex 대신 Tailwind token으로 매핑했는가?
-- [ ] 기존 Button, Label, Tab, Search, Modal 컴포넌트를 재사용할 수 없는지 확인했는가?
-- [ ] 하단 navbar 또는 sticky CTA와 콘텐츠가 겹치지 않도록 `pb-navbar`/`--sticky-cta-space`를 고려했는가?
-- [ ] empty/loading/error 상태가 필요한 화면이면 기존 skeleton/empty/error 컴포넌트를 확인했는가?
-- [ ] 컴포넌트 분리가 개념적 단위 기준이며, Figma layer 기준 과분리가 아닌가?
-- [ ] props drilling이 2단계를 넘지 않고, API response 전체를 깊게 전달하지 않는가?
-- [ ] route 전용/feature/domain/ui 위치 기준에 맞는가?
+색상은 [의미별 토큰](src/style/tokens/semantic-colors.css)과 [팔레트](src/style/tokens/colors.css), 크기·간격은 [Tailwind 설정](tailwind.config.ts)을 기준으로 한다.

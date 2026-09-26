@@ -43,17 +43,17 @@ export function TarotPromoCard() {
   return (
     <div
       className={`
-        mx-4 mt-0 overflow-hidden transition-all duration-500 ease-out
-        ${isVisible ? 'max-h-24 opacity-100 mb-[15px]' : 'max-h-0 opacity-0 mb-0'}
+        mx-16 mt-0 overflow-hidden transition-all duration-500 ease-out
+        ${isVisible ? 'max-h-96 opacity-100 mb-15' : 'max-h-0 opacity-0 mb-0'}
       `}
     >
       <Link
         href={ROUTES.WHISKEY_TAROT}
-        className="relative block rounded-xl bg-bg-brand-weak p-4"
+        className="relative block rounded-xl bg-bg-brand-weak p-16"
       >
         <button
           onClick={handleClose}
-          className="absolute right-3 top-3 text-fg-neutral-subtle hover:text-fg-neutral-muted"
+          className="absolute right-12 top-12 text-fg-neutral-subtle hover:text-fg-neutral-muted"
           aria-label="닫기"
         >
           <svg
@@ -70,11 +70,11 @@ export function TarotPromoCard() {
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
-        <div className="pr-8">
+        <div className="pr-32">
           <h3 className="text-base font-semibold text-fg-brand-primary">
             위스키와 함께하는 타로점
           </h3>
-          <p className="mt-1 text-sm text-fg-neutral-muted">
+          <p className="mt-4 text-sm text-fg-neutral-muted">
             타로 카드를 뽑아 추천 위스키를 점쳐보세요.
           </p>
         </div>

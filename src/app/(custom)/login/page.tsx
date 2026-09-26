@@ -128,7 +128,7 @@ export default function Login() {
 
   return (
     <>
-      <main className="w-full flex flex-1 flex-col justify-end items-center bg-subCoral pb-5">
+      <main className="w-full flex flex-1 flex-col justify-end items-center bg-subCoral pb-20">
         <section className="w-full">
           <SubHeader bgColor="bg-subCoral">
             <SubHeader.Left onClick={handleBack}>
@@ -144,19 +144,19 @@ export default function Login() {
         </section>
 
         <section className="shrink-0 flex-1 flex">
-          <div className="flex flex-col items-center justify-center w-[92px]">
+          <div className="flex flex-col items-center justify-center w-92">
             <Image src={LogoWhite} alt="bottle-note-logo" />
           </div>
         </section>
 
-        <section className="flex flex-col gap-5 pb-5 w-full px-5">
-          <article className="flex gap-2 items-center py-2  justify-center">
+        <section className="flex flex-col gap-20 pb-20 w-full px-20">
+          <article className="flex gap-8 items-center py-8  justify-center">
             <span className="text-sm text-white shrink-0 text-center whitespace-pre">
               {`나의 입맛에 딱 맞는 한 병을\n찾아가는 여정 노트`}
             </span>
           </article>
 
-          <article className="flex flex-col gap-2 px-4">
+          <article className="flex flex-col gap-8 px-16">
             <SocialLoginBtn type="KAKAO" onClick={startKakaoLogin} />
             {DeviceService.platform === 'ios' && (
               <SocialLoginBtn type="APPLE" onClick={startAppleLogin} />
@@ -164,8 +164,8 @@ export default function Login() {
           </article>
         </section>
 
-        <footer className="w-full pt-2 flex flex-col gap-2 px-5 pb-safe">
-          <div className="w-full h-[1px] bg-white" />
+        <footer className="w-full pt-8 flex flex-col gap-8 px-20 pb-safe">
+          <div className="w-full h-1 bg-white" />
           <p className="text-12 text-white text-center">
             © Copyright 2026. Bottle Note. All rights reserved.
           </p>

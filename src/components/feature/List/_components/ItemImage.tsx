@@ -14,7 +14,7 @@ const ItemImage = ({ src, alt, className, priority = false }: Props) => {
   return (
     <div
       className={cn(
-        `w-[89px] h-[89px] flex shrink-0 bg-palette-static-white p-2 justify-center items-center`,
+        `w-89 h-89 flex shrink-0 bg-palette-static-white p-8 justify-center items-center`,
         className,
       )}
     >

@@ -15,7 +15,7 @@ const Section = ({ children }: { children: React.ReactNode }) => {
           <>
             {child}
             {index < Children.count(children) - 1 && (
-              <div className="my-3 border-t border-stroke-neutral-subtle" />
+              <div className="my-12 border-t border-stroke-neutral-subtle" />
             )}
           </>
         ))}
@@ -25,7 +25,7 @@ const Section = ({ children }: { children: React.ReactNode }) => {
 
 function ReviewForm() {
   return (
-    <section className="px-5 pt-9 pb-[var(--sticky-cta-space)] relative">
+    <section className="px-20 pt-36 pb-[var(--sticky-cta-space)] relative">
       <Section>
         <RatingForm />
         <ContentForm />

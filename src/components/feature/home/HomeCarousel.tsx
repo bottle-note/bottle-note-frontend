@@ -15,10 +15,10 @@ import type { Banner, BannerTextPosition } from '@/api/banner/types';
 const BANNER_VIDEO_POSTER = '/images/banner-placeholder.webp';
 
 const POSITION_CLASS: Record<BannerTextPosition, string> = {
-  LT: 'pt-10 pl-6 justify-start',
-  LB: 'pb-2.5 pl-6 justify-end',
-  RT: 'pt-10 pr-6 justify-start',
-  RB: 'pb-2.5 pr-6 justify-end',
+  LT: 'pt-40 pl-24 justify-start',
+  LB: 'pb-10 pl-24 justify-end',
+  RT: 'pt-40 pr-24 justify-start',
+  RB: 'pb-10 pr-24 justify-end',
   CENTER: 'items-center justify-center',
 };
 
@@ -158,7 +158,7 @@ function BannerOverlay({ banner }: { banner: Banner }) {
   );
 
   const content = (
-    <div className={`flex flex-col gap-[12px] ${alignClass}`}>
+    <div className={`flex flex-col gap-12 ${alignClass}`}>
       {isBottom ? (
         <>
           {nameElement}
@@ -265,7 +265,7 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
         {banners.map((banner, index) => (
           <CarouselItem key={banner.id} className="!pl-0">
             <div
-              className="relative w-full h-[227px] overflow-hidden flex items-center justify-center"
+              className="relative w-full h-227 overflow-hidden flex items-center justify-center"
               style={
                 failedBannerIds.has(banner.id)
                   ? { visibility: 'hidden', height: 0 }
@@ -282,7 +282,7 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
               <button
                 type="button"
                 onClick={() => api && api.scrollPrev()}
-                className="absolute bottom-3 right-[68.45px] z-10 flex h-[35.56px] w-[35.56px] items-center justify-center rounded-full bg-bg-overlay text-palette-static-white"
+                className="absolute bottom-12 right-[68.45px] z-10 flex h-[35.56px] w-[35.56px] items-center justify-center rounded-full bg-bg-overlay text-palette-static-white"
               >
                 <Image
                   src="/icon/arrow-left-white.svg"
@@ -294,7 +294,7 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
               <button
                 type="button"
                 onClick={() => api && api.scrollNext()}
-                className="absolute bottom-3 right-3 z-10 flex h-[35.56px] w-[35.56px] items-center justify-center rounded-full bg-bg-overlay text-palette-static-white"
+                className="absolute bottom-12 right-12 z-10 flex h-[35.56px] w-[35.56px] items-center justify-center rounded-full bg-bg-overlay text-palette-static-white"
               >
                 <Image
                   src="/icon/arrow-left-white.svg"

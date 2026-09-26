@@ -16,10 +16,10 @@ export function WhiskyPairingDetail({ pairing }: WhiskyPairingDetailProps) {
   const pairingFoods = pairing.payload.flatMap((item) => item.pairings);
 
   return (
-    <div className="min-h-safe-screen bg-bg-layer-default pb-8 text-fg-neutral">
+    <div className="min-h-safe-screen bg-bg-layer-default pb-32 text-fg-neutral">
       <CurationDetailHeader title={pairing.name} onBack={() => router.back()} />
 
-      <section className="relative h-60 w-full overflow-hidden bg-bg-neutral-weak">
+      <section className="relative h-240 w-full overflow-hidden bg-bg-neutral-weak">
         <BaseImage
           src={pairing.coverImageUrl}
           alt=""
@@ -30,31 +30,31 @@ export function WhiskyPairingDetail({ pairing }: WhiskyPairingDetailProps) {
         />
         <div className="absolute inset-0 bg-[#5F3826]/25" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/75" />
-        <div className="absolute bottom-5 left-5 right-5 text-white">
-          <span className="inline-flex rounded-full bg-bg-brand-solid px-2.5 py-1 text-10 font-bold text-fg-brand-contrast">
+        <div className="absolute bottom-20 left-20 right-20 text-white">
+          <span className="inline-flex rounded-full bg-bg-brand-solid px-10 py-4 text-10 font-bold text-fg-brand-contrast">
             페어링
           </span>
-          <h1 className="mt-3 line-clamp-2 text-20 font-extrabold">
+          <h1 className="mt-12 line-clamp-2 text-20 font-extrabold">
             {pairing.name}
           </h1>
-          <p className="mt-2 text-13 font-light text-white/85">
+          <p className="mt-8 text-13 font-light text-white/85">
             페어링 {pairingFoods.length}종 추천
           </p>
         </div>
       </section>
 
-      <section className="px-5 py-5">
+      <section className="px-20 py-20">
         <p className="whitespace-pre-line text-13 font-medium leading-[1.7] text-fg-neutral-muted">
           {pairing.description}
         </p>
       </section>
 
       {pairing.payload.length > 0 && (
-        <section className="px-5 py-7">
+        <section className="px-20 py-28">
           <h2 className="text-16 font-extrabold text-fg-neutral">
             페어링 라인업
           </h2>
-          <div className="mt-4 space-y-7">
+          <div className="mt-16 space-y-28">
             {pairing.payload.map((item, index) => (
               <div
                 key={

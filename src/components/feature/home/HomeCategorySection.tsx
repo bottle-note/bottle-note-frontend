@@ -11,10 +11,7 @@ const TAB_LIST = [
 
 export default function HomeCategorySection() {
   return (
-    <HomeTabSection
-      tabList={TAB_LIST}
-      contentClassName="px-[25px] min-h-[80vh]"
-    >
+    <HomeTabSection tabList={TAB_LIST} contentClassName="px-25 min-h-[80vh]">
       {(currentTab) => {
         switch (currentTab.id) {
           case 'category':

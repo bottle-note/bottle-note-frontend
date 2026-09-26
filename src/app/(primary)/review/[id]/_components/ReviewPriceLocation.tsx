@@ -19,9 +19,9 @@ export default function ReviewPriceLocation({
   if (!shouldShowPriceOrLocation) return null;
 
   return (
-    <section className="mx-5 space-y-2 border-b border-stroke-neutral-subtle py-5 text-13.5">
+    <section className="mx-20 space-y-8 border-b border-stroke-neutral-subtle py-20 text-13.5">
       {hasValidPrice && hasValidSizeType && (
-        <div className="flex items-center space-x-[6px]">
+        <div className="flex items-center space-x-6">
           <Image
             src={
               data.reviewInfo.sizeType === 'BOTTLE'
@@ -45,7 +45,7 @@ export default function ReviewPriceLocation({
         </div>
       )}
       {hasValidLocation && (
-        <div className="flex items-start space-x-[6px]">
+        <div className="flex items-start space-x-6">
           <Image
             src="/icon/placepoint-subcoral.svg"
             width={18.4}

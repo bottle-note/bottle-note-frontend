@@ -63,10 +63,10 @@ export default function StickySearchBar({
         />
 
         {description && (
-          <div className="flex items-start gap-[2px] py-[10px]">
+          <div className="flex items-start gap-2 py-10">
             <CircleHelp
               aria-hidden
-              className="mt-[1px] h-3.5 w-3.5 shrink-0 text-fg-brand"
+              className="mt-1 h-14 w-14 shrink-0 text-fg-brand"
             />
             <p className="whitespace-pre-line text-12 text-fg-neutral-muted">
               {description}
