@@ -16,7 +16,7 @@ const TAB_SCOPED_SEARCH_PARAMS = [
   'startDate',
   'endDate',
   'country',
-  'alcoholType',
+  'category',
 ] as const;
 
 export function ImportClearanceNavLayout({

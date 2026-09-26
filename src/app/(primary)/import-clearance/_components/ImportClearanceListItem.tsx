@@ -5,6 +5,7 @@ import ItemInfo from '@/components/feature/List/_components/ItemInfo';
 import { ROUTES } from '@/constants/routes';
 import type { MfdsAlcoholListItem } from '@/api/mfds/types';
 import { formatDate } from '@/utils/formatDate';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 import { declarationName } from '../_lib/declaration';
 
 interface Props {
@@ -19,7 +20,16 @@ export default function ImportClearanceListItem({ item }: Props) {
     : '통관일자 미상';
 
   return (
-    <Link href={ROUTES.IMPORT_CLEARANCE.ALCOHOL(item.id)} className="block">
+    <Link
+      href={ROUTES.IMPORT_CLEARANCE.ALCOHOL(item.id)}
+      className="block"
+      onClick={() =>
+        trackGA4Event('select_import_clearance', {
+          declaration_id: String(item.id),
+          source: 'list',
+        })
+      }
+    >
       <List.ItemLayout className="justify-between gap-2 px-0 py-3">
         <div className="min-w-0 flex-1">
           {hasTags && (

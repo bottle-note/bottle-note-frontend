@@ -18,6 +18,7 @@ node_modules
 .gitattributes
 
 # 환경 변수 파일들 (명시적으로 복사할 것만 복사)
+.env
 .env.local
 .env.development
 .env.production

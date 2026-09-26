@@ -9,13 +9,23 @@ function AlcoholDetailsSkeleton() {
       <SkeletonBase height={250} className="w-full" borderRadius="0" />
       <div className="mb-5">
         {/* 별점 영역 */}
-        <article className="grid place-items-center space-y-2 py-[25px]">
+        <article className="grid place-items-center space-y-2 py-4">
           <SkeletonBase width={210} height={22} />
           <SkeletonBase width={260} height={55} />
         </article>
+        {/* 위스키 소개 영역 */}
+        <section className="mx-5 flex flex-col gap-2 border-y border-stroke-neutral-subtle py-3">
+          <SkeletonBase width={86} height={20} />
+          <div className="flex flex-col gap-2">
+            <SkeletonBase height={16} className="w-full" />
+            <SkeletonBase height={16} className="w-full" />
+            <SkeletonBase width={230} height={16} />
+          </div>
+          <SkeletonBase width={48} height={16} className="self-end" />
+        </section>
         {/* Alcohol 상세정보 */}
-        <section className="mx-5 border-y border-stroke-neutral-subtle py-[21px]">
-          <div className="grid gap-2">
+        <section className="mx-5 border-b border-stroke-neutral-subtle py-4">
+          <div className="grid gap-1.5">
             <div className="grid grid-cols-2 gap-2">
               {Array.from({ length: 3 }).map(() => (
                 <div

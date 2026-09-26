@@ -16,7 +16,7 @@
     "prod": {
       "accountId": "6370682004",
       "containerPublicId": "GTM-TVSGX863",
-      "measurementIdEnv": "GTM_PROD_GA4_MEASUREMENT_ID",
+      "measurementId": "G-RJSMG5SC7N",
       "baseTagName": "Google Tag - GA4 Prod"
     }
   },
@@ -46,6 +46,22 @@
     {
       "name": "view_alcohol_detail",
       "parameters": ["alcohol_id", "alcohol_name"]
+    },
+    {
+      "name": "view_import_clearance_list",
+      "parameters": ["access_state", "result_state"]
+    },
+    {
+      "name": "select_import_clearance",
+      "parameters": ["declaration_id", "source"]
+    },
+    {
+      "name": "view_import_clearance_detail",
+      "parameters": ["declaration_id", "access_state", "match_status"]
+    },
+    {
+      "name": "select_import_clearance_alcohol",
+      "parameters": ["declaration_id", "alcohol_id", "source"]
     },
     { "name": "login_prompt_shown", "parameters": ["trigger"] },
     { "name": "login_prompt_converted", "parameters": ["trigger"] },

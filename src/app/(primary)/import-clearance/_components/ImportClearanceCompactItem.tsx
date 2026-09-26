@@ -3,6 +3,7 @@ import { ChevronRight } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 import type { MfdsAlcoholListItem } from '@/api/mfds/types';
 import { formatDate } from '@/utils/formatDate';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 import { declarationName } from '../_lib/declaration';
 
 interface Props {
@@ -22,6 +23,12 @@ export default function ImportClearanceCompactItem({ item }: Props) {
     <Link
       href={ROUTES.IMPORT_CLEARANCE.DETAIL(item.id)}
       className="flex items-center justify-between gap-3 border-b border-stroke-neutral-subtle py-3 last:border-b-0"
+      onClick={() =>
+        trackGA4Event('select_import_clearance', {
+          declaration_id: String(item.id),
+          source: 'related',
+        })
+      }
     >
       <div className="min-w-0">
         <p className="truncate text-13 text-fg-neutral">{korName}</p>

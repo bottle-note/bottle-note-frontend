@@ -25,7 +25,7 @@ export default function SideFilterDrawer({
         <>
           <BackDrop isShow={isOpen} onBackdropClick={onClose}>
             <motion.section
-              className="fixed right-0 top-0 z-50 flex h-full w-72 flex-col bg-bg-layer-floating pt-16 text-fg-neutral"
+              className="fixed right-0 top-0 z-50 flex h-full w-72 flex-col bg-bg-layer-floating pb-[var(--safe-area-bottom)] pt-16 text-fg-neutral"
               initial="initial"
               animate="animate"
               exit="exit"
