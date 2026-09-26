@@ -138,4 +138,4 @@
 - 일반 화면에 콘텐츠 전용 연출을 확장하지 않는다. 신규 화면에서도 병 사진·기록·코랄 행동이 중심인 제품 톤을 유지한다.
 - 공통 기준과 기존 화면이 다르면 차이를 확인한다. 기존의 개별 예외를 새 표준으로 확대하지 않는다.
 
-색상은 [의미별 토큰](src/style/tokens/semantic-colors.css)과 [팔레트](src/style/tokens/colors.css), 크기·간격은 [Tailwind 설정](tailwind.config.ts)을 기준으로 한다. 기존 페이지의 여백 담당은 [페이지별 여백 조사](docs/design/page-layout-ownership.md)를 참고한다.
+색상은 [의미별 토큰](src/style/tokens/semantic-colors.css)과 [팔레트](src/style/tokens/colors.css), 크기·간격은 [Tailwind 설정](tailwind.config.ts)을 기준으로 한다.
