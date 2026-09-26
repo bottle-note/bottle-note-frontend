@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AgreementApi } from '@/api/agreement/agreement.api';
 import type {
@@ -13,7 +12,7 @@ import type {
 import { Button } from '@/components/ui/Button/Button';
 import { ROUTES } from '@/constants/routes';
 import useModalStore from '@/store/modalStore';
-import { getReturnToUrl } from '@/utils/loginRedirect';
+import { useLoginNavigation } from '@/hooks/useLoginNavigation';
 
 type AgreementRequirement = 'all' | 'optional' | 'required';
 type AgreementState = Record<AgreementType, boolean>;
@@ -117,7 +116,7 @@ function AgreementCheckbox({
 }
 
 export function AgreementScreen({ documentContents }: AgreementScreenProps) {
-  const router = useRouter();
+  const { completeAgreement } = useLoginNavigation();
   const queryClient = useQueryClient();
   const { handleModalState } = useModalStore();
   const [agreements, setAgreements] = useState(createEmptyAgreementState);
@@ -144,7 +143,7 @@ export function AgreementScreen({ documentContents }: AgreementScreenProps) {
     mutationFn: AgreementApi.submit,
     onSuccess: (response) => {
       queryClient.setQueryData(AGREEMENT_STATUS_QUERY_KEY, response.data);
-      router.replace(getReturnToUrl());
+      completeAgreement();
     },
     onError: () => {
       handleModalState({
@@ -161,7 +160,7 @@ export function AgreementScreen({ documentContents }: AgreementScreenProps) {
     hasHandledStatusRef.current = true;
 
     if (status.eligible) {
-      router.replace(getReturnToUrl());
+      completeAgreement();
       return;
     }
 
@@ -169,7 +168,7 @@ export function AgreementScreen({ documentContents }: AgreementScreenProps) {
     initialAgreementsRef.current = initialAgreements;
     setAgreements(initialAgreements);
     setIsInitialized(true);
-  }, [router, status]);
+  }, [completeAgreement, status]);
 
   useEffect(() => {
     if (!isStatusError || hasShownStatusErrorRef.current) return;

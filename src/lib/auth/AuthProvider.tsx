@@ -4,7 +4,6 @@ import { ReactNode, useEffect, useLayoutEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { trackLoginHistory } from '@/utils/loginHistory';
-import { clearReturnToUrl } from '@/utils/loginRedirect';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
 import { restoreAuthSession } from './session-store';
 
@@ -47,7 +46,6 @@ export function AuthProvider({ children }: Props) {
       return;
     }
     // 상단 버튼뿐 아니라 브라우저 뒤로가기로 취소한 로그인도 정리한다.
-    clearReturnToUrl();
     consumeLoginTrigger();
   }, [pathname, isLoading, isLoggedIn]);
 

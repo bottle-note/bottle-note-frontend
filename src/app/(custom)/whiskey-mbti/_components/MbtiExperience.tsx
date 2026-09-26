@@ -7,7 +7,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
-import { WHISKEY_MBTI_INTRO_PATH } from '@/utils/loginRedirect';
 
 import styles from '../mbti.module.css';
 import type { MbtiCode } from '../_types';
@@ -140,9 +139,18 @@ export default function MbtiExperience() {
                 router.replace('/whiskey-mbti');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               } else {
-                router.push(
-                  `${ROUTES.LOGIN}?returnTo=${encodeURIComponent(WHISKEY_MBTI_INTRO_PATH)}`,
+                // 로그인 취소의 공통 뒤로가기로 MBTI 시작 화면에 돌아오도록 정리한다.
+                setPhase('intro');
+                window.history.replaceState(
+                  window.history.state,
+                  '',
+                  ROUTES.WHISKEY_MBTI,
                 );
+                const params = new URLSearchParams({
+                  returnTo: ROUTES.WHISKEY_MBTI,
+                  errorTo: ROUTES.WHISKEY_MBTI,
+                });
+                router.push(`${ROUTES.LOGIN}?${params.toString()}`);
               }
             }}
             onRestart={() => {
@@ -169,8 +177,13 @@ export default function MbtiExperience() {
             setCompletedCode(null);
             setPhase('intro');
             // 모달의 로그인 클릭도 닫기를 호출하므로 추가 라우팅 없이 정리한다.
-            window.history.replaceState(null, '', '/whiskey-mbti');
+            window.history.replaceState(
+              window.history.state,
+              '',
+              ROUTES.WHISKEY_MBTI,
+            );
           }}
+          errorTo={ROUTES.WHISKEY_MBTI}
           returnTo={
             completedCode
               ? `/whiskey-mbti?result=${completedCode}`

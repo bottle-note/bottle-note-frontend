@@ -10,9 +10,10 @@ import BackDrop from '@/components/ui/Modal/BackDrop';
 interface Props {
   handleClose: () => void;
   returnTo?: string;
+  errorTo?: string;
 }
 
-function LoginModal({ handleClose, returnTo }: Props) {
+function LoginModal({ handleClose, returnTo, errorTo }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -24,8 +25,8 @@ function LoginModal({ handleClose, returnTo }: Props) {
     handleClose();
     const params = new URLSearchParams({
       returnTo: returnTo ?? currentUrl,
-      cancelTo: currentUrl,
     });
+    if (errorTo) params.set('errorTo', errorTo);
     router.push(`${ROUTES.LOGIN}?${params.toString()}`);
   };
 

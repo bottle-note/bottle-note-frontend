@@ -34,7 +34,6 @@ import { useSocialLogin } from '@/hooks/useSocialLogin';
 import OauthKakaoCallbackPage from '@/app/(custom)/oauth/kakao/page';
 import LoginPage from '@/app/(custom)/login/page';
 import { DeviceService } from '@/lib/DeviceService';
-import { setReturnToUrl } from '@/utils/loginRedirect';
 import SettingsPage from '@/app/(primary)/settings/page';
 import Modal from '@/components/ui/Modal/Modal';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -98,6 +97,8 @@ describe('Auth business flows', () => {
     routerPush.mockReset();
     resetAuthSessionForTest();
     sessionStorage.clear();
+    window.history.replaceState(null, '', '/login');
+    document.cookie = 'bn_kakao_state=; Max-Age=0; Path=/oauth/kakao';
     localStorage.clear();
     useSettingsStore.setState({ currentScreen: 'main' });
     DeviceService.setIsInApp(false);
@@ -278,7 +279,7 @@ describe('Auth business flows', () => {
 
     it('카카오 앱 로그인 성공 시 returnTo 경로로 이동한다', async () => {
       fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
-      setReturnToUrl('/explore');
+      window.history.replaceState(null, '', '/login?returnTo=%2Fexplore');
 
       const { result } = renderHook(() => useSocialLogin());
 
@@ -291,10 +292,20 @@ describe('Auth business flows', () => {
 
     it('카카오 웹 로그인 callback 페이지는 authorizationCode로 로그인 요청을 보낸다', async () => {
       fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
-      (useSearchParams as Mock).mockReturnValue(
-        new URLSearchParams('code=oauth-code'),
+      const state = new URLSearchParams({
+        returnTo: '/history',
+        nonce: 'test-nonce',
+      });
+      const params = new URLSearchParams({
+        code: 'oauth-code',
+        state: state.toString(),
+      });
+      window.history.replaceState(
+        null,
+        '',
+        `/oauth/kakao?${params.toString()}`,
       );
-      setReturnToUrl('/history');
+      document.cookie = 'bn_kakao_state=test-nonce; Path=/oauth/kakao';
 
       render(React.createElement(OauthKakaoCallbackPage));
 
@@ -316,10 +327,20 @@ describe('Auth business flows', () => {
 
     it('카카오 웹 로그인 성공 시 returnTo 경로로 이동한다', async () => {
       fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
-      (useSearchParams as Mock).mockReturnValue(
-        new URLSearchParams('code=oauth-code'),
+      const state = new URLSearchParams({
+        returnTo: '/history',
+        nonce: 'test-nonce',
+      });
+      const params = new URLSearchParams({
+        code: 'oauth-code',
+        state: state.toString(),
+      });
+      window.history.replaceState(
+        null,
+        '',
+        `/oauth/kakao?${params.toString()}`,
       );
-      setReturnToUrl('/history');
+      document.cookie = 'bn_kakao_state=test-nonce; Path=/oauth/kakao';
 
       render(React.createElement(OauthKakaoCallbackPage));
 
@@ -347,7 +368,7 @@ describe('Auth business flows', () => {
 
     it('애플 로그인 성공 시 returnTo 경로로 이동한다', async () => {
       fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
-      setReturnToUrl('/settings');
+      window.history.replaceState(null, '', '/login?returnTo=%2Fsettings');
 
       const { result } = renderHook(() => useSocialLogin());
 
@@ -553,9 +574,7 @@ describe('Auth business flows', () => {
       DeviceService.setDeviceToken('device-token');
       DeviceService.setPlatform('ios');
       (window as typeof window & { isInApp?: boolean }).isInApp = true;
-      (useSearchParams as Mock).mockReturnValue(
-        new URLSearchParams({ returnTo: '/explore' }),
-      );
+      window.history.replaceState(null, '', '/login?returnTo=%2Fexplore');
       fetchMock.mockResolvedValueOnce(
         createJsonResponse({
           errors: [],
@@ -581,9 +600,7 @@ describe('Auth business flows', () => {
 
     it('이미 로그인된 상태에서 /login 진입 시 returnTo 경로로 복귀한다', async () => {
       setAuthenticatedSession(sessionPayload);
-      (useSearchParams as Mock).mockReturnValue(
-        new URLSearchParams({ returnTo: '/explore' }),
-      );
+      window.history.replaceState(null, '', '/login?returnTo=%2Fexplore');
 
       render(React.createElement(LoginPage));
 

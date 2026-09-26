@@ -54,6 +54,7 @@ describe('AgreementScreen', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     sessionStorage.clear();
+    window.history.replaceState(null, '', '/agreements');
     (useRouter as Mock).mockReturnValue({ replace: routerReplace });
     getStatusMock.mockResolvedValue(createResponse(agreementStatus));
     submitMock.mockResolvedValue(

@@ -1,18 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import {
-  isValidReturnUrl,
-  getReturnToUrl,
-  getPendingReturnToUrl,
-  isWhiskeyMbtiReturnUrl,
-  setReturnToUrl,
-  LOGIN_RETURN_TO_KEY,
-} from './loginRedirect';
+import { describe, it, expect } from 'vitest';
+import { isValidReturnUrl, getReturnToUrl } from './loginRedirect';
 
 describe('loginRedirect 유틸리티', () => {
-  beforeEach(() => {
-    sessionStorage.clear();
-  });
-
   describe('isValidReturnUrl', () => {
     describe('허용되는 URL', () => {
       it('빈 문자열은 허용한다', () => {
@@ -106,126 +95,21 @@ describe('loginRedirect 유틸리티', () => {
     });
   });
 
-  describe('setReturnToUrl', () => {
-    it('유효한 URL을 sessionStorage에 저장한다', () => {
-      setReturnToUrl('/search/whisky/123');
-
-      expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(
-        '/search/whisky/123',
-      );
-    });
-
-    it('유효하지 않은 URL은 저장하지 않는다', () => {
-      setReturnToUrl('https://evil.com');
-
-      expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBeNull();
-    });
-
-    it('로그인 경로는 저장하지 않는다', () => {
-      setReturnToUrl('/login');
-
-      expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBeNull();
-    });
-
-    it('이미 같은 값이 저장되어 있으면 다시 저장하지 않는다', () => {
-      const spy = vi.spyOn(Storage.prototype, 'setItem');
-
-      setReturnToUrl('/search');
-      setReturnToUrl('/search');
-
-      expect(spy).toHaveBeenCalledTimes(1);
-      spy.mockRestore();
-    });
-  });
-
   describe('getReturnToUrl', () => {
-    it('저장된 URL을 반환하고 sessionStorage에서 제거한다', () => {
-      sessionStorage.setItem(LOGIN_RETURN_TO_KEY, '/search/whisky/123');
-
-      const result = getReturnToUrl();
-
-      expect(result).toBe('/search/whisky/123');
-      expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBeNull();
+    it('유효한 쿼리 주소를 반환한다', () => {
+      expect(getReturnToUrl('/search/whisky/123')).toBe('/search/whisky/123');
     });
 
-    it('저장된 URL이 없으면 루트를 반환한다', () => {
-      const result = getReturnToUrl();
-
-      expect(result).toBe('/');
+    it('쿼리 주소가 없으면 루트를 반환한다', () => {
+      expect(getReturnToUrl(null)).toBe('/');
     });
 
-    it('저장된 URL이 유효하지 않으면 루트를 반환한다', () => {
-      // 직접 sessionStorage에 악성 URL 주입 시도
-      sessionStorage.setItem(LOGIN_RETURN_TO_KEY, 'https://evil.com');
-
-      const result = getReturnToUrl();
-
-      expect(result).toBe('/');
+    it('쿼리 주소가 유효하지 않으면 루트를 반환한다', () => {
+      expect(getReturnToUrl('https://evil.com')).toBe('/');
     });
 
-    it('저장된 URL이 로그인 경로면 루트를 반환한다', () => {
-      sessionStorage.setItem(LOGIN_RETURN_TO_KEY, '/login');
-
-      const result = getReturnToUrl();
-
-      expect(result).toBe('/');
-    });
-  });
-
-  describe('MBTI 로그인 복귀 처리', () => {
-    it('대기 중인 returnTo는 성공 전까지 소비하지 않는다', () => {
-      setReturnToUrl('/whiskey-mbti?result=INTJ-A');
-
-      expect(getPendingReturnToUrl()).toBe('/whiskey-mbti?result=INTJ-A');
-      expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(
-        '/whiskey-mbti?result=INTJ-A',
-      );
-    });
-
-    it('MBTI 결과 주소를 식별한다', () => {
-      expect(isWhiskeyMbtiReturnUrl('/whiskey-mbti?result=INTJ-A')).toBe(true);
-    });
-
-    it('다른 경로는 MBTI 취소 정책에 포함하지 않는다', () => {
-      expect(isWhiskeyMbtiReturnUrl('/explore')).toBe(false);
-    });
-  });
-
-  describe('통합 시나리오', () => {
-    it('저장 후 가져오기 플로우가 정상 동작한다', () => {
-      // 1. 사용자가 /search/whisky/123 페이지에서 로그인 모달 클릭
-      setReturnToUrl('/search/whisky/123');
-
-      // 2. 로그인 완료 후 원래 페이지로 리다이렉트
-      const returnUrl = getReturnToUrl();
-      expect(returnUrl).toBe('/search/whisky/123');
-
-      // 3. 한 번 사용 후 다시 호출하면 루트 반환 (일회용)
-      const secondCall = getReturnToUrl();
-      expect(secondCall).toBe('/');
-    });
-
-    it('getReturnToUrl은 한 번만 호출해야 함 (중복 호출 시 두 번째는 루트 반환)', () => {
-      // 이 테스트는 race condition 방지를 위해 getReturnToUrl()이
-      // 반드시 한 곳에서만 호출되어야 함을 문서화
-      //
-      // 잘못된 예: 두 개의 useEffect에서 각각 getReturnToUrl() 호출
-      // - useEffect A: router.replace(getReturnToUrl()) → '/search' 반환
-      // - useEffect B: router.replace(getReturnToUrl()) → '/' 반환 (이미 삭제됨)
-      // 결과: 예측 불가능한 리다이렉트 발생
-
-      setReturnToUrl('/search');
-
-      // 첫 번째 호출: 정상적으로 저장된 URL 반환
-      const firstCall = getReturnToUrl();
-      expect(firstCall).toBe('/search');
-
-      // 두 번째 호출: sessionStorage가 비어있으므로 루트 반환
-      const secondCall = getReturnToUrl();
-      expect(secondCall).toBe('/');
-
-      // 해결책: 리다이렉트 로직을 한 곳으로 통합하고
-      // isLoading 상태를 확인하여 session 로딩 완료 후 한 번만 실행
+    it('쿼리 주소가 로그인 경로면 루트를 반환한다', () => {
+      expect(getReturnToUrl('/login')).toBe('/');
     });
   });
 });

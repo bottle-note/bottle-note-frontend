@@ -46,7 +46,6 @@ describe('LoginModal returnTo 사용자 시나리오', () => {
     expect(params.get('returnTo')).toBe(
       '/explore?tab=EXPLORER_WHISKEY&keywords=macallan&regionIds=12',
     );
-    expect(params.get('cancelTo')).toBe(params.get('returnTo'));
     expect(handleClose).toHaveBeenCalledTimes(1);
     expect(mockPush).toHaveBeenCalledWith(expect.stringMatching(/^\/login\?/));
   });
@@ -62,9 +61,6 @@ describe('LoginModal returnTo 사용자 시나리오', () => {
 
     const params = new URLSearchParams(mockPush.mock.calls[0][0].split('?')[1]);
     expect(params.get('returnTo')).toBe('/inquire/register');
-    expect(params.get('cancelTo')).toBe(
-      '/explore?tab=EXPLORER_WHISKEY&keywords=macallan&regionIds=12',
-    );
     expect(handleClose).toHaveBeenCalledTimes(1);
     expect(mockPush).toHaveBeenCalledWith(expect.stringMatching(/^\/login\?/));
   });

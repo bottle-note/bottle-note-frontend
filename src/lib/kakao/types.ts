@@ -81,7 +81,7 @@ declare global {
         sendScrap: (settings: { requestUrl: string }) => void;
       };
       Auth: {
-        authorize: (settings: { redirectUri: string }) => void;
+        authorize: (settings: { redirectUri: string; state: string }) => void;
       };
     };
   }
