@@ -97,14 +97,14 @@ export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
 
   return (
     <div
-      className="fixed-content w-full max-w-2xl px-4 z-10 transition-all duration-500 ease-out"
+      className="fixed-content w-full max-w-2xl px-16 z-10 transition-all duration-500 ease-out"
       style={{
         bottom: isVisible
           ? 'calc(var(--navbar-total-space) + 8px)'
           : 'calc(var(--safe-area-bottom, 32px) + 8px)',
       }}
     >
-      <div className="flex items-center rounded-lg border border-stroke-neutral-subtle bg-bg-layer-floating px-3 py-2 shadow-md">
+      <div className="flex items-center rounded-lg border border-stroke-neutral-subtle bg-bg-layer-floating px-12 py-8 shadow-md">
         <div className="flex-grow flex items-center">
           <textarea
             placeholder={
@@ -112,7 +112,7 @@ export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
                 ? '댓글을 입력해 주세요'
                 : '로그인 후 댓글을 작성할 수 있어요:)'
             }
-            className="max-h-[50px] flex-grow resize-none overflow-hidden bg-transparent p-1 text-13 text-fg-neutral placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
+            className="max-h-50 flex-grow resize-none overflow-hidden bg-transparent p-4 text-13 text-fg-neutral placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
             onInput={handleInput}
             rows={1}
             ref={setRefs}
@@ -124,7 +124,7 @@ export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
         </div>
         <button
           type="button"
-          className={`ml-2 px-4 py-1 ${content?.length !== 0 ? 'text-fg-brand' : 'text-fg-disabled'}`}
+          className={`ml-8 px-16 py-4 ${content?.length !== 0 ? 'text-fg-brand' : 'text-fg-disabled'}`}
           onClick={handleButtonClick}
         >
           등록

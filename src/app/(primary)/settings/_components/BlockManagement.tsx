@@ -67,7 +67,7 @@ export default function BlockManagement() {
   return (
     <>
       <div className="min-h-screen bg-bg-layer-default text-fg-neutral">
-        <div className="px-6 pt-6">
+        <div className="px-24 pt-24">
           <List
             emptyViewText="차단된 사용자가 없습니다."
             isListFirstLoading={isLoading}
@@ -86,14 +86,14 @@ export default function BlockManagement() {
                     initial="hidden"
                     animate="visible"
                     custom={index}
-                    className="py-[14px]"
+                    className="py-14"
                   >
                     {index > 0 && (
-                      <div className="border-t border-stroke-neutral-subtle -mt-[14px] mb-[14px]" />
+                      <div className="border-t border-stroke-neutral-subtle -mt-14 mb-14" />
                     )}
 
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-[10px]">
+                      <div className="flex items-center space-x-10">
                         <ProfileImage size={36} />
                         <span className="text-13 font-bold text-fg-neutral">
                           {user?.userName}
@@ -114,7 +114,7 @@ export default function BlockManagement() {
                     </div>
 
                     {isLast && (
-                      <div className="border-t border-stroke-neutral-subtle mt-[14px] -mb-[14px]" />
+                      <div className="border-t border-stroke-neutral-subtle mt-14 -mb-14" />
                     )}
                   </motion.div>
                 );

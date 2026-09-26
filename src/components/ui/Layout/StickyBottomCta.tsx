@@ -16,7 +16,7 @@ export function StickyBottomCta(props: StickyBottomCtaProps) {
 
   return (
     <div
-      className="fixed-content z-20 px-5"
+      className="fixed-content z-20 px-20"
       style={{ bottom: 'var(--navbar-margin-bottom)' }}
     >
       {typeof props.href !== 'string' || disabled ? (

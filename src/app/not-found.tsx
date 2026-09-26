@@ -25,7 +25,7 @@ export default function NotFound() {
         </SubHeader.Left>
         <SubHeader.Center>ERROR</SubHeader.Center>
       </SubHeader>
-      <div className="h-screen flex flex-col justify-center items-center gap-5">
+      <div className="h-screen flex flex-col justify-center items-center gap-20">
         <Image
           src="/icon/logo-subcoral.svg"
           alt="bottle_logo"
@@ -34,7 +34,7 @@ export default function NotFound() {
           style={{ width: 73, height: 125 }}
           priority
         />
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-8">
           <p className="text-mainGray text-20">어이쿠!</p>
           <p className="text-mainGray text-15">
             에러가 발생했어요.

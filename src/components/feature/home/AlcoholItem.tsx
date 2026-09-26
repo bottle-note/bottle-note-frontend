@@ -60,22 +60,22 @@ export default function AlcoholItem({ data }: Props) {
   const href = path ?? `/search/${engCategory}/${alcoholId}`;
 
   return (
-    <div className="w-[145px] overflow-hidden rounded-lg">
+    <div className="w-145 overflow-hidden rounded-lg">
       <Link href={href} className="block">
-        <div className="relative flex h-[145px] w-full shrink-0 items-center justify-center bg-palette-static-white">
+        <div className="relative flex h-145 w-full shrink-0 items-center justify-center bg-palette-static-white">
           <AlcoholImage
             imageUrl={imageUrl}
-            outerHeightClass="h-[145px]"
-            outerWidthClass="w-[145px]"
-            innerHeightClass="h-[125px]"
-            innerWidthClass="w-[125px]"
+            outerHeightClass="h-145"
+            outerWidthClass="w-145"
+            innerHeightClass="h-125"
+            innerWidthClass="w-125"
             bgColor="bg-palette-static-white"
             blendMode="mix-blend-multiply dark:mix-blend-normal"
             rounded="rounded-none"
           />
         </div>
-        <div className="h-[80px] space-y-[6px] bg-bg-layer-basement px-2 py-[10px]">
-          <div className="h-[38px] whitespace-normal break-words text-13 font-extrabold text-fg-neutral">
+        <div className="h-80 space-y-6 bg-bg-layer-basement px-8 py-10">
+          <div className="h-38 whitespace-normal break-words text-13 font-extrabold text-fg-neutral">
             {korName && truncStr(korName, 20)}
           </div>
           <div className="flex items-end justify-between text-fg-brand">

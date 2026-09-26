@@ -52,7 +52,7 @@ const OptionSelect = ({
   return (
     <>
       <button
-        className="label-default flex items-center gap-1 px-2.5 py-1 rounded-md text-10"
+        className="label-default flex items-center gap-4 px-10 py-4 rounded-md text-10"
         onClick={handleSortOptionsShow}
       >
         <span className="whitespace-nowrap">{selectedOption}</span>

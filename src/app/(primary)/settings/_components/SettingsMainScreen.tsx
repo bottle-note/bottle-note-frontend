@@ -28,7 +28,7 @@ export const SettingsMainScreen = ({
 }: SettingsMainScreenProps) => {
   return (
     <motion.section
-      className="flex-1 overflow-y-auto px-6"
+      className="flex-1 overflow-y-auto px-24"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -40,11 +40,11 @@ export const SettingsMainScreen = ({
           {categoryIndex > 0 && (
             <div className="border-t border-stroke-neutral-subtle" />
           )}
-          <div className="py-[22px]">
+          <div className="py-22">
             <h2 className="text-fg-brand text-13 font-bold">
               {category.title}
             </h2>
-            <div className="mt-[27px] space-y-[25px] text-15 font-medium text-fg-neutral">
+            <div className="mt-27 space-y-25 text-15 font-medium text-fg-neutral">
               {category.items.map((item) => {
                 const isExternalLink =
                   item.link?.startsWith('http://') ||
@@ -78,7 +78,7 @@ export const SettingsMainScreen = ({
         </div>
       ))}
 
-      <div className="py-[22px] border-t border-stroke-neutral-subtle">
+      <div className="py-22 border-t border-stroke-neutral-subtle">
         <div className="flex justify-between items-center text-15 text-fg-disabled">
           <span>빌드 {process.env.NEXT_PUBLIC_BUILD_TIME}</span>
         </div>

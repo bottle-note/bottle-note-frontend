@@ -77,18 +77,18 @@ export function ProgramEventInfoCard({
   return (
     <div
       className={cn(
-        'rounded-2xl bg-bg-neutral-weak px-4 py-4 text-fg-neutral',
+        'rounded-2xl bg-bg-neutral-weak px-16 py-16 text-fg-neutral',
         className,
       )}
     >
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-24">
         {infoItems.map(({ key, Icon, title, action }) => (
-          <div key={key} className="flex gap-2.5">
-            <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-fg-neutral">
+          <div key={key} className="flex gap-10">
+            <span className="mt-2 flex h-16 w-16 shrink-0 items-center justify-center text-fg-neutral">
               <Icon size={16} strokeWidth={2} />
             </span>
-            <div className="flex min-w-0 flex-1 items-start justify-between gap-2">
-              <p className="min-w-0 flex-1 break-words text-14 font-bold leading-[18px] text-fg-neutral">
+            <div className="flex min-w-0 flex-1 items-start justify-between gap-8">
+              <p className="min-w-0 flex-1 break-words text-14 font-bold text-fg-neutral">
                 {title}
               </p>
               {action && (
@@ -96,7 +96,7 @@ export function ProgramEventInfoCard({
                   href={action.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="shrink-0 rounded-md bg-bg-layer-default px-3 py-1 text-13 font-bold leading-[17px] text-fg-neutral"
+                  className="shrink-0 rounded-md bg-bg-layer-default px-12 py-4 text-13 font-bold text-fg-neutral"
                 >
                   {action.label}
                 </a>
@@ -105,11 +105,9 @@ export function ProgramEventInfoCard({
           </div>
         ))}
 
-        <div className="flex items-end justify-between gap-2 border-t border-stroke-neutral-basement pt-4">
-          <span className="text-13 font-semibold leading-[17px] text-fg-neutral">
-            참가비
-          </span>
-          <span className="text-right text-[19px] font-bold leading-none text-fg-neutral">
+        <div className="flex items-end justify-between gap-8 border-t border-stroke-neutral-basement pt-16">
+          <span className="text-13 font-semibold text-fg-neutral">참가비</span>
+          <span className="text-right text-19 font-bold leading-none text-fg-neutral">
             {entryFeeLabel}
           </span>
         </div>

@@ -32,26 +32,26 @@ function AlcoholInfo({ data, handleLogin }: Props) {
 
   return (
     <>
-      <section className="relative z-10 flex px-5 pt-[6px] pb-6 space-x-[22px]">
+      <section className="relative z-10 flex px-20 pt-6 pb-24 space-x-22">
         {data.imageUrl && (
           <AlcoholImage
             imageUrl={data.imageUrl}
-            outerWidthClass="w-[73px]"
-            outerHeightClass="h-[120px]"
-            innerWidthClass="w-[53px]"
-            innerHeightClass="h-[104px]"
+            outerWidthClass="w-73"
+            outerHeightClass="h-120"
+            innerWidthClass="w-53"
+            innerHeightClass="h-104"
             enableModal
           />
         )}
-        <article className="w-2/3 pt-[5px] pb-[9.15px] text-white space-y-2 overflow-x-hidden">
-          <div className="space-y-[6px]">
+        <article className="w-2/3 pt-5 pb-[9.15px] text-white space-y-8 overflow-x-hidden">
+          <div className="space-y-6">
             <Label
               name={data.korCategory}
-              styleClass="border-white px-2 py-[0.15rem] rounded-md text-10"
+              styleClass="border-white px-8 py-[2.4px] rounded-md text-10"
             />
             <Link
               href={ROUTES.SEARCH.ALL(data.alcoholId)}
-              className="block space-y-[6px]"
+              className="block space-y-6"
             >
               <h1 className="text-15 font-semibold whitespace-normal break-words">
                 {data?.korName}
@@ -61,9 +61,9 @@ function AlcoholInfo({ data, handleLogin }: Props) {
               </p>
             </Link>
           </div>
-          <div className="space-y-[10px] mt-[10px]">
+          <div className="space-y-10 mt-10">
             <div className="border-[0.5px] border-white" />
-            <div className="flex space-x-3">
+            <div className="flex space-x-12">
               <div
                 className="text-14 font-normal flex"
                 onClick={handleLoginConfirm}
@@ -74,7 +74,7 @@ function AlcoholInfo({ data, handleLogin }: Props) {
                 }}
               >
                 <Image
-                  className="mr-1"
+                  className="mr-4"
                   src="/icon/edit-outlined-white.svg"
                   alt="write"
                   width={19}
@@ -82,7 +82,7 @@ function AlcoholInfo({ data, handleLogin }: Props) {
                 />
                 <button>리뷰 작성</button>
               </div>
-              <div className="border-[0.5px] border-white my-[0.1rem]" />
+              <div className="border-[0.5px] border-white my-[1.6px]" />
               <AlcoholPickButton
                 size={19}
                 isPicked={isPicked}

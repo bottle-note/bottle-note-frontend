@@ -74,10 +74,10 @@ export default function ContentForm() {
       <textarea
         {...register('review')}
         placeholder={`위스키 리뷰를 작성해보세요.\n(작성 완료 후 공개/비공개 여부를 변경할 수 있습니다.)`}
-        className="h-48 w-full resize-none rounded-lg bg-bg-neutral-weak p-3 text-16 text-fg-neutral placeholder:text-14 placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
+        className="h-192 w-full resize-none rounded-lg bg-bg-neutral-weak p-12 text-16 text-fg-neutral placeholder:text-14 placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
         maxLength={700}
       />
-      <div className="flex justify-between items-center mt-1">
+      <div className="flex justify-between items-center mt-4">
         <p className="text-13 text-fg-neutral-subtle">{review.length}/700</p>
         <Button
           type="button"
@@ -85,7 +85,7 @@ export default function ContentForm() {
           disabled={isExtracting}
           size="sm"
           variant="secondary"
-          className="w-24"
+          className="w-96"
         >
           {isExtracting ? '추출 중...' : '태그 추출'}
         </Button>

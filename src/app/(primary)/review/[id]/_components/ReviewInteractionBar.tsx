@@ -70,8 +70,8 @@ export default function ReviewInteractionBar({
   };
 
   return (
-    <section className="mx-5 py-5 flex items-center">
-      <div className="flex-1 flex justify-center items-center space-x-1">
+    <section className="mx-20 py-20 flex items-center">
+      <div className="flex-1 flex justify-center items-center space-x-4">
         <ReviewLikeButton
           size={19}
           reviewId={data?.reviewInfo?.reviewId}
@@ -83,9 +83,9 @@ export default function ReviewInteractionBar({
         />
         <div className="text-10 text-fg-neutral-subtle">{likeCount}개</div>
       </div>
-      <span className="h-4 w-px border-[0.01rem] border-stroke-neutral-subtle" />
+      <span className="h-16 w-1 border-[0.01rem] border-stroke-neutral-subtle" />
       <button
-        className="flex-1 flex text-center justify-center items-center space-x-1"
+        className="flex-1 flex text-center justify-center items-center space-x-4"
         onClick={() => {
           if (!isLoggedIn) {
             handleLogin();
@@ -96,7 +96,7 @@ export default function ReviewInteractionBar({
       >
         <MessageCircle
           aria-hidden
-          className={`h-4 w-4 ${
+          className={`h-16 w-16 ${
             data.reviewInfo?.hasReplyByMe
               ? 'fill-current text-fg-brand'
               : 'text-fg-neutral-muted'
@@ -106,12 +106,12 @@ export default function ReviewInteractionBar({
           댓글 작성
         </p>
       </button>
-      <span className="h-4 w-px border-[0.01rem] border-stroke-neutral-subtle" />
+      <span className="h-16 w-1 border-[0.01rem] border-stroke-neutral-subtle" />
       <button
-        className="flex-1 flex text-center justify-center items-center space-x-1"
+        className="flex-1 flex text-center justify-center items-center space-x-4"
         onClick={() => setIsShareOpen(true)}
       >
-        <ExternalLink aria-hidden className="h-4 w-4 text-fg-neutral-muted" />
+        <ExternalLink aria-hidden className="h-16 w-16 text-fg-neutral-muted" />
         <p className="text-13 font-bold text-fg-neutral-muted">공유</p>
       </button>
 

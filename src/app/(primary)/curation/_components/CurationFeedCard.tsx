@@ -16,7 +16,7 @@ export function CurationFeedCard({
 }: CurationFeedCardProps) {
   return (
     <Link href={ROUTES.CURATION.DETAIL(curation.id)} className="block">
-      <article className="relative isolate h-[157px] w-full overflow-hidden rounded-lg bg-bg-neutral-weak">
+      <article className="relative isolate h-157 w-full overflow-hidden rounded-lg bg-bg-neutral-weak">
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
           <BaseImage
             src={curation.coverImageUrl}
@@ -31,14 +31,14 @@ export function CurationFeedCard({
           <div className="absolute inset-0 bg-[#5F3826]/20" />
         </div>
 
-        <div className="relative z-10 flex h-full flex-col px-4 pb-4 pt-4">
-          <span className="inline-flex w-fit rounded-full bg-white/30 px-2.5 py-1 text-11 font-bold text-white backdrop-blur-sm">
+        <div className="relative z-10 flex h-full flex-col px-16 pb-16 pt-16">
+          <span className="inline-flex w-fit rounded-full bg-white/30 px-10 py-4 text-11 font-bold text-white backdrop-blur-sm">
             {badgeLabel}
           </span>
-          <h2 className="mt-4 line-clamp-2 text-[22px] font-extrabold leading-[26px] text-white">
+          <h2 className="mt-16 line-clamp-2 text-22 font-extrabold text-white">
             {curation.name}
           </h2>
-          <p className="mt-2 line-clamp-2 text-12 font-light leading-[18px] text-white">
+          <p className="mt-8 line-clamp-2 text-12 font-light leading-18 text-white">
             {curation.description}
           </p>
         </div>

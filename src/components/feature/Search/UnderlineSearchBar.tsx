@@ -67,7 +67,7 @@ export default function UnderlineSearchBar({
         aria-label={ariaLabel ?? placeholder}
         placeholder={placeholder}
         className={cn(
-          'w-full appearance-none rounded-none border-b-2 border-stroke-neutral-subtle bg-transparent px-2 py-2.5 text-base outline-none transition-colors placeholder:text-fg-neutral-muted focus:border-stroke-focus-ring',
+          'w-full appearance-none rounded-none border-b-2 border-stroke-neutral-subtle bg-transparent px-8 py-10 text-base outline-none transition-colors placeholder:text-fg-neutral-muted focus:border-stroke-focus-ring',
           inputClassName,
         )}
         value={value ?? searchText}
@@ -84,7 +84,7 @@ export default function UnderlineSearchBar({
       {(clearable && searchText.length > 0) || renderActions ? (
         <div
           className={cn(
-            'absolute right-0 top-2.5 flex justify-end gap-[7px]',
+            'absolute right-0 top-10 flex justify-end gap-7',
             actionsClassName,
           )}
         >
@@ -93,10 +93,10 @@ export default function UnderlineSearchBar({
               type="button"
               onMouseDown={(event) => event.preventDefault()}
               onClick={clearSearchText}
-              className="flex h-6 w-6 items-center justify-center"
+              className="flex h-24 w-24 items-center justify-center"
               aria-label="검색어 지우기"
             >
-              <X aria-hidden className="h-3.5 w-3.5 text-fg-neutral-muted" />
+              <X aria-hidden className="h-14 w-14 text-fg-neutral-muted" />
             </button>
           )}
           {renderActions?.({ searchText, submit: handleSubmit })}

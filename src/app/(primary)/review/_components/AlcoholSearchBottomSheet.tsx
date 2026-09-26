@@ -125,7 +125,7 @@ export default function AlcoholSearchBottomSheet({
 
   return (
     <BottomSheet isOpen={isOpen} onClose={handleClose} height={85}>
-      <div className="px-5 pt-4 pb-3">
+      <div className="px-20 pt-16 pb-12">
         <SearchBar
           handleSearch={handleSearch}
           value={inputKeyword}
@@ -135,7 +135,7 @@ export default function AlcoholSearchBottomSheet({
         />
       </div>
 
-      <article className="space-y-4 pb-3">
+      <article className="space-y-16 pb-12">
         <Tab
           variant="bookmark"
           surface="floating"
@@ -143,7 +143,7 @@ export default function AlcoholSearchBottomSheet({
           handleTab={handleCategoryTab}
           currentTab={categorySelectedTab}
         />
-        <div className="pl-5">
+        <div className="pl-20">
           <CategorySelector
             handleCategoryCallback={handleCategoryChange}
             selectedCategory={selectedCategory}
@@ -151,9 +151,9 @@ export default function AlcoholSearchBottomSheet({
         </div>
       </article>
 
-      <div className="flex-1 overflow-y-auto px-5 pb-safe">
+      <div className="flex-1 overflow-y-auto px-20 pb-safe">
         {isLoading || isSearching ? (
-          <div className="space-y-2">
+          <div className="space-y-8">
             {['a', 'b', 'c', 'd', 'e'].map((id) => (
               <ListItemSkeleton key={`skeleton-${id}`} />
             ))}
@@ -168,22 +168,22 @@ export default function AlcoholSearchBottomSheet({
               />
             ))}
             {isFetchingNextPage && (
-              <div className="space-y-2 py-2">
+              <div className="space-y-8 py-8">
                 <ListItemSkeleton />
                 <ListItemSkeleton />
               </div>
             )}
-            <div ref={targetRef} className="h-1" />
+            <div ref={targetRef} className="h-4" />
           </div>
         ) : error ? (
-          <div className="flex h-full flex-col items-center justify-center gap-4 text-fg-neutral-muted">
+          <div className="flex h-full flex-col items-center justify-center gap-16 text-fg-neutral-muted">
             <p className="text-14">검색 중 문제가 발생했습니다.</p>
             <Button type="button" onClick={() => void refetch()} size="md">
               다시 시도
             </Button>
           </div>
         ) : showEmptySearch ? (
-          <div className="flex h-full flex-col items-center justify-center gap-4 text-fg-neutral-muted">
+          <div className="flex h-full flex-col items-center justify-center gap-16 text-fg-neutral-muted">
             <p className="text-14">검색 결과가 없습니다.</p>
             <Button
               type="button"

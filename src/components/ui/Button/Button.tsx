@@ -3,13 +3,13 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 export const buttonVariants = cva(
-  'inline-flex shrink-0 items-center justify-center gap-1 whitespace-nowrap box-border font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:border-stroke-neutral-subtle disabled:bg-bg-neutral-weak disabled:text-fg-disabled disabled:active:bg-bg-neutral-weak aria-disabled:pointer-events-none aria-disabled:border-stroke-neutral-subtle aria-disabled:bg-bg-neutral-weak aria-disabled:text-fg-disabled',
+  'inline-flex shrink-0 items-center justify-center gap-4 whitespace-nowrap box-border font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:border-stroke-neutral-subtle disabled:bg-bg-neutral-weak disabled:text-fg-disabled disabled:active:bg-bg-neutral-weak aria-disabled:pointer-events-none aria-disabled:border-stroke-neutral-subtle aria-disabled:bg-bg-neutral-weak aria-disabled:text-fg-disabled',
   {
     variants: {
       size: {
-        sm: 'h-7 rounded-md px-3 text-[13px] leading-[17px]',
-        md: 'h-10 rounded-lg px-4 text-[15px] leading-[19px]',
-        lg: 'h-[52px] rounded-xl px-4 text-[15px] leading-[19px]',
+        sm: 'h-28 rounded-md px-12 text-13',
+        md: 'h-40 rounded-lg px-16 text-15',
+        lg: 'h-52 rounded-xl px-16 text-15',
       },
       variant: {
         primary:
@@ -65,7 +65,7 @@ export function DualButton({
   onClickCancel,
 }: DualButtonProps) {
   return (
-    <div className="flex w-full gap-2">
+    <div className="flex w-full gap-8">
       <Button
         btnName={cancelBtnName}
         onClick={onClickCancel}

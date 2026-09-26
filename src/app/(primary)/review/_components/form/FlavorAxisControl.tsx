@@ -21,13 +21,13 @@ export default function FlavorAxisControl({
   onChange,
 }: Props) {
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-baseline gap-1.5">
+    <div className="flex flex-col gap-4">
+      <div className="flex items-baseline gap-6">
         <span className="text-12 font-bold text-fg-neutral">{label}</span>
         <span className="text-[10px] text-fg-neutral-muted">{descriptor}</span>
       </div>
-      <div className="flex items-center gap-1.5">
-        <span className="w-[24px] shrink-0 whitespace-nowrap text-[9px] text-fg-neutral-subtle">
+      <div className="flex items-center gap-6">
+        <span className="w-24 shrink-0 whitespace-nowrap text-[9px] text-fg-neutral-subtle">
           {minHint}
         </span>
         <input
@@ -37,10 +37,10 @@ export default function FlavorAxisControl({
           step={1}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="flex-1 h-1 rounded-full appearance-none cursor-pointer
+          className="flex-1 h-4 rounded-full appearance-none cursor-pointer
             [&::-webkit-slider-thumb]:appearance-none
-            [&::-webkit-slider-thumb]:w-4
-            [&::-webkit-slider-thumb]:h-4
+            [&::-webkit-slider-thumb]:w-16
+            [&::-webkit-slider-thumb]:h-16
             [&::-webkit-slider-thumb]:rounded-full
             [&::-webkit-slider-thumb]:bg-bg-brand-solid
             [&::-webkit-slider-thumb]:shadow-sm
@@ -52,7 +52,7 @@ export default function FlavorAxisControl({
         <span className="shrink-0 whitespace-nowrap text-[9px] text-fg-neutral-subtle">
           {maxHint}
         </span>
-        <span className="w-3 shrink-0 text-right text-12 font-bold text-fg-brand">
+        <span className="w-12 shrink-0 text-right text-12 font-bold text-fg-brand">
           {value}
         </span>
       </div>

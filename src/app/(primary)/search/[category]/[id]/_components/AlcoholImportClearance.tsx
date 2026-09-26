@@ -26,7 +26,7 @@ export default function AlcoholImportClearance({ alcoholId, korName }: Props) {
   if (!items) return null;
 
   return (
-    <section className="mx-5 py-[20px]">
+    <section className="mx-20 py-20">
       <h2 className="text-11 font-bold text-fg-neutral">수입 정보</h2>
       <div className={SECTION_HEADING_GAP_CLASS}>
         {items.map((item) => (
@@ -36,7 +36,7 @@ export default function AlcoholImportClearance({ alcoholId, korName }: Props) {
       {hasMore && (
         <Link
           href={`${ROUTES.IMPORT_CLEARANCE.BASE}?keyword=${encodeURIComponent(korName)}`}
-          className="mt-2 flex items-center justify-center gap-1 py-2 text-12 font-semibold text-fg-brand"
+          className="mt-8 flex items-center justify-center gap-4 py-8 text-12 font-semibold text-fg-brand"
         >
           전체 수입 내역 보기
           <ChevronRight size={14} aria-hidden />

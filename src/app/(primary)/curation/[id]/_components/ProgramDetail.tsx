@@ -57,12 +57,12 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
   return (
     <div
       className={`min-h-safe-screen bg-bg-layer-default text-fg-neutral ${
-        registrationUrl ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-8'
+        registrationUrl ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-32'
       }`}
     >
       <CurationDetailHeader title={program.name} onBack={() => router.back()} />
 
-      <section className="relative h-60 w-full overflow-hidden bg-bg-neutral-weak">
+      <section className="relative h-240 w-full overflow-hidden bg-bg-neutral-weak">
         <BaseImage
           src={program.coverImageUrl}
           alt=""
@@ -72,24 +72,24 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/75" />
-        <div className="absolute bottom-5 left-5 right-5 text-white">
-          <span className="inline-flex rounded-full bg-white/70 px-2.5 py-1 text-10 font-bold text-palette-static-black backdrop-blur-sm">
+        <div className="absolute bottom-20 left-20 right-20 text-white">
+          <span className="inline-flex rounded-full bg-white/70 px-10 py-4 text-10 font-bold text-palette-static-black backdrop-blur-sm">
             프로그램
           </span>
-          <h1 className="mt-3 line-clamp-2 text-20 font-extrabold">
+          <h1 className="mt-12 line-clamp-2 text-20 font-extrabold">
             {program.name}
           </h1>
-          <p className="mt-2 line-clamp-1 text-13 font-light">
+          <p className="mt-8 line-clamp-1 text-13 font-light">
             {dateLabel} · {payload.placeName} · {entryFeeLabel}
           </p>
         </div>
       </section>
 
-      <section className="px-5 py-5">
+      <section className="px-20 py-20">
         <ProgramEventInfoCard payload={payload} />
       </section>
 
-      <section className="px-5">
+      <section className="px-20">
         <p className="whitespace-pre-line text-13 font-medium leading-[1.7] text-fg-neutral">
           {program.description}
         </p>
@@ -98,9 +98,9 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
             href={officialUrl}
             target="_blank"
             rel="noreferrer"
-            className="mt-5 flex w-full items-center justify-between py-2 text-14 font-bold text-fg-brand"
+            className="mt-20 flex w-full items-center justify-between py-8 text-14 font-bold text-fg-brand"
           >
-            <span className="flex items-center gap-2">
+            <span className="flex items-center gap-8">
               <ExternalLink size={16} aria-hidden />
               참조 링크
             </span>
@@ -110,13 +110,13 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
       </section>
 
       {tagLabels.length > 0 && (
-        <section className="px-5 pt-6">
+        <section className="px-20 pt-24">
           <h2 className="text-16 font-extrabold text-fg-neutral">행사 태그</h2>
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          <div className="mt-12 flex flex-wrap gap-6">
             {tagLabels.map((tag) => (
               <span
                 key={tag}
-                className="label-default px-2 py-1 text-11 font-medium"
+                className="label-default px-8 py-4 text-11 font-medium"
               >
                 {tag}
               </span>
@@ -126,7 +126,7 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
       )}
 
       {imageUrls.length > 0 && (
-        <section className="mt-6 w-full">
+        <section className="mt-24 w-full">
           <Carousel
             setApi={setCarouselApi}
             opts={{ align: 'start', loop: imageUrls.length > 1 }}
@@ -135,7 +135,7 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
             <CarouselContent className="!ml-0">
               {imageUrls.map((url, index) => (
                 <CarouselItem key={url} className="!pl-0">
-                  <div className="relative h-60 w-full overflow-hidden bg-bg-neutral-weak">
+                  <div className="relative h-240 w-full overflow-hidden bg-bg-neutral-weak">
                     <BaseImage
                       src={url}
                       alt=""
@@ -150,11 +150,11 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
             </CarouselContent>
 
             {imageUrls.length > 1 && (
-              <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+              <div className="absolute bottom-12 left-1/2 flex -translate-x-1/2 gap-6">
                 {imageUrls.map((url, index) => (
                   <span
                     key={url}
-                    className={`h-1.5 w-1.5 rounded-full ${
+                    className={`h-6 w-6 rounded-full ${
                       currentSlide === index ? 'bg-white' : 'bg-white/50'
                     }`}
                   />
@@ -166,11 +166,11 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
       )}
 
       {programs.length > 0 && (
-        <section className="px-5 py-7">
+        <section className="px-20 py-28">
           <h2 className="text-16 font-extrabold text-fg-neutral">
             프로그램 및 이벤트 라인업
           </h2>
-          <div className="mt-4 space-y-4">
+          <div className="mt-16 space-y-16">
             {programs.map((item, index) => (
               <ProgramScheduleItem
                 key={`${item.name}-${index}`}

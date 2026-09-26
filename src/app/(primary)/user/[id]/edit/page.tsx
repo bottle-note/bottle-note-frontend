@@ -125,7 +125,7 @@ export default function UserEditPage({
         }}
       />
 
-      <section className="px-5 flex justify-center h-52 relative">
+      <section className="px-20 flex justify-center h-208 relative">
         <Image
           src={ChangeProfile}
           alt="이미지 수정"
@@ -144,7 +144,7 @@ export default function UserEditPage({
         </div>
       </section>
 
-      <section className="px-5">
+      <section className="px-20">
         <EditForm userId={id} />
       </section>
       {isOptionShow && (

@@ -30,25 +30,25 @@ export default function ImportClearanceListItem({ item }: Props) {
         })
       }
     >
-      <List.ItemLayout className="justify-between gap-2 px-0 py-3">
+      <List.ItemLayout className="justify-between gap-8 px-0 py-12">
         <div className="min-w-0 flex-1">
           {hasTags && (
-            <div className="mb-1.5 flex flex-wrap items-center gap-1">
+            <div className="mb-6 flex flex-wrap items-center gap-4">
               {item.alcoholCategoryKo && (
-                <span className="label-default whitespace-nowrap px-2 text-10">
+                <span className="label-default whitespace-nowrap px-8 text-10">
                   {item.alcoholCategoryKo}
                 </span>
               )}
               {item.exportCountryNameKo && (
-                <span className="whitespace-nowrap rounded-md border border-stroke-neutral-subtle bg-bg-neutral-weak px-2 py-1 text-10 text-fg-neutral-muted">
+                <span className="whitespace-nowrap rounded-md border border-stroke-neutral-subtle bg-bg-neutral-weak px-8 py-4 text-10 text-fg-neutral-muted">
                   {item.exportCountryNameKo}
                 </span>
               )}
             </div>
           )}
           <ItemInfo korName={korName} engName={engName} length={null} />
-          <p className="mt-1.5 text-13 text-fg-neutral">
-            <span className="mr-1 text-fg-neutral-muted">수입사</span>
+          <p className="mt-6 text-13 text-fg-neutral">
+            <span className="mr-4 text-fg-neutral-muted">수입사</span>
             {item.importerBaseName ?? '수입사 미상'}
             <span className="text-fg-neutral-muted">
               {' '}

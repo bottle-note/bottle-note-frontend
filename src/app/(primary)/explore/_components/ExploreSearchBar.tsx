@@ -62,14 +62,14 @@ export const ExploreSearchBar = ({
     <>
       <StickySearchBar
         testId="explore-search-bar"
-        containerClassName="-mx-4 px-4 pt-[5px]"
+        containerClassName="-mx-16 px-16 pt-5"
         isSearchActive={isSearchActive}
         onSearchActiveChange={onSearchActiveChange}
         description={description}
         onValueChange={onValueChange}
         initialValue={initialValue}
         ariaLabel={filterTarget === 'review' ? '리뷰 검색' : '위스키 검색'}
-        inputClassName="pr-16"
+        inputClassName="pr-64"
         clearable
         renderActions={() => (
           <button
@@ -78,7 +78,7 @@ export const ExploreSearchBar = ({
             className="rounded-sm text-fg-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
             onClick={() => setIsOpenSideFilter(true)}
           >
-            <ListFilter aria-hidden className="h-5 w-5" />
+            <ListFilter aria-hidden className="h-20 w-20" />
           </button>
         )}
       />

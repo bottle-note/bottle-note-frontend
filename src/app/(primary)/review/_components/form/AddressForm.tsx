@@ -32,7 +32,7 @@ export default function AddressForm() {
   }, [currentLocationName]);
 
   const ExtraButtons = (
-    <div className="flex gap-1">
+    <div className="flex gap-4">
       <a
         href={watch('mapUrl') || '#'}
         onClick={(e) => {
@@ -59,7 +59,7 @@ export default function AddressForm() {
       <div className="text-fg-brand">|</div>
       <button
         type="button"
-        className="flex items-center space-x-[2px]"
+        className="flex items-center space-x-2"
         onClick={resetAddress}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
@@ -68,7 +68,7 @@ export default function AddressForm() {
         }}
       >
         <p className="text-fg-neutral-muted">주소삭제</p>
-        <CircleX aria-hidden className="h-4 w-4 text-fg-neutral-muted" />
+        <CircleX aria-hidden className="h-16 w-16 text-fg-neutral-muted" />
       </button>
     </div>
   );
@@ -82,7 +82,7 @@ export default function AddressForm() {
         subTitle={currentLocationName ? '' : '(선택)'}
         forceOpen={searchModal}
       >
-        <article className="ml-7 mt-[6px] text-14">
+        <article className="ml-28 mt-6 text-14">
           {!watch('address') ? (
             <Button
               type="button"
@@ -96,14 +96,14 @@ export default function AddressForm() {
               장소 검색
             </Button>
           ) : (
-            <div className="w-full space-y-1">
-              <div className="pb-1">{watch('mapUrl') && ExtraButtons}</div>
+            <div className="w-full space-y-4">
+              <div className="pb-4">{watch('mapUrl') && ExtraButtons}</div>
               <p className="text-fg-neutral">{watch('address')}</p>
               <div className="border-b border-stroke-brand-solid">
                 <input
                   type="text"
                   placeholder="상세 주소를 입력하세요."
-                  className="h-5 w-full border-none bg-transparent text-fg-neutral placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
+                  className="h-20 w-full border-none bg-transparent text-fg-neutral placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
                   maxLength={30}
                   {...register('detailAddress')}
                 />

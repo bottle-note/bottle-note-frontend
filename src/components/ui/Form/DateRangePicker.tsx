@@ -76,8 +76,8 @@ export default function DateRangePicker({
 
   return (
     <div className="relative" ref={ref}>
-      <div className="flex items-center gap-3 rounded-lg border border-mainCoral py-2 px-4">
-        <div className="flex flex-1 items-center justify-between gap-4">
+      <div className="flex items-center gap-12 rounded-lg border border-mainCoral py-8 px-16">
+        <div className="flex flex-1 items-center justify-between gap-16">
           <button
             type="button"
             onClick={() => setIsOpen(true)}
@@ -90,7 +90,7 @@ export default function DateRangePicker({
               src={CalendarSubcoralIcon}
               alt=""
               aria-hidden
-              className="ml-2 h-3.5 w-3.5 shrink-0"
+              className="ml-8 h-14 w-14 shrink-0"
             />
           </button>
           <span className="text-12 text-fg-neutral">~</span>
@@ -106,7 +106,7 @@ export default function DateRangePicker({
               src={CalendarSubcoralIcon}
               alt=""
               aria-hidden
-              className="ml-2 h-3.5 w-3.5 shrink-0"
+              className="ml-8 h-14 w-14 shrink-0"
             />
           </button>
         </div>
@@ -121,12 +121,12 @@ export default function DateRangePicker({
             !hasDate && 'invisible',
           )}
         >
-          <X aria-hidden className="h-3.5 w-3.5 text-fg-neutral-muted" />
+          <X aria-hidden className="h-14 w-14 text-fg-neutral-muted" />
         </button>
       </div>
 
       {description && (
-        <div className="text-10 text-brightGray text-center py-2">
+        <div className="text-10 text-brightGray text-center py-8">
           {description}
         </div>
       )}
@@ -151,7 +151,7 @@ export default function DateRangePicker({
           wrapperClassName="w-full"
           calendarClassName={cn(
             'bg-white !border-mainCoral rounded-lg shadow-lg',
-            !description && 'mt-2',
+            !description && 'mt-8',
           )}
           dayClassName={(date) => {
             if (!date) return '';

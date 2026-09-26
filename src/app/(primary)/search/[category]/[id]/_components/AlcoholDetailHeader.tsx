@@ -18,21 +18,21 @@ function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
   const { handleReviewWrite } = useNavigateReviewWrite();
 
   return (
-    <section className="relative z-20 flex gap-4 px-5 pb-4">
+    <section className="relative z-20 flex gap-16 px-20 pb-16">
       <AlcoholImage
         imageUrl={data?.alcoholUrlImg}
-        outerHeightClass="h-[190px]"
-        outerWidthClass="w-[120px]"
-        innerHeightClass="h-[160px]"
-        innerWidthClass="w-[88px]"
+        outerHeightClass="h-190"
+        outerWidthClass="w-120"
+        innerHeightClass="h-160"
+        innerWidthClass="w-88"
         bgColor="bg-palette-static-white"
         priority
         enableModal={true}
       />
-      <article className="flex min-w-0 flex-1 flex-col justify-center gap-4 overflow-x-hidden text-fg-neutral">
+      <article className="flex min-w-0 flex-1 flex-col justify-center gap-16 overflow-x-hidden text-fg-neutral">
         {data && (
           <>
-            <div className="space-y-[6px]">
+            <div className="space-y-6">
               <Label
                 name={data.korCategory}
                 styleClass="rounded-[4.62px] border-stroke-neutral-weak px-[7.69px] py-[3.85px] text-10 text-fg-neutral-muted"
@@ -44,12 +44,12 @@ function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
                 {data?.engName.toUpperCase()}
               </p>
             </div>
-            <div className="space-y-[10px]">
-              <div className="flex items-end gap-2">
+            <div className="space-y-10">
+              <div className="flex items-end gap-8">
                 <Star
                   rating={data?.rating}
                   size={27}
-                  textStyle="text-27 font-extrabold leading-[27px]"
+                  textStyle="text-27 font-extrabold leading-27"
                   tone="brand"
                   align="end"
                 />
@@ -58,9 +58,9 @@ function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
                 </div>
               </div>
               <div className="border-[0.5px] border-stroke-neutral-subtle" />
-              <div className="flex gap-3 text-fg-neutral-muted">
+              <div className="flex gap-12 text-fg-neutral-muted">
                 <button
-                  className="flex items-center gap-[3px]"
+                  className="flex items-center gap-3"
                   onClick={() => handleReviewWrite(data.alcoholId)}
                 >
                   <SemanticIcon
@@ -70,7 +70,7 @@ function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
                   />
                   <p className="text-12 font-normal">리뷰 작성</p>
                 </button>
-                <div className="my-[0.1rem] border-[0.5px] border-stroke-neutral-subtle" />
+                <div className="my-[1.6px] border-[0.5px] border-stroke-neutral-subtle" />
                 <AlcoholPickButton
                   size={16}
                   isPicked={isPicked}

@@ -122,13 +122,13 @@ function AnimatedPage({
 
     switch (direction) {
       case 'up':
-        return 'translate-y-8';
+        return 'translate-y-32';
       case 'down':
-        return '-translate-y-8';
+        return '-translate-y-32';
       case 'left':
-        return 'translate-x-8';
+        return 'translate-x-32';
       case 'right':
-        return '-translate-x-8';
+        return '-translate-x-32';
       default:
         return 'scale-95';
     }

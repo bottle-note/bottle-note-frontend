@@ -9,7 +9,7 @@ interface IconProps {
 const defaultProps: Partial<IconProps> = {
   color: '#BFBFBF',
   className: '',
-  size: 4,
+  size: 16,
 };
 
 export const StarIcon: FC<IconProps> = ({
@@ -18,7 +18,8 @@ export const StarIcon: FC<IconProps> = ({
   size = defaultProps.size,
 }) => (
   <svg
-    className={`w-${size} h-${size} ${className}`}
+    className={className}
+    style={{ width: size, height: size }}
     width="13"
     height="13"
     viewBox="0 0 10 10"
@@ -40,7 +41,8 @@ export const ReviewIcon: FC<IconProps> = ({
   size = defaultProps.size,
 }) => (
   <svg
-    className={`w-${size} h-${size} ${className}`}
+    className={className}
+    style={{ width: size, height: size }}
     width="14"
     height="15"
     viewBox="0 0 14 15"
@@ -60,7 +62,8 @@ export const LikeIcon: FC<IconProps> = ({
   size = defaultProps.size,
 }) => (
   <svg
-    className={`w-${size} h-${size} ${className}`}
+    className={className}
+    style={{ width: size, height: size }}
     width="30"
     height="30"
     viewBox="0 0 30 30"

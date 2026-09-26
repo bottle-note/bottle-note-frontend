@@ -16,9 +16,9 @@ const Toggle = ({
   textSize = 'text-10',
 }: Props) => {
   return (
-    <div className="flex items-center space-x-[3px]">
+    <div className="flex items-center space-x-3">
       <button
-        className={`toggle-container flex items-center justify-center w-8 h-4 rounded-full ${
+        className={`toggle-container flex items-center justify-center w-32 h-16 rounded-full ${
           isActive ? 'bg-bg-brand-primary-solid' : 'bg-bg-disabled'
         }`}
         disabled={disabled}
@@ -26,8 +26,8 @@ const Toggle = ({
         aria-label={isActive ? onName : offName}
       >
         <div
-          className={`toggle-handle w-[0.8rem] h-[0.8rem] rounded-full bg-bg-layer-default transform transition-transform ${
-            isActive ? 'translate-x-2' : 'translate-x-[-0.5rem]'
+          className={`toggle-handle w-[12.8px] h-[12.8px] rounded-full bg-bg-layer-default transform transition-transform ${
+            isActive ? 'translate-x-8' : 'translate-x-[-8px]'
           }`}
         />
       </button>

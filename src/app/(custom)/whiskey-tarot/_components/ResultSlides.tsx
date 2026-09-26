@@ -74,7 +74,7 @@ function SingleCardSlide({
       className={`
         relative flex flex-col min-h-screen overflow-hidden
         transition-all duration-300 ease-out
-        ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}
+        ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-32'}
       `}
       style={{ backgroundColor: card.color || '#0a0a0f' }}
     >
@@ -82,11 +82,11 @@ function SingleCardSlide({
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60" />
 
       {/* 진행 바 */}
-      <div className="relative z-20 flex gap-1 px-4 pt-6">
+      <div className="relative z-20 flex gap-4 px-16 pt-24">
         {Array.from({ length: totalCards }).map((_, index) => (
           <div
             key={index}
-            className="flex-1 h-1 rounded-full overflow-hidden bg-white/20"
+            className="flex-1 h-4 rounded-full overflow-hidden bg-white/20"
           >
             <div
               className={`h-full bg-white transition-all duration-500 ${
@@ -98,17 +98,17 @@ function SingleCardSlide({
       </div>
 
       {/* 카드 번호 */}
-      <div className="relative z-10 text-center mt-8">
+      <div className="relative z-10 text-center mt-32">
         <span className="text-white/60 text-sm tracking-wider">
           {cardNumber}번째 카드
         </span>
       </div>
 
       {/* 메인 콘텐츠 - 스크롤 가능 */}
-      <div className="relative z-10 flex-1 flex flex-col items-center px-6 py-4 overflow-y-auto">
+      <div className="relative z-10 flex-1 flex flex-col items-center px-24 py-16 overflow-y-auto">
         {/* 카드 뒤집기 애니메이션 */}
         <div
-          className="relative w-48 h-72 mb-8"
+          className="relative w-192 h-288 mb-32"
           style={{ perspective: '1000px' }}
         >
           <div
@@ -120,7 +120,7 @@ function SingleCardSlide({
           >
             {/* 카드 뒷면 */}
             <div className="absolute inset-0 [backface-visibility:hidden]">
-              <div className="w-full h-full rounded-xl bg-[#f4e4c1] p-2 shadow-2xl">
+              <div className="w-full h-full rounded-xl bg-[#f4e4c1] p-8 shadow-2xl">
                 <div className="relative w-full h-full rounded-lg overflow-hidden border-2 border-[#c9a227]/30">
                   <Image
                     src="/images/tarot/card-back.png"
@@ -137,7 +137,7 @@ function SingleCardSlide({
 
             {/* 카드 앞면 */}
             <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-              <div className="w-full h-full rounded-xl bg-[#f4e4c1] p-2 shadow-2xl">
+              <div className="w-full h-full rounded-xl bg-[#f4e4c1] p-8 shadow-2xl">
                 <div className="relative w-full h-full rounded-lg overflow-hidden border-2 border-[#c9a227]/30">
                   <Image
                     src={card.image}
@@ -155,17 +155,17 @@ function SingleCardSlide({
         {/* 카드 해설 */}
         <div
           className={`
-            text-center max-w-[320px] transition-all duration-500
-            ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+            text-center max-w-320 transition-all duration-500
+            ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'}
           `}
         >
           {/* 카드 이름 */}
-          <h2 className="text-white text-xl font-bold mb-1">{card.nameKo}</h2>
-          <p className="text-white/60 text-xs mb-3">{card.name}</p>
+          <h2 className="text-white text-xl font-bold mb-4">{card.nameKo}</h2>
+          <p className="text-white/60 text-xs mb-12">{card.name}</p>
 
           {/* Flavor 태그 */}
-          <div className="mb-4">
-            <span className="px-4 py-1.5 bg-mainCoral/20 rounded-full text-mainCoral text-sm">
+          <div className="mb-16">
+            <span className="px-16 py-6 bg-mainCoral/20 rounded-full text-mainCoral text-sm">
               #{FLAVOR_TAG_LABELS[card.flavorTag] || card.flavorTag}
             </span>
           </div>
@@ -176,11 +176,11 @@ function SingleCardSlide({
           </p>
 
           {/* 구분선 */}
-          <div className="w-12 h-px bg-white/20 mx-auto my-4" />
+          <div className="w-48 h-1 bg-white/20 mx-auto my-16" />
 
           {/* 카드의 역사 */}
           <div className="text-left">
-            <p className="text-white/40 text-xs mb-2">카드의 역사</p>
+            <p className="text-white/40 text-xs mb-8">카드의 역사</p>
             <p className="text-white/60 text-xs leading-relaxed">
               {card.history}
             </p>
@@ -191,14 +191,14 @@ function SingleCardSlide({
       {/* 하단 버튼 */}
       <div
         className={`
-          relative z-10 px-6 pb-safe-lg transition-all duration-500
+          relative z-10 px-24 pb-safe-lg transition-all duration-500
           ${showContent ? 'opacity-100' : 'opacity-0'}
         `}
       >
         <button
           onClick={onNext}
           disabled={!showContent}
-          className="w-full py-4 bg-white/10 text-white font-semibold rounded-full border border-white/20 backdrop-blur-sm disabled:opacity-50"
+          className="w-full py-16 bg-white/10 text-white font-semibold rounded-full border border-white/20 backdrop-blur-sm disabled:opacity-50"
         >
           {isLast ? '나의 위스키 확인하기' : '다음 카드 보기'}
         </button>

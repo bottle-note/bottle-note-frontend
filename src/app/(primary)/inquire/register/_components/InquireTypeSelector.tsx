@@ -15,19 +15,19 @@ export default function InquireTypeSelector({
   const { setValue, watch } = useFormContext<FormValues>();
 
   const labelBaseStyle =
-    'border border-stroke-brand-solid rounded-md text-15 px-3 py-2';
+    'border border-stroke-brand-solid rounded-md text-15 px-12 py-8';
   const typeList =
     paramsType === 'business' ? BUSINESS_TYPE_LIST : SERVICE_TYPE_LIST;
 
   return (
-    <article className="space-y-[10px]">
+    <article className="space-y-10">
       <label
-        className="block font-bold text-fg-neutral-muted text-13 mb-1"
+        className="block font-bold text-fg-neutral-muted text-13 mb-4"
         htmlFor="type"
       >
         문의 유형
       </label>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-8">
         {typeList.map((item) => {
           return (
             <Label

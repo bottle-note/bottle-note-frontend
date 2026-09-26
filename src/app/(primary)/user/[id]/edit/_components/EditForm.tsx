@@ -92,20 +92,20 @@ function EditForm({ userId }: Props) {
 
   return (
     <>
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-32">
         <div>
           <article className="flex flex-col relative">
             <label className="text-13 text-fg-neutral">닉네임</label>
             <input
               placeholder="닉네임 입력"
-              className="border-b border-stroke-neutral-subtle py-2 text-15 placeholder:text-fg-placeholder bg-transparent outline-none appearance-none rounded-none"
+              className="border-b border-stroke-neutral-subtle py-8 text-15 placeholder:text-fg-placeholder bg-transparent outline-none appearance-none rounded-none"
               value={nickName}
               onChange={(e) => setNickName(e.target.value)}
               type="text"
               maxLength={19}
             />
 
-            <div className="flex  gap-2 absolute bottom-2 right-0">
+            <div className="flex  gap-8 absolute bottom-8 right-0">
               {nickName.length ? (
                 <Image
                   src={CloseIconGray}
@@ -125,7 +125,7 @@ function EditForm({ userId }: Props) {
               </Button>
             </div>
           </article>
-          <div className="text-right clear-start text-fg-neutral-muted text-10 mt-1">{`${nickName.length}/20`}</div>
+          <div className="text-right clear-start text-fg-neutral-muted text-10 mt-4">{`${nickName.length}/20`}</div>
         </div>
       </div>
     </>

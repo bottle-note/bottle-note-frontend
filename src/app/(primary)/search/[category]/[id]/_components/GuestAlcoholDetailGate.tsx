@@ -51,7 +51,7 @@ export function GuestAlcoholDetailGate({
             'linear-gradient(to bottom, transparent 0%, var(--color-bg-layer-default) 42%, var(--color-bg-layer-default) 100%)',
         }}
       />
-      <div className="pointer-events-none relative z-10 w-full bg-bg-layer-default px-5 py-5">
+      <div className="pointer-events-none relative z-10 w-full bg-bg-layer-default px-20 py-20">
         <GuestLoginPrompt
           title={title}
           description={description}

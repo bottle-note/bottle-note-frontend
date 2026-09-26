@@ -86,7 +86,7 @@ export default function Inquire() {
 
   return (
     <>
-      <section className="min-h-safe-screen bg-bg-layer-default pb-8 relative text-fg-neutral">
+      <section className="min-h-safe-screen bg-bg-layer-default pb-32 relative text-fg-neutral">
         <SubHeader>
           <SubHeader.Left
             onClick={() => {
@@ -104,7 +104,7 @@ export default function Inquire() {
         </SubHeader>
         {inquireDetails !== null && (
           <>
-            <article className="mt-4 mx-5 flex justify-between items-center">
+            <article className="mt-16 mx-20 flex justify-between items-center">
               <p className="text-13 font-bold text-fg-brand">
                 {inquireDetails.typeName} 문의
               </p>
@@ -113,7 +113,7 @@ export default function Inquire() {
               </p>
             </article>
 
-            <article className="mx-5 mt-2 space-y-[18px]">
+            <article className="mx-20 mt-8 space-y-18">
               <h3 className="text-16 font-bold text-fg-neutral">
                 {inquireDetails.title}
               </h3>
@@ -126,7 +126,7 @@ export default function Inquire() {
                 />
               </div>
               {inquireDetails.imageUrlList.length > 0 && (
-                <div className="flex overflow-x-auto gap-[6px] pb-2">
+                <div className="flex overflow-x-auto gap-6 pb-8">
                   {inquireDetails.imageUrlList.map((imgData) => (
                     <div
                       className="relative flex-shrink-0 cursor-pointer bg-palette-static-white"
@@ -161,7 +161,7 @@ export default function Inquire() {
               )}
             </article>
 
-            <article className="border-t border-b border-stroke-neutral-subtle mx-5 my-[26px] py-[26px]">
+            <article className="border-t border-b border-stroke-neutral-subtle mx-20 my-26 py-26">
               <div className="flex items-center justify-between">
                 <p className="text-13 text-fg-brand font-bold">
                   {getStatusText(inquireDetails.status as Status)}
@@ -173,7 +173,7 @@ export default function Inquire() {
                 )}
               </div>
               {inquireDetails.adminId && (
-                <div className="pt-5 text-12 break-words text-fg-neutral">
+                <div className="pt-20 text-12 break-words text-fg-neutral">
                   {inquireDetails.responseContent}
                 </div>
               )}

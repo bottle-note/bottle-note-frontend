@@ -44,9 +44,9 @@ function PrimaryLinkButton({
       <Link
         href={linkSrc}
         onClick={handleBeforeRouteChange}
-        className="h-full w-full flex flex-col justify-between relative z-10 py-[16.5px] px-[17.02px]"
+        className="h-full w-full flex flex-col justify-between relative z-10 py-16.5 px-[17.02px]"
       >
-        <div className={`${imgSrc ? 'space-y-[90px]' : 'space-y-[11.7px]'}`}>
+        <div className={`${imgSrc ? 'space-y-90' : 'space-y-[11.7px]'}`}>
           <div
             className={`${icon ? 'flex justify-between' : ''} relative z-20 text-fg-brand-contrast`}
           >
@@ -54,13 +54,13 @@ function PrimaryLinkButton({
               <p className="font-extrabold text-14">{korName}</p>
               <p className="text-12 font-normal">{engName}</p>
             </div>
-            {icon && <ArrowRight aria-hidden className="h-[25px] w-[25px]" />}
+            {icon && <ArrowRight aria-hidden className="h-25 w-25" />}
           </div>
           <div className="relative z-0 border border-fg-brand-contrast" />
         </div>
         {imgSrc && (
           <Image
-            className="absolute bottom-[0.5px] right-4 z-10"
+            className="absolute bottom-0.5 right-16 z-10"
             src={imgSrc}
             height={imageSize?.height}
             width={imageSize?.width}

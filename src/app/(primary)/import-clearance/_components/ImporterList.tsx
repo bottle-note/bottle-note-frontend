@@ -113,7 +113,7 @@ export default function ImporterList() {
   return (
     <div className="min-h-safe-screen bg-bg-layer-default text-fg-neutral">
       <section
-        className="w-full px-5 pb-navbar"
+        className="w-full px-20 pb-navbar"
         style={{ marginTop: 'var(--logo-header-expanded-height)' }}
       >
         <h1 className="sr-only">수입사</h1>
@@ -137,7 +137,7 @@ export default function ImporterList() {
           </List.Section>
         </List>
         {hasNextPageError ? (
-          <div className="flex flex-col items-center gap-3 py-6">
+          <div className="flex flex-col items-center gap-12 py-24">
             <p className="text-13 text-fg-neutral-muted">
               목록을 더 불러오지 못했어요.
             </p>
@@ -160,7 +160,7 @@ export default function ImporterList() {
           />
         )}
         {isFetchingNextPage && (
-          <p className="py-4 text-center text-13 text-fg-neutral-muted">
+          <p className="py-16 text-center text-13 text-fg-neutral-muted">
             불러오는 중…
           </p>
         )}

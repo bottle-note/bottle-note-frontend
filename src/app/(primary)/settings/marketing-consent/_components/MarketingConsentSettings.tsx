@@ -108,26 +108,26 @@ export function MarketingConsentSettings({
 
   if (isAuthLoading || !isLoggedIn) {
     return (
-      <div className="px-5 py-10 text-center text-14 text-fg-neutral-muted">
+      <div className="px-20 py-40 text-center text-14 text-fg-neutral-muted">
         로그인 정보를 확인하고 있어요.
       </div>
     );
   }
 
   return (
-    <section className="px-5 pb-safe-lg pt-8">
+    <section className="px-20 pb-safe-lg pt-32">
       <h1 className="text-20 font-bold">수신 동의 현황</h1>
-      <p className="mt-2 text-13 leading-5 text-fg-neutral-muted">
+      <p className="mt-8 text-13 leading-20 text-fg-neutral-muted">
         마케팅 정보 수신 여부를 확인하고 변경할 수 있어요.
       </p>
 
       {isStatusError ? (
-        <div className="mt-8 rounded-xl border border-stroke-neutral-subtle bg-bg-neutral-weak px-4 py-6 text-center">
+        <div className="mt-32 rounded-xl border border-stroke-neutral-subtle bg-bg-neutral-weak px-16 py-24 text-center">
           <p className="text-14 text-fg-neutral-muted">
             동의 상태를 불러오지 못했습니다.
           </p>
           <button
-            className="mt-4 text-14 font-bold text-fg-brand underline underline-offset-4"
+            className="mt-16 text-14 font-bold text-fg-brand underline underline-offset-4"
             onClick={() => refetch()}
             type="button"
           >
@@ -136,15 +136,15 @@ export function MarketingConsentSettings({
         </div>
       ) : (
         <>
-          <div className="mt-8 overflow-hidden rounded-xl border border-stroke-neutral-subtle">
+          <div className="mt-32 overflow-hidden rounded-xl border border-stroke-neutral-subtle">
             <table className="w-full text-14">
               <caption className="sr-only">마케팅 정보 수신 동의 현황</caption>
               <tbody className="divide-y divide-stroke-neutral-subtle">
                 <tr>
-                  <th className="w-32 bg-bg-neutral-weak px-4 py-4 text-left font-medium text-fg-neutral-muted">
+                  <th className="w-128 bg-bg-neutral-weak px-16 py-16 text-left font-medium text-fg-neutral-muted">
                     수신 동의 여부
                   </th>
-                  <td className="px-4 py-4 font-bold">
+                  <td className="px-16 py-16 font-bold">
                     {isStatusPending ? (
                       <span className="text-fg-neutral-muted">조회 중</span>
                     ) : (
@@ -159,16 +159,18 @@ export function MarketingConsentSettings({
                   </td>
                 </tr>
                 <tr>
-                  <th className="w-32 bg-bg-neutral-weak px-4 py-4 text-left font-medium text-fg-neutral-muted">
+                  <th className="w-128 bg-bg-neutral-weak px-16 py-16 text-left font-medium text-fg-neutral-muted">
                     동의 일자
                   </th>
-                  <td className="px-4 py-4 text-fg-neutral-muted">정보 없음</td>
+                  <td className="px-16 py-16 text-fg-neutral-muted">
+                    정보 없음
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <div className="mt-10">
+          <div className="mt-40">
             {isAgreed ? (
               <Button
                 btnName={submitMutation.isPending ? '처리 중...' : '동의 철회'}

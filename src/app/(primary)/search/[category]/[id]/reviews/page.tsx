@@ -103,7 +103,7 @@ function Reviews() {
   }, [activeTab, refetchReview, refetchMyReview]);
 
   return (
-    <div className="pb-8 relative">
+    <div className="pb-32 relative">
       <SubHeader>
         <SubHeader.Left
           onClick={() => {
@@ -119,10 +119,10 @@ function Reviews() {
         </SubHeader.Left>
         <SubHeader.Center>{alcoholKorName}</SubHeader.Center>
       </SubHeader>
-      <section className="pt-5 px-5 pb-7 space-y-9">
-        <div className="flex gap-3 relative">
+      <section className="pt-20 px-20 pb-28 space-y-36">
+        <div className="flex gap-12 relative">
           <button
-            className={`py-2 ${activeTab === 'tab1' ? 'tab-selected' : 'tab-default'} w-full font-bold text-15 text-center`}
+            className={`py-8 ${activeTab === 'tab1' ? 'tab-selected' : 'tab-default'} w-full font-bold text-15 text-center`}
             onClick={() => {
               handleTabClick('tab1');
               refetchReview();
@@ -131,7 +131,7 @@ function Reviews() {
             모든 리뷰
           </button>
           <button
-            className={`py-2 ${activeTab === 'tab2' ? 'tab-selected' : 'tab-default'} w-full font-bold text-15 text-center`}
+            className={`py-8 ${activeTab === 'tab2' ? 'tab-selected' : 'tab-default'} w-full font-bold text-15 text-center`}
             onClick={() => {
               handleTabClick('tab2');
               refetchMyReview();
@@ -169,7 +169,7 @@ function Reviews() {
                         />
                       ))
                   ) : (
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-8">
                       {Array.from({ length: 3 }).map(() => (
                         <ReviewItemSkeleton key={uuidv4()} />
                       ))}
@@ -211,7 +211,7 @@ function Reviews() {
                         />
                       ))
                   ) : (
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-8">
                       {Array.from({ length: 3 }).map(() => (
                         <ReviewItemSkeleton key={uuidv4()} />
                       ))}
@@ -224,7 +224,7 @@ function Reviews() {
           )}
         </div>
       </section>
-      <section className="px-5  bottom-6  fixed-content">
+      <section className="px-20  bottom-24  fixed-content">
         <Button
           onClick={() => handleReviewWrite(alcoholId)}
           btnName="리뷰 작성"

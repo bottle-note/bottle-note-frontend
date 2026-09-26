@@ -203,15 +203,15 @@
 }
 @layer components {
   .label-default {
-    @apply bg-bg-layer-default text-fg-brand border border-solid border-stroke-brand-solid rounded-md py-1 px-3;
+    @apply bg-bg-layer-default text-fg-brand border border-solid border-stroke-brand-solid rounded-md py-4 px-12;
   }
 
   .label-selected {
-    @apply bg-bg-brand-solid text-fg-brand-contrast border border-solid border-stroke-brand-solid rounded-md py-1 px-3;
+    @apply bg-bg-brand-solid text-fg-brand-contrast border border-solid border-stroke-brand-solid rounded-md py-4 px-12;
   }
 
   .label-disabled {
-    @apply bg-bg-disabled text-fg-disabled border border-solid border-stroke-neutral-subtle rounded-md py-1 px-3;
+    @apply bg-bg-disabled text-fg-disabled border border-solid border-stroke-neutral-subtle rounded-md py-4 px-12;
   }
 
   .link-button {
@@ -227,11 +227,11 @@
   }
 
   .modal-mainText {
-    @apply text-20 text-fg-brand font-medium whitespace-pre-wrap mb-2;
+    @apply text-20 text-fg-brand font-medium whitespace-pre-wrap mb-8;
   }
 
   .modal-subText {
-    @apply text-16 text-fg-neutral-muted whitespace-pre-wrap mb-3;
+    @apply text-16 text-fg-neutral-muted whitespace-pre-wrap mb-12;
   }
 }
 

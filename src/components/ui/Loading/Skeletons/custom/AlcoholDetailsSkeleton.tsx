@@ -7,16 +7,16 @@ function AlcoholDetailsSkeleton() {
   return (
     <div className="w-full">
       <SkeletonBase height={250} className="w-full" borderRadius="0" />
-      <div className="mb-5">
+      <div className="mb-20">
         {/* 별점 영역 */}
-        <article className="grid place-items-center space-y-2 py-4">
+        <article className="grid place-items-center space-y-8 py-16">
           <SkeletonBase width={210} height={22} />
           <SkeletonBase width={260} height={55} />
         </article>
         {/* 위스키 소개 영역 */}
-        <section className="mx-5 flex flex-col gap-2 border-y border-stroke-neutral-subtle py-3">
+        <section className="mx-20 flex flex-col gap-8 border-y border-stroke-neutral-subtle py-12">
           <SkeletonBase width={86} height={20} />
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-8">
             <SkeletonBase height={16} className="w-full" />
             <SkeletonBase height={16} className="w-full" />
             <SkeletonBase width={230} height={16} />
@@ -24,33 +24,33 @@ function AlcoholDetailsSkeleton() {
           <SkeletonBase width={48} height={16} className="self-end" />
         </section>
         {/* Alcohol 상세정보 */}
-        <section className="mx-5 border-b border-stroke-neutral-subtle py-4">
-          <div className="grid gap-1.5">
-            <div className="grid grid-cols-2 gap-2">
+        <section className="mx-20 border-b border-stroke-neutral-subtle py-16">
+          <div className="grid gap-6">
+            <div className="grid grid-cols-2 gap-8">
               {Array.from({ length: 3 }).map(() => (
                 <div
                   key={uuid()}
-                  className="flex items-start gap-2 text-12 text-fg-neutral"
+                  className="flex items-start gap-8 text-12 text-fg-neutral"
                 >
                   <SkeletonBase width={50} height={16} />
                   <SkeletonBase width={100} height={16} />
                 </div>
               ))}
             </div>
-            <div className="flex items-start gap-2 text-12 text-fg-neutral">
+            <div className="flex items-start gap-8 text-12 text-fg-neutral">
               <SkeletonBase width={50} height={16} />
               <SkeletonBase width={150} height={16} />
             </div>
           </div>
         </section>
         {/* 태그 영역 */}
-        <section className="mx-5 space-y-2 border-b border-stroke-neutral-subtle py-[21px]">
+        <section className="mx-20 space-y-8 border-b border-stroke-neutral-subtle py-21">
           <TagSkeleton />
         </section>
         {/* 친구 목록 영역 */}
-        <section className="mx-5 space-y-2 border-b border-stroke-neutral-subtle py-5">
+        <section className="mx-20 space-y-8 border-b border-stroke-neutral-subtle py-20">
           <SkeletonBase width={70} height={18} />
-          <div className="whitespace-nowrap overflow-x-auto flex space-x-5 scrollbar-hide">
+          <div className="whitespace-nowrap overflow-x-auto flex space-x-20 scrollbar-hide">
             {Array.from({ length: 4 }).map(() => (
               <div
                 key={uuid()}
@@ -65,15 +65,15 @@ function AlcoholDetailsSkeleton() {
         </section>
       </div>
       {/* 리뷰 리스트/더보기 영역 */}
-      <div className="mx-5">
-        <div className="h-4 bg-bg-layer-basement" />
-        <section className="pt-[34px] pb-[20px]">
-          <SkeletonBase width={50} height={18} className="mb-[10px]" />
+      <div className="mx-20">
+        <div className="h-16 bg-bg-layer-basement" />
+        <section className="pt-34 pb-20">
+          <SkeletonBase width={50} height={18} className="mb-10" />
           <div className="border-t border-stroke-neutral-subtle">
             <ReviewItemSkeleton />
           </div>
         </section>
-        <section className="mb-24">
+        <section className="mb-96">
           <SkeletonBase height={80} borderRadius="0.5rem" />
         </section>
       </div>

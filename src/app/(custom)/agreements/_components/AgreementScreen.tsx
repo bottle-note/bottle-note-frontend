@@ -76,9 +76,9 @@ function AgreementCheckbox({
         : '';
 
   return (
-    <div className="flex items-center gap-3 py-4">
+    <div className="flex items-center gap-12 py-16">
       <label
-        className="flex min-w-0 flex-1 cursor-pointer items-center gap-3"
+        className="flex min-w-0 flex-1 cursor-pointer items-center gap-12"
         htmlFor={id}
       >
         <input
@@ -91,7 +91,7 @@ function AgreementCheckbox({
         />
         <span
           aria-hidden="true"
-          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-stroke-neutral-weak text-13 font-bold text-fg-brand transition-colors peer-checked:border-stroke-brand-solid peer-checked:bg-bg-brand-weak peer-focus-visible:ring-2 peer-focus-visible:ring-stroke-focus-ring"
+          className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border border-stroke-neutral-weak text-13 font-bold text-fg-brand transition-colors peer-checked:border-stroke-brand-solid peer-checked:bg-bg-brand-weak peer-focus-visible:ring-2 peer-focus-visible:ring-stroke-focus-ring"
         >
           {checked ? '✓' : ''}
         </span>
@@ -223,24 +223,24 @@ export function AgreementScreen({ documentContents }: AgreementScreenProps) {
   const isInteractionDisabled = !isInitialized || submitMutation.isPending;
 
   return (
-    <main className="content-container flex min-h-safe-screen flex-col bg-bg-layer-default px-5 pb-safe-lg pt-safe text-fg-neutral">
-      <section className="pt-8">
+    <main className="content-container flex min-h-safe-screen flex-col bg-bg-layer-default px-20 pb-safe-lg pt-safe text-fg-neutral">
+      <section className="pt-32">
         <p className="text-13 font-bold text-fg-brand">보틀노트</p>
-        <h1 className="mt-3 text-27 font-extrabold leading-9">
+        <h1 className="mt-12 text-27 font-extrabold leading-36">
           서비스 이용을 위해
           <br />
           동의가 필요해요
         </h1>
-        <p className="mt-3 text-14 leading-6 text-fg-neutral-muted">
+        <p className="mt-12 text-14 leading-24 text-fg-neutral-muted">
           약관과 개인정보 처리 내용을 확인한 후 동의해주세요.
         </p>
       </section>
 
-      <section className="mt-10 rounded-2xl border border-stroke-neutral-subtle bg-bg-neutral-weak px-4 py-4">
-        <div className="flex items-start justify-between gap-4">
+      <section className="mt-40 rounded-2xl border border-stroke-neutral-subtle bg-bg-neutral-weak px-16 py-16">
+        <div className="flex items-start justify-between gap-16">
           <div>
             <h2 className="text-14 font-bold">개인정보 처리방침</h2>
-            <p className="mt-1 text-12 leading-5 text-fg-neutral-muted">
+            <p className="mt-4 text-12 leading-20 text-fg-neutral-muted">
               개인정보를 어떻게 처리하는지 언제든지 확인할 수 있어요.
             </p>
           </div>
@@ -255,7 +255,7 @@ export function AgreementScreen({ documentContents }: AgreementScreenProps) {
 
       <section
         aria-label="서비스 이용 동의 항목"
-        className="mt-6 divide-y divide-stroke-neutral-subtle border-y border-stroke-neutral-subtle"
+        className="mt-24 divide-y divide-stroke-neutral-subtle border-y border-stroke-neutral-subtle"
       >
         <AgreementCheckbox
           checked={isAllAgreed}
@@ -298,7 +298,7 @@ export function AgreementScreen({ documentContents }: AgreementScreenProps) {
         />
       </section>
 
-      <div className="mt-auto pt-10">
+      <div className="mt-auto pt-40">
         <Button
           btnName={
             submitMutation.isPending ? '처리 중...' : '동의하고 시작하기'

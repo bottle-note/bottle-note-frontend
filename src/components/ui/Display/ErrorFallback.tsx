@@ -14,7 +14,7 @@ function ErrorFallback({
   onBack,
 }: Props) {
   return (
-    <div className="h-[calc(100vh-120px)] flex flex-col justify-center items-center gap-5">
+    <div className="h-[calc(100vh-120px)] flex flex-col justify-center items-center gap-20">
       <Image
         src="/icon/logo-subcoral.svg"
         alt=""
@@ -27,7 +27,7 @@ function ErrorFallback({
         {message}
       </p>
       {(onBack || onRetry) && (
-        <div className="flex gap-3 mt-2">
+        <div className="flex gap-12 mt-8">
           {onBack && (
             <Button
               type="button"

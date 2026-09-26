@@ -33,22 +33,22 @@ export const ReviewListItem = ({ data }: Props) => {
   } = data;
 
   return (
-    <section className="flex items-center border-b border-stroke-neutral-subtle py-4 text-fg-neutral">
+    <section className="flex items-center border-b border-stroke-neutral-subtle py-16 text-fg-neutral">
       {/* image */}
-      <Link href={ROUTES.REVIEW.DETAIL(reviewId)} className="mr-3 shrink-0">
+      <Link href={ROUTES.REVIEW.DETAIL(reviewId)} className="mr-12 shrink-0">
         <ItemImage src={imageUrl} alt="image" />
       </Link>
 
       {/* info */}
       <Link
         href={ROUTES.REVIEW.DETAIL(reviewId)}
-        className="flex flex-col items-start justify-center space-y-1.5"
+        className="flex flex-col items-start justify-center space-y-6"
       >
         {/* labels */}
         {isHot && (
           <Label
             name={LABEL_NAMES.HOT_5}
-            styleClass="mb-1 rounded border-stroke-brand-solid bg-bg-brand-solid px-2 py-[0.1rem] text-[8px] text-fg-brand-contrast"
+            styleClass="mb-4 rounded border-stroke-brand-solid bg-bg-brand-solid px-8 py-[1.6px] text-[8px] text-fg-brand-contrast"
           />
         )}
         {isBestReview && (
@@ -61,7 +61,7 @@ export const ReviewListItem = ({ data }: Props) => {
                 height={10}
               />
             }
-            styleClass="rounded border-stroke-brand-primary-solid bg-bg-brand-primary-solid px-2 py-[0.1rem] text-10 text-fg-brand-contrast"
+            styleClass="rounded border-stroke-brand-primary-solid bg-bg-brand-primary-solid px-8 py-[1.6px] text-10 text-fg-brand-contrast"
           />
         )}
         <ItemInfo
@@ -77,12 +77,12 @@ export const ReviewListItem = ({ data }: Props) => {
 
         {/* flavor tags */}
         {!!reviewTastingTags.length && (
-          <div className="flex items-center space-x-1.5">
+          <div className="flex items-center space-x-6">
             {reviewTastingTags.slice(0, 4).map((tag) => (
               <Label
                 key={tag}
                 name={tag}
-                styleClass="label-default text-10 px-2"
+                styleClass="label-default text-10 px-8"
               />
             ))}
             {reviewTastingTags.length > 4 && (

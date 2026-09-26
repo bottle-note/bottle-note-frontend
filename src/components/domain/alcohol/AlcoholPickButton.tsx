@@ -80,7 +80,7 @@ const AlcoholPickButton = ({
             : 'text-fg-brand-contrast'
       } ${
         pickBtnName
-          ? 'flex items-center space-x-[3px]'
+          ? 'flex items-center space-x-3'
           : 'justify-self-end row-start-3'
       }`}
       onClick={handleClick}

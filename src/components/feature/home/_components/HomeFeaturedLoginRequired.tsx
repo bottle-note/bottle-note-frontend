@@ -10,8 +10,8 @@ export function HomeFeaturedLoginRequired() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col h-full -ml-[25px]">
-      <div className="flex flex-col items-center justify-center flex-grow space-y-[14px]">
+    <div className="flex flex-col h-full -ml-25">
+      <div className="flex flex-col items-center justify-center flex-grow space-y-14">
         <Image
           src="/icon/logo-subcoral.svg"
           alt="logo"
@@ -26,7 +26,7 @@ export function HomeFeaturedLoginRequired() {
         <Button
           size="md"
           variant="secondary"
-          className="w-[237px]"
+          className="w-237"
           onClick={() => router.push(ROUTES.LOGIN)}
         >
           로그인 하러가기

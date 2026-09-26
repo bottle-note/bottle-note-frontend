@@ -38,7 +38,7 @@ export function LoginGate(props: LoginGateProps) {
     return (
       <>
         {children}
-        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-stroke-neutral-subtle bg-bg-layer-default px-5 py-4 safe-area-bottom">
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-stroke-neutral-subtle bg-bg-layer-default px-20 py-16 safe-area-bottom">
           <Button onClick={onLogin}>
             {label || buttonLabel || '로그인하기'}
           </Button>
@@ -53,7 +53,7 @@ export function LoginGate(props: LoginGateProps) {
     title,
     description,
     buttonLabel = '로그인하기',
-    visibleHeight = 'min-h-[260px]',
+    visibleHeight = 'min-h-260',
     gradientStartPercent = 42,
   } = blurProps;
 
@@ -63,7 +63,7 @@ export function LoginGate(props: LoginGateProps) {
         {children}
       </div>
       <div
-        className="pointer-events-none absolute inset-0 z-10 flex items-end px-5 pb-5"
+        className="pointer-events-none absolute inset-0 z-10 flex items-end px-20 pb-20"
         style={
           {
             '--gradient-start': `${gradientStartPercent}%`,

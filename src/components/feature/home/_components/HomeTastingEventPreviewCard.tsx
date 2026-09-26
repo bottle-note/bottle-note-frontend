@@ -40,7 +40,7 @@ export function HomeTastingEventPreviewCard({
 
   return (
     <Link href={ROUTES.CURATION.DETAIL(event.id)} className="block">
-      <article className="relative isolate h-[312px] w-[272px] overflow-hidden rounded-lg bg-bg-neutral-weak">
+      <article className="relative isolate h-312 w-272 overflow-hidden rounded-lg bg-bg-neutral-weak">
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
           <BaseImage
             src={event.coverImageUrl}
@@ -54,27 +54,27 @@ export function HomeTastingEventPreviewCard({
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-[#4A3426]/50 to-[#3B2B22]/70" />
         </div>
 
-        <div className="relative z-10 flex h-full flex-col px-4 pb-4 pt-4">
-          <span className="inline-flex w-fit rounded-full bg-palette-static-white/35 px-2.5 py-1 text-10 font-bold text-palette-static-white backdrop-blur-sm">
+        <div className="relative z-10 flex h-full flex-col px-16 pb-16 pt-16">
+          <span className="inline-flex w-fit rounded-full bg-palette-static-white/35 px-10 py-4 text-10 font-bold text-palette-static-white backdrop-blur-sm">
             시음회
           </span>
 
-          <h3 className="mt-3">
+          <h3 className="mt-12">
             <AutoMarqueeText
               text={event.name}
-              className="text-16 font-extrabold leading-[21px] text-palette-static-white"
+              className="text-16 font-extrabold leading-21 text-palette-static-white"
             />
           </h3>
 
-          <p className="mt-2 line-clamp-2 whitespace-normal text-11 font-light leading-[17px] text-palette-static-white">
+          <p className="mt-8 line-clamp-2 whitespace-normal text-11 font-light leading-17 text-palette-static-white">
             {event.description}
           </p>
 
-          <div className="mt-auto rounded-2xl bg-palette-static-white/85 px-3 py-3 backdrop-blur-sm">
-            <div className="space-y-2">
+          <div className="mt-auto rounded-2xl bg-palette-static-white/85 px-12 py-12 backdrop-blur-sm">
+            <div className="space-y-8">
               {infoItems.map(({ key, Icon, title, description }) => (
-                <div key={key} className="flex gap-2">
-                  <span className="mt-0.5 flex h-3 w-3 shrink-0 items-center justify-center text-palette-neutral-950">
+                <div key={key} className="flex gap-8">
+                  <span className="mt-2 flex h-12 w-12 shrink-0 items-center justify-center text-palette-neutral-950">
                     <Icon size={12} strokeWidth={2} />
                   </span>
 
@@ -83,7 +83,7 @@ export function HomeTastingEventPreviewCard({
                       {title}
                     </p>
                     {description && (
-                      <p className="mt-0.5 truncate text-9 font-light text-palette-neutral-800">
+                      <p className="mt-2 truncate text-9 font-light text-palette-neutral-800">
                         {description}
                       </p>
                     )}
@@ -92,7 +92,7 @@ export function HomeTastingEventPreviewCard({
               ))}
             </div>
 
-            <div className="mt-3 flex items-end gap-2">
+            <div className="mt-12 flex items-end gap-8">
               <span className="text-9 font-semibold leading-none text-palette-neutral-950">
                 참가비
               </span>
@@ -113,22 +113,22 @@ export function HomeTastingEventMoreCard() {
       href={`${ROUTES.CURATION.BASE}?tab=${CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT}`}
       className="block"
     >
-      <article className="flex h-[312px] w-[190px] flex-col justify-between rounded-lg bg-bg-layer-basement px-4 py-5">
+      <article className="flex h-312 w-190 flex-col justify-between rounded-lg bg-bg-layer-basement px-16 py-20">
         <div>
-          <span className="inline-flex w-fit rounded-full bg-bg-layer-default px-2.5 py-1 text-10 font-bold text-fg-brand">
+          <span className="inline-flex w-fit rounded-full bg-bg-layer-default px-10 py-4 text-10 font-bold text-fg-brand">
             시음회
           </span>
-          <h3 className="mt-4 text-16 font-extrabold leading-[21px] text-fg-neutral">
+          <h3 className="mt-16 text-16 font-extrabold leading-21 text-fg-neutral">
             더 많은
             <br />
             시음회 보기
           </h3>
-          <p className="mt-3 whitespace-normal text-11 font-medium leading-[17px] text-fg-neutral-muted">
+          <p className="mt-12 whitespace-normal text-11 font-medium leading-17 text-fg-neutral-muted">
             진행 중인 시음회를 한 번에 확인해보세요.
           </p>
         </div>
 
-        <span className="flex h-10 items-center justify-center rounded-lg bg-bg-brand-solid text-12 font-bold text-fg-brand-contrast">
+        <span className="flex h-40 items-center justify-center rounded-lg bg-bg-brand-solid text-12 font-bold text-fg-brand-contrast">
           보러가기
         </span>
       </article>
