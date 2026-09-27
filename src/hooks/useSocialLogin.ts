@@ -5,7 +5,6 @@ import { useLoginNavigation } from '@/hooks/useLoginNavigation';
 import { DeviceService } from '@/lib/DeviceService';
 import { loginAuthSession } from '@/lib/auth/session-store';
 import { loadKakaoSDK } from '@/lib/kakao/kakaoSDK';
-import useModalStore from '@/store/modalStore';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { handleWebViewMessage, sendLogToFlutter } from '@/utils/flutterUtil';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
@@ -24,19 +23,19 @@ const clearKakaoState = () => {
   document.cookie = `${KAKAO_STATE_COOKIE}=; Max-Age=0; ${KAKAO_COOKIE_OPTIONS}`;
 };
 
-// 소셜 로그인 시작·콜백·공통 인증 완료와 오류 표시를 담당한다.
+// 소셜 로그인 시작·콜백·공통 인증 완료와 실패 처리를 담당한다.
 export const useSocialLogin = () => {
   const navigation = useLoginNavigation();
-  const { handleModalState } = useModalStore();
   const hasHandledKakaoCallback = useRef(false);
 
-  // 로그인 실패 메시지를 공통 모달로 표시한다.
-  const showLoginError = (error: unknown) => {
-    handleModalState({
-      isShowModal: true,
-      mainText: '로그인 실패',
-      subText: getErrorMessage(error),
-    });
+  // 웹·앱의 로그인 실패를 기록하고 요청 정보를 정리한 뒤 공통 실패 이동을 요청한다.
+  const handleLoginError = (
+    error: unknown,
+    errorTo = navigation.getCurrentErrorTo(),
+  ) => {
+    console.error(error);
+    clearKakaoState();
+    navigation.redirectOnLoginError(errorTo);
   };
 
   // 카카오 요청 정보를 정리한 뒤 로그인 취소 이동을 요청한다.
@@ -102,21 +101,27 @@ export const useSocialLogin = () => {
       const nonce = crypto.randomUUID();
       const secure = window.location.protocol === 'https:' ? '; Secure' : '';
       document.cookie = `${KAKAO_STATE_COOKIE}=${nonce}; ${KAKAO_COOKIE_OPTIONS}${secure}`;
+      const returnTo = navigation.getCurrentReturnTo();
       const state = new URLSearchParams({
-        returnTo: navigation.getCurrentReturnTo(),
+        returnTo,
         nonce,
       });
 
       const errorTo = navigation.getCurrentErrorTo();
       if (errorTo) state.set('errorTo', errorTo);
 
-      window.Kakao.Auth.authorize({
-        redirectUri: `${process.env.NEXT_PUBLIC_CLIENT_URL}/oauth/kakao`,
-        state: state.toString(),
+      navigation.replaceBeforeExternalLogin(returnTo, () => {
+        try {
+          window.Kakao.Auth.authorize({
+            redirectUri: `${process.env.NEXT_PUBLIC_CLIENT_URL}/oauth/kakao`,
+            state: state.toString(),
+          });
+        } catch (error) {
+          handleLoginError(error, errorTo);
+        }
       });
     } catch (error) {
-      clearKakaoState();
-      if (!navigation.redirectOnLoginError()) throw error;
+      handleLoginError(error);
     }
   };
 
@@ -128,7 +133,7 @@ export const useSocialLogin = () => {
       const nonce = await AuthApi.client.getAppleNonce();
       handleWebViewMessage('loginWithApple', { nonce });
     } catch (error) {
-      if (!navigation.redirectOnLoginError()) throw error;
+      handleLoginError(error);
     }
   };
 
@@ -163,9 +168,7 @@ export const useSocialLogin = () => {
         returnTo,
       );
     } catch (error) {
-      clearKakaoState();
-      console.error(error);
-      navigation.redirectOnLoginError(state.get('errorTo'), true);
+      handleLoginError(error);
     }
   };
 
@@ -177,7 +180,7 @@ export const useSocialLogin = () => {
         accessToken,
       });
     } catch (error) {
-      if (!navigation.redirectOnLoginError()) showLoginError(error);
+      handleLoginError(error);
     }
   };
 
@@ -196,7 +199,7 @@ export const useSocialLogin = () => {
       });
     } catch (error) {
       sendLogToFlutter(`onAppleLoginError:${getErrorMessage(error)}`);
-      if (!navigation.redirectOnLoginError()) showLoginError(error);
+      handleLoginError(error);
     }
   };
 
@@ -205,15 +208,9 @@ export const useSocialLogin = () => {
     startAppleLogin,
     handleKakaoCallback,
     onKakaoAppLoginSuccess,
-    // 앱 카카오 로그인 실패 시 errorTo로 이동하거나 오류 모달을 표시한다.
-    onKakaoAppLoginError: (error: unknown) => {
-      if (!navigation.redirectOnLoginError()) showLoginError(error);
-    },
+    onKakaoAppLoginError: handleLoginError,
     onAppleAppLoginSuccess,
-    // 앱 애플 로그인 실패 시 errorTo로 이동하거나 오류 모달을 표시한다.
-    onAppleAppLoginError: (error: unknown) => {
-      if (!navigation.redirectOnLoginError()) showLoginError(error);
-    },
+    onAppleAppLoginError: handleLoginError,
     initializeLoginPage,
     cancelLogin,
   };

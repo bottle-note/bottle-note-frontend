@@ -21,6 +21,7 @@
     "gtm:validate": "node scripts/gtm-sync.mjs --validate",
     "gtm:sync": "node scripts/gtm-sync.mjs",
     "test:vitest": "vitest run",
+    "test:e2e": "playwright test",
     "test:jest": "jest",
     "test:jest:watch": "jest --watch"
   },
@@ -66,6 +67,7 @@
     "zustand": "^4.5.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@svgr/webpack": "^8.1.0",
     "@testing-library/dom": "^9.3.4",
     "@testing-library/react": "^14.2.1",

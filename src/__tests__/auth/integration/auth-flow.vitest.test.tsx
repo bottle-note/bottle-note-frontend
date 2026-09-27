@@ -398,7 +398,7 @@ describe('Auth business flows', () => {
       expect(getAuthSnapshot().status).not.toBe('authenticated');
     });
 
-    it('로그인 실패 시 실패 핸들러가 호출된다', async () => {
+    it('로그인 실패 시 공통 오류 화면으로 이동한다', async () => {
       fetchMock.mockResolvedValueOnce(
         createJsonResponse({ message: 'Login failed' }, { status: 400 }),
       );
@@ -409,7 +409,7 @@ describe('Auth business flows', () => {
         await result.current.onKakaoAppLoginSuccess('kakao-access-token');
       });
 
-      expect(useModalStore.getState().state.mainText).toBe('로그인 실패');
+      expect(routerReplace).toHaveBeenCalledWith('/error');
     });
   });
 

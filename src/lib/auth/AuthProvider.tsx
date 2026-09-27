@@ -1,9 +1,9 @@
 'use client';
 
-import { ReactNode, useEffect, useLayoutEffect } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { ReactNode, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
-import { trackLoginHistory } from '@/utils/loginHistory';
+import { completeLoginPageReplacement } from '@/hooks/useLoginNavigation';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
 import { restoreAuthSession } from './session-store';
 
@@ -13,30 +13,22 @@ interface Props {
 
 export function AuthProvider({ children }: Props) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { isLoading, isLoggedIn } = useAuthSession();
 
-  // 로그인 페이지의 effect보다 먼저 현재 히스토리 위치를 확인한다.
-  useLayoutEffect(() => {
-    trackLoginHistory();
-  }, [pathname, searchParams]);
-
   useEffect(() => {
+    // 외부 인증 전 문서가 복원되면 로그인 전 세션 상태도 다시 확인한다.
     const handlePageShow = (event: PageTransitionEvent) => {
       if (!event.persisted) return;
-      trackLoginHistory();
       void restoreAuthSession();
     };
-    window.addEventListener('popstate', trackLoginHistory);
+
     window.addEventListener('pageshow', handlePageShow);
     void restoreAuthSession();
-    return () => {
-      window.removeEventListener('popstate', trackLoginHistory);
-      window.removeEventListener('pageshow', handlePageShow);
-    };
+    return () => window.removeEventListener('pageshow', handlePageShow);
   }, []);
 
   useEffect(() => {
+    if (completeLoginPageReplacement()) return;
     if (isLoading || isLoggedIn) return;
     if (
       pathname === '/login' ||

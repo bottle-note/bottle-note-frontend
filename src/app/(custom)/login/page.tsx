@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import Loading from '@/components/ui/Loading/Loading';
@@ -8,7 +8,6 @@ import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { DeviceService } from '@/lib/DeviceService';
 import { useSocialLogin } from '@/hooks/useSocialLogin';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
-import { restoreAuthSession } from '@/lib/auth/session-store';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
@@ -16,26 +15,10 @@ export default function Login() {
   const { startKakaoLogin, startAppleLogin, initializeLoginPage, cancelLogin } =
     useSocialLogin();
   const { isLoggedIn, isLoading } = useAuthSession();
-  const hasCheckedInitialSession = useRef(false);
-
   useEffect(() => {
-    if (isLoading || hasCheckedInitialSession.current) return;
-    hasCheckedInitialSession.current = true;
+    if (isLoading) return;
     void initializeLoginPage(isLoggedIn);
   }, [initializeLoginPage, isLoggedIn, isLoading]);
-
-  useEffect(() => {
-    const handlePageShow = (event: PageTransitionEvent) => {
-      if (!event.persisted) return;
-
-      // OAuth 이전 문서가 bfcache로 복원되면 로그인 전 메모리 상태도 복원된다.
-      hasCheckedInitialSession.current = false;
-      void restoreAuthSession();
-    };
-
-    window.addEventListener('pageshow', handlePageShow);
-    return () => window.removeEventListener('pageshow', handlePageShow);
-  }, []);
 
   // 인앱 환경에서 초기화
   useEffect(() => {

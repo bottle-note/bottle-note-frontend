@@ -10,7 +10,7 @@ const config: Config = {
   testEnvironment: 'jsdom',
   testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)'],
   modulePathIgnorePatterns: ['<rootDir>/.next/'],
-  testPathIgnorePatterns: ['\\.vitest\\.test\\.'],
+  testPathIgnorePatterns: ['\\.vitest\\.test\\.', '<rootDir>/e2e/'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',

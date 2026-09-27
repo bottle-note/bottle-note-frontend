@@ -1,10 +1,24 @@
+import { useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/constants/routes';
 import { getReturnToUrl, isValidReturnUrl } from '@/utils/loginRedirect';
-import { getLoginHistoryDirection } from '@/utils/loginHistory';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
 
-const LOGIN_HISTORY_STATE_KEY = '__bottleNoteLogin';
+// 로그인 화면이 언마운트되어도 다음 화면의 렌더링까지 SDK 호출을 메모리에서 이어준다.
+let pendingExternalLogin: { returnTo: string; start: () => void } | null = null;
+
+// returnTo 화면의 렌더링이 끝나면 대기 중인 외부 인증을 시작하고, 로그인 유입 정보를 유지한다.
+export const completeLoginPageReplacement = (): boolean => {
+  if (!pendingExternalLogin) return false;
+  if (window.location.pathname === ROUTES.LOGIN) return true;
+
+  const pending = pendingExternalLogin;
+  pendingExternalLogin = null;
+  if (window.location.href !== pending.returnTo) return false;
+
+  pending.start();
+  return true;
+};
 
 // 호출 시점의 URL에서 로그인 쿼리를 읽고, 카카오 콜백에서는 state를 풀어 읽는다.
 const getCurrentLoginParams = () => {
@@ -14,9 +28,10 @@ const getCurrentLoginParams = () => {
     : url.searchParams;
 };
 
-// 로그인 복귀 주소의 조회·검증과 로그인 화면의 히스토리·이동을 담당한다.
+// 로그인 복귀 주소의 조회·검증과 로그인 화면의 이동을 담당한다.
 export const useLoginNavigation = () => {
   const router = useRouter();
+  const hasStartedLoginRedirect = useRef(false);
 
   // 현재 returnTo를 검증하고, 유효하지 않으면 기본 복귀 주소를 반환한다.
   const getCurrentReturnTo = () =>
@@ -28,27 +43,27 @@ export const useLoginNavigation = () => {
     return errorTo && isValidReturnUrl(errorTo) ? errorTo : null;
   };
 
-  // errorTo로 실패 복귀를 처리하며, 웹 콜백에서는 기본 오류 화면도 사용할 수 있다.
-  const redirectOnLoginError = (
-    errorTo = getCurrentErrorTo(),
-    useErrorPage = false,
-  ) => {
-    if (errorTo && isValidReturnUrl(errorTo)) {
-      consumeLoginTrigger();
-      router.replace(errorTo);
-      return true;
-    }
-    if (useErrorPage) {
-      router.replace(ROUTES.ERROR);
-      return true;
-    }
-    return false;
+  // 웹·앱 로그인 실패 시 유입 정보를 정리하고 errorTo 또는 공통 오류 화면으로 이동한다.
+  const redirectOnLoginError = (errorTo = getCurrentErrorTo()) => {
+    pendingExternalLogin = null;
+    consumeLoginTrigger();
+    router.replace(errorTo ?? ROUTES.ERROR);
+  };
+
+  // 로그인 기록을 실제 returnTo 화면으로 교체하고, 렌더링 완료 후 실행할 외부 인증을 등록한다.
+  const replaceBeforeExternalLogin = (returnTo: string, start: () => void) => {
+    pendingExternalLogin = {
+      returnTo: new URL(returnTo, window.location.origin).href,
+      start,
+    };
+    router.replace(returnTo);
   };
 
   // 로그인 유입 정보를 정리하고 이전 화면으로 돌아가며, 이전 화면이 없으면 홈으로 이동한다.
   const cancelLogin = () => {
+    pendingExternalLogin = null;
     consumeLoginTrigger();
-    if (window.history.state?.[LOGIN_HISTORY_STATE_KEY]?.hasPreviousPage) {
+    if (window.history.length > 1) {
       router.back();
     } else {
       router.replace(ROUTES.HOME);
@@ -73,47 +88,24 @@ export const useLoginNavigation = () => {
     redirectAfterLogin(false);
   };
 
-  // 로그인 히스토리를 건너뛰거나 취소 정보를 기록하고, 인증된 진입은 준비 작업 후 복귀한다.
+  // 인증된 사용자는 준비 작업 후 복귀하며, 비로그인 사용자는 로그인 화면에 머문다.
   const initializeLoginPage = async (
     isLoggedIn: boolean,
     beforeReturn: () => Promise<void>,
   ) => {
-    const entry = window.history.state?.[LOGIN_HISTORY_STATE_KEY];
-    if (isLoggedIn && entry) {
-      const direction = getLoginHistoryDirection();
-      if (direction === 'back') {
-        if (entry.hasPreviousPage) router.back();
-        else router.replace(ROUTES.HOME);
-        return;
-      }
-      if (direction === 'forward') {
-        window.history.forward();
-        return;
-      }
-    }
+    if (!isLoggedIn || hasStartedLoginRedirect.current) return;
+    hasStartedLoginRedirect.current = true;
 
-    if (isLoggedIn) {
-      const returnTo = getCurrentReturnTo();
-      await beforeReturn();
-      redirectAfterLogin(false, returnTo);
-      return;
-    }
-
-    window.history.replaceState(
-      {
-        ...window.history.state,
-        [LOGIN_HISTORY_STATE_KEY]: {
-          hasPreviousPage: entry?.hasPreviousPage ?? window.history.length > 1,
-        },
-      },
-      '',
-    );
+    const returnTo = getCurrentReturnTo();
+    await beforeReturn();
+    redirectAfterLogin(false, returnTo);
   };
 
   return {
     getCurrentReturnTo,
     getCurrentErrorTo,
     redirectOnLoginError,
+    replaceBeforeExternalLogin,
     redirectAfterLogin,
     initializeLoginPage,
     cancelLogin,

@@ -112,6 +112,8 @@ module.exports = {
           '**/*.test.{ts,tsx}',
           'vitest.setup.ts',
           'vitest.config.mts',
+          'playwright.config.ts',
+          'e2e/**/*.spec.ts',
         ],
         peerDependencies: true,
       },

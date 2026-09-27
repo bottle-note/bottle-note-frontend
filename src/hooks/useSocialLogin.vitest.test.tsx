@@ -9,6 +9,7 @@ import { loadKakaoSDK } from '@/lib/kakao/kakaoSDK';
 import { loginAuthSession } from '@/lib/auth/session-store';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
+import { completeLoginPageReplacement } from '@/hooks/useLoginNavigation';
 import { useSocialLogin } from './useSocialLogin';
 
 vi.mock('next/navigation', () => ({
@@ -189,7 +190,7 @@ describe('useSocialLogin', () => {
     expect(routerReplace).toHaveBeenCalledWith('/whiskey-mbti');
   });
 
-  it('브라우저에서 Kakao 로그인을 시작하면 SDK를 로드하고 authorize를 호출한다', async () => {
+  it('브라우저에서는 returnTo 화면 교체 후 기존 Kakao SDK를 호출한다', async () => {
     const { result } = renderHook(() => useSocialLogin());
 
     await act(async () => {
@@ -197,6 +198,13 @@ describe('useSocialLogin', () => {
     });
 
     expect(loadKakaoSDKMock).toHaveBeenCalledTimes(1);
+    expect(routerReplace).toHaveBeenCalledWith('/');
+    expect(window.Kakao.Auth.authorize).not.toHaveBeenCalled();
+
+    window.history.replaceState(null, '', '/');
+    act(() => {
+      completeLoginPageReplacement();
+    });
     expect(window.Kakao.Auth.authorize).toHaveBeenCalledWith(
       expect.objectContaining({
         redirectUri: `${process.env.NEXT_PUBLIC_CLIENT_URL}/oauth/kakao`,
