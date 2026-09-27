@@ -28,7 +28,7 @@ export default function ReplyButton({
 
   return (
     <div
-      className={`flex items-center space-x-[2px] cursor-pointer ${className}`}
+      className={`flex items-center space-x-2 cursor-pointer ${className}`}
       onClick={moveToReviewDetail}
       tabIndex={0}
       role="button"

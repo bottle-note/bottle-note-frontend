@@ -11,8 +11,8 @@ function CategoryList() {
   const menu: LinkData[] = generateMenu(categories);
 
   return (
-    <div className="flex flex-col gap-[18px]">
-      <div className="grid grid-cols-2 gap-y-[18px] gap-x-[12px]">
+    <div className="flex flex-col gap-18">
+      <div className="grid grid-cols-2 gap-y-18 gap-x-12">
         {menu.map((data) => (
           <PrimaryLinkButton key={data.engName} data={data} />
         ))}

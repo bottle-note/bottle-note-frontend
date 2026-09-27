@@ -46,7 +46,7 @@ export const HISTORY_TYPE_INFO: Record<string, HistoryTypeInfo> = {
       const ratingValue = isNegative ? ratingDiffStr?.slice(1) : ratingDiffStr;
       return (
         <div className="flex items-center">
-          <p className="mr-1 text-12 text-fg-neutral-muted">
+          <p className="mr-4 text-12 text-fg-neutral-muted">
             <strong>별점 {rate?.currentValue}점</strong>을 주셨어요.
           </p>
           {/* 뭐가 무제인지 모르겠지만 tailwindcss가 적용되지 않는다. 추후 파보기 */}

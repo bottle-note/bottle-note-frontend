@@ -5,7 +5,7 @@ export default function TagSkeleton({ itemCount = 6 }: { itemCount?: number }) {
   return (
     <>
       <SkeletonBase width={70} height={18} />
-      <div className="flex flex-wrap gap-1">
+      <div className="flex flex-wrap gap-4">
         {Array.from({ length: itemCount }).map(() => (
           <div key={uuid()} className="overflow-hidden flex-shrink-0">
             <SkeletonBase key={uuid()} width={60} height={25} />

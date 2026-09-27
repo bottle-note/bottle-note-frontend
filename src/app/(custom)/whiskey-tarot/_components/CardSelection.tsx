@@ -34,7 +34,7 @@ function CardItem({
       onClick={onClick}
       disabled={disabled || selected || !isVisible}
       className={`
-        relative w-20 h-28 sm:w-24 sm:h-36 transition-all duration-500 ease-out
+        relative w-80 h-112 sm:w-96 sm:h-144 transition-all duration-500 ease-out
         ${disabled && isVisible ? 'opacity-40 cursor-not-allowed' : ''}
         ${selected ? 'scale-105 z-10 cursor-default' : 'hover:scale-105 active:scale-95'}
       `}
@@ -51,7 +51,7 @@ function CardItem({
       {/* 카드 테두리 (빈티지 타로 스타일) */}
       <div
         className={`
-          absolute inset-0 rounded-lg bg-[#f4e4c1] p-1 sm:p-1.5 transition-all duration-300
+          absolute inset-0 rounded-lg bg-[#f4e4c1] p-4 sm:p-6 transition-all duration-300
           ${selected ? 'shadow-lg shadow-mainCoral/40 ring-2 ring-mainCoral' : 'shadow-md hover:shadow-lg'}
         `}
       >
@@ -68,7 +68,7 @@ function CardItem({
 
       {/* 선택 표시 */}
       {selected && selectedIndex >= 0 && (
-        <div className="absolute -top-2 -right-2 w-7 h-7 sm:w-8 sm:h-8 bg-mainCoral rounded-full flex items-center justify-center shadow-lg z-20 border-2 border-white">
+        <div className="absolute -top-8 -right-8 w-28 h-28 sm:w-32 sm:h-32 bg-mainCoral rounded-full flex items-center justify-center shadow-lg z-20 border-2 border-white">
           <span className="text-white text-xs sm:text-sm font-bold">
             {selectedIndex + 1}
           </span>
@@ -115,7 +115,7 @@ export default function CardSelection({
   const canSelectMore = selectedCards.length < 3;
 
   return (
-    <div className="relative flex flex-col min-h-screen px-4 py-8">
+    <div className="relative flex flex-col min-h-screen px-16 py-32">
       {/* 배경 */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#12121a] to-[#0a0a0f]" />
 
@@ -123,11 +123,11 @@ export default function CardSelection({
       <div className="relative z-10 flex-1 flex flex-col justify-center">
         <div
           className={`
-            text-center mb-8 transition-all duration-500
-            ${showTitle ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}
+            text-center mb-32 transition-all duration-500
+            ${showTitle ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-16'}
           `}
         >
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-8">
             마음이 끌리는 카드를 선택하세요
           </h2>
           <p className="text-gray-400 text-sm">
@@ -136,9 +136,9 @@ export default function CardSelection({
         </div>
 
         {/* 카드 그리드 - 4+4+4 배치 */}
-        <div className="flex flex-col items-center gap-3 sm:gap-4 px-2">
+        <div className="flex flex-col items-center gap-12 sm:gap-16 px-8">
           {/* 1줄: 4장 */}
-          <div className="flex gap-2 sm:gap-3 justify-center">
+          <div className="flex gap-8 sm:gap-12 justify-center">
             {cards.slice(0, 4).map((card, index) => (
               <CardItem
                 key={card.id}
@@ -152,7 +152,7 @@ export default function CardSelection({
             ))}
           </div>
           {/* 2줄: 4장 */}
-          <div className="flex gap-2 sm:gap-3 justify-center">
+          <div className="flex gap-8 sm:gap-12 justify-center">
             {cards.slice(4, 8).map((card, index) => (
               <CardItem
                 key={card.id}
@@ -166,7 +166,7 @@ export default function CardSelection({
             ))}
           </div>
           {/* 3줄: 4장 */}
-          <div className="flex gap-2 sm:gap-3 justify-center">
+          <div className="flex gap-8 sm:gap-12 justify-center">
             {cards.slice(8, 12).map((card, index) => (
               <CardItem
                 key={card.id}
@@ -183,13 +183,13 @@ export default function CardSelection({
       </div>
 
       {/* 선택된 카드 표시 */}
-      <div className="relative z-10 mt-6 mb-4">
-        <div className="flex justify-center gap-3">
+      <div className="relative z-10 mt-24 mb-16">
+        <div className="flex justify-center gap-12">
           {[0, 1, 2].map((index) => (
             <div
               key={index}
               className={`
-                relative w-14 h-20 rounded-lg border-2 border-dashed
+                relative w-56 h-80 rounded-lg border-2 border-dashed
                 overflow-hidden
                 transition-all duration-300
                 ${
@@ -220,12 +220,12 @@ export default function CardSelection({
       </div>
 
       {/* 확인 버튼 */}
-      <div className="relative z-10 px-4 pb-safe-lg">
+      <div className="relative z-10 px-16 pb-safe-lg">
         <button
           onClick={onConfirm}
           disabled={selectedCards.length !== 3 || isLoading}
           className={`
-            w-full py-4 rounded-full font-semibold transition-all duration-300
+            w-full py-16 rounded-full font-semibold transition-all duration-300
             ${
               selectedCards.length === 3
                 ? 'bg-gradient-to-r from-mainCoral to-subCoral text-white shadow-lg shadow-mainCoral/30'

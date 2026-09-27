@@ -34,8 +34,8 @@ export default function PriceForm() {
       title="가격"
       subTitle="(선택)"
     >
-      <div className="w-full pl-7 space-y-4 mt-[6px]">
-        <div className="flex items-center space-x-3">
+      <div className="w-full pl-28 space-y-16 mt-6">
+        <div className="flex items-center space-x-12">
           {options.map((option) => (
             <label
               key={option.value}
@@ -44,7 +44,7 @@ export default function PriceForm() {
             >
               <input
                 type="radio"
-                className="mr-1 h-5 w-5 accent-bg-brand-solid"
+                className="mr-4 h-20 w-20 accent-bg-brand-solid"
                 id={option.value}
                 value={option.value}
                 {...register('price_type')}
@@ -55,15 +55,15 @@ export default function PriceForm() {
           ))}
         </div>
         {watch('price_type') && (
-          <div className="flex items-center gap-3">
-            <div className="flex h-7 min-w-0 flex-1 items-center border-b border-stroke-brand-solid">
-              <span className="shrink-0 pr-1 text-15 text-fg-brand">
+          <div className="flex items-center gap-12">
+            <div className="flex h-28 min-w-0 flex-1 items-center border-b border-stroke-brand-solid">
+              <span className="shrink-0 pr-4 text-15 text-fg-brand">
                 {getPriceTypeLabel(watch('price_type'))}
               </span>
               <div className="flex-1 min-w-0 relative h-full">
                 <input
                   type="number"
-                  className="absolute inset-0 h-full w-full bg-transparent pb-[1.5px] pr-2 text-right text-15 text-fg-neutral focus-visible:ring-2 focus-visible:ring-stroke-focus-ring [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  className="absolute inset-0 h-full w-full bg-transparent pb-1.5 pr-8 text-right text-15 text-fg-neutral focus-visible:ring-2 focus-visible:ring-stroke-focus-ring [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   maxLength={10}
                   {...register('price', {
                     setValueAs: (value) =>
@@ -80,11 +80,14 @@ export default function PriceForm() {
             </div>
             <button
               type="button"
-              className="flex items-center gap-[2px] shrink-0"
+              className="flex items-center gap-2 shrink-0"
               onClick={resetPrice}
             >
               <span className="text-14 text-fg-neutral-muted">초기화</span>
-              <CircleX aria-hidden className="h-4 w-4 text-fg-neutral-muted" />
+              <CircleX
+                aria-hidden
+                className="h-16 w-16 text-fg-neutral-muted"
+              />
             </button>
           </div>
         )}

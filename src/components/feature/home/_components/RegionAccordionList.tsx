@@ -48,20 +48,20 @@ function RegionRowContent({
   const isBottleFallback = currentImageUrl === '/bottle.svg';
 
   return (
-    <div className="flex items-center gap-[10px]">
+    <div className="flex items-center gap-10">
       <Image
         src={currentImageUrl}
         alt={group.displayName}
         width={26}
         height={26}
         onError={handleImageError}
-        className={`w-[26px] h-[26px] rounded-lg ${
+        className={`w-26 h-26 rounded-lg ${
           isBottleFallback
-            ? 'bg-palette-static-white object-cover p-1'
-            : 'bg-palette-static-white object-contain p-[2px]'
+            ? 'bg-palette-static-white object-cover p-4'
+            : 'bg-palette-static-white object-contain p-2'
         }`}
       />
-      <div className="gap-[4px] flex items-center">
+      <div className="gap-4 flex items-center">
         <span className="text-13 font-extrabold text-fg-neutral">
           {group.displayName}
         </span>
@@ -86,7 +86,7 @@ function RegionRow({
 
   if (!hasChildren) {
     return (
-      <li className="rounded-xl border border-stroke-neutral-basement px-[10px] py-[14px]">
+      <li className="rounded-xl border border-stroke-neutral-basement px-10 py-14">
         <Link
           href={buildRegionHref(group.parent.regionId)}
           className="flex w-full items-center justify-between"
@@ -102,7 +102,7 @@ function RegionRow({
   }
 
   return (
-    <li className="flex flex-col rounded-xl border border-stroke-neutral-basement px-[10px] py-[14px]">
+    <li className="flex flex-col rounded-xl border border-stroke-neutral-basement px-10 py-14">
       <button
         type="button"
         onClick={onToggle}
@@ -126,12 +126,12 @@ function RegionRow({
       </button>
 
       <AnimatedCollapse isOpen={isOpen}>
-        <ul className="flex flex-col gap-[10px] px-[8px] pt-[10px]">
+        <ul className="flex flex-col gap-10 px-8 pt-10">
           {/* /전체 항목 */}
           <li>
             <Link
               href={buildRegionHref(group.parent.regionId)}
-              className="flex items-center justify-between border-b border-dashed border-stroke-neutral-basement py-[8px]"
+              className="flex items-center justify-between border-b border-dashed border-stroke-neutral-basement py-8"
             >
               <span className="text-13 font-bold text-fg-neutral">
                 {group.parent.korName}
@@ -144,9 +144,9 @@ function RegionRow({
             <li key={child.regionId}>
               <Link
                 href={buildRegionHref(child.regionId)}
-                className="flex items-center justify-between border-b border-dashed border-stroke-neutral-basement py-[8px]"
+                className="flex items-center justify-between border-b border-dashed border-stroke-neutral-basement py-8"
               >
-                <div className="gap-[4px] flex items-center">
+                <div className="gap-4 flex items-center">
                   <span className="text-13 font-bold text-fg-neutral">
                     {child.korName}
                   </span>
@@ -184,10 +184,10 @@ export default function RegionAccordionList() {
   if (isLoading) {
     return (
       <SkeletonList count={8} gap={8}>
-        <li className="flex items-center justify-between rounded-xl border border-stroke-neutral-basement px-[10px] py-[14px]">
-          <div className="flex items-center gap-[10px]">
+        <li className="flex items-center justify-between rounded-xl border border-stroke-neutral-basement px-10 py-14">
+          <div className="flex items-center gap-10">
             <SkeletonBase width={26} height={26} borderRadius="8px" />
-            <div className="flex items-center gap-[4px]">
+            <div className="flex items-center gap-4">
               <SkeletonBase width={56} height={14} />
             </div>
           </div>
@@ -197,7 +197,7 @@ export default function RegionAccordionList() {
   }
 
   return (
-    <ul className="space-y-[8px]">
+    <ul className="space-y-8">
       {regionGroups.map((group) => (
         <RegionRow
           key={group.parent.regionId}

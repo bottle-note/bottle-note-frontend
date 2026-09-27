@@ -16,7 +16,7 @@ export function TastingEventFeedCard({
 }: TastingEventFeedCardProps) {
   return (
     <Link href={ROUTES.CURATION.DETAIL(event.id)} className="block">
-      <article className="relative isolate h-[390px] w-full overflow-hidden rounded-lg bg-bg-neutral-weak">
+      <article className="relative isolate h-390 w-full overflow-hidden rounded-lg bg-bg-neutral-weak">
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
           <BaseImage
             src={event.coverImageUrl}
@@ -30,18 +30,18 @@ export function TastingEventFeedCard({
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/10" />
         </div>
 
-        <div className="relative z-10 flex h-full flex-col justify-between px-4 pb-5 pt-5">
+        <div className="relative z-10 flex h-full flex-col justify-between px-16 pb-20 pt-20">
           <div>
-            <span className="inline-flex rounded-full bg-white/30 px-2.5 py-1 text-[12px] leading-[16px] font-bold text-white backdrop-blur-sm">
+            <span className="inline-flex rounded-full bg-white/30 px-10 py-4 text-12 font-bold text-white backdrop-blur-sm">
               시음회
             </span>
-            <h2 className="mt-4">
+            <h2 className="mt-16">
               <AutoMarqueeText
                 text={event.name}
-                className="text-[22px] font-extrabold leading-[26px] text-white"
+                className="text-22 font-extrabold text-white"
               />
             </h2>
-            <p className="mt-3.5 line-clamp-2 whitespace-normal text-[12px] font-light leading-[18px] text-white">
+            <p className="mt-14 line-clamp-2 whitespace-normal text-12 font-light leading-18 text-white">
               {event.description}
             </p>
           </div>

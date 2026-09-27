@@ -20,7 +20,7 @@ export function ProgramFeedCard({
 
   return (
     <Link href={ROUTES.CURATION.DETAIL(program.id)} className="block">
-      <article className="relative isolate h-[248px] w-full overflow-hidden rounded-lg bg-bg-neutral-weak">
+      <article className="relative isolate h-248 w-full overflow-hidden rounded-lg bg-bg-neutral-weak">
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
           <BaseImage
             src={program.coverImageUrl}
@@ -34,34 +34,34 @@ export function ProgramFeedCard({
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/15 to-black/75" />
         </div>
 
-        <div className="relative z-10 flex h-full flex-col justify-between px-4 pb-4 pt-4 text-white">
+        <div className="relative z-10 flex h-full flex-col justify-between px-16 pb-16 pt-16 text-white">
           <div>
-            <span className="inline-flex rounded-full bg-white/30 px-2.5 py-1 text-11 font-bold backdrop-blur-sm">
+            <span className="inline-flex rounded-full bg-white/30 px-10 py-4 text-11 font-bold backdrop-blur-sm">
               프로그램
             </span>
-            <h2 className="mt-3 line-clamp-2 text-20 font-extrabold leading-6">
+            <h2 className="mt-12 line-clamp-2 text-20 font-extrabold">
               {program.name}
             </h2>
-            <p className="mt-2 line-clamp-2 text-12 font-light leading-[18px]">
+            <p className="mt-8 line-clamp-2 text-12 font-light leading-18">
               {program.description}
             </p>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-8">
             <p className="text-12 font-bold">
               {dateLabel} · {program.payload.placeName}
             </p>
-            <div className="flex flex-wrap items-center gap-1.5 text-11 font-medium">
-              <span className="rounded-full bg-white/20 px-2 py-1 backdrop-blur-sm">
+            <div className="flex flex-wrap items-center gap-6 text-11 font-medium">
+              <span className="rounded-full bg-white/20 px-8 py-4 backdrop-blur-sm">
                 {entryFeeLabel}
               </span>
-              <span className="rounded-full bg-white/20 px-2 py-1 backdrop-blur-sm">
+              <span className="rounded-full bg-white/20 px-8 py-4 backdrop-blur-sm">
                 {programCountLabel}
               </span>
               {tagLabels.slice(0, 2).map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-white/20 px-2 py-1 backdrop-blur-sm"
+                  className="rounded-full bg-white/20 px-8 py-4 backdrop-blur-sm"
                 >
                   {tag}
                 </span>

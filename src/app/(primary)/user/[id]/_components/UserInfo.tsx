@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Button from '@/components/ui/Button/Button';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { ROUTES } from '@/constants/routes';
 import ProfileImage from '@/components/domain/user/ProfileImage';
@@ -33,14 +34,14 @@ const UserInfo = ({
   }, []);
 
   return (
-    <section className="flex space-x-5.25 py-7">
+    <section className="flex space-x-[21.008px] py-28">
       <ProfileImage profileImgSrc={profileImgSrc} borderWidth="bold" />
 
-      <article className="py-[13.5px] space-y-3">
-        <div className="space-y-1">
+      <article className="py-13.5 space-y-12">
+        <div className="space-y-4">
           <h1 className="text-20 font-extrabold text-fg-brand">{nickName}</h1>
 
-          <div className="flex gap-2">
+          <div className="flex gap-8">
             <button
               onClick={() =>
                 router.push(ROUTES.USER.FOLLOW(currentId, 'follower'))
@@ -65,14 +66,15 @@ const UserInfo = ({
           </div>
         </div>
 
-        <div className="space-x-1 text-sm">
+        <div className="space-x-4 text-sm">
           {isMyProfile && (
-            <button
-              className="rounded-md border border-stroke-brand-solid bg-bg-layer-default px-2.5 py-1 text-10 text-fg-brand"
+            <Button
+              size="sm"
+              variant="secondary"
               onClick={() => router.push(ROUTES.USER.EDIT(currentId))}
             >
               프로필 수정
-            </button>
+            </Button>
           )}
 
           {!isMyProfile && (

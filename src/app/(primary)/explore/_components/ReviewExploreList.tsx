@@ -319,7 +319,7 @@ export const ReviewExplorerList = ({
   );
 
   return (
-    <section className="pb-20">
+    <section className="pb-80">
       <ExploreSearchBar
         mode="realtime"
         initialValue={inputKeyword}
@@ -363,7 +363,7 @@ export const ReviewExplorerList = ({
                     aria-posinset={virtualItem.index + 1}
                     aria-setsize={reviewCount}
                     data-index={virtualItem.index}
-                    className={`absolute left-0 top-0 w-full pb-[30px] ${
+                    className={`absolute left-0 top-0 w-full pb-30 ${
                       virtualItem.index === 0
                         ? ''
                         : 'border-t border-stroke-neutral-subtle'
@@ -382,7 +382,7 @@ export const ReviewExplorerList = ({
               })}
             </div>
           </div>
-          {isLoggedIn && <div ref={targetRef} className="h-10" />}
+          {isLoggedIn && <div ref={targetRef} className="h-40" />}
           {shouldGateGuestList && (
             <GuestListGate
               key={measurementCacheKey}

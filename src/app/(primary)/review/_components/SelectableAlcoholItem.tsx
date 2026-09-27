@@ -29,11 +29,11 @@ export default function SelectableAlcoholItem({ data, onSelect }: Props) {
     <button
       type="button"
       onClick={handleClick}
-      className="flex w-full items-center border-b border-solid border-stroke-neutral-subtle py-1 text-left text-fg-neutral transition-colors hover:bg-bg-layer-default-pressed active:bg-bg-layer-default-pressed"
+      className="flex w-full items-center border-b border-solid border-stroke-neutral-subtle py-4 text-left text-fg-neutral transition-colors hover:bg-bg-layer-default-pressed active:bg-bg-layer-default-pressed"
     >
-      <ItemImage src={alcoholUrlImg} alt="image" className="mr-3" />
+      <ItemImage src={alcoholUrlImg} alt="image" className="mr-12" />
 
-      <div className="flex flex-col items-start justify-center space-y-1.5">
+      <div className="flex flex-col items-start justify-center space-y-6">
         <ItemInfo
           korName={korName}
           engName={engName}
@@ -41,13 +41,13 @@ export default function SelectableAlcoholItem({ data, onSelect }: Props) {
         />
       </div>
 
-      <article className="ml-auto pr-1 flex flex-col items-end">
+      <article className="ml-auto pr-4 flex flex-col items-end">
         <Star rating={rating} />
-        <p className="flex text-10 mt-1.5">
+        <p className="flex text-10 mt-6">
           (
           <UserRound
             aria-label="평가 참여자 수"
-            className="h-3 w-3 pb-[2px] text-fg-neutral-muted"
+            className="h-12 w-12 pb-2 text-fg-neutral-muted"
           />
           <span>{totalRatingsCount ?? 0}</span>)
         </p>

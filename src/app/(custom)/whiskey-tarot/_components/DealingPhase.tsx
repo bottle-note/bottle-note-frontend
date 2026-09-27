@@ -93,7 +93,7 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
   return (
     <div
       className={`
-        relative flex flex-col items-center justify-center min-h-screen px-4 py-8
+        relative flex flex-col items-center justify-center min-h-screen px-16 py-32
         transition-opacity duration-500
         ${isExiting ? 'opacity-0' : 'opacity-100'}
       `}
@@ -102,8 +102,8 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#12121a] to-[#0a0a0f]" />
 
       {/* 제목 */}
-      <div className="relative z-10 text-center mb-8">
-        <h2 className="text-white text-xl font-bold mb-2">
+      <div className="relative z-10 text-center mb-32">
+        <h2 className="text-white text-xl font-bold mb-8">
           {showMessage ? '카드를 선택해주세요' : '카드를 뽑고 있습니다...'}
         </h2>
         <p className="text-white/60 text-sm">
@@ -116,7 +116,7 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
       {/* 카드 영역 */}
       <div
         className={`
-          relative z-10 w-full max-w-md h-[400px] flex items-center justify-center
+          relative z-10 w-full max-w-md h-400 flex items-center justify-center
           transition-opacity duration-300
           ${isImageLoaded ? 'opacity-100' : 'opacity-0'}
         `}
@@ -132,14 +132,14 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
           {DECK_LAYERS.map((layer, index) => (
             <div
               key={index}
-              className="absolute w-16 h-24 sm:w-20 sm:h-28 rounded-lg bg-[#f4e4c1] shadow-lg"
+              className="absolute w-64 h-96 sm:w-80 sm:h-112 rounded-lg bg-[#f4e4c1] shadow-lg"
               style={{
                 transform: `translate(${layer.offsetX}px, ${layer.offsetY}px)`,
                 opacity: layer.opacity,
                 zIndex: DECK_LAYERS.length - index,
               }}
             >
-              <div className="w-full h-full rounded-lg overflow-hidden border border-[#c9a227]/30 p-1">
+              <div className="w-full h-full rounded-lg overflow-hidden border border-[#c9a227]/30 p-4">
                 <div className="relative w-full h-full rounded overflow-hidden">
                   <Image
                     src="/images/tarot/card-back.png"
@@ -168,7 +168,7 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
             return (
               <div
                 key={card.id}
-                className="absolute left-1/2 top-0 w-14 h-20 sm:w-16 sm:h-24 transition-all duration-500 ease-out"
+                className="absolute left-1/2 top-0 w-56 h-80 sm:w-64 sm:h-96 transition-all duration-500 ease-out"
                 style={{
                   transform: isDealt
                     ? `translate(calc(-50% + ${fanPos.x}px), ${fanPos.y}px) rotate(${fanPos.rotation}deg)`
@@ -178,7 +178,7 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
                   zIndex: isDealt ? index + 10 : 0,
                 }}
               >
-                <div className="w-full h-full rounded-lg bg-[#f4e4c1] shadow-md p-0.5 sm:p-1">
+                <div className="w-full h-full rounded-lg bg-[#f4e4c1] shadow-md p-2 sm:p-4">
                   <div className="relative w-full h-full rounded overflow-hidden border border-[#c9a227]/30">
                     <Image
                       src="/images/tarot/card-back.png"
@@ -196,12 +196,12 @@ export default function DealingPhase({ cards, onComplete }: DealingPhaseProps) {
       </div>
 
       {/* 하단 인디케이터 */}
-      <div className="relative z-10 flex gap-1.5 mt-4">
+      <div className="relative z-10 flex gap-6 mt-16">
         {cards.map((_, index) => (
           <div
             key={index}
             className={`
-              w-2 h-2 rounded-full transition-all duration-300
+              w-8 h-8 rounded-full transition-all duration-300
               ${index < dealtCount ? 'bg-mainCoral' : 'bg-white/20'}
             `}
           />

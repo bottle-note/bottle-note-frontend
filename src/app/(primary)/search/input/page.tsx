@@ -49,7 +49,7 @@ export default function SearchInput() {
 
   return (
     <main className="w-full pt-safe-header min-h-safe-screen bg-white">
-      <div className="flex items-center gap-3 px-5">
+      <div className="flex items-center gap-12 px-20">
         <button
           onClick={() => router.back()}
           className="flex-shrink-0"
@@ -71,7 +71,7 @@ export default function SearchInput() {
         </div>
       </div>
 
-      <div className="mt-5">
+      <div className="mt-20">
         <RecentSearch handleSearch={onSearch} />
       </div>
     </main>

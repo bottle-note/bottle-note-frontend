@@ -28,8 +28,8 @@ const AccordionItemWrapper = ({
   return (
     <>
       {/* 토글 헤더 */}
-      <div className="flex items-center justify-between border-b border-stroke-neutral-basement px-5 py-3">
-        <div className="flex items-center space-x-1">
+      <div className="flex items-center justify-between border-b border-stroke-neutral-basement px-20 py-12">
+        <div className="flex items-center space-x-4">
           <p className="text-12 font-bold text-fg-neutral">
             {title}
             <span className="font-normal text-fg-neutral-muted">
@@ -46,7 +46,7 @@ const AccordionItemWrapper = ({
         >
           <ChevronDown
             aria-hidden
-            className={`h-4 w-4 transform transition-transform duration-300 ${
+            className={`h-16 w-16 transform transition-transform duration-300 ${
               isOpen ? 'rotate-180' : 'rotate-0'
             }`}
           />
@@ -55,7 +55,7 @@ const AccordionItemWrapper = ({
 
       {/* 컨텐츠 */}
       <AnimatedCollapse isOpen={isOpen}>
-        <div className="bg-bg-neutral-weak px-5 py-3">{children}</div>
+        <div className="bg-bg-neutral-weak px-20 py-12">{children}</div>
       </AnimatedCollapse>
     </>
   );
@@ -64,7 +64,7 @@ const AccordionItemWrapper = ({
 const AccordionItemSingleContainer = ({
   children,
 }: React.PropsWithChildren) => {
-  return <div className="mb-1">{children}</div>;
+  return <div className="mb-4">{children}</div>;
 };
 
 interface AccordionItemGridContainerProps {
@@ -77,7 +77,7 @@ const AccordionItemGridContainer = ({
 }: React.PropsWithChildren<AccordionItemGridContainerProps>) => {
   return (
     <div
-      className="grid gap-1"
+      className="grid gap-4"
       style={{
         gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
       }}
@@ -107,7 +107,7 @@ const AccordionItemContent = ({
   onClick,
 }: AccordionContentProps) => {
   const baseStyles = `
-    flex h-9 w-full min-w-[74px] items-center justify-center rounded border px-3
+    flex h-36 w-full min-w-74 items-center justify-center rounded border px-12
     text-11 font-semibold transition-all duration-200 ease-in-out
     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring
     ${
@@ -118,7 +118,7 @@ const AccordionItemContent = ({
   `;
 
   const contentStyles = cn(
-    'flex items-center gap-2',
+    'flex items-center gap-8',
     IconComponent ? 'w-full justify-between' : 'justify-center',
   );
 
@@ -146,7 +146,7 @@ const AccordionItemContent = ({
     >
       <div className={contentStyles}>
         {IconComponent && (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-4">
             {IconComponent && (
               <IconComponent
                 color={

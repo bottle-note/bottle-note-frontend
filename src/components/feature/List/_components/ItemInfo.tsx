@@ -14,7 +14,7 @@ const ItemInfo = ({ korName, engName, korCategory, length }: Props) => {
       : truncStr(engName.toUpperCase(), length ?? 13);
 
   return (
-    <article className="flex flex-col space-y-1">
+    <article className="flex flex-col space-y-4">
       <h2 className="line-clamp-2 text-15 font-bold leading-[1.3] text-fg-neutral">
         {korName}
       </h2>

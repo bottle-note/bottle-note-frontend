@@ -103,7 +103,7 @@ const HeaderLogo = () => {
 
 const HeaderMenu = () => {
   return (
-    <div className="pt-2">
+    <div className="pt-8">
       <Link href={ROUTES.SETTINGS.BASE}>
         <Image src={Menu} alt="Settings" />
       </Link>
@@ -129,7 +129,7 @@ const HeaderProfile = () => {
       type="button"
       onClick={handleClick}
       aria-label="마이"
-      className="pt-2"
+      className="pt-8"
     >
       <Image src={UserIcon} alt="" width={22} height={22} />
     </button>
@@ -165,7 +165,7 @@ function SubHeaderMain({
 
   return (
     <div
-      className={`${bgColor} flex items-center w-full px-[17px] pb-[15px] pt-safe-header`}
+      className={`${bgColor} flex items-center w-full px-17 pb-15 pt-safe-header`}
     >
       <div className="flex-1 flex items-center min-w-0">{leftComponent}</div>
       <div className="flex-1 flex justify-center items-center min-w-0">

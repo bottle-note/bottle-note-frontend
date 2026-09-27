@@ -108,8 +108,8 @@ export default function TimelineFull({
 
   if (isLoading || !data) {
     return (
-      <section className="p-5 mb-10 flex flex-col items-center w-full">
-        <div className="flex items-center justify-between mb-[0.65rem] w-full">
+      <section className="p-20 mb-40 flex flex-col items-center w-full">
+        <div className="flex items-center justify-between mb-[10.4px] w-full">
           <span className="text-xs text-mainGray shrink-0" />
           <div className="flex items-center">
             <Image src={FilterIcon} alt="필터메뉴" />
@@ -123,8 +123,8 @@ export default function TimelineFull({
   const latestYearMonth = getLatestYearMonth();
 
   return (
-    <section className="p-5 mb-10 flex flex-col items-center w-full">
-      <div className="flex items-center justify-end mb-[0.65rem] w-full">
+    <section className="p-20 mb-40 flex flex-col items-center w-full">
+      <div className="flex items-center justify-end mb-[10.4px] w-full">
         <div className="flex items-center">
           <Image
             src={FilterIcon}
@@ -134,7 +134,7 @@ export default function TimelineFull({
         </div>
       </div>
       {data.userHistories.length !== 0 && !error ? (
-        <div className="w-full max-w-[399px]">
+        <div className="w-full max-w-399">
           <List
             isListFirstLoading={false}
             isScrollLoading={isFetching}
@@ -142,13 +142,13 @@ export default function TimelineFull({
           >
             <List.Section>
               <article className="relative w-full">
-                <div className="absolute bottom-0 left-11 top-6 z-0 w-px border-l border-dashed border-subCoral" />
-                <div className="text-10 text-mainGray bg-bgGray rounded-md p-2 mb-5 ml-3 relative z-10">
+                <div className="absolute bottom-0 left-44 top-24 z-0 w-1 border-l border-dashed border-subCoral" />
+                <div className="text-10 text-mainGray bg-bgGray rounded-md p-8 mb-20 ml-12 relative z-10">
                   {latestYearMonth?.year || 0}년 {latestYearMonth?.month || 0}
                   월까지 기록된 {currentUserInfo?.nickname || ''}님의
                   활동여정이에요!
                 </div>
-                <div className="relative z-10 pb-3">
+                <div className="relative z-10 pb-12">
                   {processedHistory.yearMonths.map((yearMonth, index) => {
                     const items = processedHistory.groupedHistory[yearMonth];
                     return (
@@ -165,9 +165,9 @@ export default function TimelineFull({
                   })}
                 </div>
                 {isLastPage && isSubscriptionDateInRange(subscriptionDate) && (
-                  <div className="relative z-10 pb-3 mt-5">
-                    <div className="relative pb-5">
-                      <div className="absolute left-0 right-0 h-px bg-bgGray" />
+                  <div className="relative z-10 pb-12 mt-20">
+                    <div className="relative pb-20">
+                      <div className="absolute left-0 right-0 h-1 bg-bgGray" />
                     </div>
                     <TimeLineItem
                       isStart

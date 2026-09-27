@@ -45,15 +45,15 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
 
   return (
     <>
-      <article className="flex w-full flex-col pt-[30px] text-fg-neutral">
+      <article className="flex w-full flex-col pt-30 text-fg-neutral">
         {/* 유저 정보 */}
-        <div className="flex flex-col gap-[9px] mb-5">
-          <div className="flex w-full min-w-0 items-center justify-between gap-2">
+        <div className="flex flex-col gap-9 mb-20">
+          <div className="flex w-full min-w-0 items-center justify-between gap-8">
             <div className="min-w-0 flex-1 overflow-hidden">
               <UserInfoDisplay
                 userId={content.userInfo.userId}
                 nickName={content.userInfo.nickName}
-                className="flex min-w-0 items-center space-x-[7px]"
+                className="flex min-w-0 items-center space-x-7"
                 userImageProps={{
                   imgSrc: content.userInfo.userProfileImage,
                   size: 30,
@@ -66,36 +66,36 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
               />
             </div>
 
-            <div className="flex flex-shrink-0 items-center gap-2">
-              <div className="flex gap-1">
+            <div className="flex flex-shrink-0 items-center gap-8">
+              <div className="flex gap-4">
                 {content.isBestReview && (
                   <Label
                     name={LABEL_NAMES.BEST}
                     icon={
                       <ThumbsUp
                         aria-hidden
-                        className="h-2.5 w-2.5 fill-current"
+                        className="h-10 w-10 fill-current"
                       />
                     }
-                    styleClass="rounded border-stroke-brand-primary-solid bg-bg-brand-primary-solid px-2 py-[0.1rem] text-10 text-fg-brand-contrast"
+                    styleClass="rounded border-stroke-brand-primary-solid bg-bg-brand-primary-solid px-8 py-[1.6px] text-10 text-fg-brand-contrast"
                   />
                 )}
                 {content.isMyReview && (
                   <Label
                     name={LABEL_NAMES.MY_REVIEW}
-                    icon={<UserRound aria-hidden className="h-2.5 w-2.5" />}
-                    styleClass="rounded border-stroke-brand-primary-solid bg-transparent px-2 py-[0.1rem] text-10 text-fg-brand-primary"
+                    icon={<UserRound aria-hidden className="h-10 w-10" />}
+                    styleClass="rounded border-stroke-brand-primary-solid bg-transparent px-8 py-[1.6px] text-10 text-fg-brand-primary"
                   />
                 )}
               </div>
               <Star
                 rating={content.reviewRating ?? 0}
                 size={21}
-                textStyle="w-7 text-20 font-semibold text-fg-rating"
+                textStyle="w-28 text-20 font-semibold text-fg-rating"
               />
             </div>
           </div>
-          <div className="flex w-full min-w-0 items-center justify-between gap-3">
+          <div className="flex w-full min-w-0 items-center justify-between gap-12">
             <Link
               href={ROUTES.SEARCH.ALL(content.alcoholId)}
               className="min-w-0 flex-1"
@@ -104,7 +104,7 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
             </Link>
 
             {locationName && (
-              <div className="flex max-w-[45%] flex-shrink-0 items-center gap-0.5">
+              <div className="flex max-w-[45%] flex-shrink-0 items-center gap-2">
                 <Image
                   aria-hidden
                   src="/icon/placepoint-subcoral.svg"
@@ -123,7 +123,7 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
 
         {/* 리뷰 본문 */}
         <Link href={ROUTES.REVIEW.DETAIL(content.reviewId)}>
-          <div className="flex flex-col gap-[14px]">
+          <div className="flex flex-col gap-14">
             <ReviewImageCarousel images={productImages} priority={priority} />
             <div
               className="whitespace-pre-line break-words text-15 text-fg-neutral"
@@ -131,7 +131,7 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
                 __html: content.reviewContent.replace(/\n/g, '<br />'),
               }}
             />
-            <div className="flex flex-wrap gap-[6px]">
+            <div className="flex flex-wrap gap-6">
               {reviewTags.map((tag) => (
                 <div key={tag} className="overflow-hidden flex-shrink-0">
                   <Label name={tag} styleClass="label-default text-13" />
@@ -142,9 +142,9 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
         </Link>
 
         {/* 리뷰 좋아요, 댓글 */}
-        <div className="flex items-center justify-between mt-[14px]">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center space-x-[2px]">
+        <div className="flex items-center justify-between mt-14">
+          <div className="flex items-center gap-16">
+            <div className="flex items-center space-x-2">
               <ReviewLikeButton
                 reviewId={content.reviewId}
                 isLiked={isLiked}
@@ -171,7 +171,7 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
               textSize="text-13"
             />
           </div>
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-4">
             <p className="text-13 text-fg-neutral-muted">
               {formatDate(content.createAt) as string}
             </p>
@@ -183,7 +183,7 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
                 else handleLoginModal();
               }}
             >
-              <Ellipsis aria-hidden className="h-[17px] w-[17px]" />
+              <Ellipsis aria-hidden className="h-17 w-17" />
             </button>
           </div>
         </div>

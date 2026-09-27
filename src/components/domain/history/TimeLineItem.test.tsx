@@ -28,12 +28,9 @@ describe('TimeLineItem', () => {
       />,
     );
 
-    expect(screen.getByTestId('timeline-item')).toHaveClass(
-      'w-full',
-      'gap-2.5',
-    );
-    expect(screen.getByTestId('timeline-date')).toHaveClass('w-6', 'shrink-0');
-    expect(screen.getByRole('link')).toHaveClass('w-full', 'max-w-[21rem]');
+    expect(screen.getByTestId('timeline-item')).toHaveClass('w-full', 'gap-10');
+    expect(screen.getByTestId('timeline-date')).toHaveClass('w-24', 'shrink-0');
+    expect(screen.getByRole('link')).toHaveClass('w-full', 'max-w-336');
   });
 
   it('시작 활동 카드에도 같은 최대 폭을 적용한다', () => {
@@ -41,7 +38,7 @@ describe('TimeLineItem', () => {
 
     expect(screen.getByText('보틀노트를 시작하신 날이에요.')).toHaveClass(
       'w-full',
-      'max-w-[21rem]',
+      'max-w-336',
     );
   });
 });

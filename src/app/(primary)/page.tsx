@@ -53,7 +53,7 @@ export default async function Home() {
 
         <HomeCarousel banners={banners} />
 
-        <div className="pt-[22px] pb-20">
+        <div className="pt-22 pb-80">
           <HomeFeaturedSection />
           <HomeCategorySection />
         </div>

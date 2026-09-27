@@ -21,14 +21,14 @@ export const ItemStats = ({
 }: Props) => {
   return (
     <div
-      className={`flex justify-end text-12 font-semibold gap-[1px] ${mainTextClass}`}
+      className={`flex justify-end text-12 font-semibold gap-1 ${mainTextClass}`}
     >
       {iconSrc && (
         <SemanticIcon
           src={iconSrc}
           width={iconWidth}
           height={iconHeight}
-          className="pb-[2px]"
+          className="pb-2"
         />
       )}
       <span>{pointContent === '0.0' ? '-' : pointContent}</span>

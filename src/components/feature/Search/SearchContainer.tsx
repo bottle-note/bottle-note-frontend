@@ -76,7 +76,7 @@ function SearchContainer({
 
       {isOnSearch && showRecentSearch && (
         <div
-          className="w-full fixed-content bottom-0 z-40 bg-white p-3 overflow-y-auto"
+          className="w-full fixed-content bottom-0 z-40 bg-white p-12 overflow-y-auto"
           style={{
             top: 'calc(var(--header-height-with-safe) + var(--search-bar-height))',
           }}

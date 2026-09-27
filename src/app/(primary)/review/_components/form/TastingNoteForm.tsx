@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import Button from '@/components/ui/Button/Button';
 import {
   isTastingNoteEmpty,
   DEFAULT_TASTING_NOTE,
@@ -27,33 +28,33 @@ export default function TastingNoteForm() {
         title="테이스팅 노트"
         subTitle="(선택)"
       >
-        <div className="ml-7 mt-1">
+        <div className="ml-28 mt-4">
           {hasNote ? (
             // 작성 완료: 미리보기 차트 + 수정 버튼
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-[180px] h-[180px]">
+            <div className="flex flex-col items-center gap-12">
+              <div className="w-180 h-180">
                 <TastingRadarChart
                   values={tastingNote ?? DEFAULT_TASTING_NOTE}
                   size={180}
                 />
               </div>
-              <button
+              <Button
                 type="button"
                 onClick={() => setIsModalOpen(true)}
-                className="text-13 text-fg-brand underline underline-offset-2"
+                size="sm"
+                variant="text"
               >
                 수정하기
-              </button>
+              </Button>
             </div>
           ) : (
             // 미작성: CTA 버튼
-            <button
+            <Button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="w-full py-3 border border-dashed border-stroke-brand-weak rounded-lg
-                flex items-center justify-center gap-2
-                text-14 text-fg-brand
-                active:bg-bg-brand-weak transition-colors"
+              size="md"
+              variant="secondary"
+              fullWidth
             >
               <svg
                 width="16"
@@ -70,7 +71,7 @@ export default function TastingNoteForm() {
                 />
               </svg>
               그래프로 풍미 기록하기
-            </button>
+            </Button>
           )}
         </div>
       </OptionsContainer>

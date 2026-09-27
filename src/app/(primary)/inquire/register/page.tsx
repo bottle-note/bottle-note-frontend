@@ -161,7 +161,7 @@ export default function InquireRegister() {
   return (
     <>
       <FormProvider {...formMethods}>
-        <section className="min-h-safe-screen bg-bg-layer-default pb-8 relative text-fg-neutral">
+        <section className="min-h-safe-screen bg-bg-layer-default pb-32 relative text-fg-neutral">
           <SubHeader>
             <SubHeader.Left
               onClick={() => {
@@ -188,17 +188,17 @@ export default function InquireRegister() {
             </SubHeader.Left>
             <SubHeader.Center>{serviceType} 문의하기</SubHeader.Center>
           </SubHeader>
-          <section className="mx-5 my-[30px] space-y-[30px]">
+          <section className="mx-20 my-30 space-y-30">
             <InquireForm />
             <InquireTypeSelector paramsType={paramsType} />
 
-            <article className="space-y-[10px]">
-              <label className="block text-12 mb-1 text-fg-neutral-muted">
+            <article className="space-y-10">
+              <label className="block text-12 mb-4 text-fg-neutral-muted">
                 <span className="font-bold">이미지 첨부 </span>
                 <span className="font-light">(선택·최대 5장)</span>
               </label>
 
-              <div className="mt-4">
+              <div className="mt-16">
                 <ImageUploader useMarginLeft={false} />
               </div>
             </article>

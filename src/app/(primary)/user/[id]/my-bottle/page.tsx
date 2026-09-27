@@ -164,7 +164,7 @@ export default function MyBottle({
         </SubHeader>
 
         <SearchBarLink
-          className="p-5"
+          className="p-20"
           placeholder="찾으시는 술이 있으신가요?"
           keyword={urlKeyword}
           returnUrl={`/user/${userId}/my-bottle?type=${currentTab.id}${urlKeyword ? `&keyword=${urlKeyword}` : ''}`}
@@ -175,7 +175,7 @@ export default function MyBottle({
           }}
         />
 
-        <section className="pt-5 px-5 space-y-7.5">
+        <section className="pt-20 px-20 space-y-30">
           <Tab
             currentTab={currentTab}
             handleTab={handleTab}
@@ -257,7 +257,7 @@ export default function MyBottle({
 
                       return <></>;
                     })}
-                  {hasNextPage && <div ref={targetRef} className="h-1" />}
+                  {hasNextPage && <div ref={targetRef} className="h-4" />}
                 </>
               )}
             </List.Section>

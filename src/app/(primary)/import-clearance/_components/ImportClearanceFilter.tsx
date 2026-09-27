@@ -67,14 +67,14 @@ export default function ImportClearanceFilter({
     <>
       <StickySearchBar
         testId="import-clearance-search-bar"
-        containerClassName="-mx-4 px-4 pt-[5px]"
+        containerClassName="-mx-16 px-16 pt-5"
         isSearchActive={isSearchActive}
         onSearchActiveChange={onSearchActiveChange}
         onValueChange={onKeywordChange}
         value={keyword}
         ariaLabel="수입 정보 검색"
         placeholder="품목명, 수입사 검색"
-        inputClassName="pr-16"
+        inputClassName="pr-64"
         clearable
         renderActions={() => (
           <button
@@ -84,7 +84,7 @@ export default function ImportClearanceFilter({
             onMouseDown={(event) => event.preventDefault()}
             onClick={handleOpen}
           >
-            <ListFilter aria-hidden className="h-5 w-5" />
+            <ListFilter aria-hidden className="h-20 w-20" />
           </button>
         )}
       />

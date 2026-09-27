@@ -9,7 +9,7 @@ const ListItemLayout = ({ children, className }: ListItemLayoutProps) => {
   return (
     <article
       className={cn(
-        'flex w-full items-center border-b border-stroke-neutral-subtle py-4 text-fg-neutral',
+        'flex w-full items-center border-b border-stroke-neutral-subtle py-16 text-fg-neutral',
         className,
       )}
     >

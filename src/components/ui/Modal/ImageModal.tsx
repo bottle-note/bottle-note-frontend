@@ -54,7 +54,7 @@ export default function ImageModal({ imageUrl, isOpen, onClose }: Props) {
             exit={{ scale: 0.5, opacity: 0 }}
             transition={{ duration: 0.2, delay: 0.1 }}
             onClick={onClose}
-            className="absolute top-12 right-4 z-10 w-9 h-9 bg-bg-layer-floating text-fg-neutral rounded-full flex items-center justify-center hover:bg-bg-layer-default-pressed transition-colors shadow-lg"
+            className="absolute top-48 right-16 z-10 w-36 h-36 bg-bg-layer-floating text-fg-neutral rounded-full flex items-center justify-center hover:bg-bg-layer-default-pressed transition-colors shadow-lg"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
           >

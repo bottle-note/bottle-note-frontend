@@ -22,7 +22,7 @@ export default function ImportClearanceCompactItem({ item }: Props) {
   return (
     <Link
       href={ROUTES.IMPORT_CLEARANCE.DETAIL(item.id)}
-      className="flex items-center justify-between gap-3 border-b border-stroke-neutral-subtle py-3 last:border-b-0"
+      className="flex items-center justify-between gap-12 border-b border-stroke-neutral-subtle py-12 last:border-b-0"
       onClick={() =>
         trackGA4Event('select_import_clearance', {
           declaration_id: String(item.id),
@@ -33,12 +33,12 @@ export default function ImportClearanceCompactItem({ item }: Props) {
       <div className="min-w-0">
         <p className="truncate text-13 text-fg-neutral">{korName}</p>
         {meta.length > 0 && (
-          <p className="mt-0.5 truncate text-11 text-fg-neutral-muted">
+          <p className="mt-2 truncate text-11 text-fg-neutral-muted">
             {meta.join(' · ')}
           </p>
         )}
       </div>
-      <span className="flex shrink-0 items-center gap-1 text-12 text-fg-brand">
+      <span className="flex shrink-0 items-center gap-4 text-12 text-fg-brand">
         {processedDateLabel}
         <ChevronRight
           size={14}

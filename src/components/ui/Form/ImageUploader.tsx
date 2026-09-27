@@ -99,7 +99,7 @@ export default function ImageUploader({
   return (
     <>
       <div
-        className={`flex justify-start items-center h-[3.8rem] space-x-2 ${useMarginLeft ? 'ml-7 mt-[6px]' : ''}`}
+        className={`flex justify-start items-center h-[60.8px] space-x-8 ${useMarginLeft ? 'ml-28 mt-6' : ''}`}
       >
         {previewImages?.map((data) => (
           <figure
@@ -132,7 +132,7 @@ export default function ImageUploader({
         <button
           type="button"
           onClick={onClickAddImage}
-          className="flex h-[3.8rem] w-[3.8rem] flex-col items-center justify-center border border-stroke-brand-solid"
+          className="flex h-[60.8px] w-[60.8px] flex-col items-center justify-center border border-stroke-brand-solid"
         >
           <Image
             src="/icon/plus-subcoral.svg"

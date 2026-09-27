@@ -33,7 +33,7 @@ export default function ReviewListUserInfo({
   userImageSize = 22,
   userNameSize = 'text-12',
   starSize = 22,
-  starTextStyle = 'min-w-5 text-20 font-semibold text-fg-rating',
+  starTextStyle = 'min-w-20 text-20 font-semibold text-fg-rating',
   className = '',
 }: ReviewListUserInfoProps) {
   const { isUserBlocked } = useRelationshipsStore();
@@ -41,12 +41,12 @@ export default function ReviewListUserInfo({
 
   return (
     <div className={`flex items-center justify-between ${className}`}>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-8">
         <Link href={ROUTES.USER.BASE(userInfo.userId)}>
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-4">
             {isBlocked ? (
               <>
-                <div className="h-[22px] w-[22px] rounded-full bg-bg-disabled" />
+                <div className="h-22 w-22 rounded-full bg-bg-disabled" />
 
                 <p className={`text-fg-neutral-muted ${userNameSize}`}>
                   차단한 사용자
@@ -65,7 +65,7 @@ export default function ReviewListUserInfo({
             )}
           </div>
         </Link>
-        <div className="flex items-center space-x-1">
+        <div className="flex items-center space-x-4">
           {isBestReview && (
             <Label
               name={LABEL_NAMES.BEST}
@@ -76,7 +76,7 @@ export default function ReviewListUserInfo({
                   height={12}
                 />
               }
-              styleClass={`${isBlocked ? 'border-stroke-neutral-subtle bg-bg-disabled text-fg-disabled' : 'border-stroke-brand-primary-solid bg-bg-brand-primary-solid text-fg-brand-contrast'} rounded px-2 py-[3px] text-10`}
+              styleClass={`${isBlocked ? 'border-stroke-neutral-subtle bg-bg-disabled text-fg-disabled' : 'border-stroke-brand-primary-solid bg-bg-brand-primary-solid text-fg-brand-contrast'} rounded px-8 py-3 text-10`}
             />
           )}
           {isMyReview && (
@@ -89,7 +89,7 @@ export default function ReviewListUserInfo({
                   height={12}
                 />
               }
-              styleClass="rounded border-stroke-brand-primary-solid bg-bg-transparent px-2 py-[3px] text-10 text-fg-brand-primary"
+              styleClass="rounded border-stroke-brand-primary-solid bg-bg-transparent px-8 py-3 text-10 text-fg-brand-primary"
             />
           )}
         </div>

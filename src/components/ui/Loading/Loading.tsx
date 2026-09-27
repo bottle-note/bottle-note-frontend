@@ -5,7 +5,7 @@ import BackDrop from '@/components/ui/Modal/BackDrop';
 export default function Loading() {
   return (
     <BackDrop isShow isModal={false}>
-      <main className="w-full h-full flex flex-col justify-center items-center backdrop-blur bg-white bg-opacity-50 gap-2">
+      <main className="w-full h-full flex flex-col justify-center items-center backdrop-blur bg-white bg-opacity-50 gap-8">
         <Image
           src="/bottle_note_logo_gray.svg"
           alt="bottle_logo"

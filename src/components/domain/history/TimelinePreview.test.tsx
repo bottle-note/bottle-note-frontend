@@ -56,8 +56,8 @@ describe('TimelinePreview', () => {
 
     expect(screen.getByTestId('timeline-preview')).toHaveClass(
       'w-full',
-      'max-w-[399px]',
+      'max-w-399',
     );
-    expect(screen.getByTestId('timeline-axis')).toHaveClass('left-11');
+    expect(screen.getByTestId('timeline-axis')).toHaveClass('left-44');
   });
 });

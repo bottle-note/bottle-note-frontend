@@ -25,15 +25,15 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
   }, []);
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen px-6 overflow-hidden">
+    <div className="relative flex flex-col items-center justify-center min-h-screen px-24 overflow-hidden">
       {/* 닫기 버튼 */}
       <button
         onClick={() => router.back()}
-        className="absolute top-4 left-4 z-20 p-2 text-white/40 hover:text-white/60 transition-colors"
+        className="absolute top-16 left-16 z-20 p-8 text-white/40 hover:text-white/60 transition-colors"
         aria-label="닫기"
       >
         <svg
-          className="w-6 h-6"
+          className="w-24 h-24"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -55,7 +55,7 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
         {Array.from({ length: 50 }).map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+            className="absolute w-4 h-4 bg-white rounded-full animate-pulse"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -70,21 +70,21 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
       {/* 메인 콘텐츠 */}
       <div
         className={`relative z-10 flex flex-col items-center text-center transition-all duration-1000 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-32'
         }`}
       >
         {/* 타이틀 */}
-        <div className="mb-4">
+        <div className="mb-16">
           <span className="text-mainCoral text-sm tracking-[0.3em] uppercase">
             2026 Spirits & Spirit
           </span>
         </div>
 
-        <h1 className="text-2xl font-bold text-white mb-2 leading-tight">
+        <h1 className="text-2xl font-bold text-white mb-8 leading-tight">
           위스키와 함께하는 2026 타로점
         </h1>
 
-        <p className="text-white/70 text-sm mb-12 max-w-[280px]">
+        <p className="text-white/70 text-sm mb-48 max-w-280">
           타로 카드를 뽑아
           <br />
           올해의 추천 위스키를 점쳐보세요.
@@ -92,15 +92,15 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
 
         {/* 카드 미리보기 이미지 - 로딩 완료 후 아래에서 올라오는 애니메이션 */}
         <div
-          className={`relative w-40 h-56 mb-12 transition-all duration-700 ease-out ${
+          className={`relative w-160 h-224 mb-48 transition-all duration-700 ease-out ${
             isCardImageLoaded
               ? 'opacity-100 translate-y-0'
-              : 'opacity-0 translate-y-12'
+              : 'opacity-0 translate-y-48'
           }`}
         >
           {/* 카드 뒷면 스택 효과 (빈티지 타로 스타일) */}
           <div className="absolute inset-0 transform rotate-[-8deg] opacity-60">
-            <div className="w-full h-full rounded-xl bg-[#f4e4c1] p-2 shadow-lg">
+            <div className="w-full h-full rounded-xl bg-[#f4e4c1] p-8 shadow-lg">
               <div className="relative w-full h-full rounded-lg overflow-hidden border border-[#c9a227]/30">
                 <Image
                   src="/images/tarot/card-back.png"
@@ -113,7 +113,7 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
             </div>
           </div>
           <div className="absolute inset-0 transform rotate-[-4deg] opacity-80">
-            <div className="w-full h-full rounded-xl bg-[#f4e4c1] p-2 shadow-lg">
+            <div className="w-full h-full rounded-xl bg-[#f4e4c1] p-8 shadow-lg">
               <div className="relative w-full h-full rounded-lg overflow-hidden border border-[#c9a227]/30">
                 <Image
                   src="/images/tarot/card-back.png"
@@ -126,7 +126,7 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
             </div>
           </div>
           <div className="absolute inset-0">
-            <div className="w-full h-full rounded-xl bg-[#f4e4c1] p-2 shadow-2xl">
+            <div className="w-full h-full rounded-xl bg-[#f4e4c1] p-8 shadow-2xl">
               <div className="relative w-full h-full rounded-lg overflow-hidden border border-[#c9a227]/30">
                 <Image
                   src="/images/tarot/card-back.png"
@@ -145,7 +145,7 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
         {/* 시작 버튼 */}
         <button
           onClick={onStart}
-          className="px-12 py-4 bg-gradient-to-r from-mainCoral to-subCoral text-white font-semibold rounded-full shadow-lg shadow-mainCoral/30 hover:shadow-mainCoral/50 transition-all duration-300 hover:scale-105 active:scale-95"
+          className="px-48 py-16 bg-gradient-to-r from-mainCoral to-subCoral text-white font-semibold rounded-full shadow-lg shadow-mainCoral/30 hover:shadow-mainCoral/50 transition-all duration-300 hover:scale-105 active:scale-95"
         >
           카드 뽑으러 가기
         </button>

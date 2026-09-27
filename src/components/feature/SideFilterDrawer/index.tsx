@@ -25,16 +25,16 @@ export default function SideFilterDrawer({
         <>
           <BackDrop isShow={isOpen} onBackdropClick={onClose}>
             <motion.section
-              className="fixed right-0 top-0 z-50 flex h-full w-72 flex-col bg-bg-layer-floating pb-[var(--safe-area-bottom)] pt-16 text-fg-neutral"
+              className="fixed right-0 top-0 z-50 flex h-full w-288 flex-col bg-bg-layer-floating pb-[var(--safe-area-bottom)] pt-64 text-fg-neutral"
               initial="initial"
               animate="animate"
               exit="exit"
               variants={modalVariants}
             >
-              <header className="flex items-center justify-between border-b border-stroke-neutral-subtle px-5 pb-3">
+              <header className="flex items-center justify-between border-b border-stroke-neutral-subtle px-20 pb-12">
                 <button
                   type="button"
-                  className="rounded border border-stroke-neutral-weak px-[10px] py-[2px] text-10 text-fg-neutral-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
+                  className="rounded border border-stroke-neutral-weak px-10 py-2 text-10 text-fg-neutral-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
                   onClick={() => resetFilter()}
                 >
                   초기화
@@ -48,7 +48,7 @@ export default function SideFilterDrawer({
                   className="rounded-sm text-fg-neutral-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
                   onClick={onClose}
                 >
-                  <X aria-hidden className="h-5 w-5" />
+                  <X aria-hidden className="h-20 w-20" />
                 </button>
               </header>
               <div className="flex-1 overflow-y-auto">{children}</div>

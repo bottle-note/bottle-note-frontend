@@ -103,12 +103,7 @@ export default function RatingSuccessModal({
             완료됐습니다!
           </p>
           <div ref={confirmButtonContainerRef} className={styles.confirmButton}>
-            <Button
-              btnName="확인"
-              onClick={onClose}
-              btnStyles="bg-bg-brand-solid active:bg-bg-brand-solid-pressed"
-              btnTextStyles="font-bold text-16"
-            />
+            <Button btnName="확인" onClick={onClose} />
           </div>
         </section>
       </div>

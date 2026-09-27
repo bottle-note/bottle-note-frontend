@@ -11,7 +11,7 @@ export default function GlobalError({
   return (
     <html lang="ko">
       <body>
-        <div className="h-screen flex flex-col justify-center items-center gap-5 bg-bgGray">
+        <div className="h-screen flex flex-col justify-center items-center gap-20 bg-bgGray">
           <Image
             src="/icon/logo-subcoral.svg"
             alt="bottle_logo"
@@ -25,7 +25,7 @@ export default function GlobalError({
           </p>
           <button
             onClick={reset}
-            className="mt-2 px-5 py-2 bg-mainCoral text-white rounded-lg text-13"
+            className="mt-8 px-20 py-8 bg-mainCoral text-white rounded-lg text-13"
           >
             다시 시도
           </button>

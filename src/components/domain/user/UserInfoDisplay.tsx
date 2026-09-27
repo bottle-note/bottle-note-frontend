@@ -51,7 +51,7 @@ export const UserInfoDisplay = ({
   userNickNameProps,
   nickName,
   userId,
-  className = 'flex items-center space-x-[7px]',
+  className = 'flex items-center space-x-7',
 }: UserInfoDisplayProps) => {
   return (
     <Link href={ROUTES.USER.BASE(userId)}>

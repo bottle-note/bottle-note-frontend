@@ -79,16 +79,16 @@ export default function TimelinePreview({
 
   return (
     <>
-      <div className="my-3 border-t border-stroke-neutral-subtle" />
+      <div className="my-12 border-t border-stroke-neutral-subtle" />
       <div
         data-testid="timeline-preview"
-        className="relative mx-auto w-full max-w-[399px]"
+        className="relative mx-auto w-full max-w-399"
       >
         <div
           data-testid="timeline-axis"
-          className="absolute bottom-0 left-11 top-6 z-0 w-px border-l border-dashed border-stroke-brand-solid"
+          className="absolute bottom-0 left-44 top-24 z-0 w-1 border-l border-dashed border-stroke-brand-solid"
         />
-        <div className="relative z-10 pb-3">
+        <div className="relative z-10 pb-12">
           {Object.entries(processedHistory.groupedHistory).map(
             ([yearMonth, items], index) => (
               <TimelineMonthGroup
@@ -110,7 +110,7 @@ export default function TimelinePreview({
           />
         )}
       </div>
-      <div className="mb-2" />
+      <div className="mb-8" />
     </>
   );
 }

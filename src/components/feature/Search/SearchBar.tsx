@@ -19,8 +19,8 @@ interface Props {
 }
 
 const SearchButton = () => (
-  <div className="px-2 w-10 absolute top-0 right-1 h-full flex items-center justify-center">
-    <Search aria-hidden className="h-4 w-4 text-fg-brand" />
+  <div className="px-8 w-40 absolute top-0 right-4 h-full flex items-center justify-center">
+    <Search aria-hidden className="h-16 w-16 text-fg-brand" />
   </div>
 );
 
@@ -73,7 +73,7 @@ export default function SearchBar({
   const inputProps = {
     type: 'text',
     className:
-      'h-10 w-full rounded-lg border border-stroke-brand-primary-solid bg-bg-layer-floating pl-4 pr-12 text-15 text-fg-neutral placeholder:text-fg-brand-primary focus-visible:ring-2 focus-visible:ring-stroke-focus-ring',
+      'h-40 w-full rounded-lg border border-stroke-brand-primary-solid bg-bg-layer-floating pl-16 pr-48 text-15 text-fg-neutral placeholder:text-fg-brand-primary focus-visible:ring-2 focus-visible:ring-stroke-focus-ring',
     placeholder,
     'aria-label': '검색어 입력',
   };
@@ -103,15 +103,15 @@ export default function SearchBar({
         <button
           type="button"
           onClick={handleDelete}
-          className="absolute right-14 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
+          className="absolute right-56 top-1/2 transform -translate-y-1/2 flex items-center justify-center"
           aria-label="검색어 지우기"
         >
-          <CircleX aria-hidden className="h-4 w-4 text-fg-neutral-muted" />
+          <CircleX aria-hidden className="h-16 w-16 text-fg-neutral-muted" />
         </button>
       )}
       <button
         type="button"
-        className="px-2 w-10 absolute top-0 right-1 h-full flex items-center justify-center"
+        className="px-8 w-40 absolute top-0 right-4 h-full flex items-center justify-center"
         onClick={handleSubmit}
         aria-label="검색"
       >

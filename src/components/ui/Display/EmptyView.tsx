@@ -7,7 +7,7 @@ interface Props {
 
 function EmptyView({ text = '검색 결과가 없어요!' }: Props) {
   return (
-    <div className="h-72 flex flex-col justify-center items-center gap-5">
+    <div className="h-288 flex flex-col justify-center items-center gap-20">
       <Image
         src="/icon/logo-subcoral.svg"
         alt="bottle_logo"

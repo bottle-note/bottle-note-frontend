@@ -116,9 +116,9 @@ const ReplyItem = memo(function ReplyItem({
     <>
       <div>
         {isBlocked ? (
-          <div className="space-y-[10px] mb-2">
-            <div className="flex items-center space-x-1">
-              <div className="h-[22px] w-[22px] rounded-full bg-bg-disabled" />
+          <div className="space-y-10 mb-8">
+            <div className="flex items-center space-x-4">
+              <div className="h-22 w-22 rounded-full bg-bg-disabled" />
               <p className="text-12 text-fg-neutral-muted">차단한 사용자</p>
             </div>
             <div className="flex items-center justify-between text-fg-neutral-muted">
@@ -137,7 +137,7 @@ const ReplyItem = memo(function ReplyItem({
           <>
             <div className="flex items-center justify-between">
               <Link href={ROUTES.USER.BASE(data?.userId!)}>
-                <div className="flex items-center space-x-[5px] h-8 px-">
+                <div className="flex items-center space-x-5 h-32 px-">
                   <ProfileImage profileImgSrc={data?.imageUrl} size={22} />
                   <p className="text-12 font-bold text-fg-neutral-muted">
                     {truncStr(data?.nickName, 12)}
@@ -164,15 +164,15 @@ const ReplyItem = memo(function ReplyItem({
                   >
                     <MoreVertical
                       aria-label="댓글 메뉴"
-                      className="h-3.5 w-3.5 text-fg-neutral-muted"
+                      className="h-14 w-14 text-fg-neutral-muted"
                     />
                   </button>
                 )}
               </div>
             </div>
-            <div className="my-2 flex whitespace-pre-wrap break-words text-15 text-fg-neutral">
+            <div className="my-8 flex whitespace-pre-wrap break-words text-15 text-fg-neutral">
               {'rootReviewId' in data && (
-                <div className="mr-1 text-fg-brand-primary">
+                <div className="mr-4 text-fg-brand-primary">
                   {data?.parentReviewReplyAuthor}
                 </div>
               )}
@@ -180,8 +180,8 @@ const ReplyItem = memo(function ReplyItem({
             </div>
           </>
         )}
-        <div className="space-y-[14px]">
-          <div className="flex space-x-[6px] text-13">
+        <div className="space-y-14">
+          <div className="flex space-x-6 text-13">
             {data?.status !== 'DELETED' && !isBlocked && (
               <button
                 className="text-fg-brand"
@@ -202,10 +202,10 @@ const ReplyItem = memo(function ReplyItem({
                   <p className="text-fg-brand">·</p>
                 )}
                 <button
-                  className="flex items-center space-x-[2px]"
+                  className="flex items-center space-x-2"
                   onClick={handleUpdateSubReply}
                 >
-                  <div className="pr-[1px] text-fg-brand">
+                  <div className="pr-1 text-fg-brand">
                     답글 {data?.subReplyCount}개
                   </div>
                   <Image
@@ -224,7 +224,7 @@ const ReplyItem = memo(function ReplyItem({
           </div>
           {'subReplyCount' in data &&
             data?.subReplyCount !== 0 &&
-            isSubReplyShow && <div className="space-y-[14px]">{children}</div>}
+            isSubReplyShow && <div className="space-y-14">{children}</div>}
         </div>
       </div>
       {isOptionShow && (

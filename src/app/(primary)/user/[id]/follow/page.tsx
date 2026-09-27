@@ -78,7 +78,7 @@ export default function UserFollowPage({
           <SubHeader.Center>팔로잉 / 팔로워</SubHeader.Center>
         </SubHeader>
 
-        <section className="pt-5 px-5 space-y-7.5">
+        <section className="pt-20 px-20 space-y-30">
           <Tab
             currentTab={currentTab}
             handleTab={handleTab}

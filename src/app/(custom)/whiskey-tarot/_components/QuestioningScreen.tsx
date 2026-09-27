@@ -15,7 +15,7 @@ export default function QuestioningScreen({ onReady }: QuestioningScreenProps) {
   }, []);
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen px-6 pb-safe-lg overflow-hidden">
+    <div className="relative flex flex-col items-center justify-center min-h-screen px-24 pb-safe-lg overflow-hidden">
       {/* 배경 그라데이션 */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#1a1a2e] to-[#0a0a0f]" />
 
@@ -24,7 +24,7 @@ export default function QuestioningScreen({ onReady }: QuestioningScreenProps) {
         {Array.from({ length: 30 }).map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+            className="absolute w-4 h-4 bg-white rounded-full animate-pulse"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -40,13 +40,13 @@ export default function QuestioningScreen({ onReady }: QuestioningScreenProps) {
       <div
         className={`
           relative z-10 flex flex-col items-center text-center transition-all duration-1000
-          ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
+          ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-32'}
         `}
       >
         {/* 아이콘 */}
-        <div className="w-20 h-20 rounded-full bg-mainCoral/20 flex items-center justify-center mb-8">
+        <div className="w-80 h-80 rounded-full bg-mainCoral/20 flex items-center justify-center mb-32">
           <svg
-            className="w-10 h-10 text-mainCoral"
+            className="w-40 h-40 text-mainCoral"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -61,13 +61,13 @@ export default function QuestioningScreen({ onReady }: QuestioningScreenProps) {
         </div>
 
         {/* 메인 텍스트 */}
-        <h1 className="text-white text-xl font-bold mb-4 leading-relaxed">
+        <h1 className="text-white text-xl font-bold mb-16 leading-relaxed">
           카드를 뽑기 전,
           <br />
           물어보고 싶은 것을 떠올려보세요
         </h1>
 
-        <p className="text-white/60 text-sm mb-12 max-w-[280px] leading-relaxed">
+        <p className="text-white/60 text-sm mb-48 max-w-280 leading-relaxed">
           어떤 질문이든 좋아요.
           <br />
           마음속에 품은 질문이 카드를 이끌어요.
@@ -76,7 +76,7 @@ export default function QuestioningScreen({ onReady }: QuestioningScreenProps) {
         {/* 준비 버튼 */}
         <button
           onClick={onReady}
-          className="px-12 py-4 bg-gradient-to-r from-mainCoral to-subCoral text-white font-semibold rounded-full shadow-lg shadow-mainCoral/30 hover:shadow-mainCoral/50 transition-all duration-300 hover:scale-105 active:scale-95"
+          className="px-48 py-16 bg-gradient-to-r from-mainCoral to-subCoral text-white font-semibold rounded-full shadow-lg shadow-mainCoral/30 hover:shadow-mainCoral/50 transition-all duration-300 hover:scale-105 active:scale-95"
         >
           준비되었어요
         </button>

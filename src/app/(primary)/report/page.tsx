@@ -130,7 +130,7 @@ export default function Report() {
 
   return (
     <>
-      <section className="pb-8 relative">
+      <section className="pb-32 relative">
         <SubHeader>
           <SubHeader.Left
             onClick={() => {
@@ -157,7 +157,7 @@ export default function Report() {
           </SubHeader.Left>
           <SubHeader.Center>{reportTitle}</SubHeader.Center>
         </SubHeader>
-        <article className="m-5">
+        <article className="m-20">
           <OptionSelect
             options={REPORT_TYPE[type as 'review' | 'comment' | 'user'].options}
             title="신고하기"
@@ -167,19 +167,19 @@ export default function Report() {
             }}
           />
         </article>
-        <article className="m-5 border-t-[0.01rem] border-b-[0.01rem] border-mainGray">
+        <article className="m-20 border-t-[0.01rem] border-b-[0.01rem] border-mainGray">
           <textarea
             placeholder={`${reportTitle} 사유를 작성해주세요.(최소 10자)`}
-            className="w-full h-56 bg-white p-4 text-10 outline-none resize-none text-mainGray"
+            className="w-full h-224 bg-white p-16 text-10 outline-none resize-none text-mainGray"
             minLength={10}
             maxLength={1000}
             {...register('content')}
           />
-          <div className="text-right text-mainGray text-10 pb-2">
+          <div className="text-right text-mainGray text-10 pb-8">
             ({watch('content')?.length} / 1000)
           </div>
         </article>
-        <article className="mx-5 space-y-9">
+        <article className="mx-20 space-y-36">
           <Button
             onClick={handleSubmit(onSave)}
             btnName="전송"

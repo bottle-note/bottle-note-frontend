@@ -88,28 +88,28 @@ export default function FinalResult({
       {/* 메인 콘텐츠 - 스크롤 가능 영역 */}
       <div
         className={`
-          relative z-10 flex-1 overflow-y-auto px-6 pt-8 pb-safe-lg
+          relative z-10 flex-1 overflow-y-auto px-24 pt-32 pb-safe-lg
           transition-all duration-700
-          ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
+          ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-32'}
         `}
       >
         {/* 상단 타이틀 */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-24">
           <span className="text-mainCoral text-sm tracking-wider">
             YOUR WHISKEY
           </span>
-          <h1 className="text-white text-2xl font-bold mt-2">
+          <h1 className="text-white text-2xl font-bold mt-8">
             당신의 위스키가 도착했습니다
           </h1>
         </div>
 
         {/* 위스키 카드 */}
         <div className="flex flex-col items-center">
-          <div className="w-full max-w-[320px] bg-gradient-to-b from-white/10 to-white/5 rounded-2xl p-4 border border-white/10">
+          <div className="w-full max-w-320 bg-gradient-to-b from-white/10 to-white/5 rounded-2xl p-16 border border-white/10">
             {/* 위스키 이미지 영역 */}
-            <div className="w-full flex items-center justify-center overflow-hidden py-6">
+            <div className="w-full flex items-center justify-center overflow-hidden py-24">
               {isLoading ? (
-                <div className="w-12 h-12 border-2 border-mainCoral/30 border-t-mainCoral rounded-full animate-spin" />
+                <div className="w-48 h-48 border-2 border-mainCoral/30 border-t-mainCoral rounded-full animate-spin" />
               ) : whiskyDetail?.alcoholUrlImg ? (
                 <Image
                   src={whiskyDetail.alcoholUrlImg}
@@ -125,32 +125,32 @@ export default function FinalResult({
 
             {/* 위스키 정보 */}
             <div className="text-center">
-              <p className="text-mainCoral text-sm mb-1">
+              <p className="text-mainCoral text-sm mb-4">
                 {CATEGORY_LABELS[whisky.category] || whisky.category}
               </p>
-              <h2 className="text-white text-xl font-bold mb-1">
+              <h2 className="text-white text-xl font-bold mb-4">
                 {whiskyDetail?.korName || whisky.nameKo}
               </h2>
-              <p className="text-white/60 text-sm mb-4">
+              <p className="text-white/60 text-sm mb-16">
                 {whiskyDetail?.engName || whisky.name}
               </p>
 
               {/* 매칭 이유 + 위스키 설명 */}
-              <div className="bg-white/5 rounded-lg p-4">
+              <div className="bg-white/5 rounded-lg p-16">
                 <div>
                   {selectedCards.map((cardName, index) => (
                     <span
                       key={index}
-                      className="inline-block bg-white/10 text-white/80 text-xs px-2 py-1 rounded-full mr-2 mb-2"
+                      className="inline-block bg-white/10 text-white/80 text-xs px-8 py-4 rounded-full mr-8 mb-8"
                     >
                       {cardName}
                     </span>
                   ))}
                 </div>
-                <p className="text-white/80 leading-relaxed whitespace-pre-line pt-1">
+                <p className="text-white/80 leading-relaxed whitespace-pre-line pt-4">
                   {matchReason}
                 </p>
-                <p className="text-white/60 text-sm leading-relaxed mt-3">
+                <p className="text-white/60 text-sm leading-relaxed mt-12">
                   {whisky.description}
                 </p>
               </div>
@@ -158,13 +158,13 @@ export default function FinalResult({
               {/* CTA 버튼 */}
               <button
                 onClick={handleGoToWhisky}
-                className="group mt-4 w-full py-3 bg-mainCoral/20 rounded-full flex items-center justify-center gap-2 hover:bg-mainCoral/30 active:scale-[0.98] transition-all"
+                className="group mt-16 w-full py-12 bg-mainCoral/20 rounded-full flex items-center justify-center gap-8 hover:bg-mainCoral/30 active:scale-[0.98] transition-all"
               >
                 <span className="text-mainCoral text-sm font-medium">
                   위스키 마시고 리뷰 남기러 가기
                 </span>
                 <svg
-                  className="w-4 h-4 text-mainCoral group-hover:translate-x-1 transition-transform"
+                  className="w-16 h-16 text-mainCoral group-hover:translate-x-4 transition-transform"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -181,10 +181,10 @@ export default function FinalResult({
               {/* 공유 버튼 */}
               <button
                 onClick={handleShare}
-                className="mt-3 w-full py-3 bg-white/10 rounded-full flex items-center justify-center gap-2 hover:bg-white/15 active:scale-[0.98] transition-all"
+                className="mt-12 w-full py-12 bg-white/10 rounded-full flex items-center justify-center gap-8 hover:bg-white/15 active:scale-[0.98] transition-all"
               >
                 <svg
-                  className="w-4 h-4 text-white/80"
+                  className="w-16 h-16 text-white/80"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

@@ -52,7 +52,7 @@ const BookmarkTab = <T extends { id: string; name: string }>({
               <div
                 key={tab.id}
                 ref={registerTab?.(tab.id)}
-                className={`relative ${index === 0 ? 'ml-4' : '-ml-3'}`}
+                className={`relative ${index === 0 ? 'ml-16' : '-ml-12'}`}
                 style={{
                   zIndex:
                     currentTab.id === tab.id
@@ -149,7 +149,7 @@ const BookmarkTab = <T extends { id: string; name: string }>({
           </div>
           {/* 오른쪽 여백 하단 라인 */}
           <div
-            className="flex-grow min-w-[20px]"
+            className="flex-grow min-w-20"
             style={{
               borderBottom: `${BORDER_WIDTH}px solid ${BORDER_COLOR}`,
               marginTop: `${TAB_HEIGHT - BORDER_WIDTH}px`,

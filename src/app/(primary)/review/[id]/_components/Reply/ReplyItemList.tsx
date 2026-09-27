@@ -60,12 +60,9 @@ const SubReplyList = ({
   return (
     <>
       {subReplies.map((subComment) => (
-        <div
-          key={`sub-${subComment.reviewReplyId}`}
-          className="relative ml-[6px]"
-        >
-          <div className="absolute top-0 h-full w-px bg-stroke-neutral-subtle" />
-          <div className="ml-4">
+        <div key={`sub-${subComment.reviewReplyId}`} className="relative ml-6">
+          <div className="absolute top-0 h-full w-1 bg-stroke-neutral-subtle" />
+          <div className="ml-16">
             <ReplyItem
               data={subComment}
               isReviewUser={reviewUserId === subComment.userId}
@@ -75,7 +72,7 @@ const SubReplyList = ({
           </div>
         </div>
       ))}
-      {hasNextPage && <div ref={targetRef} className="h-1" />}
+      {hasNextPage && <div ref={targetRef} className="h-4" />}
     </>
   );
 };
@@ -192,8 +189,8 @@ export default function ReplyItemList({
   if (!isRootFirstLoading && rootReplies.length === 0) {
     return (
       <>
-        <div className="h-4 bg-bg-layer-basement" />
-        <section className="py-5 mb-20">
+        <div className="h-16 bg-bg-layer-basement" />
+        <section className="py-20 mb-80">
           <EmptyView text="아직 댓글이 없어요!" />
         </section>
       </>
@@ -202,13 +199,13 @@ export default function ReplyItemList({
 
   return (
     <>
-      <div className="h-4 bg-bg-layer-basement" />
+      <div className="h-16 bg-bg-layer-basement" />
       <List
         isListFirstLoading={isRootFirstLoading}
         isScrollLoading={isRootFetching}
       >
         <List.Section>
-          <section className="mx-5 py-5 space-y-3 pb-40">
+          <section className="mx-20 py-20 space-y-12 pb-160">
             {rootReplies.map((comment, index) => (
               <React.Fragment key={`root-${comment.reviewReplyId}`}>
                 <RootReplyItemMemo

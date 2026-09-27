@@ -6,6 +6,14 @@ const paletteColor = (token: string) =>
 
 const semanticColor = (token: string) => `var(--color-${token})`;
 
+// Numeric spacing utilities use literal px, including half-pixel values.
+const pixelSpacing = Object.fromEntries(
+  Array.from({ length: 2049 }, (_, index) => {
+    const size = index / 2;
+    return [String(size), `${size}px`];
+  }),
+);
+
 export const paletteColors = {
   neutral: {
     0: paletteColor('neutral-0'),
@@ -137,6 +145,17 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    spacing: { ...pixelSpacing, px: '1px' },
+    lineHeight: {
+      ...pixelSpacing,
+      none: '1',
+      tight: '1.25',
+      snug: '1.375',
+      normal: '1.5',
+      relaxed: '1.625',
+      loose: '2',
+      sm: '14px',
+    },
     extend: {
       maxWidth: {
         content: '468px',
@@ -186,37 +205,16 @@ const config: Config = {
         },
         ...tailwindColors,
       },
-      fontSize: {
-        '9': ['9px', '9px'],
-        '10': ['10px', '14px'],
-        '11': ['11px', '15px'],
-        '12': ['12px', '16px'],
-        '13': ['13px', '17px'],
-        '13.5': ['13.5px', '17.5px'],
-        '14': ['14px', '18px'],
-        '15': ['15px', '19px'],
-        '16': ['16px', '20px'],
-        '20': ['20px', '24px'],
-        '24': ['24px', '28px'],
-        '27': ['27px', '31px'],
-      },
-      lineHeight: {
-        sm: '14px',
-      },
-      spacing: {
-        '1.5': '0.375rem',
-        '2.5': '0.625rem',
-        '2.75': '0.688rem',
-        '3.25': '0.813rem',
-        '3.5': '0.875rem',
-        '3.75': '0.938rem',
-        '4.5': '1.125rem',
-        '5.25': '1.313rem',
-        '7.5': '1.875rem',
-        '8.5': '2.125rem',
-        '8.75': '2.188rem',
-        '11.5': '2.875rem',
-      },
+      // text-N = Npx (1–100px, 0.5px steps). Preserve existing line heights.
+      fontSize: Object.fromEntries(
+        Array.from({ length: 199 }, (_, index) => {
+          const size = 1 + index / 2;
+          return [
+            String(size),
+            [`${size}px`, `${size === 9 ? 9 : size + 4}px`] as [string, string],
+          ];
+        }),
+      ),
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',

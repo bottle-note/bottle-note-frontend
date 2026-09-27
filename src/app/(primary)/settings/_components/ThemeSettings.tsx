@@ -31,7 +31,7 @@ export default function ThemeSettings() {
   const { preference, isInitialized, setPreference } = useTheme();
 
   return (
-    <div className="px-6 py-[22px]">
+    <div className="px-24 py-22">
       <div
         role="radiogroup"
         aria-label="화면 테마"
@@ -49,7 +49,7 @@ export default function ThemeSettings() {
               aria-checked={isSelected}
               disabled={!isInitialized}
               onClick={() => setPreference(option.value)}
-              className={`flex w-full items-center justify-between gap-4 px-4 py-4 text-left transition-colors active:bg-bg-layer-default-pressed disabled:cursor-wait ${
+              className={`flex w-full items-center justify-between gap-16 px-16 py-16 text-left transition-colors active:bg-bg-layer-default-pressed disabled:cursor-wait ${
                 index === 0 ? '' : 'border-t border-stroke-neutral-subtle'
               }`}
             >
@@ -57,21 +57,21 @@ export default function ThemeSettings() {
                 <span className="block text-15 font-bold text-fg-neutral">
                   {option.label}
                 </span>
-                <span className="mt-1 block text-12 text-fg-neutral-muted">
+                <span className="mt-4 block text-12 text-fg-neutral-muted">
                   {option.description}
                 </span>
               </span>
 
               <span
                 aria-hidden
-                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
+                className={`flex h-20 w-20 shrink-0 items-center justify-center rounded-full border ${
                   isSelected
                     ? 'border-stroke-brand-solid'
                     : 'border-stroke-neutral-weak'
                 }`}
               >
                 {isSelected && (
-                  <span className="h-3 w-3 rounded-full bg-bg-brand-solid" />
+                  <span className="h-12 w-12 rounded-full bg-bg-brand-solid" />
                 )}
               </span>
             </button>

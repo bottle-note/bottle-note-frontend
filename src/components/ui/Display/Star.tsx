@@ -11,7 +11,7 @@ interface Props {
 const Star = ({
   rating,
   size = 18,
-  textStyle = 'font-semibold text-15 min-w-5',
+  textStyle = 'font-semibold text-15 min-w-20',
   tone = 'rating',
   align = 'center',
 }: Props) => {
@@ -34,7 +34,7 @@ const Star = ({
     >
       <SemanticIcon src={iconSrc} width={size} height={size} />
       <span
-        className={`ml-1 ${textStyle}`}
+        className={`ml-4 ${textStyle}`}
         style={{
           lineHeight: '1',
         }}

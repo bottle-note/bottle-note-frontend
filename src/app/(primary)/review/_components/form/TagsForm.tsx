@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { CircleHelp, CircleX } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
+import Button from '@/components/ui/Button/Button';
 import useModalStore from '@/store/modalStore';
 import HoverTouchBox from '@/components/ui/Interactive/HoverTouchBox';
 import { TAGS_LIMIT, validateTagText } from '@/constants/review';
@@ -45,11 +46,11 @@ export default function TagsForm() {
   };
 
   const ExtraButtons = (
-    <div className="flex gap-1 text-13 text-fg-neutral-muted">
+    <div className="flex gap-4 text-13 text-fg-neutral-muted">
       <HoverTouchBox
         id="flavor-tooltip"
         tooltipContent={
-          <div className="absolute left-5 z-10 flex items-center space-x-1 rounded-md border border-stroke-brand-solid bg-bg-layer-floating p-2">
+          <div className="absolute left-20 z-10 flex items-center space-x-4 rounded-md border border-stroke-brand-solid bg-bg-layer-floating p-8">
             <Image
               src="/icon/questionmark-subcoral.svg"
               alt="questionMarkIcon"
@@ -62,10 +63,7 @@ export default function TagsForm() {
           </div>
         }
       >
-        <CircleHelp
-          aria-label="플레이버 태그 도움말"
-          className="h-[15px] w-[15px]"
-        />
+        <CircleHelp aria-label="플레이버 태그 도움말" className="h-15 w-15" />
       </HoverTouchBox>
       <p>
         {watchTags && watchTags.length !== 0 && `총 ${watchTags.length}개 입력`}
@@ -85,8 +83,8 @@ export default function TagsForm() {
           component: ExtraButtons,
         }}
       >
-        <article className="ml-7 mt-[6px]">
-          <div className="flex h-11 items-center border-b border-stroke-brand-solid">
+        <article className="ml-28 mt-6">
+          <div className="flex h-44 items-center border-b border-stroke-brand-solid">
             <input
               type="text"
               className="w-full bg-transparent text-15 text-fg-neutral placeholder:text-fg-placeholder focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
@@ -103,28 +101,30 @@ export default function TagsForm() {
                 }
               }}
             />
-            <button
+            <Button
               type="button"
-              className={`w-24 shrink-0 text-15 ${watchTags?.length < TAGS_LIMIT ? 'label-selected' : 'label-disabled'}`}
+              size="sm"
+              variant="secondary"
+              className="w-96"
               disabled={watchTags?.length === TAGS_LIMIT}
               onClick={handleAddTag}
             >
               태그 등록
-            </button>
+            </Button>
           </div>
           {watchTags && watchTags.length !== 0 && (
-            <div className="flex flex-wrap gap-1 pt-2">
+            <div className="flex flex-wrap gap-4 pt-8">
               {watchTags.map((tag: string) => (
                 <div key={tag} className="overflow-hidden flex-shrink-0">
                   <div className="label-default inline-block text-13">
-                    <div className="flex items-center justify-center space-x-1">
+                    <div className="flex items-center justify-center space-x-4">
                       <p>{tag}</p>
                       <button
                         type="button"
                         aria-label={`${tag} 태그 삭제`}
                         onClick={() => handleDeleteTag(tag)}
                       >
-                        <CircleX className="h-[15px] w-[15px] text-fg-neutral-muted" />
+                        <CircleX className="h-15 w-15 text-fg-neutral-muted" />
                       </button>
                     </div>
                   </div>

@@ -10,7 +10,7 @@ export default function RatingForm() {
   };
 
   return (
-    <article className="grid place-items-center space-y-2 pb-3">
+    <article className="grid place-items-center space-y-8 pb-12">
       <p className="text-13 text-fg-neutral-muted">
         이 술에 대한 평가를 남겨보세요.
       </p>

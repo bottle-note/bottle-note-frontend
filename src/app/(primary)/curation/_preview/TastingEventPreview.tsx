@@ -11,7 +11,7 @@ const cx = (...classNames: Array<string | false | null | undefined>) => {
 };
 
 const CalendarIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+  <svg viewBox="0 0 24 24" className="h-14 w-14" aria-hidden="true">
     <path
       d="M7 2v3M17 2v3M4 9h16M6 5h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"
       fill="none"
@@ -24,7 +24,7 @@ const CalendarIcon = () => (
 );
 
 const PinIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+  <svg viewBox="0 0 24 24" className="h-14 w-14" aria-hidden="true">
     <path
       d="M12 21s7-5.4 7-12a7 7 0 1 0-14 0c0 6.6 7 12 7 12Z"
       fill="none"
@@ -45,7 +45,7 @@ const PinIcon = () => (
 );
 
 const UsersIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+  <svg viewBox="0 0 24 24" className="h-14 w-14" aria-hidden="true">
     <path
       d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M9.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
       fill="none"
@@ -58,7 +58,7 @@ const UsersIcon = () => (
 );
 
 const StarIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
+  <svg viewBox="0 0 24 24" className="h-12 w-12" aria-hidden="true">
     <path
       d="m12 2 3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2Z"
       fill="currentColor"
@@ -80,7 +80,7 @@ export function TastingEventPreview({
   const model = buildTastingEventPreviewModel(event, { today });
 
   return (
-    <article className={cx('mx-auto max-w-[468px] bg-white', className)}>
+    <article className={cx('mx-auto max-w-468 bg-white', className)}>
       <TastingEventPreviewHero model={model} />
       <TastingEventPreviewInfoCard model={model} />
       <TastingEventPreviewDescription description={model.description} />
@@ -97,21 +97,21 @@ function TastingEventPreviewHero({
   model: TastingEventPreviewModel;
 }) {
   return (
-    <section className="relative h-60 w-full overflow-hidden bg-sectionWhite">
+    <section className="relative h-240 w-full overflow-hidden bg-sectionWhite">
       <img
         src={model.coverImageUrl}
         alt=""
         className="h-full w-full object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/10 to-black/70" />
-      <div className="absolute bottom-5 left-5 right-5 text-black">
-        <span className="inline-flex rounded-full bg-white/70 px-2.5 py-1 text-10 font-bold backdrop-blur-sm">
+      <div className="absolute bottom-20 left-20 right-20 text-black">
+        <span className="inline-flex rounded-full bg-white/70 px-10 py-4 text-10 font-bold backdrop-blur-sm">
           시음회
         </span>
-        <h1 className="mt-3 line-clamp-2 text-20 font-extrabold text-white">
+        <h1 className="mt-12 line-clamp-2 text-20 font-extrabold text-white">
           {model.title}
         </h1>
-        <p className="mt-2 line-clamp-1 text-10 font-light text-white">
+        <p className="mt-8 line-clamp-1 text-10 font-light text-white">
           {model.eventDateLabel} · {model.placeLabel} · {model.capacityLabel}
         </p>
       </div>
@@ -146,21 +146,21 @@ function TastingEventPreviewInfoCard({
   ];
 
   return (
-    <section className="px-5 py-5">
-      <div className="flex flex-col gap-2 rounded-2xl bg-bgGray px-4 py-4">
-        <span className="inline-flex w-fit rounded-full bg-mainCoral px-2.5 py-1 text-[8px] font-bold text-white">
+    <section className="px-20 py-20">
+      <div className="flex flex-col gap-8 rounded-2xl bg-bgGray px-16 py-16">
+        <span className="inline-flex w-fit rounded-full bg-mainCoral px-10 py-4 text-[8px] font-bold text-white">
           시음회 정보
         </span>
 
-        <div className="mt-2 flex h-full flex-col gap-4">
+        <div className="mt-8 flex h-full flex-col gap-16">
           {infoItems.map(({ key, Icon, title, description, actionHref }) => (
-            <div key={key} className="flex gap-2.5">
-              <span className="mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center text-mainDarkGray">
+            <div key={key} className="flex gap-10">
+              <span className="mt-2 flex h-14 w-14 shrink-0 items-center justify-center text-mainDarkGray">
                 <Icon />
               </span>
 
-              <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <div className="flex min-w-0 items-start gap-2">
+              <div className="flex min-w-0 flex-1 flex-col gap-4">
+                <div className="flex min-w-0 items-start gap-8">
                   <p className="min-w-0 flex-1 truncate text-11 font-bold text-mainDarkGray">
                     {title}
                   </p>
@@ -169,7 +169,7 @@ function TastingEventPreviewInfoCard({
                       href={actionHref}
                       target="_blank"
                       rel="noreferrer"
-                      className="shrink-0 rounded-full bg-white px-2 py-0.5 text-10 font-bold leading-sm text-mainDarkGray"
+                      className="shrink-0 rounded-full bg-white px-8 py-2 text-10 font-bold leading-sm text-mainDarkGray"
                     >
                       지도보기
                     </a>
@@ -184,7 +184,7 @@ function TastingEventPreviewInfoCard({
             </div>
           ))}
 
-          <div className="mt-auto flex items-end gap-2">
+          <div className="mt-auto flex items-end gap-8">
             <span className="text-10 font-semibold leading-none text-mainDarkGray">
               참가비
             </span>
@@ -204,7 +204,7 @@ function TastingEventPreviewDescription({
   description: string;
 }) {
   return (
-    <section className="px-5">
+    <section className="px-20">
       <p className="whitespace-pre-line text-13 font-medium text-mainDarkGray">
         {description}
       </p>
@@ -218,13 +218,13 @@ function TastingEventPreviewGallery({ imageUrls }: { imageUrls: string[] }) {
   }
 
   return (
-    <section className="mt-5 flex w-full snap-x overflow-x-auto bg-sectionWhite">
+    <section className="mt-20 flex w-full snap-x overflow-x-auto bg-sectionWhite">
       {imageUrls.map((imageUrl) => (
         <img
           key={imageUrl}
           src={imageUrl}
           alt=""
-          className="h-60 w-full shrink-0 snap-start object-cover"
+          className="h-240 w-full shrink-0 snap-start object-cover"
         />
       ))}
     </section>
@@ -241,11 +241,11 @@ function TastingEventPreviewLineup({
   }
 
   return (
-    <section className="px-5 py-6">
+    <section className="px-20 py-24">
       <h2 className="text-16 font-extrabold text-mainDarkGray">
         시음회 라인업
       </h2>
-      <div className="mt-4 divide-y divide-bgGray border-t border-bgGray">
+      <div className="mt-16 divide-y divide-bgGray border-t border-bgGray">
         {alcohols.map((item, index) => (
           <TastingEventPreviewLineupItem
             key={
@@ -281,14 +281,14 @@ function TastingEventPreviewLineupItem({
   ].filter(Boolean);
 
   return (
-    <article className="relative py-6">
-      <div className="absolute left-0 top-6 flex h-5 w-5 items-center justify-center rounded-full bg-mainDarkGray text-10 font-bold text-white">
+    <article className="relative py-24">
+      <div className="absolute left-0 top-24 flex h-20 w-20 items-center justify-center rounded-full bg-mainDarkGray text-10 font-bold text-white">
         {order}
       </div>
 
-      <div className="flex w-full overflow-hidden pl-8 text-mainBlack">
-        <div className="flex min-w-0 flex-1 gap-3">
-          <div className="flex h-[128px] w-[95px] shrink-0 items-center justify-center p-2">
+      <div className="flex w-full overflow-hidden pl-32 text-mainBlack">
+        <div className="flex min-w-0 flex-1 gap-12">
+          <div className="flex h-128 w-95 shrink-0 items-center justify-center p-8">
             <div className="relative h-full w-full">
               <img
                 src={alcohol.imageUrl ?? ''}
@@ -298,8 +298,8 @@ function TastingEventPreviewLineupItem({
             </div>
           </div>
 
-          <div className="flex min-w-0 flex-1 flex-col items-start justify-center space-y-2">
-            <div className="min-w-0 space-y-2">
+          <div className="flex min-w-0 flex-1 flex-col items-start justify-center space-y-8">
+            <div className="min-w-0 space-y-8">
               <h3 className="line-clamp-2 text-15 font-bold leading-[1.3] text-mainDarkGray">
                 {alcohol.korName}
               </h3>
@@ -316,12 +316,12 @@ function TastingEventPreviewLineupItem({
             </div>
 
             {typeof stats?.rating === 'number' && (
-              <div className="flex items-center gap-1 text-mainGray">
+              <div className="flex items-center gap-4 text-mainGray">
                 <span className="text-12 font-medium">유저평균</span>
-                <div className="flex items-center gap-[1px] text-12 font-semibold text-mainGray">
+                <div className="flex items-center gap-1 text-12 font-semibold text-mainGray">
                   <StarIcon />
                   <span>{stats.rating.toFixed(1)}</span>
-                  <span className="ml-[2px] text-11 font-medium">
+                  <span className="ml-2 text-11 font-medium">
                     ({stats.totalRatingsCount ?? 0})
                   </span>
                 </div>
@@ -332,11 +332,11 @@ function TastingEventPreviewLineupItem({
       </div>
 
       {chips.length > 0 && (
-        <div className="mt-5 flex w-full flex-wrap gap-1.5">
+        <div className="mt-20 flex w-full flex-wrap gap-6">
           {chips.map((chip) => (
             <span
               key={chip}
-              className="label-default border-mainGray px-2 py-1 text-11 font-medium text-mainGray"
+              className="label-default border-mainGray px-8 py-4 text-11 font-medium text-mainGray"
             >
               {chip}
             </span>
@@ -345,7 +345,7 @@ function TastingEventPreviewLineupItem({
       )}
 
       {comment && (
-        <p className="mt-5 text-13 font-medium leading-[1.8] text-mainGray">
+        <p className="mt-20 text-13 font-medium leading-[1.8] text-mainGray">
           {comment}
         </p>
       )}
@@ -363,13 +363,13 @@ function TastingEventPreviewCta({
   }
 
   return (
-    <section className="px-5 pb-8 pt-2">
+    <section className="px-20 pb-32 pt-8">
       {model.cta.type === 'apply' ? (
         <a
           href={model.cta.href}
           target="_blank"
           rel="noreferrer"
-          className="flex h-[52px] w-full items-center justify-center rounded-xl bg-subCoral"
+          className="flex h-52 w-full items-center justify-center rounded-xl bg-subCoral"
         >
           <span className="text-15 font-bold text-white">
             {model.cta.label}
@@ -379,7 +379,7 @@ function TastingEventPreviewCta({
         <button
           type="button"
           disabled
-          className="flex h-[52px] w-full cursor-not-allowed items-center justify-center rounded-xl bg-brightGray"
+          className="flex h-52 w-full cursor-not-allowed items-center justify-center rounded-xl bg-brightGray"
         >
           <span className="text-15 font-bold text-white">
             {model.cta.label}

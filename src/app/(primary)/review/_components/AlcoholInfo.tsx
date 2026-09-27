@@ -38,14 +38,14 @@ function AlcoholInfo({ data, onSelectAlcohol }: AlcoholInfoProps) {
   ];
 
   return (
-    <section className="relative z-10 px-5 pb-[10px]">
-      <div className="flex gap-5">
+    <section className="relative z-10 px-20 pb-10">
+      <div className="flex gap-20">
         {/* 이미지 영역 */}
         {isEmpty && onSelectAlcohol ? (
           <button
             type="button"
             onClick={onSelectAlcohol}
-            className="flex h-[171px] w-[99px] shrink-0 items-center justify-center rounded-md border border-stroke-neutral-subtle bg-palette-static-white"
+            className="flex h-171 w-99 shrink-0 items-center justify-center rounded-md border border-stroke-neutral-subtle bg-palette-static-white"
           >
             <Image
               src="/icon/plus-subcoral.svg"
@@ -67,8 +67,8 @@ function AlcoholInfo({ data, onSelectAlcohol }: AlcoholInfoProps) {
                 aria-label="위스키 변경"
                 className="group absolute inset-0 flex items-end overflow-hidden rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stroke-focus-ring"
               >
-                <span className="flex h-9 w-full items-center justify-center gap-1 bg-bg-overlay-muted text-palette-static-white backdrop-blur-sm transition-colors group-active:bg-bg-overlay">
-                  <Pencil aria-hidden className="h-3.5 w-3.5" />
+                <span className="flex h-36 w-full items-center justify-center gap-4 bg-bg-overlay-muted text-palette-static-white backdrop-blur-sm transition-colors group-active:bg-bg-overlay">
+                  <Pencil aria-hidden className="h-14 w-14" />
                   <span className="text-11 font-semibold">위스키 변경</span>
                 </span>
               </button>
@@ -77,8 +77,8 @@ function AlcoholInfo({ data, onSelectAlcohol }: AlcoholInfoProps) {
         )}
 
         {/* 텍스트 정보 영역 */}
-        <article className="w-full space-y-2 overflow-x-hidden text-fg-brand-contrast">
-          <div className="space-y-[8px]">
+        <article className="w-full space-y-8 overflow-x-hidden text-fg-brand-contrast">
+          <div className="space-y-8">
             {/* 기본 정보: 카테고리, 한글명, 영문명 */}
             <AlcoholBasicInfo
               korCategory={korCategory}
@@ -99,7 +99,7 @@ function AlcoholInfo({ data, onSelectAlcohol }: AlcoholInfoProps) {
       </div>
 
       {/* 테이스팅 태그 */}
-      <div className="min-h-[30px]">
+      <div className="min-h-30">
         {!isEmpty && <AlcoholTastingTags tags={alcoholsTastingTags} />}
       </div>
     </section>
@@ -126,12 +126,12 @@ function AlcoholBasicInfo({
   isEmpty,
 }: AlcoholBasicInfoProps) {
   return (
-    <div className="space-y-[6px]">
+    <div className="space-y-6">
       <Label
         name={korCategory}
-        styleClass={`border-stroke-brand-contrast px-2 py-[0.15rem] rounded-md text-10 ${isEmpty ? 'opacity-60' : ''}`}
+        styleClass={`border-stroke-brand-contrast px-8 py-[2.4px] rounded-md text-10 ${isEmpty ? 'opacity-60' : ''}`}
       />
-      <h1 className="text-[18px] font-bold leading-[22px] whitespace-normal break-words">
+      <h1 className="text-18 font-bold whitespace-normal break-words">
         {korName}
       </h1>
       <p
@@ -158,9 +158,9 @@ function AlcoholDetailList({ details, isEmpty }: AlcoholDetailListProps) {
       {details.map((item: DetailItem) => (
         <div
           key={item.title}
-          className={`flex items-start gap-2 text-fg-brand-contrast ${isEmpty ? 'opacity-60' : ''}`}
+          className={`flex items-start gap-8 text-fg-brand-contrast ${isEmpty ? 'opacity-60' : ''}`}
         >
-          <div className="w-[60px] shrink-0 whitespace-nowrap text-14 font-semibold">
+          <div className="w-60 shrink-0 whitespace-nowrap text-14 font-semibold">
             {item.title}
           </div>
           <div className="flex-1 text-13 font-light">{item.content || '-'}</div>
@@ -222,16 +222,16 @@ function AlcoholTastingTags({ tags }: AlcoholTastingTagsProps) {
   const hiddenTagCount = uniqueTags.length - visibleTagCount;
 
   return (
-    <div className="mt-[10px]">
+    <div className="mt-10">
       <ul
         ref={tagListRef}
-        className="flex h-7 flex-wrap gap-[6px] overflow-hidden"
+        className="flex h-28 flex-wrap gap-6 overflow-hidden"
       >
         {uniqueTags.map((tag: string, index) => (
           <li
             key={tag}
             aria-hidden={index >= visibleTagCount}
-            className="flex h-7 shrink-0 items-center rounded-md border border-stroke-brand-contrast px-[10px] text-12 text-fg-brand-contrast"
+            className="flex h-28 shrink-0 items-center rounded-md border border-stroke-brand-contrast px-10 text-12 text-fg-brand-contrast"
           >
             {tag}
           </li>
@@ -239,16 +239,16 @@ function AlcoholTastingTags({ tags }: AlcoholTastingTagsProps) {
       </ul>
 
       {hiddenTagCount > 0 && (
-        <div className="mt-1 flex justify-end">
+        <div className="mt-4 flex justify-end">
           <button
             type="button"
             aria-expanded={isTagDrawerOpen}
             aria-haspopup="dialog"
             onClick={() => setIsTagDrawerOpen(true)}
-            className="flex h-7 items-center gap-1 px-1 text-12 font-medium text-fg-brand-contrast underline underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stroke-brand-contrast"
+            className="flex h-28 items-center gap-4 px-4 text-12 font-medium text-fg-brand-contrast underline underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stroke-brand-contrast"
           >
             {hiddenTagCount}개 태그 더보기
-            <ChevronDown aria-hidden className="h-4 w-4" />
+            <ChevronDown aria-hidden className="h-16 w-16" />
           </button>
         </div>
       )}
@@ -258,7 +258,7 @@ function AlcoholTastingTags({ tags }: AlcoholTastingTagsProps) {
         onClose={() => setIsTagDrawerOpen(false)}
         height={40}
       >
-        <Drawer.Title className="px-5 pt-4 text-center text-20 font-bold">
+        <Drawer.Title className="px-20 pt-16 text-center text-20 font-bold">
           테이스팅 태그 {uniqueTags.length}개
         </Drawer.Title>
         <Drawer.Description className="sr-only">
@@ -268,15 +268,15 @@ function AlcoholTastingTags({ tags }: AlcoholTastingTagsProps) {
           type="button"
           aria-label="테이스팅 태그 닫기"
           onClick={() => setIsTagDrawerOpen(false)}
-          className="absolute right-4 top-9 flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stroke-focus-ring"
+          className="absolute right-16 top-36 flex h-44 w-44 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stroke-focus-ring"
         >
-          <X aria-hidden className="h-6 w-6" />
+          <X aria-hidden className="h-24 w-24" />
         </button>
-        <ul className="flex flex-wrap gap-2 overflow-y-auto px-5 pb-safe pt-6">
+        <ul className="flex flex-wrap gap-8 overflow-y-auto px-20 pb-safe pt-24">
           {uniqueTags.map((tag) => (
             <li
               key={tag}
-              className="flex h-9 items-center rounded-md border border-stroke-neutral-contrast px-3 text-12 text-fg-neutral"
+              className="flex h-36 items-center rounded-md border border-stroke-neutral-contrast px-12 text-12 text-fg-neutral"
             >
               {tag}
             </li>

@@ -43,7 +43,7 @@ function HomeFeaturedList({ type = 'week' }: Props) {
   // 로그인 필요 상태
   if (requiresAuth && !isLoggedIn) {
     return (
-      <div className="h-[321px]">
+      <div className="h-321">
         <HomeFeaturedLoginRequired />
       </div>
     );
@@ -52,7 +52,7 @@ function HomeFeaturedList({ type = 'week' }: Props) {
   // 로딩 상태
   if (isLoading) {
     return (
-      <div className="h-[321px]">
+      <div className="h-321">
         <LoadingStateSkeleton />
       </div>
     );
@@ -61,7 +61,7 @@ function HomeFeaturedList({ type = 'week' }: Props) {
   // 에러 상태
   if (isError) {
     return (
-      <div className="h-[321px]">
+      <div className="h-321">
         <HomeFeaturedErrorState onRetry={() => refetch()} />
       </div>
     );
@@ -70,7 +70,7 @@ function HomeFeaturedList({ type = 'week' }: Props) {
   // 빈 상태
   if (!featuredList || featuredList.length === 0) {
     return (
-      <div className="h-[321px]">
+      <div className="h-321">
         <HomeFeaturedEmptyState type={type} />
       </div>
     );
@@ -78,7 +78,7 @@ function HomeFeaturedList({ type = 'week' }: Props) {
 
   // 데이터 있음
   return (
-    <div className="h-[321px]">
+    <div className="h-321">
       <HomeFeaturedDescription type={type} nickname={currentUser?.nickname} />
       <HomeFeaturedItemList items={featuredList} />
     </div>

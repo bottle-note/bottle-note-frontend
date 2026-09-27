@@ -10,12 +10,12 @@ interface Props {
 
 export function HomeFeaturedItemList({ items }: Props) {
   return (
-    <div className="whitespace-nowrap overflow-x-auto overflow-y-hidden flex space-x-2 scrollbar-hide">
+    <div className="whitespace-nowrap overflow-x-auto overflow-y-hidden flex space-x-8 scrollbar-hide">
       {items.map((item, index) => (
         <div
           key={item.alcoholId}
           className={`flex-shrink-0 flex-grow-0 rounded-lg ${
-            index === items.length - 1 ? 'pr-[25px]' : ''
+            index === items.length - 1 ? 'pr-25' : ''
           }`}
         >
           <AlcoholItem data={item} />

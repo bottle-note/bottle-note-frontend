@@ -3,15 +3,15 @@ import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 
 const ListItemSkeleton = () => {
   return (
-    <section className="flex animate-pulse items-center border-b border-stroke-neutral-subtle py-4 text-fg-neutral">
-      <SkeletonBase width={89} height={89} className="mr-3 rounded-lg" />
+    <section className="flex animate-pulse items-center border-b border-stroke-neutral-subtle py-16 text-fg-neutral">
+      <SkeletonBase width={89} height={89} className="mr-12 rounded-lg" />
 
-      <div className="flex flex-col flex-1 space-y-2">
+      <div className="flex flex-col flex-1 space-y-8">
         <SkeletonBase width={130} height={20} />
         <SkeletonBase width={180} height={15} />
       </div>
 
-      <div className="ml-auto pr-1 flex flex-col items-end space-y-2">
+      <div className="ml-auto pr-4 flex flex-col items-end space-y-8">
         <div className="flex flex-col items-end">
           <SkeletonBase width={45} height={20} />
           <SkeletonBase width={30} height={15} />

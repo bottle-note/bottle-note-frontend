@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Button from '@/components/ui/Button/Button';
 import { FollowApi } from '@/api/follow/follow.api';
 import { RelationInfo } from '@/api/follow/types';
 import { trackGA4Event } from '@/utils/analytics/ga4';
@@ -37,20 +38,14 @@ export const FollowButton = ({ isFollowing, followUserId }: Props) => {
 
   if (followingStatus)
     return (
-      <button
-        className="px-2.5 py-1 text-10 label-selected"
-        onClick={handleOnFollow}
-      >
+      <Button size="sm" onClick={handleOnFollow}>
         팔로잉
-      </button>
+      </Button>
     );
 
   return (
-    <button
-      className="px-2.5 py-1 text-10 label-default"
-      onClick={handleOnFollow}
-    >
+    <Button size="sm" variant="secondary" onClick={handleOnFollow}>
       팔로우
-    </button>
+    </Button>
   );
 };

@@ -67,7 +67,7 @@ export default function Inquire() {
         </SubHeader.Left>
         <SubHeader.Center>{serviceType} 문의 내역</SubHeader.Center>
       </SubHeader>
-      <section className="py-8 px-5">
+      <section className="py-32 px-20">
         <List
           isListFirstLoading={isLoading}
           isScrollLoading={isFetching}
@@ -86,7 +86,7 @@ export default function Inquire() {
         <div ref={targetRef} />
       </section>
       <section>
-        <section className="px-5 fixed-content bottom-7">
+        <section className="px-20 fixed-content bottom-28">
           <Button
             onClick={() => {
               if (!isLoggedIn) {

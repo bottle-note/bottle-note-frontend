@@ -38,14 +38,14 @@ export const SettingsSubScreen = ({ config }: SettingsSubScreenProps) => {
 
   return (
     <motion.section
-      className="flex-1 overflow-y-auto px-6"
+      className="flex-1 overflow-y-auto px-24"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
-      <div className="space-y-0 py-[22px] text-15 font-medium text-fg-neutral border-b border-stroke-neutral-subtle">
+      <div className="space-y-0 py-22 text-15 font-medium text-fg-neutral border-b border-stroke-neutral-subtle">
         {config.items?.map((item, index) => (
-          <div key={item.text} className={index === 0 ? '' : 'pt-[25px]'}>
+          <div key={item.text} className={index === 0 ? '' : 'pt-25'}>
             {item.action && (
               <button onClick={item.action} className="w-full text-left">
                 {item.text}

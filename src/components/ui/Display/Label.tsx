@@ -21,7 +21,7 @@ function Label({
   icon,
   iconHeight = 10,
   iconWidth = 10,
-  styleClass = 'border-white px-2.5 py-1 rounded-md text-10',
+  styleClass = 'border-white px-10 py-4 rounded-md text-10',
   position = 'before',
   iconClass = '',
   onClick,
@@ -66,11 +66,11 @@ function Label({
   const content = (
     <>
       {position === 'before' && icon && (
-        <span className={`mr-1 ${iconClass}`}>{renderIcon()}</span>
+        <span className={`mr-4 ${iconClass}`}>{renderIcon()}</span>
       )}
       {name}
       {position === 'after' && icon && (
-        <span className={`ml-1 ${iconClass}`}>{renderIcon()}</span>
+        <span className={`ml-4 ${iconClass}`}>{renderIcon()}</span>
       )}
     </>
   );

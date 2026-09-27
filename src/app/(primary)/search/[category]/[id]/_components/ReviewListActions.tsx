@@ -48,8 +48,8 @@ export default function ReviewListActions({
     <div
       className={`flex justify-between ${textSize} text-fg-neutral-muted ${className}`}
     >
-      <div className="flex space-x-4">
-        <div className="flex items-center space-x-[2px]">
+      <div className="flex space-x-16">
+        <div className="flex items-center space-x-2">
           <ReviewLikeButton
             reviewId={reviewId}
             isLiked={isLiked}

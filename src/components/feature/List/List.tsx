@@ -54,12 +54,12 @@ const ListMain = ({
   return (
     <section>
       {isManageExist && (
-        <article className="flex items-center justify-between border-b border-stroke-neutral-subtle pb-2 text-sm text-fg-neutral-muted">
-          <div className="flex gap-1 w-full">
+        <article className="flex items-center justify-between border-b border-stroke-neutral-subtle pb-8 text-sm text-fg-neutral-muted">
+          <div className="flex gap-4 w-full">
             {title}
             {totalDisplay}
           </div>
-          <div className="flex gap-1.5 w-full justify-end">
+          <div className="flex gap-6 w-full justify-end">
             {sortOrderSwitch}
             {optionSelect}
           </div>

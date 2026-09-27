@@ -15,31 +15,28 @@ export function CurationDetailHeader({
   return (
     <>
       <div className="fixed-content top-0 z-30 bg-bg-layer-default">
-        <div className="flex w-full items-center px-[17px] pb-[15px] pt-safe-header">
+        <div className="flex w-full items-center px-17 pb-15 pt-safe-header">
           {onBack ? (
             <button
               type="button"
-              className="flex w-11 shrink-0 items-center"
+              className="flex w-44 shrink-0 items-center"
               onClick={onBack}
               aria-label="뒤로가기"
             >
-              <ArrowLeft
-                aria-hidden
-                className="h-[23px] w-[23px] text-fg-brand"
-              />
+              <ArrowLeft aria-hidden className="h-23 w-23 text-fg-brand" />
             </button>
           ) : (
-            <div className="w-11 shrink-0" />
+            <div className="w-44 shrink-0" />
           )}
 
-          <div className="min-w-0 flex-1 px-2">
+          <div className="min-w-0 flex-1 px-8">
             <AutoMarqueeText
               text={title}
               className="text-center text-16 font-bold text-fg-brand"
             />
           </div>
 
-          <div className="w-11 shrink-0" />
+          <div className="w-44 shrink-0" />
         </div>
       </div>
       <div aria-hidden style={{ height: DETAIL_HEADER_HEIGHT }} />

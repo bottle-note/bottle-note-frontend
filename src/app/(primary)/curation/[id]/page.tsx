@@ -82,13 +82,13 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
   return (
     <div
       className={`min-h-safe-screen bg-bg-layer-default text-fg-neutral ${
-        shouldShowCta ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-8'
+        shouldShowCta ? STICKY_BOTTOM_CTA_PADDING_CLASS : 'pb-32'
       }`}
     >
       <CurationDetailHeader title={event.name} onBack={() => router.back()} />
 
       {/* 상단 */}
-      <section className="relative h-60 w-full overflow-hidden bg-bg-neutral-weak">
+      <section className="relative h-240 w-full overflow-hidden bg-bg-neutral-weak">
         <BaseImage
           src={event.coverImageUrl}
           alt=""
@@ -98,29 +98,32 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/10 to-black/70" />
-        <div className="absolute bottom-5 left-5 right-5">
-          <span className="inline-flex rounded-full bg-white/70 px-2.5 py-1 text-10 font-bold text-palette-static-black backdrop-blur-sm">
+        <div className="absolute bottom-20 left-20 right-20">
+          <span className="inline-flex rounded-full bg-white/70 px-10 py-4 text-10 font-bold text-palette-static-black backdrop-blur-sm">
             시음회
           </span>
-          <h1 className="mt-3 line-clamp-2 text-20 font-extrabold text-white">
+          <h1 className="mt-12 line-clamp-2 text-20 font-extrabold text-white">
             {event.name}
           </h1>
-          <p className="mt-2 line-clamp-1 text-13 font-light text-white">
+          <p className="mt-8 line-clamp-1 text-13 font-light text-white">
             {summaryItems.join(' · ')}
           </p>
         </div>
       </section>
 
       {/* 시음회 정보 카드 */}
-      <section className="px-5 py-5">
+      <section className="px-20 py-20">
         <TastingEventInfoCard
           payload={payload}
           showMapCta
           textBehavior="wrap"
           className="bg-bg-neutral-weak"
         />
-        <div className="mt-3 flex items-center gap-2 rounded-xl bg-bg-brand-weak px-3 py-2.5">
-          <BadgeCheck aria-hidden className="h-4 w-4 shrink-0 text-fg-brand" />
+        <div className="mt-12 flex items-center gap-8 rounded-xl bg-bg-brand-weak px-12 py-10">
+          <BadgeCheck
+            aria-hidden
+            className="h-16 w-16 shrink-0 text-fg-brand"
+          />
           <p className="text-12 font-medium text-fg-neutral-muted">
             {TASTING_EVENT_PERMISSION_NOTICE}
           </p>
@@ -128,7 +131,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
       </section>
 
       {/* 시음회 설명 */}
-      <section className="px-5">
+      <section className="px-20">
         <p className="whitespace-pre-line text-13 font-medium text-fg-neutral">
           {event.description}
         </p>
@@ -136,7 +139,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
 
       {/* 이미지 캐러셀 */}
       {imageUrls.length > 0 && (
-        <section className="mt-5 w-full">
+        <section className="mt-20 w-full">
           <Carousel
             setApi={setCarouselApi}
             opts={{ align: 'start', loop: imageUrls.length > 1 }}
@@ -145,7 +148,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
             <CarouselContent className="!ml-0">
               {imageUrls.map((url, index) => (
                 <CarouselItem key={url} className="!pl-0">
-                  <div className="relative h-60 w-full overflow-hidden bg-bg-neutral-weak">
+                  <div className="relative h-240 w-full overflow-hidden bg-bg-neutral-weak">
                     <BaseImage
                       src={url}
                       alt=""
@@ -160,11 +163,11 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
             </CarouselContent>
 
             {imageUrls.length > 1 && (
-              <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+              <div className="absolute bottom-12 left-1/2 flex -translate-x-1/2 gap-6">
                 {imageUrls.map((url, index) => (
                   <span
                     key={url}
-                    className={`h-1.5 w-1.5 rounded-full ${
+                    className={`h-6 w-6 rounded-full ${
                       currentSlide === index ? 'bg-white' : 'bg-white/50'
                     }`}
                   />
@@ -177,12 +180,12 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
 
       {/* 시음회 라인업 */}
       {alcohols.length > 0 && (
-        <section className="px-5 py-6">
+        <section className="px-20 py-24">
           <h2 className="text-16 font-extrabold text-fg-neutral">
             시음회 라인업
           </h2>
           <List>
-            <List.Section className="mt-4 divide-y divide-stroke-neutral-basement border-t border-stroke-neutral-basement">
+            <List.Section className="mt-16 divide-y divide-stroke-neutral-basement border-t border-stroke-neutral-basement">
               {alcohols.map((item, index) => (
                 <TastingEventLineupItem
                   key={
@@ -246,13 +249,13 @@ function CurationDetail({
   }, [carouselApi]);
 
   return (
-    <div className="min-h-safe-screen bg-bg-layer-default pb-8 text-fg-neutral">
+    <div className="min-h-safe-screen bg-bg-layer-default pb-32 text-fg-neutral">
       <CurationDetailHeader
         title={curation.name}
         onBack={() => router.back()}
       />
 
-      <section className="relative h-60 w-full overflow-hidden bg-bg-neutral-weak">
+      <section className="relative h-240 w-full overflow-hidden bg-bg-neutral-weak">
         <BaseImage
           src={curation.coverImageUrl}
           alt=""
@@ -262,17 +265,17 @@ function CurationDetail({
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/75" />
-        <div className="absolute bottom-5 left-5 right-5">
-          <span className="inline-flex rounded-full bg-white/70 px-2.5 py-1 text-10 font-bold text-palette-static-black backdrop-blur-sm">
+        <div className="absolute bottom-20 left-20 right-20">
+          <span className="inline-flex rounded-full bg-white/70 px-10 py-4 text-10 font-bold text-palette-static-black backdrop-blur-sm">
             {label}
           </span>
-          <h1 className="mt-3 line-clamp-2 text-20 font-extrabold text-white">
+          <h1 className="mt-12 line-clamp-2 text-20 font-extrabold text-white">
             {curation.name}
           </h1>
         </div>
       </section>
 
-      <section className="px-5 py-5">
+      <section className="px-20 py-20">
         <p className="whitespace-pre-line text-13 font-medium text-fg-neutral">
           {curation.description}
         </p>
@@ -288,7 +291,7 @@ function CurationDetail({
             <CarouselContent className="!ml-0">
               {imageUrls.map((url, index) => (
                 <CarouselItem key={url} className="!pl-0">
-                  <div className="relative h-60 w-full overflow-hidden bg-bg-neutral-weak">
+                  <div className="relative h-240 w-full overflow-hidden bg-bg-neutral-weak">
                     <BaseImage
                       src={url}
                       alt=""
@@ -303,11 +306,11 @@ function CurationDetail({
             </CarouselContent>
 
             {imageUrls.length > 1 && (
-              <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+              <div className="absolute bottom-12 left-1/2 flex -translate-x-1/2 gap-6">
                 {imageUrls.map((url, index) => (
                   <span
                     key={url}
-                    className={`h-1.5 w-1.5 rounded-full ${
+                    className={`h-6 w-6 rounded-full ${
                       currentSlide === index ? 'bg-white' : 'bg-white/50'
                     }`}
                   />
@@ -319,12 +322,12 @@ function CurationDetail({
       )}
 
       {curation.payload.length > 0 && (
-        <section className="px-5 py-6">
+        <section className="px-20 py-24">
           <h2 className="text-16 font-extrabold text-fg-neutral">
             추천 라인업
           </h2>
           <List>
-            <List.Section className="mt-4 divide-y divide-stroke-neutral-basement border-t border-stroke-neutral-basement">
+            <List.Section className="mt-16 divide-y divide-stroke-neutral-basement border-t border-stroke-neutral-basement">
               {curation.payload.map((item, index) => (
                 <TastingEventLineupItem
                   key={
@@ -346,13 +349,13 @@ function CurationDetail({
 
 function CurationDetailSkeleton() {
   return (
-    <div className="min-h-safe-screen bg-bg-layer-default pb-28">
+    <div className="min-h-safe-screen bg-bg-layer-default pb-112">
       <CurationDetailHeader title="큐레이션" />
-      <div className="h-60 bg-bg-neutral-weak" />
-      <div className="px-5 py-5">
-        <div className="h-56 rounded-xl bg-bg-neutral-weak" />
-        <div className="mt-5 h-20 rounded-md bg-bg-neutral-weak" />
-        <div className="mt-5 h-60 rounded-xl bg-bg-neutral-weak" />
+      <div className="h-240 bg-bg-neutral-weak" />
+      <div className="px-20 py-20">
+        <div className="h-224 rounded-xl bg-bg-neutral-weak" />
+        <div className="mt-20 h-80 rounded-md bg-bg-neutral-weak" />
+        <div className="mt-20 h-240 rounded-xl bg-bg-neutral-weak" />
       </div>
     </div>
   );

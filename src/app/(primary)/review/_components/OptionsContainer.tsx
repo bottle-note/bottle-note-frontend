@@ -34,7 +34,7 @@ export default function OptionsContainer({
   }, [forceOpen]);
 
   return (
-    <article className={isOpen ? 'space-y-2' : ''}>
+    <article className={isOpen ? 'space-y-8' : ''}>
       <div
         className="flex items-center justify-between cursor-pointer"
         onClick={handleOpen}
@@ -44,7 +44,7 @@ export default function OptionsContainer({
           }
         }}
       >
-        <div className="flex items-center space-x-1">
+        <div className="flex items-center space-x-4">
           <Image src={iconSrc} alt={iconAlt} width={20} height={20} />
           <p className="text-15 font-bold text-fg-neutral">
             {title}{' '}
