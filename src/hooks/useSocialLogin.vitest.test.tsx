@@ -175,7 +175,7 @@ describe('useSocialLogin', () => {
     );
   });
 
-  it('MBTI 앱 로그인 오류는 첫 화면으로 돌아가고 실패 모달을 열지 않는다', () => {
+  it('MBTI 앱 로그인 오류는 홈으로 돌아간다', () => {
     window.history.replaceState(
       null,
       '',
@@ -187,7 +187,7 @@ describe('useSocialLogin', () => {
       result.current.onKakaoAppLoginError(new Error('cancelled'));
     });
 
-    expect(routerReplace).toHaveBeenCalledWith('/whiskey-mbti');
+    expect(routerReplace).toHaveBeenCalledWith('/');
   });
 
   it('브라우저에서는 returnTo 화면 교체 후 기존 Kakao SDK를 호출한다', async () => {

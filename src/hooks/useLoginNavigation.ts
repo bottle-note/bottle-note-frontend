@@ -1,7 +1,6 @@
-import { useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/constants/routes';
-import { getReturnToUrl, isValidReturnUrl } from '@/utils/loginRedirect';
+import { getReturnToUrl } from '@/utils/loginRedirect';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
 
 // 로그인 화면이 언마운트되어도 다음 화면의 렌더링까지 SDK 호출을 메모리에서 이어준다.
@@ -31,23 +30,16 @@ const getCurrentLoginParams = () => {
 // 로그인 복귀 주소의 조회·검증과 로그인 화면의 이동을 담당한다.
 export const useLoginNavigation = () => {
   const router = useRouter();
-  const hasStartedLoginRedirect = useRef(false);
 
   // 현재 returnTo를 검증하고, 유효하지 않으면 기본 복귀 주소를 반환한다.
   const getCurrentReturnTo = () =>
     getReturnToUrl(getCurrentLoginParams().get('returnTo'));
 
-  // 사용처에서 지정한 유효한 실패 복귀 주소를 반환한다.
-  const getCurrentErrorTo = () => {
-    const errorTo = getCurrentLoginParams().get('errorTo');
-    return errorTo && isValidReturnUrl(errorTo) ? errorTo : null;
-  };
-
-  // 웹·앱 로그인 실패 시 유입 정보를 정리하고 errorTo 또는 공통 오류 화면으로 이동한다.
-  const redirectOnLoginError = (errorTo = getCurrentErrorTo()) => {
+  // 웹·앱 로그인 실패 시 유입 정보를 정리하고 홈으로 이동한다.
+  const redirectOnLoginError = () => {
     pendingExternalLogin = null;
     consumeLoginTrigger();
-    router.replace(errorTo ?? ROUTES.ERROR);
+    router.replace(ROUTES.HOME);
   };
 
   // 로그인 기록을 실제 returnTo 화면으로 교체하고, 렌더링 완료 후 실행할 외부 인증을 등록한다.
@@ -88,26 +80,11 @@ export const useLoginNavigation = () => {
     redirectAfterLogin(false);
   };
 
-  // 인증된 사용자는 준비 작업 후 복귀하며, 비로그인 사용자는 로그인 화면에 머문다.
-  const initializeLoginPage = async (
-    isLoggedIn: boolean,
-    beforeReturn: () => Promise<void>,
-  ) => {
-    if (!isLoggedIn || hasStartedLoginRedirect.current) return;
-    hasStartedLoginRedirect.current = true;
-
-    const returnTo = getCurrentReturnTo();
-    await beforeReturn();
-    redirectAfterLogin(false, returnTo);
-  };
-
   return {
     getCurrentReturnTo,
-    getCurrentErrorTo,
     redirectOnLoginError,
     replaceBeforeExternalLogin,
     redirectAfterLogin,
-    initializeLoginPage,
     cancelLogin,
     completeAgreement,
   };

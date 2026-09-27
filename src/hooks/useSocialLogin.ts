@@ -8,6 +8,8 @@ import { loadKakaoSDK } from '@/lib/kakao/kakaoSDK';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { handleWebViewMessage, sendLogToFlutter } from '@/utils/flutterUtil';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
+import { ApiError } from '@/utils/ApiError';
+import useModalStore from '@/store/modalStore';
 
 type SocialLoginMethod = 'kakao' | 'apple';
 
@@ -26,16 +28,26 @@ const clearKakaoState = () => {
 // 소셜 로그인 시작·콜백·공통 인증 완료와 실패 처리를 담당한다.
 export const useSocialLogin = () => {
   const navigation = useLoginNavigation();
+  const { handleModalState } = useModalStore();
   const hasHandledKakaoCallback = useRef(false);
 
   // 웹·앱의 로그인 실패를 기록하고 요청 정보를 정리한 뒤 공통 실패 이동을 요청한다.
-  const handleLoginError = (
-    error: unknown,
-    errorTo = navigation.getCurrentErrorTo(),
-  ) => {
+  const handleLoginError = (error: unknown) => {
     console.error(error);
     clearKakaoState();
-    navigation.redirectOnLoginError(errorTo);
+    navigation.redirectOnLoginError();
+    handleModalState({
+      isShowModal: true,
+      type: 'ALERT',
+      mainText: '로그인에 실패했습니다.',
+      subText:
+        error instanceof ApiError && error.code
+          ? error.message
+          : '잠시 후 다시 시도해주세요.',
+      alertBtnName: '확인',
+      handleConfirm: null,
+      handleCancel: null,
+    });
   };
 
   // 카카오 요청 정보를 정리한 뒤 로그인 취소 이동을 요청한다.
@@ -57,10 +69,6 @@ export const useSocialLogin = () => {
       sendLogToFlutter(getErrorMessage(error));
     }
   };
-
-  // 로그인 화면 초기화를 요청하고, 인증된 사용자의 복귀 전에 앱 기기 정보를 전송한다.
-  const initializeLoginPage = (isLoggedIn: boolean) =>
-    navigation.initializeLoginPage(isLoggedIn, sendDeviceInfoIfNeeded);
 
   // 인증 세션·분석 이벤트·기기 정보를 처리한 뒤 약관 화면 또는 returnTo로 이동한다.
   const completeLogin = async (
@@ -107,9 +115,6 @@ export const useSocialLogin = () => {
         nonce,
       });
 
-      const errorTo = navigation.getCurrentErrorTo();
-      if (errorTo) state.set('errorTo', errorTo);
-
       navigation.replaceBeforeExternalLogin(returnTo, () => {
         try {
           window.Kakao.Auth.authorize({
@@ -117,7 +122,7 @@ export const useSocialLogin = () => {
             state: state.toString(),
           });
         } catch (error) {
-          handleLoginError(error, errorTo);
+          handleLoginError(error);
         }
       });
     } catch (error) {
@@ -211,7 +216,6 @@ export const useSocialLogin = () => {
     onKakaoAppLoginError: handleLoginError,
     onAppleAppLoginSuccess,
     onAppleAppLoginError: handleLoginError,
-    initializeLoginPage,
     cancelLogin,
   };
 };

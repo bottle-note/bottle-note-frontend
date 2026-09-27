@@ -77,7 +77,15 @@ describe('카카오 v2 로그인 API 계약', () => {
   it('v2 검증 API가 실패하면 로그인 실패로 처리한다', async () => {
     fetchMock.mockResolvedValueOnce(
       createResponse({
-        body: { message: 'INVALID_KAKAO_ACCESS_TOKEN' },
+        body: {
+          errors: [
+            {
+              code: 'INVALID_KAKAO_ACCESS_TOKEN',
+              message: '유효하지 않은 카카오 액세스 토큰입니다.',
+              status: 'UNAUTHORIZED',
+            },
+          ],
+        },
         ok: false,
         status: 401,
       }),
@@ -87,7 +95,11 @@ describe('카카오 v2 로그인 API 계약', () => {
       AuthApi.server.kakaoLogin({
         accessToken: 'invalid-kakao-access-token',
       }),
-    ).rejects.toThrow('Kakao login failed');
+    ).rejects.toMatchObject({
+      code: 'INVALID_KAKAO_ACCESS_TOKEN',
+      message: '유효하지 않은 카카오 액세스 토큰입니다.',
+      response: { status: 401 },
+    });
   });
 
   it('Bottle Note access token이 없는 성공 응답은 로그인 성공으로 처리하지 않는다', async () => {

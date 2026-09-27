@@ -1,5 +1,5 @@
 import { apiClient } from '@/shared/api/apiClient';
-import { ApiResponse } from '@/api/_shared/types';
+import { ApiResponse, ErrorResponse } from '@/api/_shared/types';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import { ApiError } from '@/utils/ApiError';
 import { extractRefreshToken } from '@/utils/cookieUtils';
@@ -18,6 +18,15 @@ import type {
 } from './types';
 
 const getRedirectUrl = () => `${process.env.CLIENT_URL}/oauth/kakao`;
+
+// 로그인 서버가 반환한 오류 이유와 HTTP 상태를 프론트까지 전달한다.
+const createAuthApiError = async (response: Response, fallback: string) => {
+  const body = (await response.json().catch(() => null)) as {
+    errors?: ErrorResponse[];
+  } | null;
+  const error = body?.errors?.[0];
+  return new ApiError(error?.message || fallback, response, error?.code);
+};
 
 export const AuthApi = {
   // ========== 서버사이드 API (Next.js API Routes에서 사용) ==========
@@ -39,7 +48,10 @@ export const AuthApi = {
       );
 
       if (!response.ok) {
-        throw new Error(`Apple login failed (status=${response.status})`);
+        throw await createAuthApiError(
+          response,
+          `Apple login failed (status=${response.status})`,
+        );
       }
 
       const refreshToken = extractRefreshToken(response);
@@ -81,7 +93,10 @@ export const AuthApi = {
       );
 
       if (!response.ok) {
-        throw new Error(`Kakao login failed (status=${response.status})`);
+        throw await createAuthApiError(
+          response,
+          `Kakao login failed (status=${response.status})`,
+        );
       }
 
       const refreshToken = extractRefreshToken(response);
@@ -152,7 +167,10 @@ export const AuthApi = {
       });
 
       if (!res.ok) {
-        throw new Error(`Kakao token exchange failed (status=${res.status})`);
+        throw new ApiError(
+          `Kakao token exchange failed (status=${res.status})`,
+          res,
+        );
       }
 
       return res.json();

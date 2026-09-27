@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -35,30 +35,27 @@ export default function MbtiExperience() {
   const resultCode = searchParams.get('result') as MbtiCode | null;
   const isShared = searchParams.get('shared') === '1';
   const [phase, setPhase] = useState<Phase>(resultCode ? 'result' : 'intro');
-  const [completedCode, setCompletedCode] = useState<MbtiCode | null>(null);
   const [showLogin, setShowLogin] = useState(false);
-  const previousResultCode = useRef(resultCode);
 
   useEffect(() => {
-    if (resultCode && resultCode !== previousResultCode.current) {
+    if (resultCode && phase === 'intro') {
       setPhase('result');
-    } else if (
-      previousResultCode.current &&
-      !resultCode &&
-      phase === 'result'
-    ) {
+    } else if (!resultCode && phase === 'result') {
       setPhase('intro');
     }
-    previousResultCode.current = resultCode;
   }, [phase, resultCode]);
 
+  // 결과 코드는 로그인 여부와 관계없이 URL에 보존하고, 완료 화면은 그대로 유지한다.
   const handleComplete = (code: MbtiCode) => {
-    setCompletedCode(code);
     setPhase('complete');
+    router.replace(
+      `${ROUTES.WHISKEY_MBTI}?${new URLSearchParams({ result: code })}`,
+    );
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const code = resultCode ?? completedCode;
+  // 쿼리로 복원한 결과도 본인 결과는 로그인 후 표시하고, 공유 결과는 바로 표시한다.
+  const canShowResult = isShared || isLoggedIn;
 
   return (
     <div className={styles.shell}>
@@ -103,7 +100,7 @@ export default function MbtiExperience() {
 
         {phase === 'quiz' && <MbtiQuiz onComplete={handleComplete} />}
 
-        {phase === 'complete' && (
+        {(phase === 'complete' || (phase === 'result' && !canShowResult)) && (
           <section
             className={`${styles.screen} ${styles.gate}`}
             aria-live="polite"
@@ -120,16 +117,16 @@ export default function MbtiExperience() {
               onClick={() =>
                 isLoggedIn ? setPhase('result') : setShowLogin(true)
               }
-              disabled={isLoading}
+              disabled={isLoading || !resultCode}
             >
               {isLoading ? '확인 중...' : '결과 보기'}
             </button>
           </section>
         )}
 
-        {phase === 'result' && code && (
+        {phase === 'result' && resultCode && canShowResult && (
           <MbtiResult
-            code={code}
+            code={resultCode}
             isShared={isShared}
             isLoggedIn={isLoggedIn}
             isAuthLoading={isLoading}
@@ -148,13 +145,11 @@ export default function MbtiExperience() {
                 );
                 const params = new URLSearchParams({
                   returnTo: ROUTES.WHISKEY_MBTI,
-                  errorTo: ROUTES.WHISKEY_MBTI,
                 });
                 router.push(`${ROUTES.LOGIN}?${params.toString()}`);
               }
             }}
             onRestart={() => {
-              setCompletedCode(null);
               setPhase('quiz');
               router.replace('/whiskey-mbti');
               window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -172,22 +167,11 @@ export default function MbtiExperience() {
 
       {showLogin && (
         <LoginModal
-          handleClose={() => {
-            setShowLogin(false);
-            setCompletedCode(null);
-            setPhase('intro');
-            // 모달의 로그인 클릭도 닫기를 호출하므로 추가 라우팅 없이 정리한다.
-            window.history.replaceState(
-              window.history.state,
-              '',
-              ROUTES.WHISKEY_MBTI,
-            );
-          }}
-          errorTo={ROUTES.WHISKEY_MBTI}
+          handleClose={() => setShowLogin(false)}
           returnTo={
-            completedCode
-              ? `/whiskey-mbti?result=${completedCode}`
-              : '/whiskey-mbti'
+            resultCode
+              ? `${ROUTES.WHISKEY_MBTI}?${new URLSearchParams({ result: resultCode })}`
+              : ROUTES.WHISKEY_MBTI
           }
         />
       )}

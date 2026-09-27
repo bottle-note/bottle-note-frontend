@@ -2,6 +2,7 @@
 
 import { UserData } from '@/types/Auth';
 import type { LoginPayload } from '@/lib/auth/login-payload';
+import { ApiError } from '@/utils/ApiError';
 
 export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
@@ -165,8 +166,13 @@ export const loginAuthSession = async (
   if (!response.ok) {
     const errorBody = (await response.json().catch(() => null)) as {
       message?: string;
+      code?: string;
     } | null;
-    throw new Error(errorBody?.message || 'Login failed');
+    throw new ApiError(
+      errorBody?.message || 'Login failed',
+      response,
+      errorBody?.code,
+    );
   }
 
   const { agreementRequired, ...session } =

@@ -32,7 +32,6 @@ import {
 import { useAuthInitializer } from '@/hooks/useAuthInitializer';
 import { useSocialLogin } from '@/hooks/useSocialLogin';
 import OauthKakaoCallbackPage from '@/app/(custom)/oauth/kakao/page';
-import LoginPage from '@/app/(custom)/login/page';
 import { DeviceService } from '@/lib/DeviceService';
 import SettingsPage from '@/app/(primary)/settings/page';
 import Modal from '@/components/ui/Modal/Modal';
@@ -398,7 +397,7 @@ describe('Auth business flows', () => {
       expect(getAuthSnapshot().status).not.toBe('authenticated');
     });
 
-    it('로그인 실패 시 공통 오류 화면으로 이동한다', async () => {
+    it('로그인 실패 시 홈으로 이동한다', async () => {
       fetchMock.mockResolvedValueOnce(
         createJsonResponse({ message: 'Login failed' }, { status: 400 }),
       );
@@ -409,7 +408,7 @@ describe('Auth business flows', () => {
         await result.current.onKakaoAppLoginSuccess('kakao-access-token');
       });
 
-      expect(routerReplace).toHaveBeenCalledWith('/error');
+      expect(routerReplace).toHaveBeenCalledWith('/');
     });
   });
 
@@ -563,49 +562,6 @@ describe('Auth business flows', () => {
 
       await waitFor(() => {
         expect(routerPush).toHaveBeenCalledWith('/');
-      });
-    });
-  });
-
-  describe('login page redirect', () => {
-    it('이미 로그인된 상태에서 /login 진입 시 디바이스 정보가 전송된다', async () => {
-      setAuthenticatedSession(sessionPayload);
-      DeviceService.setIsInApp(true);
-      DeviceService.setDeviceToken('device-token');
-      DeviceService.setPlatform('ios');
-      (window as typeof window & { isInApp?: boolean }).isInApp = true;
-      window.history.replaceState(null, '', '/login?returnTo=%2Fexplore');
-      fetchMock.mockResolvedValueOnce(
-        createJsonResponse({
-          errors: [],
-          data: {
-            message: 'saved',
-            deviceToken: 'device-token',
-            platform: 'ios',
-          },
-        }),
-      );
-
-      render(React.createElement(LoginPage));
-
-      await waitFor(() => {
-        expect(fetchMock).toHaveBeenCalledWith(
-          '/bottle-api/v1/push/token',
-          expect.objectContaining({
-            method: 'POST',
-          }),
-        );
-      });
-    });
-
-    it('이미 로그인된 상태에서 /login 진입 시 returnTo 경로로 복귀한다', async () => {
-      setAuthenticatedSession(sessionPayload);
-      window.history.replaceState(null, '', '/login?returnTo=%2Fexplore');
-
-      render(React.createElement(LoginPage));
-
-      await waitFor(() => {
-        expect(routerReplace).toHaveBeenCalledWith('/explore');
       });
     });
   });
