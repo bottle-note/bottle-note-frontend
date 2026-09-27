@@ -84,13 +84,15 @@ export const clearAuthSession = () => {
   });
 };
 
-export const restoreAuthSession = async () => {
-  if (snapshot.status === 'authenticated' && snapshot.session) {
-    return snapshot.session;
-  }
-
+export const restoreAuthSession = async ({
+  force = false,
+}: { force?: boolean } = {}) => {
   if (restorePromise) {
     return restorePromise;
+  }
+
+  if (!force && snapshot.status === 'authenticated' && snapshot.session) {
+    return snapshot.session;
   }
 
   setSnapshot({

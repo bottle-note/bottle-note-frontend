@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useEffect } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
   act,
@@ -14,16 +14,18 @@ import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { apiClient } from '@/shared/api/apiClient';
 import useModalStore from '@/store/modalStore';
 import {
+  clearAuthSession,
   getAuthSnapshot,
   resetAuthSessionForTest,
   setAuthenticatedSession,
 } from '@/lib/auth/session-store';
 import { useAuthInitializer } from '@/hooks/useAuthInitializer';
 import { useSocialLogin } from '@/hooks/useSocialLogin';
+import { useWebViewInit } from '@/hooks/useWebViewInit';
 import OauthKakaoCallbackPage from '@/app/(custom)/oauth/kakao/page';
 import LoginPage from '@/app/(custom)/login/page';
 import { DeviceService } from '@/lib/DeviceService';
-import { setReturnToUrl } from '@/utils/loginRedirect';
+import { LOGIN_RETURN_TO_KEY, setReturnToUrl } from '@/utils/loginRedirect';
 import SettingsPage from '@/app/(primary)/settings/page';
 import Modal from '@/components/ui/Modal/Modal';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -70,6 +72,14 @@ function HomeRegressionHarness() {
   return React.createElement('div', null, 'home-screen');
 }
 
+function AppLoginHarness() {
+  const { initWebView } = useWebViewInit();
+  useEffect(() => {
+    initWebView();
+  }, [initWebView]);
+  return <LoginPage />;
+}
+
 describe('Auth business flows', () => {
   const fetchMock = jest.fn();
   let consoleErrorSpy: jest.SpyInstance;
@@ -87,6 +97,7 @@ describe('Auth business flows', () => {
     routerPush.mockReset();
     resetAuthSessionForTest();
     sessionStorage.clear();
+    window.history.replaceState(null, '', '/login');
     localStorage.clear();
     useSettingsStore.setState({ currentScreen: 'main' });
     DeviceService.setIsInApp(false);
@@ -243,6 +254,42 @@ describe('Auth business flows', () => {
   });
 
   describe('login flows', () => {
+    it.each([false, true])(
+      '로그인 화면에서 앱 인증 완료 후 약관 필요 여부 %s에 따라 한 번만 이동한다',
+      async (agreementRequired) => {
+        clearAuthSession();
+        fetchMock.mockResolvedValueOnce(
+          createJsonResponse({}, { status: 401 }),
+        );
+        fetchMock.mockResolvedValueOnce(
+          createJsonResponse({ ...loginResponsePayload, agreementRequired }),
+        );
+        const returnTo = '/explore?tab=review';
+        window.history.replaceState(
+          null,
+          '',
+          `/login?returnTo=${encodeURIComponent(returnTo)}`,
+        );
+        (useSearchParams as jest.Mock).mockReturnValue(
+          new URLSearchParams({ returnTo }),
+        );
+        render(<AppLoginHarness />, { wrapper });
+        expect(await screen.findByText('카카오 로그인')).toBeVisible();
+        await act(async () => {
+          await window.onKakaoLoginSuccess('kakao-access-token');
+        });
+        expect(routerReplace).toHaveBeenCalledTimes(1);
+        expect(routerReplace).toHaveBeenCalledWith(
+          agreementRequired
+            ? `/agreements?returnTo=${encodeURIComponent(returnTo)}`
+            : returnTo,
+        );
+        expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(
+          agreementRequired ? returnTo : null,
+        );
+      },
+    );
+
     it('카카오 앱 로그인 성공 시 authenticated 상태가 된다', async () => {
       fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
 
@@ -277,6 +324,45 @@ describe('Auth business flows', () => {
 
       expect(routerReplace).toHaveBeenCalledWith('/explore');
     });
+
+    it('로그인 화면의 목적지 쿼리가 바뀌면 외부 인증 복귀도 변경된 목적지를 사용한다', async () => {
+      clearAuthSession();
+      fetchMock.mockResolvedValue(createJsonResponse({}, { status: 401 }));
+      (useSearchParams as jest.Mock).mockReturnValue(
+        new URLSearchParams({ returnTo: '/history' }),
+      );
+      const login = render(<LoginPage />, { wrapper });
+      await screen.findByText('카카오 로그인');
+      (useSearchParams as jest.Mock).mockReturnValue(
+        new URLSearchParams({ returnTo: '/explore?tab=review' }),
+      );
+      login.rerender(<LoginPage />);
+      await screen.findByText('카카오 로그인');
+      login.unmount();
+      window.history.replaceState(null, '', '/oauth/kakao?code=oauth-code');
+      (useSearchParams as jest.Mock).mockReturnValue(
+        new URLSearchParams('code=oauth-code'),
+      );
+      fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
+      render(<OauthKakaoCallbackPage />);
+      await waitFor(() =>
+        expect(routerReplace).toHaveBeenCalledWith('/explore?tab=review'),
+      );
+    });
+
+    it.each([
+      ['/whiskey-mbti?result=INTJ-A', '/error'],
+      ['/explore', '/error'],
+    ])(
+      '외부 인증 코드 없이 돌아오면 목적지 %s와 관계없이 %s로 이동한다',
+      (returnTo, expected) => {
+        setReturnToUrl(returnTo);
+        render(<OauthKakaoCallbackPage />);
+        expect(routerReplace).toHaveBeenCalledWith(expected);
+        expect(fetchMock).not.toHaveBeenCalled();
+        expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(returnTo);
+      },
+    );
 
     it('카카오 웹 로그인 callback 페이지는 authorizationCode로 로그인 요청을 보낸다', async () => {
       fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
@@ -536,6 +622,112 @@ describe('Auth business flows', () => {
   });
 
   describe('login page redirect', () => {
+    it.each([10, 3])(
+      '과거 로그인 기록의 방향 인덱스 %s와 관계없이 목적지로 replace한다',
+      async (previousIndex) => {
+        setAuthenticatedSession(sessionPayload);
+        window.history.replaceState(
+          {
+            __bottleNoteHistoryIndex: 7,
+            __bottleNoteLogin: { hasPreviousPage: true },
+          },
+          '',
+          '/login',
+        );
+        sessionStorage.setItem('bn_history_index', String(previousIndex));
+        (useSearchParams as jest.Mock).mockReturnValue(
+          new URLSearchParams({ returnTo: '/settings?qa=history' }),
+        );
+        const back = jest.fn();
+        (useRouter as jest.Mock).mockReturnValue({
+          replace: routerReplace,
+          push: routerPush,
+          back,
+        });
+        const forward = jest
+          .spyOn(window.history, 'forward')
+          .mockImplementation(() => {});
+        try {
+          render(<LoginPage />, { wrapper });
+          await waitFor(() =>
+            expect(routerReplace).toHaveBeenCalledWith('/settings?qa=history'),
+          );
+          expect(routerReplace).toHaveBeenCalledTimes(1);
+          expect(back).not.toHaveBeenCalled();
+          expect(forward).not.toHaveBeenCalled();
+        } finally {
+          forward.mockRestore();
+        }
+      },
+    );
+
+    it('bfcache로 복원된 로그인 화면은 세션을 확인하고 목적지로 한 번만 replace한다', async () => {
+      window.history.replaceState(
+        null,
+        '',
+        '/login?returnTo=%2Fsettings%3Fqa%3Drestored',
+      );
+      fetchMock.mockResolvedValueOnce(createJsonResponse({}, { status: 401 }));
+      (useSearchParams as jest.Mock).mockReturnValue(
+        new URLSearchParams({ returnTo: '/settings?qa=restored' }),
+      );
+      render(<LoginPage />, { wrapper });
+      await screen.findByText('카카오 로그인');
+      fetchMock.mockResolvedValueOnce(createJsonResponse(sessionPayload));
+      act(() =>
+        window.dispatchEvent(
+          new PageTransitionEvent('pageshow', { persisted: true }),
+        ),
+      );
+      await waitFor(() =>
+        expect(routerReplace).toHaveBeenCalledWith('/settings?qa=restored'),
+      );
+      expect(routerReplace).toHaveBeenCalledTimes(1);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBeNull();
+    });
+
+    it.each([true, false])(
+      '인증된 로그인 문서 복원 후 서버 인증 상태 %s를 반영한다',
+      async (authenticated) => {
+        window.history.replaceState(
+          null,
+          '',
+          '/login?returnTo=%2Fsettings%3Fqa%3Dcached',
+        );
+        setAuthenticatedSession(sessionPayload);
+        (useSearchParams as jest.Mock).mockReturnValue(
+          new URLSearchParams({ returnTo: '/settings?qa=cached' }),
+        );
+        render(<LoginPage />, { wrapper });
+        await waitFor(() =>
+          expect(routerReplace).toHaveBeenCalledWith('/settings?qa=cached'),
+        );
+        routerReplace.mockClear();
+        fetchMock.mockResolvedValueOnce(
+          authenticated
+            ? createJsonResponse(sessionPayload)
+            : createJsonResponse({}, { status: 401 }),
+        );
+        act(() =>
+          window.dispatchEvent(
+            new PageTransitionEvent('pageshow', { persisted: true }),
+          ),
+        );
+        if (authenticated) {
+          await waitFor(() =>
+            expect(routerReplace).toHaveBeenCalledWith('/settings?qa=cached'),
+          );
+          expect(routerReplace).toHaveBeenCalledTimes(1);
+        } else {
+          expect(await screen.findByText('카카오 로그인')).toBeVisible();
+          expect(routerReplace).not.toHaveBeenCalled();
+          expect(getAuthSnapshot().status).toBe('unauthenticated');
+        }
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+      },
+    );
+
     it('이미 로그인된 상태에서 /login 진입 시 디바이스 정보가 전송된다', async () => {
       setAuthenticatedSession(sessionPayload);
       DeviceService.setIsInApp(true);
@@ -556,7 +748,7 @@ describe('Auth business flows', () => {
         }),
       );
 
-      render(React.createElement(LoginPage));
+      render(React.createElement(LoginPage), { wrapper });
 
       await waitFor(() => {
         expect(fetchMock).toHaveBeenCalledWith(
@@ -574,7 +766,7 @@ describe('Auth business flows', () => {
         new URLSearchParams({ returnTo: '/explore?tab=EXPLORER_WHISKEY' }),
       );
 
-      render(React.createElement(LoginPage));
+      render(React.createElement(LoginPage), { wrapper });
 
       await waitFor(() => {
         expect(routerReplace).toHaveBeenCalledWith(
@@ -583,14 +775,14 @@ describe('Auth business flows', () => {
       });
     });
 
-    it('returnTo 없이 로그인 페이지에 직접 진입하면 과거 목적지 대신 홈으로 이동한다', async () => {
+    it('returnTo 쿼리 없이 로그인 페이지에 진입하면 저장소 목적지로 복귀한다', async () => {
       setAuthenticatedSession(sessionPayload);
       setReturnToUrl('/inquire/register');
 
-      render(React.createElement(LoginPage));
+      render(React.createElement(LoginPage), { wrapper });
 
       await waitFor(() => {
-        expect(routerReplace).toHaveBeenCalledWith('/');
+        expect(routerReplace).toHaveBeenCalledWith('/inquire/register');
       });
     });
   });

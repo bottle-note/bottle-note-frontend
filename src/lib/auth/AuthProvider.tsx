@@ -1,12 +1,32 @@
 'use client';
 
-import { ReactNode, useEffect, useLayoutEffect } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import {
+  ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+} from 'react';
+import { usePathname } from 'next/navigation';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
-import { trackLoginHistory } from '@/utils/loginHistory';
 import { clearReturnToUrl } from '@/utils/loginRedirect';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
-import { restoreAuthSession } from './session-store';
+import { ClientSession, restoreAuthSession } from './session-store';
+
+type SessionRestoreListener = (session: ClientSession | null) => void;
+
+const SessionRestoreContext = createContext<
+  ((listener: SessionRestoreListener) => () => void) | null
+>(null);
+
+export function useSessionRestoreSubscription() {
+  const subscribe = useContext(SessionRestoreContext);
+  if (!subscribe) {
+    throw new Error('useSessionRestoreSubscription requires AuthProvider');
+  }
+  return subscribe;
+}
 
 interface Props {
   children: ReactNode;
@@ -14,25 +34,30 @@ interface Props {
 
 export function AuthProvider({ children }: Props) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { isLoading, isLoggedIn } = useAuthSession();
-
-  // 로그인 페이지의 effect보다 먼저 현재 히스토리 위치를 확인한다.
-  useLayoutEffect(() => {
-    trackLoginHistory();
-  }, [pathname, searchParams]);
+  const restoreListeners = useRef(new Set<SessionRestoreListener>());
+  const subscribeToSessionRestore = useCallback(
+    (listener: SessionRestoreListener) => {
+      restoreListeners.current.add(listener);
+      return () => {
+        restoreListeners.current.delete(listener);
+      };
+    },
+    [],
+  );
 
   useEffect(() => {
-    const handlePageShow = (event: PageTransitionEvent) => {
+    let cancelled = false;
+    const handlePageShow = async (event: PageTransitionEvent) => {
       if (!event.persisted) return;
-      trackLoginHistory();
-      void restoreAuthSession();
+      const session = await restoreAuthSession({ force: true });
+      if (cancelled) return;
+      restoreListeners.current.forEach((listener) => listener(session));
     };
-    window.addEventListener('popstate', trackLoginHistory);
     window.addEventListener('pageshow', handlePageShow);
     void restoreAuthSession();
     return () => {
-      window.removeEventListener('popstate', trackLoginHistory);
+      cancelled = true;
       window.removeEventListener('pageshow', handlePageShow);
     };
   }, []);
@@ -51,5 +76,9 @@ export function AuthProvider({ children }: Props) {
     consumeLoginTrigger();
   }, [pathname, isLoading, isLoggedIn]);
 
-  return <>{children}</>;
+  return (
+    <SessionRestoreContext.Provider value={subscribeToSessionRestore}>
+      {children}
+    </SessionRestoreContext.Provider>
+  );
 }

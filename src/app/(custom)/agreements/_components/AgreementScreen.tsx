@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AgreementApi } from '@/api/agreement/agreement.api';
 import type {
@@ -13,7 +13,10 @@ import type {
 import { Button } from '@/components/ui/Button/Button';
 import { ROUTES } from '@/constants/routes';
 import useModalStore from '@/store/modalStore';
-import { getReturnToUrl } from '@/utils/loginRedirect';
+import {
+  clearReturnToUrl,
+  getReturnToFromSearchParams,
+} from '@/utils/loginRedirect';
 
 type AgreementRequirement = 'all' | 'optional' | 'required';
 type AgreementState = Record<AgreementType, boolean>;
@@ -118,6 +121,7 @@ function AgreementCheckbox({
 
 export function AgreementScreen({ documentContents }: AgreementScreenProps) {
   const router = useRouter();
+  const returnTo = getReturnToFromSearchParams(useSearchParams());
   const queryClient = useQueryClient();
   const { handleModalState } = useModalStore();
   const [agreements, setAgreements] = useState(createEmptyAgreementState);
@@ -144,7 +148,8 @@ export function AgreementScreen({ documentContents }: AgreementScreenProps) {
     mutationFn: AgreementApi.submit,
     onSuccess: (response) => {
       queryClient.setQueryData(AGREEMENT_STATUS_QUERY_KEY, response.data);
-      router.replace(getReturnToUrl());
+      clearReturnToUrl();
+      router.replace(returnTo);
     },
     onError: () => {
       handleModalState({
@@ -161,7 +166,8 @@ export function AgreementScreen({ documentContents }: AgreementScreenProps) {
     hasHandledStatusRef.current = true;
 
     if (status.eligible) {
-      router.replace(getReturnToUrl());
+      clearReturnToUrl();
+      router.replace(returnTo);
       return;
     }
 
@@ -169,7 +175,7 @@ export function AgreementScreen({ documentContents }: AgreementScreenProps) {
     initialAgreementsRef.current = initialAgreements;
     setAgreements(initialAgreements);
     setIsInitialized(true);
-  }, [router, status]);
+  }, [returnTo, router, status]);
 
   useEffect(() => {
     if (!isStatusError || hasShownStatusErrorRef.current) return;

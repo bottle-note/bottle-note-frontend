@@ -7,7 +7,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
-import { WHISKEY_MBTI_INTRO_PATH } from '@/utils/loginRedirect';
 import { useLoginBridge } from '@/hooks/useLoginBridge';
 
 import styles from '../mbti.module.css';
@@ -54,6 +53,15 @@ export default function MbtiExperience() {
     }
     previousResultCode.current = resultCode;
   }, [phase, resultCode]);
+
+  useEffect(() => {
+    if (isLoading || isLoggedIn || isShared || phase !== 'result') return;
+
+    setCompletedCode(null);
+    setShowLogin(false);
+    setPhase('intro');
+    if (resultCode) router.replace(ROUTES.WHISKEY_MBTI);
+  }, [isLoading, isLoggedIn, isShared, phase, resultCode, router]);
 
   const handleComplete = (code: MbtiCode) => {
     setCompletedCode(code);
@@ -130,7 +138,11 @@ export default function MbtiExperience() {
           </section>
         )}
 
-        {phase === 'result' && code && (
+        {phase === 'result' && code && !isShared && isLoading && (
+          <p className={styles.loading}>로그인 상태를 확인하는 중이에요.</p>
+        )}
+
+        {phase === 'result' && code && (isShared || isLoggedIn) && (
           <MbtiResult
             code={code}
             isShared={isShared}
@@ -142,7 +154,7 @@ export default function MbtiExperience() {
                 router.replace('/whiskey-mbti');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               } else {
-                bridgeToLogin({ returnTo: WHISKEY_MBTI_INTRO_PATH });
+                bridgeToLogin({ returnTo: ROUTES.WHISKEY_MBTI });
               }
             }}
             onRestart={() => {
@@ -168,8 +180,6 @@ export default function MbtiExperience() {
             setShowLogin(false);
             setCompletedCode(null);
             setPhase('intro');
-            // 모달의 로그인 클릭도 닫기를 호출하므로 추가 라우팅 없이 정리한다.
-            window.history.replaceState(null, '', '/whiskey-mbti');
           }}
           returnTo={
             completedCode

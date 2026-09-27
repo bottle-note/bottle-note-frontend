@@ -1,11 +1,17 @@
 import { useState } from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import {
+  fireEvent,
+  render as renderComponent,
+  screen,
+} from '@testing-library/react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import LoginPage from '@/app/(custom)/login/page';
 import LoginModal from '@/components/domain/auth/LoginModal';
 import { useLoginBridge } from '@/hooks/useLoginBridge';
 import { clearAuthSession } from '@/lib/auth/session-store';
+import { AuthProvider } from '@/lib/auth/AuthProvider';
 import { trackGA4Event } from '@/utils/analytics/ga4';
+import { LOGIN_RETURN_TO_KEY } from '@/utils/loginRedirect';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
 
 jest.mock('next/navigation', () => ({
@@ -14,6 +20,10 @@ jest.mock('next/navigation', () => ({
   useSearchParams: jest.fn(),
 }));
 jest.mock('@/utils/analytics/ga4', () => ({ trackGA4Event: jest.fn() }));
+jest.mock('@/lib/auth/session-store', () => ({
+  ...jest.requireActual('@/lib/auth/session-store'),
+  restoreAuthSession: jest.fn().mockResolvedValue(null),
+}));
 jest.mock('@/components/ui/Modal/BackDrop', () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => (
@@ -23,6 +33,9 @@ jest.mock('@/components/ui/Modal/BackDrop', () => ({
 
 const sourceUrl =
   '/explore?tab=EXPLORER_WHISKEY&keywords=macallan&regionIds=12';
+
+const render = (ui: React.ReactElement) =>
+  renderComponent(ui, { wrapper: AuthProvider });
 
 function LoginCta({ returnTo }: { returnTo?: string }) {
   const { bridgeToLogin } = useLoginBridge();
@@ -109,6 +122,7 @@ describe('로그인 진입과 상단 뒤로가기', () => {
     expect(replace).toHaveBeenCalledWith(
       `/login?returnTo=${encodeURIComponent(sourceUrl)}`,
     );
+    expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(sourceUrl);
     expect(push).not.toHaveBeenCalled();
     expect(handleClose).toHaveBeenCalledTimes(1);
     expect(trackGA4Event).not.toHaveBeenCalled();
@@ -127,6 +141,7 @@ describe('로그인 진입과 상단 뒤로가기', () => {
       expect(screen.getByText('카카오 로그인')).toBeVisible();
       fireEvent.click(screen.getByRole('button', { name: 'arrowIcon' }));
       expect(screen.getByLabelText('현재 경로')).toHaveTextContent(sourceUrl);
+      expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBeNull();
       expect(screen.getByRole('heading', { name: '복귀 화면' })).toBeVisible();
       expect(screen.queryByText('카카오 로그인')).not.toBeInTheDocument();
     },

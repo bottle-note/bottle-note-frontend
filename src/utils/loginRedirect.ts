@@ -6,7 +6,6 @@ import { ROUTES } from '@/constants/routes';
 
 export const LOGIN_RETURN_TO_PARAM = 'returnTo';
 export const LOGIN_RETURN_TO_KEY = 'login_return_to';
-export const WHISKEY_MBTI_INTRO_PATH = '/whiskey-mbti';
 
 // 리다이렉트 제외 경로 (무한 루프 방지)
 const BLOCKED_PATHS = ['/login', '/oauth'];
@@ -38,30 +37,7 @@ export const isValidReturnUrl = (url: string): boolean => {
   return true;
 };
 
-/** 쿼리에서 복귀 경로를 읽고, 없거나 유효하지 않으면 홈을 반환한다. */
-export const getReturnToFromSearchParams = (
-  searchParams: Pick<URLSearchParams, 'get'>,
-): string => {
-  const returnTo = searchParams.get(LOGIN_RETURN_TO_PARAM);
-  return returnTo && isValidReturnUrl(returnTo) ? returnTo : ROUTES.HOME;
-};
-
-/**
- * returnTo URL을 안전하게 가져오고 sessionStorage에서 제거
- */
-export const getReturnToUrl = (): string => {
-  if (typeof window === 'undefined') return '/';
-
-  const returnTo = sessionStorage.getItem(LOGIN_RETURN_TO_KEY);
-  sessionStorage.removeItem(LOGIN_RETURN_TO_KEY);
-
-  return returnTo && isValidReturnUrl(returnTo) ? returnTo : '/';
-};
-
-/**
- * 로그인 화면에서 뒤로 가기처럼, 로그인 완료 전의 흐름을 확인할 때 사용한다.
- * 성공 경로는 getReturnToUrl만 소비해야 한다.
- */
+/** 외부 인증에서 돌아올 때 사용할 저장소 목적지를 읽는다. */
 export const getPendingReturnToUrl = (): string | null => {
   if (typeof window === 'undefined') return null;
 
@@ -69,18 +45,21 @@ export const getPendingReturnToUrl = (): string | null => {
   return returnTo && isValidReturnUrl(returnTo) ? returnTo : null;
 };
 
+/** 쿼리 → 저장소 → 홈 순서로 읽는다. 잘못된 쿼리는 저장소 대신 홈으로 처리한다. */
+export const getReturnToFromSearchParams = (
+  searchParams: Pick<URLSearchParams, 'get'>,
+): string => {
+  const returnTo = searchParams.get(LOGIN_RETURN_TO_PARAM);
+  if (returnTo !== null) {
+    return returnTo && isValidReturnUrl(returnTo) ? returnTo : ROUTES.HOME;
+  }
+
+  return getPendingReturnToUrl() ?? ROUTES.HOME;
+};
+
 export const clearReturnToUrl = (): void => {
   if (typeof window === 'undefined') return;
   sessionStorage.removeItem(LOGIN_RETURN_TO_KEY);
-};
-
-export const isWhiskeyMbtiReturnUrl = (url: string | null): boolean => {
-  if (!url || !isValidReturnUrl(url)) return false;
-
-  return (
-    new URL(url, 'https://bottlenote.local').pathname ===
-    WHISKEY_MBTI_INTRO_PATH
-  );
 };
 
 /**

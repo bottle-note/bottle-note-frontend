@@ -2,7 +2,11 @@
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { ROUTES } from '@/constants/routes';
-import { isValidReturnUrl, LOGIN_RETURN_TO_PARAM } from '@/utils/loginRedirect';
+import {
+  isValidReturnUrl,
+  LOGIN_RETURN_TO_PARAM,
+  setReturnToUrl,
+} from '@/utils/loginRedirect';
 import { setLoginTrigger } from '@/utils/loginTrigger';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import type { LoginTrigger } from '@/utils/analytics/types';
@@ -30,6 +34,7 @@ export const useLoginBridge = () => {
     }
     const destination =
       returnTo && isValidReturnUrl(returnTo) ? returnTo : ROUTES.HOME;
+    setReturnToUrl(destination);
     router.replace(
       `${ROUTES.LOGIN}?${LOGIN_RETURN_TO_PARAM}=${encodeURIComponent(destination)}`,
     );

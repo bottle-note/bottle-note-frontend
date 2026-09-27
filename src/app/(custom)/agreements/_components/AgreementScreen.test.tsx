@@ -1,13 +1,15 @@
 import { PropsWithChildren } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AgreementApi } from '@/api/agreement/agreement.api';
 import type { AgreementStatusResponse } from '@/api/agreement/types';
+import { LOGIN_RETURN_TO_KEY, setReturnToUrl } from '@/utils/loginRedirect';
 import { AgreementScreen } from './AgreementScreen';
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
+  useSearchParams: jest.fn(),
 }));
 
 jest.mock('@/api/agreement/agreement.api', () => ({
@@ -54,6 +56,11 @@ describe('AgreementScreen', () => {
     jest.clearAllMocks();
     sessionStorage.clear();
     (useRouter as jest.Mock).mockReturnValue({ replace: routerReplace });
+    jest
+      .mocked(useSearchParams)
+      .mockReturnValue(
+        new URLSearchParams() as ReturnType<typeof useSearchParams>,
+      );
     getStatusMock.mockResolvedValue(createResponse(agreementStatus));
     submitMock.mockResolvedValue(
       createResponse({
@@ -154,6 +161,68 @@ describe('AgreementScreen', () => {
       screen.getByRole('checkbox', { name: /이용약관 동의/ }),
     ).not.toBeChecked();
     expect(submitButton).toBeDisabled();
+  });
+
+  it.each([
+    ['returnTo=/explore%3Ftab%3Dreview', '/history', '/explore?tab=review'],
+    ['', '/history', '/history'],
+    ['returnTo=https%3A%2F%2Fevil.com', '/history', '/'],
+  ])(
+    '동의 완료 후 쿼리 %s와 저장소 %s에 따라 %s로 복귀한다',
+    async (query, stored, expected) => {
+      setReturnToUrl(stored);
+      jest
+        .mocked(useSearchParams)
+        .mockReturnValue(
+          new URLSearchParams(query) as ReturnType<typeof useSearchParams>,
+        );
+      await renderAgreementScreen();
+      fireEvent.click(screen.getByLabelText('전체 동의'));
+      fireEvent.click(
+        screen.getByRole('button', { name: '동의하고 시작하기' }),
+      );
+      await waitFor(() => expect(routerReplace).toHaveBeenCalledWith(expected));
+      expect(routerReplace).toHaveBeenCalledTimes(1);
+      expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBeNull();
+    },
+  );
+
+  it('저장소가 없어도 이미 동의한 사용자는 URL의 목적지로 복귀한다', async () => {
+    jest.mocked(useSearchParams).mockReturnValue(
+      new URLSearchParams({
+        returnTo: '/whiskey-mbti?result=INTJ-A',
+      }) as ReturnType<typeof useSearchParams>,
+    );
+    getStatusMock.mockResolvedValueOnce(
+      createResponse({ ...agreementStatus, eligible: true }),
+    );
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <AgreementScreen documentContents={documentContents} />
+      </QueryClientProvider>,
+    );
+    await waitFor(() =>
+      expect(routerReplace).toHaveBeenCalledWith('/whiskey-mbti?result=INTJ-A'),
+    );
+    expect(routerReplace).toHaveBeenCalledTimes(1);
+  });
+
+  it('동의 제출 실패 시 목적지를 유지하고 재시도 후 복귀한다', async () => {
+    setReturnToUrl('/history');
+    submitMock.mockRejectedValueOnce(new Error('temporary failure'));
+    await renderAgreementScreen();
+    fireEvent.click(screen.getByLabelText('전체 동의'));
+    const button = screen.getByRole('button', { name: '동의하고 시작하기' });
+    fireEvent.click(button);
+    await waitFor(() => expect(button).toBeEnabled());
+    expect(routerReplace).not.toHaveBeenCalled();
+    expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe('/history');
+    fireEvent.click(button);
+    await waitFor(() => expect(routerReplace).toHaveBeenCalledWith('/history'));
+    expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBeNull();
   });
 
   it('필수 동의 원문과 개별 선택 방식을 제출하고 기존 경로로 이동한다', async () => {

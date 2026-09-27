@@ -10,14 +10,14 @@ export default function OauthKakaoCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const authCode = searchParams.get('code');
-  const { completeKakaoWebLogin, cancelMbtiLogin } = useSocialLogin();
+  const { completeKakaoWebLogin } = useSocialLogin();
 
   const loginHandler = async (code: string) => {
     try {
       await completeKakaoWebLogin(code);
     } catch (e) {
       console.error(e);
-      if (!cancelMbtiLogin()) router.replace(ROUTES.ERROR);
+      router.replace(ROUTES.ERROR);
     }
   };
 
@@ -27,7 +27,7 @@ export default function OauthKakaoCallbackPage() {
       return;
     }
 
-    if (!cancelMbtiLogin()) router.replace(ROUTES.ERROR);
+    router.replace(ROUTES.ERROR);
   }, [authCode]);
 
   return <Loading />;

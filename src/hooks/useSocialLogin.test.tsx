@@ -8,6 +8,7 @@ import { loadKakaoSDK } from '@/lib/kakao/kakaoSDK';
 import { loginAuthSession } from '@/lib/auth/session-store';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { LOGIN_RETURN_TO_KEY, setReturnToUrl } from '@/utils/loginRedirect';
+import useModalStore from '@/store/modalStore';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
 import { useSocialLogin } from './useSocialLogin';
 
@@ -84,26 +85,65 @@ describe('useSocialLogin', () => {
     (useRouter as jest.Mock).mockReturnValue({
       replace: routerReplace,
     });
+    window.history.replaceState(null, '', '/login');
     consumeLoginTriggerMock.mockReturnValue(null);
     loadKakaoSDKMock.mockResolvedValue(true);
   });
 
-  it('웹 Kakao 로그인이 완료되면 authorization code로 로그인하고 returnTo로 이동한다', async () => {
+  it.each(['kakao', 'apple'] as const)(
+    '앱 %s 로그인은 저장소보다 쿼리 목적지로 복귀한다',
+    async (provider) => {
+      loginAuthSessionMock.mockResolvedValueOnce(loginResult(false));
+      setReturnToUrl('/history');
+      window.history.replaceState(
+        null,
+        '',
+        '/login?returnTo=%2Fexplore%3Ftab%3Dreview',
+      );
+      const { result } = renderHook(() => useSocialLogin());
+      await act(async () => {
+        if (provider === 'kakao')
+          await result.current.onKakaoAppLoginSuccess('kakao-access-token');
+        else
+          await result.current.onAppleAppLoginSuccess(
+            JSON.stringify({ idToken: 'apple-id-token', nonce: 'apple-nonce' }),
+          );
+      });
+      expect(routerReplace).toHaveBeenCalledWith('/explore?tab=review');
+      expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBeNull();
+    },
+  );
+
+  it('이전에 등록된 앱 콜백도 완료 시점의 URL 목적지를 사용한다', async () => {
     loginAuthSessionMock.mockResolvedValueOnce(loginResult(false));
-    setReturnToUrl('/explore');
+    setReturnToUrl('/history');
     const { result } = renderHook(() => useSocialLogin());
-
+    const registeredCallback = result.current.onKakaoAppLoginSuccess;
+    window.history.replaceState(
+      null,
+      '',
+      '/login?returnTo=%2Fexplore%3Ftab%3Dreview',
+    );
     await act(async () => {
-      await result.current.completeKakaoWebLogin('authorization-code');
+      await registeredCallback('kakao-access-token');
     });
-
-    expect(loginAuthSessionMock).toHaveBeenCalledWith({
-      provider: 'kakao-login',
-      authorizationCode: 'authorization-code',
-    });
-    expect(routerReplace).toHaveBeenCalledTimes(1);
-    expect(routerReplace).toHaveBeenCalledWith('/explore');
+    expect(routerReplace).toHaveBeenCalledWith('/explore?tab=review');
     expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBeNull();
+  });
+
+  it('로그인 요청 실패 후에도 목적지를 유지하여 재시도할 수 있다', async () => {
+    loginAuthSessionMock.mockRejectedValueOnce(new Error('temporary failure'));
+    setReturnToUrl('/explore?tab=review');
+    const { result } = renderHook(() => useSocialLogin());
+    await act(async () => {
+      await expect(
+        result.current.completeKakaoWebLogin('code'),
+      ).rejects.toThrow('temporary failure');
+    });
+    expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(
+      '/explore?tab=review',
+    );
+    expect(routerReplace).not.toHaveBeenCalled();
   });
 
   it('필수 동의가 필요하면 agreements로 이동하고 returnTo를 유지한다', async () => {
@@ -144,36 +184,31 @@ describe('useSocialLogin', () => {
       platform: 'ios',
     });
     expect(routerReplace).toHaveBeenCalledTimes(1);
-    expect(routerReplace).toHaveBeenCalledWith(ROUTES.AGREEMENTS);
+    expect(routerReplace).toHaveBeenCalledWith(
+      `${ROUTES.AGREEMENTS}?returnTo=${encodeURIComponent('/history')}`,
+    );
     expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe('/history');
   });
 
-  it('MBTI에서 약관 동의가 필요하면 결과 주소를 유지한다', async () => {
-    loginAuthSessionMock.mockResolvedValueOnce(loginResult(true));
-    setReturnToUrl('/whiskey-mbti?result=INTJ-A');
-    const { result } = renderHook(() => useSocialLogin());
+  it.each(['kakao', 'apple'] as const)(
+    'MBTI 앱 %s 로그인 오류도 공통 오류를 표시하고 목적지를 유지한다',
+    (provider) => {
+      setReturnToUrl('/whiskey-mbti?result=INTJ-A');
+      const { result } = renderHook(() => useSocialLogin());
 
-    await act(async () => {
-      await result.current.completeKakaoWebLogin('authorization-code');
-    });
+      act(() => {
+        if (provider === 'kakao')
+          result.current.onKakaoAppLoginError(new Error('cancelled'));
+        else result.current.onAppleAppLoginError(new Error('cancelled'));
+      });
 
-    expect(routerReplace).toHaveBeenCalledWith(ROUTES.AGREEMENTS);
-    expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(
-      '/whiskey-mbti?result=INTJ-A',
-    );
-  });
-
-  it('MBTI 앱 로그인 오류는 첫 화면으로 돌아가고 실패 모달을 열지 않는다', () => {
-    setReturnToUrl('/whiskey-mbti?result=INTJ-A');
-    const { result } = renderHook(() => useSocialLogin());
-
-    act(() => {
-      result.current.onKakaoAppLoginError(new Error('cancelled'));
-    });
-
-    expect(routerReplace).toHaveBeenCalledWith('/whiskey-mbti');
-    expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBeNull();
-  });
+      expect(routerReplace).not.toHaveBeenCalled();
+      expect(useModalStore.getState().state.mainText).toBe('로그인 실패');
+      expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(
+        '/whiskey-mbti?result=INTJ-A',
+      );
+    },
+  );
 
   it('브라우저에서 Kakao 로그인을 시작하면 SDK를 로드하고 authorize를 호출한다', async () => {
     const { result } = renderHook(() => useSocialLogin());
