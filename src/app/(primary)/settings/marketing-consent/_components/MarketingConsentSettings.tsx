@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AgreementApi } from '@/api/agreement/agreement.api';
 import type { AgreementAction } from '@/api/agreement/types';
 import { Button } from '@/components/ui/Button/Button';
-import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useLoginBridge } from '@/hooks/useLoginBridge';
 import useModalStore from '@/store/modalStore';
 
 interface MarketingConsentSettingsProps {
@@ -19,16 +18,17 @@ const AGREEMENT_STATUS_QUERY_KEY = ['agreements', 'status'] as const;
 export function MarketingConsentSettings({
   documentContent,
 }: MarketingConsentSettingsProps) {
-  const router = useRouter();
+  const { bridgeToLogin } = useLoginBridge();
   const queryClient = useQueryClient();
   const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
   const { handleCloseModal, handleModalState } = useModalStore();
 
   useEffect(() => {
     if (!isAuthLoading && !isLoggedIn) {
-      router.replace(ROUTES.LOGIN);
+      bridgeToLogin();
     }
-  }, [isAuthLoading, isLoggedIn, router]);
+    // 인증 상태가 바뀔 때만 진입을 판단한다. 이동 함수의 참조 변경에는 반응하지 않는다.
+  }, [isAuthLoading, isLoggedIn]);
 
   const {
     data: status,

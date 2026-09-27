@@ -167,7 +167,7 @@ export default function SearchAlcohol() {
 
   const handleRateCommit = useCallback(
     (selectedRate: number) => {
-      if (!isLoggedIn) return bridgeToLogin('rating');
+      if (!isLoggedIn) return bridgeToLogin({ trigger: 'rating' });
       const requestId = ++latestRatingRequestIdRef.current;
 
       ratingRequestQueueRef.current = ratingRequestQueueRef.current
@@ -284,15 +284,6 @@ export default function SearchAlcohol() {
   const reviewList = data?.reviewInfo?.reviewList ?? [];
   const reviewTotalCount = data?.reviewInfo?.totalCount;
   const isGuest = !isAuthLoading && !isLoggedIn;
-
-  const handleGuestLogin = (returnTo: string) => {
-    router.replace(`/login?returnTo=${encodeURIComponent(returnTo)}`);
-  };
-
-  const detailReturnTo =
-    typeof window === 'undefined'
-      ? ''
-      : `${window.location.pathname}${window.location.search}`;
 
   const hasFlavorTags = Boolean(data?.alcohols?.alcoholsTastingTags?.length);
   const description = data?.alcohols?.description?.trim();
@@ -492,7 +483,7 @@ export default function SearchAlcohol() {
                   title="지금 보고 계신 위스키, 관심있으신가요?"
                   description="보틀노트에 기록하고 나만의 취향 노트를 쌓아보세요!"
                   buttonLabel="로그인하고 기록 시작하기"
-                  onLogin={() => handleGuestLogin(detailReturnTo)}
+                  onLogin={() => bridgeToLogin()}
                 >
                   {alcoholMetadataAndTags}
                   {friendsRating}
@@ -542,7 +533,7 @@ export default function SearchAlcohol() {
                           ) => {
                             if (!isLoggedIn) {
                               e.preventDefault();
-                              bridgeToLogin('comment');
+                              bridgeToLogin({ trigger: 'comment' });
                             }
                           },
                         }}

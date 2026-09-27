@@ -542,7 +542,9 @@ describe('Auth business flows', () => {
       DeviceService.setDeviceToken('device-token');
       DeviceService.setPlatform('ios');
       (window as typeof window & { isInApp?: boolean }).isInApp = true;
-      setReturnToUrl('/explore');
+      (useSearchParams as jest.Mock).mockReturnValue(
+        new URLSearchParams({ returnTo: '/explore' }),
+      );
       fetchMock.mockResolvedValueOnce(
         createJsonResponse({
           errors: [],
@@ -568,12 +570,27 @@ describe('Auth business flows', () => {
 
     it('이미 로그인된 상태에서 /login 진입 시 returnTo 경로로 복귀한다', async () => {
       setAuthenticatedSession(sessionPayload);
-      setReturnToUrl('/explore');
+      (useSearchParams as jest.Mock).mockReturnValue(
+        new URLSearchParams({ returnTo: '/explore?tab=EXPLORER_WHISKEY' }),
+      );
 
       render(React.createElement(LoginPage));
 
       await waitFor(() => {
-        expect(routerReplace).toHaveBeenCalledWith('/explore');
+        expect(routerReplace).toHaveBeenCalledWith(
+          '/explore?tab=EXPLORER_WHISKEY',
+        );
+      });
+    });
+
+    it('returnTo 없이 로그인 페이지에 직접 진입하면 과거 목적지 대신 홈으로 이동한다', async () => {
+      setAuthenticatedSession(sessionPayload);
+      setReturnToUrl('/inquire/register');
+
+      render(React.createElement(LoginPage));
+
+      await waitFor(() => {
+        expect(routerReplace).toHaveBeenCalledWith('/');
       });
     });
   });

@@ -2,6 +2,9 @@
  * 로그인 후 리다이렉트를 위한 유틸리티
  */
 
+import { ROUTES } from '@/constants/routes';
+
+export const LOGIN_RETURN_TO_PARAM = 'returnTo';
 export const LOGIN_RETURN_TO_KEY = 'login_return_to';
 export const WHISKEY_MBTI_INTRO_PATH = '/whiskey-mbti';
 
@@ -33,6 +36,14 @@ export const isValidReturnUrl = (url: string): boolean => {
   if (BLOCKED_PATHS.some((path) => url.startsWith(path))) return false;
 
   return true;
+};
+
+/** 쿼리에서 복귀 경로를 읽고, 없거나 유효하지 않으면 홈을 반환한다. */
+export const getReturnToFromSearchParams = (
+  searchParams: Pick<URLSearchParams, 'get'>,
+): string => {
+  const returnTo = searchParams.get(LOGIN_RETURN_TO_PARAM);
+  return returnTo && isValidReturnUrl(returnTo) ? returnTo : ROUTES.HOME;
 };
 
 /**

@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-
-import { ROUTES } from '@/constants/routes';
+import { useLoginBridge } from '@/hooks/useLoginBridge';
 import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { GuestLoginPrompt } from './GuestLoginPrompt';
@@ -35,9 +33,7 @@ interface GuestListGateProps {
 }
 
 export function GuestListGate({ title, description }: GuestListGateProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const { bridgeToLogin } = useLoginBridge();
   const { isNavbarSuppressed, isNavigationVisible } = useNavLayout();
   const [isActive, setIsActive] = useState(false);
   const gateRef = useRef<HTMLDivElement>(null);
@@ -58,13 +54,6 @@ export function GuestListGate({ title, description }: GuestListGateProps) {
 
     return () => observer.disconnect();
   }, []);
-
-  const handleLogin = () => {
-    const query = searchParams.toString();
-    const returnTo = query ? `${pathname}?${query}` : pathname;
-
-    router.replace(`${ROUTES.LOGIN}?returnTo=${encodeURIComponent(returnTo)}`);
-  };
 
   return (
     <>
@@ -99,7 +88,7 @@ export function GuestListGate({ title, description }: GuestListGateProps) {
               title={title}
               description={description}
               buttonLabel="로그인하고 더 보기"
-              onLogin={handleLogin}
+              onLogin={() => bridgeToLogin()}
             />
           </div>
         </>

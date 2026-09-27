@@ -2,12 +2,11 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button/Button';
-import { ROUTES } from '@/constants/routes';
+import { useLoginBridge } from '@/hooks/useLoginBridge';
 
 export function HomeFeaturedLoginRequired() {
-  const router = useRouter();
+  const { bridgeToLogin } = useLoginBridge();
 
   return (
     <div className="flex flex-col h-full -ml-25">
@@ -27,7 +26,7 @@ export function HomeFeaturedLoginRequired() {
           size="md"
           variant="secondary"
           className="w-237"
-          onClick={() => router.push(ROUTES.LOGIN)}
+          onClick={() => bridgeToLogin()}
         >
           로그인 하러가기
         </Button>

@@ -1,7 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { render, screen } from '@testing-library/react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { LOGIN_RETURN_TO_KEY } from '@/utils/loginRedirect';
 import LoginModal from './LoginModal';
 
 jest.mock('next/navigation', () => ({
@@ -20,13 +19,13 @@ jest.mock('@/components/ui/Modal/BackDrop', () => ({
 const mockUsePathname = usePathname as jest.Mock;
 const mockUseRouter = useRouter as jest.Mock;
 const mockUseSearchParams = useSearchParams as jest.Mock;
-const mockPush = jest.fn();
+const mockReplace = jest.fn();
 
 describe('LoginModal returnTo 사용자 시나리오', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     sessionStorage.clear();
-    mockUseRouter.mockReturnValue({ push: mockPush });
+    mockUseRouter.mockReturnValue({ replace: mockReplace });
     mockUsePathname.mockReturnValue('/explore');
     mockUseSearchParams.mockReturnValue(
       new URLSearchParams(
@@ -35,21 +34,20 @@ describe('LoginModal returnTo 사용자 시나리오', () => {
     );
   });
 
-  it('일반 로그인은 현재 pathname과 search params 전체를 복귀 경로로 저장한다', () => {
+  it('일반 로그인은 현재 pathname과 search params 전체를 복귀 경로로 전달한다', () => {
     const handleClose = jest.fn();
 
     render(<LoginModal handleClose={handleClose} />);
 
     screen.getByRole('button', { name: '로그인' }).click();
 
-    expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(
-      '/explore?tab=EXPLORER_WHISKEY&keywords=macallan&regionIds=12',
+    expect(mockReplace).toHaveBeenCalledWith(
+      `/login?returnTo=${encodeURIComponent('/explore?tab=EXPLORER_WHISKEY&keywords=macallan&regionIds=12')}`,
     );
     expect(handleClose).toHaveBeenCalledTimes(1);
-    expect(mockPush).toHaveBeenCalledWith('/login');
   });
 
-  it('명시적인 returnTo가 있으면 현재 URL보다 해당 경로를 우선 저장한다', () => {
+  it('명시적인 returnTo가 있으면 현재 URL보다 해당 경로를 우선 전달한다', () => {
     const handleClose = jest.fn();
 
     render(
@@ -58,10 +56,9 @@ describe('LoginModal returnTo 사용자 시나리오', () => {
 
     screen.getByRole('button', { name: '로그인' }).click();
 
-    expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(
-      '/inquire/register',
+    expect(mockReplace).toHaveBeenCalledWith(
+      `/login?returnTo=${encodeURIComponent('/inquire/register')}`,
     );
     expect(handleClose).toHaveBeenCalledTimes(1);
-    expect(mockPush).toHaveBeenCalledWith('/login');
   });
 });

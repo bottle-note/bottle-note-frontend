@@ -4,6 +4,7 @@ import { useMemo, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useLoginBridge } from '@/hooks/useLoginBridge';
 import useModalStore from '@/store/modalStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { UserApi } from '@/api/user/user.api';
@@ -11,13 +12,13 @@ import { AdminApi } from '@/api/admin/admin.api';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { ScreenType, ScreenConfig, MenuCategory } from '@/types/Settings';
-import { ROUTES } from '@/constants/routes';
 import { SettingsMainScreen } from './_components/SettingsMainScreen';
 import { SettingsSubScreen } from './_components/SettingsSubScreen';
 import { createScreenConfigs, createMenuCategories } from './config';
 
 export default function Settings() {
   const route = useRouter();
+  const { bridgeToLogin } = useLoginBridge();
   const { logout, user, isLoggedIn } = useAuthSession();
   const { handleModalState, handleCloseModal } = useModalStore();
   const { currentScreen, setCurrentScreen, resetToMain, clearStorage } =
@@ -52,7 +53,7 @@ export default function Settings() {
         confirmBtnName: '로그인',
         handleConfirm: () => {
           handleCloseModal();
-          route.push(ROUTES.LOGIN);
+          bridgeToLogin();
         },
       });
       return;
@@ -78,7 +79,7 @@ export default function Settings() {
   };
 
   const handleLogin = () => {
-    route.push(ROUTES.LOGIN);
+    bridgeToLogin();
   };
 
   const signOutAndRedirect = async () => {

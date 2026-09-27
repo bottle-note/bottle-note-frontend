@@ -7,7 +7,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
-import { setReturnToUrl, WHISKEY_MBTI_INTRO_PATH } from '@/utils/loginRedirect';
+import { WHISKEY_MBTI_INTRO_PATH } from '@/utils/loginRedirect';
+import { useLoginBridge } from '@/hooks/useLoginBridge';
 
 import styles from '../mbti.module.css';
 import type { MbtiCode } from '../_types';
@@ -32,6 +33,7 @@ type Phase = 'intro' | 'quiz' | 'complete' | 'result';
 export default function MbtiExperience() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { bridgeToLogin } = useLoginBridge();
   const { isLoggedIn, isLoading } = useAuthSession();
   const resultCode = searchParams.get('result') as MbtiCode | null;
   const isShared = searchParams.get('shared') === '1';
@@ -140,8 +142,7 @@ export default function MbtiExperience() {
                 router.replace('/whiskey-mbti');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               } else {
-                setReturnToUrl(WHISKEY_MBTI_INTRO_PATH);
-                router.push(ROUTES.LOGIN);
+                bridgeToLogin({ returnTo: WHISKEY_MBTI_INTRO_PATH });
               }
             }}
             onRestart={() => {

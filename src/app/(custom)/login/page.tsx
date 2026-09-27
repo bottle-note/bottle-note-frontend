@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import Loading from '@/components/ui/Loading/Loading';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
@@ -11,12 +11,10 @@ import { useSocialLogin } from '@/hooks/useSocialLogin';
 import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { restoreAuthSession } from '@/lib/auth/session-store';
-import useStatefulSearchParams from '@/hooks/useStatefulSearchParams';
 import {
   clearReturnToUrl,
-  getPendingReturnToUrl,
   setReturnToUrl,
-  isValidReturnUrl,
+  getReturnToFromSearchParams,
 } from '@/utils/loginRedirect';
 import { getLoginHistoryDirection } from '@/utils/loginHistory';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
@@ -27,29 +25,16 @@ const LOGIN_HISTORY_STATE_KEY = '__bottleNoteLogin';
 
 export default function Login() {
   const router = useRouter();
-  const [returnToParam] = useStatefulSearchParams<string | null>('returnTo');
-  const {
-    startKakaoLogin,
-    startAppleLogin,
-    continueAuthenticatedSession,
-    cancelMbtiLogin,
-  } = useSocialLogin();
+  const returnTo = getReturnToFromSearchParams(useSearchParams());
+  const { startKakaoLogin, startAppleLogin, continueAuthenticatedSession } =
+    useSocialLogin();
   const { isLoggedIn, isLoading } = useAuthSession();
   const hasCheckedInitialSession = useRef(false);
 
   const handleBack = () => {
-    const entry = window.history.state?.[LOGIN_HISTORY_STATE_KEY];
-    const returnTo = entry?.returnTo ?? getPendingReturnToUrl();
-    if (cancelMbtiLogin(returnTo)) return;
-
     clearReturnToUrl();
     consumeLoginTrigger();
-    // 쿼리 진입은 replace, 저장소를 사용하는 모달 진입은 push 방식이다.
-    if (returnToParam === null && entry?.hasPreviousPage) {
-      router.back();
-    } else {
-      router.replace(returnTo || ROUTES.HOME);
-    }
+    router.replace(returnTo);
   };
 
   useEffect(() => {
@@ -70,15 +55,8 @@ export default function Login() {
       }
     }
 
-    // 쿼리가 있으면 우선하며, 잘못된 쿼리로 과거 목적지가 재사용되지 않게 한다.
-    const returnTo =
-      returnToParam !== null
-        ? isValidReturnUrl(returnToParam)
-          ? returnToParam
-          : null
-        : entry?.returnTo ?? getPendingReturnToUrl();
     clearReturnToUrl();
-    if (returnTo) setReturnToUrl(returnTo);
+    setReturnToUrl(returnTo);
 
     if (isLoggedIn) {
       void continueAuthenticatedSession();
@@ -89,19 +67,12 @@ export default function Login() {
       {
         ...window.history.state,
         [LOGIN_HISTORY_STATE_KEY]: {
-          returnTo,
           hasPreviousPage: entry?.hasPreviousPage ?? window.history.length > 1,
         },
       },
       '',
     );
-  }, [
-    continueAuthenticatedSession,
-    isLoggedIn,
-    isLoading,
-    returnToParam,
-    router,
-  ]);
+  }, [continueAuthenticatedSession, isLoggedIn, isLoading, returnTo, router]);
 
   useEffect(() => {
     const handlePageShow = (event: PageTransitionEvent) => {

@@ -2,11 +2,9 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/ui/Button/Button';
-import { ROUTES } from '@/constants/routes';
 import BackDrop from '@/components/ui/Modal/BackDrop';
-import { setReturnToUrl } from '@/utils/loginRedirect';
+import { useLoginBridge } from '@/hooks/useLoginBridge';
 
 interface Props {
   handleClose: () => void;
@@ -14,17 +12,11 @@ interface Props {
 }
 
 function LoginModal({ handleClose, returnTo }: Props) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const { bridgeToLogin } = useLoginBridge();
 
   const handleLoginClick = () => {
-    const queryString = searchParams.toString();
-    const currentUrl = `${pathname}${queryString ? `?${queryString}` : ''}`;
-
     handleClose();
-    setReturnToUrl(returnTo ?? currentUrl);
-    router.push(ROUTES.LOGIN);
+    bridgeToLogin({ returnTo });
   };
 
   return (
