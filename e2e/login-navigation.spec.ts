@@ -1,4 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
+import type { AgreementStatusResponse } from '@/api/agreement/types';
+import type { ClientSession } from '@/lib/auth/session-store';
 
 async function enterLogin(page: Page, returnTo?: string) {
   await page.goto('/settings');
@@ -41,6 +43,123 @@ async function expectHomeScreen(page: Page) {
   await expect(page.getByRole('button', { name: /카카오 로그인/ })).toHaveCount(
     0,
   );
+}
+
+for (const agreementRequired of [false, true]) {
+  test(`MBTI 결과가 웹 카카오 ${agreementRequired ? '신규가입·약관 동의' : '기존 회원 로그인'} 후 유지된다`, async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    // 인증 응답만 주입하고 질문 응답·결과 계산·SDK·복귀 화면은 실제 흐름으로 확인한다.
+    const session: ClientSession = {
+      accessToken: 'e2e-access-token',
+      user: {
+        userId: 1,
+        sub: 'e2e@bottle-note.com',
+        profile: null,
+        roles: 'ROLE_USER',
+      },
+    };
+    let loggedIn = false;
+    await page.route('**/api/auth/session', (route) =>
+      route.fulfill({
+        status: loggedIn ? 200 : 401,
+        json: loggedIn ? session : { message: 'No refresh token' },
+      }),
+    );
+    await page.route('**/api/auth/login', (route) => {
+      loggedIn = true;
+      return route.fulfill({ json: { ...session, agreementRequired } });
+    });
+    await page.route('**/bottle-api/v1/blocks/ids', (route) =>
+      route.fulfill({ json: { errors: [], data: [] } }),
+    );
+    const status: AgreementStatusResponse = {
+      eligible: false,
+      items: [
+        { type: 'TERMS_OF_SERVICE', required: true, agreed: false },
+        { type: 'PRIVACY_COLLECTION_USE', required: true, agreed: false },
+        { type: 'MARKETING', required: false, agreed: false },
+      ],
+    };
+    await page.route('**/bottle-api/v2/agreements/status', (route) =>
+      route.fulfill({ json: { errors: [], data: status } }),
+    );
+    await page.route('**/bottle-api/v2/agreements', (route) =>
+      route.fulfill({
+        json: {
+          errors: [],
+          data: {
+            ...status,
+            eligible: true,
+            items: status.items.map((item) => ({
+              ...item,
+              agreed: item.required,
+            })),
+          },
+        },
+      }),
+    );
+    await page.goto('/whiskey-mbti');
+    await page
+      .getByRole('button', { name: '테스트 시작하기', exact: true })
+      .click();
+    for (let i = 0; i < 20; i += 1) {
+      await page
+        .getByRole('button')
+        .filter({ has: page.locator('b', { hasText: /^A$/ }) })
+        .click();
+      if (i < 19) {
+        await expect(
+          page.locator('p').filter({
+            has: page.locator('span', {
+              hasText: new RegExp(`^${String(i + 2).padStart(2, '0')}$`),
+            }),
+          }),
+        ).toBeVisible();
+      } else {
+        await expect(
+          page.getByRole('button', { name: '결과 보기', exact: true }),
+        ).toBeVisible();
+      }
+    }
+    await page.getByRole('button', { name: '결과 보기', exact: true }).click();
+    await page.getByRole('button', { name: '로그인', exact: true }).click();
+    await expect(page).toHaveURL(/\/login\?returnTo=/);
+    const returnTo = new URL(page.url()).searchParams.get('returnTo');
+    expect(returnTo).toBe('/whiskey-mbti?result=ESTJ-A');
+    const callback = new URL('/oauth/kakao', page.url());
+    await page.route('https://kauth.kakao.com/**', (route) => {
+      const request = new URL(route.request().url());
+      callback.searchParams.set(
+        'state',
+        request.searchParams.get('state') ?? '',
+      );
+      callback.searchParams.set('code', 'e2e-oauth-code');
+      return route.fulfill({
+        status: 302,
+        headers: { Location: callback.href },
+      });
+    });
+    await page.getByRole('button', { name: /카카오 로그인/ }).click();
+    if (agreementRequired) {
+      await expect(page).toHaveURL(/\/agreements\?returnTo=/);
+      expect(new URL(page.url()).searchParams.get('returnTo')).toBe(returnTo);
+      await page.getByText('[필수] 이용약관 동의', { exact: true }).click();
+      await page
+        .getByText('[필수] 개인정보 수집·이용 동의', { exact: true })
+        .click();
+      await page
+        .getByRole('button', { name: '동의하고 시작하기', exact: true })
+        .click();
+    }
+    await expect(page).toHaveURL(new URL(returnTo!, callback.origin).href);
+    await expect(page.getByText('ESTJ-A', { exact: false })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: '친구에게 결과 공유하기', exact: true }),
+    ).toBeVisible();
+    expect(await getBrowserHistoryPaths(page)).not.toContain('/login');
+  });
 }
 
 test('로그인을 취소하면 진입했던 설정 화면으로 돌아간다', async ({ page }) => {
