@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import AppStorePromptBanner from './AppStorePromptBanner';
 import {
   APP_STORE_PROMPT_SESSION_KEY,
@@ -26,6 +27,7 @@ const browserStorage = {
 
 function AppStorePrompt() {
   const pathname = usePathname();
+  const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
   const [mobileOperatingSystem, setMobileOperatingSystem] =
     useState<MobileOperatingSystem | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -55,7 +57,10 @@ function AppStorePrompt() {
   }, []);
 
   useEffect(() => {
-    if (!isInitialized || !mobileOperatingSystem || window.isInApp === true) {
+    if (!isInitialized || isAuthLoading) return;
+
+    if (!isLoggedIn || !mobileOperatingSystem || window.isInApp === true) {
+      setIsOpen(false);
       return;
     }
 
@@ -89,9 +94,17 @@ function AppStorePrompt() {
 
     setHasShownInSession(true);
     setIsOpen(true);
-  }, [hasShownInSession, isInitialized, mobileOperatingSystem, pathname]);
+  }, [
+    hasShownInSession,
+    isAuthLoading,
+    isInitialized,
+    isLoggedIn,
+    mobileOperatingSystem,
+    pathname,
+  ]);
 
   if (
+    !isLoggedIn ||
     !isOpen ||
     !mobileOperatingSystem ||
     !isAppStorePromptDetailRoute(pathname)
