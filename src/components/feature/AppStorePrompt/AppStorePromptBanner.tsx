@@ -30,15 +30,15 @@ function AppStorePromptBanner({
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-13 font-bold text-fg-neutral">
-          앱에서 이어서 보세요
+          앱에서 더 편하게 둘러보세요
         </p>
         <p className="mt-2 hidden truncate text-11 text-fg-neutral-muted min-[360px]:block">
-          위스키 기록을 이어서 확인해요
+          관심 있는 술과 기록을 한곳에서 관리해요
         </p>
       </div>
 
       <Button
-        btnName="앱에서 보기"
+        btnName="앱에서 열기"
         size="md"
         fullWidth={false}
         onClick={onAction}
