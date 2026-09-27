@@ -4,9 +4,11 @@ export const APP_STORE_URLS = {
     'https://play.google.com/store/apps/details?id=com.bottlenote.official.app',
 } as const;
 
-export const APP_STORE_PROMPT_DELAY_MS = 60_000;
 export const APP_STORE_PROMPT_PREFERENCE_KEY = 'bn_app_store_prompt_preference';
 export const APP_STORE_PROMPT_SESSION_KEY = 'bn_app_store_prompt_shown';
+export const APP_STORE_PROMPT_DETAIL_VIEW_COUNT_KEY =
+  'bn_app_store_prompt_detail_view_count';
+export const APP_STORE_PROMPT_VIEW_THRESHOLD = 3;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const FIRST_DISMISSAL_COOLDOWN_MS = 7 * DAY_MS;
@@ -29,23 +31,64 @@ const DEFAULT_PREFERENCE: AppStorePromptPreference = {
   disabled: false,
 };
 
-const LIST_PATHS = new Set(['/explore', '/search', '/curation']);
-const SEARCH_DETAIL_PATH = /^\/search\/[^/]+\/[^/]+(?:\/reviews)?$/;
+const SEARCH_DETAIL_PATH = /^\/search\/[^/]+\/[^/]+$/;
 const REVIEW_DETAIL_PATH = /^\/review\/(?!register$|modify$)[^/]+$/;
 const CURATION_DETAIL_PATH = /^\/curation\/[^/]+$/;
+const IMPORT_CLEARANCE_DETAIL_PATH =
+  /^\/import-clearance\/(?:alcohol|importer)\/[^/]+$/;
 
 const normalizePathname = (pathname: string) =>
   pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
 
-export const isAppStorePromptRoute = (pathname: string): boolean => {
+export const isAppStorePromptDetailRoute = (pathname: string): boolean => {
   const normalizedPathname = normalizePathname(pathname);
 
   return (
-    LIST_PATHS.has(normalizedPathname) ||
     SEARCH_DETAIL_PATH.test(normalizedPathname) ||
     REVIEW_DETAIL_PATH.test(normalizedPathname) ||
-    CURATION_DETAIL_PATH.test(normalizedPathname)
+    CURATION_DETAIL_PATH.test(normalizedPathname) ||
+    IMPORT_CLEARANCE_DETAIL_PATH.test(normalizedPathname)
   );
+};
+
+interface DetailViewStorage {
+  getItem: Storage['getItem'];
+  setItem: Storage['setItem'];
+}
+
+const readAppStorePromptDetailViewCount = (
+  storage: Pick<DetailViewStorage, 'getItem'>,
+): number => {
+  try {
+    const rawCount = storage.getItem(APP_STORE_PROMPT_DETAIL_VIEW_COUNT_KEY);
+    if (rawCount === null) return 0;
+
+    const parsedCount = Number(rawCount);
+    if (!Number.isInteger(parsedCount) || parsedCount < 0) return 0;
+
+    return Math.min(parsedCount, APP_STORE_PROMPT_VIEW_THRESHOLD);
+  } catch {
+    return 0;
+  }
+};
+
+export const incrementAppStorePromptDetailViewCount = (
+  storage: DetailViewStorage,
+  currentSessionCount = 0,
+): number => {
+  const nextCount = Math.min(
+    Math.max(readAppStorePromptDetailViewCount(storage), currentSessionCount) +
+      1,
+    APP_STORE_PROMPT_VIEW_THRESHOLD,
+  );
+
+  try {
+    storage.setItem(APP_STORE_PROMPT_DETAIL_VIEW_COUNT_KEY, String(nextCount));
+  } catch {
+    // The mounted session count remains available when storage is restricted.
+  }
+
+  return nextCount;
 };
 
 interface NavigatorInfo {

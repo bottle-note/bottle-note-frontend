@@ -2,17 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import PromptModal from '@/components/ui/Modal/PromptModal';
-import useModalStore from '@/store/modalStore';
+import AppStorePromptBanner from './AppStorePromptBanner';
 import {
-  APP_STORE_PROMPT_DELAY_MS,
   APP_STORE_PROMPT_SESSION_KEY,
+  APP_STORE_PROMPT_VIEW_THRESHOLD,
   APP_STORE_URLS,
   canShowAppStorePrompt,
   createDismissedPreference,
   createStoreClickedPreference,
   detectMobileOperatingSystem,
-  isAppStorePromptRoute,
+  incrementAppStorePromptDetailViewCount,
+  isAppStorePromptDetailRoute,
   readAppStorePromptPreference,
   writeAppStorePromptPreference,
   type MobileOperatingSystem,
@@ -24,29 +24,15 @@ const browserStorage = {
     window.localStorage.setItem(key, value),
 };
 
-const isTextInputActive = (): boolean => {
-  const activeElement = document.activeElement;
-  if (!(activeElement instanceof HTMLElement)) return false;
-
-  return (
-    ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeElement.tagName) ||
-    activeElement.isContentEditable
-  );
-};
-
-const isAnotherModalOpen = (): boolean => {
-  const modalRoot = document.getElementById('modal');
-  return Boolean(modalRoot?.childElementCount);
-};
-
 function AppStorePrompt() {
   const pathname = usePathname();
-  const { state, loginState } = useModalStore();
   const [mobileOperatingSystem, setMobileOperatingSystem] =
     useState<MobileOperatingSystem | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [hasShownInSession, setHasShownInSession] = useState(false);
-  const activeDurationRef = useRef(0);
+  const countedPathnameRef = useRef<string | null>(null);
+  const detailViewCountRef = useRef(0);
 
   useEffect(() => {
     setMobileOperatingSystem(
@@ -64,77 +50,54 @@ function AppStorePrompt() {
     } catch {
       setHasShownInSession(false);
     }
+
+    setIsInitialized(true);
   }, []);
 
   useEffect(() => {
-    if (
-      !mobileOperatingSystem ||
-      !isAppStorePromptRoute(pathname) ||
-      isOpen ||
-      hasShownInSession
-    ) {
-      return undefined;
+    if (!isInitialized || !mobileOperatingSystem || window.isInApp === true) {
+      return;
     }
 
+    if (countedPathnameRef.current === pathname) return;
+    countedPathnameRef.current = pathname;
+
+    if (!isAppStorePromptDetailRoute(pathname)) {
+      setIsOpen(false);
+      return;
+    }
+
+    if (hasShownInSession) return;
+
+    const now = Date.now();
     const preference = readAppStorePromptPreference(browserStorage);
-    if (!canShowAppStorePrompt(preference, Date.now())) return undefined;
+    if (!canShowAppStorePrompt(preference, now)) return;
 
-    let lastTickAt = Date.now();
+    const detailViewCount = incrementAppStorePromptDetailViewCount(
+      browserStorage,
+      detailViewCountRef.current,
+    );
+    detailViewCountRef.current = detailViewCount;
 
-    const resetLastTickAt = () => {
-      lastTickAt = Date.now();
-    };
+    if (detailViewCount < APP_STORE_PROMPT_VIEW_THRESHOLD) return;
 
-    const intervalId = window.setInterval(() => {
-      const now = Date.now();
-      const elapsedSinceLastTick = now - lastTickAt;
-      lastTickAt = now;
+    try {
+      sessionStorage.setItem(APP_STORE_PROMPT_SESSION_KEY, 'true');
+    } catch {
+      // Local state still prevents duplicate prompts in this mounted session.
+    }
 
-      if (
-        document.visibilityState !== 'visible' ||
-        window.isInApp === true ||
-        state.isShowModal ||
-        loginState.isShowLoginModal ||
-        isTextInputActive() ||
-        isAnotherModalOpen()
-      ) {
-        return;
-      }
+    setHasShownInSession(true);
+    setIsOpen(true);
+  }, [hasShownInSession, isInitialized, mobileOperatingSystem, pathname]);
 
-      activeDurationRef.current += elapsedSinceLastTick;
-      if (activeDurationRef.current < APP_STORE_PROMPT_DELAY_MS) return;
-
-      const latestPreference = readAppStorePromptPreference(browserStorage);
-      if (!canShowAppStorePrompt(latestPreference, now)) return;
-
-      try {
-        sessionStorage.setItem(APP_STORE_PROMPT_SESSION_KEY, 'true');
-      } catch {
-        // Local state still prevents duplicate prompts in this mounted session.
-      }
-
-      setHasShownInSession(true);
-      setIsOpen(true);
-    }, 1_000);
-
-    document.addEventListener('visibilitychange', resetLastTickAt);
-    window.addEventListener('focus', resetLastTickAt);
-
-    return () => {
-      window.clearInterval(intervalId);
-      document.removeEventListener('visibilitychange', resetLastTickAt);
-      window.removeEventListener('focus', resetLastTickAt);
-    };
-  }, [
-    hasShownInSession,
-    isOpen,
-    loginState.isShowLoginModal,
-    mobileOperatingSystem,
-    pathname,
-    state.isShowModal,
-  ]);
-
-  if (!isOpen || !mobileOperatingSystem) return null;
+  if (
+    !isOpen ||
+    !mobileOperatingSystem ||
+    !isAppStorePromptDetailRoute(pathname)
+  ) {
+    return null;
+  }
 
   const handleClose = () => {
     const currentPreference = readAppStorePromptPreference(browserStorage);
@@ -156,13 +119,7 @@ function AppStorePrompt() {
   };
 
   return (
-    <PromptModal
-      mainText="앱에서 더 편리하게 이용해보세요."
-      subText="BottleNote 앱에서 위스키 기록을 이어가세요."
-      actionText="앱에서 시작하기"
-      onAction={handleStoreClick}
-      onClose={handleClose}
-    />
+    <AppStorePromptBanner onAction={handleStoreClick} onClose={handleClose} />
   );
 }
 
