@@ -7,13 +7,16 @@ import { NotificationSettings } from './NotificationSettings';
 
 const { replace, auth } = vi.hoisted(() => ({
   replace: vi.fn(),
-  auth: { isLoggedIn: true },
+  auth: { isLoggedIn: true, isLoading: false },
 }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace, back: vi.fn() }),
 }));
 vi.mock('@/hooks/auth/useAuthSession', () => ({
-  useAuthSession: () => ({ isLoggedIn: auth.isLoggedIn, isLoading: false }),
+  useAuthSession: () => ({
+    isLoggedIn: auth.isLoggedIn,
+    isLoading: auth.isLoading,
+  }),
 }));
 vi.mock('@/api/notification/notification.api', () => ({
   NotificationSettingsApi: { getSettings: vi.fn(), updateSettings: vi.fn() },
@@ -76,7 +79,9 @@ function renderPage() {
 describe('알림 수신 설정', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.scrollTo = vi.fn();
     auth.isLoggedIn = true;
+    auth.isLoading = false;
     vi.mocked(NotificationSettingsApi.getSettings).mockResolvedValue(
       response(),
     );
@@ -97,86 +102,193 @@ describe('알림 수신 설정', () => {
     );
   });
 
-  it('서버 그룹과 값을 보여주고 전체 변경을 한 번에 저장해 갱신한다', async () => {
-    renderPage();
-    expect(await screen.findByText('프로그램 소식')).toBeInTheDocument();
-    expect(screen.getByText('3개 중 1개 켜짐')).toBeInTheDocument();
-    fireEvent.click(
-      screen.getByRole('checkbox', { name: '전체 알림 일괄 변경' }),
+  it('설정을 불러오는 동안 화면 형태를 보여주고 응답 후 실제 항목을 표시한다', async () => {
+    let resolveSettings!: (value: ReturnType<typeof response>) => void;
+    vi.mocked(NotificationSettingsApi.getSettings).mockReturnValue(
+      new Promise((resolve) => {
+        resolveSettings = resolve;
+      }),
     );
-    expect(screen.getByText('3개 중 3개 켜짐')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: '2개 변경사항 저장' }));
+
+    renderPage();
+    expect(
+      screen.getByRole('status', { name: '알림 설정을 불러오는 중입니다.' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('switch', { name: '새 팔로워' })).toBeNull();
+
+    resolveSettings(response());
+    fireEvent.click(
+      await screen.findByRole('button', { name: '리뷰와 팔로우 펼치기' }),
+    );
+    await waitFor(() =>
+      expect(screen.getByRole('switch', { name: '새 팔로워' })).toBeVisible(),
+    );
+    expect(
+      screen.queryByRole('status', { name: '알림 설정을 불러오는 중입니다.' }),
+    ).toBeNull();
+  });
+
+  it('전체 토글은 해당 항목을 한 요청으로 바로 저장한다', async () => {
+    renderPage();
+    expect(await screen.findByText('프로그램')).toBeInTheDocument();
+    expect(screen.getByText('3개 중 1개 켜짐')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('checkbox', { name: '전체 알림 변경' }));
     await waitFor(() =>
       expect(NotificationSettingsApi.updateSettings).toHaveBeenCalledWith({
         settings: [
+          { eventAction: 'REVIEW_LIKE_ADD', enabled: true },
           { eventAction: 'FOLLOW_CREATE', enabled: true },
           { eventAction: 'PROGRAM_OPEN', enabled: true },
         ],
       }),
     );
-    expect(
-      await screen.findByText('변경사항을 저장했어요'),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: /변경사항 저장/ }),
-    ).not.toBeInTheDocument();
+    expect(await screen.findByText('3개 중 3개 켜짐')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /변경 저장/ })).toBeNull();
   });
 
-  it('처음에는 모든 항목이 보이고, 그룹을 접어도 일괄 토글을 유지하며 다시 펼칠 수 있다', async () => {
+  it('처음에는 모든 그룹이 닫히고, 그룹 토글은 닫힌 상태에서도 동작한다', async () => {
     renderPage();
+    await screen.findByRole('button', { name: '프로그램 펼치기' });
     expect(
-      await screen.findByRole('switch', { name: '새 프로그램' }),
-    ).toBeVisible();
-    fireEvent.click(screen.getByRole('button', { name: '프로그램 소식 접기' }));
+      screen.getByRole('button', { name: '리뷰와 팔로우 펼치기' }),
+    ).toHaveAttribute('aria-expanded', 'false');
     expect(
       screen.queryByRole('switch', { name: '새 프로그램' }),
     ).not.toBeInTheDocument();
     const groupToggle = screen.getByRole('checkbox', {
-      name: '프로그램 소식 전체 변경',
+      name: '프로그램 전체 변경',
     });
     fireEvent.click(groupToggle);
-    expect(groupToggle).toHaveAttribute('aria-checked', 'true');
+    await waitFor(() =>
+      expect(NotificationSettingsApi.updateSettings).toHaveBeenCalledWith({
+        settings: [{ eventAction: 'PROGRAM_OPEN', enabled: true }],
+      }),
+    );
+    await waitFor(() =>
+      expect(groupToggle).toHaveAttribute('aria-checked', 'true'),
+    );
+    fireEvent.click(screen.getByRole('button', { name: '프로그램 펼치기' }));
+    expect(screen.getByRole('switch', { name: '새 프로그램' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+    fireEvent.click(screen.getByRole('button', { name: '프로그램 접기' }));
+    expect(
+      screen.queryByRole('switch', { name: '새 프로그램' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('그룹과 항목은 문구 맵을 쓰고 새 서버 키는 서버 표시명을 사용한다', async () => {
+    vi.mocked(NotificationSettingsApi.getSettings).mockResolvedValue(
+      response([
+        ...groups,
+        {
+          group: 'NEW_GROUP',
+          displayName: '새 알림 그룹',
+          settings: [
+            {
+              eventAction: 'NEW_ACTION',
+              displayName: '새 알림 항목',
+              description: '',
+              defaultEnabled: true,
+              enabled: true,
+            },
+          ],
+        },
+      ]),
+    );
+
+    renderPage();
+    expect(
+      await screen.findByRole('button', { name: '프로그램 펼치기' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('프로그램 소식')).toBeNull();
     fireEvent.click(
-      screen.getByRole('button', { name: '프로그램 소식 펼치기' }),
+      screen.getByRole('button', { name: '리뷰와 팔로우 펼치기' }),
+    );
+    expect(
+      screen.getByRole('switch', { name: '내 리뷰에 달린 좋아요' }),
+    ).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole('button', { name: '새 알림 그룹 펼치기' }),
+    );
+    expect(
+      screen.getByRole('switch', { name: '새 알림 항목' }),
+    ).toBeInTheDocument();
+  });
+
+  it('항목이 없는 그룹은 빈 저장 요청을 보내지 않는다', async () => {
+    vi.mocked(NotificationSettingsApi.getSettings).mockResolvedValue(
+      response([
+        groups[0],
+        { group: 'PROGRAM', displayName: '프로그램 소식', settings: [] },
+      ]),
+    );
+    renderPage();
+    expect(
+      await screen.findByRole('checkbox', { name: '프로그램 전체 변경' }),
+    ).toBeDisabled();
+    expect(NotificationSettingsApi.updateSettings).not.toHaveBeenCalled();
+  });
+
+  it('개별 토글은 해당 항목 하나만 즉시 저장하고 응답 전에도 값을 반영한다', async () => {
+    let resolveUpdate!: (value: ReturnType<typeof response>) => void;
+    vi.mocked(NotificationSettingsApi.updateSettings).mockReturnValue(
+      new Promise((resolve) => {
+        resolveUpdate = resolve;
+      }),
+    );
+    renderPage();
+    fireEvent.click(
+      await screen.findByRole('button', { name: '프로그램 펼치기' }),
+    );
+    fireEvent.click(screen.getByRole('switch', { name: '새 프로그램' }));
+    await waitFor(() =>
+      expect(NotificationSettingsApi.updateSettings).toHaveBeenCalledWith({
+        settings: [{ eventAction: 'PROGRAM_OPEN', enabled: true }],
+      }),
     );
     expect(screen.getByRole('switch', { name: '새 프로그램' })).toHaveAttribute(
       'aria-checked',
       'true',
     );
+    expect(screen.getByRole('switch', { name: '새 프로그램' })).toBeDisabled();
+    resolveUpdate(
+      response(
+        groups.map((group) => ({
+          ...group,
+          settings: group.settings.map((item) => ({
+            ...item,
+            enabled: item.eventAction === 'PROGRAM_OPEN' || item.enabled,
+          })),
+        })),
+      ),
+    );
+    await waitFor(() =>
+      expect(screen.getByRole('switch', { name: '새 프로그램' })).toBeEnabled(),
+    );
   });
 
-  it('개별 변경하고 되돌리면 저장 요청이 없다', async () => {
-    renderPage();
-    await screen.findByRole('switch', { name: '새 프로그램' });
-    fireEvent.click(screen.getByRole('switch', { name: '새 프로그램' }));
-    expect(
-      screen.getByRole('button', { name: '1개 변경사항 저장' }),
-    ).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: '되돌리기' }));
-    expect(
-      screen.queryByRole('button', { name: /변경사항 저장/ }),
-    ).not.toBeInTheDocument();
-    expect(NotificationSettingsApi.updateSettings).not.toHaveBeenCalled();
-  });
-
-  it('저장 실패 때 편집 값을 보존하고 다시 시도할 수 있다', async () => {
+  it('저장 실패 때 이전 값으로 되돌리고 다시 시도할 수 있다', async () => {
     vi.mocked(NotificationSettingsApi.updateSettings).mockRejectedValueOnce(
       new Error('request failed'),
     );
     renderPage();
-    await screen.findByText('프로그램 소식');
+    fireEvent.click(
+      await screen.findByRole('button', { name: '리뷰와 팔로우 펼치기' }),
+    );
     fireEvent.click(screen.getByRole('switch', { name: '새 팔로워' }));
-    fireEvent.click(screen.getByRole('button', { name: '1개 변경사항 저장' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      '변경사항을 저장하지 못했어요',
+      '알림 설정을 저장하지 못했습니다',
     );
     expect(screen.getByRole('switch', { name: '새 팔로워' })).toHaveAttribute(
       'aria-checked',
-      'true',
+      'false',
     );
-    expect(
-      screen.getByRole('button', { name: '1개 변경사항 저장' }),
-    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('switch', { name: '새 팔로워' }));
+    await waitFor(() =>
+      expect(NotificationSettingsApi.updateSettings).toHaveBeenCalledTimes(2),
+    );
   });
 
   it('비로그인 직접 진입은 API를 조회하지 않고 복귀 경로가 있는 로그인으로 보낸다', async () => {

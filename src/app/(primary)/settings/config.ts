@@ -2,6 +2,7 @@ import { ScreenConfig, MenuCategory, ScreenType } from '@/types/Settings';
 import { ROUTES } from '@/constants/routes';
 import BlockManagement from './_components/BlockManagement';
 import ThemeSettings from './_components/ThemeSettings';
+import { notificationSettingsCopy } from './notifications/_components/notificationSettingsCopy';
 
 interface CreateScreenConfigsParams {
   isLoggedIn: boolean;
@@ -90,7 +91,7 @@ export const createMenuCategories = (
           action: () => onScreenNavigate('blockManagement'),
         },
         {
-          text: '알림 수신 설정',
+          text: notificationSettingsCopy.title,
           link: ROUTES.SETTINGS.NOTIFICATIONS,
         },
       ],

@@ -99,6 +99,10 @@
 | 리뷰 입력·풍미 기록               | `src/app/(primary)/review/_components/form/`            |
 | 하단 메뉴·고정 행동               | `Navbar`, `StickyBottomCta`                             |
 | 확인·알림 / 선택 시트 / 복합 필터 | `Modal` / `BottomSheet` / `SideFilterDrawer`            |
+| 접기·펼치기                       | `AnimatedCollapse`의 전환 방식과 인접 화면의 토글 버튼  |
+| 초기 데이터 로딩                  | `SkeletonBase`와 해당 화면의 콘텐츠 구조                |
+
+접기·펼치기의 버튼 위치와 콘텐츠 구성은 화면에 맞게 정한다. 높이 전환이 맞으면 `AnimatedCollapse`를 재사용하고, 다른 구성이 필요하면 같은 전환 속도·모션 축소 설정·숨김 접근성을 적용한다. 조회 중에는 실제 콘텐츠 배치를 닮은 스켈레톤을 보여주고, 조회 완료 후 콘텐츠로 교체한다.
 
 ### 버튼
 
