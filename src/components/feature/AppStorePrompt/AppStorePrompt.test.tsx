@@ -5,7 +5,7 @@ import AppStorePrompt from './AppStorePrompt';
 import {
   APP_STORE_PROMPT_DETAIL_VIEW_COUNT_KEY,
   APP_STORE_PROMPT_SESSION_KEY,
-} from './appStorePrompt';
+} from './appStorePromptPolicy';
 
 jest.mock('next/navigation', () => ({
   usePathname: jest.fn(),

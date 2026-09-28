@@ -10,7 +10,7 @@ import {
   isAppStorePromptDetailRoute,
   readAppStorePromptPreference,
   type AppStorePromptPreference,
-} from './appStorePrompt';
+} from './appStorePromptPolicy';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const NOW = new Date('2026-09-16T00:00:00.000Z').getTime();

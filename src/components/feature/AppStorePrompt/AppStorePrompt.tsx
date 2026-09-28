@@ -17,7 +17,7 @@ import {
   readAppStorePromptPreference,
   writeAppStorePromptPreference,
   type MobileOperatingSystem,
-} from './appStorePrompt';
+} from './appStorePromptPolicy';
 
 const browserStorage = {
   getItem: (key: string) => window.localStorage.getItem(key),
