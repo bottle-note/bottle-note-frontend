@@ -83,27 +83,22 @@ export function NotificationSettings() {
   }
 
   return (
-    <section className="px-16 pb-[calc(110px+var(--safe-area-bottom))] pt-30">
-      <div className="px-6 pb-24">
-        <p className="mb-10 text-12 font-semibold text-fg-brand">
-          내 알림 관리
-        </p>
-        <h1 className="mb-12 text-27 font-bold tracking-[-0.03em]">
-          알림 수신 설정
-        </h1>
-        <p className="text-14 leading-[24px] text-fg-neutral-muted">
+    <section className="px-20 pb-[calc(110px+var(--safe-area-bottom))] pt-28">
+      <div>
+        <h1 className="text-20 font-bold">알림 수신 설정</h1>
+        <p className="mt-8 text-13 leading-21 text-fg-neutral-muted">
           내 알림함에 담을 소식을 골라주세요.
         </p>
       </div>
 
       {isPending ? (
-        <p role="status" className="px-6 py-32 text-14 text-fg-neutral-muted">
+        <p role="status" className="py-32 text-14 text-fg-neutral-muted">
           알림 설정을 불러오고 있어요.
         </p>
       ) : isError ? (
         <div
           role="alert"
-          className="rounded-2xl border border-stroke-neutral-subtle bg-bg-neutral-weak px-20 py-24 text-14"
+          className="mt-24 rounded-xl border border-stroke-neutral-subtle bg-bg-neutral-weak px-20 py-24 text-14"
         >
           <p>알림 설정을 불러오지 못했어요.</p>
           <button
@@ -115,15 +110,15 @@ export function NotificationSettings() {
           </button>
         </div>
       ) : items.length === 0 ? (
-        <p className="rounded-2xl border border-stroke-neutral-subtle px-20 py-24 text-14 text-fg-neutral-muted">
+        <p className="mt-24 py-24 text-14 text-fg-neutral-muted">
           설정할 수 있는 알림이 없어요.
         </p>
       ) : (
         <>
-          <div className="flex items-center gap-16 rounded-2xl border border-stroke-brand-weak bg-bg-brand-weak px-20 py-20">
+          <div className="mt-24 flex min-h-76 items-center gap-16 border-y border-stroke-neutral-subtle py-16">
             <div className="min-w-0 flex-1">
-              <strong className="mb-7 block text-16">전체 알림 받기</strong>
-              <span className="text-12 text-fg-neutral-muted">
+              <strong className="block text-15">전체 알림 받기</strong>
+              <span className="mt-4 block text-12 text-fg-neutral-muted">
                 {items.length}개 중 {enabledCount(items)}개 켜짐
               </span>
             </div>
@@ -139,94 +134,87 @@ export function NotificationSettings() {
               <SwitchTrack state={checked(items)} />
             </button>
           </div>
-          <div className="mb-12 mt-28 flex justify-between px-6 text-12 text-fg-neutral-muted">
-            <span>알림 종류</span>
-            <span className="text-11">그룹별로 한 번에 설정할 수 있어요</span>
-          </div>
-          {groups.map((group, index) => {
-            const groupState = checked(group.settings);
-            const isOpen = expanded[group.group] ?? index === 0;
-            return (
-              <section
-                key={group.group}
-                className="mb-14 overflow-hidden rounded-2xl border border-stroke-neutral-subtle bg-bg-neutral-weak"
-              >
-                <div className="flex min-h-[70px] items-center gap-9 px-16">
-                  <button
-                    type="button"
-                    aria-expanded={isOpen}
-                    aria-controls={`notification-group-${group.group}`}
-                    onClick={() =>
-                      setExpanded((previous) => ({
-                        ...previous,
-                        [group.group]: !isOpen,
-                      }))
-                    }
-                    className="flex min-h-44 min-w-0 flex-1 items-center gap-10 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
+          <div className="mt-10">
+            {groups.map((group) => {
+              const groupState = checked(group.settings);
+              const isOpen = expanded[group.group] ?? true;
+              return (
+                <section key={group.group} className="pt-28">
+                  <div className="flex min-h-44 items-center gap-12">
+                    <button
+                      type="button"
+                      aria-label={`${group.displayName} ${isOpen ? '접기' : '펼치기'}`}
+                      aria-expanded={isOpen}
+                      aria-controls={`notification-group-${group.group}`}
+                      onClick={() =>
+                        setExpanded((previous) => ({
+                          ...previous,
+                          [group.group]: !isOpen,
+                        }))
+                      }
+                      className="flex min-h-44 min-w-0 flex-1 items-center gap-8 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
+                    >
+                      <span className="min-w-0 text-13 font-bold text-fg-brand">
+                        {group.displayName}
+                      </span>
+                      <ChevronDown
+                        aria-hidden="true"
+                        size={16}
+                        className={`shrink-0 text-fg-neutral-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-checked={groupState}
+                      aria-label={`${group.displayName} 전체 변경`}
+                      disabled={save.isPending}
+                      onClick={() =>
+                        updateDraft(group.settings, groupState !== 'true')
+                      }
+                      className="flex h-44 w-48 shrink-0 items-center justify-center rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
+                    >
+                      <SwitchTrack state={groupState} />
+                    </button>
+                  </div>
+                  <div
+                    id={`notification-group-${group.group}`}
+                    hidden={!isOpen}
+                    className="pt-8"
                   >
-                    <ChevronDown
-                      aria-hidden="true"
-                      size={16}
-                      className={`shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                    />
-                    <span className="min-w-0 text-15 font-bold">
-                      {group.displayName}
-                    </span>
-                    <span className="text-11 text-fg-neutral-muted">
-                      {enabledCount(group.settings)}/{group.settings.length}
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    role="checkbox"
-                    aria-checked={groupState}
-                    aria-label={`${group.displayName} 전체 변경`}
-                    disabled={save.isPending}
-                    onClick={() =>
-                      updateDraft(group.settings, groupState !== 'true')
-                    }
-                    className="flex h-44 w-48 shrink-0 items-center justify-center rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
-                  >
-                    <SwitchTrack state={groupState} />
-                  </button>
-                </div>
-                <div
-                  id={`notification-group-${group.group}`}
-                  hidden={!isOpen}
-                  className="px-16 pb-8"
-                >
-                  {group.settings.map((item) => {
-                    const isOn = enabled(item);
-                    return (
-                      <button
-                        key={item.eventAction}
-                        type="button"
-                        role="switch"
-                        aria-checked={isOn}
-                        aria-label={item.displayName}
-                        disabled={save.isPending}
-                        onClick={() => updateDraft([item], !isOn)}
-                        className="flex min-h-[61px] w-full items-center gap-16 border-t border-stroke-neutral-subtle py-14 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
-                      >
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-14 font-medium leading-[20px]">
-                            {item.displayName}
-                          </span>
-                          {item.description && (
-                            <span className="mt-3 block text-12 leading-[20px] text-fg-neutral-muted">
-                              {item.description}
+                    {group.settings.map((item, index) => {
+                      const isOn = enabled(item);
+                      return (
+                        <button
+                          key={item.eventAction}
+                          type="button"
+                          role="switch"
+                          aria-checked={isOn}
+                          aria-label={item.displayName}
+                          disabled={save.isPending}
+                          onClick={() => updateDraft([item], !isOn)}
+                          className={`flex min-h-64 w-full items-center gap-14 py-12 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring ${index > 0 ? 'border-t border-stroke-neutral-subtle' : ''}`}
+                        >
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-15 font-medium leading-21">
+                              {item.displayName}
                             </span>
-                          )}
-                        </span>
-                        <SwitchTrack state={isOn ? 'true' : 'false'} />
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-            );
-          })}
-          <p className="mt-24 px-6 text-11 leading-[20px] text-fg-neutral-subtle">
+                            {item.description && (
+                              <span className="mt-4 block text-13 leading-20 text-fg-neutral-muted">
+                                {item.description}
+                              </span>
+                            )}
+                          </span>
+                          <SwitchTrack state={isOn ? 'true' : 'false'} />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+          <p className="mt-32 border-t border-stroke-neutral-subtle pt-20 text-13 leading-20 text-fg-neutral-muted">
             설정을 끄면 새 알림은 알림함에 쌓이지 않아요. 기존 알림은
             유지됩니다.
           </p>

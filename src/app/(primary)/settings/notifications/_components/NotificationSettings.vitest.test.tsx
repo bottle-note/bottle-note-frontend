@@ -122,10 +122,32 @@ describe('알림 수신 설정', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('그룹을 펼쳐 개별 변경하고 되돌리면 저장 요청이 없다', async () => {
+  it('처음에는 모든 항목이 보이고, 그룹을 접어도 일괄 토글을 유지하며 다시 펼칠 수 있다', async () => {
     renderPage();
-    await screen.findByText('프로그램 소식');
-    fireEvent.click(screen.getByRole('button', { name: /프로그램 소식/ }));
+    expect(
+      await screen.findByRole('switch', { name: '새 프로그램' }),
+    ).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: '프로그램 소식 접기' }));
+    expect(
+      screen.queryByRole('switch', { name: '새 프로그램' }),
+    ).not.toBeInTheDocument();
+    const groupToggle = screen.getByRole('checkbox', {
+      name: '프로그램 소식 전체 변경',
+    });
+    fireEvent.click(groupToggle);
+    expect(groupToggle).toHaveAttribute('aria-checked', 'true');
+    fireEvent.click(
+      screen.getByRole('button', { name: '프로그램 소식 펼치기' }),
+    );
+    expect(screen.getByRole('switch', { name: '새 프로그램' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+  });
+
+  it('개별 변경하고 되돌리면 저장 요청이 없다', async () => {
+    renderPage();
+    await screen.findByRole('switch', { name: '새 프로그램' });
     fireEvent.click(screen.getByRole('switch', { name: '새 프로그램' }));
     expect(
       screen.getByRole('button', { name: '1개 변경사항 저장' }),
