@@ -89,6 +89,10 @@ export const createMenuCategories = (
           text: '차단 사용자 관리',
           action: () => onScreenNavigate('blockManagement'),
         },
+        {
+          text: '알림 수신 설정',
+          link: ROUTES.SETTINGS.NOTIFICATIONS,
+        },
       ],
     },
     {
