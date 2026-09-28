@@ -12,7 +12,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "test": "jest",
+    "test": "jest && vitest run",
     "test:integration": "vitest run",
     "test:watch": "jest --watch",
     "prepare": "husky",
