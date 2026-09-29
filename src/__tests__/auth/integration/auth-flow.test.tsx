@@ -24,7 +24,7 @@ import OauthKakaoCallbackPage from '@/app/(custom)/oauth/kakao/page';
 import LoginPage from '@/app/(custom)/login/page';
 import { DeviceService } from '@/lib/DeviceService';
 import { setReturnToUrl } from '@/utils/loginRedirect';
-import SettingsClient from '@/app/(primary)/settings/SettingsClient';
+import SettingsPage from '@/app/(primary)/settings/page';
 import Modal from '@/components/ui/Modal/Modal';
 import { useSettingsStore } from '@/store/settingsStore';
 
@@ -520,9 +520,7 @@ describe('Auth business flows', () => {
         React.createElement(
           React.Fragment,
           null,
-          React.createElement(SettingsClient, {
-            showNotificationSettings: false,
-          }),
+          React.createElement(SettingsPage),
           React.createElement(Modal),
         ),
       );

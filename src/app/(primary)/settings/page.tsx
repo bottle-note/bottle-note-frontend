@@ -1,14 +1,222 @@
-import SettingsClient from './SettingsClient';
-import { isDevelopmentApi } from './isDevelopmentApi';
+'use client';
 
-// Read the deployment's API environment for each request, not from the client build.
-export const dynamic = 'force-dynamic';
+import { useMemo, useEffect, useState } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import useModalStore from '@/store/modalStore';
+import { useSettingsStore } from '@/store/settingsStore';
+import { UserApi } from '@/api/user/user.api';
+import { AdminApi } from '@/api/admin/admin.api';
+import { handleWebViewMessage } from '@/utils/flutterUtil';
+import { SubHeader } from '@/components/ui/Navigation/SubHeader';
+import { ScreenType, ScreenConfig, MenuCategory } from '@/types/Settings';
+import { ROUTES } from '@/constants/routes';
+import { SettingsMainScreen } from './_components/SettingsMainScreen';
+import { SettingsSubScreen } from './_components/SettingsSubScreen';
+import {
+  createScreenConfigs,
+  createMenuCategories,
+  isDevelopmentDeployment,
+} from './config';
 
-export default function SettingsPage() {
-  const serverUrlKey = 'NEXT_PUBLIC_SERVER_URL';
+export default function Settings() {
+  const route = useRouter();
+  const { logout, user, isLoggedIn } = useAuthSession();
+  const { handleModalState, handleCloseModal } = useModalStore();
+  const { currentScreen, setCurrentScreen, resetToMain, clearStorage } =
+    useSettingsStore();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdminPermissions = async () => {
+      if (isLoggedIn) {
+        try {
+          const response = await AdminApi.checkPermissions();
+          setIsAdmin(response.data);
+        } catch (error) {
+          console.error('Admin permission check failed:', error);
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
+    };
+
+    checkAdminPermissions();
+  }, [isLoggedIn]);
+
+  const checkAuthAndExecute = (callback: () => void) => {
+    if (!isLoggedIn) {
+      handleModalState({
+        isShowModal: true,
+        type: 'CONFIRM',
+        mainText:
+          '로그인이 필요한 서비스입니다.\n로그인 페이지로 이동하시겠습니까?',
+        confirmBtnName: '로그인',
+        handleConfirm: () => {
+          handleCloseModal();
+          route.push(ROUTES.LOGIN);
+        },
+      });
+      return;
+    }
+    callback();
+  };
+
+  const navigateToScreen = (screen: ScreenType) => {
+    if (screen === 'themeSettings' || screen === 'loginManagement') {
+      setCurrentScreen(screen);
+      return;
+    }
+
+    checkAuthAndExecute(() => setCurrentScreen(screen));
+  };
+
+  const navigateToRoute = (path: string) => {
+    checkAuthAndExecute(() => route.push(path));
+  };
+
+  const navigateBack = () => {
+    resetToMain();
+  };
+
+  const handleLogin = () => {
+    route.push(ROUTES.LOGIN);
+  };
+
+  const signOutAndRedirect = async () => {
+    await logout();
+    clearStorage();
+    handleCloseModal();
+    route.push('/');
+  };
+
+  const handleLogout = async () => {
+    handleModalState({
+      isShowModal: true,
+      type: 'CONFIRM',
+      mainText: `정말 로그아웃하시겠습니까?`,
+      handleConfirm: async () => {
+        try {
+          await signOutAndRedirect();
+        } catch (e) {
+          console.error('로그아웃 중 오류:', e);
+          handleModalState({
+            mainText: '로그아웃 중 오류가 발생했습니다.',
+          });
+        }
+      },
+    });
+  };
+
+  const handleDeleteAccount = async () => {
+    handleModalState({
+      isShowModal: true,
+      type: 'CONFIRM',
+      mainText: `서비스를 탈퇴하시겠습니까?`,
+      handleConfirm: async () => {
+        try {
+          await UserApi.deleteAccount();
+          handleModalState({
+            mainText: `탈퇴가 완료되었습니다.`,
+            handleConfirm: signOutAndRedirect,
+          });
+        } catch (e) {
+          console.error('계정 삭제 중 오류:', e);
+          handleModalState({
+            mainText: '탈퇴 처리 중 오류가 발생했습니다.',
+          });
+        }
+      },
+    });
+  };
+
+  const handleSwitchEnv = (env: 'dev' | 'prod') => {
+    handleWebViewMessage('switchEnv', env);
+    handleCloseModal();
+  };
+
+  const handleEnvSwitchModal = () => {
+    handleModalState({
+      isShowModal: true,
+      type: 'CONFIRM',
+      mainText: '개발 환경으로 전환하시겠습니까?',
+      confirmBtnName: '개발',
+      cancelBtnName: '상용',
+      handleConfirm: () => handleSwitchEnv('dev'),
+      handleCancel: () => handleSwitchEnv('prod'),
+    });
+  };
+
+  const screenConfigs: Record<
+    Exclude<ScreenType, 'main'>,
+    ScreenConfig
+  > = useMemo(
+    () =>
+      createScreenConfigs({
+        isLoggedIn,
+        handleLogin,
+        handleLogout,
+        handleDeleteAccount,
+      }),
+    [isLoggedIn, handleLogin, handleLogout, handleDeleteAccount],
+  );
+
+  const menuCategories: MenuCategory[] = useMemo(
+    () =>
+      createMenuCategories(
+        navigateToScreen,
+        navigateToRoute,
+        handleEnvSwitchModal,
+        user?.userId,
+        isAdmin,
+        isLoggedIn,
+        isDevelopmentDeployment(),
+      ),
+    [navigateToScreen, navigateToRoute, user?.userId, isAdmin, isLoggedIn],
+  );
+
+  const getHeaderTitle = () => {
+    if (currentScreen === 'main') return '보틀노트';
+    return (
+      screenConfigs[currentScreen as Exclude<ScreenType, 'main'>]?.title ||
+      '보틀노트'
+    );
+  };
+
+  const getHeaderLeftOnClick = () => {
+    if (currentScreen === 'main') {
+      return () => route.back();
+    }
+    return navigateBack;
+  };
+
   return (
-    <SettingsClient
-      showNotificationSettings={isDevelopmentApi(process.env[serverUrlKey])}
-    />
+    <main className="flex-1 flex flex-col bg-bg-layer-default text-fg-neutral">
+      <SubHeader>
+        <SubHeader.Left onClick={getHeaderLeftOnClick()}>
+          <Image
+            src="/icon/arrow-left-subcoral.svg"
+            alt="arrowIcon"
+            width={23}
+            height={23}
+          />
+        </SubHeader.Left>
+        <SubHeader.Center>{getHeaderTitle()}</SubHeader.Center>
+      </SubHeader>
+
+      {currentScreen === 'main' ? (
+        <SettingsMainScreen
+          menuCategories={menuCategories}
+          isLoggedIn={isLoggedIn}
+        />
+      ) : (
+        <SettingsSubScreen
+          screenType={currentScreen as Exclude<ScreenType, 'main'>}
+          config={screenConfigs[currentScreen as Exclude<ScreenType, 'main'>]}
+        />
+      )}
+    </main>
   );
 }

@@ -1,7 +1,20 @@
-import { createMenuCategories, createScreenConfigs } from './config';
-import { isDevelopmentApi } from './isDevelopmentApi';
+import {
+  createMenuCategories,
+  createScreenConfigs,
+  isDevelopmentDeployment,
+} from './config';
 
 describe('settings menu config', () => {
+  const originalDeployEnv = process.env.NEXT_PUBLIC_DEPLOY_ENV;
+
+  afterEach(() => {
+    if (originalDeployEnv === undefined) {
+      delete process.env.NEXT_PUBLIC_DEPLOY_ENV;
+    } else {
+      process.env.NEXT_PUBLIC_DEPLOY_ENV = originalDeployEnv;
+    }
+  });
+
   it('화면 테마 메뉴는 라우트 대신 설정 하위 화면을 연다', () => {
     const navigateToScreen = jest.fn();
     const categories = createMenuCategories(
@@ -65,14 +78,15 @@ describe('settings menu config', () => {
   });
 
   it.each([
-    ['https://api.development.bottle-note.com', true],
-    ['https://api.bottle-note.com', false],
+    ['development', true],
+    ['production', false],
+    ['preview', false],
     ['', false],
-    ['invalid-url', false],
   ])(
-    'API 환경 %s에서 개발환경 전용 알림 설정 메뉴 노출: %s',
-    (url, visible) => {
-      expect(isDevelopmentApi(url)).toBe(visible);
+    '배포 환경 %s에서 개발환경 전용 알림 설정 메뉴 노출: %s',
+    (deployEnv, visible) => {
+      process.env.NEXT_PUBLIC_DEPLOY_ENV = deployEnv;
+      expect(isDevelopmentDeployment()).toBe(visible);
       const categories = createMenuCategories(
         jest.fn(),
         jest.fn(),
@@ -80,7 +94,7 @@ describe('settings menu config', () => {
         1,
         false,
         true,
-        isDevelopmentApi(url),
+        isDevelopmentDeployment(),
       );
 
       expect(
@@ -91,7 +105,7 @@ describe('settings menu config', () => {
     },
   );
 
-  it('개발 API여도 비로그인 사용자의 알림 설정 메뉴는 숨긴다', () => {
+  it('개발 배포여도 비로그인 사용자의 알림 설정 메뉴는 숨긴다', () => {
     const categories = createMenuCategories(
       jest.fn(),
       jest.fn(),
@@ -102,6 +116,26 @@ describe('settings menu config', () => {
       true,
     );
 
+    expect(
+      categories
+        .flatMap((category) => category.items)
+        .some((item) => item.link === '/settings/notifications'),
+    ).toBe(false);
+  });
+
+  it('배포 환경값이 없으면 알림 설정 메뉴를 숨긴다', () => {
+    delete process.env.NEXT_PUBLIC_DEPLOY_ENV;
+    const categories = createMenuCategories(
+      jest.fn(),
+      jest.fn(),
+      undefined,
+      1,
+      false,
+      true,
+      isDevelopmentDeployment(),
+    );
+
+    expect(isDevelopmentDeployment()).toBe(false);
     expect(
       categories
         .flatMap((category) => category.items)

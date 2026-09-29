@@ -4,6 +4,9 @@ import BlockManagement from './_components/BlockManagement';
 import ThemeSettings from './_components/ThemeSettings';
 import { notificationSettingsCopy } from './notifications/_components/notificationSettingsCopy';
 
+export const isDevelopmentDeployment = () =>
+  process.env.NEXT_PUBLIC_DEPLOY_ENV === 'development';
+
 interface CreateScreenConfigsParams {
   isLoggedIn: boolean;
   handleLogin: () => void;
