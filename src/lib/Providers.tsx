@@ -7,6 +7,7 @@ import { useAuthInitializer } from '@/hooks/useAuthInitializer';
 import Modal from '@/components/ui/Modal/Modal';
 import { AuthProvider } from '@/lib/auth/AuthProvider';
 import { ThemeProvider } from '@/lib/theme/ThemeProvider';
+import { NotificationRealtimeBridge } from '@/components/domain/notification/NotificationRealtimeBridge';
 import { FocusScrollProvider } from './FocusScrollProvider';
 import { SafeAreaProvider } from './SafeAreaProvider';
 
@@ -39,6 +40,7 @@ export const Providers = ({ children }: Props) => {
           <SafeAreaProvider>
             <FocusScrollProvider>
               <AuthInitializer />
+              <NotificationRealtimeBridge />
               {children}
               <Modal />
               {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
