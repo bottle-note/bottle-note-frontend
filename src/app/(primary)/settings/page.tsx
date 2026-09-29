@@ -14,7 +14,11 @@ import { ScreenType, ScreenConfig, MenuCategory } from '@/types/Settings';
 import { ROUTES } from '@/constants/routes';
 import { SettingsMainScreen } from './_components/SettingsMainScreen';
 import { SettingsSubScreen } from './_components/SettingsSubScreen';
-import { createScreenConfigs, createMenuCategories } from './config';
+import {
+  createScreenConfigs,
+  createMenuCategories,
+  isDevelopmentDeployment,
+} from './config';
 
 export default function Settings() {
   const route = useRouter();
@@ -168,6 +172,7 @@ export default function Settings() {
         user?.userId,
         isAdmin,
         isLoggedIn,
+        isDevelopmentDeployment(),
       ),
     [navigateToScreen, navigateToRoute, user?.userId, isAdmin, isLoggedIn],
   );

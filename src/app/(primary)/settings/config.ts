@@ -2,6 +2,10 @@ import { ScreenConfig, MenuCategory, ScreenType } from '@/types/Settings';
 import { ROUTES } from '@/constants/routes';
 import BlockManagement from './_components/BlockManagement';
 import ThemeSettings from './_components/ThemeSettings';
+import { notificationSettingsCopy } from './notifications/_components/notificationSettingsCopy';
+
+export const isDevelopmentDeployment = () =>
+  process.env.NEXT_PUBLIC_DEPLOY_ENV === 'development';
 
 interface CreateScreenConfigsParams {
   isLoggedIn: boolean;
@@ -56,6 +60,7 @@ export const createMenuCategories = (
   userId?: string | number,
   isAdmin?: boolean,
   isLoggedIn = false,
+  showNotificationSettings = false,
 ): MenuCategory[] => {
   const publicItems = [
     {
@@ -89,6 +94,14 @@ export const createMenuCategories = (
           text: '차단 사용자 관리',
           action: () => onScreenNavigate('blockManagement'),
         },
+        ...(showNotificationSettings
+          ? [
+              {
+                text: notificationSettingsCopy.title,
+                link: ROUTES.SETTINGS.NOTIFICATIONS,
+              },
+            ]
+          : []),
       ],
     },
     {

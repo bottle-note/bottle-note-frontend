@@ -53,6 +53,7 @@ export const ROUTES = {
   SETTINGS: {
     BASE: '/settings',
     MARKETING_CONSENT: '/settings/marketing-consent',
+    NOTIFICATIONS: '/settings/notifications',
   },
   AGREEMENTS: '/agreements',
   LEGAL: {

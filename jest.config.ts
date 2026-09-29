@@ -9,6 +9,11 @@ const config: Config = {
   coverageProvider: 'v8',
   testEnvironment: 'jsdom',
   testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '<rootDir>/.next/',
+    '\\.vitest\\.test\\.[jt]sx?$',
+  ],
   modulePathIgnorePatterns: ['<rootDir>/.next/'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
