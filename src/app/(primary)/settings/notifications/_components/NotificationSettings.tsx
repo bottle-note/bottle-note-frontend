@@ -27,23 +27,34 @@ type AccountSettingsUpdate = NotificationSettingsUpdateRequest & {
 
 function NotificationSettingsSkeleton() {
   return (
-    <div role="status" aria-label={copy.loading} className="mt-24">
+    <div role="status" aria-label={copy.loading}>
       <div aria-hidden="true">
-        <div className="flex min-h-76 items-center justify-between border-y border-stroke-neutral-subtle py-16">
-          <div className="flex flex-col gap-4">
+        <div className="flex min-h-76 items-center justify-between rounded-sm border border-stroke-neutral-basement bg-bg-neutral-weak px-16 py-8">
+          <div className="flex items-center gap-8">
             <SkeletonBase width={112} height={18} />
-            <SkeletonBase width={92} height={14} />
+            <SkeletonBase width={28} height={14} />
           </div>
           <SkeletonBase width={44} height={28} borderRadius="14px" />
         </div>
-        {[0, 1, 2, 3, 4].map((group) => (
-          <div key={group} className="pt-28">
-            <div className="flex min-h-44 items-center justify-between">
-              <SkeletonBase width={group % 2 === 0 ? 104 : 76} height={16} />
-              <SkeletonBase width={44} height={28} borderRadius="14px" />
+        <div className="mt-24 space-y-12">
+          {[0, 1, 2, 3, 4].map((group) => (
+            <div
+              key={group}
+              className="rounded-sm border border-stroke-neutral-basement bg-bg-neutral-weak px-16 py-8"
+            >
+              <div className="flex min-h-56 items-center justify-between">
+                <SkeletonBase width={group % 2 === 0 ? 104 : 76} height={16} />
+                <SkeletonBase width={44} height={28} borderRadius="14px" />
+              </div>
+              {group === 0 && (
+                <div className="flex min-h-56 items-center justify-between border-t border-stroke-neutral-basement">
+                  <SkeletonBase width={136} height={15} />
+                  <SkeletonBase width={44} height={28} borderRadius="14px" />
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -135,20 +146,13 @@ export function NotificationSettings() {
   }
 
   return (
-    <section className="px-20 pb-40 pt-28">
-      <div>
-        <h1 className="text-20 font-bold">{copy.title}</h1>
-        <p className="mt-8 text-13 leading-21 text-fg-neutral-muted">
-          {copy.description}
-        </p>
-      </div>
-
+    <section className="px-20 pb-40 pt-24">
       {isAuthLoading || isPending ? (
         <NotificationSettingsSkeleton />
       ) : isError ? (
         <div
           role="alert"
-          className="mt-24 rounded-xl border border-stroke-neutral-subtle bg-bg-neutral-weak px-20 py-24 text-14"
+          className="rounded-xl border border-stroke-neutral-subtle bg-bg-neutral-weak px-20 py-24 text-14"
         >
           <p>{copy.loadError}</p>
           <button
@@ -160,15 +164,13 @@ export function NotificationSettings() {
           </button>
         </div>
       ) : items.length === 0 ? (
-        <p className="mt-24 py-24 text-14 text-fg-neutral-muted">
-          {copy.empty}
-        </p>
+        <p className="py-24 text-14 text-fg-neutral-muted">{copy.empty}</p>
       ) : (
         <>
-          <div className="mt-24 flex min-h-76 items-center gap-16 border-y border-stroke-neutral-subtle py-16">
-            <div className="min-w-0 flex-1">
-              <strong className="block text-15">{copy.all}</strong>
-              <span className="mt-4 block text-12 text-fg-neutral-muted">
+          <div className="flex min-h-76 items-center gap-16 rounded-sm border border-stroke-neutral-basement bg-bg-neutral-weak px-16 py-8">
+            <div className="flex min-w-0 flex-1 items-center gap-8">
+              <strong className="text-16 font-bold">{copy.all}</strong>
+              <span className="text-12 text-fg-neutral-muted">
                 {copy.enabledCount(enabledCount(items), items.length)}
               </span>
             </div>
@@ -184,36 +186,47 @@ export function NotificationSettings() {
               <SwitchTrack state={checked(items)} />
             </button>
           </div>
-          <div className="mt-10">
-            {groups.map((group) => {
+          <div className="mt-24 space-y-12">
+            {groups.map((group, index) => {
               const groupState = checked(group.settings);
-              const isOpen = expanded[group.group] ?? false;
-              const groupName = copy.groups[group.group] ?? group.displayName;
+              const groupName = group.displayName;
+              const isOpen = expanded[group.group] ?? index === 0;
               return (
-                <section key={group.group} className="pt-28">
-                  <div className="flex min-h-44 items-center gap-12">
-                    <button
-                      type="button"
-                      aria-label={copy.groupToggleLabel(groupName, isOpen)}
-                      aria-expanded={isOpen}
-                      aria-controls={`notification-group-${group.group}`}
-                      onClick={() =>
-                        setExpanded((previous) => ({
-                          ...previous,
-                          [group.group]: !isOpen,
-                        }))
-                      }
-                      className="flex min-h-44 min-w-0 flex-1 items-center gap-8 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
-                    >
-                      <span className="min-w-0 text-13 font-bold text-fg-brand">
-                        {groupName}
-                      </span>
-                      <ChevronDown
-                        aria-hidden="true"
-                        size={16}
-                        className={`shrink-0 text-fg-neutral-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                      />
-                    </button>
+                <section
+                  key={group.group}
+                  className="rounded-sm border border-stroke-neutral-basement bg-bg-neutral-weak px-16 py-8"
+                >
+                  <div className="flex min-h-56 items-center gap-8 py-6">
+                    <h2 className="min-w-0 flex-1">
+                      <button
+                        type="button"
+                        aria-label={copy.groupToggleLabel(groupName, isOpen)}
+                        aria-expanded={isOpen}
+                        aria-controls={`notification-group-${group.group}`}
+                        onClick={() =>
+                          setExpanded((previous) => ({
+                            ...previous,
+                            [group.group]: !isOpen,
+                          }))
+                        }
+                        className="flex min-h-44 w-full min-w-0 items-center gap-8 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
+                      >
+                        <ChevronDown
+                          aria-hidden="true"
+                          size={16}
+                          className={`shrink-0 text-fg-neutral-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                        />
+                        <span className="min-w-0 text-16 font-bold text-fg-neutral">
+                          {groupName}
+                        </span>
+                        <span className="shrink-0 text-12 font-normal text-fg-neutral-muted">
+                          {copy.enabledCount(
+                            enabledCount(group.settings),
+                            group.settings.length,
+                          )}
+                        </span>
+                      </button>
+                    </h2>
                     <button
                       type="button"
                       role="checkbox"
@@ -230,11 +243,12 @@ export function NotificationSettings() {
                   </div>
                   <div id={`notification-group-${group.group}`}>
                     <AnimatedCollapse isOpen={isOpen}>
-                      <div className="pt-8">
-                        {group.settings.map((item, index) => {
+                      <div className="pb-8">
+                        {group.settings.map((item) => {
                           const isOn = item.enabled;
-                          const itemName =
-                            copy.items[item.eventAction] ?? item.displayName;
+                          const itemName = item.displayName;
+                          const itemDescription =
+                            copy.itemDescriptions[item.eventAction];
                           return (
                             <button
                               key={item.eventAction}
@@ -244,15 +258,15 @@ export function NotificationSettings() {
                               aria-label={itemName}
                               disabled={update.isPending}
                               onClick={() => updateSettings([item], !isOn)}
-                              className={`flex min-h-64 w-full items-center gap-14 py-12 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring ${index > 0 ? 'border-t border-stroke-neutral-subtle' : ''}`}
+                              className="flex min-h-60 w-full items-center gap-14 border-t border-stroke-neutral-basement py-12 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
                             >
                               <span className="min-w-0 flex-1">
                                 <span className="block text-15 font-medium leading-21">
                                   {itemName}
                                 </span>
-                                {item.description && (
+                                {itemDescription && (
                                   <span className="mt-4 block text-13 leading-20 text-fg-neutral-muted">
-                                    {item.description}
+                                    {itemDescription}
                                   </span>
                                 )}
                               </span>

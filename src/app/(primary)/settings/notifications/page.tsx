@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function NotificationSettingsPage() {
   return (
     <main className="content-container min-h-safe-screen bg-bg-layer-default text-fg-neutral">
-      <LegalPageHeader title={copy.title} />
+      <LegalPageHeader title={copy.title} showDivider={false} />
       <NotificationSettings />
     </main>
   );
