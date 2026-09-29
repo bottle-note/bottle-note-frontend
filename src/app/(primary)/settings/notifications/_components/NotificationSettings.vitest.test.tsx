@@ -7,7 +7,7 @@ import { NotificationSettings } from './NotificationSettings';
 
 const { replace, auth } = vi.hoisted(() => ({
   replace: vi.fn(),
-  auth: { isLoggedIn: true, isLoading: false },
+  auth: { isLoggedIn: true, isLoading: false, userId: 101 },
 }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace, back: vi.fn() }),
@@ -16,6 +16,7 @@ vi.mock('@/hooks/auth/useAuthSession', () => ({
   useAuthSession: () => ({
     isLoggedIn: auth.isLoggedIn,
     isLoading: auth.isLoading,
+    user: auth.isLoggedIn ? { userId: auth.userId } : null,
   }),
 }));
 vi.mock('@/api/notification/notification.api', () => ({
@@ -82,6 +83,7 @@ describe('알림 수신 설정', () => {
     window.scrollTo = vi.fn();
     auth.isLoggedIn = true;
     auth.isLoading = false;
+    auth.userId = 101;
     vi.mocked(NotificationSettingsApi.getSettings).mockResolvedValue(
       response(),
     );
@@ -288,6 +290,55 @@ describe('알림 수신 설정', () => {
     fireEvent.click(screen.getByRole('switch', { name: '새 팔로워' }));
     await waitFor(() =>
       expect(NotificationSettingsApi.updateSettings).toHaveBeenCalledTimes(2),
+    );
+  });
+
+  it('같은 브라우저에서 계정을 바꾸면 이전 계정의 설정을 재사용하지 않는다', async () => {
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false, staleTime: 60_000 },
+        mutations: { retry: false },
+      },
+    });
+    const page = () => (
+      <QueryClientProvider client={client}>
+        <NotificationSettings />
+      </QueryClientProvider>
+    );
+    const { rerender } = render(page());
+    expect(await screen.findByText('3개 중 1개 켜짐')).toBeInTheDocument();
+    expect(NotificationSettingsApi.getSettings).toHaveBeenCalledTimes(1);
+
+    auth.userId = 202;
+    let resolveSecondAccount!: (value: ReturnType<typeof response>) => void;
+    vi.mocked(NotificationSettingsApi.getSettings).mockReturnValue(
+      new Promise((resolve) => {
+        resolveSecondAccount = resolve;
+      }),
+    );
+    rerender(page());
+
+    expect(screen.queryByText('3개 중 1개 켜짐')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('status', { name: '알림 설정을 불러오는 중입니다.' }),
+    ).toBeInTheDocument();
+    resolveSecondAccount(
+      response(
+        groups.map((group) => ({
+          ...group,
+          settings: group.settings.map((item) => ({ ...item, enabled: true })),
+        })),
+      ),
+    );
+    expect(await screen.findByText('3개 중 3개 켜짐')).toBeInTheDocument();
+    expect(NotificationSettingsApi.getSettings).toHaveBeenCalledTimes(2);
+    fireEvent.click(
+      screen.getByRole('checkbox', { name: '프로그램 전체 변경' }),
+    );
+    await waitFor(() =>
+      expect(NotificationSettingsApi.updateSettings).toHaveBeenCalledWith({
+        settings: [{ eventAction: 'PROGRAM_OPEN', enabled: false }],
+      }),
     );
   });
 

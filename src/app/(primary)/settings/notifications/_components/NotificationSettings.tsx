@@ -15,11 +15,15 @@ import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import {
-  NOTIFICATION_SETTINGS_KEY,
+  notificationSettingsKey,
   useNotificationSettingsQuery,
 } from '@/queries/useNotificationSettingsQuery';
 import { SwitchTrack } from './SwitchTrack';
 import { notificationSettingsCopy as copy } from './notificationSettingsCopy';
+
+type AccountSettingsUpdate = NotificationSettingsUpdateRequest & {
+  userId: number;
+};
 
 function NotificationSettingsSkeleton() {
   return (
@@ -48,10 +52,10 @@ function NotificationSettingsSkeleton() {
 export function NotificationSettings() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
-  const { data, isPending, isError, refetch } = useNotificationSettingsQuery(
-    !isAuthLoading && isLoggedIn,
-  );
+  const { user, isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
+  const userId = !isAuthLoading && isLoggedIn ? user?.userId ?? null : null;
+  const { data, isPending, isError, refetch } =
+    useNotificationSettingsQuery(userId);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [message, setMessage] = useState('');
   const groups = data?.groups ?? [];
@@ -72,19 +76,20 @@ export function NotificationSettings() {
   }, [isAuthLoading, isLoggedIn, router]);
 
   const update = useMutation({
-    mutationFn: NotificationSettingsApi.updateSettings,
-    onMutate: async ({ settings }: NotificationSettingsUpdateRequest) => {
+    mutationFn: ({ settings }: AccountSettingsUpdate) =>
+      NotificationSettingsApi.updateSettings({ settings }),
+    onMutate: async ({ settings, userId }: AccountSettingsUpdate) => {
       setMessage('');
-      await queryClient.cancelQueries({ queryKey: NOTIFICATION_SETTINGS_KEY });
-      const previous = queryClient.getQueryData<NotificationSettingsData>(
-        NOTIFICATION_SETTINGS_KEY,
-      );
+      const queryKey = notificationSettingsKey(userId);
+      await queryClient.cancelQueries({ queryKey });
+      const previous =
+        queryClient.getQueryData<NotificationSettingsData>(queryKey);
       const nextValues = new Map(
         settings.map(({ eventAction, enabled }) => [eventAction, enabled]),
       );
 
       queryClient.setQueryData<NotificationSettingsData>(
-        NOTIFICATION_SETTINGS_KEY,
+        queryKey,
         (current) =>
           current && {
             ...current,
@@ -97,22 +102,23 @@ export function NotificationSettings() {
             })),
           },
       );
-      return { previous };
+      return { previous, queryKey };
     },
-    onSuccess: (updated) => {
-      queryClient.setQueryData(NOTIFICATION_SETTINGS_KEY, updated);
+    onSuccess: (updated, { userId }) => {
+      queryClient.setQueryData(notificationSettingsKey(userId), updated);
     },
     onError: (_error, _variables, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(NOTIFICATION_SETTINGS_KEY, context.previous);
+        queryClient.setQueryData(context.queryKey, context.previous);
       }
       setMessage(copy.saveError);
     },
   });
 
   const updateSettings = (list: NotificationSetting[], nextValue: boolean) => {
-    if (update.isPending || list.length === 0) return;
+    if (userId === null || update.isPending || list.length === 0) return;
     update.mutate({
+      userId,
       settings: list.map((item) => ({
         eventAction: item.eventAction,
         enabled: nextValue,
