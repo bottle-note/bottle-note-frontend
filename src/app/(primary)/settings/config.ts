@@ -57,6 +57,7 @@ export const createMenuCategories = (
   userId?: string | number,
   isAdmin?: boolean,
   isLoggedIn = false,
+  showNotificationSettings = false,
 ): MenuCategory[] => {
   const publicItems = [
     {
@@ -90,10 +91,14 @@ export const createMenuCategories = (
           text: '차단 사용자 관리',
           action: () => onScreenNavigate('blockManagement'),
         },
-        {
-          text: notificationSettingsCopy.title,
-          link: ROUTES.SETTINGS.NOTIFICATIONS,
-        },
+        ...(showNotificationSettings
+          ? [
+              {
+                text: notificationSettingsCopy.title,
+                link: ROUTES.SETTINGS.NOTIFICATIONS,
+              },
+            ]
+          : []),
       ],
     },
     {

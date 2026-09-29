@@ -1,4 +1,5 @@
 import { createMenuCategories, createScreenConfigs } from './config';
+import { isDevelopmentApi } from './isDevelopmentApi';
 
 describe('settings menu config', () => {
   it('화면 테마 메뉴는 라우트 대신 설정 하위 화면을 연다', () => {
@@ -61,6 +62,51 @@ describe('settings menu config', () => {
       ]),
     );
     expect(menuTexts).not.toContain('공지사항');
+  });
+
+  it.each([
+    ['https://api.development.bottle-note.com', true],
+    ['https://api.bottle-note.com', false],
+    ['', false],
+    ['invalid-url', false],
+  ])(
+    'API 환경 %s에서 개발환경 전용 알림 설정 메뉴 노출: %s',
+    (url, visible) => {
+      expect(isDevelopmentApi(url)).toBe(visible);
+      const categories = createMenuCategories(
+        jest.fn(),
+        jest.fn(),
+        undefined,
+        1,
+        false,
+        true,
+        isDevelopmentApi(url),
+      );
+
+      expect(
+        categories
+          .flatMap((category) => category.items)
+          .some((item) => item.link === '/settings/notifications'),
+      ).toBe(visible);
+    },
+  );
+
+  it('개발 API여도 비로그인 사용자의 알림 설정 메뉴는 숨긴다', () => {
+    const categories = createMenuCategories(
+      jest.fn(),
+      jest.fn(),
+      undefined,
+      undefined,
+      false,
+      false,
+      true,
+    );
+
+    expect(
+      categories
+        .flatMap((category) => category.items)
+        .some((item) => item.link === '/settings/notifications'),
+    ).toBe(false);
   });
 
   it('로그인 상태에서 마케팅 정보 수신 동의 관리 화면으로 이동할 수 있다', () => {
