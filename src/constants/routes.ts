@@ -1,6 +1,7 @@
 export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
+  NOTIFICATIONS: '/notifications',
   SIGNUP: '/signup',
   WHISKEY_TAROT: '/whiskey-tarot',
   WHISKEY_MBTI: '/whiskey-mbti',
