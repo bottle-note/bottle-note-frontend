@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import { Bell } from 'lucide-react';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useNotificationUnreadCount } from '@/queries/useNotificationsQuery';
+import { isDevelopmentDeployment } from '@/lib/environment';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import Logo from 'public/bottle_note_Icon_logo.svg';
@@ -116,9 +117,7 @@ const HeaderMenu = () => {
 const HeaderNotificationBell = () => {
   const { user, isLoggedIn } = useAuthSession();
   const userId =
-    process.env.NEXT_PUBLIC_DEPLOY_ENV === 'development' && isLoggedIn
-      ? user?.userId ?? null
-      : null;
+    isDevelopmentDeployment() && isLoggedIn ? user?.userId ?? null : null;
   const { data } = useNotificationUnreadCount(userId);
 
   if (userId === null) return null;
