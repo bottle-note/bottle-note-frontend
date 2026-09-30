@@ -131,11 +131,11 @@ const HeaderNotificationBell = () => {
       aria-label={
         unreadCount > 0 ? `알림함, 읽지 않은 알림 ${unreadCount}개` : '알림함'
       }
-      className="relative inline-flex items-center justify-center pt-8 text-fg-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
+      className="relative inline-flex items-center justify-center pt-8 text-subCoral focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
     >
-      <Bell size={22} strokeWidth={1.8} aria-hidden="true" />
+      <Bell size={22} strokeWidth={2} aria-hidden="true" />
       {unreadCount > 0 && (
-        <span className="absolute -right-8 top-2 flex h-17 min-w-17 items-center justify-center rounded-full border-2 border-bg-layer-default bg-bg-brand-solid px-2 text-10 font-bold leading-none text-palette-static-white">
+        <span className="absolute -right-8 top-2 flex h-17 min-w-17 items-center justify-center rounded-full border-2 border-bg-layer-default bg-subCoral px-2 text-10 font-bold leading-none text-palette-static-white">
           {unreadCount > 99 ? '99+' : unreadCount}
         </span>
       )}
