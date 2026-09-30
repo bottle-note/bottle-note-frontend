@@ -95,8 +95,33 @@ beforeEach(() => {
 });
 
 describe('Whiskey MBTI campaign', () => {
-  it('gates direct/shared result URLs for guests without requesting result details', async () => {
+  it('shows a shared result to guests without an authenticated RESULT event', async () => {
     navigation.search = 'result=INTJ-A&shared=1';
+    renderExperience();
+    expect(await screen.findByText('검증된 결과')).toBeInTheDocument();
+    expect(fetch).toHaveBeenCalledWith('/api/whiskey-mbti/result?code=INTJ-A');
+    expect(
+      screen.queryByText('로그인 후 결과를 볼 수 있어요.'),
+    ).not.toBeInTheDocument();
+    expect(trackCampaignEvent).not.toHaveBeenCalledWith(
+      'whiskey-mbti',
+      'RESULT',
+    );
+  });
+
+  it('does not make a shared guest wait for the auth check', async () => {
+    navigation.search = 'result=INTJ-A&shared=1';
+    auth.isLoading = true;
+    renderExperience();
+    expect(await screen.findByText('검증된 결과')).toBeInTheDocument();
+    expect(trackCampaignEvent).not.toHaveBeenCalledWith(
+      'whiskey-mbti',
+      'RESULT',
+    );
+  });
+
+  it('gates an unshared direct result URL for guests before requesting details', async () => {
+    navigation.search = 'result=INTJ-A';
     renderExperience();
     expect(
       await screen.findByRole('button', { name: '결과 보기' }),

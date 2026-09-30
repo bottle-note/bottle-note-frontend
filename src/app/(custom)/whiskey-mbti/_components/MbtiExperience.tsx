@@ -184,58 +184,64 @@ export default function MbtiExperience() {
           </section>
         )}
 
-        {phase === 'result' && code && isLoading && (
+        {phase === 'result' && code && !isShared && isLoading && (
           <p className={styles.loading}>로그인 상태를 확인하는 중이에요.</p>
         )}
-        {phase === 'result' && code && !isLoading && !isLoggedIn && (
-          <section
-            className={`${styles.screen} ${styles.gate}`}
-            aria-live="polite"
-          >
-            <p className={styles.eyebrow}>Test complete.</p>
-            <h1>로그인 후 결과를 볼 수 있어요.</h1>
-            <button
-              className={styles.resultButton}
-              onClick={() => setShowLogin(true)}
+        {phase === 'result' &&
+          code &&
+          !isShared &&
+          !isLoading &&
+          !isLoggedIn && (
+            <section
+              className={`${styles.screen} ${styles.gate}`}
+              aria-live="polite"
             >
-              결과 보기
-            </button>
-          </section>
-        )}
-        {phase === 'result' && code && !isLoading && isLoggedIn && (
-          <MbtiResult
-            code={code}
-            isShared={isShared}
-            isLoggedIn={isLoggedIn}
-            isAuthLoading={isLoading}
-            onShown={(shownCode) => {
-              if (shownResultCode.current !== shownCode) {
-                shownResultCode.current = shownCode;
-                trackCampaignEvent('whiskey-mbti', 'RESULT');
-              }
-            }}
-            onStartTest={() => {
-              if (isLoggedIn) {
+              <p className={styles.eyebrow}>Test complete.</p>
+              <h1>로그인 후 결과를 볼 수 있어요.</h1>
+              <button
+                className={styles.resultButton}
+                onClick={() => setShowLogin(true)}
+              >
+                결과 보기
+              </button>
+            </section>
+          )}
+        {phase === 'result' &&
+          code &&
+          (isShared || (!isLoading && isLoggedIn)) && (
+            <MbtiResult
+              code={code}
+              isShared={isShared}
+              isLoggedIn={isLoggedIn}
+              isAuthLoading={isLoading}
+              onShown={(shownCode) => {
+                if (isLoggedIn && shownResultCode.current !== shownCode) {
+                  shownResultCode.current = shownCode;
+                  trackCampaignEvent('whiskey-mbti', 'RESULT');
+                }
+              }}
+              onStartTest={() => {
+                if (isLoggedIn) {
+                  sessionStorage.removeItem(PROGRESS_KEY);
+                  trackCampaignEvent('whiskey-mbti', 'START');
+                  setPhase('quiz');
+                  router.replace('/whiskey-mbti');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                  setReturnToUrl(WHISKEY_MBTI_INTRO_PATH);
+                  router.push(ROUTES.LOGIN);
+                }
+              }}
+              onRestart={() => {
                 sessionStorage.removeItem(PROGRESS_KEY);
                 trackCampaignEvent('whiskey-mbti', 'START');
+                setCompletedCode(null);
                 setPhase('quiz');
                 router.replace('/whiskey-mbti');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-              } else {
-                setReturnToUrl(WHISKEY_MBTI_INTRO_PATH);
-                router.push(ROUTES.LOGIN);
-              }
-            }}
-            onRestart={() => {
-              sessionStorage.removeItem(PROGRESS_KEY);
-              trackCampaignEvent('whiskey-mbti', 'START');
-              setCompletedCode(null);
-              setPhase('quiz');
-              router.replace('/whiskey-mbti');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-          />
-        )}
+              }}
+            />
+          )}
       </div>
 
       <footer className={styles.footer}>
