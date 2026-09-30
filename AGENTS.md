@@ -53,4 +53,4 @@
 
 - 변경 결과와 이유, 자동 테스트 결과, 브라우저에서 확인한 시나리오와 확인하지 못한 부분을 간단히 전달한다. 실행하지 않은 검증을 통과했다고 보고하지 않는다.
 - Bottle Note 제품 이슈의 원본 저장소는 `bottle-note/workspace`다. PR 전 `gh issue view <번호> --repo bottle-note/workspace`로 제목, 범위, 라벨, 완료 조건을 확인한다. 번호를 모르면 그 저장소에서 현재 사용자에게 할당된 프론트엔드 이슈를 찾는다.
-- PR에는 이슈를 자동 종료하는 키워드 없이 `[#<번호>](https://github.com/bottle-note/workspace/issues/<번호>)` 형식으로 관련 이슈를 연결한다. 다른 영역의 의존성이 있으면 현재 구현 범위와 후속 작업을 구분한다.
+- PR에는 관련 이슈를 `https://github.com/bottle-note/workspace/issues/<번호>`처럼 URL만 그대로 적는다. 대괄호를 쓰는 Markdown 링크 형식과 이슈를 자동 종료하는 키워드는 사용하지 않는다. 다른 영역의 의존성이 있으면 현재 구현 범위와 후속 작업을 구분한다.
