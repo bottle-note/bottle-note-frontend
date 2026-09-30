@@ -1,147 +1,95 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { SaveImages } from '@/types/Image';
 
+interface NewImage {
+  order: number;
+  image: File;
+}
+interface SavedImage {
+  order: number;
+  viewUrl: string;
+}
+interface LocalPreview extends NewImage {
+  url: string;
+}
+
+const MAX_IMAGES = 5;
+
 export const useImageUploader = () => {
   const { setValue, getValues, control } = useFormContext();
-  const [previewImages, setPreviewImages] = useState<SaveImages[]>([]);
-  const [savedImages, setSavedImages] = useState<SaveImages[]>([]);
+  const images: NewImage[] | null | undefined = useWatch({
+    name: 'images',
+    control,
+  });
+  const saved: SavedImage[] | null | undefined = useWatch({
+    name: 'imageUrlList',
+    control,
+  });
+  const [localPreviews, setLocalPreviews] = useState<LocalPreview[]>([]);
 
-  const isInitializedRef = useRef(false);
-  const blobUrlToFileMapRef = useRef<Map<string, File>>(new Map());
-
-  const MAX_IMAGES = 5;
-
-  // form에서 데이터가 로드될 때까지 기다림
-  const imageUrlList = useWatch({ name: 'imageUrlList', control });
-
-  const getNextOrder = (images: SaveImages[]): number => {
-    return images.length > 0
-      ? Math.max(...images.map((img) => img.order)) + 1
-      : 1;
-  };
-
-  const reorderImages = (images: SaveImages[]): SaveImages[] => {
-    return images.map((img, index) => ({
-      ...img,
-      order: index + 1,
-    }));
-  };
-
-  const validateLimit = (): boolean => {
-    return previewImages.length < MAX_IMAGES;
-  };
-
-  // 사진 수정: 초기 이미지 로드
+  // File objects belong to the form. This effect owns only disposable preview URLs.
+  // Keeping writes out of React state updaters prevents duplicate uploads in StrictMode.
   useEffect(() => {
-    if (isInitializedRef.current || !imageUrlList?.length) return;
+    const previews = (images ?? []).map((image) => ({
+      ...image,
+      url: URL.createObjectURL(image.image),
+    }));
+    setLocalPreviews(previews);
+    return () => previews.forEach(({ url }) => URL.revokeObjectURL(url));
+  }, [images]);
 
-    const urlData = imageUrlList.map(
-      (data: { order: number; viewUrl: string }) => ({
-        order: data.order,
-        image: data.viewUrl,
-      }),
+  const previewImages: SaveImages[] = [
+    ...(saved ?? []).map(({ order, viewUrl }) => ({ order, image: viewUrl })),
+    ...localPreviews.map(({ order, url }) => ({ order, image: url })),
+  ].sort((left, right) => left.order - right.order);
+
+  const uploadMultipleImages = (files: File[]) => {
+    const current: NewImage[] = getValues('images') ?? [];
+    const stored: SavedImage[] = getValues('imageUrlList') ?? [];
+    const available = Math.max(0, MAX_IMAGES - current.length - stored.length);
+    const additions = files.slice(0, available);
+    if (!additions.length) return;
+    const lastOrder = Math.max(
+      0,
+      ...current.map(({ order }) => order),
+      ...stored.map(({ order }) => order),
     );
-    setSavedImages(urlData);
-    setPreviewImages(urlData);
-    isInitializedRef.current = true;
-  }, [imageUrlList]);
-
-  const _uploadImages = (files: File[]) => {
-    if (files && files.length > 0) {
-      setPreviewImages((currentPreviews) => {
-        const maxOrderId = getNextOrder(currentPreviews) - 1;
-        const availableSlots = MAX_IMAGES - currentPreviews.length;
-
-        // 이미지 미리보기용
-        const imgForPreview = Array.from(files)
-          .slice(0, availableSlots)
-          .map((file, index) => {
-            const blobUrl = URL.createObjectURL(file);
-            // Blob URL과 File 매핑 저장
-            blobUrlToFileMapRef.current.set(blobUrl, file);
-            return {
-              order: maxOrderId + index + 1,
-              image: blobUrl,
-            };
-          });
-
-        // S3 업로드용
-        const addedNewImages = getValues('images') ?? [];
-        const imgForS3 = Array.from(files)
-          .slice(0, availableSlots)
-          .map((file, index) => ({
-            order: maxOrderId + index + 1,
-            image: file,
-          }));
-        setValue('images', [...addedNewImages, ...imgForS3]);
-
-        return [...currentPreviews, ...imgForPreview];
-      });
-    }
-  };
-
-  const uploadSingleImage = (imgData: File) => {
-    _uploadImages([imgData]);
-  };
-
-  const uploadMultipleImages = (imgDataList: File[]) => {
-    _uploadImages(imgDataList);
-  };
-
-  const removeImage = (image: string) => {
-    const isSavedImage = savedImages.some((file) => file.image === image);
-
-    // 미리보기에서 제거 및 재정렬
-    setPreviewImages((currentPreviews) => {
-      const filtered = currentPreviews.filter((file) => file.image !== image);
-      const reordered = reorderImages(filtered);
-
-      const updatedSaved: SaveImages[] = [];
-      const updatedNew: { order: number; image: File }[] = [];
-
-      reordered.forEach((preview) => {
-        const isSaved = savedImages.some((s) => s.image === preview.image);
-
-        if (isSaved) {
-          updatedSaved.push(preview);
-        } else {
-          const file = blobUrlToFileMapRef.current.get(preview.image);
-          if (file) {
-            updatedNew.push({
-              order: preview.order,
-              image: file,
-            });
-          }
-        }
-      });
-
-      setSavedImages(updatedSaved);
-      setValue(
-        'imageUrlList',
-        updatedSaved.map((img) => ({
-          order: img.order,
-          viewUrl: img.image,
+    setValue(
+      'images',
+      [
+        ...current,
+        ...additions.map((image, index) => ({
+          order: lastOrder + index + 1,
+          image,
         })),
-      );
+      ],
+      { shouldDirty: true },
+    );
+  };
 
-      setValue('images', updatedNew);
-
-      if (!isSavedImage) {
-        blobUrlToFileMapRef.current.delete(image);
-        URL.revokeObjectURL(image);
-      }
-
-      return reordered;
+  const removeImage = (url: string) => {
+    const remaining = previewImages.filter((preview) => preview.image !== url);
+    const updatedSaved: SavedImage[] = [];
+    const updatedNew: NewImage[] = [];
+    remaining.forEach((preview, index) => {
+      const local = localPreviews.find((item) => item.url === preview.image);
+      if (local) updatedNew.push({ order: index + 1, image: local.image });
+      else updatedSaved.push({ order: index + 1, viewUrl: preview.image });
     });
+    setValue('imageUrlList', updatedSaved, { shouldDirty: true });
+    setValue('images', updatedNew, { shouldDirty: true });
   };
 
   return {
     previewImages,
-    uploadSingleImage,
+    uploadSingleImage: (image: File) => uploadMultipleImages([image]),
     uploadMultipleImages,
     removeImage,
-    validateLimit,
+    validateLimit: () =>
+      (getValues('images')?.length ?? 0) +
+        (getValues('imageUrlList')?.length ?? 0) <
+      MAX_IMAGES,
     MAX_IMAGES,
   };
 };

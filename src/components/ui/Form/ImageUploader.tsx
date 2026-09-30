@@ -101,14 +101,14 @@ export default function ImageUploader({
       <div
         className={`flex justify-start items-center h-[60.8px] space-x-8 ${useMarginLeft ? 'ml-28 mt-6' : ''}`}
       >
-        {previewImages?.map((data) => (
+        {previewImages?.map((data, index) => (
           <figure
             key={data?.image}
             className="relative h-full bg-palette-static-white"
           >
             <Image
               src={data?.image}
-              alt="이미지"
+              alt={`첨부 사진 ${index + 1}`}
               height={60}
               width={60}
               quality={75}
@@ -116,6 +116,7 @@ export default function ImageUploader({
             />
             <button
               type="button"
+              aria-label={`첨부 사진 ${index + 1} 삭제`}
               onClick={() => removeImage(data?.image)}
               className="absolute top-0 right-0 bg-black"
             >
@@ -131,6 +132,7 @@ export default function ImageUploader({
 
         <button
           type="button"
+          aria-label="사진 추가"
           onClick={onClickAddImage}
           className="flex h-[60.8px] w-[60.8px] flex-col items-center justify-center border border-stroke-brand-solid"
         >

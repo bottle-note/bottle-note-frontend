@@ -1,0 +1,244 @@
+[
+  {
+    "id": 551,
+    "name": "버팔로 트레이스",
+    "category": "버번",
+    "region": "미국",
+    "abv": 45.0,
+    "rating": 3.5,
+    "ratingCount": 2,
+    "tags": [
+      "아니스",
+      "흑설탕",
+      "민트",
+      "당밀",
+      "오크",
+      "부드러운",
+      "향신료",
+      "달콤한"
+    ],
+    "bottlePrice": 55000,
+    "glassPrice": 13000
+  },
+  {
+    "id": 140,
+    "name": "조니워커 블랙",
+    "category": "블렌디드",
+    "region": "스코틀랜드",
+    "abv": 40.0,
+    "rating": 3.8,
+    "ratingCount": 2,
+    "tags": [
+      "스모키",
+      "부드러운",
+      "향신료",
+      "달콤한",
+      "바닐라",
+      "균형 잡힌",
+      "과일"
+    ],
+    "bottlePrice": 55000,
+    "glassPrice": 13000
+  },
+  {
+    "id": 6330,
+    "name": "더 글렌드로낙 12년",
+    "category": "싱글 몰트",
+    "region": "스코틀랜드/하이랜드",
+    "abv": 43.0,
+    "rating": 4.0,
+    "ratingCount": 5,
+    "tags": [
+      "시트러스",
+      "무화과",
+      "견과류",
+      "오크",
+      "후추",
+      "건포도",
+      "부드러운",
+      "바닐라"
+    ],
+    "bottlePrice": 110000,
+    "glassPrice": 18000
+  },
+  {
+    "id": 6273,
+    "name": "탈리스커 10년",
+    "category": "싱글 몰트",
+    "region": "스코틀랜드/기타섬",
+    "abv": 45.8,
+    "rating": 3.8,
+    "ratingCount": 4,
+    "tags": [
+      "오렌지",
+      "피트",
+      "후추",
+      "스모키",
+      "달콤한",
+      "긴 여운",
+      "감귤",
+      "몰트"
+    ],
+    "bottlePrice": 70000,
+    "glassPrice": 17000
+  },
+  {
+    "id": 135,
+    "name": "조니워커 그린 15년",
+    "category": "블렌디드 몰트",
+    "region": "스코틀랜드",
+    "abv": 43.0,
+    "rating": 3.7,
+    "ratingCount": 6,
+    "tags": [
+      "시트러스",
+      "허브",
+      "꿀",
+      "오크",
+      "피트",
+      "후추",
+      "스모키",
+      "바닐라"
+    ],
+    "bottlePrice": 85000,
+    "glassPrice": 17000
+  },
+  {
+    "id": 7007,
+    "name": "듀어스 12년",
+    "category": "블렌디드",
+    "region": "스코틀랜드",
+    "abv": 40.0,
+    "rating": 3.4,
+    "ratingCount": 5,
+    "tags": [
+      "버터스카치",
+      "꿀",
+      "레몬",
+      "피트",
+      "부드러운",
+      "달콤한",
+      "바닐라",
+      "몰트"
+    ],
+    "bottlePrice": 44000,
+    "glassPrice": 12000
+  },
+  {
+    "id": 145,
+    "name": "제임슨 아이리시 위스키",
+    "category": "블렌디드",
+    "region": "아일랜드",
+    "abv": 40.0,
+    "rating": 4.0,
+    "ratingCount": 6,
+    "tags": [
+      "플로럴",
+      "견과류",
+      "오크",
+      "부드러운",
+      "향신료",
+      "달콤한",
+      "바닐라",
+      "긴 여운"
+    ],
+    "bottlePrice": null,
+    "glassPrice": null
+  },
+  {
+    "id": 7866,
+    "name": "러셀 리저브 10년",
+    "category": "버번",
+    "region": "미국",
+    "abv": 45.0,
+    "rating": 3.5,
+    "ratingCount": 4,
+    "tags": [
+      "버터스카치",
+      "시나몬",
+      "시트러스",
+      "오크",
+      "오렌지",
+      "후추",
+      "부드러운",
+      "향신료"
+    ],
+    "bottlePrice": 85000,
+    "glassPrice": 18000
+  },
+  {
+    "id": 411,
+    "name": "와일드 터키 101",
+    "category": "버번",
+    "region": "미국",
+    "abv": 50.5,
+    "rating": 3.1,
+    "ratingCount": 6,
+    "tags": [
+      "버터스카치",
+      "체리",
+      "시나몬",
+      "정향",
+      "꿀",
+      "오크",
+      "오렌지",
+      "후추"
+    ],
+    "bottlePrice": 65000,
+    "glassPrice": 14000
+  },
+  {
+    "id": 8200,
+    "name": "몽키숄더",
+    "category": "블렌디드 몰트",
+    "region": "스코틀랜드",
+    "abv": 40.0,
+    "rating": 3.8,
+    "ratingCount": 6,
+    "tags": [
+      "시트러스",
+      "꿀",
+      "오렌지",
+      "부드러운",
+      "바닐라",
+      "따뜻한",
+      "몰트",
+      "과일"
+    ],
+    "bottlePrice": 55000,
+    "glassPrice": 14000
+  },
+  {
+    "id": 462,
+    "name": "아란 10년",
+    "category": "싱글 몰트",
+    "region": "스코틀랜드/기타섬",
+    "abv": 46.0,
+    "rating": 4.3,
+    "ratingCount": 2,
+    "tags": [
+      "아몬드",
+      "사과",
+      "보리",
+      "시나몬",
+      "시트러스",
+      "레몬",
+      "오크",
+      "오렌지"
+    ],
+    "bottlePrice": 90000,
+    "glassPrice": 19000
+  },
+  {
+    "id": 77,
+    "name": "포트 샬롯 10년",
+    "category": "싱글 몰트",
+    "region": "스코틀랜드/아일라",
+    "abv": 50.0,
+    "rating": 3.5,
+    "ratingCount": 1,
+    "tags": ["정향", "코코넛", "꿀", "레몬", "넛맥", "오크", "피트", "솔티"],
+    "bottlePrice": 125000,
+    "glassPrice": 28000
+  }
+]

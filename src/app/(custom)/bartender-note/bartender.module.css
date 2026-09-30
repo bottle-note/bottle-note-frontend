@@ -1,0 +1,460 @@
+.shell {
+  min-height: 100svh;
+  background: var(--color-bg-layer-default);
+  color: var(--color-fg-neutral);
+  padding-bottom: max(32px, var(--safe-area-bottom));
+}
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--color-bg-layer-default);
+}
+.iconButton {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+}
+.iconButton:focus-visible,
+.choice:focus-visible,
+.bottleCard:focus-visible,
+.dialogue:focus-visible {
+  outline: 2px solid var(--color-stroke-focus-ring);
+  outline-offset: -2px;
+}
+.previewNotice {
+  margin: 0;
+  padding: 8px 20px;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+  color: var(--color-fg-neutral-muted);
+  background: var(--color-bg-neutral-weak);
+}
+.progress {
+  height: 3px;
+  background: var(--color-bg-neutral-weak);
+}
+.progressFill {
+  height: 100%;
+  background: var(--color-bg-brand-solid);
+  transition: width 240ms ease;
+}
+.scene {
+  position: relative;
+  isolation: isolate;
+  height: clamp(230px, 64vw, 290px);
+  overflow: hidden;
+  transition: height 240ms ease;
+  background: rgb(var(--palette-oak-1000));
+}
+.scene[data-compact='true'] {
+  height: 164px;
+}
+.artwork {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.artwork canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: translateY(-6%);
+}
+.scene[data-compact='true'] canvas {
+  transform: translateY(-18%);
+}
+.artworkFallback {
+  position: absolute;
+  inset: 48px 20px auto;
+  text-align: center;
+  color: rgb(var(--palette-oak-200));
+  font-size: 13px;
+}
+.dialogue {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: calc(100% - 32px);
+  padding: 17px 14px 8px;
+  background: rgb(var(--palette-oak-1000));
+  border: 1px solid rgb(var(--palette-oak-800));
+  border-radius: 8px;
+  text-align: left;
+  color: rgb(var(--palette-oak-50));
+}
+.speaker {
+  position: absolute;
+  top: -12px;
+  left: 12px;
+  padding: 2px 9px;
+  background: rgb(var(--palette-coral-500));
+  color: rgb(var(--palette-oak-1000));
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.dialogueText {
+  min-height: 40px;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: pre-line;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.dialogueHint {
+  font-size: 11px;
+  line-height: 14px;
+  text-align: right;
+  color: rgb(var(--palette-oak-200));
+}
+.content {
+  padding: 24px 20px 0;
+}
+.step {
+  animation: arrive 200ms ease-out both;
+}
+.step[data-backward='true'] {
+  animation-name: return;
+}
+.heading {
+  margin-bottom: 16px;
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 700;
+  outline: none;
+}
+.eyebrow {
+  margin-bottom: 6px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-fg-brand);
+}
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.choice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  width: 100%;
+  min-height: 64px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  text-align: left;
+  background: var(--color-bg-neutral-weak);
+  transition:
+    border-color 140ms,
+    background-color 140ms,
+    transform 140ms;
+}
+.choice > span {
+  min-width: 0;
+}
+.choice svg {
+  flex-shrink: 0;
+  color: var(--color-fg-brand);
+}
+.choice[aria-pressed='true'] {
+  border-color: var(--color-stroke-brand-solid);
+  background: var(--color-bg-brand-weak);
+}
+.choice:active {
+  transform: scale(0.99);
+}
+.choiceTitle {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 21px;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.choiceDescription {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--color-fg-neutral-muted);
+}
+.choice:disabled,
+.bottleCard:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.hint {
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--color-fg-neutral-muted);
+}
+.error {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--color-fg-neutral);
+}
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+}
+.actionPair {
+  display: flex;
+  gap: 8px;
+}
+.actionPair > * {
+  flex: 1;
+  min-width: 0;
+}
+.bottleCard {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--color-stroke-neutral-subtle);
+  border-radius: 8px;
+  text-align: left;
+}
+.bottleCard[aria-pressed='true'] {
+  background: var(--color-bg-brand-weak);
+  border-color: var(--color-stroke-brand-solid);
+}
+.bottleSummary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.bottleImage,
+.bottlePlaceholder {
+  display: block;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background-color: #fff;
+}
+.bottleImage {
+  background-image: url('/images/bartender-note/bottles.webp');
+  background-size: 700% 500%;
+  background-repeat: no-repeat;
+}
+.bottlePlaceholder {
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+}
+.bottleInfo {
+  flex: 1;
+  min-width: 0;
+}
+.rating {
+  display: block;
+  margin-top: 4px;
+  color: var(--color-fg-rating);
+  font-size: 13px;
+}
+.pickedMark {
+  position: absolute;
+  right: 8px;
+  top: 4px;
+  color: var(--color-fg-brand);
+  font-size: 10px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--color-stroke-neutral-subtle);
+  border-radius: 6px;
+  color: var(--color-fg-neutral-muted);
+  font-size: 13px;
+}
+button.chip:focus-visible {
+  outline: 2px solid var(--color-stroke-focus-ring);
+}
+.chip[aria-pressed='true'],
+.chipSelected {
+  background: var(--color-bg-brand-weak);
+  border-color: var(--color-stroke-brand-solid);
+  color: var(--color-fg-brand);
+}
+.input,
+.textarea {
+  width: 100%;
+  border: 1px solid var(--color-stroke-neutral-weak);
+  border-radius: 8px;
+  background: var(--color-bg-layer-default);
+  padding: 12px;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--color-fg-neutral);
+}
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--color-fg-placeholder);
+}
+.input:focus,
+.textarea:focus {
+  outline: 2px solid var(--color-stroke-focus-ring);
+  outline-offset: 2px;
+}
+.textarea {
+  min-height: 152px;
+  resize: vertical;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  min-width: 0;
+}
+.fieldLabel {
+  font-size: 15px;
+  line-height: 21px;
+  font-weight: 700;
+}
+.count {
+  text-align: right;
+  font-size: 13px;
+  color: var(--color-fg-neutral-muted);
+}
+.reviewCard {
+  padding: 16px;
+  border: 1px solid var(--color-stroke-neutral-subtle);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.reviewBody {
+  font-size: 15px;
+  line-height: 24px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.photos {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+.photo {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.ratingInput {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0;
+}
+.ratingValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-fg-rating);
+}
+.spec {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  font-size: 13px;
+  line-height: 20px;
+}
+.spec dt {
+  color: var(--color-fg-neutral-muted);
+}
+.spec dd {
+  text-align: right;
+}
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 0;
+  font-size: 15px;
+}
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-stroke-neutral-subtle);
+  border-top-color: var(--color-stroke-brand-solid);
+  border-radius: 50%;
+  animation: spin 900ms linear infinite;
+}
+.completion {
+  color: var(--color-fg-brand);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.footer {
+  padding-top: 24px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-fg-neutral-subtle);
+}
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes return {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .step,
+  .spinner {
+    animation: none;
+  }
+  .scene,
+  .progressFill,
+  .choice {
+    transition: none;
+  }
+  .choice:active {
+    transform: none;
+  }
+}
