@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useQuery } from '@tanstack/react-query';
 
@@ -21,6 +21,7 @@ interface Props {
   isAuthLoading: boolean;
   onStartTest: () => void;
   onRestart: () => void;
+  onShown: (code: MbtiCode) => void;
 }
 
 async function fetchResult(code: MbtiCode) {
@@ -38,12 +39,17 @@ export default function MbtiResult({
   isAuthLoading,
   onStartTest,
   onRestart,
+  onShown,
 }: Props) {
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['whiskey-mbti-result', code],
     queryFn: () => fetchResult(code),
   });
   const [isShareOpen, setIsShareOpen] = useState(false);
+
+  useEffect(() => {
+    if (data && !isLoading && !isError) onShown(code);
+  }, [code, data, isLoading, isError, onShown]);
 
   if (isLoading)
     return <p className={styles.loading}>결과를 불러오는 중이에요.</p>;

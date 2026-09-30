@@ -163,7 +163,7 @@ describe('useSocialLogin', () => {
     );
   });
 
-  it('MBTI 앱 로그인 오류는 첫 화면으로 돌아가고 실패 모달을 열지 않는다', () => {
+  it('MBTI 앱 로그인 오류는 결과 로그인 게이트로 돌아가고 실패 모달을 열지 않는다', () => {
     setReturnToUrl('/whiskey-mbti?result=INTJ-A');
     const { result } = renderHook(() => useSocialLogin());
 
@@ -171,7 +171,7 @@ describe('useSocialLogin', () => {
       result.current.onKakaoAppLoginError(new Error('cancelled'));
     });
 
-    expect(routerReplace).toHaveBeenCalledWith('/whiskey-mbti');
+    expect(routerReplace).toHaveBeenCalledWith('/whiskey-mbti?result=INTJ-A');
     expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBeNull();
   });
 

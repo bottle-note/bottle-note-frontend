@@ -1,6 +1,9 @@
 'use client';
 
-import { useState, useEffect, ReactNode } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import LoginModal from '@/components/domain/auth/LoginModal';
+import { trackCampaignEvent } from '@/api/campaign-content/campaign-content.api';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useTarotQuiz } from './_hooks/useTarotQuiz';
 import IntroScreen from './_components/IntroScreen';
 import QuestioningScreen from './_components/QuestioningScreen';
@@ -15,7 +18,22 @@ interface AnimatedPageProps {
   direction?: 'up' | 'down' | 'left' | 'right' | 'fade';
 }
 
+const trackWithoutBlocking = (type: 'VIEW' | 'START' | 'FINISH' | 'RESULT') => {
+  try {
+    trackCampaignEvent('whiskey-tarot', type);
+  } catch {
+    // Analytics must never block the tarot journey.
+  }
+};
+
 export default function WhiskeyTarotPage() {
+  const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
+  const [showLogin, setShowLogin] = useState(false);
+  const shouldOpenLoginWhenReady = useRef(false);
+  const hasTrackedView = useRef(false);
+  const hasTrackedStart = useRef(false);
+  const hasTrackedFinish = useRef(false);
+  const hasTrackedResult = useRef(false);
   const {
     state,
     isLoading,
@@ -25,10 +43,50 @@ export default function WhiskeyTarotPage() {
     goToSelecting,
     toggleCardSelection,
     getRecommendation,
+    goToSlides,
     goToResult,
-  } = useTarotQuiz();
+  } = useTarotQuiz(isLoggedIn);
+  const canViewResults = isLoggedIn;
+
+  useEffect(() => {
+    if (hasTrackedView.current) return;
+
+    hasTrackedView.current = true;
+    trackWithoutBlocking('VIEW');
+  }, []);
+
+  useEffect(() => {
+    if (state.step !== 'ready' || isAuthLoading) return;
+
+    if (canViewResults) {
+      goToSlides();
+      return;
+    }
+
+    if (shouldOpenLoginWhenReady.current) {
+      shouldOpenLoginWhenReady.current = false;
+      setShowLogin(true);
+    }
+  }, [canViewResults, goToSlides, isAuthLoading, state.step]);
+
+  useEffect(() => {
+    if (
+      !canViewResults ||
+      state.step !== 'slides' ||
+      hasTrackedResult.current
+    ) {
+      return;
+    }
+
+    hasTrackedResult.current = true;
+    trackWithoutBlocking('RESULT');
+  }, [canViewResults, state.step]);
 
   const handleStart = () => {
+    if (!hasTrackedStart.current) {
+      hasTrackedStart.current = true;
+      trackWithoutBlocking('START');
+    }
     goToQuestioning();
   };
 
@@ -37,11 +95,29 @@ export default function WhiskeyTarotPage() {
   };
 
   const handleConfirmSelection = () => {
+    if (state.step === 'ready') {
+      if (!isAuthLoading && !canViewResults) {
+        setShowLogin(true);
+      }
+      return;
+    }
+
+    if (state.step !== 'selecting' || state.selectedCards.length !== 3) {
+      return;
+    }
+
+    if (!hasTrackedFinish.current) {
+      hasTrackedFinish.current = true;
+      trackWithoutBlocking('FINISH');
+    }
+    shouldOpenLoginWhenReady.current = !canViewResults;
     getRecommendation();
   };
 
   const handleSlidesComplete = () => {
-    goToResult();
+    if (canViewResults) {
+      goToResult();
+    }
   };
 
   return (
@@ -72,17 +148,36 @@ export default function WhiskeyTarotPage() {
         />
       </AnimatedPage>
 
-      {/* 결과 슬라이드 (Wrapped 스타일) */}
-      <AnimatedPage isActive={state.step === 'slides'} direction="left">
-        <ResultSlides
+      {/* 추천은 준비되었지만 guest에게는 로그인 전까지 결과를 렌더하지 않는다. */}
+      <AnimatedPage isActive={state.step === 'ready'} direction="up">
+        <CardSelection
+          cards={state.cards}
           selectedCards={state.selectedCards}
-          onComplete={handleSlidesComplete}
+          onSelectCard={toggleCardSelection}
+          onConfirm={handleConfirmSelection}
+          isLoading={isLoading || isAuthLoading}
         />
       </AnimatedPage>
 
+      {/* 결과 슬라이드 (Wrapped 스타일) */}
+      <AnimatedPage
+        isActive={canViewResults && state.step === 'slides'}
+        direction="left"
+      >
+        {canViewResults && (
+          <ResultSlides
+            selectedCards={state.selectedCards}
+            onComplete={handleSlidesComplete}
+          />
+        )}
+      </AnimatedPage>
+
       {/* 최종 결과 화면 */}
-      <AnimatedPage isActive={state.step === 'result'} direction="up">
-        {state.recommendedWhisky && (
+      <AnimatedPage
+        isActive={canViewResults && state.step === 'result'}
+        direction="up"
+      >
+        {canViewResults && state.recommendedWhisky && (
           <FinalResult
             whisky={state.recommendedWhisky}
             matchReason={state.matchReason}
@@ -91,6 +186,13 @@ export default function WhiskeyTarotPage() {
           />
         )}
       </AnimatedPage>
+
+      {showLogin && (
+        <LoginModal
+          handleClose={() => setShowLogin(false)}
+          returnTo="/whiskey-tarot"
+        />
+      )}
     </div>
   );
 }
@@ -108,11 +210,11 @@ function AnimatedPage({
       setShouldRender(true);
       const timer = setTimeout(() => setIsVisible(true), 20);
       return () => clearTimeout(timer);
-    } else {
-      setIsVisible(false);
-      const timer = setTimeout(() => setShouldRender(false), 400);
-      return () => clearTimeout(timer);
     }
+
+    setIsVisible(false);
+    const timer = setTimeout(() => setShouldRender(false), 400);
+    return () => clearTimeout(timer);
   }, [isActive]);
 
   if (!shouldRender) return null;

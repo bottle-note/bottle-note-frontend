@@ -1,8 +1,31 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { AlcoholDetailsResponse } from '@/api/alcohol/types';
 import { trackGA4Event } from '@/utils/analytics/ga4';
-import { QuizState, QuizStep, TarotCard, WhiskyRecommend } from '../_types';
+import {
+  FlavorTag,
+  QuizState,
+  QuizStep,
+  RecommendResponse,
+  TarotCard,
+  WhiskyRecommend,
+} from '../_types';
+
+const RESULT_STORAGE_KEY = 'whiskey-tarot:result:v1';
+const RESULT_SNAPSHOT_VERSION = 1;
+const FLAVOR_TAGS: FlavorTag[] = [
+  'Fresh',
+  'Sweet',
+  'Peat',
+  'Strong',
+  'Balance',
+];
+
+interface TarotResultSnapshot {
+  version: typeof RESULT_SNAPSHOT_VERSION;
+  selectedCards: TarotCard[];
+  recommendation: RecommendResponse;
+}
 
 const initialState: QuizState = {
   step: 'intro',
@@ -13,17 +36,178 @@ const initialState: QuizState = {
   currentSlideIndex: 0,
 };
 
-export const useTarotQuiz = () => {
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const isFlavorTag = (value: unknown): value is FlavorTag =>
+  typeof value === 'string' && FLAVOR_TAGS.includes(value as FlavorTag);
+
+const isTarotCard = (value: unknown): value is TarotCard => {
+  if (
+    !isRecord(value) ||
+    !Number.isInteger(value.id) ||
+    !isFlavorTag(value.flavorTag)
+  ) {
+    return false;
+  }
+
+  return [
+    value.name,
+    value.nameKo,
+    value.readingText,
+    value.history,
+    value.image,
+    value.color,
+  ].every((field) => typeof field === 'string');
+};
+
+const hasUniqueCardIds = (cards: TarotCard[]) =>
+  cards.length === 3 &&
+  new Set(cards.map(({ id }) => id)).size === cards.length;
+
+const isWhiskyRecommend = (value: unknown): value is WhiskyRecommend => {
+  if (!isRecord(value) || !isFlavorTag(value.category)) return false;
+
+  return (
+    Number.isInteger(value.whiskyId) &&
+    [
+      value.name,
+      value.nameKo,
+      value.description,
+      value.emoji,
+      value.whiskyCategory,
+    ].every((field) => typeof field === 'string')
+  );
+};
+
+const isFlavorScore = (value: unknown): value is Record<FlavorTag, number> =>
+  isRecord(value) &&
+  FLAVOR_TAGS.every(
+    (tag) => typeof value[tag] === 'number' && Number.isFinite(value[tag]),
+  );
+
+const isRecommendResponse = (value: unknown): value is RecommendResponse =>
+  isRecord(value) &&
+  Array.isArray(value.selectedCards) &&
+  value.selectedCards.every(isTarotCard) &&
+  hasUniqueCardIds(value.selectedCards) &&
+  isWhiskyRecommend(value.recommendedWhisky) &&
+  typeof value.matchReason === 'string' &&
+  isFlavorScore(value.flavorScore);
+
+const hasSameCardIds = (left: TarotCard[], right: TarotCard[]) =>
+  left.length === right.length &&
+  left.every((card, index) => card.id === right[index]?.id);
+
+const isTarotResultSnapshot = (value: unknown): value is TarotResultSnapshot =>
+  isRecord(value) &&
+  value.version === RESULT_SNAPSHOT_VERSION &&
+  Array.isArray(value.selectedCards) &&
+  value.selectedCards.every(isTarotCard) &&
+  hasUniqueCardIds(value.selectedCards) &&
+  isRecommendResponse(value.recommendation) &&
+  hasSameCardIds(value.selectedCards, value.recommendation.selectedCards);
+
+const readResultSnapshot = (): TarotResultSnapshot | null => {
+  try {
+    const rawSnapshot = window.sessionStorage.getItem(RESULT_STORAGE_KEY);
+    if (!rawSnapshot) return null;
+
+    const snapshot: unknown = JSON.parse(rawSnapshot);
+    return isTarotResultSnapshot(snapshot) ? snapshot : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeResultSnapshot = (
+  selectedCards: TarotCard[],
+  recommendation: RecommendResponse,
+) => {
+  try {
+    window.sessionStorage.setItem(
+      RESULT_STORAGE_KEY,
+      JSON.stringify({
+        version: RESULT_SNAPSHOT_VERSION,
+        selectedCards,
+        recommendation,
+      } satisfies TarotResultSnapshot),
+    );
+  } catch {
+    // OAuth/login can still continue when browser storage is unavailable.
+  }
+};
+
+const clearResultSnapshot = () => {
+  try {
+    window.sessionStorage.removeItem(RESULT_STORAGE_KEY);
+  } catch {
+    // Storage cleanup must not block restarting the quiz.
+  }
+};
+
+export const useTarotQuiz = (isLoggedIn: boolean) => {
   const [state, setState] = useState<QuizState>(initialState);
   const [isLoading, setIsLoading] = useState(false);
   const [prefetchedWhiskyDetail, setPrefetchedWhiskyDetail] = useState<
     AlcoholDetailsResponse['alcohols'] | null
   >(null);
+  const hasRestoredResult = useRef(false);
+  const isSubmittingRecommendation = useRef(false);
+  const prefetchedWhiskyId = useRef<number | null>(null);
+
+  const prefetchWhiskyDetail = useCallback((whiskyId?: number) => {
+    if (!whiskyId) return;
+
+    AlcoholsApi.getAlcoholDetails(String(whiskyId))
+      .then((result) => {
+        if (result?.data?.alcohols) {
+          setPrefetchedWhiskyDetail(result.data.alcohols);
+        }
+      })
+      .catch(() => {
+        // FinalResult retries this optional performance prefetch when needed.
+      });
+  }, []);
+
+  useEffect(() => {
+    if (hasRestoredResult.current) return;
+    hasRestoredResult.current = true;
+
+    const snapshot = readResultSnapshot();
+    if (!snapshot) return;
+
+    const { selectedCards, recommendation } = snapshot;
+    setState((previous) => ({
+      ...previous,
+      cards: selectedCards,
+      selectedCards,
+      recommendedWhisky: recommendation.recommendedWhisky,
+      matchReason: recommendation.matchReason,
+      currentSlideIndex: 0,
+      step: 'ready',
+    }));
+  }, []);
+
+  useEffect(() => {
+    const whiskyId = state.recommendedWhisky?.whiskyId;
+    if (
+      !isLoggedIn ||
+      (state.step !== 'slides' && state.step !== 'result') ||
+      !whiskyId ||
+      prefetchedWhiskyId.current === whiskyId
+    ) {
+      return;
+    }
+
+    prefetchedWhiskyId.current = whiskyId;
+    prefetchWhiskyDetail(whiskyId);
+  }, [isLoggedIn, prefetchWhiskyDetail, state.recommendedWhisky, state.step]);
 
   // 질문 생각 화면으로 이동
   const goToQuestioning = useCallback(() => {
     trackGA4Event('tarot_start');
-    setState((prev) => ({ ...prev, step: 'questioning' }));
+    setState((previous) => ({ ...previous, step: 'questioning' }));
   }, []);
 
   // 카드 목록 불러오기
@@ -31,10 +215,19 @@ export const useTarotQuiz = () => {
     setIsLoading(true);
     try {
       const response = await fetch('/api/whiskey-tarot/cards');
-      const data = await response.json();
-      setState((prev) => ({
-        ...prev,
-        cards: data.cards,
+      const data: unknown = await response.json();
+      if (
+        !isRecord(data) ||
+        !Array.isArray(data.cards) ||
+        !data.cards.every(isTarotCard)
+      ) {
+        throw new Error('Invalid tarot card response');
+      }
+
+      const tarotCards = data.cards as TarotCard[];
+      setState((previous) => ({
+        ...previous,
+        cards: tarotCards,
         step: 'dealing', // 덱에서 카드 뽑기 화면으로
       }));
     } catch (error) {
@@ -47,70 +240,74 @@ export const useTarotQuiz = () => {
 
   // dealing 완료 후 selecting으로 이동
   const goToSelecting = useCallback(() => {
-    setState((prev) => ({ ...prev, step: 'selecting' }));
+    setState((previous) => ({ ...previous, step: 'selecting' }));
   }, []);
 
   // 카드 선택/해제
   const toggleCardSelection = useCallback((card: TarotCard) => {
-    setState((prev) => {
-      const isSelected = prev.selectedCards.some((c) => c.id === card.id);
+    setState((previous) => {
+      const isSelected = previous.selectedCards.some(
+        (selected) => selected.id === card.id,
+      );
 
       if (isSelected) {
         return {
-          ...prev,
-          selectedCards: prev.selectedCards.filter((c) => c.id !== card.id),
+          ...previous,
+          selectedCards: previous.selectedCards.filter(
+            (selected) => selected.id !== card.id,
+          ),
         };
       }
 
       // 최대 3장까지만 선택 가능
-      if (prev.selectedCards.length >= 3) {
-        return prev;
+      if (previous.selectedCards.length >= 3) {
+        return previous;
       }
 
       return {
-        ...prev,
-        selectedCards: [...prev.selectedCards, card],
+        ...previous,
+        selectedCards: [...previous.selectedCards, card],
       };
     });
   }, []);
 
-  // 위스키 추천 받기
+  // 위스키 추천을 한 번만 랜덤으로 받아 ready 단계에 보관한다.
   const getRecommendation = useCallback(async () => {
-    if (state.selectedCards.length !== 3) return;
+    if (
+      state.selectedCards.length !== 3 ||
+      isSubmittingRecommendation.current
+    ) {
+      return;
+    }
 
+    isSubmittingRecommendation.current = true;
     setIsLoading(true);
     try {
       const response = await fetch('/api/whiskey-tarot/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          selectedCardIds: state.selectedCards.map((c) => c.id),
+          selectedCardIds: state.selectedCards.map((card) => card.id),
         }),
       });
-
-      const data = await response.json();
-
-      // 위스키 상세 정보 프리페치 (이미지 로딩 속도 개선)
-      if (data.recommendedWhisky?.whiskyId) {
-        AlcoholsApi.getAlcoholDetails(String(data.recommendedWhisky.whiskyId))
-          .then((result) => {
-            if (result?.data?.alcohols) {
-              setPrefetchedWhiskyDetail(result.data.alcohols);
-            }
-          })
-          .catch(() => {
-            // 프리페치 실패해도 무시 (FinalResult에서 다시 시도)
-          });
+      const data: unknown = await response.json();
+      if (
+        !isRecommendResponse(data) ||
+        !hasSameCardIds(state.selectedCards, data.selectedCards)
+      ) {
+        throw new Error('Invalid tarot recommendation response');
       }
 
-      setState((prev) => ({
-        ...prev,
+      writeResultSnapshot(state.selectedCards, data);
+      setState((previous) => ({
+        ...previous,
         recommendedWhisky: data.recommendedWhisky,
         matchReason: data.matchReason,
-        step: 'slides',
+        step: 'ready',
         currentSlideIndex: 0,
       }));
     } catch (error) {
+      isSubmittingRecommendation.current = false;
       // eslint-disable-next-line no-console
       console.error('추천 로딩 실패:', error);
     } finally {
@@ -118,47 +315,65 @@ export const useTarotQuiz = () => {
     }
   }, [state.selectedCards]);
 
+  const goToSlides = useCallback(() => {
+    setState((previous) => {
+      if (
+        previous.selectedCards.length !== 3 ||
+        !previous.recommendedWhisky ||
+        previous.step !== 'ready'
+      ) {
+        return previous;
+      }
+
+      return { ...previous, step: 'slides', currentSlideIndex: 0 };
+    });
+  }, []);
+
   // 스텝 변경
   const setStep = useCallback((step: QuizStep) => {
-    setState((prev) => ({ ...prev, step }));
+    setState((previous) => ({ ...previous, step }));
   }, []);
 
   // 슬라이드 인덱스 변경
   const setSlideIndex = useCallback((index: number) => {
-    setState((prev) => ({ ...prev, currentSlideIndex: index }));
+    setState((previous) => ({ ...previous, currentSlideIndex: index }));
   }, []);
 
   // 다음 슬라이드로 이동
   const nextSlide = useCallback(() => {
-    setState((prev) => {
-      const maxIndex = prev.selectedCards.length; // 카드 수 + 최종 결과
-      if (prev.currentSlideIndex >= maxIndex) {
-        return { ...prev, step: 'result' };
+    setState((previous) => {
+      const maxIndex = previous.selectedCards.length; // 카드 수 + 최종 결과
+      if (previous.currentSlideIndex >= maxIndex) {
+        return { ...previous, step: 'result' };
       }
-      return { ...prev, currentSlideIndex: prev.currentSlideIndex + 1 };
+      return { ...previous, currentSlideIndex: previous.currentSlideIndex + 1 };
     });
   }, []);
 
   // 결과 화면으로 이동
   const goToResult = useCallback(() => {
-    setState((prev) => {
-      if (prev.recommendedWhisky?.whiskyId) {
+    setState((previous) => {
+      if (previous.recommendedWhisky?.whiskyId) {
         trackGA4Event('tarot_complete', {
-          result_alcohol_id: String(prev.recommendedWhisky.whiskyId),
+          result_alcohol_id: String(previous.recommendedWhisky.whiskyId),
         });
       }
-      return { ...prev, step: 'result' };
+      return { ...previous, step: 'result' };
     });
   }, []);
 
   // 초기화 (다시하기)
   const reset = useCallback(() => {
+    isSubmittingRecommendation.current = false;
+    prefetchedWhiskyId.current = null;
+    clearResultSnapshot();
+    setPrefetchedWhiskyDetail(null);
     setState(initialState);
   }, []);
 
   // 선택된 위스키 설정 (직접 설정용)
   const setRecommendedWhisky = useCallback((whisky: WhiskyRecommend) => {
-    setState((prev) => ({ ...prev, recommendedWhisky: whisky }));
+    setState((previous) => ({ ...previous, recommendedWhisky: whisky }));
   }, []);
 
   return {
@@ -170,6 +385,7 @@ export const useTarotQuiz = () => {
     goToSelecting,
     toggleCardSelection,
     getRecommendation,
+    goToSlides,
     setStep,
     setSlideIndex,
     nextSlide,
