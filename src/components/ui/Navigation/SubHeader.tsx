@@ -10,7 +10,9 @@ import React, {
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { Bell } from 'lucide-react';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useNotificationUnreadCount } from '@/queries/useNotificationsQuery';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
 import Logo from 'public/bottle_note_Icon_logo.svg';
@@ -111,6 +113,36 @@ const HeaderMenu = () => {
   );
 };
 
+const HeaderNotificationBell = () => {
+  const { user, isLoggedIn } = useAuthSession();
+  const userId =
+    process.env.NEXT_PUBLIC_DEPLOY_ENV === 'development' && isLoggedIn
+      ? user?.userId ?? null
+      : null;
+  const { data } = useNotificationUnreadCount(userId);
+
+  if (userId === null) return null;
+
+  const unreadCount = data?.unreadCount ?? 0;
+
+  return (
+    <Link
+      href={ROUTES.NOTIFICATIONS}
+      aria-label={
+        unreadCount > 0 ? `알림함, 읽지 않은 알림 ${unreadCount}개` : '알림함'
+      }
+      className="relative inline-flex items-center justify-center pt-8 text-fg-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
+    >
+      <Bell size={22} strokeWidth={1.8} aria-hidden="true" />
+      {unreadCount > 0 && (
+        <span className="absolute -right-8 top-2 flex h-17 min-w-17 items-center justify-center rounded-full border-2 border-bg-layer-default bg-bg-brand-solid px-2 text-10 font-bold leading-none text-palette-static-white">
+          {unreadCount > 99 ? '99+' : unreadCount}
+        </span>
+      )}
+    </Link>
+  );
+};
+
 const HeaderProfile = () => {
   const router = useRouter();
   const { user, isLoggedIn } = useAuthSession();
@@ -184,5 +216,6 @@ export const SubHeader = Object.assign(SubHeaderMain, {
   Right: HeaderRight,
   Logo: HeaderLogo,
   Menu: HeaderMenu,
+  NotificationBell: HeaderNotificationBell,
   Profile: HeaderProfile,
 });

@@ -3,7 +3,6 @@
 import { useEffect, useRef } from 'react';
 import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import { cn } from '@/lib/utils';
-import { NotificationBell } from '@/components/domain/notification/NotificationBell';
 import { SubHeader } from './SubHeader';
 
 interface AutoHideLogoHeaderProps {
@@ -52,7 +51,7 @@ export default function AutoHideLogoHeader({
         {title && <SubHeader.Center>{title}</SubHeader.Center>}
         <SubHeader.Right>
           <div className="flex items-center gap-x-12">
-            <NotificationBell />
+            <SubHeader.NotificationBell />
             <SubHeader.Profile />
             <SubHeader.Menu />
           </div>
