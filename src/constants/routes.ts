@@ -9,18 +9,16 @@ export const ROUTES = {
     KAKAO: '/oauth/kakao',
   },
   SEARCH: {
-    BASE: '/search',
-    ALL: (id: string | number) => `/search/all/${id}`,
-    SEARCH: (keyword: string) => `/search?keyword=${keyword}`,
-    CATEGORY: {
-      BASE: (category: string, id: string | number) =>
-        `/search/${category}/${id}`,
-      REVIEWS: (category: string, id: string | number) =>
-        `/search/${category}/${id}/reviews`,
-    },
+    INPUT: '/search/input',
+  },
+  ALCOHOL: {
+    DETAIL: (id: string | number) => `/alcohols/${id}`,
+    REVIEWS: (id: string | number) => `/alcohols/${id}/reviews`,
   },
   EXPLORE: {
     BASE: '/explore',
+    WHISKEY_SEARCH: (keyword?: string) =>
+      `/explore?tab=EXPLORER_WHISKEY${keyword ? `&keyword=${encodeURIComponent(keyword)}` : ''}`,
   },
   CURATION: {
     BASE: '/curation',

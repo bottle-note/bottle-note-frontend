@@ -34,7 +34,7 @@ describe('TastingEventLineupItem', () => {
 
     const link = screen.getByRole('link');
 
-    expect(link).toHaveAttribute('href', ROUTES.SEARCH.ALL(123));
+    expect(link).toHaveAttribute('href', ROUTES.ALCOHOL.DETAIL(123));
     expect(screen.getAllByRole('link')).toHaveLength(1);
     expect(screen.getByText('상세보기 >')).toHaveClass('link-button');
     expect(screen.getByText('도수 40%')).toHaveClass('text-fg-neutral');

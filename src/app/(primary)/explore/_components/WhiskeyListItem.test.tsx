@@ -93,7 +93,7 @@ describe('WhiskeyListItem', () => {
     detailLinks.forEach((link) => {
       expect(link).toHaveAttribute(
         'href',
-        ROUTES.SEARCH.ALL(content.alcoholId),
+        ROUTES.ALCOHOL.DETAIL(content.alcoholId),
       );
     });
   });

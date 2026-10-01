@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/constants/routes';
 import SearchBar from './SearchBar';
 
 interface Props {
@@ -27,8 +28,8 @@ export default function SearchBarLink({
 
     const queryString = params.toString();
     const targetUrl = queryString
-      ? `/search/input?${queryString}`
-      : '/search/input';
+      ? `${ROUTES.SEARCH.INPUT}?${queryString}`
+      : ROUTES.SEARCH.INPUT;
     router.push(targetUrl);
   };
 

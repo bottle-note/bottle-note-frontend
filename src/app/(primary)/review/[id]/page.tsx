@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import * as yup from 'yup';
@@ -14,8 +14,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { FormValues } from '@/types/Reply';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { ReplyApi } from '@/api/reply/reply.api';
-import JsonLd from '@/components/seo/JsonLd';
-import { generateReviewSchema } from '@/utils/seo/generateReviewSchema';
 import NavLayout from '@/components/ui/Layout/NavLayout';
 import useModalStore from '@/store/modalStore';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
@@ -153,15 +151,8 @@ export default function ReviewDetail() {
     };
   }, []);
 
-  const reviewSchema = useMemo(() => {
-    return alcoholInfo && reviewDetails?.reviewInfo
-      ? generateReviewSchema(alcoholInfo, reviewDetails.reviewInfo)
-      : null;
-  }, [alcoholInfo, reviewDetails?.reviewInfo]);
-
   return (
     <FormProvider {...formMethods}>
-      {reviewSchema && <JsonLd data={reviewSchema} />}
       {errorInfo ? (
         <NavLayout>
           <SubHeader>

@@ -70,7 +70,7 @@ describe('transformAlcohol', () => {
     const result = transformAlcohol(raw);
 
     // Then
-    expect(result.path).toBe('/search/SINGLE_MALT/123');
+    expect(result.path).toBe('/alcohols/123');
   });
 });
 
@@ -109,8 +109,8 @@ describe('transformAlcoholList', () => {
     expect(result).toHaveLength(2);
     expect(result[0].engCategory).toBe('SINGLE_MALT');
     expect(result[1].engCategory).toBe('BOURBON');
-    expect(result[0].path).toBe('/search/SINGLE_MALT/1');
-    expect(result[1].path).toBe('/search/BOURBON/2');
+    expect(result[0].path).toBe('/alcohols/1');
+    expect(result[1].path).toBe('/alcohols/2');
   });
 
   it('빈 배열을 올바르게 처리한다', () => {

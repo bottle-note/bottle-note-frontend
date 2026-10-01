@@ -2,6 +2,7 @@
 // Alcohol API - Data Transformers
 // ============================================
 
+import { ROUTES } from '@/constants/routes';
 import type { AlcoholApiRaw, Alcohol, CategoryResponse } from './types';
 
 /**
@@ -22,7 +23,7 @@ export function transformAlcohol(raw: AlcoholApiRaw): Alcohol {
     imageUrl: raw.imageUrl,
     isPicked: raw.isPicked,
     popularScore: raw.popularScore,
-    path: `/search/${engCategory}/${raw.alcoholId}`,
+    path: ROUTES.ALCOHOL.DETAIL(raw.alcoholId),
   };
 }
 

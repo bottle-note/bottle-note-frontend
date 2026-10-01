@@ -41,13 +41,13 @@ const ListItemRating = ({ data }: Props) => {
 
   return (
     <article className="flex items-center space-x-8 text-mainBlack border-brightGray border-b h-90">
-      <Link href={ROUTES.SEARCH.ALL(alcoholId)}>
+      <Link href={ROUTES.ALCOHOL.DETAIL(alcoholId)}>
         <ItemImage src={imageUrl} alt="image" />
       </Link>
 
       <section className="flex-1 space-y-4">
         <Link
-          href={ROUTES.SEARCH.ALL(alcoholId)}
+          href={ROUTES.ALCOHOL.DETAIL(alcoholId)}
           className="flex flex-col items-start justify-center space-y-6"
         >
           <ItemInfo

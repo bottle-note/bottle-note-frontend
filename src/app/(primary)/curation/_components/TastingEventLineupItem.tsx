@@ -101,7 +101,7 @@ export function TastingEventLineupItem({
     <article className={`relative ${chips.length > 0 ? 'py-24' : 'py-12'}`}>
       {isDetailAvailable ? (
         <Link
-          href={ROUTES.SEARCH.ALL(alcoholId)}
+          href={ROUTES.ALCOHOL.DETAIL(alcoholId)}
           className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-layer-default"
         >
           {content}

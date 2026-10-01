@@ -69,6 +69,7 @@ export interface ExploreAlcohol {
   myRating: number;
   myAvgRating: number;
   isPicked: boolean;
+  reviewCount?: number;
   alcoholsTastingTags: string[];
 }
 

@@ -3,6 +3,10 @@ import { ApiResponse } from '@/api/_shared/types';
 import type { ExploreAlcohol, ExploreReview } from '@/api/explore/types';
 import { BASE_URL, SSR_CALLER_HEADER } from '@/constants/common';
 import {
+  alcoholCanonicalPath,
+  alcoholReviewsCanonicalPath,
+} from '@/shared/seo/alcoholMetadata';
+import {
   getInternalServerOrigin,
   internalApiHeaders,
 } from '@/shared/api/internalApi';
@@ -85,12 +89,23 @@ async function fetchAlcoholPages(
       { sortType: 'POPULAR', sortOrder: 'DESC' },
     );
 
-    return alcohols.map((alcohol) => ({
-      url: `${baseUrl}/search/${alcohol.engCategory}/${alcohol.alcoholId}`,
+    const detailPages = alcohols.map((alcohol) => ({
+      url: `${baseUrl}${alcoholCanonicalPath(alcohol.alcoholId)}`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     }));
+
+    // 게스트는 상세에서 리뷰 목록 링크를 볼 수 없어 크롤러 발견 경로로 sitemap에 넣는다.
+    const reviewListPages = alcohols
+      .filter((alcohol) => (alcohol.reviewCount ?? 0) > 0)
+      .map((alcohol) => ({
+        url: `${baseUrl}${alcoholReviewsCanonicalPath(alcohol.alcoholId)}`,
+        changeFrequency: 'weekly' as const,
+        priority: 0.6,
+      }));
+
+    return [...detailPages, ...reviewListPages];
   } catch (error) {
     console.error('❌ [Sitemap] Failed to fetch alcohols:', error);
   }
@@ -133,12 +148,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/search`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
     },
     {
       url: `${BASE_URL}/privacy-policy`,

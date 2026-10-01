@@ -1,4 +1,9 @@
 import { apiClient } from '@/shared/api/apiClient';
+import {
+  fetchPublicApiOnServer,
+  type PublicApiCacheOptions,
+  type PublicApiResult,
+} from '@/shared/api/internalApi';
 import { ApiResponse } from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
@@ -201,6 +206,33 @@ export const ReviewApi = {
     }
 
     return response;
+  },
+
+  // ========== 서버사이드 API (메타데이터·JSON-LD 생성, 비로그인 공개 데이터) ==========
+  server: {
+    /**
+     * 리뷰 상세 공개 정보를 조회합니다. 비공개 여부는 reviewInfo.status로 판단합니다.
+     */
+    async getReviewDetails(
+      reviewId: string,
+      cache: PublicApiCacheOptions,
+    ): Promise<PublicApiResult<ReviewDetailsResponse>> {
+      const result = await fetchPublicApiOnServer<
+        Omit<ReviewDetailsResponse, 'alcoholInfo'> & {
+          alcoholInfo: ReviewAlcoholInfoRaw;
+        }
+      >(`/v1/reviews/detail/${encodeURIComponent(reviewId)}`, cache);
+
+      if (result.status !== 'ok') return result;
+
+      return {
+        status: 'ok',
+        data: {
+          ...result.data,
+          alcoholInfo: transformReviewAlcoholInfo(result.data.alcoholInfo),
+        },
+      };
+    },
   },
 };
 

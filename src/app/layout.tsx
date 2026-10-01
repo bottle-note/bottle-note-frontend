@@ -6,6 +6,7 @@ import { GoogleTagManager } from '@next/third-parties/google';
 import { Providers } from '@/lib/Providers';
 import { THEME_INITIALIZER_SCRIPT } from '@/lib/theme/theme';
 import { BASE_URL } from '@/constants/common';
+import { SITE_TITLE_TEMPLATE } from '@/shared/seo/site';
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
   ),
   title: {
     default: '보틀노트(Bottle Note) - 위스키 라이프를 기록하다',
-    template: '%s | Bottle Note',
+    template: SITE_TITLE_TEMPLATE,
   },
   description:
     '위스키 라이프를 기록하다. 위스키 리뷰, 시음 후기, 평점을 기록하고 공유하세요. 위스키 추천과 테이스팅 노트, 다양한 정보를 보틀노트에서 만나보세요.',

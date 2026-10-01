@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
+import { sectionTitle } from '@/shared/seo/site';
 import { CurationNavLayout } from './_components/CurationNavLayout';
 
 export const metadata: Metadata = {
-  title: '큐레이션',
+  title: sectionTitle('큐레이션'),
   description:
     '보틀노트가 추천하는 위스키 큐레이션과 시음회 정보를 확인하세요.',
   keywords: ['큐레이션', '위스키 큐레이션', '위스키 추천', '위스키 시음회'],

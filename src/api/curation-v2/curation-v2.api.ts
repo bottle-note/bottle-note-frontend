@@ -1,5 +1,10 @@
 import { apiClient } from '@/shared/api/apiClient';
 import {
+  fetchPublicApiOnServer,
+  type PublicApiCacheOptions,
+  type PublicApiResult,
+} from '@/shared/api/internalApi';
+import {
   ApiResponse,
   InfiniteListParams,
   SORT_ORDER,
@@ -66,5 +71,21 @@ export const CurationV2Api = {
     }
 
     return response;
+  },
+
+  // ========== 서버사이드 API (메타데이터 생성, 비로그인 공개 데이터) ==========
+  server: {
+    /**
+     * 큐레이션 상세를 조회합니다.
+     */
+    getDetail(
+      curationId: string,
+      cache: PublicApiCacheOptions,
+    ): Promise<PublicApiResult<CurationV2DetailItem>> {
+      return fetchPublicApiOnServer<CurationV2DetailItem>(
+        `/v2/curations/${encodeURIComponent(curationId)}`,
+        cache,
+      );
+    },
   },
 };

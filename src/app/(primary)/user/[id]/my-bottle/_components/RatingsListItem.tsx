@@ -32,13 +32,13 @@ export const RatingsListItem = ({ data, isMyPage }: Props) => {
   return (
     <section className="flex items-center border-b border-stroke-neutral-subtle py-8 text-fg-neutral">
       {/* image */}
-      <Link href={ROUTES.SEARCH.ALL(alcoholId)} className="mr-12 shrink-0">
+      <Link href={ROUTES.ALCOHOL.DETAIL(alcoholId)} className="mr-12 shrink-0">
         <ItemImage src={imageUrl} alt="image" />
       </Link>
 
       {/* info */}
       <Link
-        href={ROUTES.SEARCH.ALL(alcoholId)}
+        href={ROUTES.ALCOHOL.DETAIL(alcoholId)}
         className="flex flex-col items-start justify-center space-y-6"
       >
         {isHot && (

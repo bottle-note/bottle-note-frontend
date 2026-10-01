@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef, type ReactNode } from 'react';
 
 import { GuestLoginPrompt } from '@/components/feature/auth/GuestLoginPrompt';
+import { GUEST_GATED_CONTENT_CLASS } from '../_constants';
 
 interface GuestAlcoholDetailGateProps {
   title: string;
@@ -40,7 +41,7 @@ export function GuestAlcoholDetailGate({
       <div
         ref={contentRef}
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 select-none blur-[1px]"
+        className={`${GUEST_GATED_CONTENT_CLASS} pointer-events-none absolute inset-0 select-none blur-[1px]`}
       >
         {children}
       </div>

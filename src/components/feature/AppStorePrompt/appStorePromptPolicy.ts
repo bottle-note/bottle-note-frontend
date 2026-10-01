@@ -31,7 +31,7 @@ const DEFAULT_PREFERENCE: AppStorePromptPreference = {
   disabled: false,
 };
 
-const SEARCH_DETAIL_PATH = /^\/search\/[^/]+\/[^/]+$/;
+const ALCOHOL_DETAIL_PATH = /^\/alcohols\/[^/]+$/;
 const REVIEW_DETAIL_PATH = /^\/review\/(?!register$|modify$)[^/]+$/;
 const CURATION_DETAIL_PATH = /^\/curation\/[^/]+$/;
 const IMPORT_CLEARANCE_DETAIL_PATH =
@@ -44,7 +44,7 @@ export const isAppStorePromptDetailRoute = (pathname: string): boolean => {
   const normalizedPathname = normalizePathname(pathname);
 
   return (
-    SEARCH_DETAIL_PATH.test(normalizedPathname) ||
+    ALCOHOL_DETAIL_PATH.test(normalizedPathname) ||
     REVIEW_DETAIL_PATH.test(normalizedPathname) ||
     CURATION_DETAIL_PATH.test(normalizedPathname) ||
     IMPORT_CLEARANCE_DETAIL_PATH.test(normalizedPathname)

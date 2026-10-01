@@ -1,16 +1,14 @@
-import { AlcoholInfo, ReviewInDetails } from '@/api/alcohol/types';
+import { AlcoholInfo } from '@/api/alcohol/types';
 import { BASE_URL } from '@/constants/common';
+import { alcoholCanonicalPath } from '@/shared/seo/alcoholMetadata';
 
 /**
  * 위스키 상세 정보를 Schema.org Product 형식으로 변환합니다.
+ * 보틀 조회는 캐시되므로 비공개 전환·삭제가 늦게 반영될 수 있는 개별 리뷰 본문은 넣지 않습니다.
  * @param alcohol 위스키 상세 정보
- * @param reviews 리뷰 목록 (최대 3개 권장)
  * @returns Schema.org Product JSON-LD
  */
-export function generateAlcoholSchema(
-  alcohol: AlcoholInfo,
-  reviews?: ReviewInDetails[],
-) {
+export function generateAlcoholSchema(alcohol: AlcoholInfo) {
   const schema: Record<string, any> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -25,7 +23,7 @@ export function generateAlcoholSchema(
       name: alcohol.korDistillery || alcohol.engDistillery || alcohol.korName,
     },
     category: alcohol.korCategory,
-    url: `${BASE_URL}/search/${alcohol.engCategory}/${alcohol.alcoholId}`,
+    url: `${BASE_URL}${alcoholCanonicalPath(alcohol.alcoholId)}`,
     additionalProperty: [
       {
         '@type': 'PropertyValue',
@@ -48,34 +46,44 @@ export function generateAlcoholSchema(
         value: alcohol.korDistillery || alcohol.engDistillery || '-',
       },
     ].filter((prop) => prop.value !== '-'),
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: alcohol.rating?.toFixed(1) || '0.0',
-      ratingCount: alcohol.totalRatingsCount || 0,
-      bestRating: 5,
-      worstRating: 0,
-    },
   };
 
-  if (reviews && reviews.length > 0) {
-    schema.review = reviews.slice(0, 3).map((review) => ({
-      '@type': 'Review',
-      reviewRating: {
-        '@type': 'Rating',
-        ratingValue: review.rating,
-        bestRating: 5,
-        worstRating: 0,
-      },
-      author: {
-        '@type': 'Person',
-        name: review.userInfo.nickName,
-        image: review.userInfo.userProfileImage,
-      },
-      datePublished: review.createAt,
-      reviewBody: review.reviewContent,
-      ...(review.reviewImageUrl && { image: review.reviewImageUrl }),
-    }));
+  // 평가가 없는 aggregateRating은 구조화 데이터 오류로 처리된다.
+  if (alcohol.totalRatingsCount > 0) {
+    schema.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: alcohol.rating.toFixed(1),
+      ratingCount: alcohol.totalRatingsCount,
+      bestRating: 5,
+      worstRating: 0,
+    };
   }
 
   return schema;
+}
+
+/**
+ * 위스키 상세 페이지를 Schema.org WebPage로 표현하고, 게스트에게 가려지는 영역을
+ * 로그인 제한 콘텐츠로 표시합니다. 가려진 영역을 숨긴 텍스트(클로킹)로 오해받지 않게 하는
+ * Google의 구독·로그인 제한 콘텐츠 구조화 데이터 방식입니다.
+ * @param alcohol 위스키 상세 정보
+ * @param gatedContentSelector 게스트에게 가려지는 영역의 CSS 선택자
+ * @returns Schema.org WebPage JSON-LD
+ */
+export function generateAlcoholPageSchema(
+  alcohol: AlcoholInfo,
+  gatedContentSelector: string,
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: alcohol.korName || alcohol.engName,
+    url: `${BASE_URL}${alcoholCanonicalPath(alcohol.alcoholId)}`,
+    isAccessibleForFree: false,
+    hasPart: {
+      '@type': 'WebPageElement',
+      isAccessibleForFree: false,
+      cssSelector: gatedContentSelector,
+    },
+  };
 }
