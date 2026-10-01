@@ -18,10 +18,7 @@ export default async function Layout({ params, children }: Props) {
   const result = await getAlcoholSeoData(params.id);
   const schema =
     result.status === 'ok' && result.data.alcohols
-      ? generateAlcoholSchema(
-          result.data.alcohols,
-          result.data.reviewInfo?.reviewList,
-        )
+      ? generateAlcoholSchema(result.data.alcohols)
       : null;
 
   return (

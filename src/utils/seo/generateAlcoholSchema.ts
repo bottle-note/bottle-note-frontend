@@ -1,17 +1,14 @@
-import { AlcoholInfo, ReviewInDetails } from '@/api/alcohol/types';
+import { AlcoholInfo } from '@/api/alcohol/types';
 import { BASE_URL } from '@/constants/common';
 import { alcoholCanonicalPath } from '@/shared/seo/alcoholMetadata';
 
 /**
  * 위스키 상세 정보를 Schema.org Product 형식으로 변환합니다.
+ * 보틀 조회는 캐시되므로 비공개 전환·삭제가 늦게 반영될 수 있는 개별 리뷰 본문은 넣지 않습니다.
  * @param alcohol 위스키 상세 정보
- * @param reviews 리뷰 목록 (최대 3개 권장)
  * @returns Schema.org Product JSON-LD
  */
-export function generateAlcoholSchema(
-  alcohol: AlcoholInfo,
-  reviews?: ReviewInDetails[],
-) {
+export function generateAlcoholSchema(alcohol: AlcoholInfo) {
   const schema: Record<string, any> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -60,30 +57,6 @@ export function generateAlcoholSchema(
       bestRating: 5,
       worstRating: 0,
     };
-  }
-
-  const publicReviews = (reviews ?? []).filter(
-    (review) => review.status === 'PUBLIC',
-  );
-
-  if (publicReviews.length > 0) {
-    schema.review = publicReviews.slice(0, 3).map((review) => ({
-      '@type': 'Review',
-      reviewRating: {
-        '@type': 'Rating',
-        ratingValue: review.rating,
-        bestRating: 5,
-        worstRating: 0,
-      },
-      author: {
-        '@type': 'Person',
-        name: review.userInfo.nickName,
-        image: review.userInfo.userProfileImage,
-      },
-      datePublished: review.createAt,
-      reviewBody: review.reviewContent,
-      ...(review.reviewImageUrl && { image: review.reviewImageUrl }),
-    }));
   }
 
   return schema;

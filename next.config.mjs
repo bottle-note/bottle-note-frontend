@@ -31,6 +31,15 @@ const nextConfig = {
         destination: '/alcohols/:id',
         permanent: true,
       },
+      // 큐레이션 위스키 목록 검색은 큐레이션 상세 화면이 대신한다.
+      {
+        source: '/search',
+        has: [
+          { type: 'query', key: 'curationId', value: '(?<curationId>\\d+)' },
+        ],
+        destination: '/curation/:curationId',
+        permanent: true,
+      },
       // 목록 검색은 둘러보기 위스키 탭으로 옮겼다. keyword·category 쿼리는 그대로 전달된다.
       {
         source: '/search',

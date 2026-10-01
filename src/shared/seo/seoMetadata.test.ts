@@ -170,23 +170,26 @@ describe('보틀 상세 메타데이터', () => {
 });
 
 describe('보틀 JSON-LD', () => {
-  it('평가가 없으면 aggregateRating을 넣지 않고 비공개 리뷰를 제외한다', () => {
-    const publicReview = { status: 'PUBLIC', reviewContent: '공개' };
-    const privateReview = { status: 'PRIVATE', reviewContent: '비공개' };
+  it('평가가 있으면 평균 별점을 넣는다', () => {
+    const schema = generateAlcoholSchema(alcohol());
+
+    expect(schema.url).toBe('https://bottle-note.com/alcohols/482');
+    expect(schema.aggregateRating).toMatchObject({
+      ratingValue: '3.8',
+      ratingCount: 16,
+    });
+  });
+
+  it('평가가 없으면 aggregateRating을 넣지 않는다', () => {
     const schema = generateAlcoholSchema(
       alcohol({ rating: 0, totalRatingsCount: 0 }),
-      [privateReview, publicReview].map((item) => ({
-        ...item,
-        rating: 4,
-        createAt: '2026-09-01',
-        reviewImageUrl: null,
-        userInfo: { userId: 1, nickName: '작성자' },
-      })) as never,
     );
 
     expect(schema.aggregateRating).toBeUndefined();
-    expect(schema.url).toBe('https://bottle-note.com/alcohols/482');
-    expect(schema.review.map((item: any) => item.reviewBody)).toEqual(['공개']);
+  });
+
+  it('캐시된 보틀 조회에서 만들므로 개별 리뷰 본문을 넣지 않는다', () => {
+    expect(generateAlcoholSchema(alcohol()).review).toBeUndefined();
   });
 });
 
