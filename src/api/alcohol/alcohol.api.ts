@@ -1,4 +1,9 @@
 import { apiClient } from '@/shared/api/apiClient';
+import {
+  fetchPublicApiOnServer,
+  type PublicApiCacheOptions,
+  type PublicApiResult,
+} from '@/shared/api/internalApi';
 import { ApiResponse, InfiniteListParams } from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
@@ -187,6 +192,22 @@ export const AlcoholsApi = {
     }
 
     return response;
+  },
+
+  // ========== 서버사이드 API (메타데이터·JSON-LD 생성, 비로그인 공개 데이터) ==========
+  server: {
+    /**
+     * 위스키 상세 공개 정보를 조회합니다. 사용자별 값(myRating, isPicked)은 비로그인 기본값입니다.
+     */
+    getPublicDetail(
+      alcoholId: string,
+      cache: PublicApiCacheOptions,
+    ): Promise<PublicApiResult<AlcoholDetailsResponse>> {
+      return fetchPublicApiOnServer<AlcoholDetailsResponse>(
+        `/v1/alcohols/${encodeURIComponent(alcoholId)}`,
+        cache,
+      );
+    },
   },
 };
 

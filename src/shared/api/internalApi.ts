@@ -1,3 +1,5 @@
+import { SSR_CALLER_HEADER } from '@/constants/common';
+
 function ticketFrom(raw: string | undefined): string | null {
   if (!raw) return null;
 
@@ -39,4 +41,64 @@ export function internalApiHeaders(
     ...headers,
     Authorization: `Warpgate ${ticket}`,
   };
+}
+
+export type PublicApiResult<T> =
+  | { status: 'ok'; data: T }
+  // 대상이 없다. 검색엔진에 색인되지 않게 noindex 처리한다.
+  | { status: 'not-found' }
+  // 서버 장애 등 일시적 실패. 색인을 막지 않고 기본 메타로 응답한다.
+  | { status: 'error' };
+
+export interface PublicApiCacheOptions {
+  /** Next 데이터 캐시 수명(초). 0이면 캐시하지 않는다. */
+  revalidate: number;
+  tags: string[];
+}
+
+function isNotFound(
+  status: number,
+  body: { errors?: { code: string }[] } | null,
+) {
+  if (status === 404) return true;
+  return (
+    body?.errors?.some((error) => error.code.endsWith('_NOT_FOUND')) ?? false
+  );
+}
+
+/**
+ * 서버에서 비로그인 공개 데이터를 조회한다. 메타데이터·JSON-LD처럼 크롤러가 받는 HTML을 만들 때 쓴다.
+ * 사용자 토큰을 받지 않으므로 캐시된 응답이 사용자 사이에 공유돼도 개인 정보가 섞이지 않는다.
+ * 200 응답만 Next 데이터 캐시에 저장되므로 실패는 캐시되지 않는다.
+ * @param path 버전을 포함한 product-api 경로. 예: `/v1/alcohols/1`
+ */
+export async function fetchPublicApiOnServer<T>(
+  path: `/v${number}/${string}`,
+  { revalidate, tags }: PublicApiCacheOptions,
+): Promise<PublicApiResult<T>> {
+  try {
+    const response = await fetch(`${getInternalServerOrigin()}/api${path}`, {
+      method: 'GET',
+      headers: internalApiHeaders({
+        'Content-Type': 'application/json',
+        ...SSR_CALLER_HEADER,
+      }),
+      next: { revalidate, tags },
+    });
+
+    const body = (await response.json().catch(() => null)) as {
+      data: T;
+      errors: { code: string }[];
+    } | null;
+
+    if (isNotFound(response.status, body)) return { status: 'not-found' };
+    if (!response.ok || !body || body.errors.length !== 0) {
+      return { status: 'error' };
+    }
+
+    return { status: 'ok', data: body.data };
+  } catch (error) {
+    console.error(`[internalApi] 공개 데이터 조회 실패 ${path}:`, error);
+    return { status: 'error' };
+  }
 }

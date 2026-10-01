@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { fetchProductApi } from './productApi';
+import { fetchPublicApiOnServer } from './internalApi';
 
 const originalEnv = process.env;
 
@@ -12,7 +12,7 @@ function jsonResponse(status: number, body: unknown) {
   });
 }
 
-describe('fetchProductApi', () => {
+describe('fetchPublicApiOnServer', () => {
   const fetchMock = jest.fn();
 
   beforeEach(() => {
@@ -40,7 +40,7 @@ describe('fetchProductApi', () => {
       }),
     );
 
-    const result = await fetchProductApi('/alcohols/1', {
+    const result = await fetchPublicApiOnServer('/v1/alcohols/1', {
       revalidate: 600,
       tags: ['alcohol:1'],
     });
@@ -53,6 +53,19 @@ describe('fetchProductApi', () => {
         headers: expect.objectContaining({ 'X-Bottlenote-Caller': 'ssr' }),
       }),
     );
+  });
+
+  it('사용자 인증 정보 없이 비로그인으로 조회한다', async () => {
+    fetchMock.mockResolvedValue(jsonResponse(200, { data: {}, errors: [] }));
+
+    await fetchPublicApiOnServer('/v2/curations/1', {
+      revalidate: 0,
+      tags: [],
+    });
+
+    const [, init] = fetchMock.mock.calls[0];
+    expect(init.headers).not.toHaveProperty('Authorization');
+    expect(init.credentials).toBeUndefined();
   });
 
   it('404 또는 *_NOT_FOUND 오류 코드는 not-found로 구분한다', async () => {
@@ -77,11 +90,11 @@ describe('fetchProductApi', () => {
     );
 
     const options = { revalidate: 60, tags: [] };
-    await expect(fetchProductApi('/alcohols/0', options)).resolves.toEqual({
-      status: 'not-found',
-    });
     await expect(
-      fetchProductApi('/reviews/detail/0', options),
+      fetchPublicApiOnServer('/v1/alcohols/0', options),
+    ).resolves.toEqual({ status: 'not-found' });
+    await expect(
+      fetchPublicApiOnServer('/v1/reviews/detail/0', options),
     ).resolves.toEqual({ status: 'not-found' });
   });
 
@@ -89,16 +102,12 @@ describe('fetchProductApi', () => {
     fetchMock.mockResolvedValueOnce(jsonResponse(500, { errors: [] }));
     fetchMock.mockRejectedValueOnce(new Error('ECONNRESET'));
 
-    const options = { version: 'v2' as const, revalidate: 60, tags: [] };
-    await expect(fetchProductApi('/curations/1', options)).resolves.toEqual({
-      status: 'error',
-    });
-    await expect(fetchProductApi('/curations/1', options)).resolves.toEqual({
-      status: 'error',
-    });
-    expect(fetchMock).toHaveBeenLastCalledWith(
-      'https://product-api.internal/api/v2/curations/1',
-      expect.anything(),
-    );
+    const options = { revalidate: 60, tags: [] };
+    await expect(
+      fetchPublicApiOnServer('/v2/curations/1', options),
+    ).resolves.toEqual({ status: 'error' });
+    await expect(
+      fetchPublicApiOnServer('/v2/curations/1', options),
+    ).resolves.toEqual({ status: 'error' });
   });
 });

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import type { CurationV2DetailItem } from '@/api/curation-v2/types';
 import { ROUTES } from '@/constants/routes';
-import type { SeoFetchResult } from './productApi';
+import type { PublicApiResult } from '@/shared/api/internalApi';
 import { joinSentences, normalizeText, truncateText } from './text';
 
 const NOINDEX = { index: false, follow: false } as const;
@@ -10,7 +10,7 @@ const FALLBACK_DESCRIPTION =
 
 export function buildCurationMetadata(
   id: string,
-  result: SeoFetchResult<CurationV2DetailItem>,
+  result: PublicApiResult<CurationV2DetailItem>,
 ): Metadata {
   const canonical = ROUTES.CURATION.DETAIL(id);
 

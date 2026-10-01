@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import type { AlcoholDetailsResponse, AlcoholInfo } from '@/api/alcohol/types';
 import { ROUTES } from '@/constants/routes';
-import type { SeoFetchResult } from './productApi';
+import type { PublicApiResult } from '@/shared/api/internalApi';
 import { sectionTitle } from './site';
 import {
   formatAverageRating,
@@ -123,7 +123,7 @@ export function buildAlcoholDescription(alcohol: AlcoholInfo): string {
 
 export function buildAlcoholMetadata(
   id: string,
-  result: SeoFetchResult<AlcoholDetailsResponse>,
+  result: PublicApiResult<AlcoholDetailsResponse>,
 ): Metadata {
   const canonical = alcoholCanonicalPath(id);
 
@@ -150,7 +150,7 @@ export function buildAlcoholMetadata(
 
 export function buildAlcoholReviewsMetadata(
   id: string,
-  result: SeoFetchResult<AlcoholDetailsResponse>,
+  result: PublicApiResult<AlcoholDetailsResponse>,
 ): Metadata {
   const canonical = alcoholReviewsCanonicalPath(id);
 

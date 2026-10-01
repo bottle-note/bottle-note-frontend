@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import type { ReviewDetailsResponse } from '@/api/review/types';
 import { ROUTES } from '@/constants/routes';
-import type { SeoFetchResult } from './productApi';
+import type { PublicApiResult } from '@/shared/api/internalApi';
 import { joinSentences, normalizeText, truncateText } from './text';
 
 const REVIEW_SNIPPET_LENGTH = 120;
@@ -36,7 +36,7 @@ export function buildReviewDescription(data: ReviewDetailsResponse): string {
 
 export function buildReviewMetadata(
   id: string,
-  result: SeoFetchResult<ReviewDetailsResponse>,
+  result: PublicApiResult<ReviewDetailsResponse>,
 ): Metadata {
   const canonical = ROUTES.REVIEW.DETAIL(id);
 

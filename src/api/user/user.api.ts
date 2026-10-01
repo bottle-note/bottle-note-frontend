@@ -1,4 +1,9 @@
 import { apiClient } from '@/shared/api/apiClient';
+import {
+  fetchPublicApiOnServer,
+  type PublicApiCacheOptions,
+  type PublicApiResult,
+} from '@/shared/api/internalApi';
 import { ApiResponse } from '@/api/_shared/types';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import type {
@@ -126,6 +131,22 @@ export const UserApi = {
     }
 
     return response;
+  },
+
+  // ========== 서버사이드 API (공유 미리보기 메타 생성, 비로그인 공개 데이터) ==========
+  server: {
+    /**
+     * 사용자 공개 프로필을 조회합니다.
+     */
+    getPublicProfile(
+      userId: string,
+      cache: PublicApiCacheOptions,
+    ): Promise<PublicApiResult<UserInfo>> {
+      return fetchPublicApiOnServer<UserInfo>(
+        `/v1/my-page/${encodeURIComponent(userId)}`,
+        cache,
+      );
+    },
   },
 };
 

@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import type { UserInfo } from '@/api/user/types';
-import type { SeoFetchResult } from './productApi';
+import type { PublicApiResult } from '@/shared/api/internalApi';
 import { sectionTitle } from './site';
 import { normalizeText } from './text';
 
 // 사용자 페이지는 robots.txt로 크롤링을 막고 있다. 공유 미리보기용 메타만 만든다.
 const NOINDEX = { index: false, follow: false } as const;
 
-export function buildUserMetadata(result: SeoFetchResult<UserInfo>): Metadata {
+export function buildUserMetadata(result: PublicApiResult<UserInfo>): Metadata {
   if (result.status !== 'ok') {
     return { title: sectionTitle('마이페이지'), robots: NOINDEX };
   }
