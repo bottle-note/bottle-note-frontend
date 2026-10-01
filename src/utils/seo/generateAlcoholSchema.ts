@@ -61,3 +61,29 @@ export function generateAlcoholSchema(alcohol: AlcoholInfo) {
 
   return schema;
 }
+
+/**
+ * 위스키 상세 페이지를 Schema.org WebPage로 표현하고, 게스트에게 가려지는 영역을
+ * 로그인 제한 콘텐츠로 표시합니다. 가려진 영역을 숨긴 텍스트(클로킹)로 오해받지 않게 하는
+ * Google의 구독·로그인 제한 콘텐츠 구조화 데이터 방식입니다.
+ * @param alcohol 위스키 상세 정보
+ * @param gatedContentSelector 게스트에게 가려지는 영역의 CSS 선택자
+ * @returns Schema.org WebPage JSON-LD
+ */
+export function generateAlcoholPageSchema(
+  alcohol: AlcoholInfo,
+  gatedContentSelector: string,
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: alcohol.korName || alcohol.engName,
+    url: `${BASE_URL}${alcoholCanonicalPath(alcohol.alcoholId)}`,
+    isAccessibleForFree: false,
+    hasPart: {
+      '@type': 'WebPageElement',
+      isAccessibleForFree: false,
+      cssSelector: gatedContentSelector,
+    },
+  };
+}

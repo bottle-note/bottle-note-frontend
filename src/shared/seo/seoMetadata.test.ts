@@ -1,7 +1,10 @@
 import type { AlcoholDetailsResponse, AlcoholInfo } from '@/api/alcohol/types';
 import type { CurationV2DetailItem } from '@/api/curation-v2/types';
 import type { ReviewDetailsResponse } from '@/api/review/types';
-import { generateAlcoholSchema } from '@/utils/seo/generateAlcoholSchema';
+import {
+  generateAlcoholPageSchema,
+  generateAlcoholSchema,
+} from '@/utils/seo/generateAlcoholSchema';
 import {
   buildAlcoholMetadata,
   buildAlcoholReviewsMetadata,
@@ -190,6 +193,23 @@ describe('보틀 JSON-LD', () => {
 
   it('캐시된 보틀 조회에서 만들므로 개별 리뷰 본문을 넣지 않는다', () => {
     expect(generateAlcoholSchema(alcohol()).review).toBeUndefined();
+  });
+
+  it('게스트에게 가려지는 영역을 로그인 제한 콘텐츠로 표시한다', () => {
+    expect(
+      generateAlcoholPageSchema(alcohol(), '.guest-gated-content'),
+    ).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: '스프링뱅크 10년',
+      url: 'https://bottle-note.com/alcohols/482',
+      isAccessibleForFree: false,
+      hasPart: {
+        '@type': 'WebPageElement',
+        isAccessibleForFree: false,
+        cssSelector: '.guest-gated-content',
+      },
+    });
   });
 });
 

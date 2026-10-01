@@ -1,7 +1,5 @@
 import React from 'react';
 import { Metadata } from 'next';
-import JsonLd from '@/components/seo/JsonLd';
-import { generateAlcoholSchema } from '@/utils/seo/generateAlcoholSchema';
 import { buildAlcoholMetadata } from '@/shared/seo/alcoholMetadata';
 import { getAlcoholSeoData } from '@/shared/seo/seoData';
 
@@ -14,17 +12,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return buildAlcoholMetadata(params.id, await getAlcoholSeoData(params.id));
 }
 
-export default async function Layout({ params, children }: Props) {
-  const result = await getAlcoholSeoData(params.id);
-  const schema =
-    result.status === 'ok' && result.data.alcohols
-      ? generateAlcoholSchema(result.data.alcohols)
-      : null;
-
-  return (
-    <div className="min-h-screen relative">
-      {schema && <JsonLd data={schema} />}
-      {children}
-    </div>
-  );
+export default function Layout({ children }: Props) {
+  return <div className="min-h-screen relative">{children}</div>;
 }
