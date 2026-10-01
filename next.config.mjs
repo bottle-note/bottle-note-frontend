@@ -18,6 +18,33 @@ const nextConfig = {
   experimental: {
     missingSuspenseWithCSRBailout: false,
   },
+  // 검색엔진 색인, 공유 링크, 서버가 내려주는 기존 주소를 새 경로로 옮긴다.
+  async redirects() {
+    return [
+      {
+        source: '/search/:category/:id(\\d+)/reviews',
+        destination: '/alcohols/:id/reviews',
+        permanent: true,
+      },
+      {
+        source: '/search/:category/:id(\\d+)',
+        destination: '/alcohols/:id',
+        permanent: true,
+      },
+      // 목록 검색은 둘러보기 위스키 탭으로 옮겼다. keyword·category 쿼리는 그대로 전달된다.
+      {
+        source: '/search',
+        has: [{ type: 'query', key: 'regionId', value: '(?<regionId>.*)' }],
+        destination: '/explore?tab=EXPLORER_WHISKEY&regionIds=:regionId',
+        permanent: true,
+      },
+      {
+        source: '/search',
+        destination: '/explore?tab=EXPLORER_WHISKEY',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     const rawServerUrl =
       process.env.API_SERVER_WARP_URL || process.env.INTERNAL_SERVER_URL;

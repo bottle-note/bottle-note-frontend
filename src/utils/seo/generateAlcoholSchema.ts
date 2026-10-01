@@ -1,5 +1,6 @@
 import { AlcoholInfo, ReviewInDetails } from '@/api/alcohol/types';
 import { BASE_URL } from '@/constants/common';
+import { alcoholCanonicalPath } from '@/shared/seo/alcoholMetadata';
 
 /**
  * 위스키 상세 정보를 Schema.org Product 형식으로 변환합니다.
@@ -25,7 +26,7 @@ export function generateAlcoholSchema(
       name: alcohol.korDistillery || alcohol.engDistillery || alcohol.korName,
     },
     category: alcohol.korCategory,
-    url: `${BASE_URL}/search/${alcohol.engCategory}/${alcohol.alcoholId}`,
+    url: `${BASE_URL}${alcoholCanonicalPath(alcohol.alcoholId)}`,
     additionalProperty: [
       {
         '@type': 'PropertyValue',
@@ -48,17 +49,25 @@ export function generateAlcoholSchema(
         value: alcohol.korDistillery || alcohol.engDistillery || '-',
       },
     ].filter((prop) => prop.value !== '-'),
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: alcohol.rating?.toFixed(1) || '0.0',
-      ratingCount: alcohol.totalRatingsCount || 0,
-      bestRating: 5,
-      worstRating: 0,
-    },
   };
 
-  if (reviews && reviews.length > 0) {
-    schema.review = reviews.slice(0, 3).map((review) => ({
+  // 평가가 없는 aggregateRating은 구조화 데이터 오류로 처리된다.
+  if (alcohol.totalRatingsCount > 0) {
+    schema.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: alcohol.rating.toFixed(1),
+      ratingCount: alcohol.totalRatingsCount,
+      bestRating: 5,
+      worstRating: 0,
+    };
+  }
+
+  const publicReviews = (reviews ?? []).filter(
+    (review) => review.status === 'PUBLIC',
+  );
+
+  if (publicReviews.length > 0) {
+    schema.review = publicReviews.slice(0, 3).map((review) => ({
       '@type': 'Review',
       reviewRating: {
         '@type': 'Rating',

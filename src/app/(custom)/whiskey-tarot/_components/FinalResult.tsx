@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/constants/routes';
 
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { AlcoholDetailsResponse } from '@/api/alcohol/types';
@@ -73,7 +74,7 @@ export default function FinalResult({
   }, [whisky.whiskyId, prefetchedWhiskyDetail]);
 
   const handleGoToWhisky = () => {
-    router.push(`/search/${whisky.whiskyCategory}/${whisky.whiskyId}`);
+    router.push(ROUTES.ALCOHOL.DETAIL(whisky.whiskyId));
   };
 
   const handleShare = () => {

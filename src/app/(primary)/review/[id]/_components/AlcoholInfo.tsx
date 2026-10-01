@@ -50,7 +50,7 @@ function AlcoholInfo({ data, handleLogin }: Props) {
               styleClass="border-white px-8 py-[2.4px] rounded-md text-10"
             />
             <Link
-              href={ROUTES.SEARCH.ALL(data.alcoholId)}
+              href={ROUTES.ALCOHOL.DETAIL(data.alcoholId)}
               className="block space-y-6"
             >
               <h1 className="text-15 font-semibold whitespace-normal break-words">

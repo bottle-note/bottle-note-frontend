@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ROUTES } from '@/constants/routes';
 import Star from '@/components/ui/Display/Star';
 import { truncStr } from '@/utils/truncStr';
 import type { Alcohol } from '@/api/alcohol/types';
@@ -57,7 +58,7 @@ interface Props {
 
 export default function AlcoholItem({ data }: Props) {
   const { korName, rating, engCategory, imageUrl, path, alcoholId } = data;
-  const href = path ?? `/search/${engCategory}/${alcoholId}`;
+  const href = path ?? ROUTES.ALCOHOL.DETAIL(alcoholId);
 
   return (
     <div className="w-145 overflow-hidden rounded-lg">

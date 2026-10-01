@@ -18,7 +18,7 @@ export function generateWebSiteSchema() {
         '@type': 'SearchAction',
         target: {
           '@type': 'EntryPoint',
-          urlTemplate: `${BASE_URL}/search?keyword={search_term_string}`,
+          urlTemplate: `${BASE_URL}/explore?tab=EXPLORER_WHISKEY&keyword={search_term_string}`,
         },
         'query-input': 'required name=search_term_string',
       },

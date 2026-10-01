@@ -25,7 +25,7 @@ const initialPreference: AppStorePromptPreference = {
 describe('앱 스토어 유도 노출 정책', () => {
   describe('상세 진입 집계 페이지 판별', () => {
     it.each([
-      '/search/whisky/123',
+      '/alcohols/123',
       '/review/456',
       '/curation/789',
       '/curation/789/',
@@ -38,9 +38,8 @@ describe('앱 스토어 유도 노출 정책', () => {
     it.each([
       '/',
       '/explore',
-      '/search',
       '/search/input',
-      '/search/whisky/123/reviews',
+      '/alcohols/123/reviews',
       '/review/register',
       '/review/modify',
       '/curation',

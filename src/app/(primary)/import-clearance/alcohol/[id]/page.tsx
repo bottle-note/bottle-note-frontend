@@ -483,7 +483,7 @@ export default function ImportClearanceDetail() {
               alcohol_id: String(data.alcoholId),
               source: 'sticky_cta',
             });
-            router.push(ROUTES.SEARCH.ALL(data.alcoholId!));
+            router.push(ROUTES.ALCOHOL.DETAIL(data.alcoholId!));
           }}
         />
       )}

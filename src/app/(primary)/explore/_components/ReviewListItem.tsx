@@ -97,7 +97,7 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
           </div>
           <div className="flex w-full min-w-0 items-center justify-between gap-12">
             <Link
-              href={ROUTES.SEARCH.ALL(content.alcoholId)}
+              href={ROUTES.ALCOHOL.DETAIL(content.alcoholId)}
               className="min-w-0 flex-1"
             >
               <p className="truncate text-13 text-fg-neutral">{`${content.alcoholName}  >`}</p>

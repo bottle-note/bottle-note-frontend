@@ -37,14 +37,14 @@ export default function SearchInput() {
       return;
     }
 
-    // returnUrl이 없으면 기본 검색 페이지로
+    // returnUrl이 없으면 둘러보기 위스키 탭에서 검색한다
     if (!trimmedValue) {
-      router.push(ROUTES.SEARCH.BASE);
+      router.push(ROUTES.EXPLORE.WHISKEY_SEARCH());
       return;
     }
 
     SearchHistory.save(value);
-    router.push(`${ROUTES.SEARCH.BASE}?keyword=${encodeURIComponent(value)}`);
+    router.push(ROUTES.EXPLORE.WHISKEY_SEARCH(value));
   };
 
   return (

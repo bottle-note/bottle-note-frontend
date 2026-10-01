@@ -61,6 +61,9 @@ export interface AlcoholInfo {
   myRating: number;
   totalRatingsCount: number;
   isPicked: boolean;
+  reviewCount?: number;
+  pickCount?: number;
+  // OpenAPI 문서는 string으로 표기하지만 실제 응답은 문자열 배열이다.
   alcoholsTastingTags: string[] | null;
 }
 

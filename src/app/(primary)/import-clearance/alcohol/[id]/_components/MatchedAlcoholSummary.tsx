@@ -74,7 +74,7 @@ export function MatchedAlcoholSummary({ alcohol, declarationId }: Props) {
         </p>
       )}
       <Link
-        href={ROUTES.SEARCH.ALL(alcohol.alcoholId)}
+        href={ROUTES.ALCOHOL.DETAIL(alcohol.alcoholId)}
         className="inline-flex items-center gap-4 self-start text-12 font-medium text-fg-neutral-subtle"
         onClick={() =>
           trackGA4Event('select_import_clearance_alcohol', {

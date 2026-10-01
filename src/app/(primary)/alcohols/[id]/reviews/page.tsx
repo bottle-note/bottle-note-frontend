@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ReviewApi } from '@/api/review/review.api';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import { ReviewInDetails } from '@/api/alcohol/types';
-import ReviewListItem from '@/app/(primary)/search/[category]/[id]/_components/ReviewListItem';
+import ReviewListItem from '@/app/(primary)/alcohols/[id]/_components/ReviewListItem';
 import Button from '@/components/ui/Button/Button';
 import List from '@/components/feature/List/List';
 import { SORT_TYPE, SORT_ORDER } from '@/api/_shared/types';

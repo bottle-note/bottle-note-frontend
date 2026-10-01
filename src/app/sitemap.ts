@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next';
 import { ApiResponse } from '@/api/_shared/types';
 import type { ExploreAlcohol, ExploreReview } from '@/api/explore/types';
 import { BASE_URL, SSR_CALLER_HEADER } from '@/constants/common';
+import { alcoholCanonicalPath } from '@/shared/seo/alcoholMetadata';
 import {
   getInternalServerOrigin,
   internalApiHeaders,
@@ -86,7 +87,7 @@ async function fetchAlcoholPages(
     );
 
     return alcohols.map((alcohol) => ({
-      url: `${baseUrl}/search/${alcohol.engCategory}/${alcohol.alcoholId}`,
+      url: `${baseUrl}${alcoholCanonicalPath(alcohol.alcoholId)}`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
@@ -133,12 +134,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/search`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
     },
     {
       url: `${BASE_URL}/privacy-policy`,

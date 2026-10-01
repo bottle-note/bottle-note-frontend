@@ -48,7 +48,7 @@ const ReviewActionDropdown = ({
             if (onRefresh) {
               onRefresh();
             } else {
-              router.push(ROUTES.SEARCH.ALL(alcoholId));
+              router.push(ROUTES.ALCOHOL.DETAIL(alcoholId));
             }
           },
         });

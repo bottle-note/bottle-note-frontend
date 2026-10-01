@@ -63,7 +63,7 @@ describe('AppStorePrompt 로그인 노출 조건', () => {
     localStorage.clear();
     sessionStorage.clear();
     window.isInApp = false;
-    mockUsePathname.mockReturnValue('/search/whisky/123');
+    mockUsePathname.mockReturnValue('/alcohols/123');
   });
 
   it('게스트는 상세 화면에 진입해도 카운트를 늘리거나 배너를 노출하지 않는다', async () => {

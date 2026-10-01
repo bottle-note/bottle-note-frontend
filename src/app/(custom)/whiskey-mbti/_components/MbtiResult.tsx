@@ -125,7 +125,10 @@ export default function MbtiResult({
           </div>
           <p>{data.dramCopy}</p>
           {data.whisky.id !== null && (
-            <a className={styles.cta} href={ROUTES.SEARCH.ALL(data.whisky.id)}>
+            <a
+              className={styles.cta}
+              href={ROUTES.ALCOHOL.DETAIL(data.whisky.id)}
+            >
               <span>{data.whisky.name} 상세보기</span>
               <b>↗</b>
             </a>

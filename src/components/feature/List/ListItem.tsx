@@ -33,13 +33,13 @@ const ListItem = ({ data }: Props) => {
   return (
     <section className="flex items-center text-mainBlack border-brightGray border-b py-4">
       {/* image */}
-      <Link href={ROUTES.SEARCH.ALL(alcoholId)} className="mr-12 shrink-0">
+      <Link href={ROUTES.ALCOHOL.DETAIL(alcoholId)} className="mr-12 shrink-0">
         <ItemImage src={imageUrl} alt="image" />
       </Link>
 
       {/* info */}
       <Link
-        href={ROUTES.SEARCH.ALL(alcoholId)}
+        href={ROUTES.ALCOHOL.DETAIL(alcoholId)}
         className="flex-1 flex flex-col items-start justify-center space-y-6 pr-8"
       >
         <ItemInfo

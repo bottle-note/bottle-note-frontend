@@ -26,7 +26,7 @@ const WhiskeyListItem = ({ content, priority = false, onClick }: Props) => {
     <section className="flex w-full items-center overflow-hidden py-24 text-fg-neutral gap-12">
       {/* image */}
       <Link
-        href={ROUTES.SEARCH.ALL(content.alcoholId)}
+        href={ROUTES.ALCOHOL.DETAIL(content.alcoholId)}
         className="shrink-0"
         onClick={onClick}
       >
@@ -40,7 +40,7 @@ const WhiskeyListItem = ({ content, priority = false, onClick }: Props) => {
 
       {/* info */}
       <Link
-        href={ROUTES.SEARCH.ALL(content.alcoholId)}
+        href={ROUTES.ALCOHOL.DETAIL(content.alcoholId)}
         className="flex min-w-0 flex-1 flex-col items-start justify-center space-y-8"
         onClick={onClick}
       >

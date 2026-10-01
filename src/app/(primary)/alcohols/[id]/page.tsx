@@ -12,11 +12,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
 
-import JsonLd from '@/components/seo/JsonLd';
-import { generateAlcoholSchema } from '@/utils/seo/generateAlcoholSchema';
 import Star from '@/components/ui/Display/Star';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
-import ReviewListItem from '@/app/(primary)/search/[category]/[id]/_components/ReviewListItem';
+import ReviewListItem from '@/app/(primary)/alcohols/[id]/_components/ReviewListItem';
 import PrimaryLinkButton from '@/components/ui/Button/PrimaryLinkButton';
 import NavLayout from '@/components/ui/Layout/NavLayout';
 import EmptyView from '@/components/ui/Display/EmptyView';
@@ -251,12 +249,6 @@ export default function SearchAlcohol() {
     fetchAlcoholDetails(alcoholId.toString());
   }, [alcoholId]);
 
-  const alcoholSchema = useMemo(() => {
-    return data?.alcohols
-      ? generateAlcoholSchema(data.alcohols, data.reviewInfo?.reviewList)
-      : null;
-  }, [data?.alcohols, data?.reviewInfo?.reviewList]);
-
   const shareConfig: ShareConfig | null = useMemo(() => {
     if (!data?.alcohols) return null;
 
@@ -264,7 +256,7 @@ export default function SearchAlcohol() {
     const linkUrl =
       typeof window !== 'undefined'
         ? window.location.href
-        : `https://bottle-note.com/search/${alcohol.engCategory}/${alcohol.alcoholId}`;
+        : `https://bottle-note.com${ROUTES.ALCOHOL.DETAIL(alcohol.alcoholId)}`;
 
     return {
       type: 'whisky',
@@ -417,7 +409,6 @@ export default function SearchAlcohol() {
 
   return (
     <>
-      {alcoholSchema && <JsonLd data={alcoholSchema} />}
       <NavLayout>
         {!data || !data.alcohols || isAuthLoading ? (
           <AlcoholDetailsSkeleton />
@@ -532,7 +523,7 @@ export default function SearchAlcohol() {
                           korName: '리뷰 더 보기',
                           icon: true,
                           linkSrc: {
-                            pathname: `/search/${data?.alcohols?.engCategory}/${data?.alcohols?.alcoholId}/reviews`,
+                            pathname: ROUTES.ALCOHOL.REVIEWS(String(alcoholId)),
                             query: {
                               name: data?.alcohols?.korName,
                             },
