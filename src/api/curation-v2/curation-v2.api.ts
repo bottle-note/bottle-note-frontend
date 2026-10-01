@@ -78,7 +78,7 @@ export const CurationV2Api = {
     /**
      * 큐레이션 상세를 조회합니다.
      */
-    getPublicDetail(
+    getDetail(
       curationId: string,
       cache: PublicApiCacheOptions,
     ): Promise<PublicApiResult<CurationV2DetailItem>> {

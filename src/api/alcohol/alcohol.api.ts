@@ -199,7 +199,7 @@ export const AlcoholsApi = {
     /**
      * 위스키 상세 공개 정보를 조회합니다. 사용자별 값(myRating, isPicked)은 비로그인 기본값입니다.
      */
-    getPublicDetail(
+    getAlcoholDetails(
       alcoholId: string,
       cache: PublicApiCacheOptions,
     ): Promise<PublicApiResult<AlcoholDetailsResponse>> {

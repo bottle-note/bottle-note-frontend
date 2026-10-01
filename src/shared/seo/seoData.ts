@@ -25,17 +25,17 @@ const cacheOptions = (target: keyof typeof SEO_CACHE_POLICY, id: string) => ({
 
 /** 같은 요청 안에서 generateMetadata와 layout(JSON-LD)이 한 번만 조회하도록 묶는다. */
 export const getAlcoholSeoData = cache((id: string) =>
-  AlcoholsApi.server.getPublicDetail(id, cacheOptions('alcohol', id)),
+  AlcoholsApi.server.getAlcoholDetails(id, cacheOptions('alcohol', id)),
 );
 
 export const getReviewSeoData = cache((id: string) =>
-  ReviewApi.server.getPublicDetail(id, cacheOptions('review', id)),
+  ReviewApi.server.getReviewDetails(id, cacheOptions('review', id)),
 );
 
 export const getCurationSeoData = cache((id: string) =>
-  CurationV2Api.server.getPublicDetail(id, cacheOptions('curation', id)),
+  CurationV2Api.server.getDetail(id, cacheOptions('curation', id)),
 );
 
 export const getUserSeoData = cache((id: string) =>
-  UserApi.server.getPublicProfile(id, cacheOptions('user', id)),
+  UserApi.server.getUserInfo(id, cacheOptions('user', id)),
 );

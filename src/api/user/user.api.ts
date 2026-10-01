@@ -138,7 +138,7 @@ export const UserApi = {
     /**
      * 사용자 공개 프로필을 조회합니다.
      */
-    getPublicProfile(
+    getUserInfo(
       userId: string,
       cache: PublicApiCacheOptions,
     ): Promise<PublicApiResult<UserInfo>> {

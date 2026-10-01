@@ -213,7 +213,7 @@ export const ReviewApi = {
     /**
      * 리뷰 상세 공개 정보를 조회합니다. 비공개 여부는 reviewInfo.status로 판단합니다.
      */
-    async getPublicDetail(
+    async getReviewDetails(
       reviewId: string,
       cache: PublicApiCacheOptions,
     ): Promise<PublicApiResult<ReviewDetailsResponse>> {
