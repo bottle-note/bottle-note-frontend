@@ -8,7 +8,11 @@ import styles from '../mbti.module.css';
 import type { MbtiCode, MbtiResultResponse, MbtiTieQuestion } from '../_types';
 
 interface Props {
-  onComplete: (code: MbtiCode) => void;
+  onComplete: (
+    code: MbtiCode,
+    answers: number[],
+    tieQuestions: MbtiTieQuestion[],
+  ) => void;
 }
 
 async function getResult(answers: number[]) {
@@ -35,9 +39,9 @@ export default function MbtiQuiz({ onComplete }: Props) {
 
   const resultMutation = useMutation({
     mutationFn: getResult,
-    onSuccess: (response) => {
+    onSuccess: (response, submittedAnswers) => {
       if (response.status === 'complete') {
-        onComplete(response.code);
+        onComplete(response.code, submittedAnswers, tieQuestions);
         return;
       }
       setTieQuestions((current) => [...current, response.question]);

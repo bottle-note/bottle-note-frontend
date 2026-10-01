@@ -46,6 +46,7 @@ export type QuizStep =
   | 'questioning'
   | 'dealing'
   | 'selecting'
+  | 'ready'
   | 'slides'
   | 'result'
   | 'share';

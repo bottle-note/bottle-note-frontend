@@ -14,7 +14,6 @@ import {
   getReturnToUrl,
   isWhiskeyMbtiReturnUrl,
   setReturnToUrl,
-  WHISKEY_MBTI_INTRO_PATH,
 } from '@/utils/loginRedirect';
 import { consumeLoginTrigger } from '@/utils/loginTrigger';
 
@@ -36,13 +35,16 @@ export const useSocialLogin = () => {
   };
 
   const cancelMbtiLogin = (returnTo?: string | null) => {
-    if (!isWhiskeyMbtiReturnUrl(returnTo ?? getPendingReturnToUrl())) {
+    const destination = returnTo ?? getPendingReturnToUrl();
+    if (!isWhiskeyMbtiReturnUrl(destination)) {
       return false;
     }
 
     clearReturnToUrl();
     consumeLoginTrigger();
-    router.replace(WHISKEY_MBTI_INTRO_PATH);
+    // Keep the completed result URL: the guest lands on its login gate, not
+    // the result or the intro, and can resume without answering again.
+    router.replace(destination!);
     return true;
   };
 
