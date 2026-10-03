@@ -1,0 +1,490 @@
+/* Import screens follow the catalog rows and notebook profile rhythm. */
+.imports-shortcut {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.imports-shortcut .icon {
+  width: 17px;
+  height: 17px;
+}
+.rail-secondary a[aria-current] {
+  color: var(--brand);
+  background: var(--color-bg-brand-weak);
+}
+.collection-detail-workspace .header-title .back {
+  display: flex;
+}
+.clearance-top {
+  padding-top: 6px;
+}
+.clearance-top .source-tabs {
+  margin-bottom: 18px;
+}
+.collection-workspace
+  .clearance-top
+  .source-tabs
+  > div
+  > div
+  > div:first-child
+  > div:first-child {
+  max-width: 260px;
+  flex-basis: min(100%, 260px);
+  width: min(100%, 260px);
+}
+.clearance-filter-button {
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+.clearance-filter-button[aria-expanded='true'] {
+  color: var(--brand);
+  border-color: var(--brand);
+  background: var(--color-bg-brand-weak);
+}
+.clearance-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  padding: 16px 0;
+}
+.clearance-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 0;
+}
+.clearance-filters input,
+.clearance-filters select {
+  width: 100%;
+  font-size: 13px;
+  padding: 8px;
+  border-radius: 3px;
+  min-height: 40px;
+}
+.clearance-filters > button {
+  font-size: 12px;
+  align-self: end;
+  min-height: 40px;
+  color: var(--brand);
+}
+.clearance-filters > p {
+  grid-column: 1/-1;
+  font-size: 13px;
+  color: var(--brand);
+}
+.clearance-grid,
+.company-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.clearance-main {
+  min-width: 0;
+  align-items: flex-start;
+}
+.clearance-copy {
+  min-width: 0;
+  flex: 1;
+}
+.clearance-main > .icon {
+  width: 14px;
+  height: 14px;
+  color: var(--muted);
+  margin-top: 28px;
+  flex: none;
+}
+.clearance-copy .english {
+  overflow-wrap: anywhere;
+}
+.clearance-date {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 9px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.clearance-date > span {
+  color: var(--muted);
+}
+.clearance-company {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 7px 0 0 90px;
+  min-height: 26px;
+  font-size: 11px;
+}
+.clearance-company > span {
+  color: var(--muted);
+}
+.clearance-company > b {
+  font-weight: 500;
+}
+.clearance-company .icon {
+  width: 12px;
+  height: 12px;
+  color: var(--muted);
+}
+.clearance-main:hover h3,
+.clearance-company:hover b {
+  color: var(--brand);
+}
+.company-entry {
+  display: block;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+  min-width: 0;
+}
+.company-entry-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.company-symbol {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  flex: none;
+  color: var(--brand);
+}
+.company-symbol > .icon {
+  width: 24px;
+  height: 24px;
+}
+.company-entry-top > div:not(.company-symbol) {
+  min-width: 0;
+  flex: 1;
+}
+.company-entry-top > .icon {
+  width: 14px;
+  height: 14px;
+  color: var(--muted);
+  flex: none;
+}
+.company-entry h3 {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.55;
+}
+.company-entry .meta {
+  font-size: 11px;
+  margin: 0 0 4px;
+}
+.company-location {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 7px;
+}
+.company-preview {
+  margin: 14px 0 0 60px;
+  padding-left: 12px;
+  border-left: 2px solid var(--brand);
+}
+.company-preview > span {
+  font-size: 10px;
+  color: var(--muted);
+}
+.company-preview > p {
+  font-size: 12px;
+  line-height: 1.7;
+  margin-top: 4px;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.clearance-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: var(--muted);
+  padding: 4px 0 18px;
+}
+.clearance-breadcrumb .icon {
+  width: 12px;
+  height: 12px;
+}
+.clearance-heading {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 0 0 20px;
+  border-bottom: 1px solid var(--line);
+}
+.clearance-heading > a {
+  flex: none;
+}
+.clearance-heading .photo {
+  width: 86px;
+  height: 114px;
+}
+.clearance-heading > div {
+  min-width: 0;
+}
+.clearance-heading h1 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  line-height: 1.45;
+  margin: 6px 0;
+}
+.clearance-heading .meta,
+.clearance-heading .english {
+  font-size: 11px;
+}
+.clearance-heading .english {
+  overflow-wrap: anywhere;
+}
+.clearance-heading .text-link {
+  font-size: 11px;
+  color: var(--brand);
+  margin-top: 12px;
+  min-height: 28px;
+}
+.clearance-heading .text-link .icon {
+  width: 13px;
+  height: 13px;
+}
+.clearance-detail-grid {
+  display: grid;
+  gap: 24px;
+  margin-top: 24px;
+}
+.clearance-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.clearance-detail-grid .info-rows > div {
+  font-size: 13px;
+  padding: 12px 0;
+}
+.clearance-detail-grid .info-rows > div:first-child {
+  padding-top: 0;
+}
+.clearance-detail-grid .info-rows > div:last-child {
+  border-bottom: 0;
+}
+.clearance-importer-block {
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.clearance-importer-block .company-entry {
+  padding: 0;
+  border: 0;
+}
+.clearance-related {
+  margin-top: 28px;
+}
+.company-heading {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 4px 0 20px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.company-heading > div:not(.company-symbol) {
+  min-width: 0;
+}
+.company-heading h1 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.company-heading .content-kind {
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.company-heading div > p:last-child {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+.company-heading div > p > .icon {
+  width: 13px;
+  height: 13px;
+}
+.company-heading div > p > span {
+  border-left: 1px solid var(--line);
+  padding-left: 10px;
+  margin-left: 3px;
+}
+.clearance-empty > .icon {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 14px;
+  color: var(--muted);
+}
+.clearance-empty p {
+  margin-bottom: 15px;
+}
+@media (min-width: 700px) {
+  .clearance-grid,
+  .company-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 28px;
+  }
+  .clearance-filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+    gap: 14px;
+  }
+  .clearance-filters > button {
+    padding: 0 12px;
+  }
+  .clearance-heading .photo {
+    width: 104px;
+    height: 132px;
+  }
+  .clearance-heading h1 {
+    font-size: 24px;
+  }
+  .clearance-detail-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 28px;
+  }
+  .clearance-importer-block {
+    border: 0;
+    padding: 0;
+  }
+  .clearance-heading {
+    gap: 20px;
+  }
+  .company-heading h1 {
+    font-size: 22px;
+  }
+  .clearance-section-title {
+    font-size: 16px;
+  }
+}
+@media (min-width: 1120px) {
+  .clearance-grid,
+  .company-grid {
+    column-gap: 32px;
+  }
+  .clearance-company {
+    margin-left: 118px;
+    font-size: 12px;
+  }
+  .clearance-date {
+    font-size: 12px;
+    margin-top: 10px;
+  }
+  .clearance-heading {
+    gap: 24px;
+    padding-bottom: 24px;
+  }
+  .clearance-heading .photo {
+    width: 110px;
+    height: 142px;
+  }
+  .clearance-heading h1 {
+    font-size: 26px;
+  }
+  .clearance-heading .english,
+  .clearance-heading .meta {
+    font-size: 12px;
+  }
+  .clearance-heading .text-link {
+    font-size: 12px;
+  }
+  .clearance-detail-grid {
+    gap: 48px;
+    margin-top: 28px;
+  }
+  .clearance-detail-grid .info-rows > div {
+    font-size: 14px;
+  }
+  .clearance-related {
+    margin-top: 32px;
+  }
+  .company-entry {
+    padding: 22px 0;
+  }
+  .company-entry-top {
+    gap: 18px;
+  }
+  .company-entry h3 {
+    font-size: 16px;
+  }
+  .company-symbol {
+    width: 58px;
+    height: 58px;
+  }
+  .company-symbol > .icon {
+    width: 28px;
+    height: 28px;
+  }
+  .company-location {
+    font-size: 12px;
+  }
+  .company-preview {
+    margin-left: 76px;
+  }
+  .company-preview > span {
+    font-size: 11px;
+  }
+  .company-preview > p {
+    font-size: 14px;
+  }
+  .company-heading {
+    gap: 18px;
+    padding-bottom: 24px;
+  }
+  .company-heading h1 {
+    font-size: 24px;
+  }
+  .company-heading div > p:last-child {
+    font-size: 12px;
+  }
+  .imports-shortcut {
+    font-size: 12px;
+    padding: 0 14px;
+  }
+}
+@media (max-width: 359px) {
+  .imports-shortcut {
+    padding: 0 8px;
+  }
+  .imports-shortcut > span:not(.icon) {
+    display: none;
+  }
+  .clearance-company {
+    margin-left: 76px;
+  }
+  .clearance-heading .photo {
+    width: 72px;
+    height: 100px;
+  }
+  .clearance-heading h1 {
+    font-size: 18px;
+  }
+  .clearance-related .subtle-label {
+    display: none;
+  }
+}
+@media (min-width: 700px) and (max-width: 1119px) {
+  .clearance-company {
+    margin-left: 80px;
+  }
+}

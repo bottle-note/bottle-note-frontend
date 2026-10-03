@@ -1,0 +1,2 @@
+<!-- Exact path and dimensions reused from src/components/ui/Navigation/Tab/variants/BookmarkTab.tsx. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="146" height="32" viewBox="0 0 146 32"><path d="M0,32 L12,8 Q14,2 22,2 H124 Q132,2 134,8 L146,32" fill="#FFFFFF" stroke="#C9BCA9" stroke-width="1.5" stroke-linejoin="round"/></svg>

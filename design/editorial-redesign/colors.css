@@ -1,0 +1,49 @@
+:root {
+  /*
+   * Primitive color palette
+   *
+   * These values are theme-independent. Light and dark themes should compose
+   * them through semantic role tokens instead of changing the palette itself.
+   * RGB channels are stored separately so Tailwind opacity modifiers can work.
+   */
+
+  /* Neutral */
+  --palette-neutral-0: 255 255 255; /* #FFFFFF */
+  --palette-neutral-50: 247 247 247; /* #F7F7F7 */
+  --palette-neutral-200: 230 230 221; /* #E6E6DD */
+  --palette-neutral-500: 198 198 198; /* #C6C6C6 */
+  --palette-neutral-600: 191 191 191; /* #BFBFBF */
+  --palette-neutral-700: 111 111 111; /* #6F6F6F */
+  --palette-neutral-800: 102 102 102; /* #666666 */
+  --palette-neutral-900: 43 43 43; /* #2B2B2B */
+  --palette-neutral-950: 37 37 37; /* #252525 */
+  --palette-neutral-1000: 16 16 16; /* #101010 */
+
+  /* Oak */
+  --palette-oak-50: 245 239 229; /* #F5EFE5 */
+  --palette-oak-200: 201 188 169; /* #C9BCA9 */
+  --palette-oak-500: 141 126 106; /* #8D7E6A */
+  --palette-oak-600: 117 98 75; /* #75624B */
+  --palette-oak-800: 59 50 40; /* #3B3228 */
+  --palette-oak-900: 39 33 26; /* #27211A */
+  --palette-oak-950: 26 22 18; /* #1A1612 */
+  --palette-oak-1000: 16 14 12; /* #100E0C */
+
+  /* Coral */
+  --palette-coral-50: 255 240 233; /* #FFF0E9 */
+  --palette-coral-300: 242 173 141; /* #F2AD8D */
+  --palette-coral-400: 239 154 110; /* #EF9A6E */
+  --palette-coral-500: 233 150 112; /* #E99670 */
+  --palette-coral-600: 229 130 87; /* #E58257 */
+  --palette-coral-700: 177 80 37; /* #B15025 */
+  --palette-coral-900: 56 38 27; /* #38261B */
+  --palette-coral-1000: 30 18 9; /* #1E1209 */
+
+  /* Amber */
+  --palette-amber-500: 217 164 91; /* #D9A45B */
+  --palette-amber-700: 149 101 35; /* #956523 */
+
+  /* Static colors never change with the theme. */
+  --palette-static-white: 255 255 255; /* #FFFFFF */
+  --palette-static-black: 0 0 0; /* #000000 */
+}
