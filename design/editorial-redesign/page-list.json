@@ -1,0 +1,20 @@
+{
+  "home": ["index", "/"],
+  "explore": ["explore", "/explore"],
+  "whiskey": ["whiskey", "/search/all/0"],
+  "review": ["review", "/review/0"],
+  "write": ["write-review", "/review/register"],
+  "profile": ["profile", "/user/1"],
+  "bottle": ["my-bottle", "/user/1/my-bottle"],
+  "history": ["history", "/history"],
+  "curation": ["curation", "/curation"],
+  "article": ["article", "/curation/0"],
+  "imports": ["imports", "/import-clearance"],
+  "import": ["import-detail", "/import-clearance/alcohol/0"],
+  "reviews": ["whiskey-reviews", "/search/all/0/reviews"],
+  "importer": ["importer", "/import-clearance/importer/0"],
+  "settings": ["settings", "/settings"],
+  "login": ["login", "/login"],
+  "search": ["search-input", "/search/input"],
+  "edit-profile": ["edit-profile", "/user/1/edit"]
+}
