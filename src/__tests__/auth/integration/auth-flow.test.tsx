@@ -88,6 +88,8 @@ describe('Auth business flows', () => {
     resetAuthSessionForTest();
     sessionStorage.clear();
     localStorage.clear();
+    (window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer =
+      [];
     useSettingsStore.setState({ currentScreen: 'main' });
     DeviceService.setIsInApp(false);
     DeviceService.setDeviceToken('');
@@ -243,6 +245,30 @@ describe('Auth business flows', () => {
   });
 
   describe('login flows', () => {
+    it('첫 로그인 응답부터 GTM dataLayer까지 가입 이벤트를 한 번 전달한다', async () => {
+      fetchMock.mockResolvedValue(
+        createJsonResponse({
+          ...loginResponsePayload,
+          isFirstLogin: true,
+        }),
+      );
+
+      const { result } = renderHook(() => useSocialLogin());
+      await act(async () => {
+        await result.current.completeKakaoWebLogin('oauth-code');
+        await result.current.completeKakaoWebLogin('oauth-code');
+      });
+
+      const dataLayer = (
+        window as unknown as { dataLayer: Record<string, unknown>[] }
+      ).dataLayer;
+      expect(dataLayer.filter((event) => event.event === 'sign_up')).toEqual([
+        { event: 'sign_up', method: 'kakao', trigger: undefined },
+      ]);
+      expect(JSON.stringify(dataLayer)).not.toContain('access-token');
+      expect(JSON.stringify(dataLayer)).not.toContain('tester@bottle-note.com');
+    });
+
     it('카카오 앱 로그인 성공 시 authenticated 상태가 된다', async () => {
       fetchMock.mockResolvedValueOnce(createJsonResponse(loginResponsePayload));
 
@@ -253,6 +279,11 @@ describe('Auth business flows', () => {
       });
 
       expect(getAuthSnapshot().status).toBe('authenticated');
+      expect(
+        (
+          window as unknown as { dataLayer: Record<string, unknown>[] }
+        ).dataLayer.some((event) => event.event === 'sign_up'),
+      ).toBe(false);
       expect(fetchMock).toHaveBeenCalledWith(
         '/api/auth/login',
         expect.objectContaining({
@@ -364,6 +395,11 @@ describe('Auth business flows', () => {
       });
 
       expect(getAuthSnapshot().status).not.toBe('authenticated');
+      expect(
+        (
+          window as unknown as { dataLayer: Record<string, unknown>[] }
+        ).dataLayer.some((event) => event.event === 'sign_up'),
+      ).toBe(false);
     });
 
     it('로그인 실패 시 실패 핸들러가 호출된다', async () => {

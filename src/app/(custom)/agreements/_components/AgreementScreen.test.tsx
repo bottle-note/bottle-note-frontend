@@ -1,15 +1,26 @@
 import { PropsWithChildren } from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { AgreementApi } from '@/api/agreement/agreement.api';
 import type { AgreementStatusResponse } from '@/api/agreement/types';
+import { useSocialLogin } from '@/hooks/useSocialLogin';
 import {
   resetAuthSessionForTest,
+  restoreAuthSession,
   setAuthenticatedSession,
 } from '@/lib/auth/session-store';
+import useModalStore from '@/store/modalStore';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { stageSignUp } from '@/utils/analytics/signUp';
+import { setReturnToUrl } from '@/utils/loginRedirect';
 import { AgreementScreen } from './AgreementScreen';
 
 jest.mock('next/navigation', () => ({
@@ -59,11 +70,18 @@ describe('AgreementScreen', () => {
   const getStatusMock = jest.mocked(AgreementApi.getStatus);
   const submitMock = jest.mocked(AgreementApi.submit);
   const routerReplace = jest.fn();
+  const fetchMock = jest.fn();
+
+  beforeAll(() => {
+    global.fetch = fetchMock as typeof fetch;
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
+    fetchMock.mockReset();
     sessionStorage.clear();
     resetAuthSessionForTest();
+    useModalStore.getState().handleCloseModal();
     (useRouter as jest.Mock).mockReturnValue({ replace: routerReplace });
     getStatusMock.mockResolvedValue(createResponse(agreementStatus));
     submitMock.mockResolvedValue(
@@ -196,11 +214,27 @@ describe('AgreementScreen', () => {
   });
 
   it('첫 가입자의 필수 동의가 성공하면 가입 이벤트를 한 번 기록한다', async () => {
-    setAuthenticatedSession({
-      accessToken: 'access-token',
-      user: { userId: 1, sub: 'tester', profile: null, roles: 'ROLE_USER' },
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        accessToken: 'access-token',
+        agreementRequired: true,
+        isFirstLogin: true,
+        user: { userId: 1, sub: 'tester', profile: null, roles: 'ROLE_USER' },
+      }),
     });
-    stageSignUp({ userId: 1, method: 'apple', trigger: 'review_write' });
+    setReturnToUrl('/alcohols/123');
+    const { result } = renderHook(() => useSocialLogin());
+
+    await act(async () => {
+      await result.current.completeKakaoWebLogin('authorization-code');
+    });
+
+    expect(routerReplace).toHaveBeenCalledWith('/agreements');
+    expect(trackGA4Event).not.toHaveBeenCalledWith(
+      'sign_up',
+      expect.anything(),
+    );
     await renderAgreementScreen();
 
     fireEvent.click(screen.getByLabelText('[필수] 이용약관 동의'));
@@ -209,10 +243,11 @@ describe('AgreementScreen', () => {
 
     await waitFor(() => {
       expect(trackGA4Event).toHaveBeenCalledWith('sign_up', {
-        method: 'apple',
-        trigger: 'review_write',
+        method: 'kakao',
+        trigger: undefined,
       });
     });
+    expect(routerReplace).toHaveBeenCalledWith('/alcohols/123');
     expect(
       jest
         .mocked(trackGA4Event)
@@ -226,14 +261,13 @@ describe('AgreementScreen', () => {
       user: { userId: 2, sub: 'tester', profile: null, roles: 'ROLE_USER' },
     });
     stageSignUp({ userId: 1, method: 'kakao' });
-    submitMock.mockResolvedValueOnce(createResponse(agreementStatus));
     await renderAgreementScreen();
 
     fireEvent.click(screen.getByLabelText('[필수] 이용약관 동의'));
     fireEvent.click(screen.getByLabelText('[필수] 개인정보 수집·이용 동의'));
     fireEvent.click(screen.getByRole('button', { name: '동의하고 시작하기' }));
 
-    await waitFor(() => expect(submitMock).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(routerReplace).toHaveBeenCalledWith('/'));
     expect(trackGA4Event).not.toHaveBeenCalledWith(
       'sign_up',
       expect.anything(),
@@ -253,10 +287,70 @@ describe('AgreementScreen', () => {
     fireEvent.click(screen.getByLabelText('[필수] 개인정보 수집·이용 동의'));
     fireEvent.click(screen.getByRole('button', { name: '동의하고 시작하기' }));
 
-    await waitFor(() => expect(submitMock).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      expect(useModalStore.getState().state.mainText).toBe(
+        '동의 처리에 실패했습니다.',
+      );
+    });
     expect(trackGA4Event).not.toHaveBeenCalledWith(
       'sign_up',
       expect.anything(),
     );
+  });
+
+  it('새로고침 후 동의 완료 상태와 세션이 차례로 복원되면 한 번만 기록한다', async () => {
+    stageSignUp({ userId: 1, method: 'apple' });
+    getStatusMock.mockResolvedValueOnce(
+      createResponse({ ...agreementStatus, eligible: true }),
+    );
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    const wrapper = ({ children }: PropsWithChildren) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+
+    const { unmount } = render(
+      <AgreementScreen documentContents={documentContents} />,
+      {
+        wrapper,
+      },
+    );
+    await waitFor(() => expect(getStatusMock).toHaveBeenCalledTimes(1));
+    expect(routerReplace).not.toHaveBeenCalled();
+    expect(trackGA4Event).not.toHaveBeenCalledWith(
+      'sign_up',
+      expect.anything(),
+    );
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        accessToken: 'access-token',
+        user: { userId: 1, sub: 'tester', profile: null, roles: 'ROLE_USER' },
+      }),
+    });
+    await act(async () => {
+      await restoreAuthSession();
+    });
+
+    await waitFor(() => {
+      expect(routerReplace).toHaveBeenCalledWith('/');
+      expect(trackGA4Event).toHaveBeenCalledWith('sign_up', {
+        method: 'apple',
+        trigger: undefined,
+      });
+    });
+
+    unmount();
+    render(<AgreementScreen documentContents={documentContents} />, {
+      wrapper,
+    });
+    await waitFor(() => expect(routerReplace).toHaveBeenCalledTimes(2));
+    expect(
+      jest
+        .mocked(trackGA4Event)
+        .mock.calls.filter(([event]) => event === 'sign_up'),
+    ).toHaveLength(1);
   });
 });

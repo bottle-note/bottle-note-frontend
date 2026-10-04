@@ -75,6 +75,41 @@ describe('카카오 v2 로그인 API 계약', () => {
     });
   });
 
+  it('Apple 첫 로그인 응답의 가입 여부와 동의 필요 여부를 유지한다', async () => {
+    fetchMock.mockResolvedValueOnce(
+      createResponse({
+        body: {
+          accessToken: 'bottle-access-token',
+          isFirstLogin: true,
+          agreementRequired: true,
+        },
+        refreshToken: 'bottle-refresh-token',
+      }),
+    );
+
+    const tokens = await AuthApi.server.appleLogin({
+      idToken: 'apple-id-token',
+      nonce: 'apple-nonce',
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://api.example.com/api/v2/auth/apple',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({
+          idToken: 'apple-id-token',
+          nonce: 'apple-nonce',
+        }),
+      }),
+    );
+    expect(tokens).toEqual({
+      accessToken: 'bottle-access-token',
+      refreshToken: 'bottle-refresh-token',
+      agreementRequired: true,
+      isFirstLogin: true,
+    });
+  });
+
   it('v2 검증 API가 실패하면 로그인 실패로 처리한다', async () => {
     fetchMock.mockResolvedValueOnce(
       createResponse({
