@@ -1,4 +1,9 @@
 import { apiClient } from '@/shared/api/apiClient';
+import {
+  fetchPublicApiOnServer,
+  type PublicApiCacheOptions,
+  type PublicApiResult,
+} from '@/shared/api/internalApi';
 import { ApiResponse } from '@/api/_shared/types';
 import { buildQueryParams } from '@/api/_shared/queryBuilder';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
@@ -116,6 +121,18 @@ export const MfdsApi = {
     }
 
     return response;
+  },
+
+  server: {
+    getAlcohol(
+      id: string,
+      cache: PublicApiCacheOptions,
+    ): Promise<PublicApiResult<MfdsAlcoholDetail>> {
+      return fetchPublicApiOnServer<MfdsAlcoholDetail>(
+        `/v1/mfds/alcohols/${encodeURIComponent(id)}`,
+        cache,
+      );
+    },
   },
 };
 
