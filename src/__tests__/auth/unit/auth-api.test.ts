@@ -71,6 +71,7 @@ describe('카카오 v2 로그인 API 계약', () => {
       accessToken: 'bottle-access-token',
       refreshToken: 'bottle-refresh-token',
       agreementRequired: false,
+      isFirstLogin: false,
     });
   });
 

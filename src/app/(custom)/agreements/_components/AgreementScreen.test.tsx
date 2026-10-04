@@ -4,6 +4,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { AgreementApi } from '@/api/agreement/agreement.api';
 import type { AgreementStatusResponse } from '@/api/agreement/types';
+import {
+  resetAuthSessionForTest,
+  setAuthenticatedSession,
+} from '@/lib/auth/session-store';
+import { trackGA4Event } from '@/utils/analytics/ga4';
+import { stageSignUp } from '@/utils/analytics/signUp';
 import { AgreementScreen } from './AgreementScreen';
 
 jest.mock('next/navigation', () => ({
@@ -15,6 +21,10 @@ jest.mock('@/api/agreement/agreement.api', () => ({
     getStatus: jest.fn(),
     submit: jest.fn(),
   },
+}));
+
+jest.mock('@/utils/analytics/ga4', () => ({
+  trackGA4Event: jest.fn(),
 }));
 
 const documentContents = {
@@ -53,6 +63,7 @@ describe('AgreementScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     sessionStorage.clear();
+    resetAuthSessionForTest();
     (useRouter as jest.Mock).mockReturnValue({ replace: routerReplace });
     getStatusMock.mockResolvedValue(createResponse(agreementStatus));
     submitMock.mockResolvedValue(
@@ -182,5 +193,70 @@ describe('AgreementScreen', () => {
       });
     });
     expect(routerReplace).toHaveBeenCalledWith('/');
+  });
+
+  it('첫 가입자의 필수 동의가 성공하면 가입 이벤트를 한 번 기록한다', async () => {
+    setAuthenticatedSession({
+      accessToken: 'access-token',
+      user: { userId: 1, sub: 'tester', profile: null, roles: 'ROLE_USER' },
+    });
+    stageSignUp({ userId: 1, method: 'apple', trigger: 'review_write' });
+    await renderAgreementScreen();
+
+    fireEvent.click(screen.getByLabelText('[필수] 이용약관 동의'));
+    fireEvent.click(screen.getByLabelText('[필수] 개인정보 수집·이용 동의'));
+    fireEvent.click(screen.getByRole('button', { name: '동의하고 시작하기' }));
+
+    await waitFor(() => {
+      expect(trackGA4Event).toHaveBeenCalledWith('sign_up', {
+        method: 'apple',
+        trigger: 'review_write',
+      });
+    });
+    expect(
+      jest
+        .mocked(trackGA4Event)
+        .mock.calls.filter(([event]) => event === 'sign_up'),
+    ).toHaveLength(1);
+  });
+
+  it('다른 사용자의 동의 처리에는 이전 가입 이벤트를 보내지 않는다', async () => {
+    setAuthenticatedSession({
+      accessToken: 'access-token',
+      user: { userId: 2, sub: 'tester', profile: null, roles: 'ROLE_USER' },
+    });
+    stageSignUp({ userId: 1, method: 'kakao' });
+    submitMock.mockResolvedValueOnce(createResponse(agreementStatus));
+    await renderAgreementScreen();
+
+    fireEvent.click(screen.getByLabelText('[필수] 이용약관 동의'));
+    fireEvent.click(screen.getByLabelText('[필수] 개인정보 수집·이용 동의'));
+    fireEvent.click(screen.getByRole('button', { name: '동의하고 시작하기' }));
+
+    await waitFor(() => expect(submitMock).toHaveBeenCalledTimes(1));
+    expect(trackGA4Event).not.toHaveBeenCalledWith(
+      'sign_up',
+      expect.anything(),
+    );
+  });
+
+  it('첫 가입자의 약관 제출이 실패하면 가입 이벤트를 보내지 않는다', async () => {
+    setAuthenticatedSession({
+      accessToken: 'access-token',
+      user: { userId: 1, sub: 'tester', profile: null, roles: 'ROLE_USER' },
+    });
+    stageSignUp({ userId: 1, method: 'kakao' });
+    submitMock.mockRejectedValueOnce(new Error('agreement failed'));
+    await renderAgreementScreen();
+
+    fireEvent.click(screen.getByLabelText('[필수] 이용약관 동의'));
+    fireEvent.click(screen.getByLabelText('[필수] 개인정보 수집·이용 동의'));
+    fireEvent.click(screen.getByRole('button', { name: '동의하고 시작하기' }));
+
+    await waitFor(() => expect(submitMock).toHaveBeenCalledTimes(1));
+    expect(trackGA4Event).not.toHaveBeenCalledWith(
+      'sign_up',
+      expect.anything(),
+    );
   });
 });

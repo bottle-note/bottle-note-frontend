@@ -22,6 +22,7 @@ export interface TokenData {
 
 export interface LoginTokenData extends TokenData {
   agreementRequired: boolean;
+  isFirstLogin: boolean;
 }
 
 export interface UserData {

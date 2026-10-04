@@ -110,6 +110,7 @@ describe('카카오 로그인 v2 오케스트레이션', () => {
       accessToken: bottleAccessToken,
       refreshToken: 'bottle-refresh-token',
       agreementRequired: true,
+      isFirstLogin: true,
     });
 
     const response = await createLoginResponse({
@@ -127,6 +128,7 @@ describe('카카오 로그인 v2 오케스트레이션', () => {
     });
     expect(body.accessToken).toBe(bottleAccessToken);
     expect(body.agreementRequired).toBe(true);
+    expect(body.isFirstLogin).toBe(true);
     expect(cookies.get('bn_access_token')?.value).toBe(bottleAccessToken);
     expect(cookies.get('bn_refresh_token')?.value).toBe('bottle-refresh-token');
   });

@@ -154,6 +154,7 @@ export async function createLoginResponse(payload: LoginPayload) {
   const response = NextResponse.json({
     ...createSessionPayload(tokens),
     agreementRequired: tokens.agreementRequired,
+    isFirstLogin: tokens.isFirstLogin,
   });
   applyRefreshTokenCookie(response, tokens.refreshToken);
   applyAccessTokenCookie(response, tokens.accessToken);

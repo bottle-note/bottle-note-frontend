@@ -12,7 +12,9 @@ import type {
 } from '@/api/agreement/types';
 import { Button } from '@/components/ui/Button/Button';
 import { ROUTES } from '@/constants/routes';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import useModalStore from '@/store/modalStore';
+import { completePendingSignUp } from '@/utils/analytics/signUp';
 import { getReturnToUrl } from '@/utils/loginRedirect';
 
 type AgreementRequirement = 'all' | 'optional' | 'required';
@@ -120,6 +122,7 @@ export function AgreementScreen({ documentContents }: AgreementScreenProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { handleModalState } = useModalStore();
+  const { user } = useAuthSession();
   const [agreements, setAgreements] = useState(createEmptyAgreementState);
   const [inputContexts, setInputContexts] = useState(
     createIndividualInputContexts,
@@ -144,6 +147,9 @@ export function AgreementScreen({ documentContents }: AgreementScreenProps) {
     mutationFn: AgreementApi.submit,
     onSuccess: (response) => {
       queryClient.setQueryData(AGREEMENT_STATUS_QUERY_KEY, response.data);
+      if (response.data.eligible && user) {
+        completePendingSignUp(user.userId);
+      }
       router.replace(getReturnToUrl());
     },
     onError: () => {
@@ -158,18 +164,20 @@ export function AgreementScreen({ documentContents }: AgreementScreenProps) {
   useEffect(() => {
     if (!status || hasHandledStatusRef.current) return;
 
-    hasHandledStatusRef.current = true;
-
     if (status.eligible) {
+      if (!user) return;
+      hasHandledStatusRef.current = true;
+      completePendingSignUp(user.userId);
       router.replace(getReturnToUrl());
       return;
     }
 
+    hasHandledStatusRef.current = true;
     const initialAgreements = createAgreementState(status.items);
     initialAgreementsRef.current = initialAgreements;
     setAgreements(initialAgreements);
     setIsInitialized(true);
-  }, [router, status]);
+  }, [router, status, user]);
 
   useEffect(() => {
     if (!isStatusError || hasShownStatusErrorRef.current) return;

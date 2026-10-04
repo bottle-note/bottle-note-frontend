@@ -7,6 +7,7 @@ import { loginAuthSession } from '@/lib/auth/session-store';
 import { loadKakaoSDK } from '@/lib/kakao/kakaoSDK';
 import useModalStore from '@/store/modalStore';
 import { trackGA4Event } from '@/utils/analytics/ga4';
+import { completePendingSignUp, stageSignUp } from '@/utils/analytics/signUp';
 import { handleWebViewMessage, sendLogToFlutter } from '@/utils/flutterUtil';
 import {
   clearReturnToUrl,
@@ -75,6 +76,20 @@ export const useSocialLogin = () => {
 
     if (trigger) {
       trackGA4Event('login_prompt_converted', { trigger });
+    }
+
+    stageSignUp(
+      result.isFirstLogin
+        ? {
+            userId: result.session.user.userId,
+            method,
+            trigger: trigger ?? undefined,
+          }
+        : null,
+    );
+
+    if (result.isFirstLogin && !result.agreementRequired) {
+      completePendingSignUp(result.session.user.userId);
     }
 
     await sendDeviceInfoIfNeeded();

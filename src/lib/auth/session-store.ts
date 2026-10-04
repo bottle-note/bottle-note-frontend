@@ -13,6 +13,7 @@ export interface ClientSession {
 export interface LoginResult {
   session: ClientSession;
   agreementRequired: boolean;
+  isFirstLogin: boolean;
 }
 
 type SessionListener = () => void;
@@ -169,9 +170,10 @@ export const loginAuthSession = async (
     throw new Error(errorBody?.message || 'Login failed');
   }
 
-  const { agreementRequired, ...session } =
+  const { agreementRequired, isFirstLogin, ...session } =
     (await response.json()) as ClientSession & {
       agreementRequired: boolean;
+      isFirstLogin: boolean;
     };
 
   if (typeof agreementRequired !== 'boolean') {
@@ -182,6 +184,7 @@ export const loginAuthSession = async (
   return {
     session,
     agreementRequired,
+    isFirstLogin: isFirstLogin === true,
   };
 };
 

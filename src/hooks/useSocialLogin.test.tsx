@@ -45,8 +45,9 @@ jest.mock('@/utils/loginTrigger', () => ({
   consumeLoginTrigger: jest.fn(),
 }));
 
-const loginResult = (agreementRequired: boolean) => ({
+const loginResult = (agreementRequired: boolean, isFirstLogin = false) => ({
   agreementRequired,
+  isFirstLogin,
   session: {
     accessToken: 'access-token',
     user: {
@@ -236,5 +237,50 @@ describe('useSocialLogin', () => {
     expect(trackGA4Event).toHaveBeenCalledWith('login_prompt_converted', {
       trigger: 'review_write',
     });
+    expect(trackGA4Event).not.toHaveBeenCalledWith(
+      'sign_up',
+      expect.anything(),
+    );
+  });
+
+  it('첫 Kakao 로그인에서 동의가 필요 없으면 가입 이벤트를 한 번 기록한다', async () => {
+    loginAuthSessionMock.mockResolvedValue(loginResult(false, true));
+    consumeLoginTriggerMock.mockReturnValueOnce('rating');
+    const { result } = renderHook(() => useSocialLogin());
+
+    await act(async () => {
+      await result.current.completeKakaoWebLogin('authorization-code');
+      await result.current.completeKakaoWebLogin('authorization-code');
+    });
+
+    expect(trackGA4Event).toHaveBeenCalledWith('sign_up', {
+      method: 'kakao',
+      trigger: 'rating',
+    });
+    expect(
+      jest
+        .mocked(trackGA4Event)
+        .mock.calls.filter(([event]) => event === 'sign_up'),
+    ).toHaveLength(1);
+  });
+
+  it('첫 Apple 로그인에서 동의가 필요하면 가입 이벤트를 보류한다', async () => {
+    loginAuthSessionMock.mockResolvedValueOnce(loginResult(true, true));
+    const { result } = renderHook(() => useSocialLogin());
+
+    await act(async () => {
+      await result.current.onAppleAppLoginSuccess(
+        JSON.stringify({
+          idToken: 'apple-id-token',
+          nonce: 'apple-nonce',
+        }),
+      );
+    });
+
+    expect(routerReplace).toHaveBeenCalledWith(ROUTES.AGREEMENTS);
+    expect(trackGA4Event).not.toHaveBeenCalledWith(
+      'sign_up',
+      expect.anything(),
+    );
   });
 });
