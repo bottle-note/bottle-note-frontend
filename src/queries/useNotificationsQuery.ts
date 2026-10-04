@@ -3,11 +3,16 @@ import { NotificationInboxApi } from '@/api/notification/notification.api';
 import type { NotificationListData } from '@/api/notification/types';
 import { usePaginatedQuery } from './usePaginatedQuery';
 
+export const notificationListKeyPrefix = ['notifications', 'list'] as const;
 export const notificationListKey = (userId: number | null) =>
-  ['notifications', 'list', userId] as const;
+  [...notificationListKeyPrefix, userId] as const;
 
+export const notificationUnreadCountKeyPrefix = [
+  'notifications',
+  'unread-count',
+] as const;
 export const notificationUnreadCountKey = (userId: number | null) =>
-  ['notifications', 'unread-count', userId] as const;
+  [...notificationUnreadCountKeyPrefix, userId] as const;
 
 export function useNotificationsQuery(userId: number | null) {
   return usePaginatedQuery<NotificationListData>({
@@ -23,10 +28,6 @@ export function useNotificationUnreadCount(userId: number | null) {
     queryFn: NotificationInboxApi.getUnreadCount,
     enabled: userId !== null,
     retry: false,
-    refetchOnWindowFocus: true,
-    refetchInterval: () =>
-      typeof document !== 'undefined' && document.visibilityState === 'visible'
-        ? 60_000
-        : false,
+    refetchOnWindowFocus: false,
   });
 }
