@@ -12,6 +12,7 @@ interface GuestAlcoholDetailGateProps {
   onLogin: () => void;
   children: ReactNode;
   id?: string;
+  isAuthLoading?: boolean;
 }
 
 export function GuestAlcoholDetailGate({
@@ -21,6 +22,7 @@ export function GuestAlcoholDetailGate({
   onLogin,
   children,
   id,
+  isAuthLoading = false,
 }: GuestAlcoholDetailGateProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -53,12 +55,16 @@ export function GuestAlcoholDetailGate({
         }}
       />
       <div className="pointer-events-none relative z-10 w-full bg-bg-layer-default px-20 py-20">
-        <GuestLoginPrompt
-          title={title}
-          description={description}
-          buttonLabel={buttonLabel}
-          onLogin={onLogin}
-        />
+        {isAuthLoading ? (
+          <div aria-hidden="true" className="h-88 animate-pulse" />
+        ) : (
+          <GuestLoginPrompt
+            title={title}
+            description={description}
+            buttonLabel={buttonLabel}
+            onLogin={onLogin}
+          />
+        )}
       </div>
     </section>
   );

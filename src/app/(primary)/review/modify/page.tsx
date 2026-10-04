@@ -14,6 +14,7 @@ import { useReviewSubmission } from '@/app/(primary)/review/hook/useReviewSubmis
 import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
 import { parseApiError } from '@/hooks/parseApiError';
 import { useReviewDetailQuery } from '@/queries/useReviewDetailQuery';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import Button from '@/components/ui/Button/Button';
 import useModalStore from '@/store/modalStore';
 import Loading from '@/components/ui/Loading/Loading';
@@ -29,13 +30,18 @@ function ReviewModify() {
   const isKeyboardVisible = useKeyboardVisible();
   const searchParams = useSearchParams();
   const reviewId = searchParams.get('reviewId');
+  const { isLoading: isAuthLoading, user } = useAuthSession();
 
   const {
     data: reviewData,
     error,
     isLoading,
     refetch,
-  } = useReviewDetailQuery({ reviewId: reviewId ?? undefined });
+  } = useReviewDetailQuery({
+    reviewId: reviewId ?? undefined,
+    enabled: !isAuthLoading,
+    viewerId: user?.userId ?? null,
+  });
 
   const errorInfo = parseApiError(error);
 

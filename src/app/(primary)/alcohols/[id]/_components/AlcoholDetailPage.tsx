@@ -51,16 +51,28 @@ interface DetailItem {
   content: string;
 }
 
-export default function AlcoholDetailPage() {
+interface AlcoholDetailPageProps {
+  initialData?: AlcoholDetailsResponse;
+}
+
+export default function AlcoholDetailPage({
+  initialData,
+}: AlcoholDetailPageProps) {
   const router = useRouter();
   const params = useParams();
   const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
   const { id: alcoholId } = params;
   const { handleModalState } = useModalStore();
   const { bridgeToLogin } = useLoginBridge();
-  const [data, setData] = useState<AlcoholDetailsResponse | null>(null);
-  const [alcoholDetails, setAlcoholDetails] = useState<DetailItem[]>([]);
-  const [isPicked, setIsPicked] = useState<boolean>(false);
+  const [data, setData] = useState<AlcoholDetailsResponse | null>(
+    initialData ?? null,
+  );
+  const [isPicked, setIsPicked] = useState<boolean>(
+    initialData?.alcohols.isPicked ?? false,
+  );
+  const [clientDetailAuthStatus, setClientDetailAuthStatus] = useState<
+    'guest' | 'user' | null
+  >(null);
   const [rate, setRate] = useState(0);
   const [userNickName, setUserNickName] = useState<string>('');
   const [isShareOpen, setIsShareOpen] = useState(false);
@@ -73,9 +85,26 @@ export default function AlcoholDetailPage() {
 
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const viewTrackedAlcoholIdRef = useRef<string | null>(null);
+  const latestDetailRequestIdRef = useRef(0);
   const currentRateRef = useRef(0);
   const latestRatingRequestIdRef = useRef(0);
   const ratingRequestQueueRef = useRef<Promise<void>>(Promise.resolve());
+
+  const alcoholDetails = useMemo<DetailItem[]>(() => {
+    const alcohol = data?.alcohols;
+    if (!alcohol) return [];
+
+    const formatContent = (content: string | undefined) =>
+      content?.replace('/', '/\n') || '-';
+
+    return [
+      { title: '카테고리', content: alcohol.engCategory },
+      { title: '증류소', content: formatContent(alcohol.engDistillery) },
+      { title: '캐스크', content: formatContent(alcohol.cask) },
+      { title: '국가/지역', content: formatContent(alcohol.engRegion) },
+      { title: '도수(%)', content: formatContent(alcohol.abv) },
+    ];
+  }, [data?.alcohols]);
 
   const setCurrentRate = useCallback((nextRate: number) => {
     currentRateRef.current = nextRate;
@@ -87,12 +116,14 @@ export default function AlcoholDetailPage() {
   }, []);
 
   const fetchAlcoholDetails = async (id: string) => {
+    const requestId = ++latestDetailRequestIdRef.current;
     try {
       const response = await AlcoholsApi.getAlcoholDetails(id);
-      if (response) {
+      if (response && requestId === latestDetailRequestIdRef.current) {
         const { alcohols } = response.data;
         setData(response.data);
         setIsPicked(alcohols.isPicked);
+        setClientDetailAuthStatus(isLoggedIn ? 'user' : 'guest');
 
         if (viewTrackedAlcoholIdRef.current !== id) {
           viewTrackedAlcoholIdRef.current = id;
@@ -101,20 +132,6 @@ export default function AlcoholDetailPage() {
             alcohol_name: alcohols.korName,
           });
         }
-
-        const formatContent = (content: string | undefined) =>
-          content?.replace('/', '/\n') || '-';
-
-        setAlcoholDetails([
-          { title: '카테고리', content: alcohols.engCategory },
-          { title: '증류소', content: formatContent(alcohols.engDistillery) },
-          { title: '캐스크', content: formatContent(alcohols.cask) },
-          { title: '국가/지역', content: formatContent(alcohols.engRegion) },
-          {
-            title: '도수(%)',
-            content: formatContent(alcohols.abv),
-          },
-        ]);
       }
     } catch (error) {
       console.error('Failed to fetch alcohol details:', error);
@@ -275,7 +292,9 @@ export default function AlcoholDetailPage() {
 
   const reviewList = data?.reviewInfo?.reviewList ?? [];
   const reviewTotalCount = data?.reviewInfo?.totalCount;
-  const isGuest = !isAuthLoading && !isLoggedIn;
+  const isGuest = !isLoggedIn;
+  const isPersonalizedReady =
+    !isAuthLoading && (!isLoggedIn || clientDetailAuthStatus === 'user');
 
   const handleGuestLogin = (returnTo: string) => {
     router.replace(`/login?returnTo=${encodeURIComponent(returnTo)}`);
@@ -410,7 +429,7 @@ export default function AlcoholDetailPage() {
   return (
     <>
       <NavLayout>
-        {!data || !data.alcohols || isAuthLoading ? (
+        {!data || !data.alcohols ? (
           <AlcoholDetailsSkeleton />
         ) : (
           <div
@@ -454,6 +473,7 @@ export default function AlcoholDetailPage() {
                   data={data?.alcohols}
                   isPicked={isPicked}
                   setIsPicked={setIsPicked}
+                  isPersonalizedReady={isPersonalizedReady}
                 />
               </div>
             </div>
@@ -464,22 +484,27 @@ export default function AlcoholDetailPage() {
                   : 'mb-20'
               }
             >
-              <article className="grid place-items-center space-y-8 py-16">
-                {getRatingMessage(
-                  data?.alcohols?.myAvgRating,
-                  data?.alcohols?.myRating,
-                )}
-                <div>
-                  <AlcoholRatingInput
-                    value={rate}
-                    onChange={handleRateChange}
-                    onCommit={handleRateCommit}
-                    tone="brand"
-                  />
-                </div>
-              </article>
+              {isPersonalizedReady ? (
+                <article className="grid place-items-center space-y-8 py-16">
+                  {getRatingMessage(
+                    data?.alcohols?.myAvgRating,
+                    data?.alcohols?.myRating,
+                  )}
+                  <div>
+                    <AlcoholRatingInput
+                      value={rate}
+                      onChange={handleRateChange}
+                      onCommit={handleRateCommit}
+                      tone="brand"
+                    />
+                  </div>
+                </article>
+              ) : (
+                <div aria-hidden="true" className="h-96 animate-pulse" />
+              )}
               {isGuest ? (
                 <GuestAlcoholDetailGate
+                  isAuthLoading={isAuthLoading}
                   title="지금 보고 계신 위스키, 관심있으신가요?"
                   description="보틀노트에 기록하고 나만의 취향 노트를 쌓아보세요!"
                   buttonLabel="로그인하고 기록 시작하기"
