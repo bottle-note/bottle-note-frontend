@@ -474,6 +474,7 @@ export default function AlcoholDetailPage({
                   isPicked={isPicked}
                   setIsPicked={setIsPicked}
                   isPersonalizedReady={isPersonalizedReady}
+                  isAuthLoading={isAuthLoading}
                 />
               </div>
             </div>

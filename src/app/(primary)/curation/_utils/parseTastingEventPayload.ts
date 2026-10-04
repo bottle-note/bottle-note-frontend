@@ -42,8 +42,8 @@ export function parseTastingEventPayload(payload: TastingEventPayload) {
   const eventDate = new Date(payload.eventDate);
   const eventDateLabel = Number.isNaN(eventDate.getTime())
     ? payload.eventDate
-    : `${eventDate.getMonth() + 1}월 ${eventDate.getDate()}일 (${
-        WEEKDAYS[eventDate.getDay()]
+    : `${eventDate.getUTCMonth() + 1}월 ${eventDate.getUTCDate()}일 (${
+        WEEKDAYS[eventDate.getUTCDay()]
       })`;
   const [hour, minute] = payload.eventTime.split(':');
   const eventTimeLabel =

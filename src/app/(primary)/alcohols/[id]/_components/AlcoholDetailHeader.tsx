@@ -12,6 +12,7 @@ interface Props {
   isPicked: boolean;
   setIsPicked: (value: boolean | ((prev: boolean) => boolean)) => void;
   isPersonalizedReady?: boolean;
+  isAuthLoading?: boolean;
 }
 
 function AlcoholDetailHeader({
@@ -19,6 +20,7 @@ function AlcoholDetailHeader({
   isPicked,
   setIsPicked,
   isPersonalizedReady = true,
+  isAuthLoading = false,
 }: Props) {
   const { handleLoginModal } = useModalStore();
   const { handleReviewWrite } = useNavigateReviewWrite();
@@ -67,6 +69,7 @@ function AlcoholDetailHeader({
               <div className="flex gap-12 text-fg-neutral-muted">
                 <button
                   className="flex items-center gap-3"
+                  disabled={isAuthLoading}
                   onClick={() => handleReviewWrite(data.alcoholId)}
                 >
                   <SemanticIcon
