@@ -22,6 +22,7 @@ export function buildImportClearanceAlcoholMetadata(
       title: FALLBACK_TITLE,
       description: FALLBACK_DESCRIPTION,
       alternates: { canonical },
+      robots: { index: true, follow: true },
     };
   }
 
@@ -44,6 +45,7 @@ export function buildImportClearanceAlcoholMetadata(
   return {
     title,
     description,
+    robots: { index: true, follow: true },
     alternates: { canonical },
     openGraph: {
       title,

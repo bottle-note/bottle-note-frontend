@@ -19,7 +19,7 @@ describe('sitemap', () => {
     }
   });
 
-  it('공개 큐레이션 피드의 모든 유형과 다음 커서를 조회해 상세 URL을 넣는다', async () => {
+  it('공개 큐레이션과 수입 신고의 다음 커서를 끝까지 조회해 상세 URL을 넣는다', async () => {
     Object.defineProperty(process.env, 'NODE_ENV', {
       value: 'production',
       configurable: true,
@@ -32,19 +32,23 @@ describe('sitemap', () => {
       const url = new URL(String(input));
       requestedUrls.push(url);
       const isCuration = url.pathname === '/api/v2/curations/feed';
+      const isImportClearance = url.pathname === '/api/v1/mfds/alcohols';
       const isNextPage = url.searchParams.has('cursor');
 
       return {
         ok: true,
         json: async () => ({
           errors: [],
-          data: {
-            items: isCuration ? [{ id: isNextPage ? 22 : 11 }] : [],
-          },
+          data: isImportClearance
+            ? [{ id: isNextPage ? 20026 : 19120 }]
+            : { items: isCuration ? [{ id: isNextPage ? 22 : 11 }] : [] },
           meta: {
             pagination: {
-              hasNext: isCuration && !isNextPage,
-              nextCursor: isCuration && !isNextPage ? 'next+cursor/=' : null,
+              hasNext: (isCuration || isImportClearance) && !isNextPage,
+              nextCursor:
+                (isCuration || isImportClearance) && !isNextPage
+                  ? 'next+cursor/='
+                  : null,
             },
           },
         }),
@@ -57,8 +61,12 @@ describe('sitemap', () => {
     const curationRequests = requestedUrls.filter(
       (url) => url.pathname === '/api/v2/curations/feed',
     );
+    const importClearanceRequests = requestedUrls.filter(
+      (url) => url.pathname === '/api/v1/mfds/alcohols',
+    );
 
     expect(curationRequests).toHaveLength(2);
+    expect(importClearanceRequests).toHaveLength(2);
     expect(requestedUrls).toHaveLength(requestsAfterFirstSitemap);
     expect(cachedPages).toEqual(pages);
     expect(curationRequests[0].searchParams.getAll('code')).toEqual([
@@ -71,11 +79,16 @@ describe('sitemap', () => {
     expect(curationRequests[1].searchParams.get('cursor')).toBe(
       'next+cursor/=',
     );
+    expect(importClearanceRequests[1].searchParams.get('cursor')).toBe(
+      'next+cursor/=',
+    );
     expect(pages.map((page) => page.url)).toEqual(
       expect.arrayContaining([
         'https://bottle-note.com/curation',
         'https://bottle-note.com/curation/11',
         'https://bottle-note.com/curation/22',
+        'https://bottle-note.com/import-clearance/alcohol/19120',
+        'https://bottle-note.com/import-clearance/alcohol/20026',
       ]),
     );
 
@@ -99,6 +112,9 @@ describe('sitemap', () => {
           url.pathname.includes('/alcohols/explore/standard'),
         ),
       ).toHaveLength(2);
+      expect(
+        requestedUrls.filter((url) => url.pathname === '/api/v1/mfds/alcohols'),
+      ).toHaveLength(4);
     } finally {
       dateNow.mockRestore();
     }

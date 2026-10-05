@@ -3,6 +3,7 @@ import { ApiResponse } from '@/api/_shared/types';
 import { CURATION_V2_SPEC_CODES } from '@/api/curation-v2/constants';
 import type { CurationV2FeedItem } from '@/api/curation-v2/types';
 import type { ExploreAlcohol, ExploreReview } from '@/api/explore/types';
+import type { MfdsAlcoholListItem } from '@/api/mfds/types';
 import { ROUTES } from '@/constants/routes';
 import { BASE_URL, SSR_CALLER_HEADER } from '@/constants/common';
 import {
@@ -17,6 +18,7 @@ import {
 const SITEMAP_CONFIG = {
   PAGE_SIZE: 100,
   ALCOHOL_CACHE_TTL_MS: 24 * 60 * 60 * 1000,
+  IMPORT_CLEARANCE_CACHE_TTL_MS: 24 * 60 * 60 * 1000,
   CONTENT_CACHE_TTL_MS: 60 * 60 * 1000,
   ERROR_RETRY_MS: 60 * 1000,
 };
@@ -66,14 +68,16 @@ async function fetchCursorItems<T>(
     queryParams.set('size', String(SITEMAP_CONFIG.PAGE_SIZE));
     if (cursor) queryParams.set('cursor', cursor);
 
-    const response = await fetchFromAPI<ApiResponse<{ items: T[] }>>(
+    const response = await fetchFromAPI<ApiResponse<{ items: T[] } | T[]>>(
       `${endpoint}?${queryParams.toString()}`,
     );
     if (response.errors.length !== 0) {
       throw new Error(`Sitemap API returned errors for ${endpoint}`);
     }
 
-    items.push(...response.data.items);
+    items.push(
+      ...(Array.isArray(response.data) ? response.data : response.data.items),
+    );
 
     const pagination = response.meta.pagination;
     if (!pagination?.hasNext || !pagination.nextCursor) break;
@@ -148,6 +152,19 @@ async function fetchCurationPages(
   }));
 }
 
+async function fetchImportClearancePages(
+  baseUrl: string,
+): Promise<MetadataRoute.Sitemap> {
+  const declarations = await fetchCursorItems<MfdsAlcoholListItem>(
+    '/v1/mfds/alcohols',
+    new URLSearchParams(),
+  );
+
+  return declarations.map((declaration) => ({
+    url: `${baseUrl}${ROUTES.IMPORT_CLEARANCE.ALCOHOL(declaration.id)}`,
+  }));
+}
+
 function cacheSitemapPages(
   load: () => Promise<MetadataRoute.Sitemap>,
   ttlMs: number,
@@ -194,6 +211,10 @@ const getReviewPages = cacheSitemapPages(
 const getCurationPages = cacheSitemapPages(
   () => fetchCurationPages(BASE_URL),
   SITEMAP_CONFIG.CONTENT_CACHE_TTL_MS,
+);
+const getImportClearancePages = cacheSitemapPages(
+  () => fetchImportClearancePages(BASE_URL),
+  SITEMAP_CONFIG.IMPORT_CLEARANCE_CACHE_TTL_MS,
 );
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -249,6 +270,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getAlcoholPages(),
     getReviewPages(),
     getCurationPages(),
+    getImportClearancePages(),
   ]);
 
   return [...staticPages, ...exploreTabs, ...contentPages.flat()];
