@@ -11,6 +11,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import Star from '@/components/ui/Display/Star';
 import { SubHeader } from '@/components/ui/Navigation/SubHeader';
@@ -22,8 +23,7 @@ import List from '@/components/feature/List/List';
 import { truncStr } from '@/utils/truncStr';
 // import { shareOrCopy } from '@/utils/shareOrCopy';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
-import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
-import { AlcoholDetailsResponse } from '@/api/alcohol/types';
+import type { AlcoholDetailsResponse } from '@/api/alcohol/types';
 import { UserApi } from '@/api/user/user.api';
 import { RateApi } from '@/api/rate/rate.api';
 import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
@@ -31,6 +31,10 @@ import useModalStore from '@/store/modalStore';
 import { useLoginBridge } from '@/hooks/useLoginBridge';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { ROUTES } from '@/constants/routes';
+import {
+  alcoholDetailKeys,
+  useAlcoholDetailQuery,
+} from '@/queries/useAlcoholDetailQuery';
 import AlcoholDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/AlcoholDetailsSkeleton';
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import AlcoholRatingInput from '@/components/domain/alcohol/AlcoholRatingInput';
@@ -60,19 +64,42 @@ export default function AlcoholDetailPage({
 }: AlcoholDetailPageProps) {
   const router = useRouter();
   const params = useParams();
-  const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
+  const { isLoggedIn, isLoading: isAuthLoading, user } = useAuthSession();
   const { id: alcoholId } = params;
+  const alcoholIdString = Array.isArray(alcoholId)
+    ? alcoholId[0]
+    : alcoholId ?? '';
+  const viewerId = user?.userId ?? null;
+  const queryClient = useQueryClient();
   const { handleModalState } = useModalStore();
   const { bridgeToLogin } = useLoginBridge();
-  const [data, setData] = useState<AlcoholDetailsResponse | null>(
-    initialData ?? null,
+  const { data, isFetchedAfterMount, isSuccess, refetch } =
+    useAlcoholDetailQuery({
+      alcoholId: alcoholIdString,
+      viewerId,
+      initialData,
+      enabled: !isAuthLoading,
+    });
+  const isPicked = data?.alcohols.isPicked ?? false;
+  const setIsPicked = useCallback(
+    (value: React.SetStateAction<boolean>) => {
+      queryClient.setQueryData<AlcoholDetailsResponse>(
+        alcoholDetailKeys.detail(alcoholIdString, viewerId),
+        (current) => {
+          if (!current) return current;
+          const nextIsPicked =
+            typeof value === 'function'
+              ? value(current.alcohols.isPicked)
+              : value;
+          return {
+            ...current,
+            alcohols: { ...current.alcohols, isPicked: nextIsPicked },
+          };
+        },
+      );
+    },
+    [alcoholIdString, queryClient, viewerId],
   );
-  const [isPicked, setIsPicked] = useState<boolean>(
-    initialData?.alcohols.isPicked ?? false,
-  );
-  const [clientDetailAuthStatus, setClientDetailAuthStatus] = useState<
-    'guest' | 'user' | null
-  >(null);
   const [rate, setRate] = useState(0);
   const [userNickName, setUserNickName] = useState<string>('');
   const [isShareOpen, setIsShareOpen] = useState(false);
@@ -85,8 +112,8 @@ export default function AlcoholDetailPage({
 
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const viewTrackedAlcoholIdRef = useRef<string | null>(null);
-  const latestDetailRequestIdRef = useRef(0);
   const currentRateRef = useRef(0);
+  const viewerRequestIdRef = useRef(0);
   const latestRatingRequestIdRef = useRef(0);
   const ratingRequestQueueRef = useRef<Promise<void>>(Promise.resolve());
 
@@ -115,33 +142,22 @@ export default function AlcoholDetailPage({
     setIsRatingSuccessOpen(false);
   }, []);
 
-  const fetchAlcoholDetails = async (id: string) => {
-    const requestId = ++latestDetailRequestIdRef.current;
-    try {
-      const response = await AlcoholsApi.getAlcoholDetails(id);
-      if (response && requestId === latestDetailRequestIdRef.current) {
-        const { alcohols } = response.data;
-        setData(response.data);
-        setIsPicked(alcohols.isPicked);
-        setClientDetailAuthStatus(isLoggedIn ? 'user' : 'guest');
+  useEffect(() => {
+    if (!isFetchedAfterMount || !isSuccess || !data?.alcohols || isAuthLoading)
+      return;
+    if (viewTrackedAlcoholIdRef.current === alcoholIdString) return;
 
-        if (viewTrackedAlcoholIdRef.current !== id) {
-          viewTrackedAlcoholIdRef.current = id;
-          trackGA4Event('view_alcohol_detail', {
-            alcohol_id: id,
-            alcohol_name: alcohols.korName,
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch alcohol details:', error);
-    }
-  };
+    viewTrackedAlcoholIdRef.current = alcoholIdString;
+    trackGA4Event('view_alcohol_detail', {
+      alcohol_id: alcoholIdString,
+      alcohol_name: data.alcohols.korName,
+    });
+  }, [alcoholIdString, data, isAuthLoading, isFetchedAfterMount, isSuccess]);
 
-  const getCurrentUserInfo = async () => {
+  const getCurrentUserInfo = async (requestId: number) => {
     try {
       const response = await UserApi.getCurUserInfo();
-      if (response) {
+      if (response && requestId === viewerRequestIdRef.current) {
         setUserNickName(response.data.nickname);
       }
     } catch (error) {
@@ -149,9 +165,13 @@ export default function AlcoholDetailPage({
     }
   };
 
-  const fetchUserRating = async (alcohol: string): Promise<boolean> => {
+  const fetchUserRating = async (
+    alcohol: string,
+    requestId = viewerRequestIdRef.current,
+  ): Promise<boolean> => {
     try {
       const ratingResult = await RateApi.getUserRating(alcohol);
+      if (requestId !== viewerRequestIdRef.current) return false;
       setCurrentRate(ratingResult.data.rating);
       return true;
     } catch (error) {
@@ -161,16 +181,13 @@ export default function AlcoholDetailPage({
   };
 
   useEffect(() => {
-    if (alcoholId) {
-      const alcoholIdString = alcoholId.toString();
-      fetchAlcoholDetails(alcoholIdString);
-
-      if (isLoggedIn) {
-        fetchUserRating(alcoholIdString);
-        getCurrentUserInfo();
-      }
-    }
-  }, [alcoholId, isLoggedIn]);
+    const requestId = ++viewerRequestIdRef.current;
+    setCurrentRate(0);
+    setUserNickName('');
+    if (isAuthLoading || !isLoggedIn || !alcoholIdString) return;
+    void fetchUserRating(alcoholIdString, requestId);
+    void getCurrentUserInfo(requestId);
+  }, [alcoholIdString, isAuthLoading, isLoggedIn, viewerId]);
 
   const handleRateChange = useCallback(
     (selectedRate: number) => {
@@ -202,7 +219,7 @@ export default function AlcoholDetailPage({
             });
             setSuccessfulRating(selectedRate);
             setIsRatingSuccessOpen(true);
-            void fetchAlcoholDetails(String(alcoholId));
+            void refetch();
           } catch (error) {
             if (requestId !== latestRatingRequestIdRef.current) return;
 
@@ -224,6 +241,7 @@ export default function AlcoholDetailPage({
       data?.alcohols.korName,
       handleModalState,
       isLoggedIn,
+      refetch,
     ],
   );
 
@@ -263,8 +281,8 @@ export default function AlcoholDetailPage({
   };
 
   const refreshAlcoholDetails = useCallback(() => {
-    fetchAlcoholDetails(alcoholId.toString());
-  }, [alcoholId]);
+    void refetch();
+  }, [refetch]);
 
   const shareConfig: ShareConfig | null = useMemo(() => {
     if (!data?.alcohols) return null;
@@ -294,7 +312,7 @@ export default function AlcoholDetailPage({
   const reviewTotalCount = data?.reviewInfo?.totalCount;
   const isGuest = !isLoggedIn;
   const isPersonalizedReady =
-    !isAuthLoading && (!isLoggedIn || clientDetailAuthStatus === 'user');
+    !isAuthLoading && (!isLoggedIn || (isFetchedAfterMount && isSuccess));
 
   const handleGuestLogin = (returnTo: string) => {
     router.replace(`/login?returnTo=${encodeURIComponent(returnTo)}`);
