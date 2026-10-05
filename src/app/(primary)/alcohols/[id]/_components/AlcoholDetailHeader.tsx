@@ -11,9 +11,17 @@ interface Props {
   data: AlcoholInfo;
   isPicked: boolean;
   setIsPicked: (value: boolean | ((prev: boolean) => boolean)) => void;
+  isPersonalizedReady?: boolean;
+  isAuthLoading?: boolean;
 }
 
-function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
+function AlcoholDetailHeader({
+  data,
+  isPicked,
+  setIsPicked,
+  isPersonalizedReady = true,
+  isAuthLoading = false,
+}: Props) {
   const { handleLoginModal } = useModalStore();
   const { handleReviewWrite } = useNavigateReviewWrite();
 
@@ -61,6 +69,7 @@ function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
               <div className="flex gap-12 text-fg-neutral-muted">
                 <button
                   className="flex items-center gap-3"
+                  disabled={isAuthLoading}
                   onClick={() => handleReviewWrite(data.alcoholId)}
                 >
                   <SemanticIcon
@@ -71,16 +80,23 @@ function AlcoholDetailHeader({ data, isPicked, setIsPicked }: Props) {
                   <p className="text-12 font-normal">리뷰 작성</p>
                 </button>
                 <div className="my-[1.6px] border-[0.5px] border-stroke-neutral-subtle" />
-                <AlcoholPickButton
-                  size={16}
-                  isPicked={isPicked}
-                  alcoholId={Number(data.alcoholId)}
-                  handleUpdatePicked={() => setIsPicked((prev) => !prev)}
-                  onApiError={() => setIsPicked(isPicked)}
-                  handleNotLogin={handleLoginModal}
-                  pickBtnName="찜하기"
-                  tone="neutral"
-                />
+                {isPersonalizedReady ? (
+                  <AlcoholPickButton
+                    size={16}
+                    isPicked={isPicked}
+                    alcoholId={Number(data.alcoholId)}
+                    handleUpdatePicked={() => setIsPicked((prev) => !prev)}
+                    onApiError={() => setIsPicked(isPicked)}
+                    handleNotLogin={handleLoginModal}
+                    pickBtnName="찜하기"
+                    tone="neutral"
+                  />
+                ) : (
+                  <span
+                    aria-hidden="true"
+                    className="h-16 w-44 animate-pulse"
+                  />
+                )}
               </div>
             </div>
           </>

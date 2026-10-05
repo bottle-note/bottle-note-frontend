@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, memo } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -14,13 +14,18 @@ import { ROUTES } from '@/constants/routes';
 interface Props {
   data: AlcoholType;
   handleLogin: () => void;
+  isPersonalizedReady?: boolean;
 }
 
-function AlcoholInfo({ data, handleLogin }: Props) {
+function AlcoholInfo({ data, handleLogin, isPersonalizedReady = true }: Props) {
   const router = useRouter();
   const { isLoggedIn } = useAuthSession();
   const { isPicked: originalIsPicked } = data;
   const [isPicked, setIsPicked] = useState<boolean>(originalIsPicked);
+
+  useEffect(() => {
+    setIsPicked(originalIsPicked);
+  }, [originalIsPicked]);
 
   const handleLoginConfirm = () => {
     if (!isLoggedIn || !data.alcoholId) {
@@ -63,37 +68,41 @@ function AlcoholInfo({ data, handleLogin }: Props) {
           </div>
           <div className="space-y-10 mt-10">
             <div className="border-[0.5px] border-white" />
-            <div className="flex space-x-12">
-              <div
-                className="text-14 font-normal flex"
-                onClick={handleLoginConfirm}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleLoginConfirm();
-                  }
-                }}
-              >
-                <Image
-                  className="mr-4"
-                  src="/icon/edit-outlined-white.svg"
-                  alt="write"
-                  width={19}
-                  height={19}
+            {isPersonalizedReady ? (
+              <div className="flex space-x-12">
+                <div
+                  className="text-14 font-normal flex"
+                  onClick={handleLoginConfirm}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleLoginConfirm();
+                    }
+                  }}
+                >
+                  <Image
+                    className="mr-4"
+                    src="/icon/edit-outlined-white.svg"
+                    alt="write"
+                    width={19}
+                    height={19}
+                  />
+                  <button>리뷰 작성</button>
+                </div>
+                <div className="border-[0.5px] border-white my-[1.6px]" />
+                <AlcoholPickButton
+                  size={19}
+                  isPicked={isPicked}
+                  alcoholId={data.alcoholId}
+                  handleUpdatePicked={() => setIsPicked((prev) => !prev)}
+                  onApiError={() => setIsPicked(originalIsPicked)}
+                  handleNotLogin={handleLogin}
+                  pickBtnName="찜하기"
+                  fontSize="text-14"
                 />
-                <button>리뷰 작성</button>
               </div>
-              <div className="border-[0.5px] border-white my-[1.6px]" />
-              <AlcoholPickButton
-                size={19}
-                isPicked={isPicked}
-                alcoholId={data.alcoholId}
-                handleUpdatePicked={() => setIsPicked((prev) => !prev)}
-                onApiError={() => setIsPicked(originalIsPicked)}
-                handleNotLogin={handleLogin}
-                pickBtnName="찜하기"
-                fontSize="text-14"
-              />
-            </div>
+            ) : (
+              <div aria-hidden="true" className="h-20" />
+            )}
           </div>
         </article>
       </section>

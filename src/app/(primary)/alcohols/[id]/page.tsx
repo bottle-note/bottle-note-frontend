@@ -29,7 +29,10 @@ export default async function Page({ params }: Props) {
           />
         </>
       )}
-      <AlcoholDetailPage />
+      <AlcoholDetailPage
+        key={params.id}
+        initialData={result.status === 'ok' ? result.data : undefined}
+      />
     </>
   );
 }

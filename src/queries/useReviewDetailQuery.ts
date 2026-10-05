@@ -4,11 +4,15 @@ import type { ReviewDetailsResponse } from '@/api/review/types';
 
 export const reviewDetailKeys = {
   all: ['reviewDetail'] as const,
-  detail: (reviewId: string) => [...reviewDetailKeys.all, reviewId] as const,
+  detail: (reviewId: string, viewerId: number | null) =>
+    [...reviewDetailKeys.all, reviewId, viewerId] as const,
 };
 
 interface UseReviewDetailQueryOptions {
   reviewId: string | string[] | undefined;
+  initialData?: ReviewDetailsResponse;
+  enabled?: boolean;
+  viewerId?: number | null;
 }
 
 /**
@@ -16,12 +20,15 @@ interface UseReviewDetailQueryOptions {
  */
 export const useReviewDetailQuery = ({
   reviewId,
+  initialData,
+  enabled = true,
+  viewerId = null,
 }: UseReviewDetailQueryOptions) => {
   const id = Array.isArray(reviewId) ? reviewId[0] : reviewId;
   const hasId = typeof id === 'string' && id.length > 0;
 
   return useQuery({
-    queryKey: reviewDetailKeys.detail(hasId ? id : 'disabled'),
+    queryKey: reviewDetailKeys.detail(hasId ? id : 'disabled', viewerId),
     queryFn: async (): Promise<ReviewDetailsResponse> => {
       if (!hasId) {
         throw new Error('Cannot fetch review details: reviewId is missing.');
@@ -29,7 +36,9 @@ export const useReviewDetailQuery = ({
       const response = await ReviewApi.getReviewDetails(id);
       return response.data;
     },
-    enabled: hasId,
+    enabled: enabled && hasId,
+    initialData,
+    refetchOnMount: initialData ? 'always' : undefined,
     retry: false,
     staleTime: 0,
   });

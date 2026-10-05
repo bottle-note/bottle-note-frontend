@@ -48,12 +48,19 @@ export const getDateOnlyTime = (dateValue: string) => {
 };
 
 export const getTodayTime = () => {
-  const today = new Date();
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+  }).formatToParts(new Date());
+  const datePart = (type: 'year' | 'month' | 'day') =>
+    Number(parts.find((part) => part.type === type)?.value);
 
   return new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate(),
+    datePart('year'),
+    datePart('month') - 1,
+    datePart('day'),
   ).getTime();
 };
 

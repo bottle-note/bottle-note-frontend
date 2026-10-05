@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MoreVertical } from 'lucide-react';
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
@@ -17,6 +17,7 @@ interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;
   alcoholId: number;
   handleLogin: () => void;
+  isPersonalizedReady?: boolean;
   onRefresh: () => void;
   textareaRef?: React.MutableRefObject<HTMLTextAreaElement | null>;
 }
@@ -25,6 +26,7 @@ function ReviewDetails({
   data,
   alcoholId,
   handleLogin,
+  isPersonalizedReady = true,
   onRefresh,
   textareaRef,
 }: Props) {
@@ -32,6 +34,11 @@ function ReviewDetails({
   const [isOptionShow, setIsOptionShow] = useState(false);
   const [isLiked, setIsLiked] = useState(data?.reviewInfo?.isLikedByMe);
   const [likeCount, setLikeCount] = useState(data?.reviewInfo?.likeCount);
+
+  useEffect(() => {
+    setIsLiked(data.reviewInfo.isLikedByMe);
+    setLikeCount(data.reviewInfo.likeCount);
+  }, [data.reviewInfo.isLikedByMe, data.reviewInfo.likeCount]);
   const formatUrl = data?.reviewImageList?.map((url) => url.viewUrl);
   const productImages = convertImageUrlsToProductImageArray(
     formatUrl,
@@ -50,12 +57,9 @@ function ReviewDetails({
               <ReviewImageCarousel images={productImages} priority />
             </div>
           )}
-          <div
-            className="whitespace-pre-line break-words text-15 text-fg-neutral"
-            dangerouslySetInnerHTML={{
-              __html: data.reviewInfo?.reviewContent?.replace(/\n/g, '<br />'),
-            }}
-          />
+          <div className="whitespace-pre-line break-words text-15 text-fg-neutral">
+            {data.reviewInfo?.reviewContent}
+          </div>
           <article className="flex items-center justify-between mt-10">
             {data.reviewInfo?.createAt && (
               <p className="text-13 text-fg-neutral-muted">
@@ -85,21 +89,25 @@ function ReviewDetails({
         <ReviewPriceLocation data={data} />
 
         {/* 좋아요, 댓글, 공유 버튼 */}
-        <ReviewInteractionBar
-          data={data}
-          isLiked={isLiked}
-          likeCount={likeCount}
-          onLikeUpdate={() => {
-            setIsLiked((prev) => !prev);
-            setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
-          }}
-          onLikeError={() => {
-            setLikeCount(data?.reviewInfo?.likeCount);
-            setIsLiked(data?.reviewInfo?.isLikedByMe);
-          }}
-          handleLogin={handleLogin}
-          textareaRef={textareaRef}
-        />
+        {isPersonalizedReady ? (
+          <ReviewInteractionBar
+            data={data}
+            isLiked={isLiked}
+            likeCount={likeCount}
+            onLikeUpdate={() => {
+              setIsLiked((prev) => !prev);
+              setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+            }}
+            onLikeError={() => {
+              setLikeCount(data?.reviewInfo?.likeCount);
+              setIsLiked(data?.reviewInfo?.isLikedByMe);
+            }}
+            handleLogin={handleLogin}
+            textareaRef={textareaRef}
+          />
+        ) : (
+          <div aria-hidden="true" className="h-64" />
+        )}
       </section>
       <ReviewActionDropdown
         isShow={isOptionShow}

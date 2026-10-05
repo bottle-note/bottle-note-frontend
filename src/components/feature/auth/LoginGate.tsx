@@ -17,6 +17,7 @@ type LoginGateProps = {
       buttonLabel?: string;
       visibleHeight?: string;
       gradientStartPercent?: number;
+      isAuthLoading?: boolean;
     }
   | {
       variant?: 'clear';
@@ -55,6 +56,7 @@ export function LoginGate(props: LoginGateProps) {
     buttonLabel = '로그인하기',
     visibleHeight = 'min-h-260',
     gradientStartPercent = 42,
+    isAuthLoading = false,
   } = blurProps;
 
   return (
@@ -73,12 +75,16 @@ export function LoginGate(props: LoginGateProps) {
         }
       >
         <div className="w-full">
-          <GuestLoginPrompt
-            title={title}
-            description={description}
-            buttonLabel={buttonLabel}
-            onLogin={onLogin}
-          />
+          {isAuthLoading ? (
+            <div aria-hidden="true" className="h-88 animate-pulse" />
+          ) : (
+            <GuestLoginPrompt
+              title={title}
+              description={description}
+              buttonLabel={buttonLabel}
+              onLogin={onLogin}
+            />
+          )}
         </div>
       </div>
     </section>
