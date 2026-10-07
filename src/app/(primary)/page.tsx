@@ -25,7 +25,12 @@ async function getBanners(): Promise<Banner[]> {
     if (!res.ok) return [];
 
     const json: ApiResponse<Banner[]> = await res.json();
-    return json.data ?? [];
+    const now = Date.now();
+    return (json.data ?? []).filter(
+      ({ startDate, endDate }) =>
+        (!startDate || Date.parse(`${startDate}+09:00`) <= now) &&
+        (!endDate || Date.parse(`${endDate}+09:00`) >= now),
+    );
   } catch {
     return [];
   }
