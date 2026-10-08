@@ -6,9 +6,10 @@ import { GoogleTagManager } from '@next/third-parties/google';
 import { Providers } from '@/lib/Providers';
 import { THEME_INITIALIZER_SCRIPT } from '@/lib/theme/theme';
 import { BASE_URL } from '@/constants/common';
+import { isProductionDeployment } from '@/lib/environment';
 import { SITE_TITLE_TEMPLATE } from '@/shared/seo/site';
 
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = isProductionDeployment();
 
 export const metadata: Metadata = {
   metadataBase: new URL(
