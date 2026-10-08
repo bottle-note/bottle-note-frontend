@@ -1,4 +1,13 @@
-import sitemap from './sitemap';
+import type sitemapType from './sitemap';
+
+// 캐시가 모듈 상태라 테스트마다 새로 불러온다.
+function loadSitemap(): typeof sitemapType {
+  jest.resetModules();
+  return require('./sitemap').default;
+}
+
+// 백그라운드 갱신이 끝날 때까지 대기한다.
+const flushRefresh = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 const originalFetch = global.fetch;
 const originalNodeEnv = process.env.NODE_ENV;
@@ -26,6 +35,7 @@ describe('sitemap', () => {
       writable: true,
     });
     process.env.INTERNAL_SERVER_URL = 'https://api.example.com';
+    const sitemap = loadSitemap();
 
     const requestedUrls: URL[] = [];
     global.fetch = jest.fn(async (input) => {
@@ -98,6 +108,7 @@ describe('sitemap', () => {
       .mockReturnValue(baselineTime + 60 * 60 * 1000 + 1);
     try {
       await sitemap();
+      await flushRefresh();
       expect(requestedUrls).toHaveLength(requestsAfterFirstSitemap + 3);
       expect(
         requestedUrls.filter((url) =>
@@ -107,6 +118,7 @@ describe('sitemap', () => {
 
       dateNow.mockReturnValue(baselineTime + 24 * 60 * 60 * 1000 + 1);
       await sitemap();
+      await flushRefresh();
       expect(
         requestedUrls.filter((url) =>
           url.pathname.includes('/alcohols/explore/standard'),
@@ -115,6 +127,67 @@ describe('sitemap', () => {
       expect(
         requestedUrls.filter((url) => url.pathname === '/api/v1/mfds/alcohols'),
       ).toHaveLength(4);
+    } finally {
+      dateNow.mockRestore();
+    }
+  });
+  it('캐시가 만료돼도 갱신을 기다리지 않고 이전 sitemap을 응답한 뒤, 갱신이 끝나면 새 URL을 응답한다', async () => {
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'production',
+      configurable: true,
+      writable: true,
+    });
+    process.env.INTERNAL_SERVER_URL = 'https://api.example.com';
+    const sitemap = loadSitemap();
+
+    let importClearanceIds = [19120];
+    let holdImportClearance = false;
+    let releaseImportClearance = () => {};
+    global.fetch = jest.fn(async (input) => {
+      const url = new URL(String(input));
+      const isImportClearance = url.pathname === '/api/v1/mfds/alcohols';
+      if (isImportClearance && holdImportClearance) {
+        await new Promise<void>((resolve) => {
+          releaseImportClearance = resolve;
+        });
+      }
+
+      return {
+        ok: true,
+        json: async () => ({
+          errors: [],
+          data: isImportClearance
+            ? importClearanceIds.map((id) => ({ id }))
+            : { items: [] },
+          meta: { pagination: { hasNext: false, nextCursor: null } },
+        }),
+      } as Response;
+    });
+
+    const importClearanceUrl = (id: number) =>
+      `https://bottle-note.com/import-clearance/alcohol/${id}`;
+    const firstPages = await sitemap();
+    expect(firstPages.map((page) => page.url)).toContain(
+      importClearanceUrl(19120),
+    );
+
+    // 24시간 뒤, 수입 신고 목록 응답이 끝나지 않는 상태
+    importClearanceIds = [19120, 20026];
+    holdImportClearance = true;
+    const dateNow = jest
+      .spyOn(Date, 'now')
+      .mockReturnValue(Date.now() + 24 * 60 * 60 * 1000 + 1);
+    try {
+      const stalePages = await sitemap();
+      expect(stalePages).toEqual(firstPages);
+
+      releaseImportClearance();
+      await flushRefresh();
+
+      const refreshedPages = await sitemap();
+      expect(refreshedPages.map((page) => page.url)).toContain(
+        importClearanceUrl(20026),
+      );
     } finally {
       dateNow.mockRestore();
     }
