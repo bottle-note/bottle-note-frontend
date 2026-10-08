@@ -13,6 +13,7 @@ import {
   getInternalServerOrigin,
   internalApiHeaders,
 } from '@/shared/api/internalApi';
+import { filterBannersByDate } from './_utils/filterBannersByDate';
 
 async function getBanners(): Promise<Banner[]> {
   try {
@@ -25,12 +26,7 @@ async function getBanners(): Promise<Banner[]> {
     if (!res.ok) return [];
 
     const json: ApiResponse<Banner[]> = await res.json();
-    const now = Date.now();
-    return (json.data ?? []).filter(
-      ({ startDate, endDate }) =>
-        (!startDate || Date.parse(`${startDate}+09:00`) <= now) &&
-        (!endDate || Date.parse(`${endDate}+09:00`) >= now),
-    );
+    return filterBannersByDate(json.data ?? []);
   } catch {
     return [];
   }
