@@ -32,7 +32,7 @@ export default function TastingNoteForm() {
           {hasNote ? (
             // 작성 완료: 미리보기 차트 + 수정 버튼
             <div className="flex flex-col items-center gap-12">
-              <div className="w-180 h-180">
+              <div className="w-180 h-180" data-tasting-note-preview>
                 <TastingRadarChart
                   values={tastingNote ?? DEFAULT_TASTING_NOTE}
                   size={180}

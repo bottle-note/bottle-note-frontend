@@ -2,95 +2,81 @@
 
 import {
   TASTING_AXES,
-  TASTING_MAX_VALUE,
   type TastingNoteValues,
   isTastingNoteEmpty,
 } from '@/constants/tastingNote';
 
-const SVG_SIZE = 400;
-const CENTER = SVG_SIZE / 2;
-const MAX_RADIUS = SVG_SIZE / 2 - 50;
-const AXIS_COUNT = TASTING_AXES.length;
-const ANGLE_OFFSET = -Math.PI / 2;
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+const OUTPUT_SCALE = 4;
 
-function polar(radius: number, index: number) {
-  const angle = (2 * Math.PI * index) / AXIS_COUNT + ANGLE_OFFSET;
-  return {
-    x: CENTER + radius * Math.cos(angle),
-    y: CENTER + radius * Math.sin(angle),
-  };
+function getChartSize(svg: SVGSVGElement): number {
+  const size = Number(svg.getAttribute('viewBox')?.split(/\s+/)[2]);
+  if (!Number.isFinite(size) || size <= 0) {
+    throw new Error('테이스팅 차트 크기를 확인할 수 없습니다.');
+  }
+  return size;
 }
 
-function polygonPoints(radius: number): string {
-  return Array.from({ length: AXIS_COUNT })
-    .map((_, i) => {
-      const { x, y } = polar(radius, i);
-      return `${x},${y}`;
-    })
-    .join(' ');
+function resolveBackgroundColor(): string {
+  const probe = document.createElement('span');
+  probe.style.color = 'var(--color-bg-layer-default)';
+  document.body.appendChild(probe);
+  const color = getComputedStyle(probe).color;
+  probe.remove();
+  return color;
 }
 
-/**
- * TastingNoteValues → SVG 문자열 (인라인 스타일, DOM 불필요)
- */
-function generateSvgString(values: TastingNoteValues): string {
-  const gridLines = Array.from({ length: TASTING_MAX_VALUE }, (_, i) => i + 1)
-    .map((level) => {
-      const r = (MAX_RADIUS * level) / TASTING_MAX_VALUE;
-      const sw = level === TASTING_MAX_VALUE ? 1.5 : 0.8;
-      const op = level === TASTING_MAX_VALUE ? 0.8 : 0.5;
-      return `<polygon points="${polygonPoints(r)}" fill="none" stroke="#E6E6DD" stroke-width="${sw}" opacity="${op}"/>`;
-    })
-    .join('');
+/** 완료 미리보기의 실제 SVG를 이미지에서도 동일하게 보이도록 독립형 SVG로 만든다. */
+export function serializeTastingNotePreview(svg: SVGSVGElement): string {
+  const size = getChartSize(svg);
+  const clone = svg.cloneNode(true) as SVGSVGElement;
+  clone.setAttribute('width', String(size));
+  clone.setAttribute('height', String(size));
 
-  const axisLines = TASTING_AXES.map((_, i) => {
-    const { x, y } = polar(MAX_RADIUS, i);
-    return `<line x1="${CENTER}" y1="${CENTER}" x2="${x}" y2="${y}" stroke="#E6E6DD" stroke-width="0.8" opacity="0.6"/>`;
-  }).join('');
+  const sourceNodes = [svg, ...Array.from(svg.querySelectorAll('*'))];
+  const clonedNodes = [clone, ...Array.from(clone.querySelectorAll('*'))];
 
-  const valuePoints = TASTING_AXES.map((axis, i) => {
-    const ratio = values[axis.key] / TASTING_MAX_VALUE;
-    return polar(MAX_RADIUS * ratio, i);
+  sourceNodes.forEach((source, index) => {
+    const target = clonedNodes[index];
+    const style = getComputedStyle(source);
+
+    if (style.fill) target.setAttribute('fill', style.fill);
+    if (style.stroke) target.setAttribute('stroke', style.stroke);
+
+    if (source.tagName.toLowerCase() === 'text') {
+      target.setAttribute('font-family', style.fontFamily);
+      target.setAttribute('font-size', style.fontSize);
+      target.setAttribute('font-weight', style.fontWeight);
+    }
+
+    if (source.tagName.toLowerCase() === 'fedropshadow') {
+      const floodColor = style.getPropertyValue('flood-color');
+      if (floodColor) target.setAttribute('flood-color', floodColor);
+    }
   });
 
-  const valuePoly = valuePoints.map((p) => `${p.x},${p.y}`).join(' ');
+  const background = document.createElementNS(SVG_NAMESPACE, 'rect');
+  background.setAttribute('width', String(size));
+  background.setAttribute('height', String(size));
+  background.setAttribute('fill', resolveBackgroundColor());
+  clone.insertBefore(background, clone.firstChild);
 
-  const dots = valuePoints
-    .map(
-      (p) =>
-        `<circle cx="${p.x}" cy="${p.y}" r="5" fill="#E58257" stroke="#fff" stroke-width="2"/>`,
-    )
-    .join('');
-
-  const labels = TASTING_AXES.map((axis, i) => {
-    const { x, y } = polar(MAX_RADIUS + 28, i);
-    return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" fill="#252525" font-size="13" font-weight="600" font-family="system-ui, -apple-system, sans-serif">${axis.label}</text>`;
-  }).join('');
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${SVG_SIZE}" height="${SVG_SIZE}" viewBox="0 0 ${SVG_SIZE} ${SVG_SIZE}">
-    <rect width="${SVG_SIZE}" height="${SVG_SIZE}" fill="white"/>
-    ${gridLines}
-    ${axisLines}
-    <polygon points="${valuePoly}" fill="#EF9A6E" fill-opacity="0.25" stroke="#E58257" stroke-width="2.5"/>
-    ${dots}
-    ${labels}
-  </svg>`;
+  return new XMLSerializer().serializeToString(clone);
 }
 
-/**
- * SVG 문자열 → Canvas → PNG File
- */
-async function svgToFile(svgString: string): Promise<File | null> {
+async function svgToFile(
+  svgString: string,
+  size: number,
+): Promise<File | null> {
   return new Promise((resolve) => {
     const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const img = new Image();
 
     img.onload = () => {
-      const scale = 2;
       const canvas = document.createElement('canvas');
-      canvas.width = SVG_SIZE * scale;
-      canvas.height = SVG_SIZE * scale;
+      canvas.width = size * OUTPUT_SCALE;
+      canvas.height = size * OUTPUT_SCALE;
       const ctx = canvas.getContext('2d');
 
       if (!ctx) {
@@ -99,8 +85,8 @@ async function svgToFile(svgString: string): Promise<File | null> {
         return;
       }
 
-      ctx.scale(scale, scale);
-      ctx.drawImage(img, 0, 0, SVG_SIZE, SVG_SIZE);
+      ctx.scale(OUTPUT_SCALE, OUTPUT_SCALE);
+      ctx.drawImage(img, 0, 0, size, size);
       URL.revokeObjectURL(url);
 
       canvas.toBlob(
@@ -129,18 +115,28 @@ async function svgToFile(svgString: string): Promise<File | null> {
   });
 }
 
-/**
- * 테이스팅 노트 데이터 → PNG 이미지 File
- * DOM 의존성 없이 순수 데이터에서 이미지를 생성
- */
+/** 작성 완료 화면에 렌더링된 차트를 PNG 파일로 캡처한다. */
 export async function captureTastingNote(
   values: TastingNoteValues | null | undefined,
 ): Promise<File | null> {
   if (!values || isTastingNoteEmpty(values)) return null;
 
   try {
-    const svgString = generateSvgString(values);
-    return await svgToFile(svgString);
+    const preview = document.querySelector<SVGSVGElement>(
+      '[data-tasting-note-preview] svg',
+    );
+    const signature = TASTING_AXES.map((axis) => values[axis.key]).join(',');
+
+    if (preview?.getAttribute('data-tasting-note-values') !== signature) {
+      throw new Error(
+        '테이스팅 차트 미리보기가 현재 입력과 일치하지 않습니다.',
+      );
+    }
+
+    return await svgToFile(
+      serializeTastingNotePreview(preview),
+      getChartSize(preview),
+    );
   } catch (error) {
     console.error('테이스팅 노트 이미지 생성 실패:', error);
     return null;
