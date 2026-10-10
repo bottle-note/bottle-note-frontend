@@ -66,8 +66,8 @@ function ReviewDetails({
               className="mb-22 flex justify-center"
               aria-label="테이스팅 그래프"
             >
-              <div className="h-280 w-280">
-                <TastingRadarChart values={tastingNote} size={280} />
+              <div className="h-240 w-240">
+                <TastingRadarChart values={tastingNote} size={240} />
               </div>
             </div>
           )}
