@@ -12,6 +12,17 @@ export type ReviewListParams = InfiniteListParams & {
   sortOrder?: SORT_ORDER;
 };
 
+export interface ReviewTastingProfile {
+  version: number;
+  maxScore: number;
+  axes: {
+    code: string | null;
+    name: string;
+    description: string | null;
+    score: number;
+  }[];
+}
+
 export interface ReviewQueryParams {
   alcoholId?: string;
   content: string;
@@ -19,6 +30,7 @@ export interface ReviewQueryParams {
   sizeType: 'GLASS' | 'BOTTLE' | null;
   price?: number | null;
   tastingTagList?: string[] | null;
+  tastingProfile?: ReviewTastingProfile | null;
   rating: number;
   imageUrlList?:
     | {
@@ -85,6 +97,7 @@ export interface Review {
   hasReplyByMe: boolean;
   isBestReview: boolean;
   tastingTagList?: string[];
+  tastingProfile?: ReviewTastingProfile | null;
   createAt: string;
   rating: number;
 }
