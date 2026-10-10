@@ -65,6 +65,15 @@ describe('sitemap', () => {
       } as Response;
     });
 
+    const firstPages = await sitemap();
+    expect(firstPages.map((page) => page.url)).toContain(
+      'https://bottle-note.com',
+    );
+    expect(firstPages.map((page) => page.url)).not.toContain(
+      'https://bottle-note.com/import-clearance/alcohol/19120',
+    );
+    await flushRefresh();
+
     const pages = await sitemap();
     const requestsAfterFirstSitemap = requestedUrls.length;
     const cachedPages = await sitemap();
@@ -166,6 +175,8 @@ describe('sitemap', () => {
 
     const importClearanceUrl = (id: number) =>
       `https://bottle-note.com/import-clearance/alcohol/${id}`;
+    await sitemap();
+    await flushRefresh();
     const firstPages = await sitemap();
     expect(firstPages.map((page) => page.url)).toContain(
       importClearanceUrl(19120),
@@ -191,5 +202,50 @@ describe('sitemap', () => {
     } finally {
       dateNow.mockRestore();
     }
+  });
+  it('첫 조회가 끝나지 않아도 정적 URL을 즉시 응답하고, 완료 후 동적 URL을 포함한다', async () => {
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'production',
+      configurable: true,
+      writable: true,
+    });
+    process.env.INTERNAL_SERVER_URL = 'https://api.example.com';
+    const sitemap = loadSitemap();
+
+    let releaseImportClearance = () => {};
+    global.fetch = jest.fn(async (input) => {
+      const url = new URL(String(input));
+      const isImportClearance = url.pathname === '/api/v1/mfds/alcohols';
+      if (isImportClearance) {
+        await new Promise<void>((resolve) => {
+          releaseImportClearance = resolve;
+        });
+      }
+
+      return {
+        ok: true,
+        json: async () => ({
+          errors: [],
+          data: isImportClearance ? [{ id: 19120 }] : { items: [] },
+          meta: { pagination: { hasNext: false, nextCursor: null } },
+        }),
+      } as Response;
+    });
+
+    const firstPages = await sitemap();
+    expect(firstPages.map((page) => page.url)).toContain(
+      'https://bottle-note.com',
+    );
+    expect(firstPages.map((page) => page.url)).not.toContain(
+      'https://bottle-note.com/import-clearance/alcohol/19120',
+    );
+
+    releaseImportClearance();
+    await flushRefresh();
+
+    const refreshedPages = await sitemap();
+    expect(refreshedPages.map((page) => page.url)).toContain(
+      'https://bottle-note.com/import-clearance/alcohol/19120',
+    );
   });
 });

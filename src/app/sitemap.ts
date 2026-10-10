@@ -182,9 +182,9 @@ function cacheSitemapPages(
       pending = refresh();
     }
 
-    // 전체 목록을 다시 받는 동안 크롤러 요청이 타임아웃되지 않도록 이전 결과를 먼저 응답한다.
-    if (cachedPages) return cachedPages;
-    return pending ?? [];
+    // 첫 조회 중에는 빈 목록을, 갱신 중에는 이전 결과를 즉시 반환한다.
+    // 정적 URL은 sitemap()에서 별도로 합쳐진다.
+    return cachedPages ?? [];
   };
 
   function refresh() {
