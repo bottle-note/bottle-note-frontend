@@ -1,10 +1,9 @@
 import { MetadataRoute } from 'next';
 import { BASE_URL } from '@/constants/common';
+import { isProductionDeployment } from '@/lib/environment';
 
 export default function robots(): MetadataRoute.Robots {
-  const isProduction = process.env.NODE_ENV === 'production';
-
-  if (!isProduction) {
+  if (!isProductionDeployment()) {
     return {
       rules: {
         userAgent: '*',

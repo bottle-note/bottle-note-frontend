@@ -1,17 +1,17 @@
 import sitemap from './sitemap';
 
 const originalFetch = global.fetch;
-const originalNodeEnv = process.env.NODE_ENV;
+const originalDeployEnv = process.env.NEXT_PUBLIC_DEPLOY_ENV;
 const originalInternalServerUrl = process.env.INTERNAL_SERVER_URL;
 
 describe('sitemap', () => {
   afterEach(() => {
     global.fetch = originalFetch;
-    Object.defineProperty(process.env, 'NODE_ENV', {
-      value: originalNodeEnv,
-      configurable: true,
-      writable: true,
-    });
+    if (originalDeployEnv === undefined) {
+      delete process.env.NEXT_PUBLIC_DEPLOY_ENV;
+    } else {
+      process.env.NEXT_PUBLIC_DEPLOY_ENV = originalDeployEnv;
+    }
     if (originalInternalServerUrl === undefined) {
       delete process.env.INTERNAL_SERVER_URL;
     } else {
@@ -20,11 +20,7 @@ describe('sitemap', () => {
   });
 
   it('공개 큐레이션과 수입 신고의 다음 커서를 끝까지 조회해 상세 URL을 넣는다', async () => {
-    Object.defineProperty(process.env, 'NODE_ENV', {
-      value: 'production',
-      configurable: true,
-      writable: true,
-    });
+    process.env.NEXT_PUBLIC_DEPLOY_ENV = 'production';
     process.env.INTERNAL_SERVER_URL = 'https://api.example.com';
 
     const requestedUrls: URL[] = [];
