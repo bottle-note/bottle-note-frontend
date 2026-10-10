@@ -178,10 +178,18 @@ function cacheSitemapPages(
   return async () => {
     const now = Date.now();
     if (cachedPages && now < expiresAt) return cachedPages;
-    if (pending) return pending;
-    if (now < retryAfter) return cachedPages ?? [];
 
-    pending = load()
+    if (!pending && now >= retryAfter) {
+      pending = refresh();
+    }
+
+    // 첫 조회 중에는 빈 목록을, 갱신 중에는 이전 결과를 즉시 반환한다.
+    // 정적 URL은 sitemap()에서 별도로 합쳐진다.
+    return cachedPages ?? [];
+  };
+
+  function refresh() {
+    return load()
       .then((pages) => {
         cachedPages = pages;
         expiresAt = Date.now() + ttlMs;
@@ -196,9 +204,7 @@ function cacheSitemapPages(
       .finally(() => {
         pending = null;
       });
-
-    return pending;
-  };
+  }
 }
 
 const getAlcoholPages = cacheSitemapPages(
