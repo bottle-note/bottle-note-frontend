@@ -4,12 +4,8 @@ import type sitemapType from './sitemap';
 function loadProductionSitemap(): typeof sitemapType {
   jest.resetModules();
   const sitemap = require('./sitemap').default;
-  // 모듈 로딩 중 테스트 환경변수가 복원될 수 있어 로딩 후 production으로 설정한다.
-  Object.defineProperty(process.env, 'NODE_ENV', {
-    value: 'production',
-    configurable: true,
-    writable: true,
-  });
+  // 모듈 로딩 중 테스트 환경변수가 복원될 수 있어 로딩 후 운영 환경으로 설정한다.
+  process.env.NEXT_PUBLIC_DEPLOY_ENV = 'production';
   process.env.INTERNAL_SERVER_URL = 'https://api.example.com';
   return sitemap;
 }
@@ -18,17 +14,17 @@ function loadProductionSitemap(): typeof sitemapType {
 const flushRefresh = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 const originalFetch = global.fetch;
-const originalNodeEnv = process.env.NODE_ENV;
+const originalDeployEnv = process.env.NEXT_PUBLIC_DEPLOY_ENV;
 const originalInternalServerUrl = process.env.INTERNAL_SERVER_URL;
 
 describe('sitemap', () => {
   afterEach(() => {
     global.fetch = originalFetch;
-    Object.defineProperty(process.env, 'NODE_ENV', {
-      value: originalNodeEnv,
-      configurable: true,
-      writable: true,
-    });
+    if (originalDeployEnv === undefined) {
+      delete process.env.NEXT_PUBLIC_DEPLOY_ENV;
+    } else {
+      process.env.NEXT_PUBLIC_DEPLOY_ENV = originalDeployEnv;
+    }
     if (originalInternalServerUrl === undefined) {
       delete process.env.INTERNAL_SERVER_URL;
     } else {

@@ -14,6 +14,7 @@ import {
   getInternalServerOrigin,
   internalApiHeaders,
 } from '@/shared/api/internalApi';
+import { isProductionDeployment } from '@/lib/environment';
 
 const SITEMAP_CONFIG = {
   PAGE_SIZE: 100,
@@ -224,7 +225,7 @@ const getImportClearancePages = cacheSitemapPages(
 );
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  if (process.env.NODE_ENV !== 'production') {
+  if (!isProductionDeployment()) {
     return [];
   }
 

@@ -18,6 +18,17 @@ const nextConfig = {
   experimental: {
     missingSuspenseWithCSRBailout: false,
   },
+  // 개발·프리뷰는 페이지 메타가 index를 지정해도 색인되지 않게 응답 헤더로 막는다.
+  async headers() {
+    if (process.env.NEXT_PUBLIC_DEPLOY_ENV === 'production') return [];
+
+    return [
+      {
+        source: '/:path*',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+    ];
+  },
   // 검색엔진 색인, 공유 링크, 서버가 내려주는 기존 주소를 새 경로로 옮긴다.
   async redirects() {
     return [
