@@ -43,12 +43,6 @@ export const ReviewImageCarousel = ({
 }: ReviewImageCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
-  const hasPhoto = images.some((image) => !image.src.includes('tasting-graph'));
-  const isCurrentGraph = images[current]?.src.includes('tasting-graph');
-  const activeIndicatorColor = isCurrentGraph ? 'bg-fg-neutral' : 'bg-white';
-  const inactiveIndicatorColor = isCurrentGraph
-    ? 'bg-stroke-neutral-weak'
-    : 'bg-white/50';
 
   useEffect(() => {
     if (!api) {
@@ -73,50 +67,24 @@ export const ReviewImageCarousel = ({
         align: 'start',
         loop: true,
       }}
-      className={`w-full ${hasPhoto ? 'bg-bg-layer-default' : ''}`}
+      className="w-full bg-bg-layer-default"
     >
       <CarouselContent>
-        {images.map((image, index) => {
-          const isGraph = image.src.includes('tasting-graph');
-
-          return (
-            <CarouselItem key={image.id}>
-              {isGraph ? (
-                <div
-                  className={`flex items-center justify-center bg-bg-layer-default ${
-                    hasPhoto
-                      ? 'aspect-square w-full'
-                      : 'mx-auto aspect-square w-240 max-w-full'
-                  }`}
-                >
-                  <div className="aspect-square w-240 max-w-full">
-                    <BaseImage
-                      src={image.src}
-                      alt={image.alt}
-                      fill
-                      quality={80}
-                      sizes="240px"
-                      priority={priority && index === 0}
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="aspect-square overflow-hidden rounded-md border border-stroke-neutral-subtle bg-bg-neutral-weak">
-                  <BaseImage
-                    src={image.src}
-                    alt={image.alt}
-                    fill
-                    quality={80}
-                    sizes="(max-width: 768px) calc(100vw - 40px), 600px"
-                    priority={priority && index === 0}
-                    className="object-cover"
-                  />
-                </div>
-              )}
-            </CarouselItem>
-          );
-        })}
+        {images.map((image, index) => (
+          <CarouselItem key={image.id}>
+            <div className="aspect-square overflow-hidden rounded-md border border-stroke-neutral-subtle bg-bg-neutral-weak">
+              <BaseImage
+                src={image.src}
+                alt={image.alt}
+                fill
+                quality={80}
+                sizes="(max-width: 768px) calc(100vw - 40px), 600px"
+                priority={priority && index === 0}
+                className="object-cover"
+              />
+            </div>
+          </CarouselItem>
+        ))}
       </CarouselContent>
       {images.length > 1 && (
         <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-8">
@@ -124,9 +92,7 @@ export const ReviewImageCarousel = ({
             <div
               key={image.id}
               className={`w-8 h-8 rounded-full transition-opacity ${
-                current === index
-                  ? activeIndicatorColor
-                  : inactiveIndicatorColor
+                current === index ? 'bg-white' : 'bg-white/50'
               }`}
             />
           ))}
