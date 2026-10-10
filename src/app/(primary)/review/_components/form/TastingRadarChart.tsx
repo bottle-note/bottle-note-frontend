@@ -121,14 +121,12 @@ function ValueBadge({
   value,
   isActive,
   isDragging,
-  isInteractive,
 }: {
   targetX: number;
   targetY: number;
   value: number;
   isActive: boolean;
   isDragging: boolean;
-  isInteractive: boolean;
 }) {
   const springConfig = { stiffness: 300, damping: 25, mass: 0.8 };
   const animX = useSpring(useMotionValue(targetX), springConfig);
@@ -143,59 +141,6 @@ function ValueBadge({
   const r = isDragging ? 14 : isActive ? 12 : 11;
   const glowR = isDragging ? 19 : 16;
   const haloR = isDragging ? 24 : 20;
-
-  if (!isInteractive) {
-    return (
-      <>
-        <circle
-          cx={targetX}
-          cy={targetY}
-          r={haloR}
-          fill={hasValue ? 'var(--color-bg-brand-weak)' : 'transparent'}
-          stroke={
-            hasValue
-              ? 'var(--color-stroke-brand-weak)'
-              : 'var(--color-stroke-neutral-subtle)'
-          }
-          strokeWidth={1}
-          strokeDasharray="3 2"
-        />
-        <circle
-          cx={targetX}
-          cy={targetY}
-          r={glowR}
-          fill={
-            hasValue ? 'var(--color-bg-brand-weak)' : 'var(--color-bg-disabled)'
-          }
-        />
-        <circle
-          cx={targetX}
-          cy={targetY}
-          r={r}
-          fill={
-            hasValue
-              ? 'var(--color-bg-brand-solid)'
-              : 'var(--color-bg-disabled)'
-          }
-          stroke="var(--color-bg-layer-default)"
-          strokeWidth={2.5}
-          filter="url(#badge-shadow)"
-        />
-        <text
-          x={targetX}
-          y={targetY}
-          dy={0.5}
-          textAnchor="middle"
-          dominantBaseline="central"
-          fill="var(--color-fg-brand-contrast)"
-          fontSize={10}
-          fontWeight={700}
-        >
-          {value}
-        </text>
-      </>
-    );
-  }
 
   return (
     <>
@@ -405,9 +350,6 @@ export default function TastingRadarChart({
       viewBox={`0 0 ${size} ${size}`}
       width="100%"
       height="100%"
-      data-tasting-note-values={TASTING_AXES.map(
-        (axis) => values[axis.key],
-      ).join(',')}
       onPointerMove={isInteractive ? handlePointerMove : undefined}
       onPointerUp={isInteractive ? endDrag : undefined}
       onPointerCancel={isInteractive ? endDrag : undefined}
@@ -527,7 +469,6 @@ export default function TastingRadarChart({
           value={values[TASTING_AXES[i].key]}
           isActive={activeAxis === TASTING_AXES[i].key}
           isDragging={draggingIdx === i}
-          isInteractive={isInteractive}
         />
       ))}
 
