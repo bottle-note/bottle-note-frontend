@@ -439,14 +439,26 @@ export default function TastingRadarChart({
       })}
 
       {/* 값 영역 */}
-      <motion.polygon
-        animate={{ points: valuePolygon }}
-        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        fill="var(--color-bg-brand-solid)"
-        fillOpacity={0.25}
-        stroke="var(--color-stroke-brand-solid)"
-        strokeWidth={2}
-      />
+      {isInteractive ? (
+        <motion.polygon
+          initial={false}
+          points={valuePolygon}
+          animate={{ points: valuePolygon }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          fill="var(--color-bg-brand-solid)"
+          fillOpacity={0.25}
+          stroke="var(--color-stroke-brand-solid)"
+          strokeWidth={2}
+        />
+      ) : (
+        <polygon
+          points={valuePolygon}
+          fill="var(--color-bg-brand-solid)"
+          fillOpacity={0.25}
+          stroke="var(--color-stroke-brand-solid)"
+          strokeWidth={2}
+        />
+      )}
 
       {/* 값 배지 (시각적 레이어) */}
       {badgePoints.map((p, i) => (

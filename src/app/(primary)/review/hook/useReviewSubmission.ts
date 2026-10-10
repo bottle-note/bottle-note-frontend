@@ -2,6 +2,8 @@ import { useRouter } from 'next/navigation';
 import { uploadImages } from '@/utils/S3Upload';
 import { RateApi } from '@/api/rate/rate.api';
 import { ReviewApi } from '@/api/review/review.api';
+import type { ReviewTastingProfile } from '@/api/review/types';
+import { toReviewTastingProfile } from '@/api/review/tastingProfile';
 import useModalStore from '@/store/modalStore';
 import { FormValues } from '@/types/Review';
 import { ROUTES } from '@/constants/routes';
@@ -13,6 +15,7 @@ interface UseReviewSubmissionProps {
   reviewId?: string;
   initialRating: number;
   removeSavedReview?: () => void;
+  initialTastingProfile?: ReviewTastingProfile | null;
 }
 
 export const useReviewSubmission = ({
@@ -20,6 +23,7 @@ export const useReviewSubmission = ({
   reviewId,
   initialRating,
   removeSavedReview,
+  initialTastingProfile,
 }: UseReviewSubmissionProps) => {
   const router = useRouter();
   const { handleModalState, handleCloseModal } = useModalStore();
@@ -60,6 +64,10 @@ export const useReviewSubmission = ({
     price: data.price,
     imageUrlList,
     tastingTagList: data.flavor_tags,
+    tastingProfile:
+      data.tastingNote == null
+        ? initialTastingProfile ?? null
+        : toReviewTastingProfile(data.tastingNote),
     locationInfo: {
       locationName: data.locationName,
       zipCode: data.zipCode,
@@ -123,24 +131,33 @@ export const useReviewSubmission = ({
     try {
       // 유저 이미지 업로드
       const userImages = data.images?.map((file) => file.image) ?? [];
+      const existingPhotoCount = originImgUrlList.filter(
+        (img) => !img.viewUrl.includes('tasting-graph'),
+      ).length;
       if (userImages.length > 0) {
         newImgUrlList = await handleUploadImages(userImages);
       }
 
-      // 테이스팅 노트 차트 이미지 생성 → 별도 경로(tasting-graph)로 업로드
-      const chartFile = await captureTastingNote(data.tastingNote);
-      if (chartFile) {
-        chartImgUrlList = await uploadImages('tastingGraph', [chartFile]);
+      // 이미지 제한(5장) 안에서만 차트 이미지를 함께 보관한다.
+      // 차트 이미지를 올리지 못한 경우에도 tastingProfile로 상세 화면에 표시할 수 있다.
+      if (existingPhotoCount + userImages.length < 5) {
+        const chartFile = await captureTastingNote(data.tastingNote);
+        if (chartFile) {
+          chartImgUrlList = await uploadImages('tastingGraph', [chartFile]);
+        }
       }
     } catch (error) {
       trackReviewFailure('image_upload');
       throw error;
     }
 
-    // 새 차트가 생성된 경우에만 기존 차트 이미지 교체
-    const filteredOriginList = chartImgUrlList
-      ? originImgUrlList.filter((img) => !img.viewUrl.includes('tasting-graph'))
-      : originImgUrlList;
+    // 그래프를 수정하거나 초기화한 경우 기존 차트 이미지를 교체/제거
+    const filteredOriginList =
+      data.tastingNote != null
+        ? originImgUrlList.filter(
+            (img) => !img.viewUrl.includes('tasting-graph'),
+          )
+        : originImgUrlList;
 
     const finalImageUrlList =
       filteredOriginList.length > 0 ||

@@ -1,5 +1,6 @@
 import { ReviewUserInfo } from './User';
 import type { TastingNoteValues } from '@/constants/tastingNote';
+import type { ReviewTastingProfile } from '@/api/review/types';
 
 export interface ReviewLocationInfo {
   name?: string;
@@ -42,6 +43,7 @@ export interface Review {
   hasReplyByMe: boolean;
   isBestReview: boolean;
   tastingTagList?: string[];
+  tastingProfile?: ReviewTastingProfile | null;
   createAt: string;
   rating: number;
 }
