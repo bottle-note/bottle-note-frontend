@@ -1,9 +1,17 @@
 import type sitemapType from './sitemap';
 
 // 캐시가 모듈 상태라 테스트마다 새로 불러온다.
-function loadSitemap(): typeof sitemapType {
+function loadProductionSitemap(): typeof sitemapType {
   jest.resetModules();
-  return require('./sitemap').default;
+  const sitemap = require('./sitemap').default;
+  // 모듈 로딩 중 테스트 환경변수가 복원될 수 있어 로딩 후 production으로 설정한다.
+  Object.defineProperty(process.env, 'NODE_ENV', {
+    value: 'production',
+    configurable: true,
+    writable: true,
+  });
+  process.env.INTERNAL_SERVER_URL = 'https://api.example.com';
+  return sitemap;
 }
 
 // 백그라운드 갱신이 끝날 때까지 대기한다.
@@ -29,13 +37,7 @@ describe('sitemap', () => {
   });
 
   it('공개 큐레이션과 수입 신고의 다음 커서를 끝까지 조회해 상세 URL을 넣는다', async () => {
-    Object.defineProperty(process.env, 'NODE_ENV', {
-      value: 'production',
-      configurable: true,
-      writable: true,
-    });
-    process.env.INTERNAL_SERVER_URL = 'https://api.example.com';
-    const sitemap = loadSitemap();
+    const sitemap = loadProductionSitemap();
 
     const requestedUrls: URL[] = [];
     global.fetch = jest.fn(async (input) => {
@@ -141,13 +143,7 @@ describe('sitemap', () => {
     }
   });
   it('캐시가 만료돼도 갱신을 기다리지 않고 이전 sitemap을 응답한 뒤, 갱신이 끝나면 새 URL을 응답한다', async () => {
-    Object.defineProperty(process.env, 'NODE_ENV', {
-      value: 'production',
-      configurable: true,
-      writable: true,
-    });
-    process.env.INTERNAL_SERVER_URL = 'https://api.example.com';
-    const sitemap = loadSitemap();
+    const sitemap = loadProductionSitemap();
 
     let importClearanceIds = [19120];
     let holdImportClearance = false;
@@ -204,13 +200,7 @@ describe('sitemap', () => {
     }
   });
   it('첫 조회가 끝나지 않아도 정적 URL을 즉시 응답하고, 완료 후 동적 URL을 포함한다', async () => {
-    Object.defineProperty(process.env, 'NODE_ENV', {
-      value: 'production',
-      configurable: true,
-      writable: true,
-    });
-    process.env.INTERNAL_SERVER_URL = 'https://api.example.com';
-    const sitemap = loadSitemap();
+    const sitemap = loadProductionSitemap();
 
     let releaseImportClearance = () => {};
     global.fetch = jest.fn(async (input) => {
