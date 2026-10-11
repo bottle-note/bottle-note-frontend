@@ -10,6 +10,7 @@ import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import { transformAlcoholList, transformCategories } from './transformers';
 import type {
   AlcoholApiRaw,
+  AlcoholLookupItem,
   Alcohol,
   AlcoholDetailsResponse,
   RegionResponse,
@@ -19,6 +20,23 @@ import type {
 } from './types';
 
 export const AlcoholsApi = {
+  async lookup(
+    keyword: string,
+    signal?: AbortSignal,
+  ): Promise<AlcoholLookupItem[]> {
+    const params = buildQueryParams({ keyword, size: 6 });
+    // OpenAPI는 data를 배열로 표시하지만 실제 응답은 { items }다.
+    const response = await apiClient.get<
+      ApiResponse<{ items: AlcoholLookupItem[] }>
+    >(`/alcohols/lookup?${params}`, { authRequired: false, signal });
+
+    if (response.errors.length !== 0 || !Array.isArray(response.data?.items)) {
+      throw new Error(ERROR_MESSAGES.ALCOHOL_LIST_FETCH_FAILED);
+    }
+
+    return response.data.items;
+  },
+
   /**
    * 주간 인기 위스키 목록을 조회합니다.
    */

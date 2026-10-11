@@ -9,6 +9,28 @@ export interface PickParams {
   isPicked: boolean;
 }
 
+export interface AlcoholLookupItem {
+  alcoholId: number;
+  korName: string;
+  engName: string;
+  imageUrl: string;
+  korCategoryName: string;
+  engCategoryName: string;
+  categoryGroup:
+    | 'SINGLE_MALT'
+    | 'BLEND'
+    | 'BLENDED_MALT'
+    | 'BOURBON'
+    | 'RYE'
+    | 'OTHER';
+  korRegion: string;
+  engRegion: string;
+  korDistillery: string;
+  engDistillery: string;
+  regionId: number;
+  distilleryId: number;
+}
+
 // --------------- Response Types (API 원본) ---------------
 
 export interface AlcoholApiRaw {
