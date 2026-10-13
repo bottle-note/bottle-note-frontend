@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { OptionList, FlowAction } from './FlowControls';
 import BartenderFrame from './BartenderFrame';
 import RecommendationFlow from './RecommendationFlow';
@@ -9,14 +9,13 @@ import WhiskeyDetail from './WhiskeyDetail';
 import CurationFlow from './CurationFlow';
 import ReviewFlow from './ReviewFlow';
 import { getDialogue, type FavoriteNotice } from './dialogue';
-import { getBackLabel, getStepHeader, getStepPose } from './stepMeta';
+import { getBackLabel, getStepHeader } from './stepMeta';
 import { useBartenderPicks } from './useBartenderPicks';
 import { useBartenderJourney } from './useBartenderJourney';
 import { useTasteRecommendation } from './useTasteRecommendation';
 import { useReviewDraft } from './useReviewDraft';
-import { prefersReducedMotion } from './prefersReducedMotion';
+import { useBartenderPose } from './useBartenderPose';
 import type { Step } from './types';
-import type { Pose } from './BarScene';
 import type { Curation, Situation, Whiskey } from '../_data/demo';
 
 export default function BartenderExperience({
@@ -34,29 +33,11 @@ export default function BartenderExperience({
   const [chosenId, setChosenId] = useState<number | null>(null);
   const [situation, setSituation] = useState<Situation>('home');
   const [curationId, setCurationId] = useState<number | null>(null);
-  const [heldPose, setHeldPose] = useState<Pose | null>(null);
   const [favoriteNotice, setFavoriteNotice] = useState<FavoriteNotice | null>(
     null,
   );
-  const favoritePoseTimer = useRef<number | null>(null);
   const picks = useBartenderPicks();
-
-  useEffect(() => {
-    if (favoritePoseTimer.current !== null) {
-      window.clearTimeout(favoritePoseTimer.current);
-      favoritePoseTimer.current = null;
-    }
-    if (step !== 'detail' && step !== 'review-done') {
-      setHeldPose(null);
-      return undefined;
-    }
-    setHeldPose(step === 'detail' ? 'pour' : 'toast');
-    const timer = window.setTimeout(
-      () => setHeldPose(step === 'detail' ? 'serve' : 'smile'),
-      prefersReducedMotion() ? 0 : step === 'detail' ? 1700 : 3000,
-    );
-    return () => window.clearTimeout(timer);
-  }, [step]);
+  const bartender = useBartenderPose(step);
 
   const home = () => {
     restart();
@@ -77,13 +58,7 @@ export default function BartenderExperience({
       setFavoriteNotice('failed');
       return;
     }
-    setHeldPose('smile');
-    if (favoritePoseTimer.current !== null)
-      window.clearTimeout(favoritePoseTimer.current);
-    favoritePoseTimer.current = window.setTimeout(
-      () => setHeldPose('serve'),
-      prefersReducedMotion() ? 0 : 2600,
-    );
+    bartender.smile();
   };
 
   const selected = whiskies.find((whiskey) => whiskey.id === chosenId);
@@ -98,7 +73,6 @@ export default function BartenderExperience({
     curationTitle: curation?.title,
     reviewMode: review.mode,
   });
-  const pose = heldPose ?? getStepPose(step);
   const dialogueLines = getDialogue({
     step,
     detailOrigin: previous,
@@ -121,7 +95,7 @@ export default function BartenderExperience({
       subtitle={header.subtitle}
       progress={header.progress}
       lines={dialogueLines}
-      pose={pose}
+      pose={bartender.pose}
       onBack={previous ? back : undefined}
       backLabel={getBackLabel(step, previous)}
       onClose={home}
