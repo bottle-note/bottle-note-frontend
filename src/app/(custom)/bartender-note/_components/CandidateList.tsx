@@ -134,6 +134,7 @@ export default function CandidateList({
   move,
   home,
   onLeave,
+  onOpenAlcoholPage,
 }: {
   step: CandidateStep;
   candidates: Candidates;
@@ -143,6 +144,8 @@ export default function CandidateList({
   home: () => void;
   /** 바텐더 노트 밖의 페이지로 나가기 직전에 부른다. */
   onLeave: () => void;
+  /** 데모에 없는 찜한 술의 실제 상세 페이지로 나가기 직전에 부른다. */
+  onOpenAlcoholPage: (alcoholId: number) => void;
 }) {
   const { heading, conditions, items, emptyText, priceUnit } = candidates;
   return (
@@ -176,7 +179,7 @@ export default function CandidateList({
             <Link
               key={item.alcohol.alcoholId}
               href={ROUTES.ALCOHOL.DETAIL(item.alcohol.alcoholId)}
-              onClick={onLeave}
+              onClick={() => onOpenAlcoholPage(item.alcohol.alcoholId)}
               className="flex min-h-74 w-full items-center gap-12 border-b border-stroke-neutral-subtle py-10 text-left text-fg-neutral transition-colors hover:text-fg-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
             >
               <b className="w-14 text-13 text-fg-brand">{index + 1}</b>

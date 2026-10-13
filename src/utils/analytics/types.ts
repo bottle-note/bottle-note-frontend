@@ -14,6 +14,9 @@ export type LoginTrigger =
 
 export type LoginMethod = 'kakao' | 'apple';
 
+// 다른 화면과 구분해야 하는 진입 위치. 값이 없으면 기존 화면(술 상세, 리뷰 작성 페이지)이다.
+export type FeatureSource = 'bartender_note';
+
 // GA4 이벤트별 파라미터 타입 정의
 export interface GA4EventMap {
   // 🔴 1순위 — 핵심 전환
@@ -31,18 +34,22 @@ export interface GA4EventMap {
   };
   write_review_start: {
     alcohol_id: string;
+    source?: FeatureSource;
   };
   write_review_complete: {
     alcohol_id: string;
+    source?: FeatureSource;
   };
   write_review_failed: {
     alcohol_id: string;
     failure_type: 'image_upload' | 'rating_save' | 'review_save';
+    source?: FeatureSource;
   };
   add_to_picks: {
     alcohol_id: string;
     alcohol_name: string;
     action: 'add' | 'remove';
+    source?: FeatureSource;
   };
 
   // 🟡 2순위 — 탐색 행동
@@ -98,6 +105,23 @@ export interface GA4EventMap {
   like_review: {
     review_id: string;
     action: 'like' | 'unlike';
+  };
+
+  // 바텐더 노트
+  bartender_start: {
+    entry: 'recommend' | 'situation' | 'review' | 'picks';
+  };
+  bartender_recommend_result: {
+    mode: 'taste' | 'situation';
+    result_state: 'exact' | 'similar' | 'empty';
+  };
+  bartender_select_alcohol: {
+    alcohol_id: string;
+    source: 'taste' | 'situation' | 'picks';
+  };
+  bartender_open_alcohol_page: {
+    alcohol_id: string;
+    source: 'detail' | 'picks';
   };
 
   // 공유
