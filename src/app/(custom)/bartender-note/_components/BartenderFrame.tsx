@@ -1,16 +1,10 @@
 'use client';
 
-import {
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import Button from '@/components/ui/Button/Button';
 import BarScene, { type Pose } from './BarScene';
-import { prefersReducedMotion } from './prefersReducedMotion';
+import { useDialoguePlayback } from './useDialoguePlayback';
 import { ActionDockContext } from './FlowControls';
 import type { Step } from './types';
 
@@ -27,46 +21,6 @@ type Props = {
   children: ReactNode;
 };
 
-function paginateDialogue(value: string, fits: (text: string) => boolean) {
-  const pages: string[] = [];
-  let current = '';
-  const push = () => {
-    if (current) pages.push(current);
-    current = '';
-  };
-  value.split('\n').forEach((paragraph, paragraphIndex) => {
-    paragraph
-      .split(/\s+/)
-      .filter(Boolean)
-      .forEach((word, wordIndex) => {
-        const separator = current
-          ? paragraphIndex > 0 && wordIndex === 0
-            ? '\n'
-            : ' '
-          : '';
-        const candidate = `${current}${separator}${word}`;
-        if (fits(candidate)) {
-          current = candidate;
-          return;
-        }
-        push();
-        if (fits(word)) {
-          current = word;
-          return;
-        }
-        [...word].forEach((character) => {
-          if (fits(`${current}${character}`)) current += character;
-          else {
-            push();
-            current = character;
-          }
-        });
-      });
-  });
-  push();
-  return pages.length ? pages : [''];
-}
-
 export default function BartenderFrame({
   step,
   title,
@@ -81,130 +35,21 @@ export default function BartenderFrame({
 }: Props) {
   const contentRef = useRef<HTMLElement>(null);
   const [actionDock, setActionDock] = useState<HTMLDivElement | null>(null);
-  const dialogueRef = useRef<HTMLButtonElement>(null);
-  const rulerRef = useRef<HTMLSpanElement>(null);
-  const [dialogueWidth, setDialogueWidth] = useState(0);
-  const [pages, setPages] = useState(lines);
-  const [page, setPage] = useState(0);
-  const [typed, setTyped] = useState(0);
-  const [skippedIntroKey, setSkippedIntroKey] = useState<string | null>(null);
-  const [introPhase, setIntroPhase] = useState<'bow' | 'greet' | 'ready'>(
-    step === 'intro' ? 'bow' : 'ready',
-  );
-  const [sceneReady, setSceneReady] = useState(false);
-  const text = pages[page] ?? '';
+  const dialogue = useDialoguePlayback(step, lines);
   const dialogueKey = lines.join('\u0000');
-  const currentDialogueKey = `${step}\u0000${dialogueKey}`;
-  const introSkipped = skippedIntroKey === currentDialogueKey;
-  const introReady = introPhase === 'ready';
-  const isTyping = introReady && typed < text.length;
-  const optionsVisible =
-    introReady && typed >= text.length && page === pages.length - 1;
-
-  useLayoutEffect(() => setSkippedIntroKey(null), [step, dialogueKey]);
 
   useEffect(() => {
-    const element = dialogueRef.current;
-    if (!element) return undefined;
-    const update = () => setDialogueWidth(element.clientWidth);
-    update();
-    const observer =
-      typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(update);
-    observer?.observe(element);
-    window.addEventListener('resize', update);
-    return () => {
-      observer?.disconnect();
-      window.removeEventListener('resize', update);
-    };
-  }, []);
-
-  useEffect(() => {
-    const ruler = rulerRef.current;
-    if (!ruler || !dialogueWidth) return;
-    const fits = (value: string) => {
-      ruler.textContent = value;
-      return ruler.getBoundingClientRect().height <= 40;
-    };
-    setPages(
-      dialogueKey
-        .split('\u0000')
-        .flatMap((line) => paginateDialogue(line, fits)),
-    );
-    setPage(0);
-    setTyped(0);
-  }, [dialogueKey, dialogueWidth]);
-
-  useEffect(() => {
-    const fallback = window.setTimeout(() => setSceneReady(true), 2500);
-    return () => window.clearTimeout(fallback);
-  }, []);
-
-  useEffect(() => {
-    setPage(0);
-    setTyped(0);
     contentRef.current?.scrollTo({ top: 0, behavior: 'auto' });
   }, [step, dialogueKey]);
-
-  useEffect(() => {
-    if (step !== 'intro' || prefersReducedMotion() || introSkipped) {
-      setIntroPhase('ready');
-      return undefined;
-    }
-    setIntroPhase('bow');
-    if (!sceneReady) return undefined;
-    const greetTimer = window.setTimeout(() => setIntroPhase('greet'), 1100);
-    const talkTimer = window.setTimeout(() => setIntroPhase('ready'), 1900);
-    return () => {
-      window.clearTimeout(greetTimer);
-      window.clearTimeout(talkTimer);
-    };
-  }, [step, dialogueKey, introSkipped, sceneReady]);
-
-  useEffect(() => {
-    if (!introReady || typed >= text.length) return undefined;
-    if (prefersReducedMotion()) {
-      setTyped(text.length);
-      return undefined;
-    }
-    const timer = window.setTimeout(() => setTyped((value) => value + 1), 30);
-    return () => window.clearTimeout(timer);
-  }, [introReady, typed, text]);
-
-  useEffect(() => {
-    if (!introReady || typed < text.length || page >= pages.length - 1)
-      return undefined;
-    const readingMs = Math.min(
-      2500,
-      Math.max(1200, 500 + 50 * text.replace(/\s/g, '').length),
-    );
-    const timer = window.setTimeout(() => {
-      setPage((value) => value + 1);
-      setTyped(0);
-    }, readingMs);
-    return () => window.clearTimeout(timer);
-  }, [introReady, typed, text, page, pages.length]);
-
-  const advanceDialogue = () => {
-    if (!introReady) {
-      setSkippedIntroKey(currentDialogueKey);
-      setIntroPhase('ready');
-    }
-    if (typed < text.length) {
-      setTyped(text.length);
-    } else if (page < pages.length - 1) {
-      setPage(page + 1);
-      setTyped(0);
-    }
-  };
 
   return (
     <div
       className="dark flex h-dvh min-h-0 justify-center overflow-hidden bg-bg-layer-basement text-fg-neutral"
       onClickCapture={(event) => {
-        if (optionsVisible) return;
+        if (dialogue.optionsVisible) return;
         event.preventDefault();
         event.stopPropagation();
-        advanceDialogue();
+        dialogue.advance();
       }}
     >
       <div className="flex h-full min-h-0 w-full max-w-[468px] flex-col bg-bg-layer-default">
@@ -244,28 +89,30 @@ export default function BartenderFrame({
           className={`relative shrink-0 overflow-hidden bg-bg-layer-basement ${onBack ? 'max-h-[min(40dvh,calc(100dvh-276px))]' : 'max-h-[40dvh]'}`}
         >
           <BarScene
-            pose={step === 'intro' && introPhase === 'bow' ? 'bow' : pose}
-            talking={isTyping}
-            onReady={() => setSceneReady(true)}
+            pose={
+              step === 'intro' && dialogue.introPhase === 'bow' ? 'bow' : pose
+            }
+            talking={dialogue.isTyping}
+            onReady={dialogue.markSceneReady}
           />
           <button
             type="button"
-            ref={dialogueRef}
-            className={`absolute inset-x-10 bottom-6 z-10 min-h-56 rounded-md bg-[rgba(20,16,13,0.94)] px-14 py-9 text-left text-14 leading-19 text-[#F5EFE5] shadow-md transition-[opacity,transform] duration-250 motion-reduce:transition-none ${introReady ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-8 opacity-0'}`}
+            ref={dialogue.dialogueRef}
+            className={`absolute inset-x-10 bottom-6 z-10 min-h-56 rounded-md bg-[rgba(20,16,13,0.94)] px-14 py-9 text-left text-14 leading-19 text-[#F5EFE5] shadow-md transition-[opacity,transform] duration-250 motion-reduce:transition-none ${dialogue.introReady ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-8 opacity-0'}`}
             aria-label="노트의 대사, 누르면 이어 보기"
           >
             <span className="absolute -top-10 left-10 rounded-sm bg-bg-brand-solid px-8 py-2 text-11 font-extrabold leading-14 text-fg-brand-contrast">
               노트
             </span>
             <span className="block min-h-38 whitespace-pre-wrap break-keep">
-              {text.slice(0, typed)}
+              {dialogue.text}
             </span>
             <span
-              ref={rulerRef}
+              ref={dialogue.rulerRef}
               aria-hidden="true"
               className="invisible absolute left-14 right-14 top-0 block whitespace-pre-wrap break-keep"
             />
-            {introReady && typed >= text.length && page < pages.length - 1 && (
+            {dialogue.hasNextPage && (
               <span
                 aria-hidden="true"
                 className="absolute bottom-5 right-10 text-8 text-fg-brand motion-safe:animate-pulse"
@@ -280,7 +127,7 @@ export default function BartenderFrame({
             ref={contentRef}
             className="flex min-h-0 flex-1 flex-col gap-12 overflow-y-auto overscroll-contain px-20 pb-20 pt-14 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-200 [&>*]:shrink-0"
           >
-            {optionsVisible ? children : null}
+            {dialogue.optionsVisible ? children : null}
           </section>
         </ActionDockContext.Provider>
         <div
