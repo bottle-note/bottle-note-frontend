@@ -86,9 +86,7 @@ export default function BartenderFrame({
   const [pages, setPages] = useState(lines);
   const [page, setPage] = useState(0);
   const [typed, setTyped] = useState(0);
-  const [skippedDialogueKey, setSkippedDialogueKey] = useState<string | null>(
-    null,
-  );
+  const [skippedIntroKey, setSkippedIntroKey] = useState<string | null>(null);
   const [introPhase, setIntroPhase] = useState<'bow' | 'greet' | 'ready'>(
     step === 'intro' ? 'bow' : 'ready',
   );
@@ -97,14 +95,13 @@ export default function BartenderFrame({
   const text = pages[page] ?? '';
   const dialogueKey = lines.join('\u0000');
   const currentDialogueKey = `${step}\u0000${dialogueKey}`;
-  const dialogueSkipped = skippedDialogueKey === currentDialogueKey;
+  const introSkipped = skippedIntroKey === currentDialogueKey;
   const introReady = introPhase === 'ready';
-  const isTyping = introReady && !dialogueSkipped && typed < text.length;
+  const isTyping = introReady && typed < text.length;
   const optionsVisible =
-    introReady &&
-    (dialogueSkipped || (typed >= text.length && page === pages.length - 1));
+    introReady && typed >= text.length && page === pages.length - 1;
 
-  useLayoutEffect(() => setSkippedDialogueKey(null), [step, dialogueKey]);
+  useLayoutEffect(() => setSkippedIntroKey(null), [step, dialogueKey]);
 
   useEffect(() => {
     const element = dialogueRef.current;
@@ -154,7 +151,10 @@ export default function BartenderFrame({
     setPage(0);
     setTyped(0);
     contentRef.current?.scrollTo({ top: 0, behavior: 'auto' });
-    if (step !== 'intro' || reducedMotion || dialogueSkipped) {
+  }, [step, dialogueKey]);
+
+  useEffect(() => {
+    if (step !== 'intro' || reducedMotion || introSkipped) {
       setIntroPhase('ready');
       return undefined;
     }
@@ -166,41 +166,43 @@ export default function BartenderFrame({
       window.clearTimeout(greetTimer);
       window.clearTimeout(talkTimer);
     };
-  }, [step, dialogueKey, dialogueSkipped, reducedMotion, sceneReady]);
+  }, [step, dialogueKey, introSkipped, reducedMotion, sceneReady]);
 
   useEffect(() => {
-    if (!introReady || dialogueSkipped || typed >= text.length)
-      return undefined;
+    if (!introReady || typed >= text.length) return undefined;
     if (reducedMotion) {
       setTyped(text.length);
       return undefined;
     }
     const timer = window.setTimeout(() => setTyped((value) => value + 1), 30);
     return () => window.clearTimeout(timer);
-  }, [introReady, dialogueSkipped, reducedMotion, typed, text]);
+  }, [introReady, reducedMotion, typed, text]);
 
   useEffect(() => {
-    if (
-      !introReady ||
-      dialogueSkipped ||
-      typed < text.length ||
-      page >= pages.length - 1
-    )
+    if (!introReady || typed < text.length || page >= pages.length - 1)
       return undefined;
     const readingMs = Math.min(
-      4500,
-      Math.max(2000, 1000 + 70 * text.replace(/\s/g, '').length),
+      2500,
+      Math.max(1200, 500 + 50 * text.replace(/\s/g, '').length),
     );
     const timer = window.setTimeout(() => {
       setPage((value) => value + 1);
       setTyped(0);
     }, readingMs);
     return () => window.clearTimeout(timer);
-  }, [introReady, dialogueSkipped, typed, text, page, pages.length]);
+  }, [introReady, typed, text, page, pages.length]);
 
-  const revealDialogue = () => {
-    setIntroPhase('ready');
-    setSkippedDialogueKey(currentDialogueKey);
+  const advanceDialogue = () => {
+    if (!introReady) {
+      setSkippedIntroKey(currentDialogueKey);
+      setIntroPhase('ready');
+    }
+    if (typed < text.length) {
+      setTyped(text.length);
+    } else if (page < pages.length - 1) {
+      setPage(page + 1);
+      setTyped(0);
+    }
   };
 
   return (
@@ -210,7 +212,7 @@ export default function BartenderFrame({
         if (optionsVisible) return;
         event.preventDefault();
         event.stopPropagation();
-        revealDialogue();
+        advanceDialogue();
       }}
     >
       <div className="flex h-full min-h-0 w-full max-w-[468px] flex-col bg-bg-layer-default">
@@ -256,22 +258,22 @@ export default function BartenderFrame({
           />
           <button
             type="button"
+            ref={dialogueRef}
             className={`absolute inset-x-10 bottom-6 z-10 min-h-56 rounded-md bg-[rgba(20,16,13,0.94)] px-14 py-9 text-left text-14 leading-19 text-[#F5EFE5] shadow-md transition-[opacity,transform] duration-250 motion-reduce:transition-none ${introReady ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-8 opacity-0'}`}
-            onClick={revealDialogue}
-            aria-label="노트의 대사, 누르면 전체 문장 보기"
+            aria-label="노트의 대사, 누르면 이어 보기"
           >
             <span className="absolute -top-10 left-10 rounded-sm bg-bg-brand-solid px-8 py-2 text-11 font-extrabold leading-14 text-fg-brand-contrast">
               노트
             </span>
             <span className="block min-h-38 whitespace-pre-wrap break-keep">
-              {dialogueSkipped ? lines.join('\n') : text.slice(0, typed)}
+              {text.slice(0, typed)}
             </span>
             <span
               ref={rulerRef}
               aria-hidden="true"
               className="invisible absolute left-14 right-14 top-0 block whitespace-pre-wrap break-keep"
             />
-            {isTyping && (
+            {introReady && typed >= text.length && page < pages.length - 1 && (
               <span
                 aria-hidden="true"
                 className="absolute bottom-5 right-10 text-8 text-fg-brand motion-safe:animate-pulse"
