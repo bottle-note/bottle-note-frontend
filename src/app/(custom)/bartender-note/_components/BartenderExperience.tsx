@@ -40,12 +40,34 @@ export default function BartenderExperience({
   curations: Curation[];
 }) {
   const router = useRouter();
-  const journey = useBartenderJourney();
-  const { step, previous } = journey;
-  const taste = useTasteRecommendation(whiskies);
-  const { answers, recommendation } = taste;
-  const reviewDraft = useReviewDraft();
-  const { review } = reviewDraft;
+  const {
+    step,
+    history,
+    previous,
+    move: moveStep,
+    back: backStep,
+    restart: restartJourney,
+    restore: restoreJourney,
+  } = useBartenderJourney();
+  const {
+    answers,
+    likedLookups,
+    recommendation,
+    baseWhiskeyName,
+    updateAnswers,
+    rememberLookup,
+    reset: resetTaste,
+    restore: restoreTaste,
+  } = useTasteRecommendation(whiskies);
+  const {
+    review,
+    lastMode: lastReviewMode,
+    updateReview,
+    chooseMode,
+    startAnother,
+    reset: resetReview,
+    restore: restoreReview,
+  } = useReviewDraft();
   const [chosenId, setChosenId] = useState<number | null>(null);
   const [situation, setSituation] = useState<Situation>('home');
   const [curationId, setCurationId] = useState<number | null>(null);
@@ -62,9 +84,9 @@ export default function BartenderExperience({
   useEffect(() => {
     const saved = takeSnapshot();
     if (!saved) return;
-    journey.restore(saved.journey);
-    taste.restore(saved);
-    reviewDraft.restore(saved.review, saved.lastReviewMode);
+    restoreJourney(saved.journey);
+    restoreTaste(saved);
+    restoreReview(saved.review, saved.lastReviewMode);
     setChosenId(saved.chosenId);
     setSituation(saved.situation);
     setCurationId(saved.curationId);
@@ -73,11 +95,11 @@ export default function BartenderExperience({
   /** 바텐더 노트 밖으로 나가기 직전에 지금 화면을 남겨 둔다. */
   const leave = () => {
     saveSnapshot({
-      journey: { step, history: journey.history },
+      journey: { step, history },
       answers,
-      likedLookups: taste.likedLookups,
+      likedLookups,
       review: { ...review, photos: [] },
-      lastReviewMode: reviewDraft.lastMode,
+      lastReviewMode,
       chosenId,
       situation,
       curationId,
@@ -88,21 +110,21 @@ export default function BartenderExperience({
   // 바텐더의 알림 대사는 다른 단계로 넘어가면 사라진다.
   const move = (next: Step) => {
     setNotice(null);
-    journey.move(next);
+    moveStep(next);
   };
   const back = () => {
     setNotice(null);
-    journey.back();
+    backStep();
   };
   const restart = (next?: Step) => {
     setNotice(null);
-    journey.restart(next);
+    restartJourney(next);
   };
 
   const home = () => {
     restart();
-    taste.reset();
-    reviewDraft.reset();
+    resetTaste();
+    resetReview();
     setChosenId(null);
     reviewStartedFor.current = null;
   };
@@ -127,7 +149,7 @@ export default function BartenderExperience({
     bartender.smile();
   };
   const chooseReviewMode = (mode: ReviewDraft['mode']) => {
-    reviewDraft.chooseMode(mode);
+    chooseMode(mode);
     if (!selected || reviewStartedFor.current === selected.id) return;
     reviewStartedFor.current = selected.id;
     trackGA4Event('write_review_start', {
@@ -216,7 +238,7 @@ export default function BartenderExperience({
     level: answers.level,
     kind: answers.kind,
     likedCount: answers.likedIds.length,
-    baseWhiskeyName: taste.baseWhiskeyName,
+    baseWhiskeyName,
   });
 
   return (
@@ -262,10 +284,10 @@ export default function BartenderExperience({
       <RecommendationFlow
         step={step}
         answers={answers}
-        updateAnswers={taste.updateAnswers}
+        updateAnswers={updateAnswers}
         whiskies={whiskies}
-        likedLookups={taste.likedLookups}
-        rememberLookup={taste.rememberLookup}
+        likedLookups={likedLookups}
+        rememberLookup={rememberLookup}
         move={move}
       />
       {isCandidateStep(step) && (
@@ -316,13 +338,13 @@ export default function BartenderExperience({
       <ReviewFlow
         step={step}
         review={review}
-        updateReview={reviewDraft.updateReview}
+        updateReview={updateReview}
         selected={selected}
         whiskies={whiskies}
         move={move}
         home={home}
         chooseWhiskey={chooseWhiskey}
-        lastReviewMode={reviewDraft.lastMode}
+        lastReviewMode={lastReviewMode}
         chooseMode={chooseReviewMode}
         postReview={postReview}
         isPosting={submit.isPending}
@@ -332,7 +354,7 @@ export default function BartenderExperience({
           router.push(ROUTES.REVIEW.DETAIL(postedReviewId));
         }}
         startAnotherReview={() => {
-          reviewDraft.startAnother();
+          startAnother();
           setChosenId(null);
           reviewStartedFor.current = null;
           restart('review-pick');
