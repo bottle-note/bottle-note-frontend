@@ -1,14 +1,30 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import type { AlcoholLookupItem } from '@/api/alcohol/types';
+import { MyBottleApi } from '@/api/my-bottle/my-bottle.api';
+import type { PickMyBottleItem } from '@/api/my-bottle/types';
 import BartenderExperience from './BartenderExperience';
 import type { Curation, Whiskey } from '../_data/demo';
 
 const { back } = vi.hoisted(() => ({ back: vi.fn() }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ back, push: vi.fn(), replace: vi.fn() }),
+}));
+// 바텐더 노트는 로그인한 사용자 기준으로 동작한다.
+vi.mock('@/hooks/auth/useAuthSession', () => ({
+  useAuthSession: () => ({
+    user: { sub: 'tester', profile: null, userId: 7 },
+    isLoggedIn: true,
+    isLoading: false,
+  }),
 }));
 
 const whiskies: Whiskey[] = [
@@ -112,6 +128,66 @@ const lookupItem: AlcoholLookupItem = {
   distilleryId: 1,
 };
 
+function pickItem(
+  alcoholId: number,
+  alcoholKorName: string,
+  korCategoryName = '싱글 몰트',
+): PickMyBottleItem {
+  return {
+    baseMyBottleInfo: {
+      alcoholId,
+      alcoholKorName,
+      alcoholEngName: '',
+      korCategoryName,
+      imageUrl: '',
+      isHot: false,
+    },
+    isPicked: true,
+    totalPicksCount: 1,
+  };
+}
+
+/** 서버 찜 목록 대역. 찜 토글 요청이 이 목록을 바꾼다. */
+let serverPicks: PickMyBottleItem[] = [];
+
+function stubPickApi() {
+  vi.spyOn(MyBottleApi, 'getPicks').mockImplementation(async ({ userId }) => ({
+    success: true,
+    code: 200,
+    data: { userId, isMyPage: true, myBottleList: [...serverPicks] },
+    errors: [],
+    meta: {
+      serverEncoding: 'UTF-8',
+      serverVersion: '1.0.0',
+      serverPathVersion: 'v1',
+      serverResponseTime: '',
+      pagination: { hasNext: false, nextCursor: null },
+    },
+  }));
+  return vi
+    .spyOn(AlcoholsApi, 'putPick')
+    .mockImplementation(async ({ alcoholId, isPicked }) => {
+      const whiskey = whiskies.find(({ id }) => id === Number(alcoholId));
+      serverPicks = isPicked
+        ? [pickItem(Number(alcoholId), whiskey?.name ?? ''), ...serverPicks]
+        : serverPicks.filter(
+            (item) => item.baseMyBottleInfo.alcoholId !== Number(alcoholId),
+          );
+      return {
+        success: true,
+        code: 200,
+        data: { message: '', status: isPicked ? 'PICK' : 'UNPICK' },
+        errors: [],
+        meta: {
+          serverEncoding: 'UTF-8',
+          serverVersion: '1.0.0',
+          serverPathVersion: 'v1',
+          serverResponseTime: '',
+        },
+      };
+    });
+}
+
 function renderExperience() {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -164,7 +240,8 @@ async function openHomeCurationDetail(name: string) {
 beforeEach(() => {
   vi.restoreAllMocks();
   back.mockClear();
-  localStorage.clear();
+  serverPicks = [];
+  stubPickApi();
   // 모션 줄이기 환경에서는 인사 동작과 타자 효과 없이 대사와 선택지가 바로 보인다.
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
     matches: query.includes('reduce'),
@@ -322,15 +399,22 @@ describe('바텐더 노트 상황별 추천', () => {
 });
 
 describe('바텐더 노트 찜', () => {
-  it('술 상세에서 찜하면 처음 화면에서 찜한 술을 다시 볼 수 있다', async () => {
+  it('술 상세에서 찜하면 서버에 저장하고 처음 화면의 찜 목록에서 다시 볼 수 있다', async () => {
     renderExperience();
     await openHomeCurationDetail('글렌피딕 12년');
 
     await press('♡ 찜해둘게요');
 
-    expect(
-      await screen.findByRole('button', { name: '♥ 찜했어요' }),
-    ).toBeInTheDocument();
+    // 찜 알림 대사가 나오는 동안 선택지가 다시 그려지므로 최종 상태를 기다린다.
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: '♥ 찜했어요' }),
+      ).toBeInTheDocument(),
+    );
+    expect(AlcoholsApi.putPick).toHaveBeenCalledWith({
+      alcoholId: 103,
+      isPicked: true,
+    });
     expect(dialogue()).toHaveTextContent('찜해 두었습니다.');
 
     await press('닫기');
@@ -340,6 +424,44 @@ describe('바텐더 노트 찜', () => {
     expect(
       await screen.findByRole('heading', { name: '글렌피딕 12년' }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '♥ 찜했어요' }),
+    ).toBeInTheDocument();
+  });
+
+  it('데모에 없는 찜한 술은 실제 술 상세 페이지로 연결한다', async () => {
+    serverPicks = [
+      pickItem(900, '탈리스커 10년'),
+      pickItem(104, '조니워커 블랙', '블렌디드'),
+    ];
+    renderExperience();
+
+    await press('찜한 술 2병 볼게요');
+
+    expect(
+      await screen.findByRole('link', { name: /탈리스커 10년/ }),
+    ).toHaveAttribute('href', '/alcohols/900');
+    await press(/조니워커 블랙/);
+    expect(
+      await screen.findByRole('heading', { name: '조니워커 블랙' }),
+    ).toBeInTheDocument();
+  });
+
+  it('찜 저장에 실패하면 찜하지 않은 상태로 되돌리고 알려 준다', async () => {
+    vi.spyOn(AlcoholsApi, 'putPick').mockRejectedValue(
+      new Error('찜하기 업데이트에 실패했습니다.'),
+    );
+    renderExperience();
+    await openHomeCurationDetail('글렌피딕 12년');
+
+    await press('♡ 찜해둘게요');
+
+    await waitFor(() => {
+      expect(dialogue()).toHaveTextContent('찜을 바꾸지 못했어요.');
+      expect(
+        screen.getByRole('button', { name: '♡ 찜해둘게요' }),
+      ).toBeInTheDocument();
+    });
   });
 });
 

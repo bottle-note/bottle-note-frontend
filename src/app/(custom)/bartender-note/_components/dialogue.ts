@@ -1,7 +1,7 @@
 import type { Step } from './types';
 import type { Curation, Whiskey } from '../_data/demo';
 
-export type FavoriteNotice = 'added' | 'removed';
+export type FavoriteNotice = 'added' | 'removed' | 'failed';
 
 export type DialogueInput = {
   step: Step;
@@ -24,6 +24,7 @@ export type DialogueInput = {
 const favoriteNotices: Record<FavoriteNotice, string> = {
   added: '찜해 두었습니다. 처음 화면에서 다시 볼 수 있어요.',
   removed: '찜에서 뺐습니다.',
+  failed: '찜을 바꾸지 못했어요.\n잠시 후 다시 눌러 주세요.',
 };
 
 function detailReason({

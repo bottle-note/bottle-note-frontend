@@ -1,10 +1,12 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
+import Link from 'next/link';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import type { AlcoholLookupItem } from '@/api/alcohol/types';
 import { ROUTES } from '@/constants/routes';
 import type { Answers, Step } from './types';
 import { OptionList, FlowAction, FlowLink } from './FlowControls';
 import { WhiskeyImage, WhiskeyRow } from './WhiskeyRow';
+import type { PickedAlcohol } from './useBartenderPicks';
 import type { Curation, Whiskey } from '../_data/demo';
 import type { RecommendationMeta } from '../_data/demoSelection';
 
@@ -79,7 +81,11 @@ type Props = {
   recommendationMeta: Map<number, RecommendationMeta>;
   selected?: Whiskey;
   curation?: Curation;
-  favorites: number[];
+  /** 서버 찜 목록. 데모에 있는 술이면 whiskey가 함께 온다. */
+  pickedItems: { alcohol: PickedAlcohol; whiskey?: Whiskey }[];
+  hasMorePicks: boolean;
+  isPicked: (id: number) => boolean;
+  isTogglingPick: boolean;
   move: (next: Step) => void;
   home: () => void;
   back: () => void;
@@ -108,7 +114,10 @@ export default function RecommendationFlow({
   recommendationMeta,
   selected,
   curation,
-  favorites,
+  pickedItems,
+  hasMorePicks,
+  isPicked,
+  isTogglingPick,
   move,
   home,
   back,
@@ -372,7 +381,7 @@ export default function RecommendationFlow({
             {step === 'curation-list'
               ? curation?.title
               : step === 'favorites'
-                ? `찜한 술 ${listed.length}병`
+                ? `찜한 술 ${pickedItems.length}${hasMorePicks ? '병 이상' : '병'}`
                 : step === 'recommendations' &&
                     exactCount === 0 &&
                     listed.length === 0
@@ -394,7 +403,10 @@ export default function RecommendationFlow({
                 .join(' · ')}
             </p>
           )}
-          {listed.length === 0 && (
+          {step === 'favorites' && pickedItems.length === 0 && (
+            <p className="text-15 text-fg-neutral">찜한 술이 없어요.</p>
+          )}
+          {step !== 'favorites' && listed.length === 0 && (
             <p className="text-15 text-fg-neutral">
               보여 드릴 병이 없어요. 조건을 바꿔 다시 골라 볼까요?
             </p>
@@ -406,6 +418,52 @@ export default function RecommendationFlow({
               : '추천 이유와 자세한 정보'}
             를 볼 수 있어요.
           </p>
+          {step === 'favorites' && (
+            <div className="flex flex-col">
+              {pickedItems.map(({ alcohol, whiskey }, index) =>
+                whiskey ? (
+                  <WhiskeyRow
+                    key={alcohol.alcoholId}
+                    whiskey={whiskey}
+                    rank={index + 1}
+                    showPrice
+                    priceUnit={answers.unit}
+                    onClick={() => {
+                      setShowAllTags(false);
+                      onSelectDetail();
+                      chooseWhiskey(whiskey, 'detail');
+                    }}
+                  />
+                ) : (
+                  <Link
+                    key={alcohol.alcoholId}
+                    href={ROUTES.ALCOHOL.DETAIL(alcohol.alcoholId)}
+                    className="flex min-h-74 w-full items-center gap-12 border-b border-stroke-neutral-subtle py-10 text-left text-fg-neutral transition-colors hover:text-fg-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
+                  >
+                    <b className="w-14 text-13 text-fg-brand">{index + 1}</b>
+                    <AlcoholImage
+                      imageUrl={alcohol.imageUrl}
+                      outerHeightClass="h-44"
+                      outerWidthClass="w-44"
+                      innerHeightClass="h-36"
+                      innerWidthClass="w-24"
+                    />
+                    <span className="flex min-w-0 flex-1 flex-col gap-3">
+                      <b className="text-14 font-bold leading-18">
+                        {alcohol.alcoholKorName}
+                      </b>
+                      <small className="text-12 leading-16 text-fg-neutral-muted">
+                        {alcohol.korCategoryName} · 상세 페이지로 이동
+                      </small>
+                    </span>
+                    <span aria-hidden="true" className="text-fg-neutral-muted">
+                      ›
+                    </span>
+                  </Link>
+                ),
+              )}
+            </div>
+          )}
           <div className="flex flex-col">
             {listed.map((whiskey, index) => (
               <WhiskeyRow
@@ -413,7 +471,7 @@ export default function RecommendationFlow({
                 whiskey={whiskey}
                 rank={index + 1}
                 hit={
-                  step === 'curation-list' || step === 'favorites'
+                  step === 'curation-list'
                     ? []
                     : recommendationMeta.get(whiskey.id)?.hit
                 }
@@ -517,8 +575,10 @@ export default function RecommendationFlow({
           </FlowLink>
           <div className="grid grid-cols-2 gap-6">
             {action(
-              favorites.includes(selected.id) ? '♥ 찜했어요' : '♡ 찜해둘게요',
+              isPicked(selected.id) ? '♥ 찜했어요' : '♡ 찜해둘게요',
               () => toggleFavorite(selected.id),
+              false,
+              isTogglingPick,
             )}
             {action('리뷰 작성', () => move('review-mode'))}
           </div>

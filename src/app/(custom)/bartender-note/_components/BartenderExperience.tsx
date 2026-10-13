@@ -12,6 +12,7 @@ import CurationFlow from './CurationFlow';
 import ReviewFlow from './ReviewFlow';
 import { getDialogue, type FavoriteNotice } from './dialogue';
 import { getBackLabel, getStepHeader, getStepPose } from './stepMeta';
+import { useBartenderPicks } from './useBartenderPicks';
 import {
   initialAnswers,
   initialReview,
@@ -42,7 +43,6 @@ export default function BartenderExperience({
   const [debouncedLookupQuery, setDebouncedLookupQuery] = useState('');
   const [likedLookups, setLikedLookups] = useState<AlcoholLookupItem[]>([]);
   const [tagQuery, setTagQuery] = useState('');
-  const [favorites, setFavorites] = useState<number[]>([]);
   const [heldPose, setHeldPose] = useState<Pose | null>(null);
   const [favoriteNotice, setFavoriteNotice] = useState<FavoriteNotice | null>(
     null,
@@ -50,6 +50,7 @@ export default function BartenderExperience({
   const [lastReviewMode, setLastReviewMode] =
     useState<ReviewDraft['mode']>('quick');
   const favoritePoseTimer = useRef<number | null>(null);
+  const picks = useBartenderPicks();
 
   useEffect(() => {
     const timer = window.setTimeout(
@@ -66,20 +67,6 @@ export default function BartenderExperience({
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
-
-  useEffect(() => {
-    try {
-      const saved: unknown = JSON.parse(
-        localStorage.getItem('bn-bartender-fav') ?? '[]',
-      );
-      if (Array.isArray(saved))
-        setFavorites(
-          saved.filter((id): id is number => typeof id === 'number'),
-        );
-    } catch {
-      /* 저장소를 쓸 수 없으면 이번 방문의 상태만 사용한다. */
-    }
-  }, []);
 
   useEffect(() => {
     if (favoritePoseTimer.current !== null) {
@@ -139,17 +126,14 @@ export default function BartenderExperience({
     setChosenId(whiskey.id);
     move(next);
   };
-  const toggleFavorite = (id: number) => {
-    const next = favorites.includes(id)
-      ? favorites.filter((value) => value !== id)
-      : [id, ...favorites];
-    setFavorites(next);
+  const toggleFavorite = async (id: number) => {
     try {
-      localStorage.setItem('bn-bartender-fav', JSON.stringify(next));
+      const picked = await picks.toggle(id);
+      setFavoriteNotice(picked ? 'added' : 'removed');
     } catch {
-      /* 메모리 상태 유지 */
+      setFavoriteNotice('failed');
+      return;
     }
-    setFavoriteNotice(next.includes(id) ? 'added' : 'removed');
     setHeldPose('smile');
     if (favoritePoseTimer.current !== null)
       window.clearTimeout(favoritePoseTimer.current);
@@ -161,9 +145,10 @@ export default function BartenderExperience({
 
   const selected = whiskies.find((whiskey) => whiskey.id === chosenId);
   const curation = curations.find((item) => item.id === curationId);
-  const availableFavorites = favorites.filter((id) =>
-    whiskies.some((whiskey) => whiskey.id === id),
-  );
+  const pickedItems = picks.items.map((alcohol) => ({
+    alcohol,
+    whiskey: whiskies.find((whiskey) => whiskey.id === alcohol.alcoholId),
+  }));
   const detailOrigin = history[history.length - 1];
   // 서버 결과를 연결하기 전까지 결과와 조건 이탈 UI를 확인하는 데모 평가.
   const evaluated = useMemo(
@@ -203,9 +188,7 @@ export default function BartenderExperience({
           .map((id) => whiskies.find((whiskey) => whiskey.id === id))
           .filter((item): item is Whiskey => Boolean(item)) ?? []
       : step === 'favorites'
-        ? availableFavorites
-            .map((id) => whiskies.find((whiskey) => whiskey.id === id))
-            .filter((item): item is Whiskey => Boolean(item))
+        ? []
         : step === 'similar' ||
             (step === 'recommendations' && exact.length === 0)
           ? similar.map(({ whiskey }) => whiskey)
@@ -296,9 +279,9 @@ export default function BartenderExperience({
               },
             ]}
           />
-          {availableFavorites.length > 0 && (
+          {pickedItems.length > 0 && (
             <FlowAction onClick={() => move('favorites')}>
-              찜한 술 {availableFavorites.length}병 볼게요
+              {`찜한 술 ${pickedItems.length}${picks.hasMore ? '병 이상' : '병'} 볼게요`}
             </FlowAction>
           )}
         </>
@@ -337,7 +320,10 @@ export default function BartenderExperience({
         recommendationMeta={recommendationMeta}
         selected={selected}
         curation={curation}
-        favorites={favorites}
+        pickedItems={pickedItems}
+        hasMorePicks={picks.hasMore}
+        isPicked={picks.isPicked}
+        isTogglingPick={picks.isToggling}
         move={move}
         home={home}
         back={back}
