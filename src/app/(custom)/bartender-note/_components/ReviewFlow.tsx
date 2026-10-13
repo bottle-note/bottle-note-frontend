@@ -14,6 +14,7 @@ import { TAGS_LIMIT } from '@/constants/review';
 import type { ReviewDraft, Step } from './types';
 import { OptionList, FlowAction } from './FlowControls';
 import { WhiskeyImage, WhiskeyRow } from './WhiskeyRow';
+import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 import RadarPreview from './RadarPreview';
 import ReviewComposer from './ReviewComposer';
 import type { Whiskey } from '../_data/demo';
@@ -92,6 +93,7 @@ export default function ReviewFlow({
 }: Props) {
   const [infoOpen, setInfoOpen] = useState(false);
   const ratingCommitTimer = useRef<number | null>(null);
+  const reducedMotion = usePrefersReducedMotion();
   useEffect(() => {
     if (ratingCommitTimer.current !== null)
       window.clearTimeout(ratingCommitTimer.current);
@@ -495,9 +497,7 @@ export default function ReviewFlow({
               onCommit={() => {
                 ratingCommitTimer.current = window.setTimeout(
                   () => move('review-where'),
-                  window.matchMedia('(prefers-reduced-motion: reduce)').matches
-                    ? 0
-                    : 850,
+                  reducedMotion ? 0 : 850,
                 );
               }}
             />

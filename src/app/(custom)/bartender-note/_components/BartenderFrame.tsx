@@ -10,6 +10,7 @@ import {
 import { ArrowLeft } from 'lucide-react';
 import Button from '@/components/ui/Button/Button';
 import BarScene, { type Pose } from './BarScene';
+import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 import { ActionDockContext } from './FlowControls';
 import type { Step } from './types';
 
@@ -90,7 +91,7 @@ export default function BartenderFrame({
   const [introPhase, setIntroPhase] = useState<'bow' | 'greet' | 'ready'>(
     step === 'intro' ? 'bow' : 'ready',
   );
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
   const [sceneReady, setSceneReady] = useState(false);
   const text = pages[page] ?? '';
   const dialogueKey = lines.join('\u0000');
@@ -133,14 +134,6 @@ export default function BartenderFrame({
     setPage(0);
     setTyped(0);
   }, [dialogueKey, dialogueWidth]);
-
-  useEffect(() => {
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setReducedMotion(media.matches);
-    update();
-    media.addEventListener('change', update);
-    return () => media.removeEventListener('change', update);
-  }, []);
 
   useEffect(() => {
     const fallback = window.setTimeout(() => setSceneReady(true), 2500);
