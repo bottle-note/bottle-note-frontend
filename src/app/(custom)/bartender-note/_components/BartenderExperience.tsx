@@ -13,8 +13,9 @@ import { getBackLabel, getStepHeader, getStepPose } from './stepMeta';
 import { useBartenderPicks } from './useBartenderPicks';
 import { useBartenderJourney } from './useBartenderJourney';
 import { useTasteRecommendation } from './useTasteRecommendation';
+import { useReviewDraft } from './useReviewDraft';
 import { prefersReducedMotion } from './prefersReducedMotion';
-import { initialReview, type ReviewDraft, type Step } from './types';
+import type { Step } from './types';
 import type { Pose } from './BarScene';
 import type { Curation, Situation, Whiskey } from '../_data/demo';
 
@@ -28,7 +29,8 @@ export default function BartenderExperience({
   const { step, previous, move, back, restart } = useBartenderJourney();
   const taste = useTasteRecommendation(whiskies);
   const { answers, recommendation } = taste;
-  const [review, setReview] = useState<ReviewDraft>(initialReview);
+  const reviewDraft = useReviewDraft();
+  const { review } = reviewDraft;
   const [chosenId, setChosenId] = useState<number | null>(null);
   const [situation, setSituation] = useState<Situation>('home');
   const [curationId, setCurationId] = useState<number | null>(null);
@@ -36,8 +38,6 @@ export default function BartenderExperience({
   const [favoriteNotice, setFavoriteNotice] = useState<FavoriteNotice | null>(
     null,
   );
-  const [lastReviewMode, setLastReviewMode] =
-    useState<ReviewDraft['mode']>('quick');
   const favoritePoseTimer = useRef<number | null>(null);
   const picks = useBartenderPicks();
 
@@ -61,12 +61,10 @@ export default function BartenderExperience({
   const home = () => {
     restart();
     taste.reset();
-    setReview(initialReview);
+    reviewDraft.reset();
     setChosenId(null);
     setFavoriteNotice(null);
   };
-  const updateReview = (value: Partial<ReviewDraft>) =>
-    setReview((current) => ({ ...current, ...value }));
   const chooseWhiskey = (whiskey: Whiskey, next: Step) => {
     setChosenId(whiskey.id);
     move(next);
@@ -207,21 +205,17 @@ export default function BartenderExperience({
       <ReviewFlow
         step={step}
         review={review}
-        updateReview={updateReview}
+        updateReview={reviewDraft.updateReview}
         selected={selected}
         whiskies={whiskies}
         move={move}
         home={home}
         chooseWhiskey={chooseWhiskey}
-        lastReviewMode={lastReviewMode}
-        setLastReviewMode={setLastReviewMode}
+        lastReviewMode={reviewDraft.lastMode}
+        chooseMode={reviewDraft.chooseMode}
         postReview={() => restart('review-done')}
         startAnotherReview={() => {
-          setReview({
-            ...initialReview,
-            place: review.place,
-            mode: lastReviewMode,
-          });
+          reviewDraft.startAnother();
           setChosenId(null);
           restart('review-pick');
         }}

@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import AlcoholRatingInput from '@/components/domain/alcohol/AlcoholRatingInput';
 import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
@@ -65,7 +59,7 @@ type Props = {
   home: () => void;
   chooseWhiskey: (whiskey: Whiskey, next: Step) => void;
   lastReviewMode: ReviewDraft['mode'];
-  setLastReviewMode: Dispatch<SetStateAction<ReviewDraft['mode']>>;
+  chooseMode: (mode: ReviewDraft['mode']) => void;
   postReview: () => void;
   startAnotherReview: () => void;
 };
@@ -80,7 +74,7 @@ export default function ReviewFlow({
   home,
   chooseWhiskey,
   lastReviewMode,
-  setLastReviewMode,
+  chooseMode,
   postReview,
   startAnotherReview,
 }: Props) {
@@ -261,8 +255,7 @@ export default function ReviewFlow({
                   title: '내 느낌 한 줄로 쓸게요',
                   description: '키워드를 고르거나 직접 적어요',
                   action: () => {
-                    updateReview({ mode: 'quick' });
-                    setLastReviewMode('quick');
+                    chooseMode('quick');
                     move('review-text');
                   },
                 },
@@ -270,8 +263,7 @@ export default function ReviewFlow({
                   title: '노즈 · 팔레트 · 피니시로 쓸게요',
                   description: '향 · 맛 · 여운을 따로 적어요',
                   action: () => {
-                    updateReview({ mode: 'detail' });
-                    setLastReviewMode('detail');
+                    chooseMode('detail');
                     move('review-nose');
                   },
                 },
