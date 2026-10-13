@@ -25,7 +25,6 @@ export const AlcoholsApi = {
     signal?: AbortSignal,
   ): Promise<AlcoholLookupItem[]> {
     const params = buildQueryParams({ keyword, size: 6 });
-    // OpenAPI는 data를 배열로 표시하지만 실제 응답은 { items }다.
     const response = await apiClient.get<
       ApiResponse<{ items: AlcoholLookupItem[] }>
     >(`/alcohols/lookup?${params}`, { authRequired: false, signal });

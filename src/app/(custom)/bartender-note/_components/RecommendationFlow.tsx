@@ -413,7 +413,7 @@ export default function RecommendationFlow({
           )}
           <p className="m-0 text-13 text-fg-neutral-muted">
             술을 누르면{' '}
-            {step === 'curation-list'
+            {step === 'curation-list' || step === 'favorites'
               ? '자세한 정보'
               : '추천 이유와 자세한 정보'}
             를 볼 수 있어요.
