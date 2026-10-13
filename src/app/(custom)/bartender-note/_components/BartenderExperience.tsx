@@ -1,9 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
-import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import type { AlcoholLookupItem } from '@/api/alcohol/types';
 import { OptionList, FlowAction } from './FlowControls';
 import BartenderFrame from './BartenderFrame';
@@ -13,6 +10,7 @@ import ReviewFlow from './ReviewFlow';
 import { getDialogue, type FavoriteNotice } from './dialogue';
 import { getBackLabel, getStepHeader, getStepPose } from './stepMeta';
 import { useBartenderPicks } from './useBartenderPicks';
+import { useBartenderJourney } from './useBartenderJourney';
 import { prefersReducedMotion } from './prefersReducedMotion';
 import {
   initialAnswers,
@@ -32,18 +30,13 @@ export default function BartenderExperience({
   whiskies: Whiskey[];
   curations: Curation[];
 }) {
-  const router = useRouter();
-  const [step, setStep] = useState<Step>('intro');
-  const [history, setHistory] = useState<Step[]>([]);
+  const { step, previous, move, back, restart } = useBartenderJourney();
   const [answers, setAnswers] = useState<Answers>(initialAnswers);
   const [review, setReview] = useState<ReviewDraft>(initialReview);
   const [chosenId, setChosenId] = useState<number | null>(null);
   const [situation, setSituation] = useState<Situation>('home');
   const [curationId, setCurationId] = useState<number | null>(null);
-  const [query, setQuery] = useState('');
-  const [debouncedLookupQuery, setDebouncedLookupQuery] = useState('');
   const [likedLookups, setLikedLookups] = useState<AlcoholLookupItem[]>([]);
-  const [tagQuery, setTagQuery] = useState('');
   const [heldPose, setHeldPose] = useState<Pose | null>(null);
   const [favoriteNotice, setFavoriteNotice] = useState<FavoriteNotice | null>(
     null,
@@ -52,22 +45,6 @@ export default function BartenderExperience({
     useState<ReviewDraft['mode']>('quick');
   const favoritePoseTimer = useRef<number | null>(null);
   const picks = useBartenderPicks();
-
-  useEffect(() => {
-    const timer = window.setTimeout(
-      () => setDebouncedLookupQuery(query.trim().replace(/\s+/g, ' ')),
-      300,
-    );
-    return () => window.clearTimeout(timer);
-  }, [query]);
-
-  const lookup = useQuery({
-    queryKey: ['bartender-note', 'alcohol-lookup', debouncedLookupQuery],
-    queryFn: ({ signal }) => AlcoholsApi.lookup(debouncedLookupQuery, signal),
-    enabled: step === 'likes' && debouncedLookupQuery.length > 0,
-    staleTime: 5 * 60 * 1000,
-    retry: false,
-  });
 
   useEffect(() => {
     if (favoritePoseTimer.current !== null) {
@@ -86,33 +63,12 @@ export default function BartenderExperience({
     return () => window.clearTimeout(timer);
   }, [step]);
 
-  const move = (next: Step) => {
-    setHistory((current) => [...current, step]);
-    setStep(next);
-    setQuery('');
-    setTagQuery('');
-  };
-  const back = () => {
-    if (step === 'review-done') {
-      home();
-      return;
-    }
-    if (history.length === 0) {
-      router.back();
-      return;
-    }
-    setStep(history[history.length - 1]);
-    setHistory((current) => current.slice(0, -1));
-  };
   const home = () => {
-    setHistory([]);
-    setStep('intro');
+    restart();
     setAnswers(initialAnswers);
     setLikedLookups([]);
     setReview(initialReview);
     setChosenId(null);
-    setQuery('');
-    setTagQuery('');
     setFavoriteNotice(null);
   };
   const updateAnswers = (value: Partial<Answers>) =>
@@ -146,7 +102,6 @@ export default function BartenderExperience({
     alcohol,
     whiskey: whiskies.find((whiskey) => whiskey.id === alcohol.alcoholId),
   }));
-  const detailOrigin = history[history.length - 1];
   // 서버 결과를 연결하기 전까지 결과와 조건 이탈 UI를 확인하는 데모 평가.
   const evaluated = useMemo(
     () =>
@@ -190,20 +145,6 @@ export default function BartenderExperience({
             (step === 'recommendations' && exact.length === 0)
           ? similar.map(({ whiskey }) => whiskey)
           : exact.slice(0, 10).map(({ whiskey }) => whiskey);
-  const searchResults = whiskies
-    .filter(
-      (whiskey) =>
-        whiskey.name.toLowerCase().includes(query.trim().toLowerCase()) ||
-        whiskey.category.toLowerCase().includes(query.trim().toLowerCase()),
-    )
-    .sort((a, b) => {
-      const key = query.trim().toLowerCase();
-      if (!key) return 0;
-      return (
-        Number(b.name.toLowerCase().startsWith(key)) -
-        Number(a.name.toLowerCase().startsWith(key))
-      );
-    });
 
   const header = getStepHeader(step, {
     curationTitle: curation?.title,
@@ -230,7 +171,7 @@ export default function BartenderExperience({
   );
   const dialogueLines = getDialogue({
     step,
-    detailOrigin,
+    detailOrigin: previous,
     selected,
     curation,
     recommendationReason: recommendationMeta.get(chosenId ?? -1)?.why,
@@ -251,8 +192,8 @@ export default function BartenderExperience({
       progress={header.progress}
       lines={dialogueLines}
       pose={pose}
-      onBack={history.length > 0 ? back : undefined}
-      backLabel={getBackLabel(step, history[history.length - 1])}
+      onBack={previous ? back : undefined}
+      backLabel={getBackLabel(step, previous)}
       onClose={home}
     >
       {step === 'intro' && (
@@ -288,21 +229,6 @@ export default function BartenderExperience({
         answers={answers}
         updateAnswers={updateAnswers}
         whiskies={whiskies}
-        query={query}
-        setQuery={setQuery}
-        searchResults={searchResults}
-        lookupResults={
-          query.trim().replace(/\s+/g, ' ') === debouncedLookupQuery
-            ? lookup.data ?? []
-            : []
-        }
-        lookupLoading={
-          !!query.trim() &&
-          (query.trim().replace(/\s+/g, ' ') !== debouncedLookupQuery ||
-            lookup.isFetching)
-        }
-        lookupError={!!lookup.error}
-        retryLookup={() => void lookup.refetch()}
         likedLookups={likedLookups}
         rememberLookup={(item) =>
           setLikedLookups((current) =>
@@ -342,20 +268,13 @@ export default function BartenderExperience({
         review={review}
         updateReview={updateReview}
         selected={selected}
-        query={query}
-        setQuery={setQuery}
-        searchResults={searchResults}
-        tagQuery={tagQuery}
-        setTagQuery={setTagQuery}
+        whiskies={whiskies}
         move={move}
         home={home}
         chooseWhiskey={chooseWhiskey}
         lastReviewMode={lastReviewMode}
         setLastReviewMode={setLastReviewMode}
-        postReview={() => {
-          setHistory([]);
-          setStep('review-done');
-        }}
+        postReview={() => restart('review-done')}
         startAnotherReview={() => {
           setReview({
             ...initialReview,
@@ -363,9 +282,7 @@ export default function BartenderExperience({
             mode: lastReviewMode,
           });
           setChosenId(null);
-          setHistory([]);
-          setStep('review-pick');
-          setQuery('');
+          restart('review-pick');
         }}
       />
     </BartenderFrame>

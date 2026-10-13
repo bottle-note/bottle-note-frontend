@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useState,
-  type Dispatch,
-  type ReactNode,
-  type SetStateAction,
-} from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { TAGS_LIMIT, validateTagText } from '@/constants/review';
 import type { ReviewDraft, Step } from './types';
 import { FlowAction } from './FlowControls';
@@ -16,46 +10,19 @@ import {
   tagSentence,
 } from '../_data/reviewHelpers';
 
-type Props = {
-  step: Step;
-  review: ReviewDraft;
-  selected?: Whiskey;
-  whiskeySummary: ReactNode;
-  reviewTags: string[];
-  updateReview: (value: Partial<ReviewDraft>) => void;
-  move: (next: Step) => void;
-  prepareGraph: () => void;
-  tagQuery: string;
-  setTagQuery: Dispatch<SetStateAction<string>>;
-};
-
-export default function ReviewComposer({
-  step,
+/** 플레이버 태그를 고르거나 직접 적어 넣는다. */
+function TagEditor({
   review,
-  selected,
-  whiskeySummary,
   reviewTags,
+  suggestions,
   updateReview,
-  move,
-  prepareGraph,
-  tagQuery,
-  setTagQuery,
-}: Props) {
-  const [keywordTab, setKeywordTab] = useState('향·맛');
-  const [keywordSearch, setKeywordSearch] = useState('');
-  useEffect(() => {
-    setKeywordSearch('');
-  }, [step]);
-  const action = (
-    label: string,
-    onClick: () => void,
-    primary = false,
-    disabled = false,
-  ) => (
-    <FlowAction onClick={onClick} primary={primary} disabled={disabled}>
-      {label}
-    </FlowAction>
-  );
+}: {
+  review: ReviewDraft;
+  reviewTags: string[];
+  suggestions: string[];
+  updateReview: (value: Partial<ReviewDraft>) => void;
+}) {
+  const [tagQuery, setTagQuery] = useState('');
   const addTag = (tag: string) => {
     const value = tag.trim();
     if (
@@ -71,10 +38,10 @@ export default function ReviewComposer({
     });
     setTagQuery('');
   };
-  const tagMatches = searchTags(tagQuery, selected?.tags ?? [])
+  const tagMatches = searchTags(tagQuery, suggestions)
     .filter((tag) => !reviewTags.includes(tag))
     .slice(0, 8);
-  const tagEditor = (
+  return (
     <div className="flex flex-col gap-10 rounded-lg bg-bg-neutral-weak p-12">
       <p className="text-13 font-bold text-fg-neutral">
         플레이버 태그{' '}
@@ -140,6 +107,52 @@ export default function ReviewComposer({
         ))}
       </div>
     </div>
+  );
+}
+
+type Props = {
+  step: Step;
+  review: ReviewDraft;
+  selected?: Whiskey;
+  whiskeySummary: ReactNode;
+  reviewTags: string[];
+  updateReview: (value: Partial<ReviewDraft>) => void;
+  move: (next: Step) => void;
+  prepareGraph: () => void;
+};
+
+export default function ReviewComposer({
+  step,
+  review,
+  selected,
+  whiskeySummary,
+  reviewTags,
+  updateReview,
+  move,
+  prepareGraph,
+}: Props) {
+  const [keywordTab, setKeywordTab] = useState('향·맛');
+  const [keywordSearch, setKeywordSearch] = useState('');
+  useEffect(() => {
+    setKeywordSearch('');
+  }, [step]);
+  const action = (
+    label: string,
+    onClick: () => void,
+    primary = false,
+    disabled = false,
+  ) => (
+    <FlowAction onClick={onClick} primary={primary} disabled={disabled}>
+      {label}
+    </FlowAction>
+  );
+  const tagEditor = (
+    <TagEditor
+      review={review}
+      reviewTags={reviewTags}
+      suggestions={selected?.tags ?? []}
+      updateReview={updateReview}
+    />
   );
   const npfField =
     step === 'review-nose'

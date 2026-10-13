@@ -1,4 +1,4 @@
-import { useState, type Dispatch, type SetStateAction } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import type { AlcoholLookupItem } from '@/api/alcohol/types';
@@ -6,6 +6,7 @@ import { ROUTES } from '@/constants/routes';
 import type { Answers, Step } from './types';
 import { OptionList, FlowAction, FlowLink } from './FlowControls';
 import { WhiskeyImage, WhiskeyRow } from './WhiskeyRow';
+import LikesStep from './LikesStep';
 import type { PickedAlcohol } from './useBartenderPicks';
 import type { Curation, Whiskey } from '../_data/demo';
 import type { RecommendationMeta } from '../_data/demoSelection';
@@ -66,13 +67,6 @@ type Props = {
   answers: Answers;
   updateAnswers: (value: Partial<Answers>) => void;
   whiskies: Whiskey[];
-  query: string;
-  setQuery: Dispatch<SetStateAction<string>>;
-  searchResults: Whiskey[];
-  lookupResults: AlcoholLookupItem[];
-  lookupLoading: boolean;
-  lookupError: boolean;
-  retryLookup: () => void;
   likedLookups: AlcoholLookupItem[];
   rememberLookup: (item: AlcoholLookupItem) => void;
   listed: Whiskey[];
@@ -99,13 +93,6 @@ export default function RecommendationFlow({
   answers,
   updateAnswers,
   whiskies,
-  query,
-  setQuery,
-  searchResults,
-  lookupResults,
-  lookupLoading,
-  lookupError,
-  retryLookup,
   likedLookups,
   rememberLookup,
   listed,
@@ -153,154 +140,14 @@ export default function RecommendationFlow({
           })),
         )}
       {step === 'likes' && (
-        <>
-          <input
-            className="h-46 w-full rounded-lg border border-stroke-neutral-weak bg-bg-neutral-weak px-14 text-16 text-fg-neutral outline-none placeholder:text-fg-placeholder focus-visible:border-stroke-focus-ring focus-visible:ring-2 focus-visible:ring-stroke-focus-ring disabled:cursor-not-allowed disabled:opacity-60"
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="마셔본 술 이름 검색"
-            aria-label="마셔본 술 이름 검색"
-            disabled={answers.likedIds.length >= 3}
-          />
-          <p className="m-0 text-13 leading-17 text-fg-neutral-muted">
-            {answers.likedIds.length >= 3
-              ? '3/3병 · 다른 술을 고르려면 선택한 술을 빼 주세요'
-              : `${answers.likedIds.length}/3병 · 선택 사항`}
-          </p>
-          <div className="flex flex-wrap gap-5">
-            {answers.likedIds.map((id) => {
-              const item = whiskies.find((whiskey) => whiskey.id === id);
-              const lookupItem = likedLookups.find(
-                (whiskey) => whiskey.alcoholId === id,
-              );
-              return (
-                (item || lookupItem) && (
-                  <button
-                    type="button"
-                    key={id}
-                    className="rounded border border-stroke-brand-solid bg-bg-brand-weak px-7 py-4 text-12 leading-15 text-fg-brand"
-                    onClick={() =>
-                      updateAnswers({
-                        likedIds: answers.likedIds.filter(
-                          (value) => value !== id,
-                        ),
-                      })
-                    }
-                  >
-                    {lookupItem?.korName ?? item?.name} ×
-                  </button>
-                )
-              );
-            })}
-          </div>
-          {!query && answers.likedIds.length < 3 && (
-            <div className="flex flex-wrap gap-6">
-              {[...searchResults]
-                .sort((a, b) =>
-                  answers.level === '자주 마시는 편이에요'
-                    ? (b.rating ?? 0) - (a.rating ?? 0)
-                    : 0,
-                )
-                .slice(0, 10)
-                .map((whiskey) => (
-                  <button
-                    key={whiskey.id}
-                    type="button"
-                    className="rounded-full border border-stroke-neutral-weak px-10 py-6 text-13 text-fg-neutral"
-                    onClick={() => {
-                      if (
-                        !answers.likedIds.includes(whiskey.id) &&
-                        answers.likedIds.length < 3
-                      )
-                        updateAnswers({
-                          likedIds: [...answers.likedIds, whiskey.id],
-                        });
-                      setQuery('');
-                    }}
-                  >
-                    {whiskey.name}
-                  </button>
-                ))}
-            </div>
-          )}
-          {query && !lookupLoading && !lookupError && (
-            <p className="m-0 text-13 text-fg-neutral-muted">
-              검색 결과 {lookupResults.length}개
-              {lookupResults.length === 6 ? ' · 이름을 더 적으면 좁혀져요' : ''}
-            </p>
-          )}
-          {query && lookupLoading && (
-            <p className="text-14 text-fg-neutral-muted" role="status">
-              술을 찾고 있어요…
-            </p>
-          )}
-          {query && !lookupLoading && lookupError && (
-            <div className="flex items-center gap-10 text-14 text-fg-neutral-muted">
-              <span>검색 중 문제가 생겼어요.</span>
-              <button
-                type="button"
-                className="text-fg-brand underline"
-                onClick={retryLookup}
-              >
-                다시 시도
-              </button>
-            </div>
-          )}
-          {query &&
-            !lookupLoading &&
-            !lookupError &&
-            lookupResults.length === 0 && (
-              <p className="text-15 text-fg-neutral">
-                그 이름으로는 못 찾겠네요. 철자를 조금 바꿔 보시겠어요?
-              </p>
-            )}
-          {query && !lookupLoading && !lookupError && (
-            <div className="flex flex-col">
-              {lookupResults.map((whiskey) => (
-                <button
-                  key={whiskey.alcoholId}
-                  type="button"
-                  className="flex min-h-74 w-full items-center gap-12 border-b border-stroke-neutral-subtle py-10 text-left text-fg-neutral transition-colors hover:text-fg-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
-                  onClick={() => {
-                    if (
-                      !answers.likedIds.includes(whiskey.alcoholId) &&
-                      answers.likedIds.length < 3
-                    ) {
-                      updateAnswers({
-                        likedIds: [...answers.likedIds, whiskey.alcoholId],
-                      });
-                      rememberLookup(whiskey);
-                    }
-                    setQuery('');
-                  }}
-                >
-                  <AlcoholImage
-                    imageUrl={whiskey.imageUrl}
-                    outerHeightClass="h-44"
-                    outerWidthClass="w-44"
-                    innerHeightClass="h-36"
-                    innerWidthClass="w-24"
-                  />
-                  <span className="flex min-w-0 flex-1 flex-col gap-3">
-                    <b className="text-14 font-bold leading-18">
-                      {whiskey.korName}
-                    </b>
-                    <small className="text-12 leading-16 text-fg-neutral-muted">
-                      {whiskey.korCategoryName}
-                      {whiskey.engName ? ` · ${whiskey.engName}` : ''}
-                    </small>
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
-          {action(
-            answers.likedIds.length ? '이 술을 기억할게요' : '건너뛸게요',
-            () => move('kind'),
-            true,
-          )}
-        </>
+        <LikesStep
+          answers={answers}
+          updateAnswers={updateAnswers}
+          whiskies={whiskies}
+          likedLookups={likedLookups}
+          rememberLookup={rememberLookup}
+          onNext={() => move('kind')}
+        />
       )}
       {step === 'kind' &&
         optionList(

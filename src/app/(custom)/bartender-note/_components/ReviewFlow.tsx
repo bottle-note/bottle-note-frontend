@@ -13,7 +13,8 @@ import { TASTING_AXES, type TastingNoteValues } from '@/constants/tastingNote';
 import { TAGS_LIMIT } from '@/constants/review';
 import type { ReviewDraft, Step } from './types';
 import { OptionList, FlowAction } from './FlowControls';
-import { WhiskeyImage, WhiskeyRow } from './WhiskeyRow';
+import { WhiskeyImage } from './WhiskeyRow';
+import ReviewPickStep from './ReviewPickStep';
 import { prefersReducedMotion } from './prefersReducedMotion';
 import RadarPreview from './RadarPreview';
 import ReviewComposer from './ReviewComposer';
@@ -59,11 +60,7 @@ type Props = {
   review: ReviewDraft;
   updateReview: (value: Partial<ReviewDraft>) => void;
   selected?: Whiskey;
-  query: string;
-  setQuery: Dispatch<SetStateAction<string>>;
-  searchResults: Whiskey[];
-  tagQuery: string;
-  setTagQuery: Dispatch<SetStateAction<string>>;
+  whiskies: Whiskey[];
   move: (next: Step) => void;
   home: () => void;
   chooseWhiskey: (whiskey: Whiskey, next: Step) => void;
@@ -78,11 +75,7 @@ export default function ReviewFlow({
   review,
   updateReview,
   selected,
-  query,
-  setQuery,
-  searchResults,
-  tagQuery,
-  setTagQuery,
+  whiskies,
   move,
   home,
   chooseWhiskey,
@@ -250,58 +243,13 @@ export default function ReviewFlow({
   return (
     <>
       {step === 'review-pick' && (
-        <>
-          <input
-            className="h-46 w-full rounded-lg border border-stroke-neutral-weak bg-bg-neutral-weak px-14 text-16 text-fg-neutral outline-none placeholder:text-fg-placeholder focus-visible:border-stroke-focus-ring focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="마시고 있는 술 이름 검색"
-            aria-label="술 이름 또는 종류 검색"
-          />
-          <p className="m-0 text-13 leading-17 text-fg-neutral-muted">
-            {query
-              ? `검색 결과 ${searchResults.length}병${searchResults.length > 6 ? ' · 이름을 더 적으면 좁혀져요' : ''}`
-              : '또는 많이 찾는 술에서 골라 보세요'}
-          </p>
-          {!query && (
-            <div className="flex flex-wrap gap-6">
-              {searchResults.slice(0, 10).map((whiskey) => (
-                <button
-                  type="button"
-                  key={whiskey.id}
-                  className="rounded-full border border-stroke-neutral-weak px-10 py-6 text-13 text-fg-neutral"
-                  onClick={() => {
-                    setInfoOpen(false);
-                    chooseWhiskey(whiskey, 'review-mode');
-                  }}
-                >
-                  {whiskey.name}
-                </button>
-              ))}
-            </div>
-          )}
-          {query && searchResults.length === 0 && (
-            <p className="text-15 text-fg-neutral">
-              그 이름으로는 못 찾겠네요. 철자를 조금 바꿔 보시겠어요?
-            </p>
-          )}
-          {query && (
-            <div className="flex flex-col">
-              {searchResults.slice(0, 6).map((whiskey) => (
-                <WhiskeyRow
-                  key={whiskey.id}
-                  whiskey={whiskey}
-                  search
-                  onClick={() => {
-                    setInfoOpen(false);
-                    chooseWhiskey(whiskey, 'review-mode');
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </>
+        <ReviewPickStep
+          whiskies={whiskies}
+          onPick={(whiskey) => {
+            setInfoOpen(false);
+            chooseWhiskey(whiskey, 'review-mode');
+          }}
+        />
       )}
       {step === 'review-mode' && (
         <>
@@ -347,8 +295,6 @@ export default function ReviewFlow({
         updateReview={updateReview}
         move={move}
         prepareGraph={prepareGraph}
-        tagQuery={tagQuery}
-        setTagQuery={setTagQuery}
       />
       {step === 'review-graph' && (
         <>
