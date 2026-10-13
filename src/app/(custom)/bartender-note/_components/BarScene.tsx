@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { usePrefersReducedMotion } from './usePrefersReducedMotion';
+import { prefersReducedMotion } from './prefersReducedMotion';
 
 export type Pose =
   | 'idle'
@@ -48,11 +48,9 @@ export default function BarScene({
   const poseRef = useRef(pose);
   const talkingRef = useRef(talking);
   const onReadyRef = useRef(onReady);
-  const reducedMotionRef = useRef(false);
   poseRef.current = pose;
   talkingRef.current = talking;
   onReadyRef.current = onReady;
-  reducedMotionRef.current = usePrefersReducedMotion();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -67,6 +65,7 @@ export default function BarScene({
       item.src = `/images/bartender-note/${file}`;
       return item;
     });
+    const reducedMotion = prefersReducedMotion();
     let animationFrame = 0;
     let active = true;
     let previousFrame = -1;
@@ -80,7 +79,7 @@ export default function BarScene({
         bartender.complete &&
         bartender.naturalWidth
       ) {
-        const frame = reducedMotionRef.current
+        const frame = reducedMotion
           ? POSE_FRAME[poseRef.current]
           : talkingRef.current &&
               (poseRef.current === 'idle' || poseRef.current === 'greet')

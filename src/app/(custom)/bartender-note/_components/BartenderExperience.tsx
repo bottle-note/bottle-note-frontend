@@ -13,7 +13,7 @@ import ReviewFlow from './ReviewFlow';
 import { getDialogue, type FavoriteNotice } from './dialogue';
 import { getBackLabel, getStepHeader, getStepPose } from './stepMeta';
 import { useBartenderPicks } from './useBartenderPicks';
-import { usePrefersReducedMotion } from './usePrefersReducedMotion';
+import { prefersReducedMotion } from './prefersReducedMotion';
 import {
   initialAnswers,
   initialReview,
@@ -33,7 +33,6 @@ export default function BartenderExperience({
   curations: Curation[];
 }) {
   const router = useRouter();
-  const reducedMotion = usePrefersReducedMotion();
   const [step, setStep] = useState<Step>('intro');
   const [history, setHistory] = useState<Step[]>([]);
   const [answers, setAnswers] = useState<Answers>(initialAnswers);
@@ -82,10 +81,10 @@ export default function BartenderExperience({
     setHeldPose(step === 'detail' ? 'pour' : 'toast');
     const timer = window.setTimeout(
       () => setHeldPose(step === 'detail' ? 'serve' : 'smile'),
-      reducedMotion ? 0 : step === 'detail' ? 1700 : 3000,
+      prefersReducedMotion() ? 0 : step === 'detail' ? 1700 : 3000,
     );
     return () => window.clearTimeout(timer);
-  }, [step, reducedMotion]);
+  }, [step]);
 
   const move = (next: Step) => {
     setHistory((current) => [...current, step]);
@@ -137,7 +136,7 @@ export default function BartenderExperience({
       window.clearTimeout(favoritePoseTimer.current);
     favoritePoseTimer.current = window.setTimeout(
       () => setHeldPose('serve'),
-      reducedMotion ? 0 : 2600,
+      prefersReducedMotion() ? 0 : 2600,
     );
   };
 

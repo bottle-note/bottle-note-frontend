@@ -10,7 +10,7 @@ import {
 import { ArrowLeft } from 'lucide-react';
 import Button from '@/components/ui/Button/Button';
 import BarScene, { type Pose } from './BarScene';
-import { usePrefersReducedMotion } from './usePrefersReducedMotion';
+import { prefersReducedMotion } from './prefersReducedMotion';
 import { ActionDockContext } from './FlowControls';
 import type { Step } from './types';
 
@@ -91,7 +91,6 @@ export default function BartenderFrame({
   const [introPhase, setIntroPhase] = useState<'bow' | 'greet' | 'ready'>(
     step === 'intro' ? 'bow' : 'ready',
   );
-  const reducedMotion = usePrefersReducedMotion();
   const [sceneReady, setSceneReady] = useState(false);
   const text = pages[page] ?? '';
   const dialogueKey = lines.join('\u0000');
@@ -147,7 +146,7 @@ export default function BartenderFrame({
   }, [step, dialogueKey]);
 
   useEffect(() => {
-    if (step !== 'intro' || reducedMotion || introSkipped) {
+    if (step !== 'intro' || prefersReducedMotion() || introSkipped) {
       setIntroPhase('ready');
       return undefined;
     }
@@ -159,17 +158,17 @@ export default function BartenderFrame({
       window.clearTimeout(greetTimer);
       window.clearTimeout(talkTimer);
     };
-  }, [step, dialogueKey, introSkipped, reducedMotion, sceneReady]);
+  }, [step, dialogueKey, introSkipped, sceneReady]);
 
   useEffect(() => {
     if (!introReady || typed >= text.length) return undefined;
-    if (reducedMotion) {
+    if (prefersReducedMotion()) {
       setTyped(text.length);
       return undefined;
     }
     const timer = window.setTimeout(() => setTyped((value) => value + 1), 30);
     return () => window.clearTimeout(timer);
-  }, [introReady, reducedMotion, typed, text]);
+  }, [introReady, typed, text]);
 
   useEffect(() => {
     if (!introReady || typed < text.length || page >= pages.length - 1)
