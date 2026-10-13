@@ -1,5 +1,7 @@
+import { TAGS_LIMIT } from '@/constants/review';
 import { TASTING_AXES } from '@/constants/tastingNote';
 import { tastingTags } from './tastingTags';
+import type { ReviewDraft } from '../_components/types';
 
 export const noteKeywords: Record<string, string[]> = {
   '마신 방법': [
@@ -157,4 +159,28 @@ export function flavorFromText(text: string) {
     values: TASTING_AXES.map((_, index) => values[index]),
     hits: [...new Set(hits)],
   };
+}
+
+/** 리뷰 본문. 노즈·팔레트·피니시로 쓴 리뷰는 항목 이름을 붙여 한 줄씩 잇는다. */
+export function getReviewText(review: ReviewDraft) {
+  if (review.mode === 'quick') return review.text;
+  return [
+    review.nose && `노즈: ${review.nose}`,
+    review.palate && `팔레트: ${review.palate}`,
+    review.finish && `피니시: ${review.finish}`,
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+/** 본문에서 찾은 태그와 직접 넣은 태그. 뺀 태그는 제외하고 최대 개수까지만 둔다. */
+export function getReviewTags(review: ReviewDraft) {
+  const found = extractTags(
+    review.mode === 'detail'
+      ? [review.nose, review.palate, review.finish].join(', ')
+      : review.text,
+  );
+  return [...new Set([...found, ...review.tags])]
+    .filter((tag) => !review.excludedTags.includes(tag))
+    .slice(0, TAGS_LIMIT);
 }

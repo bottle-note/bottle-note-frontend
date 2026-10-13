@@ -1,7 +1,13 @@
 import type { Step } from './types';
 import type { Curation, Whiskey } from '../_data/demo';
 
-export type FavoriteNotice = 'added' | 'removed' | 'failed';
+/** 바텐더가 방금 일어난 일을 알리는 대사. 다른 단계로 넘어가면 사라진다. */
+export type Notice =
+  | 'pick-added'
+  | 'pick-removed'
+  | 'pick-failed'
+  | 'review-failed'
+  | 'rating-failed';
 
 export type DialogueInput = {
   step: Step;
@@ -11,7 +17,7 @@ export type DialogueInput = {
   curation?: Curation;
   /** 추천 목록에서 고른 술의 추천 이유 */
   recommendationReason?: string;
-  favoriteNotice?: FavoriteNotice | null;
+  notice?: Notice | null;
   exactCount: number;
   similarCount: number;
   level: string;
@@ -21,10 +27,13 @@ export type DialogueInput = {
   baseWhiskeyName?: string;
 };
 
-const favoriteNotices: Record<FavoriteNotice, string> = {
-  added: '찜해 두었습니다. 처음 화면에서 다시 볼 수 있어요.',
-  removed: '찜에서 뺐습니다.',
-  failed: '찜을 바꾸지 못했어요.\n잠시 후 다시 눌러 주세요.',
+const notices: Record<Notice, string> = {
+  'pick-added': '찜해 두었습니다. 처음 화면에서 다시 볼 수 있어요.',
+  'pick-removed': '찜에서 뺐습니다.',
+  'pick-failed': '찜을 바꾸지 못했어요.\n잠시 후 다시 눌러 주세요.',
+  'review-failed': '리뷰를 올리지 못했어요.\n잠시 후 다시 눌러 주세요.',
+  'rating-failed':
+    '리뷰는 올렸는데 별점은 저장하지 못했어요.\n술 상세 페이지에서 별점을 다시 남겨 주세요.',
 };
 
 function detailReason({
@@ -51,8 +60,7 @@ function axisLine({ baseWhiskeyName, likedCount, kind }: DialogueInput) {
 
 export function getDialogue(input: DialogueInput): string[] {
   const { step, exactCount, similarCount, curation, selected, level } = input;
-  if (step === 'detail' && input.favoriteNotice)
-    return [favoriteNotices[input.favoriteNotice]];
+  if (input.notice) return [notices[input.notice]];
   const reason = detailReason(input);
   const dialogue: Record<Step, string[]> = {
     intro: [
@@ -120,9 +128,6 @@ export function getDialogue(input: DialogueInput): string[] {
     'review-preview': ['다 적었습니다.\n이렇게 올리면 될까요?'],
     'review-done': [
       '올렸습니다. 좋은 기록이 하나 늘었네요.\n한 잔 더 기록하시겠어요?',
-    ],
-    'review-posted-detail': [
-      '방금 남긴 기록입니다.\n오늘의 한 잔을 다시 살펴보세요.',
     ],
   };
   return dialogue[step];

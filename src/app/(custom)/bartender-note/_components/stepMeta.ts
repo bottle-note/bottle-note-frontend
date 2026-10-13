@@ -56,12 +56,6 @@ const STEP_META: Record<Step, StepMeta> = {
     pose: 'toast',
     progress: 100,
   },
-  'review-posted-detail': {
-    title: REVIEW,
-    subtitle: '내 리뷰',
-    pose: 'idle',
-    progress: 100,
-  },
 };
 
 function reviewProgressSteps(mode: ReviewDraft['mode']): Step[] {
@@ -76,7 +70,6 @@ function reviewProgressSteps(mode: ReviewDraft['mode']): Step[] {
     'review-where',
     'review-preview',
     'review-done',
-    'review-posted-detail',
   ];
 }
 

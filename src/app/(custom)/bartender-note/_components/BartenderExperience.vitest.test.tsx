@@ -11,12 +11,27 @@ import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import type { AlcoholLookupItem } from '@/api/alcohol/types';
 import { MyBottleApi } from '@/api/my-bottle/my-bottle.api';
 import type { PickMyBottleItem } from '@/api/my-bottle/types';
+import { RateApi } from '@/api/rate/rate.api';
+import { ReviewApi } from '@/api/review/review.api';
 import BartenderExperience from './BartenderExperience';
 import type { Curation, Whiskey } from '../_data/demo';
 
-const { back } = vi.hoisted(() => ({ back: vi.fn() }));
+const { back, push } = vi.hoisted(() => ({ back: vi.fn(), push: vi.fn() }));
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ back, push: vi.fn(), replace: vi.fn() }),
+  useRouter: () => ({ back, push, replace: vi.fn() }),
+}));
+// 사진은 S3 업로드 URL로 올라간다. 테스트에서는 올린 결과 주소만 돌려준다.
+vi.mock('@/utils/S3Upload', () => ({
+  uploadImages: vi.fn(async (type: string, files: File | File[]) =>
+    [files].flat().map((_, index) => ({
+      order: index + 1,
+      viewUrl: `https://images.test/${type}/${index + 1}`,
+    })),
+  ),
+}));
+// 테이스팅 그래프 이미지는 캔버스로 만든다. jsdom에는 캔버스가 없어 결과 파일만 돌려준다.
+vi.mock('@/app/(primary)/review/hook/useTastingNoteCapture', () => ({
+  captureTastingNote: vi.fn(async () => null),
 }));
 // 바텐더 노트는 로그인한 사용자 기준으로 동작한다.
 vi.mock('@/hooks/auth/useAuthSession', () => ({
@@ -188,6 +203,31 @@ function stubPickApi() {
     });
 }
 
+const meta = {
+  serverEncoding: 'UTF-8',
+  serverVersion: '1.0.0',
+  serverPathVersion: 'v1',
+  serverResponseTime: '',
+};
+
+/** 리뷰 저장 대역. 저장하면 리뷰 id 77을 돌려준다. */
+function stubReviewApi() {
+  vi.spyOn(RateApi, 'postRating').mockResolvedValue({
+    success: true,
+    code: 200,
+    data: { rating: '5.0', message: '' },
+    errors: [],
+    meta,
+  });
+  return vi.spyOn(ReviewApi, 'registerReview').mockResolvedValue({
+    success: true,
+    code: 200,
+    data: { id: 77, content: '', callback: '' },
+    errors: [],
+    meta,
+  });
+}
+
 function renderExperience() {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -230,6 +270,18 @@ async function answerTasteQuestions(answers: {
   await choose(answers.price);
 }
 
+/** 술 상세에서 리뷰 작성을 시작해 한 줄 리뷰를 쓰고 별점 단계까지 간다. */
+async function writeQuickReview(text: string) {
+  await press('리뷰 작성');
+  await choose('내 느낌 한 줄로 쓸게요');
+  fireEvent.change(await screen.findByRole('textbox', { name: '리뷰 본문' }), {
+    target: { value: text },
+  });
+  await press('다 썼어요');
+  await press(/다 그렸어요|그래프 없이 넘어갈게요/);
+  await press('사진 없이 넘어갈게요');
+}
+
 async function openHomeCurationDetail(name: string) {
   await choose('상황에 맞게 추천해 주세요');
   await choose('집에서 마실 한 병');
@@ -240,6 +292,7 @@ async function openHomeCurationDetail(name: string) {
 beforeEach(() => {
   vi.restoreAllMocks();
   back.mockClear();
+  push.mockClear();
   window.sessionStorage.clear();
   serverPicks = [];
   stubPickApi();
@@ -249,6 +302,8 @@ beforeEach(() => {
     media: query,
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
   }));
   Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
     configurable: true,
@@ -467,21 +522,12 @@ describe('바텐더 노트 찜', () => {
 });
 
 describe('바텐더 노트 리뷰', () => {
-  it('술 상세에서 리뷰를 간편하게 작성해 등록하면 완료 화면을 보여 준다', async () => {
+  it('술 상세에서 리뷰를 간편하게 작성해 등록하면 서버에 저장하고 내 리뷰로 갈 수 있다', async () => {
+    const register = stubReviewApi();
     renderExperience();
     await openHomeCurationDetail('글렌피딕 12년');
 
-    await press('리뷰 작성');
-    await choose('내 느낌 한 줄로 쓸게요');
-    fireEvent.change(
-      await screen.findByRole('textbox', { name: '리뷰 본문' }),
-      {
-        target: { value: '사과 향이 산뜻하고 부드러워요' },
-      },
-    );
-    await press('다 썼어요');
-    await press(/다 그렸어요|그래프 없이 넘어갈게요/);
-    await press('사진 없이 넘어갈게요');
+    await writeQuickReview('사과 향이 산뜻하고 부드러워요');
     await press('별점 없이 넘어갈게요');
     await press('건너뛰기');
 
@@ -492,11 +538,86 @@ describe('바텐더 노트 리뷰', () => {
     await press('비공개');
     await press('이걸로 등록할게요');
 
-    expect(await screen.findByText('✓ 등록됨 · 비공개')).toBeInTheDocument();
+    // 완료 대사가 나오는 동안 선택지가 다시 그려지므로 최종 상태를 기다린다.
+    await waitFor(() =>
+      expect(screen.getByText('✓ 등록됨 · 비공개')).toBeInTheDocument(),
+    );
     expect(screen.getByText('등록 완료')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /^내 리뷰 볼게요/ }),
-    ).toBeInTheDocument();
+    expect(register).toHaveBeenCalledWith(
+      expect.objectContaining({
+        alcoholId: '103',
+        status: 'PRIVATE',
+        content: '사과 향이 산뜻하고 부드러워요',
+        sizeType: null,
+        price: null,
+        rating: 0,
+        locationInfo: { locationName: null },
+      }),
+    );
+    expect(RateApi.postRating).not.toHaveBeenCalled();
+
+    await choose('내 리뷰 볼게요');
+    expect(push).toHaveBeenCalledWith('/review/77');
+  });
+
+  it('리뷰 저장에 실패하면 미리보기에 남아 다시 등록할 수 있다', async () => {
+    const register = stubReviewApi().mockRejectedValueOnce(
+      new Error('리뷰 등록에 실패했습니다.'),
+    );
+    renderExperience();
+    await openHomeCurationDetail('글렌피딕 12년');
+    await writeQuickReview('사과 향이 산뜻해요');
+    await press('별점 없이 넘어갈게요');
+    await press('건너뛰기');
+
+    await press('이걸로 등록할게요');
+
+    await waitFor(() =>
+      expect(dialogue()).toHaveTextContent('리뷰를 올리지 못했어요.'),
+    );
+    expect(screen.getByText('다 됐습니다')).toBeInTheDocument();
+
+    await press('이걸로 등록할게요');
+
+    // 완료 대사가 나오는 동안 선택지가 다시 그려지므로 최종 상태를 기다린다.
+    await waitFor(() =>
+      expect(screen.getByText('✓ 등록됨 · 공개')).toBeInTheDocument(),
+    );
+    expect(register).toHaveBeenCalledTimes(2);
+  });
+
+  it('리뷰는 저장됐는데 별점 저장에 실패하면 완료 화면에서 알려 준다', async () => {
+    stubReviewApi();
+    vi.spyOn(RateApi, 'postRating').mockRejectedValue(
+      new Error('별점 등록에 실패했습니다.'),
+    );
+    renderExperience();
+    await openHomeCurationDetail('글렌피딕 12년');
+    await writeQuickReview('사과 향이 산뜻해요');
+
+    const rating = await screen.findByRole('slider', { name: '내 별점' });
+    fireEvent.keyDown(rating, { key: 'End' });
+    fireEvent.keyUp(rating, { key: 'End' });
+    // 별점을 고르면 잠시 뒤 장소 단계로 넘어간다.
+    await waitFor(() =>
+      expect(dialogue()).toHaveTextContent('어디에서 드셨나요?'),
+    );
+    await press('건너뛰기');
+    await press('이걸로 등록할게요');
+
+    // 완료 대사가 나오는 동안 선택지가 다시 그려지므로 최종 상태를 기다린다.
+    await waitFor(() =>
+      expect(screen.getByText('✓ 등록됨 · 공개')).toBeInTheDocument(),
+    );
+    expect(RateApi.postRating).toHaveBeenCalledWith({
+      alcoholId: 103,
+      rating: 5,
+    });
+    await waitFor(() =>
+      expect(dialogue()).toHaveTextContent(
+        '리뷰는 올렸는데 별점은 저장하지 못했어요.',
+      ),
+    );
   });
 
   it('첫 화면에서 리뷰를 시작하면 술을 검색해 고른 뒤 작성 방식을 묻는다', async () => {

@@ -25,8 +25,7 @@ export type Step =
   | 'review-rating'
   | 'review-where'
   | 'review-preview'
-  | 'review-done'
-  | 'review-posted-detail';
+  | 'review-done';
 
 export type Answers = {
   level: string;

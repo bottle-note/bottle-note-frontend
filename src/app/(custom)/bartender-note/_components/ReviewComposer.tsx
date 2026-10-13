@@ -10,6 +10,10 @@ import {
   tagSentence,
 } from '../_data/reviewHelpers';
 
+// 리뷰 본문은 서버에서 700자까지 받는다. 노즈·팔레트·피니시는 항목 이름과 함께 이어도 넘지 않게 나눈다.
+const REVIEW_TEXT_MAX = 700;
+const NOTE_FIELD_MAX = 220;
+
 /** 플레이버 태그를 고르거나 직접 적어 넣는다. */
 function TagEditor({
   review,
@@ -178,7 +182,7 @@ export default function ReviewComposer({
               className="min-h-140 w-full resize-y border-0 bg-transparent px-14 py-12 text-16 text-fg-neutral outline-none placeholder:text-fg-placeholder focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
               value={review.text}
               onChange={(event) => updateReview({ text: event.target.value })}
-              maxLength={700}
+              maxLength={REVIEW_TEXT_MAX}
               placeholder="아래 키워드를 눌러 보세요. 직접 써도 돼요."
               aria-label="리뷰 본문"
             />
@@ -234,16 +238,16 @@ export default function ReviewComposer({
                       type="button"
                       aria-pressed={active}
                       key={word}
-                      onClick={() =>
-                        updateReview({
-                          text: active
-                            ? review.text
-                                .replace(phrase, '')
-                                .replace(/\s{2,}/g, ' ')
-                                .trim()
-                            : `${review.text.trim()}${review.text.trim() ? ' ' : ''}${phrase}`,
-                        })
-                      }
+                      onClick={() => {
+                        const next = active
+                          ? review.text
+                              .replace(phrase, '')
+                              .replace(/\s{2,}/g, ' ')
+                              .trim()
+                          : `${review.text.trim()}${review.text.trim() ? ' ' : ''}${phrase}`;
+                        if (next.length <= REVIEW_TEXT_MAX)
+                          updateReview({ text: next });
+                      }}
                     >
                       {active ? '✓' : '＋'} {word.replace(/[.]$/, '')}
                     </button>
@@ -258,9 +262,9 @@ export default function ReviewComposer({
                       type="button"
                       className="rounded border border-stroke-brand-solid px-7 py-4 text-12 text-fg-brand"
                       onClick={() => {
-                        updateReview({
-                          text: `${review.text.trim()}${review.text.trim() ? ' ' : ''}${tagSentence(keywordSearch.trim())}`,
-                        });
+                        const next = `${review.text.trim()}${review.text.trim() ? ' ' : ''}${tagSentence(keywordSearch.trim())}`;
+                        if (next.length <= REVIEW_TEXT_MAX)
+                          updateReview({ text: next });
                         setKeywordSearch('');
                       }}
                     >
@@ -271,7 +275,7 @@ export default function ReviewComposer({
             </div>
           </div>
           <p className="m-0 text-13 leading-17 text-fg-neutral-muted">
-            {review.text.length} / 700
+            {review.text.length} / {REVIEW_TEXT_MAX}
           </p>
           {tagEditor}
           {action('다 썼어요', prepareGraph, true, !review.text.trim())}
@@ -312,7 +316,7 @@ export default function ReviewComposer({
               })
             }
             placeholder="예) 사과, 꿀, 은은한 향"
-            maxLength={300}
+            maxLength={NOTE_FIELD_MAX}
           />
           <input
             type="search"
@@ -341,11 +345,11 @@ export default function ReviewComposer({
                   const parts = review[npfField]
                     .split(/\s*,\s*/)
                     .filter(Boolean);
-                  updateReview({
-                    [npfField]: parts.includes(word)
-                      ? parts.filter((part) => part !== word).join(', ')
-                      : [...parts, word].join(', '),
-                  });
+                  const next = parts.includes(word)
+                    ? parts.filter((part) => part !== word).join(', ')
+                    : [...parts, word].join(', ');
+                  if (next.length <= NOTE_FIELD_MAX)
+                    updateReview({ [npfField]: next });
                   setKeywordSearch('');
                 }}
               >
@@ -360,9 +364,9 @@ export default function ReviewComposer({
                   type="button"
                   className="rounded border border-stroke-brand-solid px-7 py-4 text-12 text-fg-brand"
                   onClick={() => {
-                    updateReview({
-                      [npfField]: `${review[npfField]}${review[npfField] ? ', ' : ''}${keywordSearch.trim()}`,
-                    });
+                    const next = `${review[npfField]}${review[npfField] ? ', ' : ''}${keywordSearch.trim()}`;
+                    if (next.length <= NOTE_FIELD_MAX)
+                      updateReview({ [npfField]: next });
                     setKeywordSearch('');
                   }}
                 >

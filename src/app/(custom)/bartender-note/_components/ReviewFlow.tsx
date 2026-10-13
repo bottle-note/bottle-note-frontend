@@ -4,7 +4,6 @@ import AlcoholRatingInput from '@/components/domain/alcohol/AlcoholRatingInput';
 import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
 import TastingRadarChart from '@/app/(primary)/review/_components/form/TastingRadarChart';
 import { TASTING_AXES, type TastingNoteValues } from '@/constants/tastingNote';
-import { TAGS_LIMIT } from '@/constants/review';
 import type { ReviewDraft, Step } from './types';
 import { OptionList, FlowAction } from './FlowControls';
 import { WhiskeyImage } from './WhiskeyRow';
@@ -13,7 +12,11 @@ import { prefersReducedMotion } from './prefersReducedMotion';
 import RadarPreview from './RadarPreview';
 import ReviewComposer from './ReviewComposer';
 import type { Whiskey } from '../_data/demo';
-import { extractTags, flavorFromText } from '../_data/reviewHelpers';
+import {
+  flavorFromText,
+  getReviewTags,
+  getReviewText,
+} from '../_data/reviewHelpers';
 
 const graphLabels = TASTING_AXES.map((axis) => axis.labelKo);
 function PhotoThumb({ file, onRemove }: { file: File; onRemove?: () => void }) {
@@ -61,6 +64,8 @@ type Props = {
   lastReviewMode: ReviewDraft['mode'];
   chooseMode: (mode: ReviewDraft['mode']) => void;
   postReview: () => void;
+  isPosting: boolean;
+  onViewPostedReview: () => void;
   startAnotherReview: () => void;
 };
 
@@ -76,6 +81,8 @@ export default function ReviewFlow({
   lastReviewMode,
   chooseMode,
   postReview,
+  isPosting,
+  onViewPostedReview,
   startAnotherReview,
 }: Props) {
   const [infoOpen, setInfoOpen] = useState(false);
@@ -148,24 +155,8 @@ export default function ReviewFlow({
       </AnimatedCollapse>
     </div>
   );
-  const reviewText =
-    review.mode === 'detail'
-      ? [
-          review.nose && `노즈: ${review.nose}`,
-          review.palate && `팔레트: ${review.palate}`,
-          review.finish && `피니시: ${review.finish}`,
-        ]
-          .filter(Boolean)
-          .join('\n')
-      : review.text;
-  const autoTags = extractTags(
-    review.mode === 'detail'
-      ? [review.nose, review.palate, review.finish].join(', ')
-      : review.text,
-  );
-  const reviewTags = [...new Set([...autoTags, ...review.tags])]
-    .filter((tag) => !review.excludedTags.includes(tag))
-    .slice(0, TAGS_LIMIT);
+  const reviewText = getReviewText(review);
+  const reviewTags = getReviewTags(review);
   const prepareGraph = () => {
     if (!review.tastingAuto && review.tasting.every((value) => value === 0)) {
       const inferred = flavorFromText(reviewText);
@@ -540,7 +531,12 @@ export default function ReviewFlow({
               비공개
             </button>
           </div>
-          {action('이걸로 등록할게요', postReview, true)}
+          {action(
+            isPosting ? '올리고 있어요…' : '이걸로 등록할게요',
+            postReview,
+            true,
+            isPosting,
+          )}
         </>
       )}
       {step === 'review-done' && (
@@ -550,7 +546,7 @@ export default function ReviewFlow({
             {
               title: '내 리뷰 볼게요',
               description: '방금 남긴 기록 보기',
-              action: () => move('review-posted-detail'),
+              action: onViewPostedReview,
             },
             {
               title: '다른 술도 기록할게요',
@@ -565,13 +561,6 @@ export default function ReviewFlow({
               action: home,
             },
           ])}
-        </>
-      )}
-      {step === 'review-posted-detail' && (
-        <>
-          {renderReviewCard(true)}
-          {action('한 잔 더 기록할게요', startAnotherReview)}
-          {action('처음으로 갈게요', home)}
         </>
       )}
     </>

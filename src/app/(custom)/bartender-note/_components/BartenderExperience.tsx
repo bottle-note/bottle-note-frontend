@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/constants/routes';
 import { OptionList, FlowAction } from './FlowControls';
 import BartenderFrame from './BartenderFrame';
 import RecommendationFlow from './RecommendationFlow';
@@ -8,12 +10,13 @@ import CandidateList, { getCandidates, isCandidateStep } from './CandidateList';
 import WhiskeyDetail from './WhiskeyDetail';
 import CurationFlow from './CurationFlow';
 import ReviewFlow from './ReviewFlow';
-import { getDialogue, type FavoriteNotice } from './dialogue';
+import { getDialogue, type Notice } from './dialogue';
 import { getBackLabel, getStepHeader } from './stepMeta';
 import { useBartenderPicks } from './useBartenderPicks';
 import { useBartenderJourney } from './useBartenderJourney';
 import { useTasteRecommendation } from './useTasteRecommendation';
 import { useReviewDraft } from './useReviewDraft';
+import { useReviewSubmit } from './useReviewSubmit';
 import { useBartenderPose } from './useBartenderPose';
 import { saveSnapshot, takeSnapshot } from './bartenderSnapshot';
 import type { Step } from './types';
@@ -26,8 +29,9 @@ export default function BartenderExperience({
   whiskies: Whiskey[];
   curations: Curation[];
 }) {
+  const router = useRouter();
   const journey = useBartenderJourney();
-  const { step, previous, move, back, restart } = journey;
+  const { step, previous } = journey;
   const taste = useTasteRecommendation(whiskies);
   const { answers, recommendation } = taste;
   const reviewDraft = useReviewDraft();
@@ -35,11 +39,12 @@ export default function BartenderExperience({
   const [chosenId, setChosenId] = useState<number | null>(null);
   const [situation, setSituation] = useState<Situation>('home');
   const [curationId, setCurationId] = useState<number | null>(null);
-  const [favoriteNotice, setFavoriteNotice] = useState<FavoriteNotice | null>(
-    null,
-  );
+  const [postedReviewId, setPostedReviewId] = useState<number | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
   const picks = useBartenderPicks();
+  const submit = useReviewSubmit();
   const bartender = useBartenderPose(step);
+  const selected = whiskies.find((whiskey) => whiskey.id === chosenId);
 
   // 다른 페이지에 다녀왔으면 보던 화면으로 돌아온다.
   useEffect(() => {
@@ -51,6 +56,7 @@ export default function BartenderExperience({
     setChosenId(saved.chosenId);
     setSituation(saved.situation);
     setCurationId(saved.curationId);
+    setPostedReviewId(saved.postedReviewId);
   }, []);
   /** 바텐더 노트 밖으로 나가기 직전에 지금 화면을 남겨 둔다. */
   const leave = () => {
@@ -63,7 +69,22 @@ export default function BartenderExperience({
       chosenId,
       situation,
       curationId,
+      postedReviewId,
     });
+  };
+
+  // 바텐더의 알림 대사는 다른 단계로 넘어가면 사라진다.
+  const move = (next: Step) => {
+    setNotice(null);
+    journey.move(next);
+  };
+  const back = () => {
+    setNotice(null);
+    journey.back();
+  };
+  const restart = (next?: Step) => {
+    setNotice(null);
+    journey.restart(next);
   };
 
   const home = () => {
@@ -71,7 +92,6 @@ export default function BartenderExperience({
     taste.reset();
     reviewDraft.reset();
     setChosenId(null);
-    setFavoriteNotice(null);
   };
   const chooseWhiskey = (whiskey: Whiskey, next: Step) => {
     setChosenId(whiskey.id);
@@ -80,15 +100,30 @@ export default function BartenderExperience({
   const toggleFavorite = async (id: number) => {
     try {
       const picked = await picks.toggle(id);
-      setFavoriteNotice(picked ? 'added' : 'removed');
+      setNotice(picked ? 'pick-added' : 'pick-removed');
     } catch {
-      setFavoriteNotice('failed');
+      setNotice('pick-failed');
       return;
     }
     bartender.smile();
   };
+  /** 리뷰가 저장되면 완료 화면으로, 저장하지 못하면 미리보기에 남아 다시 누르게 한다. */
+  const postReview = async () => {
+    if (!selected) return;
+    setNotice(null);
+    try {
+      const { reviewId, ratingSaved } = await submit.mutateAsync({
+        alcoholId: selected.id,
+        review,
+      });
+      setPostedReviewId(reviewId);
+      restart('review-done');
+      if (!ratingSaved) setNotice('rating-failed');
+    } catch {
+      setNotice('review-failed');
+    }
+  };
 
-  const selected = whiskies.find((whiskey) => whiskey.id === chosenId);
   const curation = curations.find((item) => item.id === curationId);
   const pickedItems = picks.items.map((alcohol) => ({
     alcohol,
@@ -106,7 +141,7 @@ export default function BartenderExperience({
     selected,
     curation,
     recommendationReason: recommendation.meta.get(chosenId ?? -1)?.why,
-    favoriteNotice,
+    notice,
     exactCount: exact.length,
     similarCount: similar.length,
     level: answers.level,
@@ -176,10 +211,7 @@ export default function BartenderExperience({
             hasMorePicks: picks.hasMore,
           })}
           curation={curation}
-          onChoose={(whiskey) => {
-            setFavoriteNotice(null);
-            chooseWhiskey(whiskey, 'detail');
-          }}
+          onChoose={(whiskey) => chooseWhiskey(whiskey, 'detail')}
           move={move}
           home={home}
           onLeave={leave}
@@ -216,7 +248,13 @@ export default function BartenderExperience({
         chooseWhiskey={chooseWhiskey}
         lastReviewMode={reviewDraft.lastMode}
         chooseMode={reviewDraft.chooseMode}
-        postReview={() => restart('review-done')}
+        postReview={postReview}
+        isPosting={submit.isPending}
+        onViewPostedReview={() => {
+          if (postedReviewId === null) return;
+          leave();
+          router.push(ROUTES.REVIEW.DETAIL(postedReviewId));
+        }}
         startAnotherReview={() => {
           reviewDraft.startAnother();
           setChosenId(null);

@@ -16,6 +16,7 @@ export type BartenderSnapshot = {
   chosenId: number | null;
   situation: Situation;
   curationId: number | null;
+  postedReviewId: number | null;
 };
 
 export function saveSnapshot(snapshot: BartenderSnapshot) {
