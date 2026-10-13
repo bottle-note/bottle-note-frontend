@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import type { AlcoholLookupItem } from '@/api/alcohol/types';
+import { useEffect, useRef, useState } from 'react';
 import { OptionList, FlowAction } from './FlowControls';
 import BartenderFrame from './BartenderFrame';
 import RecommendationFlow from './RecommendationFlow';
@@ -11,16 +10,10 @@ import { getDialogue, type FavoriteNotice } from './dialogue';
 import { getBackLabel, getStepHeader, getStepPose } from './stepMeta';
 import { useBartenderPicks } from './useBartenderPicks';
 import { useBartenderJourney } from './useBartenderJourney';
+import { useTasteRecommendation } from './useTasteRecommendation';
 import { prefersReducedMotion } from './prefersReducedMotion';
-import {
-  initialAnswers,
-  initialReview,
-  type Answers,
-  type ReviewDraft,
-  type Step,
-} from './types';
+import { initialReview, type ReviewDraft, type Step } from './types';
 import type { Pose } from './BarScene';
-import { evaluateDemoWhiskey } from '../_data/demoSelection';
 import type { Curation, Situation, Whiskey } from '../_data/demo';
 
 export default function BartenderExperience({
@@ -31,12 +24,12 @@ export default function BartenderExperience({
   curations: Curation[];
 }) {
   const { step, previous, move, back, restart } = useBartenderJourney();
-  const [answers, setAnswers] = useState<Answers>(initialAnswers);
+  const taste = useTasteRecommendation(whiskies);
+  const { answers, recommendation } = taste;
   const [review, setReview] = useState<ReviewDraft>(initialReview);
   const [chosenId, setChosenId] = useState<number | null>(null);
   const [situation, setSituation] = useState<Situation>('home');
   const [curationId, setCurationId] = useState<number | null>(null);
-  const [likedLookups, setLikedLookups] = useState<AlcoholLookupItem[]>([]);
   const [heldPose, setHeldPose] = useState<Pose | null>(null);
   const [favoriteNotice, setFavoriteNotice] = useState<FavoriteNotice | null>(
     null,
@@ -65,14 +58,11 @@ export default function BartenderExperience({
 
   const home = () => {
     restart();
-    setAnswers(initialAnswers);
-    setLikedLookups([]);
+    taste.reset();
     setReview(initialReview);
     setChosenId(null);
     setFavoriteNotice(null);
   };
-  const updateAnswers = (value: Partial<Answers>) =>
-    setAnswers((current) => ({ ...current, ...value }));
   const updateReview = (value: Partial<ReviewDraft>) =>
     setReview((current) => ({ ...current, ...value }));
   const chooseWhiskey = (whiskey: Whiskey, next: Step) => {
@@ -102,38 +92,7 @@ export default function BartenderExperience({
     alcohol,
     whiskey: whiskies.find((whiskey) => whiskey.id === alcohol.alcoholId),
   }));
-  // 서버 결과를 연결하기 전까지 결과와 조건 이탈 UI를 확인하는 데모 평가.
-  const evaluated = useMemo(
-    () =>
-      whiskies
-        .filter((whiskey) => !answers.likedIds.includes(whiskey.id))
-        .map((whiskey) => ({
-          whiskey,
-          meta: evaluateDemoWhiskey(whiskey, answers),
-        })),
-    [answers, whiskies],
-  );
-  const exact = evaluated
-    .filter(({ meta }) => meta.miss.length === 0)
-    .sort((a, b) => b.meta.score - a.meta.score);
-  const nearCandidates = evaluated.filter(
-    ({ meta }) =>
-      meta.miss.length > 0 &&
-      !meta.miss.some((label) => /예산|가격/.test(label)),
-  );
-  const leastMisses = Math.min(
-    ...nearCandidates.map(({ meta }) => meta.miss.length),
-  );
-  const similar = nearCandidates
-    .filter(({ meta }) => meta.miss.length === leastMisses)
-    .sort(
-      (a, b) =>
-        a.meta.miss.length - b.meta.miss.length || b.meta.score - a.meta.score,
-    )
-    .slice(0, 10);
-  const recommendationMeta = new Map(
-    evaluated.map(({ whiskey, meta }) => [whiskey.id, meta]),
-  );
+  const { exact, similar } = recommendation;
   const listed =
     step === 'curation-list'
       ? curation?.whiskeyIds
@@ -143,45 +102,27 @@ export default function BartenderExperience({
         ? []
         : step === 'similar' ||
             (step === 'recommendations' && exact.length === 0)
-          ? similar.map(({ whiskey }) => whiskey)
-          : exact.slice(0, 10).map(({ whiskey }) => whiskey);
+          ? similar
+          : exact.slice(0, 10);
 
   const header = getStepHeader(step, {
     curationTitle: curation?.title,
     reviewMode: review.mode,
   });
   const pose = heldPose ?? getStepPose(step);
-  const likedBase = whiskies.find(
-    (whiskey) =>
-      answers.likedIds.includes(whiskey.id) &&
-      (answers.kind === '상관없어요' || whiskey.category === answers.kind),
-  );
-  const likedLookupBase = likedLookups.find(
-    (item) =>
-      answers.likedIds.includes(item.alcoholId) &&
-      (answers.kind === '상관없어요' ||
-        {
-          SINGLE_MALT: '싱글 몰트',
-          BLEND: '블렌디드',
-          BLENDED_MALT: '블렌디드',
-          BOURBON: '버번',
-          RYE: '라이',
-          OTHER: '',
-        }[item.categoryGroup] === answers.kind),
-  );
   const dialogueLines = getDialogue({
     step,
     detailOrigin: previous,
     selected,
     curation,
-    recommendationReason: recommendationMeta.get(chosenId ?? -1)?.why,
+    recommendationReason: recommendation.meta.get(chosenId ?? -1)?.why,
     favoriteNotice,
     exactCount: exact.length,
     similarCount: similar.length,
     level: answers.level,
     kind: answers.kind,
     likedCount: answers.likedIds.length,
-    baseWhiskeyName: likedBase?.name ?? likedLookupBase?.korName,
+    baseWhiskeyName: taste.baseWhiskeyName,
   });
 
   return (
@@ -227,20 +168,14 @@ export default function BartenderExperience({
       <RecommendationFlow
         step={step}
         answers={answers}
-        updateAnswers={updateAnswers}
+        updateAnswers={taste.updateAnswers}
         whiskies={whiskies}
-        likedLookups={likedLookups}
-        rememberLookup={(item) =>
-          setLikedLookups((current) =>
-            current.some((saved) => saved.alcoholId === item.alcoholId)
-              ? current
-              : [...current, item],
-          )
-        }
+        likedLookups={taste.likedLookups}
+        rememberLookup={taste.rememberLookup}
         listed={listed}
         exactCount={exact.length}
         similarCount={similar.length}
-        recommendationMeta={recommendationMeta}
+        recommendationMeta={recommendation.meta}
         selected={selected}
         curation={curation}
         pickedItems={pickedItems}

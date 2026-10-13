@@ -109,3 +109,49 @@ export function evaluateDemoWhiskey(
       : `${whiskey.name}, 말씀하신 조건에 맞는 병이에요.`;
   return { miss, hit, score, why };
 }
+
+export type DemoRecommendation = {
+  /** 모든 조건에 맞는 술. 점수가 높은 순서다. */
+  exact: Whiskey[];
+  /** 예산은 맞고 다른 조건이 가장 적게 어긋난 술. 점수가 높은 순서로 10병까지. */
+  similar: Whiskey[];
+  /** 술 id별 맞은 조건, 어긋난 조건, 추천 이유. */
+  meta: Map<number, RecommendationMeta>;
+};
+
+// 서버 추천이 연결되기 전까지 결과와 조건 이탈 화면을 확인하기 위한 데모 추천이다.
+export function recommendDemoWhiskies(
+  whiskies: Whiskey[],
+  answers: Answers,
+): DemoRecommendation {
+  const evaluated = whiskies
+    .filter((whiskey) => !answers.likedIds.includes(whiskey.id))
+    .map((whiskey) => ({
+      whiskey,
+      meta: evaluateDemoWhiskey(whiskey, answers),
+    }));
+  const byScore = (
+    a: (typeof evaluated)[number],
+    b: (typeof evaluated)[number],
+  ) => b.meta.score - a.meta.score;
+
+  const exact = evaluated
+    .filter(({ meta }) => meta.miss.length === 0)
+    .sort(byScore);
+  const near = evaluated.filter(
+    ({ meta }) =>
+      meta.miss.length > 0 &&
+      !meta.miss.some((label) => /예산|가격/.test(label)),
+  );
+  const fewestMisses = Math.min(...near.map(({ meta }) => meta.miss.length));
+  const similar = near
+    .filter(({ meta }) => meta.miss.length === fewestMisses)
+    .sort(byScore)
+    .slice(0, 10);
+
+  return {
+    exact: exact.map(({ whiskey }) => whiskey),
+    similar: similar.map(({ whiskey }) => whiskey),
+    meta: new Map(evaluated.map(({ whiskey, meta }) => [whiskey.id, meta])),
+  };
+}
