@@ -21,11 +21,18 @@ export function useBartenderJourney() {
     setStep(next);
   };
 
+  const restore = (saved: { step: Step; history: Step[] }) => {
+    setStep(saved.step);
+    setHistory(saved.history);
+  };
+
   return {
     step,
+    history,
     previous: history[history.length - 1] as Step | undefined,
     move,
     back,
     restart,
+    restore,
   };
 }

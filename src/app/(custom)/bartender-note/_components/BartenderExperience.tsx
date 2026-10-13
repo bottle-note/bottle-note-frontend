@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { OptionList, FlowAction } from './FlowControls';
 import BartenderFrame from './BartenderFrame';
 import RecommendationFlow from './RecommendationFlow';
@@ -15,6 +15,7 @@ import { useBartenderJourney } from './useBartenderJourney';
 import { useTasteRecommendation } from './useTasteRecommendation';
 import { useReviewDraft } from './useReviewDraft';
 import { useBartenderPose } from './useBartenderPose';
+import { saveSnapshot, takeSnapshot } from './bartenderSnapshot';
 import type { Step } from './types';
 import type { Curation, Situation, Whiskey } from '../_data/demo';
 
@@ -25,7 +26,8 @@ export default function BartenderExperience({
   whiskies: Whiskey[];
   curations: Curation[];
 }) {
-  const { step, previous, move, back, restart } = useBartenderJourney();
+  const journey = useBartenderJourney();
+  const { step, previous, move, back, restart } = journey;
   const taste = useTasteRecommendation(whiskies);
   const { answers, recommendation } = taste;
   const reviewDraft = useReviewDraft();
@@ -38,6 +40,31 @@ export default function BartenderExperience({
   );
   const picks = useBartenderPicks();
   const bartender = useBartenderPose(step);
+
+  // 다른 페이지에 다녀왔으면 보던 화면으로 돌아온다.
+  useEffect(() => {
+    const saved = takeSnapshot();
+    if (!saved) return;
+    journey.restore(saved.journey);
+    taste.restore(saved);
+    reviewDraft.restore(saved.review, saved.lastReviewMode);
+    setChosenId(saved.chosenId);
+    setSituation(saved.situation);
+    setCurationId(saved.curationId);
+  }, []);
+  /** 바텐더 노트 밖으로 나가기 직전에 지금 화면을 남겨 둔다. */
+  const leave = () => {
+    saveSnapshot({
+      journey: { step, history: journey.history },
+      answers,
+      likedLookups: taste.likedLookups,
+      review: { ...review, photos: [] },
+      lastReviewMode: reviewDraft.lastMode,
+      chosenId,
+      situation,
+      curationId,
+    });
+  };
 
   const home = () => {
     restart();
@@ -155,6 +182,7 @@ export default function BartenderExperience({
           }}
           move={move}
           home={home}
+          onLeave={leave}
         />
       )}
       {step === 'detail' && selected && (
@@ -165,6 +193,7 @@ export default function BartenderExperience({
           onTogglePick={() => toggleFavorite(selected.id)}
           onWriteReview={() => move('review-mode')}
           onBack={back}
+          onLeave={leave}
         />
       )}
       <CurationFlow

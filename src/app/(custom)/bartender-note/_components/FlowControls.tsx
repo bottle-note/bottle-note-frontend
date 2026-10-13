@@ -83,14 +83,20 @@ export function FlowLink({
   href,
   children,
   primary = false,
+  onClick,
 }: {
   href: string;
   children: ReactNode;
   primary?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <DockItem>
-      <Link className={flowLinkClassName(primary)} href={href}>
+      <Link
+        className={flowLinkClassName(primary)}
+        href={href}
+        onClick={onClick}
+      >
         {children}
       </Link>
     </DockItem>

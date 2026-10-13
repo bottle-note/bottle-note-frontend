@@ -16,6 +16,18 @@ export function useReviewDraft() {
   const startAnother = () =>
     setReview({ ...initialReview, place: review.place, mode: lastMode });
   const reset = () => setReview(initialReview);
+  const restore = (saved: ReviewDraft, savedMode: ReviewDraft['mode']) => {
+    setReview(saved);
+    setLastMode(savedMode);
+  };
 
-  return { review, updateReview, lastMode, chooseMode, startAnother, reset };
+  return {
+    review,
+    updateReview,
+    lastMode,
+    chooseMode,
+    startAnother,
+    reset,
+    restore,
+  };
 }

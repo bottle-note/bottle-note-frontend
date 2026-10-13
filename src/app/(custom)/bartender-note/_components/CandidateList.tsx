@@ -133,6 +133,7 @@ export default function CandidateList({
   onChoose,
   move,
   home,
+  onLeave,
 }: {
   step: CandidateStep;
   candidates: Candidates;
@@ -140,6 +141,8 @@ export default function CandidateList({
   onChoose: (whiskey: Whiskey) => void;
   move: (next: Step) => void;
   home: () => void;
+  /** 바텐더 노트 밖의 페이지로 나가기 직전에 부른다. */
+  onLeave: () => void;
 }) {
   const { heading, conditions, items, emptyText, priceUnit } = candidates;
   return (
@@ -173,6 +176,7 @@ export default function CandidateList({
             <Link
               key={item.alcohol.alcoholId}
               href={ROUTES.ALCOHOL.DETAIL(item.alcohol.alcoholId)}
+              onClick={onLeave}
               className="flex min-h-74 w-full items-center gap-12 border-b border-stroke-neutral-subtle py-10 text-left text-fg-neutral transition-colors hover:text-fg-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
             >
               <b className="w-14 text-13 text-fg-brand">{index + 1}</b>
@@ -209,7 +213,7 @@ export default function CandidateList({
         </FlowAction>
       )}
       {step === 'curation-list' && curation && (
-        <FlowLink href={ROUTES.CURATION.DETAIL(curation.id)}>
+        <FlowLink href={ROUTES.CURATION.DETAIL(curation.id)} onClick={onLeave}>
           큐레이션 전체 보기
         </FlowLink>
       )}

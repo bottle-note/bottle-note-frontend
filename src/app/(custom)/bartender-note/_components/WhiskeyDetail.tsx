@@ -12,6 +12,7 @@ export default function WhiskeyDetail({
   onTogglePick,
   onWriteReview,
   onBack,
+  onLeave,
 }: {
   whiskey: Whiskey;
   isPicked: boolean;
@@ -19,6 +20,8 @@ export default function WhiskeyDetail({
   onTogglePick: () => void;
   onWriteReview: () => void;
   onBack: () => void;
+  /** 실제 술 상세 페이지로 나가기 직전에 부른다. */
+  onLeave: () => void;
 }) {
   const [showAllTags, setShowAllTags] = useState(false);
   const action = (
@@ -85,7 +88,11 @@ export default function WhiskeyDetail({
           </p>
         )}
       </div>
-      <FlowLink primary href={ROUTES.ALCOHOL.DETAIL(whiskey.id)}>
+      <FlowLink
+        primary
+        href={ROUTES.ALCOHOL.DETAIL(whiskey.id)}
+        onClick={onLeave}
+      >
         자세히 볼게요
       </FlowLink>
       <div className="grid grid-cols-2 gap-6">

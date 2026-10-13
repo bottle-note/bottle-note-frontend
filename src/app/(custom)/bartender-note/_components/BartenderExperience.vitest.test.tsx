@@ -240,6 +240,7 @@ async function openHomeCurationDetail(name: string) {
 beforeEach(() => {
   vi.restoreAllMocks();
   back.mockClear();
+  window.sessionStorage.clear();
   serverPicks = [];
   stubPickApi();
   // 모션 줄이기 환경에서는 인사 동작과 타자 효과 없이 대사와 선택지가 바로 보인다.
@@ -516,6 +517,39 @@ describe('바텐더 노트 리뷰', () => {
 });
 
 describe('바텐더 노트 공통 이동', () => {
+  it('술 상세 페이지에 다녀오면 보던 술 상세로 돌아오고 이전 목록으로 갈 수 있다', async () => {
+    const { unmount } = renderExperience();
+    await openHomeCurationDetail('글렌피딕 12년');
+
+    fireEvent.click(screen.getByRole('link', { name: '자세히 볼게요' }));
+    unmount();
+    renderExperience();
+
+    expect(
+      await screen.findByRole('heading', { name: '글렌피딕 12년' }),
+    ).toBeInTheDocument();
+    await press('‹ 후보 목록으로');
+    expect(
+      await screen.findByRole('button', { name: /조니워커 블랙/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('다른 페이지에 다녀온 지 30분이 지나면 처음 화면부터 시작한다', async () => {
+    const now = Date.now();
+    vi.spyOn(Date, 'now').mockReturnValue(now);
+    const { unmount } = renderExperience();
+    await openHomeCurationDetail('글렌피딕 12년');
+
+    fireEvent.click(screen.getByRole('link', { name: '자세히 볼게요' }));
+    unmount();
+    vi.spyOn(Date, 'now').mockReturnValue(now + 31 * 60 * 1000);
+    renderExperience();
+
+    expect(
+      await screen.findByRole('button', { name: /^위스키 추천해 주세요/ }),
+    ).toBeInTheDocument();
+  });
+
   it('뒤로 가기는 이전 질문으로, 닫기는 처음 화면으로 돌아간다', async () => {
     renderExperience();
 

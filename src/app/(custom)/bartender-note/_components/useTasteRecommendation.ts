@@ -50,6 +50,13 @@ export function useTasteRecommendation(whiskies: Whiskey[]) {
     setAnswers(initialAnswers);
     setLikedLookups([]);
   };
+  const restore = (saved: {
+    answers: Answers;
+    likedLookups: AlcoholLookupItem[];
+  }) => {
+    setAnswers(saved.answers);
+    setLikedLookups(saved.likedLookups);
+  };
 
   return {
     answers,
@@ -59,5 +66,6 @@ export function useTasteRecommendation(whiskies: Whiskey[]) {
     recommendation,
     baseWhiskeyName,
     reset,
+    restore,
   };
 }
