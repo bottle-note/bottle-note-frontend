@@ -1,28 +1,72 @@
 import type { Step } from './types';
 import type { Curation, Whiskey } from '../_data/demo';
 
-export function getDialogue(
-  step: Step,
-  exactCount: number,
-  curation?: Curation,
-  selected?: Whiskey,
-  recommendationReason?: string,
-  similarCount = 0,
-) {
+export type FavoriteNotice = 'added' | 'removed';
+
+export type DialogueInput = {
+  step: Step;
+  /** 상세 직전 단계. 추천 이유와 큐레이션 설명 중 무엇을 말할지 정한다. */
+  detailOrigin?: Step;
+  selected?: Whiskey;
+  curation?: Curation;
+  /** 추천 목록에서 고른 술의 추천 이유 */
+  recommendationReason?: string;
+  favoriteNotice?: FavoriteNotice | null;
+  exactCount: number;
+  similarCount: number;
+  level: string;
+  kind: string;
+  likedCount: number;
+  /** 마셔본 술 중 고른 종류에 맞는 술 이름 */
+  baseWhiskeyName?: string;
+};
+
+const favoriteNotices: Record<FavoriteNotice, string> = {
+  added: '찜해 두었습니다. 처음 화면에서 다시 볼 수 있어요.',
+  removed: '찜에서 뺐습니다.',
+};
+
+function detailReason({
+  detailOrigin,
+  selected,
+  curation,
+  recommendationReason,
+}: DialogueInput) {
+  if (!selected) return undefined;
+  if (detailOrigin === 'curation-list')
+    return `「${curation?.title}」에 담긴 병이에요.\n${selected.tags.slice(0, 2).join('·')} 향이 중심입니다.`;
+  if (detailOrigin === 'recommendations' || detailOrigin === 'similar')
+    return recommendationReason;
+  return undefined;
+}
+
+function axisLine({ baseWhiskeyName, likedCount, kind }: DialogueInput) {
+  if (baseWhiskeyName)
+    return `「${baseWhiskeyName}」을 기준으로 잡을게요.\n오늘은 어떤 결로 가실까요?`;
+  if (likedCount > 0 && kind !== '상관없어요')
+    return `${kind} 중에선 어떤 결로 드릴까요?\n한 가지만 잡으면 나머지는 제가 맞춰 드립니다.`;
+  return '오늘은 어떤 결로 가실까요?\n한 가지만 잡으면 나머지는 제가 맞춰 드립니다.';
+}
+
+export function getDialogue(input: DialogueInput): string[] {
+  const { step, exactCount, similarCount, curation, selected, level } = input;
+  if (step === 'detail' && input.favoriteNotice)
+    return [favoriteNotices[input.favoriteNotice]];
+  const reason = detailReason(input);
   const dialogue: Record<Step, string[]> = {
     intro: [
       '어서 오십시오. 편한 자리에 앉으시면 됩니다.\n오늘은 어떻게 도와드릴까요?',
     ],
     level: ['알겠습니다.\n위스키는 얼마나 드셔보셨어요?'],
     likes: [
-      '드셔본 술이 있으면 알려 주세요.\n최대 세 병까지 고르거나 건너뛰셔도 됩니다.',
+      level === '위스키 잘 몰라요'
+        ? '드셔본 게 없으시면 그냥 넘어가셔도 됩니다.\n혹시 이름만 들어본 술이라도 있으신가요?'
+        : '그중에 괜찮았던 게 있나요?\n이름을 적으시면 그 결에 가까운 쪽으로 찾아드려요.',
     ],
     kind: [
       '종류는 어떤 쪽이 좋으세요?\n잘 모르시면 상관없어요로 두셔도 됩니다.',
     ],
-    axis: [
-      '오늘은 어떤 결로 가실까요?\n한 가지만 잡으면 나머지는 제가 맞춰 드립니다.',
-    ],
+    axis: [axisLine(input)],
     abv: [
       '도수는 어느 정도가 좋으신가요?\n높을수록 향은 진하지만 부담도 큽니다.',
     ],
@@ -50,7 +94,7 @@ export function getDialogue(
     favorites: ['찜해 둔 술입니다.\n오늘은 어느 쪽으로 드릴까요?'],
     detail: [
       selected
-        ? recommendationReason ??
+        ? reason ??
           `${selected.name}, 좋은 선택입니다.\n향과 정보를 살펴보세요.`
         : '한 병 골라 보세요.',
     ],

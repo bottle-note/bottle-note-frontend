@@ -10,7 +10,8 @@ import BartenderFrame from './BartenderFrame';
 import RecommendationFlow from './RecommendationFlow';
 import CurationFlow from './CurationFlow';
 import ReviewFlow from './ReviewFlow';
-import { getDialogue } from './dialogue';
+import { getDialogue, type FavoriteNotice } from './dialogue';
+import { getBackLabel, getStepHeader, getStepPose } from './stepMeta';
 import {
   initialAnswers,
   initialReview,
@@ -21,15 +22,6 @@ import {
 import type { Pose } from './BarScene';
 import { evaluateDemoWhiskey } from '../_data/demoSelection';
 import type { Curation, Situation, Whiskey } from '../_data/demo';
-
-const questionSteps: Step[] = [
-  'level',
-  'likes',
-  'kind',
-  'axis',
-  'abv',
-  'price',
-];
 
 export default function BartenderExperience({
   whiskies,
@@ -52,7 +44,9 @@ export default function BartenderExperience({
   const [tagQuery, setTagQuery] = useState('');
   const [favorites, setFavorites] = useState<number[]>([]);
   const [heldPose, setHeldPose] = useState<Pose | null>(null);
-  const [favoriteMessage, setFavoriteMessage] = useState('');
+  const [favoriteNotice, setFavoriteNotice] = useState<FavoriteNotice | null>(
+    null,
+  );
   const [lastReviewMode, setLastReviewMode] =
     useState<ReviewDraft['mode']>('quick');
   const favoritePoseTimer = useRef<number | null>(null);
@@ -135,7 +129,7 @@ export default function BartenderExperience({
     setChosenId(null);
     setQuery('');
     setTagQuery('');
-    setFavoriteMessage('');
+    setFavoriteNotice(null);
   };
   const updateAnswers = (value: Partial<Answers>) =>
     setAnswers((current) => ({ ...current, ...value }));
@@ -155,11 +149,7 @@ export default function BartenderExperience({
     } catch {
       /* 메모리 상태 유지 */
     }
-    setFavoriteMessage(
-      next.includes(id)
-        ? '찜해 두었습니다. 처음 화면에서 다시 볼 수 있어요.'
-        : '찜에서 뺐습니다.',
-    );
+    setFavoriteNotice(next.includes(id) ? 'added' : 'removed');
     setHeldPose('smile');
     if (favoritePoseTimer.current !== null)
       window.clearTimeout(favoritePoseTimer.current);
@@ -235,87 +225,11 @@ export default function BartenderExperience({
       );
     });
 
-  const questionProgress = questionSteps.indexOf(step);
-  const reviewSteps: Step[] = [
-    'review-mode',
-    ...(review.mode === 'quick'
-      ? (['review-text'] as Step[])
-      : (['review-nose', 'review-palate', 'review-finish'] as Step[])),
-    'review-graph',
-    'review-photo',
-    'review-rating',
-    'review-where',
-    'review-preview',
-    'review-done',
-    'review-posted-detail',
-  ];
-  const reviewProgress = reviewSteps.indexOf(step);
-  const isReview = step.startsWith('review-');
-  const reviewSubtitle: Partial<Record<Step, string>> = {
-    'review-pick': '어떤 술인가요',
-    'review-mode': '어떻게 남길까요',
-    'review-text': '코멘트',
-    'review-nose': '노즈 1 / 3',
-    'review-palate': '팔레트 2 / 3',
-    'review-finish': '피니시 3 / 3',
-    'review-graph': '테이스팅 노트',
-    'review-photo': '사진',
-    'review-rating': '별점',
-    'review-where': '장소',
-    'review-preview': '다 됐습니다',
-    'review-done': '등록 완료',
-    'review-posted-detail': '내 리뷰',
-  };
-  const headerTitle = isReview
-    ? '리뷰 쓰기'
-    : step === 'situation' || step === 'curations' || step === 'curation-empty'
-      ? '상황별 추천'
-      : step === 'detail'
-        ? '오늘의 한 잔'
-        : step === 'favorites'
-          ? '찜한 술'
-          : step === 'recommendations' ||
-              step === 'similar' ||
-              step === 'curation-list'
-            ? '바텐더 추천'
-            : '바텐더 노트';
-  const headerSubtitle =
-    questionProgress >= 0
-      ? `질문 ${questionProgress + 1} / 6`
-      : isReview
-        ? reviewSubtitle[step] ?? ''
-        : step === 'curations'
-          ? '상황별 큐레이션'
-          : step === 'curation-list'
-            ? curation?.title ?? ''
-            : '';
-  const progress =
-    step === 'review-done' || step === 'review-posted-detail'
-      ? 100
-      : questionProgress >= 0
-        ? ((questionProgress + 1) / questionSteps.length) * 100
-        : reviewProgress >= 0
-          ? ((reviewProgress + 1) / reviewSteps.length) * 100
-          : step === 'recommendations' || step === 'curation-list'
-            ? 100
-            : 0;
-  const pose: Pose =
-    heldPose ??
-    (step === 'intro'
-      ? 'greet'
-      : step === 'detail' || step === 'review-mode'
-        ? 'serve'
-        : step === 'review-nose'
-          ? 'nose'
-          : step === 'review-done'
-            ? 'toast'
-            : step === 'likes' ||
-                step === 'situation' ||
-                step === 'recommendations'
-              ? 'think'
-              : step === 'curation-empty'
-                ? 'bow'
-                : 'idle');
+  const header = getStepHeader(step, {
+    curationTitle: curation?.title,
+    reviewMode: review.mode,
+  });
+  const pose = heldPose ?? getStepPose(step);
   const likedBase = whiskies.find(
     (whiskey) =>
       answers.likedIds.includes(whiskey.id) &&
@@ -334,54 +248,31 @@ export default function BartenderExperience({
           OTHER: '',
         }[item.categoryGroup] === answers.kind),
   );
-  const dialogueLines =
-    favoriteMessage && step === 'detail'
-      ? [favoriteMessage]
-      : step === 'likes'
-        ? [
-            answers.level === '위스키 잘 몰라요'
-              ? '드셔본 게 없으시면 그냥 넘어가셔도 됩니다.\n혹시 이름만 들어본 술이라도 있으신가요?'
-              : '그중에 괜찮았던 게 있나요?\n이름을 적으시면 그 결에 가까운 쪽으로 찾아드려요.',
-          ]
-        : step === 'axis' && (likedBase || likedLookupBase)
-          ? [
-              `「${likedBase?.name ?? likedLookupBase?.korName}」을 기준으로 잡을게요.\n오늘은 어떤 결로 가실까요?`,
-            ]
-          : step === 'axis' &&
-              answers.likedIds.length > 0 &&
-              answers.kind !== '상관없어요'
-            ? [
-                `${answers.kind} 중에선 어떤 결로 드릴까요?\n한 가지만 잡으면 나머지는 제가 맞춰 드립니다.`,
-              ]
-            : getDialogue(
-                step,
-                exact.length,
-                curation,
-                selected,
-                detailOrigin === 'curation-list' && selected
-                  ? `「${curation?.title}」에 담긴 병이에요.\n${selected.tags.slice(0, 2).join('·')} 향이 중심입니다.`
-                  : detailOrigin === 'recommendations' ||
-                      detailOrigin === 'similar'
-                    ? recommendationMeta.get(chosenId ?? -1)?.why
-                    : undefined,
-                similar.length,
-              );
+  const dialogueLines = getDialogue({
+    step,
+    detailOrigin,
+    selected,
+    curation,
+    recommendationReason: recommendationMeta.get(chosenId ?? -1)?.why,
+    favoriteNotice,
+    exactCount: exact.length,
+    similarCount: similar.length,
+    level: answers.level,
+    kind: answers.kind,
+    likedCount: answers.likedIds.length,
+    baseWhiskeyName: likedBase?.name ?? likedLookupBase?.korName,
+  });
 
   return (
     <BartenderFrame
       step={step}
-      title={headerTitle}
-      subtitle={headerSubtitle}
-      progress={progress}
+      title={header.title}
+      subtitle={header.subtitle}
+      progress={header.progress}
       lines={dialogueLines}
       pose={pose}
       onBack={history.length > 0 ? back : undefined}
-      backLabel={
-        questionProgress >= 0 &&
-        questionSteps.includes(history[history.length - 1])
-          ? '이전 질문'
-          : '이전 단계'
-      }
+      backLabel={getBackLabel(step, history[history.length - 1])}
       onClose={home}
     >
       {step === 'intro' && (
@@ -452,7 +343,7 @@ export default function BartenderExperience({
         back={back}
         chooseWhiskey={chooseWhiskey}
         toggleFavorite={toggleFavorite}
-        onSelectDetail={() => setFavoriteMessage('')}
+        onSelectDetail={() => setFavoriteNotice(null)}
       />
       <CurationFlow
         step={step}
