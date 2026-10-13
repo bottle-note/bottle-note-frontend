@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { OptionList, FlowAction } from './FlowControls';
 import BartenderFrame from './BartenderFrame';
 import RecommendationFlow from './RecommendationFlow';
+import CandidateList, { getCandidates, isCandidateStep } from './CandidateList';
+import WhiskeyDetail from './WhiskeyDetail';
 import CurationFlow from './CurationFlow';
 import ReviewFlow from './ReviewFlow';
 import { getDialogue, type FavoriteNotice } from './dialogue';
@@ -93,17 +95,6 @@ export default function BartenderExperience({
     whiskey: whiskies.find((whiskey) => whiskey.id === alcohol.alcoholId),
   }));
   const { exact, similar } = recommendation;
-  const listed =
-    step === 'curation-list'
-      ? curation?.whiskeyIds
-          .map((id) => whiskies.find((whiskey) => whiskey.id === id))
-          .filter((item): item is Whiskey => Boolean(item)) ?? []
-      : step === 'favorites'
-        ? []
-        : step === 'similar' ||
-            (step === 'recommendations' && exact.length === 0)
-          ? similar
-          : exact.slice(0, 10);
 
   const header = getStepHeader(step, {
     curationTitle: curation?.title,
@@ -172,23 +163,38 @@ export default function BartenderExperience({
         whiskies={whiskies}
         likedLookups={taste.likedLookups}
         rememberLookup={taste.rememberLookup}
-        listed={listed}
-        exactCount={exact.length}
-        similarCount={similar.length}
-        recommendationMeta={recommendation.meta}
-        selected={selected}
-        curation={curation}
-        pickedItems={pickedItems}
-        hasMorePicks={picks.hasMore}
-        isPicked={picks.isPicked}
-        isTogglingPick={picks.isToggling}
         move={move}
-        home={home}
-        back={back}
-        chooseWhiskey={chooseWhiskey}
-        toggleFavorite={toggleFavorite}
-        onSelectDetail={() => setFavoriteNotice(null)}
       />
+      {isCandidateStep(step) && (
+        <CandidateList
+          step={step}
+          candidates={getCandidates(step, {
+            recommendation,
+            answers,
+            curation,
+            whiskies,
+            pickedItems,
+            hasMorePicks: picks.hasMore,
+          })}
+          curation={curation}
+          onChoose={(whiskey) => {
+            setFavoriteNotice(null);
+            chooseWhiskey(whiskey, 'detail');
+          }}
+          move={move}
+          home={home}
+        />
+      )}
+      {step === 'detail' && selected && (
+        <WhiskeyDetail
+          whiskey={selected}
+          isPicked={picks.isPicked(selected.id)}
+          isTogglingPick={picks.isToggling}
+          onTogglePick={() => toggleFavorite(selected.id)}
+          onWriteReview={() => move('review-mode')}
+          onBack={back}
+        />
+      )}
       <CurationFlow
         step={step}
         curations={curations}

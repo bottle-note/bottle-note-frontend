@@ -1,15 +1,8 @@
-import { useState } from 'react';
-import Link from 'next/link';
-import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import type { AlcoholLookupItem } from '@/api/alcohol/types';
-import { ROUTES } from '@/constants/routes';
 import type { Answers, Step } from './types';
-import { OptionList, FlowAction, FlowLink } from './FlowControls';
-import { WhiskeyImage, WhiskeyRow } from './WhiskeyRow';
+import { OptionList } from './FlowControls';
 import LikesStep from './LikesStep';
-import type { PickedAlcohol } from './useBartenderPicks';
-import type { Curation, Whiskey } from '../_data/demo';
-import type { RecommendationMeta } from '../_data/demoSelection';
+import type { Whiskey } from '../_data/demo';
 
 const levels = [
   ['위스키 잘 몰라요', '무난하고 평이 좋은 쪽으로 골라 드려요'],
@@ -69,25 +62,10 @@ type Props = {
   whiskies: Whiskey[];
   likedLookups: AlcoholLookupItem[];
   rememberLookup: (item: AlcoholLookupItem) => void;
-  listed: Whiskey[];
-  exactCount: number;
-  similarCount: number;
-  recommendationMeta: Map<number, RecommendationMeta>;
-  selected?: Whiskey;
-  curation?: Curation;
-  /** 서버 찜 목록. 데모에 있는 술이면 whiskey가 함께 온다. */
-  pickedItems: { alcohol: PickedAlcohol; whiskey?: Whiskey }[];
-  hasMorePicks: boolean;
-  isPicked: (id: number) => boolean;
-  isTogglingPick: boolean;
   move: (next: Step) => void;
-  home: () => void;
-  back: () => void;
-  chooseWhiskey: (whiskey: Whiskey, next: Step) => void;
-  toggleFavorite: (id: number) => void;
-  onSelectDetail: () => void;
 };
 
+/** 취향 질문 여섯 가지. 답을 고르면 다음 질문으로, 마지막 답이면 추천으로 간다. */
 export default function RecommendationFlow({
   step,
   answers,
@@ -95,36 +73,10 @@ export default function RecommendationFlow({
   whiskies,
   likedLookups,
   rememberLookup,
-  listed,
-  exactCount,
-  similarCount,
-  recommendationMeta,
-  selected,
-  curation,
-  pickedItems,
-  hasMorePicks,
-  isPicked,
-  isTogglingPick,
   move,
-  home,
-  back,
-  chooseWhiskey,
-  toggleFavorite,
-  onSelectDetail,
 }: Props) {
-  const [showAllTags, setShowAllTags] = useState(false);
   const optionList = (items: Parameters<typeof OptionList>[0]['items']) => (
     <OptionList items={items} />
-  );
-  const action = (
-    label: string,
-    onClick: () => void,
-    primary = false,
-    disabled = false,
-  ) => (
-    <FlowAction onClick={onClick} primary={primary} disabled={disabled}>
-      {label}
-    </FlowAction>
   );
   return (
     <>
@@ -217,219 +169,6 @@ export default function RecommendationFlow({
               },
             })),
           )}
-        </>
-      )}
-      {(step === 'recommendations' ||
-        step === 'similar' ||
-        step === 'curation-list' ||
-        step === 'favorites') && (
-        <>
-          <p className="m-0 text-13 font-extrabold text-fg-brand">
-            {step === 'curation-list'
-              ? curation?.title
-              : step === 'favorites'
-                ? `찜한 술 ${pickedItems.length}${hasMorePicks ? '병 이상' : '병'}`
-                : step === 'recommendations' &&
-                    exactCount === 0 &&
-                    listed.length === 0
-                  ? '추천할 술이 없어요'
-                  : step === 'similar' ||
-                      (step === 'recommendations' && exactCount === 0)
-                    ? '비슷한 술'
-                    : `추천 ${listed.length}병`}
-          </p>
-          {step === 'recommendations' && exactCount > 0 && (
-            <p className="m-0 text-13 text-fg-neutral-muted">
-              {[
-                answers.kind !== '상관없어요' ? answers.kind : '',
-                answers.axis !== '상관없어요' ? answers.axis : '',
-                answers.abv !== '상관없어요' ? answers.abv.split(' · ')[0] : '',
-                answers.price !== '상관없어요' ? answers.price : '',
-              ]
-                .filter(Boolean)
-                .join(' · ')}
-            </p>
-          )}
-          {step === 'favorites' && pickedItems.length === 0 && (
-            <p className="text-15 text-fg-neutral">찜한 술이 없어요.</p>
-          )}
-          {step !== 'favorites' && listed.length === 0 && (
-            <p className="text-15 text-fg-neutral">
-              보여 드릴 병이 없어요. 조건을 바꿔 다시 골라 볼까요?
-            </p>
-          )}
-          <p className="m-0 text-13 text-fg-neutral-muted">
-            술을 누르면{' '}
-            {step === 'curation-list' || step === 'favorites'
-              ? '자세한 정보'
-              : '추천 이유와 자세한 정보'}
-            를 볼 수 있어요.
-          </p>
-          {step === 'favorites' && (
-            <div className="flex flex-col">
-              {pickedItems.map(({ alcohol, whiskey }, index) =>
-                whiskey ? (
-                  <WhiskeyRow
-                    key={alcohol.alcoholId}
-                    whiskey={whiskey}
-                    rank={index + 1}
-                    showPrice
-                    priceUnit={answers.unit}
-                    onClick={() => {
-                      setShowAllTags(false);
-                      onSelectDetail();
-                      chooseWhiskey(whiskey, 'detail');
-                    }}
-                  />
-                ) : (
-                  <Link
-                    key={alcohol.alcoholId}
-                    href={ROUTES.ALCOHOL.DETAIL(alcohol.alcoholId)}
-                    className="flex min-h-74 w-full items-center gap-12 border-b border-stroke-neutral-subtle py-10 text-left text-fg-neutral transition-colors hover:text-fg-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
-                  >
-                    <b className="w-14 text-13 text-fg-brand">{index + 1}</b>
-                    <AlcoholImage
-                      imageUrl={alcohol.imageUrl}
-                      outerHeightClass="h-44"
-                      outerWidthClass="w-44"
-                      innerHeightClass="h-36"
-                      innerWidthClass="w-24"
-                    />
-                    <span className="flex min-w-0 flex-1 flex-col gap-3">
-                      <b className="text-14 font-bold leading-18">
-                        {alcohol.alcoholKorName}
-                      </b>
-                      <small className="text-12 leading-16 text-fg-neutral-muted">
-                        {alcohol.korCategoryName} · 상세 페이지로 이동
-                      </small>
-                    </span>
-                    <span aria-hidden="true" className="text-fg-neutral-muted">
-                      ›
-                    </span>
-                  </Link>
-                ),
-              )}
-            </div>
-          )}
-          <div className="flex flex-col">
-            {listed.map((whiskey, index) => (
-              <WhiskeyRow
-                key={whiskey.id}
-                whiskey={whiskey}
-                rank={index + 1}
-                hit={
-                  step === 'curation-list'
-                    ? []
-                    : recommendationMeta.get(whiskey.id)?.hit
-                }
-                miss={
-                  step === 'similar' ||
-                  (step === 'recommendations' && exactCount === 0)
-                    ? recommendationMeta.get(whiskey.id)?.miss
-                    : []
-                }
-                showPrice
-                priceUnit={
-                  step === 'curation-list'
-                    ? curation?.unit ?? 'glass'
-                    : answers.unit
-                }
-                onClick={() => {
-                  setShowAllTags(false);
-                  onSelectDetail();
-                  chooseWhiskey(whiskey, 'detail');
-                }}
-              />
-            ))}
-          </div>
-          {step === 'recommendations' &&
-            exactCount > 0 &&
-            exactCount < 10 &&
-            similarCount > 0 &&
-            action('비슷한 술도 볼게요', () => move('similar'))}
-          {step === 'curation-list' &&
-            action('다른 주제 볼게요', () => move('situation'))}
-          {step === 'curation-list' && curation && (
-            <FlowLink href={ROUTES.CURATION.DETAIL(curation.id)}>
-              큐레이션 전체 보기
-            </FlowLink>
-          )}
-          {action('처음으로 갈게요', home)}
-        </>
-      )}
-      {step === 'detail' && selected && (
-        <>
-          <div className="rounded-xl bg-bg-neutral-weak p-14">
-            <div className="flex items-center gap-12">
-              <WhiskeyImage whiskey={selected} size={64} />
-              <h1 className="text-18 font-extrabold leading-24">
-                {selected.name}
-              </h1>
-            </div>
-            <dl className="my-14 grid grid-cols-[78px_1fr] gap-y-6 text-13">
-              <dt className="text-fg-neutral-muted">종류·도수</dt>
-              <dd>
-                {selected.category} · {selected.region} · {selected.abv}%
-              </dd>
-              <dt className="text-fg-neutral-muted">유저평균</dt>
-              <dd className={selected.rating === null ? '' : 'text-fg-rating'}>
-                {selected.rating === null
-                  ? '평가 없음'
-                  : `★ ${selected.rating.toFixed(1)}${selected.ratingCount ? ` · 평가 ${selected.ratingCount}건` : ''}${selected.reviewCount ? ` · 리뷰 ${selected.reviewCount}건` : ''}`}
-              </dd>
-              <dt className="text-fg-neutral-muted">대략 가격</dt>
-              <dd>
-                {selected.glassPrice
-                  ? `한 잔 ${selected.glassPrice.toLocaleString()}원`
-                  : '정보 없음'}{' '}
-                ·{' '}
-                {selected.bottlePrice
-                  ? `한 병 ${selected.bottlePrice.toLocaleString()}원`
-                  : '정보 없음'}
-              </dd>
-            </dl>
-            <div className="flex flex-wrap gap-5">
-              {selected.tags
-                .slice(0, showAllTags ? undefined : 8)
-                .map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded bg-bg-brand-weak px-7 py-4 text-11 leading-15 text-fg-brand"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              {selected.tags.length > 8 && (
-                <button
-                  type="button"
-                  className="text-13 font-bold text-fg-brand"
-                  onClick={() => setShowAllTags(!showAllTags)}
-                >
-                  {showAllTags
-                    ? '접기'
-                    : `${selected.tags.length - 8}개 더보기`}
-                </button>
-              )}
-            </div>
-            {selected.glassPrice && (
-              <p className="mb-0 text-12 text-fg-neutral-muted">
-                바 한 잔 가격은 매장마다 다를 수 있어요.
-              </p>
-            )}
-          </div>
-          <FlowLink primary href={ROUTES.ALCOHOL.DETAIL(selected.id)}>
-            자세히 볼게요
-          </FlowLink>
-          <div className="grid grid-cols-2 gap-6">
-            {action(
-              isPicked(selected.id) ? '♥ 찜했어요' : '♡ 찜해둘게요',
-              () => toggleFavorite(selected.id),
-              false,
-              isTogglingPick,
-            )}
-            {action('리뷰 작성', () => move('review-mode'))}
-          </div>
-          {action('‹ 후보 목록으로', back)}
         </>
       )}
     </>
