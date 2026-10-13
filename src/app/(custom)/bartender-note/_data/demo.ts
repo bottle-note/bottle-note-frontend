@@ -60,7 +60,7 @@ export const demoWhiskies: Whiskey[] = [
     glassPrice: 14000,
   },
   {
-    id: 6330,
+    id: 567,
     name: '발베니 더블우드 12년',
     category: '싱글 몰트',
     region: '스페이사이드',
@@ -71,7 +71,7 @@ export const demoWhiskies: Whiskey[] = [
     glassPrice: 22000,
   },
   {
-    id: 567,
+    id: 247,
     name: '글렌피딕 12년',
     category: '싱글 몰트',
     region: '스페이사이드',
@@ -82,7 +82,7 @@ export const demoWhiskies: Whiskey[] = [
     glassPrice: 18000,
   },
   {
-    id: 6273,
+    id: 600,
     name: '라프로익 10년',
     category: '싱글 몰트',
     region: '아일라',
@@ -93,7 +93,7 @@ export const demoWhiskies: Whiskey[] = [
     glassPrice: 22000,
   },
   {
-    id: 9146,
+    id: 4927,
     name: '아드벡 10년',
     category: '싱글 몰트',
     region: '아일라',
@@ -104,7 +104,7 @@ export const demoWhiskies: Whiskey[] = [
     glassPrice: 24000,
   },
   {
-    id: 8200,
+    id: 551,
     name: '버팔로 트레이스',
     category: '버번',
     region: '미국',
@@ -137,7 +137,7 @@ export const demoWhiskies: Whiskey[] = [
     glassPrice: 19000,
   },
   {
-    id: 224,
+    id: 8200,
     name: '몽키숄더',
     category: '블렌디드',
     region: '스코틀랜드',
@@ -190,7 +190,7 @@ export const demoCurations: Curation[] = [
     unit: 'bottle',
     title: '3~6만 원, 하이볼부터 니트까지',
     description: '처음엔 탄산, 다음엔 얼음, 마지막엔 그대로.',
-    whiskeyIds: [7007, 145, 575, 140, 8200],
+    whiskeyIds: [7007, 145, 575, 140, 551],
   },
   {
     id: 49,
@@ -198,7 +198,7 @@ export const demoCurations: Curation[] = [
     unit: 'glass',
     title: '스며드는 피트 15잔',
     description: '가벼운 스모키함부터 피트까지 천천히.',
-    whiskeyIds: [140, 6273, 9146],
+    whiskeyIds: [140, 600, 4927],
   },
   {
     id: 40,
@@ -206,7 +206,7 @@ export const demoCurations: Curation[] = [
     unit: 'glass',
     title: '가을의 빛과 그림자를 닮은 위스키',
     description: '서늘한 날 천천히 마시기 좋은 술.',
-    whiskeyIds: [6330, 567, 6273],
+    whiskeyIds: [567, 247, 600],
   },
   {
     id: 63,
@@ -214,7 +214,7 @@ export const demoCurations: Curation[] = [
     unit: 'bottle',
     title: '위스키 선물 4~6만 원',
     description: '고마운 마음을 전하기 좋은 병.',
-    whiskeyIds: [7007, 575, 8200],
+    whiskeyIds: [7007, 575, 551],
   },
   {
     id: 64,
@@ -222,6 +222,6 @@ export const demoCurations: Curation[] = [
     unit: 'bottle',
     title: '위스키 선물 7~13만 원',
     description: '조금 더 신경 쓴 선물을 고를 때.',
-    whiskeyIds: [6330, 567, 9146],
+    whiskeyIds: [567, 247, 4927],
   },
 ];
