@@ -34,73 +34,6 @@ const CHARACTER = {
   x: 263,
   y: 109,
 };
-const BG_HOLD = 3500;
-const BG_OUT = 1150;
-const BG_STAY = 450;
-const BG_BACK = 1500;
-const BG_CYCLE = BG_HOLD + BG_OUT + BG_STAY + BG_BACK;
-const ease = (value: number) => 0.5 - 0.5 * Math.cos(Math.PI * value);
-
-function sceneLighting(time: number) {
-  const cycle = time % BG_CYCLE;
-  const amplitude = Math.floor(time / BG_CYCLE) % 2 ? 1.2 : 0.6;
-  if (cycle < BG_HOLD) return 0;
-  if (cycle < BG_HOLD + BG_OUT)
-    return amplitude * ease((cycle - BG_HOLD) / BG_OUT);
-  if (cycle < BG_HOLD + BG_OUT + BG_STAY) return amplitude;
-  return amplitude * (1 - ease((cycle - BG_HOLD - BG_OUT - BG_STAY) / BG_BACK));
-}
-
-function drawScene(
-  context: CanvasRenderingContext2D,
-  images: HTMLImageElement[],
-  lighting: number,
-  y: number,
-  height: number,
-) {
-  const painter = context;
-  context.drawImage(
-    images[0],
-    0,
-    y,
-    SCENE_SIZE.width,
-    height,
-    0,
-    y,
-    SCENE_SIZE.width,
-    height,
-  );
-  if (lighting > 0) {
-    painter.globalAlpha = Math.min(1, lighting);
-    context.drawImage(
-      images[1],
-      0,
-      y,
-      SCENE_SIZE.width,
-      height,
-      0,
-      y,
-      SCENE_SIZE.width,
-      height,
-    );
-    if (lighting > 1) {
-      painter.globalAlpha = lighting - 1;
-      context.drawImage(
-        images[2],
-        0,
-        y,
-        SCENE_SIZE.width,
-        height,
-        0,
-        y,
-        SCENE_SIZE.width,
-        height,
-      );
-    }
-    painter.globalAlpha = 1;
-  }
-}
-
 export default function BarScene({
   pose,
   talking,
@@ -123,13 +56,10 @@ export default function BarScene({
     const context = canvas?.getContext('2d');
     if (!canvas || !context) return undefined;
 
-    const sources = [
+    const [background, bartender] = [
       'scene-0.webp',
-      'scene-1.webp',
-      'scene-2.webp',
       'bartender-sprite.webp',
-    ];
-    const images = sources.map((file) => {
+    ].map((file) => {
       const item = new Image();
       item.src = `/images/bartender-note/${file}`;
       return item;
@@ -142,13 +72,17 @@ export default function BarScene({
     media.addEventListener('change', updateMotion);
     let animationFrame = 0;
     let active = true;
-    let previousKey = '';
+    let previousFrame = -1;
     let readyNotified = false;
 
     const paint = (time: number) => {
       if (!active) return;
-      if (images.every((image) => image.complete && image.naturalWidth)) {
-        const lighting = reduceMotion ? 0 : sceneLighting(time);
+      if (
+        background.complete &&
+        background.naturalWidth &&
+        bartender.complete &&
+        bartender.naturalWidth
+      ) {
         const frame = reduceMotion
           ? POSE_FRAME[poseRef.current]
           : talkingRef.current &&
@@ -161,13 +95,18 @@ export default function BarScene({
                 time % 3400 < 180
               ? 2
               : POSE_FRAME[poseRef.current];
-        const key = `${Math.round(lighting * 300)}:${frame}`;
-        if (key !== previousKey) {
-          previousKey = key;
+        if (frame !== previousFrame) {
+          previousFrame = frame;
           context.clearRect(0, 0, SCENE_SIZE.width, SCENE_SIZE.height);
-          drawScene(context, images, lighting, 0, SCENE_SIZE.height);
           context.drawImage(
-            images[3],
+            background,
+            0,
+            0,
+            SCENE_SIZE.width,
+            SCENE_SIZE.height,
+          );
+          context.drawImage(
+            bartender,
             frame * CHARACTER.width,
             0,
             CHARACTER.width,
@@ -177,7 +116,17 @@ export default function BarScene({
             CHARACTER.targetWidth,
             CHARACTER.targetHeight,
           );
-          drawScene(context, images, lighting, 342, 138);
+          context.drawImage(
+            background,
+            0,
+            342,
+            SCENE_SIZE.width,
+            138,
+            0,
+            342,
+            SCENE_SIZE.width,
+            138,
+          );
         }
         if (!readyNotified) {
           readyNotified = true;
