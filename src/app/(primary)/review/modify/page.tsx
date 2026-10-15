@@ -15,7 +15,10 @@ import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
 import { parseApiError } from '@/hooks/parseApiError';
 import { useReviewDetailQuery } from '@/queries/useReviewDetailQuery';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
-import { fromReviewTastingProfile } from '@/api/review/tastingProfile';
+import {
+  fromReviewTastingProfile,
+  isLegacyTastingGraphImage,
+} from '@/api/review/tastingProfile';
 import Button from '@/components/ui/Button/Button';
 import useModalStore from '@/store/modalStore';
 import Loading from '@/components/ui/Loading/Loading';
@@ -89,7 +92,11 @@ function ReviewModify() {
       price: reviewInfo.price || null,
       flavor_tags: reviewInfo.tastingTagList || [],
       images: null,
-      imageUrlList: reviewImageList || [],
+      imageUrlList: reviewInfo.tastingProfile
+        ? (reviewImageList || []).filter(
+            (image) => !isLegacyTastingGraphImage(image.viewUrl),
+          )
+        : reviewImageList || [],
       rating: reviewInfo.rating || 0,
       tastingNote: fromReviewTastingProfile(reviewInfo.tastingProfile),
       locationName: locationInfo.name,

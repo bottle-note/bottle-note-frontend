@@ -5,6 +5,7 @@ import ShareDropdown from '@/components/share/ShareDropdown';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import type { ShareConfig } from '@/types/share';
+import { isLegacyTastingGraphImage } from '@/api/review/tastingProfile';
 
 interface ReviewInteractionBarProps {
   data: ReviewDetailsWithoutAlcoholInfo;
@@ -45,13 +46,18 @@ export default function ReviewInteractionBar({
       typeof window !== 'undefined'
         ? window.location.href
         : `https://bottle-note.com/review/${reviewId}`;
+    const firstPhoto = data.reviewInfo.tastingProfile
+      ? data.reviewImageList?.find(
+          (image) => !isLegacyTastingGraphImage(image.viewUrl),
+        )?.viewUrl
+      : data.reviewImageList?.[0]?.viewUrl;
 
     return {
       type: 'review',
       contentId: reviewId,
       title: `${userName}님의 리뷰`,
       description: description || '위스키 리뷰를 확인해보세요!',
-      imageUrl: data.reviewImageList?.[0]?.viewUrl || '/images/og-image.png',
+      imageUrl: firstPhoto || '/images/og-image.png',
       linkUrl,
       buttonTitle: '리뷰 보기',
     };

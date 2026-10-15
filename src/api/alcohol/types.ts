@@ -2,6 +2,8 @@
 // Alcohol API - Request/Response Types
 // ============================================
 
+import type { ReviewTastingProfile } from '@/api/review/types';
+
 // --------------- Request Types ---------------
 
 export interface PickParams {
@@ -98,6 +100,7 @@ export interface ReviewInDetails {
   hasReplyByMe: boolean;
   isBestReview: boolean;
   tastingTagList?: string[];
+  tastingProfile?: ReviewTastingProfile | null;
   createAt: string;
   rating: number;
 }

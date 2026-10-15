@@ -3,12 +3,14 @@ import { uploadImages } from '@/utils/S3Upload';
 import { RateApi } from '@/api/rate/rate.api';
 import { ReviewApi } from '@/api/review/review.api';
 import type { ReviewTastingProfile } from '@/api/review/types';
-import { toReviewTastingProfile } from '@/api/review/tastingProfile';
+import {
+  isLegacyTastingGraphImage,
+  toReviewTastingProfile,
+} from '@/api/review/tastingProfile';
 import useModalStore from '@/store/modalStore';
 import { FormValues } from '@/types/Review';
 import { ROUTES } from '@/constants/routes';
 import { trackGA4Event } from '@/utils/analytics/ga4';
-import { captureTastingNote } from './useTastingNoteCapture';
 
 interface UseReviewSubmissionProps {
   alcoholId: string;
@@ -127,47 +129,29 @@ export const useReviewSubmission = ({
     }[] = [],
   ) => {
     let newImgUrlList = null;
-    let chartImgUrlList = null;
     try {
-      // 유저 이미지 업로드
+      // 일반 리뷰 사진만 업로드한다. 테이스팅 프로필은 API 수치로 저장·표시한다.
       const userImages = data.images?.map((file) => file.image) ?? [];
-      const existingPhotoCount = originImgUrlList.filter(
-        (img) => !img.viewUrl.includes('tasting-graph'),
-      ).length;
       if (userImages.length > 0) {
         newImgUrlList = await handleUploadImages(userImages);
-      }
-
-      // 이미지 제한(5장) 안에서만 차트 이미지를 함께 보관한다.
-      // 차트 이미지를 올리지 못한 경우에도 tastingProfile로 상세 화면에 표시할 수 있다.
-      if (existingPhotoCount + userImages.length < 5) {
-        const chartFile = await captureTastingNote(data.tastingNote);
-        if (chartFile) {
-          chartImgUrlList = await uploadImages('tastingGraph', [chartFile]);
-        }
       }
     } catch (error) {
       trackReviewFailure('image_upload');
       throw error;
     }
 
-    // 그래프를 수정하거나 초기화한 경우 기존 차트 이미지를 교체/제거
-    const filteredOriginList =
-      data.tastingNote != null
-        ? originImgUrlList.filter(
-            (img) => !img.viewUrl.includes('tasting-graph'),
-          )
-        : originImgUrlList;
-
+    // 저장된 프로필을 새 그래프로 표시할 때만 과거 PNG를 목록에서 제외한다.
+    // 프로필 없이 이미지로만 남아 있는 예전 리뷰는 사진을 보존한다.
+    const hasProfile =
+      data.tastingNote != null || initialTastingProfile != null;
+    const originPhotos = hasProfile
+      ? originImgUrlList.filter(
+          (img) => !isLegacyTastingGraphImage(img.viewUrl),
+        )
+      : originImgUrlList;
     const finalImageUrlList =
-      filteredOriginList.length > 0 ||
-      (newImgUrlList?.length ?? 0) > 0 ||
-      (chartImgUrlList?.length ?? 0) > 0
-        ? [
-            ...filteredOriginList,
-            ...(newImgUrlList ?? []),
-            ...(chartImgUrlList ?? []),
-          ]
+      originPhotos.length > 0 || (newImgUrlList?.length ?? 0) > 0
+        ? [...originPhotos, ...(newImgUrlList ?? [])]
         : null;
 
     const reviewParams = createReviewParams(data, finalImageUrlList);

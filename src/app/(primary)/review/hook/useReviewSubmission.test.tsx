@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import { ReviewApi } from '@/api/review/review.api';
 import { uploadImages } from '@/utils/S3Upload';
-import { captureTastingNote } from './useTastingNoteCapture';
+
 import { useReviewSubmission } from './useReviewSubmission';
 
 jest.mock('next/navigation', () => ({ useRouter: jest.fn() }));
@@ -13,7 +13,7 @@ jest.mock('@/api/rate/rate.api', () => ({
   RateApi: { postRating: jest.fn() },
 }));
 jest.mock('@/utils/S3Upload', () => ({ uploadImages: jest.fn() }));
-jest.mock('./useTastingNoteCapture', () => ({ captureTastingNote: jest.fn() }));
+
 jest.mock('@/utils/analytics/ga4', () => ({ trackGA4Event: jest.fn() }));
 
 const note = {
@@ -45,15 +45,9 @@ describe('리뷰 테이스팅 그래프 저장', () => {
     (ReviewApi.modifyReview as jest.Mock).mockResolvedValue({
       data: { reviewId: 12 },
     });
-    (captureTastingNote as jest.Mock).mockResolvedValue(null);
   });
 
   it('작성한 여섯 축을 리뷰 요청에 저장한다', async () => {
-    const chart = new File(['chart'], 'chart.png', { type: 'image/png' });
-    (captureTastingNote as jest.Mock).mockResolvedValue(chart);
-    (uploadImages as jest.Mock).mockResolvedValue([
-      { order: 1, viewUrl: 'https://example.com/tasting-graph/chart.png' },
-    ]);
     const { result } = renderHook(() =>
       useReviewSubmission({ alcoholId: '7', initialRating: 4 }),
     );
@@ -108,7 +102,7 @@ describe('리뷰 테이스팅 그래프 저장', () => {
         },
       }),
     );
-    expect(uploadImages).toHaveBeenCalledWith('tastingGraph', [chart]);
+    expect(uploadImages).not.toHaveBeenCalled();
   });
 
   it('수정 화면에서 초기화하면 저장된 그래프와 차트 이미지를 함께 제거한다', async () => {
@@ -147,7 +141,7 @@ describe('리뷰 테이스팅 그래프 저장', () => {
     );
   });
 
-  it('사진이 5장이면 그래프 이미지를 추가하지 않고 수치만 저장한다', async () => {
+  it('사진 5장은 일반 리뷰 경로로만 업로드하고 수치 프로필은 보존한다', async () => {
     const photos = Array.from({ length: 5 }, (_, index) => ({
       order: index + 1,
       image: new File(['photo'], `photo-${index}.png`, { type: 'image/png' }),
@@ -166,7 +160,11 @@ describe('리뷰 테이스팅 그래프 저장', () => {
       await result.current.submitReview({ ...form, images: photos });
     });
 
-    expect(captureTastingNote).not.toHaveBeenCalled();
+    expect(uploadImages).toHaveBeenCalledTimes(1);
+    expect(uploadImages).toHaveBeenCalledWith(
+      'review',
+      photos.map((photo) => photo.image),
+    );
     expect(ReviewApi.registerReview).toHaveBeenCalledWith(
       expect.objectContaining({
         imageUrlList: expect.arrayContaining([

@@ -9,6 +9,10 @@ import type { ReviewTastingProfile } from './types';
 
 const PROFILE_VERSION = 1;
 
+/** 예전에 테이스팅 PNG를 저장하던 전용 S3 경로. 일반 리뷰 사진과 구별한다. */
+export const isLegacyTastingGraphImage = (url: string): boolean =>
+  /(?:^|\/)tasting-graph(?:\/|$)/.test(url);
+
 export function toReviewTastingProfile(
   note: TastingNoteValues | null | undefined,
 ): ReviewTastingProfile | null {
