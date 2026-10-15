@@ -18,6 +18,8 @@ import {
 import ReplyButton from '@/components/domain/review/ReplyButton';
 import ReviewLikeButton from '@/components/domain/review/ReviewLikeButton';
 import Label from '@/components/ui/Display/Label';
+import ReviewTastingProfileChart from '@/components/domain/review/ReviewTastingProfileChart';
+import { isLegacyTastingGraphImage } from '@/api/review/tastingProfile';
 
 interface Props {
   content: ExploreReview;
@@ -32,7 +34,9 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
   const [likeCount, setLikeCount] = useState(content.likeCount);
   const [isReportOptionShow, setIsReportOptionShow] = useState(false);
   const productImages = convertImageUrlsToProductImageArray(
-    content.reviewImages,
+    content.tastingProfile
+      ? content.reviewImages.filter((url) => !isLegacyTastingGraphImage(url))
+      : content.reviewImages,
     '리뷰 이미지',
   );
   const reviewTags = [...new Set(content.reviewTags)];
@@ -138,6 +142,7 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
                 </div>
               ))}
             </div>
+            <ReviewTastingProfileChart profile={content.tastingProfile} />
           </div>
         </Link>
 

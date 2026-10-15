@@ -242,6 +242,25 @@ describe('리뷰 상세 메타데이터', () => {
     );
   });
 
+  it('프로필이 있으면 과거 그래프 PNG 대신 실제 사진을 공유 이미지로 고른다', () => {
+    const data = review({
+      tastingProfile: {
+        version: 1,
+        maxScore: 5,
+        axes: [{ code: 'SMOKY', name: '스모키', description: null, score: 3 }],
+      },
+    });
+    data.reviewImageList = [
+      { order: 1, viewUrl: 'https://cdn.example.com/tasting-graph/old.png' },
+      { order: 2, viewUrl: 'https://cdn.example.com/photo.jpg' },
+    ];
+    const metadata = buildReviewMetadata('9001', { status: 'ok', data });
+
+    expect(metadata.openGraph?.images).toEqual([
+      { url: 'https://cdn.example.com/photo.jpg' },
+    ]);
+  });
+
   it('비공개 리뷰는 본문을 메타에 넣지 않고 색인하지 않는다', () => {
     const metadata = buildReviewMetadata('9001', {
       status: 'ok',

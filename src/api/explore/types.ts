@@ -3,6 +3,7 @@
 // ============================================
 
 import type { InfiniteListParams } from '@/api/_shared/types';
+import type { ReviewTastingProfile } from '@/api/review/types';
 
 // --------------- Request Types ---------------
 
@@ -97,6 +98,7 @@ export interface ExploreReview {
   modifiedAt: string;
   totalImageCount: number;
   reviewImages: string[];
+  tastingProfile?: ReviewTastingProfile | null;
   locationInfo?: ExploreLocationInfo | null;
   isBestReview: boolean;
   likeCount: number;
