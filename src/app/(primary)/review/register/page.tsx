@@ -235,7 +235,7 @@ function ReviewRegister() {
         onSelectAlcohol={() => setIsSearchOpen(true)}
       />
 
-      <ReviewForm />
+      <ReviewForm alcoholTastingTags={alcoholData?.alcoholsTastingTags} />
       <article
         className={`sticky px-20 z-10 flex justify-center transition-opacity duration-200 ${
           isKeyboardVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'

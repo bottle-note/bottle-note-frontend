@@ -462,7 +462,7 @@ export default function TastingRadarChart({
       })}
 
       {/* 각 축의 격자 레벨 숫자 */}
-      {axes.map((axis, axisIdx) => {
+      {axes.map((_, axisIdx) => {
         const angle = (2 * Math.PI * axisIdx) / axisCount + ANGLE_OFFSET;
         const perpAngle = angle + Math.PI / 2;
         const offsetDist = 7;
@@ -474,6 +474,7 @@ export default function TastingRadarChart({
 
           return (
             <text
+              // eslint-disable-next-line react/no-array-index-key
               key={`grid-${axisIdx}-${level}`}
               x={px + offsetDist * Math.cos(perpAngle)}
               y={py + offsetDist * Math.sin(perpAngle)}
@@ -491,10 +492,11 @@ export default function TastingRadarChart({
       })}
 
       {/* 축 선 */}
-      {axes.map((axis, i) => {
+      {axes.map((_, i) => {
         const { x, y } = polarToCartesian(ctrX, ctrY, maxRadius, i, axisCount);
         return (
           <line
+            // eslint-disable-next-line react/no-array-index-key
             key={`axis-${i}`}
             x1={ctrX}
             y1={ctrY}

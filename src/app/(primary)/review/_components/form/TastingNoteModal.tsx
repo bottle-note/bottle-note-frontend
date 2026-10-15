@@ -13,19 +13,27 @@ import {
 } from '@/api/review/tastingProfile';
 import { FormValues } from '@/types/Review';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
+import Button from '@/components/ui/Button/Button';
 import TastingRadarChart from './TastingRadarChart';
 import FlavorAxisControl from './FlavorAxisControl';
 import TastingConfirmDialog from './TastingConfirmDialog';
+import TastingAxisEditSheet from './TastingAxisEditSheet';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  /** 항목 추가 시 추천할 주류 태그 */
+  alcoholTastingTags?: string[] | null;
 }
 
 const isSameProfile = (a: ReviewTastingProfile, b: ReviewTastingProfile) =>
   JSON.stringify(a) === JSON.stringify(b);
 
-export default function TastingNoteModal({ isOpen, onClose }: Props) {
+export default function TastingNoteModal({
+  isOpen,
+  onClose,
+  alcoholTastingTags,
+}: Props) {
   const { setValue, getValues } = useFormContext<FormValues>();
 
   // 완료 전까지는 폼 값을 바꾸지 않고 초안만 수정한다.
@@ -39,6 +47,9 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
   const [hasSavedProfile, setHasSavedProfile] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [isDiscardConfirmOpen, setIsDiscardConfirmOpen] = useState(false);
+  const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
+  /** 항목 편집에서 새로 추가한 항목. 점수를 넣기 전까지 강조한다. */
+  const [newAxisNames, setNewAxisNames] = useState<string[]>([]);
 
   const isDirty = !isSameProfile(draft, baseline);
 
@@ -56,6 +67,8 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
   onCloseRef.current = onClose;
   const isDirtyRef = useRef(isDirty);
   isDirtyRef.current = isDirty;
+  const isEditSheetOpenRef = useRef(isEditSheetOpen);
+  isEditSheetOpenRef.current = isEditSheetOpen;
 
   const historyPushedRef = useRef(false);
   /** 완료·버리기로 닫을 때는 뒤로 가기 확인을 건너뛴다. */
@@ -70,6 +83,8 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
     setHasSavedProfile(!isTastingProfileEmpty(saved));
     setActiveIndex(null);
     setIsDiscardConfirmOpen(false);
+    setIsEditSheetOpen(false);
+    setNewAxisNames([]);
     closingRef.current = false;
   }, [isOpen, getValues]);
 
@@ -82,6 +97,12 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
       historyPushedRef.current = true;
 
       const handlePopState = () => {
+        if (!closingRef.current && isEditSheetOpenRef.current) {
+          // 항목 편집 시트가 열려 있으면 시트만 닫는다.
+          window.history.pushState({ tastingNoteModal: true }, '');
+          setIsEditSheetOpen(false);
+          return;
+        }
         if (!closingRef.current && isDirtyRef.current) {
           // 바뀐 내용이 있으면 닫지 않고 확인을 묻는다.
           window.history.pushState({ tastingNoteModal: true }, '');
@@ -117,6 +138,9 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
       handleWebViewMessage('triggerHaptic', { type: hapticType });
     }
     setActiveIndex(index);
+    setNewAxisNames((prev) =>
+      prev.filter((name) => name !== draft.axes[index].name),
+    );
     setDraft((prev) => ({
       ...prev,
       axes: prev.axes.map((axis, i) =>
@@ -142,6 +166,25 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
     setIsDiscardConfirmOpen(false);
     closingRef.current = true;
     window.history.back();
+  };
+
+  const handleApplyAxes = (axes: ReviewTastingProfile['axes']) => {
+    const previousNames = new Set(draft.axes.map((axis) => axis.name));
+    setNewAxisNames(
+      axes
+        .filter((axis) => !previousNames.has(axis.name))
+        .map((axis) => axis.name),
+    );
+    setActiveIndex(null);
+    setDraft((prev) => ({ ...prev, axes }));
+    setIsEditSheetOpen(false);
+  };
+
+  const handleResetToDefault = () => {
+    setNewAxisNames([]);
+    setActiveIndex(null);
+    setDraft(createDefaultTastingProfile());
+    setIsEditSheetOpen(false);
   };
 
   const handleReset = () => {
@@ -249,6 +292,7 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
                       value={axis.score}
                       max={draft.maxScore}
                       originalValue={originalScores.get(axis.name)}
+                      isHighlighted={newAxisNames.includes(axis.name)}
                       onChange={(v) => handleAxisChange(i, v)}
                     />
                   </motion.div>
@@ -256,8 +300,15 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
               })}
             </div>
 
-            {/* 초기화 버튼 */}
-            <div className="flex justify-center mt-24 pb-24">
+            <div className="flex flex-col items-center gap-14 mt-24 pb-24">
+              <Button
+                type="button"
+                size="md"
+                variant="secondary"
+                onClick={() => setIsEditSheetOpen(true)}
+              >
+                항목 편집
+              </Button>
               <button
                 type="button"
                 onClick={handleReset}
@@ -267,6 +318,15 @@ export default function TastingNoteModal({ isOpen, onClose }: Props) {
               </button>
             </div>
           </div>
+
+          <TastingAxisEditSheet
+            isOpen={isEditSheetOpen}
+            profile={draft}
+            suggestionSources={[getValues('flavor_tags'), alcoholTastingTags]}
+            onClose={() => setIsEditSheetOpen(false)}
+            onApply={handleApplyAxes}
+            onResetToDefault={handleResetToDefault}
+          />
 
           {isDiscardConfirmOpen && (
             <TastingConfirmDialog

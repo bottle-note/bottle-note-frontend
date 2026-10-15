@@ -13,7 +13,11 @@ import TastingRadarChart from './TastingRadarChart';
 import TastingNoteModal from './TastingNoteModal';
 import OptionsContainer from '../OptionsContainer';
 
-export default function TastingNoteForm() {
+interface Props {
+  alcoholTastingTags?: string[] | null;
+}
+
+export default function TastingNoteForm({ alcoholTastingTags }: Props) {
   const { watch } = useFormContext<FormValues>();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -100,6 +104,7 @@ export default function TastingNoteForm() {
       <TastingNoteModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        alcoholTastingTags={alcoholTastingTags}
       />
     </>
   );
