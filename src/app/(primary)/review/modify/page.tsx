@@ -15,10 +15,7 @@ import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
 import { parseApiError } from '@/hooks/parseApiError';
 import { useReviewDetailQuery } from '@/queries/useReviewDetailQuery';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
-import {
-  fromReviewTastingProfile,
-  isLegacyTastingGraphImage,
-} from '@/api/review/tastingProfile';
+import { isLegacyTastingGraphImage } from '@/api/review/tastingProfile';
 import Button from '@/components/ui/Button/Button';
 import useModalStore from '@/store/modalStore';
 import Loading from '@/components/ui/Loading/Loading';
@@ -98,7 +95,7 @@ function ReviewModify() {
           )
         : reviewImageList || [],
       rating: reviewInfo.rating || 0,
-      tastingNote: fromReviewTastingProfile(reviewInfo.tastingProfile),
+      tastingProfile: reviewInfo.tastingProfile ?? null,
       locationName: locationInfo.name,
       address: locationInfo.address,
       detailAddress: locationInfo.detailAddress || null,

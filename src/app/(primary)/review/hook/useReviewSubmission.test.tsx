@@ -16,13 +16,42 @@ jest.mock('@/utils/S3Upload', () => ({ uploadImages: jest.fn() }));
 
 jest.mock('@/utils/analytics/ga4', () => ({ trackGA4Event: jest.fn() }));
 
-const note = {
-  smoky: 3,
-  fruity: 2,
-  floral: 0,
-  sweet: 4,
-  spicy: 1,
-  body: 5,
+const profile = {
+  version: 1,
+  maxScore: 5,
+  axes: [
+    {
+      code: 'SMOKY',
+      name: '스모키',
+      description: '연기 · 이탄 · 숯',
+      score: 3,
+    },
+    {
+      code: 'FRUITY',
+      name: '과일',
+      description: '사과 · 배 · 열대과일',
+      score: 2,
+    },
+    {
+      code: 'FLORAL',
+      name: '꽃/허브',
+      description: '장미 · 라벤더 · 풀',
+      score: 0,
+    },
+    {
+      code: 'SWEET',
+      name: '달콤함',
+      description: '바닐라 · 캐러멜 · 꿀',
+      score: 4,
+    },
+    {
+      code: 'SPICY',
+      name: '향신료',
+      description: '후추 · 시나몬 · 생강',
+      score: 1,
+    },
+    { code: 'BODY', name: '바디감', description: '가벼움 ↔ 묵직함', score: 5 },
+  ],
 };
 
 const form = {
@@ -32,7 +61,7 @@ const form = {
   price: null,
   flavor_tags: [],
   rating: 4,
-  tastingNote: note,
+  tastingProfile: profile,
 };
 
 describe('리뷰 테이스팅 그래프 저장', () => {
@@ -58,48 +87,7 @@ describe('리뷰 테이스팅 그래프 저장', () => {
 
     expect(ReviewApi.registerReview).toHaveBeenCalledWith(
       expect.objectContaining({
-        tastingProfile: {
-          version: 1,
-          maxScore: 5,
-          axes: [
-            {
-              code: 'SMOKY',
-              name: '스모키',
-              description: '연기 · 이탄 · 숯',
-              score: 3,
-            },
-            {
-              code: 'FRUITY',
-              name: '과일',
-              description: '사과 · 배 · 열대과일',
-              score: 2,
-            },
-            {
-              code: 'FLORAL',
-              name: '꽃/허브',
-              description: '장미 · 라벤더 · 풀',
-              score: 0,
-            },
-            {
-              code: 'SWEET',
-              name: '달콤함',
-              description: '바닐라 · 캐러멜 · 꿀',
-              score: 4,
-            },
-            {
-              code: 'SPICY',
-              name: '향신료',
-              description: '후추 · 시나몬 · 생강',
-              score: 1,
-            },
-            {
-              code: 'BODY',
-              name: '바디감',
-              description: '가벼움 ↔ 묵직함',
-              score: 5,
-            },
-          ],
-        },
+        tastingProfile: profile,
       }),
     );
     expect(uploadImages).not.toHaveBeenCalled();
@@ -114,13 +102,9 @@ describe('리뷰 테이스팅 그래프 저장', () => {
       await result.current.submitReview(
         {
           ...form,
-          tastingNote: {
-            ...note,
-            smoky: 0,
-            fruity: 0,
-            sweet: 0,
-            spicy: 0,
-            body: 0,
+          tastingProfile: {
+            ...profile,
+            axes: profile.axes.map((axis) => ({ ...axis, score: 0 })),
           },
         },
         [
@@ -175,11 +159,15 @@ describe('리뷰 테이스팅 그래프 저장', () => {
     );
   });
 
-  it('현재 화면에서 편집할 수 없는 축은 다른 항목을 수정해도 보존한다', async () => {
+  it('사용자 정의 프로필은 리뷰 글만 수정해도 그대로 보존한다', async () => {
     const originalProfile = {
       version: 1,
       maxScore: 10,
-      axes: [{ code: 'OTHER', name: '다른 축', description: null, score: 7 }],
+      axes: [
+        { code: null, name: '스모키', description: null, score: 7 },
+        { code: null, name: '바닐라', description: null, score: 4 },
+        { code: null, name: '바디감', description: null, score: 8 },
+      ],
     };
     const { result } = renderHook(() =>
       useReviewSubmission({
@@ -191,7 +179,11 @@ describe('리뷰 테이스팅 그래프 저장', () => {
     );
 
     await act(async () => {
-      await result.current.submitReview({ ...form, tastingNote: null });
+      await result.current.submitReview({
+        ...form,
+        review: '글만 수정',
+        tastingProfile: originalProfile,
+      });
     });
 
     expect(ReviewApi.modifyReview).toHaveBeenCalledWith(

@@ -8,33 +8,51 @@ import {
   AnimatePresence,
 } from 'framer-motion';
 import {
-  TASTING_AXES,
   TASTING_MAX_VALUE,
-  LEVEL_DESCRIPTIONS,
-  type TastingNoteValues,
-  type TastingAxisKey,
+  getTastingLevelDescription,
 } from '@/constants/tastingNote';
 
-interface Props {
-  values: TastingNoteValues;
-  size?: number;
-  activeAxis?: string | null;
-  /** 배지 드래그로 값 변경 */
-  onAxisChange?: (key: TastingAxisKey, value: number) => void;
+interface ChartAxis {
+  name: string;
+  score: number;
 }
 
-const AXIS_COUNT = TASTING_AXES.length;
+interface Props {
+  axes: ChartAxis[];
+  maxScore: number;
+  size?: number;
+  activeIndex?: number | null;
+  /** 배지 드래그로 값 변경 */
+  onAxisChange?: (index: number, value: number) => void;
+}
+
 const ANGLE_OFFSET = -Math.PI / 2;
 const MIN_DISPLAY_RATIO = 0.25;
 const BADGE_HIT_RADIUS = 18;
+const LABEL_FONT_SIZE = 11;
+
+/** 최고 점수가 5를 넘으면 5개 격자로 나눠 그린다. */
+function getGridLevels(maxScore: number): number[] {
+  if (maxScore <= TASTING_MAX_VALUE) {
+    return Array.from({ length: maxScore }, (_, i) => i + 1);
+  }
+  return [
+    ...new Set(
+      Array.from({ length: TASTING_MAX_VALUE }, (_, i) =>
+        Math.round((maxScore * (i + 1)) / TASTING_MAX_VALUE),
+      ),
+    ),
+  ];
+}
 
 function polarToCartesian(
   cx: number,
   cy: number,
   radius: number,
   index: number,
+  count: number,
 ): { x: number; y: number } {
-  const angle = (2 * Math.PI * index) / AXIS_COUNT + ANGLE_OFFSET;
+  const angle = (2 * Math.PI * index) / count + ANGLE_OFFSET;
   return {
     x: cx + radius * Math.cos(angle),
     y: cy + radius * Math.sin(angle),
@@ -49,7 +67,7 @@ function buildPolygonPoints(
 ): string {
   return Array.from({ length: count })
     .map((_, i) => {
-      const { x, y } = polarToCartesian(cx, cy, radius, i);
+      const { x, y } = polarToCartesian(cx, cy, radius, i, count);
       return `${x},${y}`;
     })
     .join(' ');
@@ -61,6 +79,7 @@ function findClosestAxis(
   pointerY: number,
   cx: number,
   cy: number,
+  count: number,
 ): number {
   const dx = pointerX - cx;
   const dy = pointerY - cy;
@@ -69,8 +88,8 @@ function findClosestAxis(
   let closestIndex = 0;
   let minDiff = Infinity;
 
-  for (let i = 0; i < AXIS_COUNT; i++) {
-    const axisAngle = (2 * Math.PI * i) / AXIS_COUNT + ANGLE_OFFSET;
+  for (let i = 0; i < count; i++) {
+    const axisAngle = (2 * Math.PI * i) / count + ANGLE_OFFSET;
     let diff = Math.abs(pointerAngle - axisAngle);
     if (diff > Math.PI) diff = 2 * Math.PI - diff;
     if (diff < minDiff) {
@@ -82,36 +101,39 @@ function findClosestAxis(
   return closestIndex;
 }
 
-/** 중심으로부터의 거리를 0~MAX_VALUE 값으로 변환 (탭용) */
+/** 중심으로부터의 거리를 0~maxScore 값으로 변환 (탭용) */
 function pointerToAxisValue(
   pointerX: number,
   pointerY: number,
   cx: number,
   cy: number,
   maxRadius: number,
+  maxScore: number,
 ): number {
   const dx = pointerX - cx;
   const dy = pointerY - cy;
   const dist = Math.sqrt(dx * dx + dy * dy);
   const ratio = Math.max(0, Math.min(1, dist / maxRadius));
-  return Math.round(ratio * TASTING_MAX_VALUE);
+  return Math.round(ratio * maxScore);
 }
 
-/** 포인터를 특정 축 방향으로 투영하여 0~MAX_VALUE 값 계산 (드래그용) */
+/** 포인터를 특정 축 방향으로 투영하여 0~maxScore 값 계산 (드래그용) */
 function projectOntoAxis(
   pointerX: number,
   pointerY: number,
   cx: number,
   cy: number,
   axisIndex: number,
+  count: number,
   maxRadius: number,
+  maxScore: number,
 ): number {
-  const angle = (2 * Math.PI * axisIndex) / AXIS_COUNT + ANGLE_OFFSET;
+  const angle = (2 * Math.PI * axisIndex) / count + ANGLE_OFFSET;
   const dx = pointerX - cx;
   const dy = pointerY - cy;
   const projection = dx * Math.cos(angle) + dy * Math.sin(angle);
   const ratio = Math.max(0, Math.min(1, projection / maxRadius));
-  return Math.round(ratio * TASTING_MAX_VALUE);
+  return Math.round(ratio * maxScore);
 }
 
 /** 드래그 가능한 값 배지 — 스냅포인트 핸들 */
@@ -198,11 +220,13 @@ function ValueBadge({
 }
 
 export default function TastingRadarChart({
-  values,
+  axes,
+  maxScore,
   size = 260,
-  activeAxis = null,
+  activeIndex = null,
   onAxisChange,
 }: Props) {
+  const axisCount = axes.length;
   const ctrX = size / 2;
   const ctrY = size / 2;
   const maxRadius = size / 2 - 30;
@@ -227,26 +251,32 @@ export default function TastingRadarChart({
 
   const valuePoints = useMemo(
     () =>
-      TASTING_AXES.map((axis, i) => {
-        const ratio = values[axis.key] / TASTING_MAX_VALUE;
-        return polarToCartesian(ctrX, ctrY, maxRadius * ratio, i);
+      axes.map((axis, i) => {
+        const ratio = axis.score / maxScore;
+        return polarToCartesian(ctrX, ctrY, maxRadius * ratio, i, axisCount);
       }),
-    [values, ctrX, ctrY, maxRadius],
+    [axes, axisCount, maxScore, ctrX, ctrY, maxRadius],
   );
 
   const badgePoints = useMemo(
     () =>
-      TASTING_AXES.map((axis, i) => {
-        const ratio = values[axis.key] / TASTING_MAX_VALUE;
+      axes.map((axis, i) => {
+        const ratio = axis.score / maxScore;
         const displayRatio = Math.max(MIN_DISPLAY_RATIO, ratio);
-        return polarToCartesian(ctrX, ctrY, maxRadius * displayRatio, i);
+        return polarToCartesian(
+          ctrX,
+          ctrY,
+          maxRadius * displayRatio,
+          i,
+          axisCount,
+        );
       }),
-    [values, ctrX, ctrY, maxRadius],
+    [axes, axisCount, maxScore, ctrX, ctrY, maxRadius],
   );
 
   const valuePolygon = valuePoints.map((p) => `${p.x},${p.y}`).join(' ');
 
-  const gridLevels = Array.from({ length: TASTING_MAX_VALUE }, (_, i) => i + 1);
+  const gridLevels = getGridLevels(maxScore);
 
   const toSvgCoords = useCallback(
     (clientX: number, clientY: number) => {
@@ -286,8 +316,17 @@ export default function TastingRadarChart({
 
       // 초기 값 즉시 적용
       const { x, y } = toSvgCoords(e.clientX, e.clientY);
-      const val = projectOntoAxis(x, y, ctrX, ctrY, axisIndex, maxRadius);
-      onAxisChange!(TASTING_AXES[axisIndex].key, val);
+      const val = projectOntoAxis(
+        x,
+        y,
+        ctrX,
+        ctrY,
+        axisIndex,
+        axisCount,
+        maxRadius,
+        maxScore,
+      );
+      onAxisChange!(axisIndex, val);
       showFeedback(val);
     },
     [
@@ -295,7 +334,9 @@ export default function TastingRadarChart({
       toSvgCoords,
       ctrX,
       ctrY,
+      axisCount,
       maxRadius,
+      maxScore,
       onAxisChange,
       showFeedback,
     ],
@@ -307,11 +348,29 @@ export default function TastingRadarChart({
       const idx = draggingAxisRef.current;
       if (idx === null) return;
       const { x, y } = toSvgCoords(e.clientX, e.clientY);
-      const val = projectOntoAxis(x, y, ctrX, ctrY, idx, maxRadius);
-      onAxisChange!(TASTING_AXES[idx].key, val);
+      const val = projectOntoAxis(
+        x,
+        y,
+        ctrX,
+        ctrY,
+        idx,
+        axisCount,
+        maxRadius,
+        maxScore,
+      );
+      onAxisChange!(idx, val);
       showFeedback(val);
     },
-    [toSvgCoords, ctrX, ctrY, maxRadius, onAxisChange, showFeedback],
+    [
+      toSvgCoords,
+      ctrX,
+      ctrY,
+      axisCount,
+      maxRadius,
+      maxScore,
+      onAxisChange,
+      showFeedback,
+    ],
   );
 
   // 빈 영역 탭: 가장 가까운 축에 값 설정 (onPointerUp → 스크롤과 자연 구분)
@@ -319,9 +378,16 @@ export default function TastingRadarChart({
     (e: React.PointerEvent) => {
       if (!isInteractive || draggingAxisRef.current !== null) return;
       const { x, y } = toSvgCoords(e.clientX, e.clientY);
-      const closestIdx = findClosestAxis(x, y, ctrX, ctrY);
-      const newValue = pointerToAxisValue(x, y, ctrX, ctrY, maxRadius);
-      onAxisChange!(TASTING_AXES[closestIdx].key, newValue);
+      const closestIdx = findClosestAxis(x, y, ctrX, ctrY, axisCount);
+      const newValue = pointerToAxisValue(
+        x,
+        y,
+        ctrX,
+        ctrY,
+        maxRadius,
+        maxScore,
+      );
+      onAxisChange!(closestIdx, newValue);
 
       showFeedback(newValue);
       if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
@@ -332,7 +398,9 @@ export default function TastingRadarChart({
       toSvgCoords,
       ctrX,
       ctrY,
+      axisCount,
       maxRadius,
+      maxScore,
       onAxisChange,
       showFeedback,
     ],
@@ -350,6 +418,7 @@ export default function TastingRadarChart({
       viewBox={`0 0 ${size} ${size}`}
       width="100%"
       height="100%"
+      overflow="visible"
       onPointerMove={isInteractive ? handlePointerMove : undefined}
       onPointerUp={isInteractive ? endDrag : undefined}
       onPointerCancel={isInteractive ? endDrag : undefined}
@@ -379,33 +448,33 @@ export default function TastingRadarChart({
 
       {/* 배경 격자 */}
       {gridLevels.map((level) => {
-        const radius = (maxRadius * level) / TASTING_MAX_VALUE;
+        const radius = (maxRadius * level) / maxScore;
         return (
           <polygon
             key={level}
-            points={buildPolygonPoints(ctrX, ctrY, radius, AXIS_COUNT)}
+            points={buildPolygonPoints(ctrX, ctrY, radius, axisCount)}
             fill="none"
             stroke="var(--color-stroke-neutral-subtle)"
-            strokeWidth={level === TASTING_MAX_VALUE ? 1.5 : 0.8}
-            opacity={level === TASTING_MAX_VALUE ? 0.8 : 0.5}
+            strokeWidth={level === maxScore ? 1.5 : 0.8}
+            opacity={level === maxScore ? 0.8 : 0.5}
           />
         );
       })}
 
       {/* 각 축의 격자 레벨 숫자 */}
-      {TASTING_AXES.map((axis, axisIdx) => {
-        const angle = (2 * Math.PI * axisIdx) / AXIS_COUNT + ANGLE_OFFSET;
+      {axes.map((axis, axisIdx) => {
+        const angle = (2 * Math.PI * axisIdx) / axisCount + ANGLE_OFFSET;
         const perpAngle = angle + Math.PI / 2;
         const offsetDist = 7;
 
         return gridLevels.map((level) => {
-          const radius = (maxRadius * level) / TASTING_MAX_VALUE;
+          const radius = (maxRadius * level) / maxScore;
           const px = ctrX + radius * Math.cos(angle);
           const py = ctrY + radius * Math.sin(angle);
 
           return (
             <text
-              key={`grid-${axis.key}-${level}`}
+              key={`grid-${axisIdx}-${level}`}
               x={px + offsetDist * Math.cos(perpAngle)}
               y={py + offsetDist * Math.sin(perpAngle)}
               textAnchor="middle"
@@ -422,11 +491,11 @@ export default function TastingRadarChart({
       })}
 
       {/* 축 선 */}
-      {TASTING_AXES.map((axis, i) => {
-        const { x, y } = polarToCartesian(ctrX, ctrY, maxRadius, i);
+      {axes.map((axis, i) => {
+        const { x, y } = polarToCartesian(ctrX, ctrY, maxRadius, i, axisCount);
         return (
           <line
-            key={`axis-${axis.key}`}
+            key={`axis-${i}`}
             x1={ctrX}
             y1={ctrY}
             x2={x}
@@ -463,33 +532,41 @@ export default function TastingRadarChart({
       {/* 값 배지 (시각적 레이어) */}
       {badgePoints.map((p, i) => (
         <ValueBadge
-          key={TASTING_AXES[i].key}
+          // eslint-disable-next-line react/no-array-index-key
+          key={i}
           targetX={p.x}
           targetY={p.y}
-          value={values[TASTING_AXES[i].key]}
-          isActive={activeAxis === TASTING_AXES[i].key}
+          value={axes[i].score}
+          isActive={activeIndex === i}
           isDragging={draggingIdx === i}
         />
       ))}
 
-      {/* 축 라벨 (한글) */}
-      {TASTING_AXES.map((axis, i) => {
-        const { x, y } = polarToCartesian(ctrX, ctrY, maxRadius + 20, i);
+      {/* 축 라벨 — 사용자 정의 이름이 길어도 차트 폭 안에 들어오도록 위치를 제한한다 */}
+      {axes.map((axis, i) => {
+        const { x, y } = polarToCartesian(
+          ctrX,
+          ctrY,
+          maxRadius + 20,
+          i,
+          axisCount,
+        );
+        const halfWidth = (axis.name.length * LABEL_FONT_SIZE) / 2;
+        const labelX = Math.max(halfWidth, Math.min(size - halfWidth, x));
         return (
           <text
-            key={axis.key}
-            x={x}
+            // eslint-disable-next-line react/no-array-index-key
+            key={i}
+            x={labelX}
             y={y}
             textAnchor="middle"
             dominantBaseline="central"
             className="fill-fg-neutral"
-            fontSize={11}
-            fontWeight={
-              activeAxis === axis.key || draggingIdx === i ? 700 : 600
-            }
+            fontSize={LABEL_FONT_SIZE}
+            fontWeight={activeIndex === i || draggingIdx === i ? 700 : 600}
             style={{ pointerEvents: 'none' }}
           >
-            {axis.labelKo}
+            {axis.name}
           </text>
         );
       })}
@@ -510,7 +587,8 @@ export default function TastingRadarChart({
       {isInteractive &&
         badgePoints.map((p, i) => (
           <circle
-            key={`hit-${TASTING_AXES[i].key}`}
+            // eslint-disable-next-line react/no-array-index-key
+            key={`hit-${i}`}
             cx={p.x}
             cy={p.y}
             r={BADGE_HIT_RADIUS}
@@ -538,7 +616,7 @@ export default function TastingRadarChart({
             exit={{ opacity: 0, scale: 0.7 }}
             transition={{ duration: 0.15 }}
           >
-            {LEVEL_DESCRIPTIONS[feedback.level]}
+            {getTastingLevelDescription(feedback.level, maxScore)}
           </motion.text>
         )}
       </AnimatePresence>
