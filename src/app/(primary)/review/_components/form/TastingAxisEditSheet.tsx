@@ -241,11 +241,11 @@ export default function TastingAxisEditSheet({
               type="button"
               onClick={handleAdd}
               disabled={isFull || hasBlankNewRow}
-              className="flex h-44 items-center gap-10 text-15 font-bold text-fg-brand disabled:text-fg-disabled"
+              className="group flex h-44 items-center gap-10 text-15 font-bold text-fg-brand disabled:text-fg-disabled"
             >
               <span
                 aria-hidden
-                className="flex h-24 w-24 items-center justify-center rounded-full bg-bg-brand-solid text-18 font-medium text-palette-static-white"
+                className="flex h-24 w-24 items-center justify-center rounded-full bg-bg-brand-solid text-18 font-medium text-palette-static-white group-disabled:bg-bg-disabled"
               >
                 +
               </span>
