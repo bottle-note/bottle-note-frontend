@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { CircleHelp, CircleX } from 'lucide-react';
+import { CircleHelp, CircleX, Search } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 import Button from '@/components/ui/Button/Button';
 import useModalStore from '@/store/modalStore';
@@ -85,10 +85,14 @@ export default function TagsForm() {
       >
         <article className="ml-28 mt-6">
           <div className="flex h-44 items-center border-b border-stroke-brand-solid">
+            <Search
+              aria-hidden
+              className="mr-8 h-16 w-16 shrink-0 text-fg-brand"
+            />
             <input
               type="text"
               className="w-full bg-transparent text-15 text-fg-neutral placeholder:text-fg-placeholder focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
-              placeholder="예) 반건조 된 건자두"
+              placeholder="태그 검색 또는 직접입력"
               value={tagValue}
               maxLength={12}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
