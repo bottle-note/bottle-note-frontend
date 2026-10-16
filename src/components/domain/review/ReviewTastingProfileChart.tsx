@@ -64,27 +64,32 @@ const getBadgeMinRadius = (count: number) =>
 const getGridLevels = (maxScore: number) =>
   maxScore <= DEFAULT_MAX_SCORE ? Math.max(1, Math.round(maxScore)) : 5;
 
+/** 그래프로 그릴 수 있는 저장 프로필인지 확인한다. 척도나 점수가 어긋난 데이터는 그리지 않는다. */
+export function isDisplayableTastingProfile(
+  profile: ReviewTastingProfile | null | undefined,
+): profile is ReviewTastingProfile {
+  return (
+    !!profile &&
+    Number.isFinite(profile.maxScore) &&
+    profile.maxScore > 0 &&
+    Array.isArray(profile.axes) &&
+    profile.axes.length > 0 &&
+    profile.axes.every(
+      (axis) =>
+        !!axis.name?.trim() &&
+        Number.isFinite(axis.score) &&
+        axis.score >= 0 &&
+        axis.score <= profile.maxScore,
+    )
+  );
+}
+
 /** API에 저장된 축의 순서·이름·척도를 그대로 사용하는 조회 전용 그래프. */
 export default function ReviewTastingProfileChart({
   profile,
   size = 240,
 }: Props) {
-  if (
-    !profile ||
-    !Number.isFinite(profile.maxScore) ||
-    profile.maxScore <= 0 ||
-    !Array.isArray(profile.axes) ||
-    profile.axes.length === 0 ||
-    profile.axes.some(
-      (axis) =>
-        !axis.name?.trim() ||
-        !Number.isFinite(axis.score) ||
-        axis.score < 0 ||
-        axis.score > profile.maxScore,
-    )
-  ) {
-    return null;
-  }
+  if (!isDisplayableTastingProfile(profile)) return null;
 
   const { axes, maxScore } = profile;
   const accessibleName = `테이스팅 프로필: ${axes
@@ -128,7 +133,7 @@ export default function ReviewTastingProfileChart({
         viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
         width={size}
         height={size}
-        className="mx-auto block max-w-full text-fg-neutral"
+        className="mx-auto block h-auto max-w-full text-fg-neutral"
       >
         {Array.from({ length: levels }, (_, i) => i + 1).map((level) => (
           <polygon

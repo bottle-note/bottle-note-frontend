@@ -18,7 +18,6 @@ import {
 import ReplyButton from '@/components/domain/review/ReplyButton';
 import ReviewLikeButton from '@/components/domain/review/ReviewLikeButton';
 import Label from '@/components/ui/Display/Label';
-import ReviewTastingProfileChart from '@/components/domain/review/ReviewTastingProfileChart';
 import { isLegacyTastingGraphImage } from '@/api/review/tastingProfile';
 
 interface Props {
@@ -128,7 +127,11 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
         {/* 리뷰 본문 */}
         <Link href={ROUTES.REVIEW.DETAIL(content.reviewId)}>
           <div className="flex flex-col gap-14">
-            <ReviewImageCarousel images={productImages} priority={priority} />
+            <ReviewImageCarousel
+              images={productImages}
+              tastingProfile={content.tastingProfile}
+              priority={priority}
+            />
             <div
               className="whitespace-pre-line break-words text-15 text-fg-neutral"
               dangerouslySetInnerHTML={{
@@ -142,7 +145,6 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
                 </div>
               ))}
             </div>
-            <ReviewTastingProfileChart profile={content.tastingProfile} />
           </div>
         </Link>
 

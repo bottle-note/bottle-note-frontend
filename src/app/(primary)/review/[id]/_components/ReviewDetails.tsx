@@ -6,11 +6,11 @@ import { formatDate } from '@/utils/formatDate';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import ReviewActionDropdown from '@/components/domain/review/ReviewActionDropdown';
 import { isLegacyTastingGraphImage } from '@/api/review/tastingProfile';
-import ReviewTastingProfileChart from '@/components/domain/review/ReviewTastingProfileChart';
 import {
   ReviewImageCarousel,
   convertImageUrlsToProductImageArray,
 } from '@/components/domain/review/ReviewImageCarousel';
+import { isDisplayableTastingProfile } from '@/components/domain/review/ReviewTastingProfileChart';
 import ReviewUserHeader from './ReviewUserHeader';
 import ReviewPriceLocation from './ReviewPriceLocation';
 import ReviewInteractionBar from './ReviewInteractionBar';
@@ -59,16 +59,13 @@ function ReviewDetails({
           <ReviewUserHeader data={data} onRefresh={onRefresh} />
         </div>
         <section className="mx-20 border-b border-stroke-neutral-subtle pb-20">
-          {productImages?.length > 0 && (
+          {(productImages?.length > 0 ||
+            isDisplayableTastingProfile(data.reviewInfo.tastingProfile)) && (
             <div className="mb-22">
-              <ReviewImageCarousel images={productImages} priority />
-            </div>
-          )}
-          {data.reviewInfo.tastingProfile && (
-            <div className="mb-22">
-              <ReviewTastingProfileChart
-                profile={data.reviewInfo.tastingProfile}
-                size={280}
+              <ReviewImageCarousel
+                images={productImages}
+                tastingProfile={data.reviewInfo.tastingProfile}
+                priority
               />
             </div>
           )}
