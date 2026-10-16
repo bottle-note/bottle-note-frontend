@@ -5,7 +5,7 @@ import { ReviewApi } from '@/api/review/review.api';
 import type { ReviewTastingProfile } from '@/api/review/types';
 import {
   isLegacyTastingGraphImage,
-  toReviewTastingProfile,
+  toSubmitTastingProfile,
 } from '@/api/review/tastingProfile';
 import useModalStore from '@/store/modalStore';
 import { FormValues } from '@/types/Review';
@@ -66,10 +66,8 @@ export const useReviewSubmission = ({
     price: data.price,
     imageUrlList,
     tastingTagList: data.flavor_tags,
-    tastingProfile:
-      data.tastingNote == null
-        ? initialTastingProfile ?? null
-        : toReviewTastingProfile(data.tastingNote),
+    // 수정 요청에서 null·생략은 삭제로 저장되므로 편집하지 않은 프로필도 그대로 보낸다.
+    tastingProfile: toSubmitTastingProfile(data.tastingProfile),
     locationInfo: {
       locationName: data.locationName,
       zipCode: data.zipCode,
@@ -143,7 +141,7 @@ export const useReviewSubmission = ({
     // 저장된 프로필을 새 그래프로 표시할 때만 과거 PNG를 목록에서 제외한다.
     // 프로필 없이 이미지로만 남아 있는 예전 리뷰는 사진을 보존한다.
     const hasProfile =
-      data.tastingNote != null || initialTastingProfile != null;
+      data.tastingProfile != null || initialTastingProfile != null;
     const originPhotos = hasProfile
       ? originImgUrlList.filter(
           (img) => !isLegacyTastingGraphImage(img.viewUrl),

@@ -69,7 +69,6 @@ function ReviewDetails({
               <ReviewTastingProfileChart
                 profile={data.reviewInfo.tastingProfile}
                 size={280}
-                showDescriptions
               />
             </div>
           )}

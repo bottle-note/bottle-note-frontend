@@ -23,6 +23,12 @@ describe('API 테이스팅 프로필 조회 그래프', () => {
         .getAllByTestId('tasting-axis-label')
         .map((node) => node.textContent),
     ).toEqual(['바디감', '스모키', '과일', '꽃/허브']);
+    expect(
+      within(chart)
+        .getAllByTestId('tasting-score-badge')
+        .map((node) => node.textContent),
+    ).toEqual(['7', '0', '9', '3']);
+    expect(screen.getByText('10점 만점')).toBeInTheDocument();
     expect(chart).toHaveAccessibleName(
       /바디감.*7\/10.*묵직한 질감.*스모키.*0\/10.*연기와 이탄.*과일.*9\/10/,
     );

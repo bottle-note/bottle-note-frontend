@@ -51,20 +51,9 @@ export const TASTING_AXES = [
 
 export type TastingAxisKey = (typeof TASTING_AXES)[number]['key'];
 
-export type TastingNoteValues = Record<TastingAxisKey, number>;
-
 export const TASTING_MAX_VALUE = 5;
 
-export const DEFAULT_TASTING_NOTE: TastingNoteValues = {
-  smoky: 0,
-  fruity: 0,
-  floral: 0,
-  sweet: 0,
-  spicy: 0,
-  body: 0,
-};
-
-/** 탭 시 표시되는 레벨 설명 (index = value) */
+/** 탭 시 표시되는 레벨 설명 (index = 0~5 단계) */
 export const LEVEL_DESCRIPTIONS = [
   '느껴지지 않음',
   '살짝 느껴짐',
@@ -74,17 +63,22 @@ export const LEVEL_DESCRIPTIONS = [
   '매우 강렬',
 ] as const;
 
-/** 테이스팅 노트 값(0~5)에 따른 햅틱 강도 매핑 */
-export function getTastingHapticType(
-  value: number,
-): 'light' | 'medium' | 'heavy' | null {
-  if (value <= 0) return null;
-  if (value >= 4) return 'heavy';
-  if (value >= 2) return 'medium';
-  return 'light';
+/** 최고 점수가 다른 프로필도 0~5 단계로 환산한다. */
+const toFiveLevel = (value: number, maxScore: number) =>
+  Math.round((value / maxScore) * TASTING_MAX_VALUE);
+
+export function getTastingLevelDescription(value: number, maxScore: number) {
+  return LEVEL_DESCRIPTIONS[toFiveLevel(value, maxScore)];
 }
 
-export const isTastingNoteEmpty = (note: TastingNoteValues | null): boolean => {
-  if (!note) return true;
-  return Object.values(note).every((v) => v === 0);
-};
+/** 점수의 0~5 단계에 따른 햅틱 강도 매핑 */
+export function getTastingHapticType(
+  value: number,
+  maxScore: number = TASTING_MAX_VALUE,
+): 'light' | 'medium' | 'heavy' | null {
+  const level = toFiveLevel(value, maxScore);
+  if (level <= 0) return null;
+  if (level >= 4) return 'heavy';
+  if (level >= 2) return 'medium';
+  return 'light';
+}

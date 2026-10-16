@@ -4,20 +4,26 @@ import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import Button from '@/components/ui/Button/Button';
 import {
-  isTastingNoteEmpty,
-  DEFAULT_TASTING_NOTE,
-} from '@/constants/tastingNote';
+  isDefaultTastingProfile,
+  isTastingProfileEmpty,
+} from '@/api/review/tastingProfile';
+import { TASTING_MAX_VALUE } from '@/constants/tastingNote';
 import { FormValues } from '@/types/Review';
 import TastingRadarChart from './TastingRadarChart';
 import TastingNoteModal from './TastingNoteModal';
 import OptionsContainer from '../OptionsContainer';
 
-export default function TastingNoteForm() {
+interface Props {
+  alcoholTastingTags?: string[] | null;
+}
+
+export default function TastingNoteForm({ alcoholTastingTags }: Props) {
   const { watch } = useFormContext<FormValues>();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const tastingNote = watch('tastingNote');
-  const hasNote = !isTastingNoteEmpty(tastingNote ?? null);
+  const tastingProfile = watch('tastingProfile');
+  const hasNote = tastingProfile && !isTastingProfileEmpty(tastingProfile);
+  const isCustom = hasNote && !isDefaultTastingProfile(tastingProfile);
 
   return (
     <>
@@ -32,12 +38,31 @@ export default function TastingNoteForm() {
           {hasNote ? (
             // 작성 완료: 미리보기 차트 + 수정 버튼
             <div className="flex flex-col items-center gap-12">
-              <div className="w-180 h-180">
-                <TastingRadarChart
-                  values={tastingNote ?? DEFAULT_TASTING_NOTE}
-                  size={180}
-                />
-              </div>
+              {tastingProfile.axes.length >= 3 ? (
+                <div className="w-180 h-180">
+                  <TastingRadarChart
+                    axes={tastingProfile.axes}
+                    maxScore={tastingProfile.maxScore}
+                    size={180}
+                  />
+                </div>
+              ) : (
+                <p className="text-13 text-fg-neutral">
+                  {tastingProfile.axes
+                    .map(
+                      (axis) =>
+                        `${axis.name} ${axis.score}/${tastingProfile.maxScore}`,
+                    )
+                    .join(' · ')}
+                </p>
+              )}
+              {isCustom && (
+                <span className="rounded-sm bg-bg-brand-weak px-8 text-12 font-bold text-fg-brand">
+                  커스텀 · {tastingProfile.axes.length}개 항목
+                  {tastingProfile.maxScore !== TASTING_MAX_VALUE &&
+                    ` · ${tastingProfile.maxScore}점`}
+                </span>
+              )}
               <Button
                 type="button"
                 onClick={() => setIsModalOpen(true)}
@@ -79,6 +104,7 @@ export default function TastingNoteForm() {
       <TastingNoteModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        alcoholTastingTags={alcoholTastingTags}
       />
     </>
   );

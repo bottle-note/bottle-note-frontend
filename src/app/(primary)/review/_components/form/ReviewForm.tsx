@@ -23,14 +23,19 @@ const Section = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-function ReviewForm() {
+interface Props {
+  /** 테이스팅 항목 추가 시 추천으로 보여줄 주류 태그 */
+  alcoholTastingTags?: string[] | null;
+}
+
+function ReviewForm({ alcoholTastingTags }: Props) {
   return (
     <section className="px-20 pt-36 pb-[var(--sticky-cta-space)] relative">
       <Section>
         <RatingForm />
         <ContentForm />
         <TagsForm />
-        <TastingNoteForm />
+        <TastingNoteForm alcoholTastingTags={alcoholTastingTags} />
         <AddressForm />
         <PriceForm />
         <ImagesForm />
