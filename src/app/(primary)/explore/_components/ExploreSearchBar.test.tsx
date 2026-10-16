@@ -78,7 +78,7 @@ describe('ExploreSearchBar', () => {
     expect(input).toHaveValue('mac');
     expect(input).toHaveAttribute(
       'placeholder',
-      '검색어를 입력해보세요(위스키 이름, 테이스팅노트 등)',
+      '위스키 이름, 테이스팅노트로 검색',
     );
     expect(screen.queryByText('+ 검색어 추가')).not.toBeInTheDocument();
     expect(
