@@ -11,15 +11,7 @@ export default function ReviewContentPreview({ content }: Props) {
 
   useLayoutEffect(() => {
     const el = textRef.current;
-    if (!el) return undefined;
-
-    const measure = () => setIsClamped(el.scrollHeight > el.clientHeight + 1);
-    measure();
-
-    if (typeof ResizeObserver === 'undefined') return undefined;
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    return () => observer.disconnect();
+    if (el) setIsClamped(el.scrollHeight > el.clientHeight + 1);
   }, [content]);
 
   // line-clamp는 빈 줄에서도 브라우저 말줄임표를 따로 그리므로 text-15 줄 높이(19px) × 4줄로 자른다.
