@@ -76,7 +76,10 @@ describe('ExploreSearchBar', () => {
 
     const input = screen.getByRole('textbox', { name: '위스키 검색' });
     expect(input).toHaveValue('mac');
-    expect(input).toHaveAttribute('placeholder', '키워드를 입력하세요');
+    expect(input).toHaveAttribute(
+      'placeholder',
+      '검색어를 입력해보세요(위스키 이름, 테이스팅노트 등)',
+    );
     expect(screen.queryByText('+ 검색어 추가')).not.toBeInTheDocument();
     expect(
       screen.getByText('이름이나 플레이버 태그를 입력해 검색해보세요.'),
