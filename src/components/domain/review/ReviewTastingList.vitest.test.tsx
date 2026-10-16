@@ -165,7 +165,7 @@ describe('리뷰 목록 카드의 저장된 프로필 표시', () => {
     expect(screen.getByAltText('content_img')).toHaveAttribute('src', oldGraph);
   });
 
-  it('상세: 저장된 축 설명을 보여주고 이전 그래프 PNG는 사진에서 제외한다', () => {
+  it('상세: 점수를 그래프 안에 보여주고 이전 그래프 PNG는 사진에서 제외한다', () => {
     const data = {
       reviewInfo: {
         reviewId: 11,
@@ -196,7 +196,10 @@ describe('리뷰 목록 카드의 저장된 프로필 표시', () => {
     expect(
       screen.getByRole('img', { name: /바디감 7\/10, 묵직함/ }),
     ).toBeInTheDocument();
-    expect(screen.getByText('바디감 7/10')).toBeInTheDocument();
+    expect(
+      screen.getAllByTestId('tasting-score-badge').map((n) => n.textContent),
+    ).toContain('7');
+    expect(screen.queryByText('바디감 7/10')).not.toBeInTheDocument();
     expect(screen.getByTestId('review-photos')).toHaveTextContent(photo);
     expect(screen.getByTestId('review-photos')).not.toHaveTextContent(oldGraph);
   });
