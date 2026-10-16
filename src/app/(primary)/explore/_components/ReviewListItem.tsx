@@ -20,6 +20,7 @@ import ReviewLikeButton from '@/components/domain/review/ReviewLikeButton';
 import Label from '@/components/ui/Display/Label';
 import ReviewTastingProfileChart from '@/components/domain/review/ReviewTastingProfileChart';
 import { isLegacyTastingGraphImage } from '@/api/review/tastingProfile';
+import ReviewContentPreview from './ReviewContentPreview';
 
 interface Props {
   content: ExploreReview;
@@ -129,12 +130,7 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
         <Link href={ROUTES.REVIEW.DETAIL(content.reviewId)}>
           <div className="flex flex-col gap-14">
             <ReviewImageCarousel images={productImages} priority={priority} />
-            <div
-              className="whitespace-pre-line break-words text-15 text-fg-neutral"
-              dangerouslySetInnerHTML={{
-                __html: content.reviewContent.replace(/\n/g, '<br />'),
-              }}
-            />
+            <ReviewContentPreview content={content.reviewContent} />
             <div className="flex flex-wrap gap-6">
               {reviewTags.map((tag) => (
                 <div key={tag} className="overflow-hidden flex-shrink-0">
