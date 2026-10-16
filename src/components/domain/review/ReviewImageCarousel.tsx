@@ -9,6 +9,7 @@ import {
   type CarouselApi,
 } from '@/components/ui/Display/carousel';
 import BaseImage from '@/components/ui/Display/BaseImage';
+import { cn } from '@/lib/utils';
 import type { ReviewTastingProfile } from '@/api/review/types';
 import ReviewTastingProfileChart, {
   isDisplayableTastingProfile,
@@ -40,6 +41,7 @@ interface ReviewImageCarouselProps {
   /** 있으면 사진 앞 첫 장에 테이스팅 그래프를 둔다. */
   tastingProfile?: ReviewTastingProfile | null;
   priority?: boolean;
+  className?: string;
 }
 
 const SLIDE_FRAME_CLASS =
@@ -49,6 +51,7 @@ export const ReviewImageCarousel = ({
   images,
   tastingProfile,
   priority = false,
+  className,
 }: ReviewImageCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
@@ -58,18 +61,20 @@ export const ReviewImageCarousel = ({
       return;
     }
 
-    setCurrent(api.selectedScrollSnap());
+    const onSelect = () => setCurrent(api.selectedScrollSnap());
+    onSelect();
+    api.on('select', onSelect);
 
-    api.on('select', () => {
-      setCurrent(api.selectedScrollSnap());
-    });
+    return () => {
+      api.off('select', onSelect);
+    };
   }, [api]);
 
   const hasGraph = isDisplayableTastingProfile(tastingProfile);
-  const slideCount = (hasGraph ? 1 : 0) + (images?.length ?? 0);
+  const slideCount = (hasGraph ? 1 : 0) + images.length;
 
   if (slideCount === 0) {
-    return <></>;
+    return null;
   }
 
   // 여러 장이면 다음 장이 살짝 보이도록 한 장 폭을 줄인다.
@@ -82,13 +87,13 @@ export const ReviewImageCarousel = ({
         align: 'start',
         loop: true,
       }}
-      className="w-full bg-bg-layer-default"
+      className={cn('w-full bg-bg-layer-default', className)}
     >
       <CarouselContent>
         {hasGraph && (
           <CarouselItem className={itemClassName}>
             <div
-              className={`${SLIDE_FRAME_CLASS} flex items-center justify-center bg-bg-layer-default p-12`}
+              className={`${SLIDE_FRAME_CLASS} flex items-center justify-center p-12`}
             >
               <ReviewTastingProfileChart profile={tastingProfile} size={340} />
             </div>

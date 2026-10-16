@@ -142,6 +142,41 @@ const alcohol = {
   tastingProfile: profile,
 } as ReviewInDetails;
 
+const renderDetails = ({
+  tastingProfile,
+  viewUrls,
+}: {
+  tastingProfile: ReviewTastingProfile | null;
+  viewUrls: string[];
+}) => {
+  const data = {
+    reviewInfo: {
+      reviewId: 11,
+      userInfo,
+      reviewContent: '과일향',
+      tastingProfile,
+      tastingTagList: [],
+      isLikedByMe: false,
+      likeCount: 0,
+      createAt: '2026-01-01',
+    },
+    reviewImageList: viewUrls.map((viewUrl, index) => ({
+      order: index + 1,
+      viewUrl,
+    })),
+  } as unknown as ReviewDetailsWithoutAlcoholInfo;
+
+  render(
+    <ReviewDetails
+      data={data}
+      alcoholId={7}
+      handleLogin={vi.fn()}
+      isPersonalizedReady={false}
+      onRefresh={vi.fn()}
+    />,
+  );
+};
+
 describe('리뷰 목록 카드의 저장된 프로필 표시', () => {
   it('둘러보기: 그래프를 첫 장에 두고 과거 PNG만 제외하며 일반 사진은 유지한다', () => {
     render(<ExploreReviewCard content={explore} />);
@@ -174,32 +209,10 @@ describe('리뷰 목록 카드의 저장된 프로필 표시', () => {
   });
 
   it('상세: 그래프를 첫 장에 두고 이전 그래프 PNG는 사진에서 제외한다', () => {
-    const data = {
-      reviewInfo: {
-        reviewId: 11,
-        userInfo,
-        reviewContent: '과일향',
-        tastingProfile: profile,
-        tastingTagList: [],
-        isLikedByMe: false,
-        likeCount: 0,
-        createAt: '2026-01-01',
-      },
-      reviewImageList: [
-        { order: 1, viewUrl: oldGraph },
-        { order: 2, viewUrl: photo },
-      ],
-    } as unknown as ReviewDetailsWithoutAlcoholInfo;
-
-    render(
-      <ReviewDetails
-        data={data}
-        alcoholId={7}
-        handleLogin={vi.fn()}
-        isPersonalizedReady={false}
-        onRefresh={vi.fn()}
-      />,
-    );
+    renderDetails({
+      tastingProfile: profile,
+      viewUrls: [oldGraph, photo],
+    });
 
     const slides = screen.getAllByRole('group');
     expect(slides).toHaveLength(2);
@@ -213,5 +226,22 @@ describe('리뷰 목록 카드의 저장된 프로필 표시', () => {
     ).toContain('7');
     expect(within(slides[1]).getByRole('img')).toHaveAttribute('src', photo);
     expect(document.querySelector(`img[src="${oldGraph}"]`)).toBeNull();
+  });
+
+  it('상세: 사진 없이 프로필만 있으면 그래프 한 장만 보여준다', () => {
+    renderDetails({ tastingProfile: profile, viewUrls: [] });
+
+    const slides = screen.getAllByRole('group');
+    expect(slides).toHaveLength(1);
+    expect(
+      within(slides[0]).getByRole('img', { name: /테이스팅 프로필/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('상세: 사진도 프로필도 없으면 슬라이드를 그리지 않는다', () => {
+    renderDetails({ tastingProfile: null, viewUrls: [] });
+
+    expect(screen.queryAllByRole('group')).toHaveLength(0);
+    expect(screen.getByText('과일향')).toBeInTheDocument();
   });
 });
