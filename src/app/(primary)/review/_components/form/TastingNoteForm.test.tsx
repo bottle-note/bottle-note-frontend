@@ -6,6 +6,7 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
+import { MotionGlobalConfig } from 'framer-motion';
 import { FormProvider, useForm } from 'react-hook-form';
 import type { ReviewTastingProfile } from '@/api/review/types';
 import type { FormValues } from '@/types/Review';
@@ -85,6 +86,14 @@ const submittedProfile = async (onSubmit: jest.Mock) => {
 };
 
 describe('리뷰 테이스팅 노트 입력', () => {
+  // 모달 닫힘 spring 애니메이션이 느린 CI에서 waitFor 기본 대기(1초)를 넘겨 실패하지 않도록 건너뛴다.
+  beforeAll(() => {
+    MotionGlobalConfig.skipAnimations = true;
+  });
+  afterAll(() => {
+    MotionGlobalConfig.skipAnimations = false;
+  });
+
   it('저장된 사용자 정의 프로필을 그대로 열어 점수만 수정한다', async () => {
     const onSubmit = renderForm(savedProfile);
 
