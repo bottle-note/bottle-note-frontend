@@ -4,7 +4,7 @@ interface Props {
   content: string;
 }
 
-/** 리뷰 본문을 4줄까지만 보여주고, 실제로 잘린 경우에만 마지막 줄 끝에 더보기를 붙인다. */
+/** 리뷰 본문을 8줄까지만 보여주고, 실제로 잘린 경우에만 마지막 줄 끝에 더보기를 붙인다. */
 export default function ReviewContentPreview({ content }: Props) {
   const textRef = useRef<HTMLParagraphElement>(null);
   const [isClamped, setIsClamped] = useState(false);
@@ -14,12 +14,12 @@ export default function ReviewContentPreview({ content }: Props) {
     if (el) setIsClamped(el.scrollHeight > el.clientHeight + 1);
   }, [content]);
 
-  // line-clamp는 빈 줄에서도 브라우저 말줄임표를 따로 그리므로 text-15 줄 높이(19px) × 4줄로 자른다.
+  // line-clamp는 빈 줄에서도 브라우저 말줄임표를 따로 그리므로 text-15 줄 높이(19px) × 8줄로 자른다.
   return (
     <div className="relative">
       <p
         ref={textRef}
-        className="max-h-[76px] overflow-hidden whitespace-pre-line break-words text-15 text-fg-neutral"
+        className="max-h-[152px] overflow-hidden whitespace-pre-line break-words text-15 text-fg-neutral"
       >
         {content}
       </p>
