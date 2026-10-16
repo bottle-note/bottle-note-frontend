@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { vi } from 'vitest';
 import type { ExploreReview } from '@/api/explore/types';
 import type { ReviewInDetails } from '@/api/alcohol/types';
@@ -72,15 +72,21 @@ vi.mock('@/components/domain/review/ReplyButton', () => ({
 vi.mock('@/components/domain/review/ReviewLikeButton', () => ({
   default: () => null,
 }));
-vi.mock('@/components/domain/review/ReviewImageCarousel', () => ({
-  convertImageUrlsToProductImageArray: (urls: string[] | undefined) =>
-    (urls ?? []).map((url) => ({ url })),
-  ReviewImageCarousel: ({ images }: { images: { url: string }[] }) => (
-    <div data-testid="review-photos">
-      {images.map((image) => image.url).join(' | ')}
-    </div>
-  ),
-}));
+// embla는 jsdom에서 matchMedia·레이아웃이 없어 초기화되지 않는다. 슬라이드 순서만 확인하므로 정지 상태 API로 대신한다.
+vi.mock('embla-carousel-react', () => {
+  // setApi로 상태에 들어가므로 렌더마다 같은 객체를 돌려준다.
+  const api = {
+    on: () => {},
+    off: () => {},
+    canScrollPrev: () => false,
+    canScrollNext: () => true,
+    selectedScrollSnap: () => 0,
+    scrollPrev: () => {},
+    scrollNext: () => {},
+  };
+  const ref = () => {};
+  return { default: () => [ref, api] };
+});
 
 const profile: ReviewTastingProfile = {
   version: 2,
@@ -137,13 +143,15 @@ const alcohol = {
 } as ReviewInDetails;
 
 describe('리뷰 목록 카드의 저장된 프로필 표시', () => {
-  it('둘러보기: 프로필을 즉시 그리고 과거 PNG만 제외하며 일반 사진은 유지한다', () => {
+  it('둘러보기: 그래프를 첫 장에 두고 과거 PNG만 제외하며 일반 사진은 유지한다', () => {
     render(<ExploreReviewCard content={explore} />);
+    const slides = screen.getAllByRole('group');
+    expect(slides).toHaveLength(2);
     expect(
-      screen.getByRole('img', { name: /바디감 7\/10/ }),
+      within(slides[0]).getByRole('img', { name: /바디감 7\/10/ }),
     ).toBeInTheDocument();
-    expect(screen.getByTestId('review-photos')).toHaveTextContent(photo);
-    expect(screen.getByTestId('review-photos')).not.toHaveTextContent(oldGraph);
+    expect(within(slides[1]).getByRole('img')).toHaveAttribute('src', photo);
+    expect(document.querySelector(`img[src="${oldGraph}"]`)).toBeNull();
   });
 
   it('위스키 리뷰: 프로필을 즉시 그리고 예전 그래프 썸네일은 가린다', () => {
@@ -165,7 +173,7 @@ describe('리뷰 목록 카드의 저장된 프로필 표시', () => {
     expect(screen.getByAltText('content_img')).toHaveAttribute('src', oldGraph);
   });
 
-  it('상세: 점수를 그래프 안에 보여주고 이전 그래프 PNG는 사진에서 제외한다', () => {
+  it('상세: 그래프를 첫 장에 두고 이전 그래프 PNG는 사진에서 제외한다', () => {
     const data = {
       reviewInfo: {
         reviewId: 11,
@@ -193,14 +201,17 @@ describe('리뷰 목록 카드의 저장된 프로필 표시', () => {
       />,
     );
 
+    const slides = screen.getAllByRole('group');
+    expect(slides).toHaveLength(2);
     expect(
-      screen.getByRole('img', { name: /바디감 7\/10, 묵직함/ }),
+      within(slides[0]).getByRole('img', { name: /바디감 7\/10, 묵직함/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getAllByTestId('tasting-score-badge').map((n) => n.textContent),
+      within(slides[0])
+        .getAllByTestId('tasting-score-badge')
+        .map((n) => n.textContent),
     ).toContain('7');
-    expect(screen.queryByText('바디감 7/10')).not.toBeInTheDocument();
-    expect(screen.getByTestId('review-photos')).toHaveTextContent(photo);
-    expect(screen.getByTestId('review-photos')).not.toHaveTextContent(oldGraph);
+    expect(within(slides[1]).getByRole('img')).toHaveAttribute('src', photo);
+    expect(document.querySelector(`img[src="${oldGraph}"]`)).toBeNull();
   });
 });
