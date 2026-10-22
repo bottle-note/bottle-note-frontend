@@ -5,7 +5,7 @@ import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { formatDate } from '@/utils/formatDate';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import ReviewActionDropdown from '@/components/domain/review/ReviewActionDropdown';
-import { fromReviewTastingProfile } from '@/api/review/tastingProfile';
+import { isLegacyTastingGraphImage } from '@/api/review/tastingProfile';
 import {
   ReviewImageCarousel,
   convertImageUrlsToProductImageArray,
@@ -13,7 +13,6 @@ import {
 import ReviewUserHeader from './ReviewUserHeader';
 import ReviewPriceLocation from './ReviewPriceLocation';
 import ReviewInteractionBar from './ReviewInteractionBar';
-import TastingRadarChart from '../../_components/form/TastingRadarChart';
 
 interface Props {
   data: ReviewDetailsWithoutAlcoholInfo;
@@ -41,13 +40,16 @@ function ReviewDetails({
     setIsLiked(data.reviewInfo.isLikedByMe);
     setLikeCount(data.reviewInfo.likeCount);
   }, [data.reviewInfo.isLikedByMe, data.reviewInfo.likeCount]);
-  const formatUrl = data?.reviewImageList?.map((url) => url.viewUrl);
+  const formatUrl = data?.reviewImageList
+    ?.map((url) => url.viewUrl)
+    .filter(
+      (url) =>
+        !data.reviewInfo.tastingProfile || !isLegacyTastingGraphImage(url),
+    );
   const productImages = convertImageUrlsToProductImageArray(
     formatUrl,
     '리뷰 이미지',
   );
-  const tastingNote = fromReviewTastingProfile(data.reviewInfo?.tastingProfile);
-  const hasGraphImage = formatUrl?.some((url) => url.includes('tasting-graph'));
 
   return (
     <>
@@ -56,21 +58,12 @@ function ReviewDetails({
           <ReviewUserHeader data={data} onRefresh={onRefresh} />
         </div>
         <section className="mx-20 border-b border-stroke-neutral-subtle pb-20">
-          {productImages?.length > 0 && (
-            <div className="mb-22">
-              <ReviewImageCarousel images={productImages} priority />
-            </div>
-          )}
-          {tastingNote && !hasGraphImage && (
-            <div
-              className="mb-22 flex justify-center"
-              aria-label="테이스팅 그래프"
-            >
-              <div className="h-280 w-280">
-                <TastingRadarChart values={tastingNote} size={280} />
-              </div>
-            </div>
-          )}
+          <ReviewImageCarousel
+            images={productImages}
+            tastingProfile={data.reviewInfo.tastingProfile}
+            priority
+            className="mb-22"
+          />
           <div className="whitespace-pre-line break-words text-15 text-fg-neutral">
             {data.reviewInfo?.reviewContent}
           </div>

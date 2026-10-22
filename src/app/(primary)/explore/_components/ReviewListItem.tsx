@@ -18,6 +18,8 @@ import {
 import ReplyButton from '@/components/domain/review/ReplyButton';
 import ReviewLikeButton from '@/components/domain/review/ReviewLikeButton';
 import Label from '@/components/ui/Display/Label';
+import { isLegacyTastingGraphImage } from '@/api/review/tastingProfile';
+import ReviewContentPreview from './ReviewContentPreview';
 
 interface Props {
   content: ExploreReview;
@@ -32,7 +34,9 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
   const [likeCount, setLikeCount] = useState(content.likeCount);
   const [isReportOptionShow, setIsReportOptionShow] = useState(false);
   const productImages = convertImageUrlsToProductImageArray(
-    content.reviewImages,
+    content.tastingProfile
+      ? content.reviewImages.filter((url) => !isLegacyTastingGraphImage(url))
+      : content.reviewImages,
     '리뷰 이미지',
   );
   const reviewTags = [...new Set(content.reviewTags)];
@@ -124,13 +128,12 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
         {/* 리뷰 본문 */}
         <Link href={ROUTES.REVIEW.DETAIL(content.reviewId)}>
           <div className="flex flex-col gap-14">
-            <ReviewImageCarousel images={productImages} priority={priority} />
-            <div
-              className="whitespace-pre-line break-words text-15 text-fg-neutral"
-              dangerouslySetInnerHTML={{
-                __html: content.reviewContent.replace(/\n/g, '<br />'),
-              }}
+            <ReviewImageCarousel
+              images={productImages}
+              tastingProfile={content.tastingProfile}
+              priority={priority}
             />
+            <ReviewContentPreview content={content.reviewContent} />
             <div className="flex flex-wrap gap-6">
               {reviewTags.map((tag) => (
                 <div key={tag} className="overflow-hidden flex-shrink-0">

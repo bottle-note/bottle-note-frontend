@@ -1,5 +1,6 @@
 import { AlcoholInfo, Review } from '@/types/Review';
 import { BASE_URL } from '@/constants/common';
+import { isLegacyTastingGraphImage } from '@/api/review/tastingProfile';
 
 /**
  * 리뷰 정보를 Schema.org Review 형식으로 변환합니다.
@@ -44,7 +45,12 @@ export function generateReviewSchema(
     },
     datePublished: reviewInfo.createAt,
     reviewBody: reviewInfo.reviewContent,
-    image: reviewInfo.reviewImageUrl || undefined,
+    image:
+      reviewInfo.tastingProfile &&
+      reviewInfo.reviewImageUrl &&
+      isLegacyTastingGraphImage(reviewInfo.reviewImageUrl)
+        ? undefined
+        : reviewInfo.reviewImageUrl || undefined,
     publisher: {
       '@type': 'Organization',
       name: 'Bottle Note',

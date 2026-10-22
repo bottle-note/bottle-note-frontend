@@ -69,6 +69,7 @@ export const ExploreSearchBar = ({
         onValueChange={onValueChange}
         initialValue={initialValue}
         ariaLabel={filterTarget === 'review' ? '리뷰 검색' : '위스키 검색'}
+        placeholder="위스키 이름, 테이스팅노트로 검색"
         inputClassName="pr-64"
         clearable
         renderActions={() => (

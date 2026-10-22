@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import type { ReviewDetailsResponse } from '@/api/review/types';
 import { ROUTES } from '@/constants/routes';
 import type { PublicApiResult } from '@/shared/api/internalApi';
+import { isLegacyTastingGraphImage } from '@/api/review/tastingProfile';
 import { joinSentences, normalizeText, truncateText } from './text';
 
 const REVIEW_SNIPPET_LENGTH = 120;
@@ -64,7 +65,12 @@ export function buildReviewMetadata(
     ? `${name} 후기 - ${nickName}님의 테이스팅 노트`
     : `${name} 후기`;
   const description = buildReviewDescription(data);
-  const imageUrl = reviewImageList?.[0]?.viewUrl || data.alcoholInfo.imageUrl;
+  const firstPhoto = reviewInfo.tastingProfile
+    ? reviewImageList?.find(
+        (image) => !isLegacyTastingGraphImage(image.viewUrl),
+      )?.viewUrl
+    : reviewImageList?.[0]?.viewUrl;
+  const imageUrl = firstPhoto || data.alcoholInfo.imageUrl;
 
   return {
     title,

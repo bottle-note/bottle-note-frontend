@@ -16,6 +16,8 @@ import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import ReviewActionDropdown from '@/components/domain/review/ReviewActionDropdown';
 import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import { useBlockActions } from '@/hooks/useBlockActions';
+import ReviewTastingProfileChart from '@/components/domain/review/ReviewTastingProfileChart';
+import { isLegacyTastingGraphImage } from '@/api/review/tastingProfile';
 
 interface Props {
   data: ReviewInDetails;
@@ -109,20 +111,23 @@ function ReviewListItem({ data, onRefresh }: Props) {
                       )}
                     </p>
                   </div>
-                  {data.reviewImageUrl && (
-                    <div className="flex-shrink-0 bg-palette-static-white">
-                      <Image
-                        className="w-68 h-68 bg-palette-static-white object-cover"
-                        src={data.reviewImageUrl}
-                        alt="content_img"
-                        width={68}
-                        height={68}
-                      />
-                    </div>
-                  )}
+                  {data.reviewImageUrl &&
+                    (!data.tastingProfile ||
+                      !isLegacyTastingGraphImage(data.reviewImageUrl)) && (
+                      <div className="flex-shrink-0 bg-palette-static-white">
+                        <Image
+                          className="w-68 h-68 bg-palette-static-white object-cover"
+                          src={data.reviewImageUrl}
+                          alt="content_img"
+                          width={68}
+                          height={68}
+                        />
+                      </div>
+                    )}
                 </div>
               </Link>
             </div>
+            <ReviewTastingProfileChart profile={data.tastingProfile} />
             <ReviewListActions
               reviewId={data.reviewId}
               isLiked={isLiked}

@@ -18,6 +18,7 @@ import { useReviewSubmission } from '@/app/(primary)/review/hook/useReviewSubmis
 import useModalStore from '@/store/modalStore';
 import Toast from '@/components/ui/Interactive/Toast';
 import { trackGA4Event } from '@/utils/analytics/ga4';
+import { restoreSavedReviewContent } from '@/api/review/tastingProfile';
 import ReviewForm from '../_components/form/ReviewForm';
 import ReviewHeaderLayout from '../_components/ReviewHeaderLayout';
 import AlcoholSearchBottomSheet from '../_components/AlcoholSearchBottomSheet';
@@ -61,7 +62,7 @@ function ReviewRegister() {
     mapUrl: null,
     latitude: null,
     longitude: null,
-    tastingNote: null,
+    tastingProfile: null,
   };
 
   const formMethods = useForm<FormValues>({
@@ -112,7 +113,7 @@ function ReviewRegister() {
 
   const handleLoad = useCallback(
     (savedData: ReviewTempData) => {
-      reset(savedData.content);
+      reset(restoreSavedReviewContent(savedData.content));
     },
     [reset],
   );
@@ -234,7 +235,7 @@ function ReviewRegister() {
         onSelectAlcohol={() => setIsSearchOpen(true)}
       />
 
-      <ReviewForm />
+      <ReviewForm alcoholTastingTags={alcoholData?.alcoholsTastingTags} />
       <article
         className={`sticky px-20 z-10 flex justify-center transition-opacity duration-200 ${
           isKeyboardVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'

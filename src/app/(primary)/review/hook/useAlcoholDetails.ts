@@ -1,43 +1,32 @@
 import { useState, useEffect } from 'react';
-import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
-import type { AlcoholDetailsResponse } from '@/api/alcohol/types';
 import { RateApi } from '@/api/rate/rate.api';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useAlcoholDetailQuery } from '@/queries/useAlcoholDetailQuery';
 
 export const useAlcoholDetails = (
   alcoholId: string | number,
   type = 'register',
 ) => {
-  const [alcoholData, setAlcoholData] =
-    useState<AlcoholDetailsResponse['alcohols']>();
+  const alcoholIdString = alcoholId ? alcoholId.toString() : '';
+  const { isLoading: isAuthLoading, user } = useAuthSession();
+  const { data, isLoading: isAlcoholLoading } = useAlcoholDetailQuery({
+    alcoholId: alcoholIdString,
+    viewerId: user?.userId ?? null,
+    enabled: !isAuthLoading,
+  });
   const [userRating, setUserRating] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!alcoholId) return;
+    if (!alcoholIdString || type !== 'register') return;
 
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const alcoholResult = await AlcoholsApi.getAlcoholDetails(
-          alcoholId.toString(),
-        );
-        setAlcoholData(alcoholResult.data.alcohols);
+    RateApi.getUserRating(alcoholIdString)
+      .then((ratingResult) => setUserRating(ratingResult.data.rating))
+      .catch((err) => console.error('Failed to fetch user rating:', err));
+  }, [alcoholIdString, type]);
 
-        if (type === 'register') {
-          const ratingResult = await RateApi.getUserRating(
-            alcoholId.toString(),
-          );
-          setUserRating(ratingResult.data.rating);
-        }
-      } catch (err) {
-        console.error('Failed to fetch alcohol details:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [alcoholId, type]);
-
-  return { alcoholData, userRating, isLoading };
+  return {
+    alcoholData: data?.alcohols,
+    userRating,
+    isLoading: isAlcoholLoading,
+  };
 };

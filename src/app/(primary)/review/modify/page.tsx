@@ -15,7 +15,7 @@ import { reviewSchema } from '@/app/(primary)/review/_schemas/reviewFormSchema';
 import { parseApiError } from '@/hooks/parseApiError';
 import { useReviewDetailQuery } from '@/queries/useReviewDetailQuery';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
-import { fromReviewTastingProfile } from '@/api/review/tastingProfile';
+import { isLegacyTastingGraphImage } from '@/api/review/tastingProfile';
 import Button from '@/components/ui/Button/Button';
 import useModalStore from '@/store/modalStore';
 import Loading from '@/components/ui/Loading/Loading';
@@ -89,9 +89,13 @@ function ReviewModify() {
       price: reviewInfo.price || null,
       flavor_tags: reviewInfo.tastingTagList || [],
       images: null,
-      imageUrlList: reviewImageList || [],
+      imageUrlList: reviewInfo.tastingProfile
+        ? (reviewImageList || []).filter(
+            (image) => !isLegacyTastingGraphImage(image.viewUrl),
+          )
+        : reviewImageList || [],
       rating: reviewInfo.rating || 0,
-      tastingNote: fromReviewTastingProfile(reviewInfo.tastingProfile),
+      tastingProfile: reviewInfo.tastingProfile ?? null,
       locationName: locationInfo.name,
       address: locationInfo.address,
       detailAddress: locationInfo.detailAddress || null,
@@ -143,7 +147,7 @@ function ReviewModify() {
         onBack={handleBack}
         headerTitle="리뷰 수정"
       />
-      <ReviewForm />
+      <ReviewForm alcoholTastingTags={alcoholData?.alcoholsTastingTags} />
       <article
         className={`sticky px-20 z-10 flex justify-center transition-opacity duration-200 ${
           isKeyboardVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'
