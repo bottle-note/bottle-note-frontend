@@ -182,7 +182,7 @@ export default function LikesStep({
           ))}
         </div>
       )}
-      <FlowAction primary onClick={onNext}>
+      <FlowAction onClick={onNext}>
         {answers.likedIds.length ? '이 술을 기억할게요' : '건너뛸게요'}
       </FlowAction>
     </>

@@ -5,7 +5,12 @@ import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
 import TastingRadarChart from '@/app/(primary)/review/_components/form/TastingRadarChart';
 import { TASTING_AXES, TASTING_MAX_VALUE } from '@/constants/tastingNote';
 import type { ReviewDraft, Step } from './types';
-import { OptionList, FlowAction } from './FlowControls';
+import {
+  OptionList,
+  FlowAction,
+  FlowNavigation,
+  FlowTextAction,
+} from './FlowControls';
 import { WhiskeyImage } from './WhiskeyRow';
 import ReviewPickStep from './ReviewPickStep';
 import { prefersReducedMotion } from './prefersReducedMotion';
@@ -94,13 +99,8 @@ export default function ReviewFlow({
   const optionList = (items: Parameters<typeof OptionList>[0]['items']) => (
     <OptionList items={items} />
   );
-  const action = (
-    label: string,
-    onClick: () => void,
-    primary = false,
-    disabled = false,
-  ) => (
-    <FlowAction onClick={onClick} primary={primary} disabled={disabled}>
+  const action = (label: string, onClick: () => void, disabled = false) => (
+    <FlowAction onClick={onClick} disabled={disabled}>
       {label}
     </FlowAction>
   );
@@ -345,7 +345,6 @@ export default function ReviewFlow({
               ? '다 그렸어요'
               : '그래프 없이 넘어갈게요',
             () => move('review-photo'),
-            true,
           )}
         </>
       )}
@@ -403,7 +402,6 @@ export default function ReviewFlow({
               ? '사진과 함께 넘어갈게요'
               : '사진 없이 넘어갈게요',
             () => move('review-rating'),
-            true,
           )}
         </>
       )}
@@ -434,15 +432,11 @@ export default function ReviewFlow({
               ? `${review.rating.toFixed(1)}점`
               : '별점은 선택 사항이에요'}
           </p>
-          {action(
-            review.rating ? '다음으로' : '별점 없이 넘어갈게요',
-            () => {
-              if (ratingCommitTimer.current !== null)
-                window.clearTimeout(ratingCommitTimer.current);
-              move('review-where');
-            },
-            true,
-          )}
+          {action(review.rating ? '다음으로' : '별점 없이 넘어갈게요', () => {
+            if (ratingCommitTimer.current !== null)
+              window.clearTimeout(ratingCommitTimer.current);
+            move('review-where');
+          })}
         </>
       )}
       {step === 'review-where' && (
@@ -499,17 +493,22 @@ export default function ReviewFlow({
             }
             placeholder="금액 (원)"
           />
-          {action('다 됐어요', () => move('review-preview'), true)}
-          {action('건너뛰기', () => {
-            updateReview({ place: '', price: '' });
-            move('review-preview');
-          })}
+          <FlowNavigation>
+            <FlowTextAction
+              onClick={() => {
+                updateReview({ place: '', price: '' });
+                move('review-preview');
+              }}
+            >
+              장소와 가격 건너뛰기
+            </FlowTextAction>
+          </FlowNavigation>
+          {action('다 됐어요', () => move('review-preview'))}
         </>
       )}
       {step === 'review-preview' && (
         <>
           {whiskeySummary}
-          {renderReviewCard()}
           <div
             className="grid grid-cols-2 gap-4 rounded-lg bg-bg-neutral-weak p-4 [&>button]:min-h-40 [&>button]:rounded-md [&>button]:text-13 [&>button]:text-fg-neutral-muted [&>button[aria-pressed=true]]:bg-bg-brand-weak [&>button[aria-pressed=true]]:font-bold [&>button[aria-pressed=true]]:text-fg-brand"
             role="group"
@@ -530,10 +529,10 @@ export default function ReviewFlow({
               비공개
             </button>
           </div>
+          {renderReviewCard()}
           {action(
             isPosting ? '올리고 있어요…' : '이걸로 등록할게요',
             postReview,
-            true,
             isPosting,
           )}
         </>

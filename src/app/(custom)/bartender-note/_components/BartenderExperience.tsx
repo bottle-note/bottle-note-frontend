@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/constants/routes';
 import { trackGA4Event } from '@/utils/analytics/ga4';
-import { OptionList, FlowAction } from './FlowControls';
+import { OptionList, FlowNavigation, FlowTextAction } from './FlowControls';
 import BartenderFrame from './BartenderFrame';
 import RecommendationFlow from './RecommendationFlow';
 import CandidateList, { getCandidates, isCandidateStep } from './CandidateList';
@@ -275,9 +275,11 @@ export default function BartenderExperience({
             ]}
           />
           {pickedItems.length > 0 && (
-            <FlowAction onClick={() => start('picks', 'favorites')}>
-              {`찜한 술 ${pickedItems.length}${picks.hasMore ? '병 이상' : '병'} 볼게요`}
-            </FlowAction>
+            <FlowNavigation>
+              <FlowTextAction onClick={() => start('picks', 'favorites')}>
+                {`찜한 술 ${pickedItems.length}${picks.hasMore ? '병 이상' : '병'} 보기`}
+              </FlowTextAction>
+            </FlowNavigation>
           )}
         </>
       )}
@@ -322,7 +324,6 @@ export default function BartenderExperience({
           isTogglingPick={picks.isToggling}
           onTogglePick={() => toggleFavorite(selected.id)}
           onWriteReview={() => move('review-mode')}
-          onBack={back}
           onLeave={() => openAlcoholPage(selected.id, 'detail')}
         />
       )}

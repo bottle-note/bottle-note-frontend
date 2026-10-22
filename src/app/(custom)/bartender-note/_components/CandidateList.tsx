@@ -2,7 +2,7 @@ import Link from 'next/link';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import { ROUTES } from '@/constants/routes';
 import type { Answers, Step } from './types';
-import { FlowAction, FlowLink } from './FlowControls';
+import { FlowNavigation, FlowTextAction, FlowTextLink } from './FlowControls';
 import { WhiskeyRow } from './WhiskeyRow';
 import type { PickedAlcohol } from './useBartenderPicks';
 import type { Curation, Whiskey } from '../_data/demo';
@@ -205,22 +205,27 @@ export default function CandidateList({
           ),
         )}
       </div>
-      {candidates.offersSimilar && (
-        <FlowAction onClick={() => move('similar')}>
-          비슷한 술도 볼게요
-        </FlowAction>
-      )}
-      {step === 'curation-list' && (
-        <FlowAction onClick={() => move('situation')}>
-          다른 주제 볼게요
-        </FlowAction>
-      )}
-      {step === 'curation-list' && curation && (
-        <FlowLink href={ROUTES.CURATION.DETAIL(curation.id)} onClick={onLeave}>
-          큐레이션 전체 보기
-        </FlowLink>
-      )}
-      <FlowAction onClick={home}>처음으로 갈게요</FlowAction>
+      <FlowNavigation>
+        {candidates.offersSimilar && (
+          <FlowTextAction onClick={() => move('similar')}>
+            비슷한 술도 보기
+          </FlowTextAction>
+        )}
+        {step === 'curation-list' && (
+          <FlowTextAction onClick={() => move('situation')}>
+            다른 주제 보기
+          </FlowTextAction>
+        )}
+        {step === 'curation-list' && curation && (
+          <FlowTextLink
+            href={ROUTES.CURATION.DETAIL(curation.id)}
+            onClick={onLeave}
+          >
+            큐레이션 전체 보기
+          </FlowTextLink>
+        )}
+        <FlowTextAction onClick={home}>처음으로</FlowTextAction>
+      </FlowNavigation>
     </>
   );
 }

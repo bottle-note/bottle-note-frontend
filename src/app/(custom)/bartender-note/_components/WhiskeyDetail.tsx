@@ -1,6 +1,9 @@
 import { useState } from 'react';
+import Link from 'next/link';
+import { Heart } from 'lucide-react';
+import Button, { buttonVariants } from '@/components/ui/Button/Button';
 import { ROUTES } from '@/constants/routes';
-import { FlowAction, FlowLink } from './FlowControls';
+import { FlowDock } from './FlowControls';
 import { WhiskeyImage } from './WhiskeyRow';
 import type { Whiskey } from '../_data/demo';
 
@@ -11,7 +14,6 @@ export default function WhiskeyDetail({
   isTogglingPick,
   onTogglePick,
   onWriteReview,
-  onBack,
   onLeave,
 }: {
   whiskey: Whiskey;
@@ -19,27 +21,33 @@ export default function WhiskeyDetail({
   isTogglingPick: boolean;
   onTogglePick: () => void;
   onWriteReview: () => void;
-  onBack: () => void;
   /** 실제 술 상세 페이지로 나가기 직전에 부른다. */
   onLeave: () => void;
 }) {
   const [showAllTags, setShowAllTags] = useState(false);
-  const action = (
-    label: string,
-    onClick: () => void,
-    primary = false,
-    disabled = false,
-  ) => (
-    <FlowAction onClick={onClick} primary={primary} disabled={disabled}>
-      {label}
-    </FlowAction>
-  );
   return (
     <>
       <div className="rounded-xl bg-bg-neutral-weak p-14">
         <div className="flex items-center gap-12">
           <WhiskeyImage whiskey={whiskey} size={64} />
-          <h1 className="text-18 font-extrabold leading-24">{whiskey.name}</h1>
+          <h1 className="min-w-0 flex-1 text-18 font-extrabold leading-24">
+            {whiskey.name}
+          </h1>
+          <button
+            type="button"
+            aria-label={isPicked ? '찜 취소' : '찜하기'}
+            aria-pressed={isPicked}
+            disabled={isTogglingPick}
+            onClick={onTogglePick}
+            className="inline-flex min-h-40 shrink-0 items-center gap-4 rounded-md px-6 text-12 font-semibold text-fg-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring disabled:opacity-45"
+          >
+            <Heart
+              aria-hidden="true"
+              className="h-18 w-18"
+              fill={isPicked ? 'currentColor' : 'none'}
+            />
+            {isPicked ? '찜했어요' : '찜'}
+          </button>
         </div>
         <dl className="my-14 grid grid-cols-[78px_1fr] gap-y-6 text-13">
           <dt className="text-fg-neutral-muted">종류·도수</dt>
@@ -88,23 +96,24 @@ export default function WhiskeyDetail({
           </p>
         )}
       </div>
-      <FlowLink
-        primary
-        href={ROUTES.ALCOHOL.DETAIL(whiskey.id)}
-        onClick={onLeave}
-      >
-        자세히 볼게요
-      </FlowLink>
-      <div className="grid grid-cols-2 gap-6">
-        {action(
-          isPicked ? '♥ 찜했어요' : '♡ 찜해둘게요',
-          onTogglePick,
-          false,
-          isTogglingPick,
-        )}
-        {action('리뷰 작성', onWriteReview)}
-      </div>
-      {action('‹ 후보 목록으로', onBack)}
+      <FlowDock>
+        <div className="grid grid-cols-2 gap-8">
+          <Link
+            href={ROUTES.ALCOHOL.DETAIL(whiskey.id)}
+            onClick={onLeave}
+            className={buttonVariants({
+              size: 'lg',
+              variant: 'secondary',
+              fullWidth: true,
+            })}
+          >
+            자세히 볼게요
+          </Link>
+          <Button size="lg" variant="primary" onClick={onWriteReview}>
+            리뷰 작성
+          </Button>
+        </div>
+      </FlowDock>
     </>
   );
 }

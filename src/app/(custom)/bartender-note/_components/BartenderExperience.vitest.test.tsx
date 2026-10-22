@@ -409,6 +409,17 @@ describe('바텐더 노트 상황별 추천', () => {
     expect(
       screen.getByRole('link', { name: '큐레이션 전체 보기' }),
     ).toHaveAttribute('href', '/curation/1');
+    expect(
+      within(screen.getByRole('group', { name: '현재 단계 행동' })).queryByRole(
+        'button',
+      ),
+    ).not.toBeInTheDocument();
+    expect(
+      within(screen.getByRole('navigation', { name: '다른 보기' })).getByRole(
+        'button',
+        { name: '다른 주제 보기' },
+      ),
+    ).toBeInTheDocument();
 
     await press(/조니워커 블랙/);
 
@@ -455,13 +466,14 @@ describe('바텐더 노트 찜', () => {
     renderExperience();
     await openHomeCurationDetail('글렌피딕 12년');
 
-    await press('♡ 찜해둘게요');
+    await press('찜하기');
 
     // 찜 알림 대사가 나오는 동안 선택지가 다시 그려지므로 최종 상태를 기다린다.
     await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: '♥ 찜했어요' }),
-      ).toBeInTheDocument(),
+      expect(screen.getByRole('button', { name: '찜 취소' })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      ),
     );
     expect(AlcoholsApi.putPick).toHaveBeenCalledWith({
       alcoholId: 103,
@@ -470,15 +482,16 @@ describe('바텐더 노트 찜', () => {
     expect(dialogue()).toHaveTextContent('찜해 두었습니다.');
 
     await press('닫기');
-    await press('찜한 술 1병 볼게요');
+    await press('찜한 술 1병 보기');
     await press(/글렌피딕 12년/);
 
     expect(
       await screen.findByRole('heading', { name: '글렌피딕 12년' }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: '♥ 찜했어요' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '찜 취소' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
   });
 
   it('데모에 없는 찜한 술은 실제 술 상세 페이지로 연결한다', async () => {
@@ -488,7 +501,7 @@ describe('바텐더 노트 찜', () => {
     ];
     renderExperience();
 
-    await press('찜한 술 2병 볼게요');
+    await press('찜한 술 2병 보기');
 
     expect(
       await screen.findByRole('link', { name: /탈리스커 10년/ }),
@@ -506,13 +519,14 @@ describe('바텐더 노트 찜', () => {
     renderExperience();
     await openHomeCurationDetail('글렌피딕 12년');
 
-    await press('♡ 찜해둘게요');
+    await press('찜하기');
 
     await waitFor(() => {
       expect(dialogue()).toHaveTextContent('찜을 바꾸지 못했어요.');
-      expect(
-        screen.getByRole('button', { name: '♡ 찜해둘게요' }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '찜하기' })).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      );
     });
   });
 });
@@ -525,7 +539,7 @@ describe('바텐더 노트 리뷰', () => {
 
     await writeQuickReview('사과 향이 산뜻하고 부드러워요');
     await press('별점 없이 넘어갈게요');
-    await press('건너뛰기');
+    await press('장소와 가격 건너뛰기');
 
     expect(await screen.findByText('다 됐습니다')).toBeInTheDocument();
     expect(
@@ -573,7 +587,7 @@ describe('바텐더 노트 리뷰', () => {
     await openHomeCurationDetail('글렌피딕 12년');
     await writeQuickReview('사과 향이 산뜻해요');
     await press('별점 없이 넘어갈게요');
-    await press('건너뛰기');
+    await press('장소와 가격 건너뛰기');
 
     await press('이걸로 등록할게요');
 
@@ -607,7 +621,7 @@ describe('바텐더 노트 리뷰', () => {
     await waitFor(() =>
       expect(dialogue()).toHaveTextContent('어디에서 드셨나요?'),
     );
-    await press('건너뛰기');
+    await press('장소와 가격 건너뛰기');
     await press('이걸로 등록할게요');
 
     // 완료 대사가 나오는 동안 선택지가 다시 그려지므로 최종 상태를 기다린다.
@@ -654,7 +668,17 @@ describe('바텐더 노트 공통 이동', () => {
     expect(
       await screen.findByRole('heading', { name: '글렌피딕 12년' }),
     ).toBeInTheDocument();
-    await press('‹ 후보 목록으로');
+    expect(
+      within(
+        screen.getByRole('group', { name: '현재 단계 행동' }),
+      ).getAllByRole('link', { name: '자세히 볼게요' }),
+    ).toHaveLength(1);
+    expect(
+      within(
+        screen.getByRole('group', { name: '현재 단계 행동' }),
+      ).getAllByRole('button', { name: '리뷰 작성' }),
+    ).toHaveLength(1);
+    await press('이전 단계');
     expect(
       await screen.findByRole('button', { name: /조니워커 블랙/ }),
     ).toBeInTheDocument();

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import Button from '@/components/ui/Button/Button';
 import BarScene, { type Pose } from './BarScene';
 import { useDialoguePlayback } from './useDialoguePlayback';
 import { ActionDockContext } from './FlowControls';
@@ -46,7 +45,11 @@ export default function BartenderFrame({
     <div
       className="dark flex h-dvh min-h-0 justify-center overflow-hidden bg-bg-layer-basement text-fg-neutral"
       onClickCapture={(event) => {
-        if (dialogue.optionsVisible) return;
+        if (
+          dialogue.optionsVisible ||
+          (event.target as HTMLElement).closest('[data-dialogue-control]')
+        )
+          return;
         event.preventDefault();
         event.stopPropagation();
         dialogue.advance();
@@ -54,7 +57,19 @@ export default function BartenderFrame({
     >
       <div className="flex h-full min-h-0 w-full max-w-[468px] flex-col bg-bg-layer-default">
         <header className="relative flex h-56 shrink-0 items-center gap-4 px-8">
-          <span aria-hidden="true" className="h-40 w-40 shrink-0" />
+          {onBack ? (
+            <button
+              type="button"
+              className="grid h-40 w-40 shrink-0 place-items-center text-fg-neutral focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
+              aria-label={backLabel ?? '이전 단계'}
+              data-dialogue-control
+              onClick={onBack}
+            >
+              <ArrowLeft aria-hidden="true" className="h-20 w-20" />
+            </button>
+          ) : (
+            <span aria-hidden="true" className="h-40 w-40 shrink-0" />
+          )}
           <div className="flex min-w-0 flex-1 flex-col items-center text-center leading-tight">
             <b className="text-15 font-bold">{title}</b>
             {subtitle && (
@@ -67,6 +82,7 @@ export default function BartenderFrame({
             type="button"
             className="grid h-40 w-40 shrink-0 place-items-center text-28 leading-none text-fg-neutral-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
             aria-label="닫기"
+            data-dialogue-control
             onClick={onClose}
           >
             ×
@@ -85,9 +101,7 @@ export default function BartenderFrame({
             />
           </div>
         </header>
-        <div
-          className={`relative shrink-0 overflow-hidden bg-bg-layer-basement ${onBack ? 'max-h-[min(40dvh,calc(100dvh-276px))]' : 'max-h-[40dvh]'}`}
-        >
+        <div className="relative max-h-[40dvh] shrink-0 overflow-hidden bg-bg-layer-basement">
           <BarScene
             pose={
               step === 'intro' && dialogue.introPhase === 'bow' ? 'bow' : pose
@@ -135,14 +149,7 @@ export default function BartenderFrame({
           role="group"
           aria-label="현재 단계 행동"
           className="empty:hidden z-20 flex shrink-0 flex-col gap-12 px-20 pb-[max(28px,var(--safe-area-bottom))] pt-12 [@media(max-height:500px)]:gap-4 [@media(max-height:500px)]:pt-6"
-        >
-          {onBack && backLabel && (
-            <Button size="md" variant="text" fullWidth onClick={onBack}>
-              <ArrowLeft aria-hidden="true" className="h-16 w-16" />
-              {backLabel}
-            </Button>
-          )}
-        </div>
+        />
       </div>
     </div>
   );

@@ -1,6 +1,11 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import type { Step } from './types';
-import { OptionList, FlowAction } from './FlowControls';
+import {
+  OptionList,
+  FlowAction,
+  FlowNavigation,
+  FlowTextAction,
+} from './FlowControls';
 import { situations, type Curation, type Situation } from '../_data/demo';
 
 type Props = {
@@ -63,12 +68,14 @@ export default function CurationFlow({
         )}
       {step === 'curation-empty' && (
         <>
-          <FlowAction primary onClick={() => move('level')}>
+          <FlowAction onClick={() => move('level')}>
             취향으로 골라 주세요
           </FlowAction>
-          <FlowAction onClick={() => move('situation')}>
-            다른 자리 볼게요
-          </FlowAction>
+          <FlowNavigation>
+            <FlowTextAction onClick={() => move('situation')}>
+              다른 자리 보기
+            </FlowTextAction>
+          </FlowNavigation>
         </>
       )}
       {step === 'curations' && (
@@ -83,20 +90,22 @@ export default function CurationFlow({
               },
             })),
           )}
-          {choices.length > (page + 1) * 3 && (
-            <FlowAction onClick={() => setPage(page + 1)}>
-              다른 큐레이션도 볼게요
-            </FlowAction>
-          )}
-          {page > 0 && choices.length <= (page + 1) * 3 && (
-            <FlowAction onClick={() => setPage(0)}>
-              처음 큐레이션부터 볼게요
-            </FlowAction>
-          )}
-          <FlowAction onClick={() => move('situation')}>
-            ‹ 다른 자리 볼게요
-          </FlowAction>
-          <FlowAction onClick={home}>처음으로 갈게요</FlowAction>
+          <FlowNavigation>
+            {choices.length > (page + 1) * 3 && (
+              <FlowTextAction onClick={() => setPage(page + 1)}>
+                다른 큐레이션 보기
+              </FlowTextAction>
+            )}
+            {page > 0 && choices.length <= (page + 1) * 3 && (
+              <FlowTextAction onClick={() => setPage(0)}>
+                처음 큐레이션부터 보기
+              </FlowTextAction>
+            )}
+            <FlowTextAction onClick={() => move('situation')}>
+              다른 자리 보기
+            </FlowTextAction>
+            <FlowTextAction onClick={home}>처음으로</FlowTextAction>
+          </FlowNavigation>
         </>
       )}
     </>
