@@ -27,15 +27,18 @@
       "name": "rate_alcohol",
       "parameters": ["alcohol_id", "alcohol_name"]
     },
-    { "name": "write_review_start", "parameters": ["alcohol_id"] },
-    { "name": "write_review_complete", "parameters": ["alcohol_id"] },
+    { "name": "write_review_start", "parameters": ["alcohol_id", "source"] },
+    {
+      "name": "write_review_complete",
+      "parameters": ["alcohol_id", "source"]
+    },
     {
       "name": "write_review_failed",
-      "parameters": ["alcohol_id", "failure_type"]
+      "parameters": ["alcohol_id", "failure_type", "source"]
     },
     {
       "name": "add_to_picks",
-      "parameters": ["alcohol_id", "alcohol_name", "action"]
+      "parameters": ["alcohol_id", "alcohol_name", "action", "source"]
     },
     { "name": "search", "parameters": ["result_count", "query_length"] },
     {
@@ -72,6 +75,19 @@
       "parameters": ["follow_user_id", "action"]
     },
     { "name": "like_review", "parameters": ["review_id", "action"] },
+    { "name": "bartender_start", "parameters": ["entry"] },
+    {
+      "name": "bartender_recommend_result",
+      "parameters": ["mode", "result_state"]
+    },
+    {
+      "name": "bartender_select_alcohol",
+      "parameters": ["alcohol_id", "source"]
+    },
+    {
+      "name": "bartender_open_alcohol_page",
+      "parameters": ["alcohol_id", "source"]
+    },
     {
       "name": "share",
       "parameters": [
