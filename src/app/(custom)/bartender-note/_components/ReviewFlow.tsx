@@ -3,7 +3,7 @@ import Image from 'next/image';
 import AlcoholRatingInput from '@/components/domain/alcohol/AlcoholRatingInput';
 import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
 import TastingRadarChart from '@/app/(primary)/review/_components/form/TastingRadarChart';
-import { TASTING_AXES, type TastingNoteValues } from '@/constants/tastingNote';
+import { TASTING_AXES, TASTING_MAX_VALUE } from '@/constants/tastingNote';
 import type { ReviewDraft, Step } from './types';
 import { OptionList, FlowAction } from './FlowControls';
 import { WhiskeyImage } from './WhiskeyRow';
@@ -164,9 +164,10 @@ export default function ReviewFlow({
     }
     move('review-graph');
   };
-  const tastingValues = Object.fromEntries(
-    TASTING_AXES.map((axis, index) => [axis.key, review.tasting[index]]),
-  ) as TastingNoteValues;
+  const tastingAxes = TASTING_AXES.map((axis, index) => ({
+    name: axis.labelKo,
+    score: review.tasting[index] ?? 0,
+  }));
   const renderReviewCard = (posted = false) => (
     <div className="flex flex-col gap-8 rounded-xl bg-bg-neutral-weak p-16">
       {posted && (
@@ -285,12 +286,10 @@ export default function ReviewFlow({
           <div className="flex flex-col gap-8 rounded-xl bg-bg-neutral-weak p-14">
             <div className="mb-8 mt-8 flex justify-center">
               <TastingRadarChart
-                values={tastingValues}
+                axes={tastingAxes}
+                maxScore={TASTING_MAX_VALUE}
                 size={280}
-                onAxisChange={(axis, value) => {
-                  const index = TASTING_AXES.findIndex(
-                    (item) => item.key === axis,
-                  );
+                onAxisChange={(index, value) => {
                   updateReview({
                     tasting: review.tasting.map((current, position) =>
                       position === index ? value : current,

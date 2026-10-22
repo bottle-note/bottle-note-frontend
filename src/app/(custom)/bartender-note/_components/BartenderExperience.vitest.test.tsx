@@ -29,10 +29,6 @@ vi.mock('@/utils/S3Upload', () => ({
     })),
   ),
 }));
-// 테이스팅 그래프 이미지는 캔버스로 만든다. jsdom에는 캔버스가 없어 결과 파일만 돌려준다.
-vi.mock('@/app/(primary)/review/hook/useTastingNoteCapture', () => ({
-  captureTastingNote: vi.fn(async () => null),
-}));
 // 바텐더 노트는 로그인한 사용자 기준으로 동작한다.
 vi.mock('@/hooks/auth/useAuthSession', () => ({
   useAuthSession: () => ({
@@ -552,6 +548,15 @@ describe('바텐더 노트 리뷰', () => {
         price: null,
         rating: 0,
         locationInfo: { locationName: null },
+        imageUrlList: null,
+        tastingProfile: {
+          version: 1,
+          maxScore: 5,
+          axes: expect.arrayContaining([
+            expect.objectContaining({ code: 'FRUITY', score: 2 }),
+            expect.objectContaining({ code: 'BODY', score: 2 }),
+          ]),
+        },
       }),
     );
     expect(RateApi.postRating).not.toHaveBeenCalled();
