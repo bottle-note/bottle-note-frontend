@@ -497,7 +497,7 @@ describe('바텐더 노트 상황별 추천', () => {
 
 describe('바텐더 노트 찜', () => {
   it('술 상세에서 찜하면 서버에 저장하고 처음 화면의 찜 목록에서 다시 볼 수 있다', async () => {
-    renderExperience();
+    const { unmount } = renderExperience();
     await openHomeCurationDetail('글렌피딕 12년');
 
     await press('찜하기');
@@ -516,6 +516,9 @@ describe('바텐더 노트 찜', () => {
     expect(dialogue()).toHaveTextContent('찜해 두었습니다.');
 
     await press('닫기');
+    expect(push).toHaveBeenCalledWith('/');
+    unmount();
+    renderExperience();
     await press('찜한 술 1병 보기');
     await press(/글렌피딕 12년/);
 
@@ -755,7 +758,7 @@ describe('바텐더 노트 공통 이동', () => {
     ).toBeInTheDocument();
   });
 
-  it('뒤로 가기는 이전 질문으로, 닫기는 처음 화면으로 돌아간다', async () => {
+  it('뒤로 가기는 이전 질문으로, 닫기는 제품 홈으로 이동한다', async () => {
     renderExperience();
 
     await choose('위스키 추천해 주세요');
@@ -768,13 +771,6 @@ describe('바텐더 노트 공통 이동', () => {
     expect(await screen.findByText('질문 1 / 6')).toBeInTheDocument();
 
     await press('닫기');
-    expect(
-      await screen.findByRole('button', { name: /^위스키 추천해 주세요/ }),
-    ).toBeInTheDocument();
-    expect(
-      within(screen.getByRole('group', { name: '현재 단계 행동' })).queryByRole(
-        'button',
-      ),
-    ).not.toBeInTheDocument();
+    expect(push).toHaveBeenCalledWith('/');
   });
 });

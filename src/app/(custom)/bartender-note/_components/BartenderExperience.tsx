@@ -269,7 +269,7 @@ export default function BartenderExperience({
       pose={bartender.pose}
       onBack={previous ? back : undefined}
       backLabel={getBackLabel(step, previous)}
-      onClose={home}
+      onClose={() => router.push(ROUTES.HOME)}
     >
       {step === 'intro' && (
         <>
