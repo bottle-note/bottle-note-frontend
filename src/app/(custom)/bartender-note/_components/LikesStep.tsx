@@ -66,7 +66,7 @@ export default function LikesStep({
         ? (b.rating ?? 0) - (a.rating ?? 0)
         : 0,
     )
-    .slice(0, 10);
+    .slice(0, 6);
 
   return (
     <>
@@ -94,7 +94,7 @@ export default function LikesStep({
               <button
                 type="button"
                 key={id}
-                className="rounded border border-stroke-brand-solid bg-bg-brand-weak px-7 py-4 text-12 leading-15 text-fg-brand"
+                className="min-h-40 rounded border border-stroke-brand-solid bg-bg-brand-weak px-9 py-7 text-12 leading-15 text-fg-brand"
                 onClick={() =>
                   updateAnswers({
                     likedIds: answers.likedIds.filter((value) => value !== id),
@@ -113,7 +113,7 @@ export default function LikesStep({
             <button
               key={whiskey.id}
               type="button"
-              className="rounded-full border border-stroke-neutral-weak px-10 py-6 text-13 text-fg-neutral"
+              className="min-h-40 rounded-full border border-stroke-neutral-weak px-10 text-13 text-fg-neutral"
               onClick={() => like(whiskey.id)}
             >
               {whiskey.name}
@@ -137,7 +137,7 @@ export default function LikesStep({
           <span>검색 중 문제가 생겼어요.</span>
           <button
             type="button"
-            className="text-fg-brand underline"
+            className="min-h-40 text-fg-brand underline"
             onClick={() => void lookup.refetch()}
           >
             다시 시도

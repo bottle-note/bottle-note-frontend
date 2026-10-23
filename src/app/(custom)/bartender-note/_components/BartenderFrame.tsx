@@ -47,7 +47,9 @@ export default function BartenderFrame({
       onClickCapture={(event) => {
         if (
           dialogue.optionsVisible ||
-          (event.target as HTMLElement).closest('[data-dialogue-control]')
+          (event.target as HTMLElement).closest(
+            '[data-dialogue-control], section',
+          )
         )
           return;
         event.preventDefault();
@@ -141,7 +143,7 @@ export default function BartenderFrame({
             ref={contentRef}
             className="flex min-h-0 flex-1 flex-col gap-12 overflow-y-auto overscroll-contain px-20 pb-20 pt-14 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-200 [&>*]:shrink-0"
           >
-            {dialogue.optionsVisible ? children : null}
+            {children}
           </section>
         </ActionDockContext.Provider>
         <div

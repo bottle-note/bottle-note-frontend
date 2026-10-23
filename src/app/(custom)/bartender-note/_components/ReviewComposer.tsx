@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { TAGS_LIMIT, validateTagText } from '@/constants/review';
 import type { ReviewDraft, Step } from './types';
 import { FlowAction } from './FlowControls';
-import type { Whiskey } from '../_data/demo';
+import type { ReviewAlcohol } from './reviewAlcohol';
 import {
   noteKeywords,
   npfFeel,
@@ -117,7 +117,7 @@ function TagEditor({
 type Props = {
   step: Step;
   review: ReviewDraft;
-  selected?: Whiskey;
+  selected?: ReviewAlcohol;
   whiskeySummary: ReactNode;
   reviewTags: string[];
   updateReview: (value: Partial<ReviewDraft>) => void;

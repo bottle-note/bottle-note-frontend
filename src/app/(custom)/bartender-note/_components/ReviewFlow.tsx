@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import AlcoholRatingInput from '@/components/domain/alcohol/AlcoholRatingInput';
 import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
+import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import TastingRadarChart from '@/app/(primary)/review/_components/form/TastingRadarChart';
 import { TASTING_AXES, TASTING_MAX_VALUE } from '@/constants/tastingNote';
 import type { ReviewDraft, Step } from './types';
@@ -16,7 +17,7 @@ import ReviewPickStep from './ReviewPickStep';
 import { prefersReducedMotion } from './prefersReducedMotion';
 import RadarPreview from './RadarPreview';
 import ReviewComposer from './ReviewComposer';
-import type { Whiskey } from '../_data/demo';
+import type { ReviewAlcohol } from './reviewAlcohol';
 import {
   flavorFromText,
   getReviewTags,
@@ -61,11 +62,10 @@ type Props = {
   step: Step;
   review: ReviewDraft;
   updateReview: (value: Partial<ReviewDraft>) => void;
-  selected?: Whiskey;
-  whiskies: Whiskey[];
+  selected?: ReviewAlcohol;
   move: (next: Step) => void;
   home: () => void;
-  chooseWhiskey: (whiskey: Whiskey, next: Step) => void;
+  onPickAlcohol: (alcohol: ReviewAlcohol) => void;
   lastReviewMode: ReviewDraft['mode'];
   chooseMode: (mode: ReviewDraft['mode']) => void;
   postReview: () => void;
@@ -79,10 +79,9 @@ export default function ReviewFlow({
   review,
   updateReview,
   selected,
-  whiskies,
   move,
   home,
-  chooseWhiskey,
+  onPickAlcohol,
   lastReviewMode,
   chooseMode,
   postReview,
@@ -104,6 +103,18 @@ export default function ReviewFlow({
       {label}
     </FlowAction>
   );
+  const bottleImage = (size: 40 | 44) =>
+    selected?.demoWhiskey ? (
+      <WhiskeyImage whiskey={selected.demoWhiskey} size={size} />
+    ) : (
+      <AlcoholImage
+        imageUrl={selected?.imageUrl ?? ''}
+        outerHeightClass={size === 40 ? 'h-40' : 'h-44'}
+        outerWidthClass={size === 40 ? 'w-40' : 'w-44'}
+        innerHeightClass={size === 40 ? 'h-32' : 'h-36'}
+        innerWidthClass="w-24"
+      />
+    );
   const whiskeySummary = selected && (
     <div className="rounded-lg border border-stroke-neutral-subtle">
       <button
@@ -112,11 +123,13 @@ export default function ReviewFlow({
         className="flex w-full items-center gap-10 p-8 text-left"
         onClick={() => setInfoOpen(!infoOpen)}
       >
-        <WhiskeyImage whiskey={selected} size={40} />
+        {bottleImage(40)}
         <span className="flex min-w-0 flex-1 flex-col gap-2">
           <b className="truncate text-14 font-bold">{selected.name}</b>
           <small className="text-12 text-fg-neutral-muted">
-            {selected.category} · {selected.abv}%
+            {[selected.category, selected.abv && `${selected.abv}%`]
+              .filter(Boolean)
+              .join(' · ')}
           </small>
         </span>
         <span className="text-12 text-fg-brand">
@@ -126,23 +139,32 @@ export default function ReviewFlow({
       <AnimatedCollapse isOpen={infoOpen}>
         <div className="border-t border-stroke-neutral-subtle px-12 py-10 text-13 text-fg-neutral-muted">
           <p className="m-0">
-            {selected.category} · {selected.region} · {selected.abv}%
+            {[
+              selected.category,
+              selected.region,
+              selected.abv && `${selected.abv}%`,
+            ]
+              .filter(Boolean)
+              .join(' · ')}
           </p>
           <p className="mb-0 mt-4">
             {selected.rating === null
               ? '평가 없음'
               : `★ ${selected.rating.toFixed(1)}${selected.ratingCount ? ` · 평가 ${selected.ratingCount}건` : ''}`}
           </p>
-          <p className="mb-0 mt-4">
-            대략 가격 ·{' '}
-            {selected.glassPrice
-              ? `한 잔 ${selected.glassPrice.toLocaleString()}원`
-              : '한 잔 정보 없음'}{' '}
-            ·{' '}
-            {selected.bottlePrice
-              ? `한 병 ${selected.bottlePrice.toLocaleString()}원`
-              : '한 병 정보 없음'}
-          </p>
+          {(selected.glassPrice !== undefined ||
+            selected.bottlePrice !== undefined) && (
+            <p className="mb-0 mt-4">
+              대략 가격 ·{' '}
+              {selected.glassPrice
+                ? `한 잔 ${selected.glassPrice.toLocaleString()}원`
+                : '한 잔 정보 없음'}{' '}
+              ·{' '}
+              {selected.bottlePrice
+                ? `한 병 ${selected.bottlePrice.toLocaleString()}원`
+                : '한 병 정보 없음'}
+            </p>
+          )}
           {selected.tags.length > 0 && (
             <p className="mb-0 mt-8">
               {selected.tags.slice(0, 10).join(' · ')}
@@ -177,7 +199,7 @@ export default function ReviewFlow({
       )}
       {selected && (
         <div className="flex items-center gap-8">
-          <WhiskeyImage whiskey={selected} size={44} />
+          {bottleImage(44)}
           <b className="text-15">{selected.name}</b>
         </div>
       )}
@@ -230,10 +252,9 @@ export default function ReviewFlow({
     <>
       {step === 'review-pick' && (
         <ReviewPickStep
-          whiskies={whiskies}
-          onPick={(whiskey) => {
+          onPick={(alcohol) => {
             setInfoOpen(false);
-            chooseWhiskey(whiskey, 'review-mode');
+            onPickAlcohol(alcohol);
           }}
         />
       )}

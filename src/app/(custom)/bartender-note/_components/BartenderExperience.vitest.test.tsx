@@ -8,13 +8,17 @@ import {
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
-import type { AlcoholLookupItem } from '@/api/alcohol/types';
+import type {
+  AlcoholDetailsResponse,
+  AlcoholLookupItem,
+} from '@/api/alcohol/types';
 import { MyBottleApi } from '@/api/my-bottle/my-bottle.api';
 import type { PickMyBottleItem } from '@/api/my-bottle/types';
 import { RateApi } from '@/api/rate/rate.api';
 import { ReviewApi } from '@/api/review/review.api';
 import BartenderExperience from './BartenderExperience';
 import type { Curation, Whiskey } from '../_data/demo';
+import { localQuestionnaire } from '../_data/questionnaire';
 
 const { back, push } = vi.hoisted(() => ({ back: vi.fn(), push: vi.fn() }));
 vi.mock('next/navigation', () => ({
@@ -139,6 +143,32 @@ const lookupItem: AlcoholLookupItem = {
   distilleryId: 1,
 };
 
+const lookupDetails: AlcoholDetailsResponse = {
+  alcohols: {
+    alcoholId: lookupItem.alcoholId,
+    alcoholUrlImg: lookupItem.imageUrl,
+    description: '바다 향이 나는 위스키',
+    korName: lookupItem.korName,
+    engName: lookupItem.engName,
+    korCategory: lookupItem.korCategoryName,
+    engCategory: lookupItem.engCategoryName,
+    korRegion: lookupItem.korRegion,
+    engRegion: lookupItem.engRegion,
+    cask: '',
+    abv: '45.8%',
+    korDistillery: lookupItem.korDistillery,
+    engDistillery: lookupItem.engDistillery,
+    rating: 4.1,
+    myAvgRating: 0,
+    myRating: 0,
+    totalRatingsCount: 12,
+    isPicked: false,
+    alcoholsTastingTags: ['피트', '바다'],
+  },
+  friendsInfo: { followerCount: 0, friends: [] },
+  reviewInfo: { reviewList: [] },
+};
+
 function pickItem(
   alcoholId: number,
   alcoholKorName: string,
@@ -230,7 +260,11 @@ function renderExperience() {
   });
   return render(
     <QueryClientProvider client={client}>
-      <BartenderExperience whiskies={whiskies} curations={curations} />
+      <BartenderExperience
+        whiskies={whiskies}
+        curations={curations}
+        questionnaire={localQuestionnaire}
+      />
     </QueryClientProvider>,
   );
 }
@@ -640,19 +674,40 @@ describe('바텐더 노트 리뷰', () => {
   });
 
   it('첫 화면에서 리뷰를 시작하면 술을 검색해 고른 뒤 작성 방식을 묻는다', async () => {
+    const lookup = vi
+      .spyOn(AlcoholsApi, 'lookup')
+      .mockResolvedValue([lookupItem]);
+    const detail = vi
+      .spyOn(AlcoholsApi, 'getAlcoholDetails')
+      .mockResolvedValue({
+        success: true,
+        code: 200,
+        data: lookupDetails,
+        errors: [],
+        meta,
+      });
+    vi.spyOn(AlcoholsApi, 'getWeeklyViewPopular').mockResolvedValue({
+      success: true,
+      code: 200,
+      data: { totalCount: 0, alcohols: [] },
+      errors: [],
+      meta,
+    });
     renderExperience();
 
     await choose('바텐더님과 함께 리뷰를 쓸게요');
     fireEvent.change(
       await screen.findByRole('searchbox', { name: '술 이름 또는 종류 검색' }),
-      { target: { value: '메이커스' } },
+      { target: { value: '탈리스커' } },
     );
-    await press(/메이커스 마크/);
+    await press(/탈리스커 10년/);
 
     expect(await screen.findByText('어떻게 남길까요')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /메이커스 마크/ }),
+      screen.getByRole('button', { name: /탈리스커 10년/ }),
     ).toBeInTheDocument();
+    expect(lookup).toHaveBeenCalledWith('탈리스커', expect.anything());
+    expect(detail).toHaveBeenCalledWith('900');
   });
 });
 

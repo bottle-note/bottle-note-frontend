@@ -11,6 +11,7 @@ import CandidateList, { getCandidates, isCandidateStep } from './CandidateList';
 import WhiskeyDetail from './WhiskeyDetail';
 import CurationFlow from './CurationFlow';
 import ReviewFlow from './ReviewFlow';
+import { reviewAlcoholFromWhiskey, type ReviewAlcohol } from './reviewAlcohol';
 import { getDialogue, type Notice } from './dialogue';
 import { getBackLabel, getStepHeader } from './stepMeta';
 import { useBartenderPicks } from './useBartenderPicks';
@@ -23,6 +24,7 @@ import { useTrackRecommendResult } from './useTrackRecommendResult';
 import { saveSnapshot, takeSnapshot } from './bartenderSnapshot';
 import type { ReviewDraft, Step } from './types';
 import type { Curation, Situation, Whiskey } from '../_data/demo';
+import type { BartenderQuestionnaire } from '../_data/questionnaire';
 
 /** 목록 단계별로 술을 고른 경로. */
 const SELECT_SOURCE = {
@@ -35,9 +37,11 @@ const SELECT_SOURCE = {
 export default function BartenderExperience({
   whiskies,
   curations,
+  questionnaire,
 }: {
   whiskies: Whiskey[];
   curations: Curation[];
+  questionnaire: BartenderQuestionnaire;
 }) {
   const router = useRouter();
   const {
@@ -69,6 +73,9 @@ export default function BartenderExperience({
     restore: restoreReview,
   } = useReviewDraft();
   const [chosenId, setChosenId] = useState<number | null>(null);
+  const [reviewAlcohol, setReviewAlcohol] = useState<ReviewAlcohol | null>(
+    null,
+  );
   const [situation, setSituation] = useState<Situation>('home');
   const [curationId, setCurationId] = useState<number | null>(null);
   const [postedReviewId, setPostedReviewId] = useState<number | null>(null);
@@ -77,6 +84,9 @@ export default function BartenderExperience({
   const submit = useReviewSubmit();
   const bartender = useBartenderPose(step);
   const selected = whiskies.find((whiskey) => whiskey.id === chosenId);
+  const selectedReviewAlcohol =
+    reviewAlcohol ??
+    (selected ? reviewAlcoholFromWhiskey(selected) : undefined);
   // 리뷰 작성 시작은 술 하나에 한 번만 보낸다.
   const reviewStartedFor = useRef<number | null>(null);
 
@@ -88,6 +98,7 @@ export default function BartenderExperience({
     restoreTaste(saved);
     restoreReview(saved.review, saved.lastReviewMode);
     setChosenId(saved.chosenId);
+    setReviewAlcohol(saved.reviewAlcohol ?? null);
     setSituation(saved.situation);
     setCurationId(saved.curationId);
     setPostedReviewId(saved.postedReviewId);
@@ -101,6 +112,7 @@ export default function BartenderExperience({
       review: { ...review, photos: [] },
       lastReviewMode,
       chosenId,
+      reviewAlcohol,
       situation,
       curationId,
       postedReviewId,
@@ -126,10 +138,12 @@ export default function BartenderExperience({
     resetTaste();
     resetReview();
     setChosenId(null);
+    setReviewAlcohol(null);
     reviewStartedFor.current = null;
   };
   const chooseWhiskey = (whiskey: Whiskey, next: Step) => {
     setChosenId(whiskey.id);
+    setReviewAlcohol(null);
     move(next);
   };
   const toggleFavorite = async (id: number) => {
@@ -150,21 +164,25 @@ export default function BartenderExperience({
   };
   const chooseReviewMode = (mode: ReviewDraft['mode']) => {
     chooseMode(mode);
-    if (!selected || reviewStartedFor.current === selected.id) return;
-    reviewStartedFor.current = selected.id;
+    if (
+      !selectedReviewAlcohol ||
+      reviewStartedFor.current === selectedReviewAlcohol.id
+    )
+      return;
+    reviewStartedFor.current = selectedReviewAlcohol.id;
     trackGA4Event('write_review_start', {
-      alcohol_id: String(selected.id),
+      alcohol_id: String(selectedReviewAlcohol.id),
       source: 'bartender_note',
     });
   };
   /** 리뷰가 저장되면 완료 화면으로, 저장하지 못하면 미리보기에 남아 다시 누르게 한다. */
   const postReview = async () => {
-    if (!selected) return;
-    const alcoholId = String(selected.id);
+    if (!selectedReviewAlcohol) return;
+    const alcoholId = String(selectedReviewAlcohol.id);
     setNotice(null);
     try {
       const { reviewId, ratingSaved } = await submit.mutateAsync({
-        alcoholId: selected.id,
+        alcoholId: selectedReviewAlcohol.id,
         review,
       });
       trackGA4Event('write_review_complete', {
@@ -229,7 +247,7 @@ export default function BartenderExperience({
   const dialogueLines = getDialogue({
     step,
     detailOrigin: previous,
-    selected,
+    selected: selectedReviewAlcohol ?? selected,
     curation,
     recommendationReason: recommendation.meta.get(chosenId ?? -1)?.why,
     notice,
@@ -284,6 +302,7 @@ export default function BartenderExperience({
         </>
       )}
       <RecommendationFlow
+        questionnaire={questionnaire}
         step={step}
         answers={answers}
         updateAnswers={updateAnswers}
@@ -340,11 +359,14 @@ export default function BartenderExperience({
         step={step}
         review={review}
         updateReview={updateReview}
-        selected={selected}
-        whiskies={whiskies}
+        selected={selectedReviewAlcohol}
         move={move}
         home={home}
-        chooseWhiskey={chooseWhiskey}
+        onPickAlcohol={(alcohol) => {
+          setChosenId(alcohol.id);
+          setReviewAlcohol(alcohol);
+          move('review-mode');
+        }}
         lastReviewMode={lastReviewMode}
         chooseMode={chooseReviewMode}
         postReview={postReview}
@@ -357,6 +379,7 @@ export default function BartenderExperience({
         startAnotherReview={() => {
           startAnother();
           setChosenId(null);
+          setReviewAlcohol(null);
           reviewStartedFor.current = null;
           restart('review-pick');
         }}

@@ -1,5 +1,6 @@
 import type { AlcoholLookupItem } from '@/api/alcohol/types';
 import type { Answers, ReviewDraft, Step } from './types';
+import type { ReviewAlcohol } from './reviewAlcohol';
 import type { Situation } from '../_data/demo';
 
 const STORAGE_KEY = 'bartender-note:snapshot';
@@ -14,6 +15,7 @@ export type BartenderSnapshot = {
   review: ReviewDraft;
   lastReviewMode: ReviewDraft['mode'];
   chosenId: number | null;
+  reviewAlcohol?: ReviewAlcohol | null;
   situation: Situation;
   curationId: number | null;
   postedReviewId: number | null;

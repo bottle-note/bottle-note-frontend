@@ -13,7 +13,7 @@ export type DialogueInput = {
   step: Step;
   /** 상세 직전 단계. 추천 이유와 큐레이션 설명 중 무엇을 말할지 정한다. */
   detailOrigin?: Step;
-  selected?: Whiskey;
+  selected?: Pick<Whiskey, 'name' | 'tags'>;
   curation?: Curation;
   /** 추천 목록에서 고른 술의 추천 이유 */
   recommendationReason?: string;
