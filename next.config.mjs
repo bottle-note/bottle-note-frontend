@@ -92,7 +92,18 @@ const nextConfig = {
       ? `?warpgate-ticket=${encodeURIComponent(ticket)}`
       : '';
 
+    const scenarioServer = process.env.SCENARIO_API_SERVER_URL;
+    const scenarioRewrites = scenarioServer
+      ? [
+          {
+            source: '/bottle-api/v1/scenarios/:path*',
+            destination: `${new URL(scenarioServer).origin}/api/v1/scenarios/:path*`,
+          },
+        ]
+      : [];
+
     return [
+      ...scenarioRewrites,
       {
         source: '/bottle-api/v1/:path*',
         destination: `${serverUrl}/api/v1/:path*${ticketQuery}`,

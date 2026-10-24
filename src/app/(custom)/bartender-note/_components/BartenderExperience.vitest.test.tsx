@@ -7,6 +7,8 @@ import {
 } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ScenarioApi } from '@/api/scenario/scenario.api';
+import { trackCampaignEvent } from '@/api/campaign-content/campaign-content.api';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import type { AlcoholLookupItem } from '@/api/alcohol/types';
 import { MyBottleApi } from '@/api/my-bottle/my-bottle.api';
@@ -17,6 +19,12 @@ import BartenderExperience from './BartenderExperience';
 import type { Curation, Whiskey } from '../_data/demo';
 
 const { back, push } = vi.hoisted(() => ({ back: vi.fn(), push: vi.fn() }));
+vi.mock('@/api/campaign-content/campaign-content.api', () => ({
+  trackCampaignEvent: vi.fn(),
+}));
+vi.mock('@/api/scenario/scenario.api', () => ({
+  ScenarioApi: { get: vi.fn(), evaluate: vi.fn() },
+}));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ back, push, replace: vi.fn() }),
 }));
@@ -698,4 +706,30 @@ describe('바텐더 노트 공통 이동', () => {
       ),
     ).not.toBeInTheDocument();
   });
+});
+
+it('네 번째 추천 블록은 서버 시나리오를 조회한다', async () => {
+  vi.mocked(ScenarioApi.get).mockResolvedValue({
+    scenarioId: 1,
+    versionId: 1,
+    title: '추천',
+    state: 'QUESTION',
+    nextQuestionId: 11,
+    path: [11],
+    answers: [],
+    question: { questionId: 11, title: '서버에서 받은 질문', options: [] },
+    candidateCount: 12,
+    candidates: {
+      content: [],
+      pagination: { hasNext: false, nextCursor: null },
+    },
+  });
+  renderExperience();
+  await choose('위스키 진짜로 추천해주세요');
+  expect(await screen.findByText('현재 후보 12병')).toBeInTheDocument();
+  expect(ScenarioApi.get).toHaveBeenCalledWith(1, expect.anything());
+  expect(trackCampaignEvent).toHaveBeenCalledWith(
+    'bartender-note-type-d',
+    'VIEW',
+  );
 });

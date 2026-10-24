@@ -7,7 +7,8 @@ import { cn } from '@/lib/utils';
 export type Option = {
   title: string;
   description?: string;
-  action: () => void;
+  action?: () => void;
+  selected?: boolean;
 };
 
 export const ActionDockContext = createContext<HTMLElement | null | undefined>(
@@ -23,11 +24,13 @@ function DockItem({ children }: { children: ReactNode }) {
 export function OptionList({ items }: { items: Option[] }) {
   return (
     <div className="flex flex-col gap-6">
-      {items.map(({ title, description, action }) => (
+      {items.map(({ title, description, action, selected }) => (
         <button
           key={title}
-          className="flex min-h-48 w-full flex-col justify-center gap-2 rounded-lg border border-transparent bg-bg-neutral-weak px-14 py-10 text-left text-fg-neutral transition-colors duration-150 hover:border-stroke-brand-solid hover:bg-bg-brand-weak focus-visible:border-stroke-brand-solid focus-visible:bg-bg-brand-weak focus-visible:outline-none [&:hover>b]:text-fg-brand [&:focus-visible>b]:text-fg-brand"
+          className="flex min-h-48 w-full flex-col justify-center gap-2 rounded-lg border border-transparent bg-bg-neutral-weak px-14 py-10 text-left text-fg-neutral transition-colors duration-150 enabled:hover:border-stroke-brand-solid enabled:hover:bg-bg-brand-weak aria-pressed:border-stroke-brand-solid aria-pressed:bg-bg-brand-weak disabled:cursor-not-allowed disabled:opacity-50 focus-visible:border-stroke-brand-solid focus-visible:bg-bg-brand-weak focus-visible:outline-none [&:hover>b]:text-fg-brand [&:focus-visible>b]:text-fg-brand"
           type="button"
+          disabled={!action}
+          aria-pressed={selected}
           onClick={action}
         >
           <b className="text-15 font-bold leading-20">{title}</b>
