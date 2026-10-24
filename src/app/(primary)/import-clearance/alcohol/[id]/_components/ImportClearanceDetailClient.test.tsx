@@ -19,6 +19,13 @@ jest.mock('@/utils/analytics/ga4', () => ({
   trackGA4Event: jest.fn(),
 }));
 
+beforeAll(() => {
+  window.IntersectionObserver = jest.fn().mockImplementation(() => ({
+    observe: jest.fn(),
+    disconnect: jest.fn(),
+  })) as unknown as typeof IntersectionObserver;
+});
+
 const declaration: MfdsAlcoholDetail = {
   id: 123,
   rcno: '2026-123',
@@ -81,6 +88,10 @@ it('초기 공개 본문을 보여주고 브라우저 재조회 후 갱신하며
   expect(screen.getByText('스프링뱅크')).toBeInTheDocument();
   expect(screen.getByText('기존 제조사')).toBeInTheDocument();
   expect(screen.queryByText('로그인하고 보기')).not.toBeInTheDocument();
+  expect(trackGA4Event).not.toHaveBeenCalledWith(
+    'login_gate_page_view',
+    expect.anything(),
+  );
   await waitFor(() => expect(getAlcohol).toHaveBeenCalledWith('123'));
 
   await act(async () => {
@@ -104,6 +115,9 @@ it('초기 공개 본문을 보여주고 브라우저 재조회 후 갱신하며
   >);
   rerender(view());
   expect(screen.getByText('로그인하고 보기')).toBeInTheDocument();
+  expect(trackGA4Event).toHaveBeenCalledWith('login_gate_page_view', {
+    gate_page: 'import_clearance_detail',
+  });
   await waitFor(() =>
     expect(trackGA4Event).toHaveBeenCalledWith('view_import_clearance_detail', {
       declaration_id: '123',

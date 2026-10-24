@@ -8,7 +8,7 @@ import { loadKakaoSDK } from '@/lib/kakao/kakaoSDK';
 import { loginAuthSession } from '@/lib/auth/session-store';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { LOGIN_RETURN_TO_KEY, setReturnToUrl } from '@/utils/loginRedirect';
-import { consumeLoginTrigger } from '@/utils/loginTrigger';
+import { setLoginContext } from '@/utils/loginTrigger';
 import { useSocialLogin } from './useSocialLogin';
 
 jest.mock('next/navigation', () => ({
@@ -41,10 +41,6 @@ jest.mock('@/utils/analytics/ga4', () => ({
   trackGA4Event: jest.fn(),
 }));
 
-jest.mock('@/utils/loginTrigger', () => ({
-  consumeLoginTrigger: jest.fn(),
-}));
-
 const loginResult = (agreementRequired: boolean) => ({
   agreementRequired,
   session: {
@@ -64,7 +60,6 @@ describe('useSocialLogin', () => {
   const loadKakaoSDKMock = jest.mocked(loadKakaoSDK);
   const getAppleNonceMock = jest.mocked(AuthApi.client.getAppleNonce);
   const sendDeviceInfoMock = jest.mocked(UserApi.sendDeviceInfo);
-  const consumeLoginTriggerMock = jest.mocked(consumeLoginTrigger);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -84,7 +79,6 @@ describe('useSocialLogin', () => {
     (useRouter as jest.Mock).mockReturnValue({
       replace: routerReplace,
     });
-    consumeLoginTriggerMock.mockReturnValue(null);
     loadKakaoSDKMock.mockResolvedValue(true);
   });
 
@@ -222,7 +216,7 @@ describe('useSocialLogin', () => {
 
   it('로그인이 완료되면 로그인 분석 이벤트를 기록한다', async () => {
     loginAuthSessionMock.mockResolvedValueOnce(loginResult(false));
-    consumeLoginTriggerMock.mockReturnValueOnce('review_write');
+    setLoginContext({ trigger: 'review_write' });
     const { result } = renderHook(() => useSocialLogin());
 
     await act(async () => {
@@ -232,9 +226,32 @@ describe('useSocialLogin', () => {
     expect(trackGA4Event).toHaveBeenCalledWith('login', {
       method: 'kakao',
       trigger: 'review_write',
+      gate_page: undefined,
     });
     expect(trackGA4Event).toHaveBeenCalledWith('login_prompt_converted', {
       trigger: 'review_write',
     });
+  });
+
+  it('로그인 게이트를 거쳐 로그인하면 게이트 위치를 로그인 이벤트에 기록한다', async () => {
+    loginAuthSessionMock.mockResolvedValueOnce(loginResult(false));
+    setLoginContext({ gatePage: 'explore_whiskey' });
+    const { result } = renderHook(() => useSocialLogin());
+
+    await act(async () => {
+      await result.current.completeKakaoWebLogin('authorization-code');
+    });
+
+    expect(trackGA4Event).toHaveBeenCalledWith('login', {
+      method: 'kakao',
+      trigger: undefined,
+      gate_page: 'explore_whiskey',
+    });
+    expect(trackGA4Event).not.toHaveBeenCalledWith(
+      'login_prompt_converted',
+      expect.anything(),
+    );
+    // 다음 로그인에 같은 경로가 다시 기록되지 않도록 소비한다.
+    expect(sessionStorage.length).toBe(0);
   });
 });

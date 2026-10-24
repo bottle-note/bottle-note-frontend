@@ -222,6 +222,7 @@ export const WhiskeyExplorerList = ({
       {isLoggedIn && <div ref={targetRef} />}
       {shouldGateGuestList && (
         <GuestListGate
+          gatePage="explore_whiskey"
           key={JSON.stringify([
             category,
             regionIds,

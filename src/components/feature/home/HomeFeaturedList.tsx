@@ -19,7 +19,7 @@ interface Props {
 }
 
 function HomeFeaturedList({ type = 'week' }: Props) {
-  const { isLoggedIn } = useAuthSession();
+  const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
   const { requiresAuth } = HOME_FEATURED_CONFIG[type];
 
   // 로그인이 필요한 타입인데 로그인하지 않은 경우 쿼리 비활성화
@@ -44,7 +44,7 @@ function HomeFeaturedList({ type = 'week' }: Props) {
   if (requiresAuth && !isLoggedIn) {
     return (
       <div className="h-321">
-        <HomeFeaturedLoginRequired />
+        <HomeFeaturedLoginRequired isAuthLoading={isAuthLoading} />
       </div>
     );
   }

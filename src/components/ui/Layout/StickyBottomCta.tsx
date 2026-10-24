@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import Button, { buttonVariants } from '@/components/ui/Button/Button';
 
 /**
@@ -11,26 +12,29 @@ type StickyBottomCtaProps =
   | { label: string; disabled?: boolean; href: string; onClick?: never };
 
 /** 내비바 위에 떠 있는 화면 하단 고정 CTA. onClick은 내부 액션, href는 외부링크용. */
-export function StickyBottomCta(props: StickyBottomCtaProps) {
-  const { label, disabled } = props;
+export const StickyBottomCta = forwardRef<HTMLDivElement, StickyBottomCtaProps>(
+  function StickyBottomCta(props, ref) {
+    const { label, disabled } = props;
 
-  return (
-    <div
-      className="fixed-content z-20 px-20"
-      style={{ bottom: 'var(--navbar-margin-bottom)' }}
-    >
-      {typeof props.href !== 'string' || disabled ? (
-        <Button btnName={label} onClick={props.onClick} disabled={disabled} />
-      ) : (
-        <a
-          href={props.href}
-          target="_blank"
-          rel="noreferrer"
-          className={buttonVariants()}
-        >
-          {label}
-        </a>
-      )}
-    </div>
-  );
-}
+    return (
+      <div
+        ref={ref}
+        className="fixed-content z-20 px-20"
+        style={{ bottom: 'var(--navbar-margin-bottom)' }}
+      >
+        {typeof props.href !== 'string' || disabled ? (
+          <Button btnName={label} onClick={props.onClick} disabled={disabled} />
+        ) : (
+          <a
+            href={props.href}
+            target="_blank"
+            rel="noreferrer"
+            className={buttonVariants()}
+          >
+            {label}
+          </a>
+        )}
+      </div>
+    );
+  },
+);

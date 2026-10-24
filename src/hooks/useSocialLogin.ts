@@ -15,7 +15,7 @@ import {
   isWhiskeyMbtiReturnUrl,
   setReturnToUrl,
 } from '@/utils/loginRedirect';
-import { consumeLoginTrigger } from '@/utils/loginTrigger';
+import { consumeLoginContext } from '@/utils/loginTrigger';
 
 type SocialLoginMethod = 'kakao' | 'apple';
 
@@ -41,7 +41,7 @@ export const useSocialLogin = () => {
     }
 
     clearReturnToUrl();
-    consumeLoginTrigger();
+    consumeLoginContext();
     // Keep the completed result URL: the guest lands on its login gate, not
     // the result or the intro, and can resume without answering again.
     router.replace(destination!);
@@ -66,11 +66,12 @@ export const useSocialLogin = () => {
     payload: Parameters<typeof loginAuthSession>[0],
   ) => {
     const result = await loginAuthSession(payload);
-    const trigger = consumeLoginTrigger();
+    const { trigger, gatePage } = consumeLoginContext();
 
     trackGA4Event('login', {
       method,
-      trigger: trigger ?? undefined,
+      trigger,
+      gate_page: gatePage,
     });
 
     if (trigger) {

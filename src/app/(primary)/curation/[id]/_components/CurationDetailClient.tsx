@@ -16,6 +16,7 @@ import {
   STICKY_BOTTOM_CTA_PADDING_CLASS,
   StickyBottomCta,
 } from '@/components/ui/Layout/StickyBottomCta';
+import { useLoginGateTracking } from '@/components/feature/auth/useLoginGateTracking';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useLoginBridge } from '@/hooks/useLoginBridge';
 import {
@@ -55,6 +56,10 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
   const shouldShowCta = Boolean(applicationLink);
   const canApply = shouldShowCta && payload.isRecruiting && !isEventPast;
   const shouldShowGuestLoginCta = canApply && !isAuthLoading && !isLoggedIn;
+  const { ref: guestLoginCtaRef, trackClick: trackGuestLoginClick } =
+    useLoginGateTracking('curation_detail', {
+      enabled: shouldShowGuestLoginCta,
+    });
   const shouldShowApplicationCta = canApply && isLoggedIn;
   const shouldShowClosedCta = shouldShowCta && !canApply;
   const summaryItems = [
@@ -205,8 +210,12 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
 
       {shouldShowGuestLoginCta && (
         <StickyBottomCta
+          ref={guestLoginCtaRef}
           label="로그인 후 신청하기"
-          onClick={() => bridgeToLogin()}
+          onClick={() => {
+            trackGuestLoginClick();
+            bridgeToLogin({ gatePage: 'curation_detail' });
+          }}
         />
       )}
       {shouldShowApplicationCta && (

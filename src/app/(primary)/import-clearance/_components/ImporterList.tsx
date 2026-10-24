@@ -155,6 +155,7 @@ export default function ImporterList() {
         )}
         {shouldGateGuestList && (
           <GuestListGate
+            gatePage="importer_list"
             title="더 많은 수입사 정보가 궁금하신가요?"
             description="로그인하고 전체 수입사 정보를 더 확인해보세요."
           />

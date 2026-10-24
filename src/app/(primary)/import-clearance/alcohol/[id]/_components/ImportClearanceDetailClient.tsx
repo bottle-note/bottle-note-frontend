@@ -457,11 +457,12 @@ export default function ImportClearanceDetailClient({
       {heroSection}
       {!isLoggedIn ? (
         <LoginGate
+          gatePage="import_clearance_detail"
           variant="blur"
           title="더 알고 싶으신가요?"
           description="로그인하고 이 수입 정보를 무료로 확인하세요"
           buttonLabel="로그인하고 보기"
-          onLogin={() => bridgeToLogin()}
+          onLogin={() => bridgeToLogin({ gatePage: 'import_clearance_detail' })}
           visibleHeight="min-h-0"
           gradientStartPercent={80}
           isAuthLoading={isAuthLoading}
