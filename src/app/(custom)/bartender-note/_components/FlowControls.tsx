@@ -1,32 +1,39 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import Link from 'next/link';
 import { createPortal } from 'react-dom';
-import Button, { buttonVariants } from '@/components/ui/Button/Button';
-import { cn } from '@/lib/utils';
+import Button from '@/components/ui/Button/Button';
 
-export type Option = {
+export interface Option {
+  id?: string;
   title: string;
   description?: string;
   action: () => void;
-};
+}
 
 export const ActionDockContext = createContext<HTMLElement | null | undefined>(
   undefined,
 );
 
-function DockItem({ children }: { children: ReactNode }) {
+export function FlowDock({ children }: { children: ReactNode }) {
   const dock = useContext(ActionDockContext);
   if (dock === undefined) return children;
   return dock ? createPortal(children, dock) : null;
 }
 
-export function OptionList({ items }: { items: Option[] }) {
+export function OptionList({
+  items,
+  disabled = false,
+}: {
+  items: Option[];
+  disabled?: boolean;
+}) {
   return (
     <div className="flex flex-col gap-6">
-      {items.map(({ title, description, action }) => (
+      {items.map(({ id, title, description, action }) => (
         <button
-          key={title}
-          className="flex min-h-48 w-full flex-col justify-center gap-2 rounded-lg border border-transparent bg-bg-neutral-weak px-14 py-10 text-left text-fg-neutral transition-colors duration-150 hover:border-stroke-brand-solid hover:bg-bg-brand-weak focus-visible:border-stroke-brand-solid focus-visible:bg-bg-brand-weak focus-visible:outline-none [&:hover>b]:text-fg-brand [&:focus-visible>b]:text-fg-brand"
+          key={id ?? title}
+          disabled={disabled}
+          className="flex min-h-48 w-full flex-col justify-center gap-2 rounded-lg border border-transparent bg-bg-neutral-weak px-14 py-10 text-left text-fg-neutral transition-colors duration-150 hover:border-stroke-brand-solid hover:bg-bg-brand-weak focus-visible:border-stroke-brand-solid focus-visible:bg-bg-brand-weak focus-visible:outline-none disabled:pointer-events-none disabled:opacity-60 [&:hover>b]:text-fg-brand [&:focus-visible>b]:text-fg-brand"
           type="button"
           onClick={action}
         >
@@ -45,60 +52,68 @@ export function OptionList({ items }: { items: Option[] }) {
 export function FlowAction({
   children,
   onClick,
-  primary = false,
   disabled = false,
 }: {
   children: ReactNode;
   onClick: () => void;
-  primary?: boolean;
   disabled?: boolean;
 }) {
   return (
-    <DockItem>
-      <Button
-        size={primary ? 'lg' : 'md'}
-        variant={primary ? 'primary' : 'secondary'}
-        fullWidth
-        disabled={disabled}
-        onClick={onClick}
-      >
+    <FlowDock>
+      <Button size="lg" variant="primary" disabled={disabled} onClick={onClick}>
         {children}
       </Button>
-    </DockItem>
+    </FlowDock>
   );
 }
 
-export function flowLinkClassName(primary = false) {
-  return cn(
-    buttonVariants({
-      size: primary ? 'lg' : 'md',
-      variant: primary ? 'primary' : 'secondary',
-      fullWidth: true,
-    }),
-    'no-underline',
+const navigationClassName =
+  'inline-flex min-h-40 items-center text-13 font-semibold text-fg-neutral-muted underline decoration-stroke-neutral-weak underline-offset-4 transition-colors hover:text-fg-brand focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring';
+
+export function FlowNavigation({ children }: { children: ReactNode }) {
+  return (
+    <nav
+      aria-label="다른 보기"
+      className="flex flex-wrap items-center gap-x-16 gap-y-2 border-t border-stroke-neutral-subtle pt-8"
+    >
+      {children}
+    </nav>
   );
 }
 
-export function FlowLink({
-  href,
+export function FlowTextAction({
   children,
-  primary = false,
+  onClick,
+  disabled = false,
+}: {
+  children: ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      className={navigationClassName}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function FlowTextLink({
+  children,
+  href,
   onClick,
 }: {
-  href: string;
   children: ReactNode;
-  primary?: boolean;
+  href: string;
   onClick?: () => void;
 }) {
   return (
-    <DockItem>
-      <Link
-        className={flowLinkClassName(primary)}
-        href={href}
-        onClick={onClick}
-      >
-        {children}
-      </Link>
-    </DockItem>
+    <Link href={href} className={navigationClassName} onClick={onClick}>
+      {children}
+    </Link>
   );
 }

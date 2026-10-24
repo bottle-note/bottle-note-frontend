@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { TAGS_LIMIT, validateTagText } from '@/constants/review';
 import type { ReviewDraft, Step } from './types';
 import { FlowAction } from './FlowControls';
-import type { Whiskey } from '../_data/demo';
+import type { ReviewAlcohol } from './reviewAlcohol';
 import {
   noteKeywords,
   npfFeel,
@@ -117,7 +117,7 @@ function TagEditor({
 type Props = {
   step: Step;
   review: ReviewDraft;
-  selected?: Whiskey;
+  selected?: ReviewAlcohol;
   whiskeySummary: ReactNode;
   reviewTags: string[];
   updateReview: (value: Partial<ReviewDraft>) => void;
@@ -140,13 +140,8 @@ export default function ReviewComposer({
   useEffect(() => {
     setKeywordSearch('');
   }, [step]);
-  const action = (
-    label: string,
-    onClick: () => void,
-    primary = false,
-    disabled = false,
-  ) => (
-    <FlowAction onClick={onClick} primary={primary} disabled={disabled}>
+  const action = (label: string, onClick: () => void, disabled = false) => (
+    <FlowAction onClick={onClick} disabled={disabled}>
       {label}
     </FlowAction>
   );
@@ -278,7 +273,7 @@ export default function ReviewComposer({
             {review.text.length} / {REVIEW_TEXT_MAX}
           </p>
           {tagEditor}
-          {action('다 썼어요', prepareGraph, true, !review.text.trim())}
+          {action('다 썼어요', prepareGraph, !review.text.trim())}
         </>
       )}
       {(step === 'review-nose' ||
@@ -384,7 +379,6 @@ export default function ReviewComposer({
                   step === 'review-nose' ? 'review-palate' : 'review-finish',
                 );
             },
-            true,
             step === 'review-finish' &&
               !review.nose.trim() &&
               !review.palate.trim() &&

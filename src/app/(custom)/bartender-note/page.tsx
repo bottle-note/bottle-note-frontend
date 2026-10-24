@@ -1,5 +1,6 @@
 import BartenderExperience from './_components/BartenderExperience';
 import { demoCurations, demoWhiskies } from './_data/demo';
+import { MOCK_SCENARIO_CONTEXT } from './_scenario/mockScenario';
 
 export const metadata = {
   title: '바텐더 노트 | 보틀노트',
@@ -9,6 +10,10 @@ export const metadata = {
 
 export default function BartenderNotePage() {
   return (
-    <BartenderExperience whiskies={demoWhiskies} curations={demoCurations} />
+    <BartenderExperience
+      whiskies={demoWhiskies}
+      curations={demoCurations}
+      scenarioContext={MOCK_SCENARIO_CONTEXT}
+    />
   );
 }
