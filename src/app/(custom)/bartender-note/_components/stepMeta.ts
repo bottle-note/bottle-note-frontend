@@ -1,15 +1,6 @@
 import type { Pose } from './BarScene';
 import type { ReviewDraft, Step } from './types';
 
-export const questionSteps: Step[] = [
-  'level',
-  'likes',
-  'kind',
-  'axis',
-  'abv',
-  'price',
-];
-
 type StepMeta = {
   title: string;
   subtitle?: string;
@@ -25,14 +16,8 @@ const REVIEW = '리뷰 쓰기';
 
 const STEP_META: Record<Step, StepMeta> = {
   intro: { title: NOTE, pose: 'greet' },
-  level: { title: NOTE, pose: 'idle' },
-  likes: { title: NOTE, pose: 'think' },
-  kind: { title: NOTE, pose: 'idle' },
-  axis: { title: NOTE, pose: 'idle' },
-  abv: { title: NOTE, pose: 'idle' },
-  price: { title: NOTE, pose: 'idle' },
+  scenario: { title: NOTE, pose: 'idle' },
   recommendations: { title: PICKS, pose: 'think', progress: 100 },
-  similar: { title: PICKS, pose: 'idle' },
   situation: { title: SITUATION, pose: 'think' },
   curations: { title: SITUATION, subtitle: '상황별 큐레이션', pose: 'idle' },
   'curation-empty': { title: SITUATION, pose: 'bow' },
@@ -78,36 +63,30 @@ export function getStepHeader(
   {
     curationTitle,
     reviewMode,
-  }: { curationTitle?: string; reviewMode: ReviewDraft['mode'] },
+    questionNumber,
+  }: {
+    curationTitle?: string;
+    reviewMode: ReviewDraft['mode'];
+    questionNumber?: number;
+  },
 ) {
   const meta = STEP_META[step];
-  const question = questionSteps.indexOf(step);
   const reviewSteps = reviewProgressSteps(reviewMode);
   const review = reviewSteps.indexOf(step);
   const subtitle =
-    question >= 0
-      ? `질문 ${question + 1} / ${questionSteps.length}`
+    step === 'scenario'
+      ? `질문 ${questionNumber}`
       : step === 'curation-list'
         ? curationTitle ?? ''
         : meta.subtitle ?? '';
   const progress =
-    meta.progress ??
-    (question >= 0
-      ? ((question + 1) / questionSteps.length) * 100
-      : review >= 0
-        ? ((review + 1) / reviewSteps.length) * 100
-        : 0);
+    step === 'scenario'
+      ? undefined
+      : meta.progress ??
+        (review >= 0 ? ((review + 1) / reviewSteps.length) * 100 : 0);
   return { title: meta.title, subtitle, progress };
 }
 
 export function getStepPose(step: Step) {
   return STEP_META[step].pose;
-}
-
-export function getBackLabel(step: Step, previous?: Step) {
-  return questionSteps.includes(step) &&
-    previous !== undefined &&
-    questionSteps.includes(previous)
-    ? '이전 질문'
-    : '이전 단계';
 }

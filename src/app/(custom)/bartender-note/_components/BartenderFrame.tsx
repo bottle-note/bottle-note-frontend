@@ -11,7 +11,8 @@ type Props = {
   step: Step;
   title: string;
   subtitle: string;
-  progress: number;
+  progress?: number;
+  questionId?: number;
   lines: string[];
   pose: Pose;
   onBack?: () => void;
@@ -25,6 +26,7 @@ export default function BartenderFrame({
   title,
   subtitle,
   progress,
+  questionId,
   lines,
   pose,
   onBack,
@@ -34,12 +36,12 @@ export default function BartenderFrame({
 }: Props) {
   const contentRef = useRef<HTMLElement>(null);
   const [actionDock, setActionDock] = useState<HTMLDivElement | null>(null);
-  const dialogue = useDialoguePlayback(step, lines);
+  const dialogue = useDialoguePlayback(step, lines, questionId);
   const dialogueKey = lines.join('\u0000');
 
   useEffect(() => {
     contentRef.current?.scrollTo({ top: 0, behavior: 'auto' });
-  }, [step, dialogueKey]);
+  }, [step, dialogueKey, questionId]);
 
   return (
     <div
@@ -48,7 +50,7 @@ export default function BartenderFrame({
         if (
           dialogue.optionsVisible ||
           (event.target as HTMLElement).closest(
-            '[data-dialogue-control], section',
+            '[data-dialogue-control], [data-flow-action-dock], section',
           )
         )
           return;
@@ -89,19 +91,21 @@ export default function BartenderFrame({
           >
             ×
           </button>
-          <div
-            aria-label="진행률"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={Math.round(progress)}
-            role="progressbar"
-            className="absolute inset-x-0 bottom-0 h-3 overflow-hidden bg-stroke-neutral-subtle"
-          >
-            <span
-              className="block h-full w-full origin-left bg-bg-brand-solid transition-transform duration-300 ease-out motion-reduce:transition-none"
-              style={{ transform: `scaleX(${progress / 100})` }}
-            />
-          </div>
+          {progress !== undefined && (
+            <div
+              aria-label="진행률"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(progress)}
+              role="progressbar"
+              className="absolute inset-x-0 bottom-0 h-3 overflow-hidden bg-stroke-neutral-subtle"
+            >
+              <span
+                className="block h-full w-full origin-left bg-bg-brand-solid transition-transform duration-300 ease-out motion-reduce:transition-none"
+                style={{ transform: `scaleX(${progress / 100})` }}
+              />
+            </div>
+          )}
         </header>
         <div className="relative max-h-[40dvh] shrink-0 overflow-hidden bg-bg-layer-basement">
           <BarScene
@@ -150,6 +154,7 @@ export default function BartenderFrame({
           ref={setActionDock}
           role="group"
           aria-label="현재 단계 행동"
+          data-flow-action-dock
           className="empty:hidden z-20 flex shrink-0 flex-col gap-12 px-20 pb-[max(28px,var(--safe-area-bottom))] pt-12 [@media(max-height:500px)]:gap-4 [@media(max-height:500px)]:pt-6"
         />
       </div>

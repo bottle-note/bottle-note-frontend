@@ -16,6 +16,7 @@ type Props = {
   setCurationId: Dispatch<SetStateAction<number | null>>;
   move: (next: Step) => void;
   home: () => void;
+  onStartScenario: () => void;
 };
 
 export default function CurationFlow({
@@ -26,6 +27,7 @@ export default function CurationFlow({
   setCurationId,
   move,
   home,
+  onStartScenario,
 }: Props) {
   const [page, setPage] = useState(0);
   const now = new Date();
@@ -68,7 +70,7 @@ export default function CurationFlow({
         )}
       {step === 'curation-empty' && (
         <>
-          <FlowAction onClick={() => move('level')}>
+          <FlowAction onClick={onStartScenario}>
             취향으로 골라 주세요
           </FlowAction>
           <FlowNavigation>

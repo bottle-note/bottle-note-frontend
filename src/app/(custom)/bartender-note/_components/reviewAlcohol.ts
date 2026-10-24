@@ -1,8 +1,8 @@
 import type { AlcoholDetailsResponse } from '@/api/alcohol/types';
 import type { Whiskey } from '../_data/demo';
 
-/** 리뷰 흐름에서 쓰는 술 정보. 가격처럼 API에 없는 값은 표시하지 않는다. */
-export type ReviewAlcohol = {
+/** 바텐더 내부 상세·리뷰에서 공유하는 표시용 정보. API에 없는 가격은 보충하지 않는다. */
+export interface ReviewAlcohol {
   id: number;
   name: string;
   category: string;
@@ -16,7 +16,8 @@ export type ReviewAlcohol = {
   description?: string;
   imageUrl?: string;
   demoWhiskey?: Whiskey;
-};
+  reviewCount?: number;
+}
 
 export function reviewAlcoholFromWhiskey(whiskey: Whiskey): ReviewAlcohol {
   return {

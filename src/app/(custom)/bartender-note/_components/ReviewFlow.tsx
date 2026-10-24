@@ -65,7 +65,7 @@ type Props = {
   selected?: ReviewAlcohol;
   move: (next: Step) => void;
   home: () => void;
-  onPickAlcohol: (alcohol: ReviewAlcohol) => void;
+  onPickAlcohol: (alcoholId: number) => void;
   lastReviewMode: ReviewDraft['mode'];
   chooseMode: (mode: ReviewDraft['mode']) => void;
   postReview: () => void;

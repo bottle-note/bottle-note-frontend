@@ -8,9 +8,9 @@ import type {
   ScenarioStepRequest,
 } from './model';
 import {
-  localQuestionnaire,
-  type QuestionOption,
-} from '../_data/questionnaire';
+  mockQuestionnaire,
+  type MockQuestionOption,
+} from './mockQuestionnaire';
 
 /** 테스트용 ID이며 실제 서버의 그룹·시나리오 ID가 아니다. 호출부가 명시적으로 주입한다. */
 export const MOCK_SCENARIO_CONTEXT: ScenarioContext = {
@@ -20,14 +20,14 @@ export const MOCK_SCENARIO_CONTEXT: ScenarioContext = {
 
 interface MockScenarioChoiceInput {
   kind: 'choice';
-  choices: QuestionOption[];
+  choices: MockQuestionOption[];
   allowAny: boolean;
 }
 
 interface MockScenarioPriceUnitOptions {
   unit: ScenarioPriceUnit;
   label: string;
-  choices: QuestionOption[];
+  choices: MockQuestionOption[];
 }
 
 interface MockScenarioPriceInput {
@@ -60,7 +60,7 @@ const candidates = [
   { id: 575, name: '메이커스 마크', imageUrl: null, kindId: 'bourbon' },
 ];
 
-function choiceInput(options: QuestionOption[]): MockScenarioChoiceInput {
+function choiceInput(options: MockQuestionOption[]): MockScenarioChoiceInput {
   return {
     kind: 'choice',
     choices: options.filter(({ id }) => id !== 'any'),
@@ -121,8 +121,7 @@ export async function getMockScenarioStep(
     throw new Error('목에서 지원하지 않는 시나리오입니다.');
   }
 
-  const { levels, kinds, axes, americanAxes, abvs, prices } =
-    localQuestionnaire;
+  const { levels, kinds, axes, americanAxes, abvs, prices } = mockQuestionnaire;
   const level = answers[0]?.value;
   const kind = answers[2]?.value;
   const kindId = kind?.kind === 'choice' ? kind.choiceId : undefined;

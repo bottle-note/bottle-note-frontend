@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
-import { alcoholDetailKeys } from '@/queries/useAlcoholDetailQuery';
 import type { AlcoholLookupItem } from '@/api/alcohol/types';
-import { reviewAlcoholFromDetails, type ReviewAlcohol } from './reviewAlcohol';
 
 const normalize = (value: string) => value.trim().replace(/\s+/g, ' ');
 
@@ -12,13 +10,10 @@ const normalize = (value: string) => value.trim().replace(/\s+/g, ' ');
 export default function ReviewPickStep({
   onPick,
 }: {
-  onPick: (alcohol: ReviewAlcohol) => void;
+  onPick: (alcoholId: number) => void;
 }) {
-  const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
   const [lookupQuery, setLookupQuery] = useState('');
-  const [loadingId, setLoadingId] = useState<number | null>(null);
-  const [selectionFailed, setSelectionFailed] = useState(false);
 
   useEffect(() => {
     const timer = window.setTimeout(
@@ -49,25 +44,6 @@ export default function ReviewPickStep({
   const results: AlcoholLookupItem[] =
     normalizedQuery === lookupQuery ? lookup.data ?? [] : [];
 
-  const selectAlcohol = async (alcoholId: number) => {
-    if (loadingId !== null) return;
-    setLoadingId(alcoholId);
-    setSelectionFailed(false);
-    try {
-      const details = await queryClient.fetchQuery({
-        queryKey: alcoholDetailKeys.detail(String(alcoholId), null),
-        queryFn: async () =>
-          (await AlcoholsApi.getAlcoholDetails(String(alcoholId))).data,
-        staleTime: 5 * 60 * 1000,
-      });
-      setLoadingId(null);
-      onPick(reviewAlcoholFromDetails(details));
-    } catch {
-      setLoadingId(null);
-      setSelectionFailed(true);
-    }
-  };
-
   return (
     <>
       <input
@@ -78,16 +54,6 @@ export default function ReviewPickStep({
         placeholder="마시고 있는 술 이름 검색"
         aria-label="술 이름 또는 종류 검색"
       />
-      {loadingId !== null && (
-        <p className="m-0 text-14 text-fg-neutral-muted" role="status">
-          술 정보를 불러오고 있어요…
-        </p>
-      )}
-      {selectionFailed && (
-        <p className="m-0 text-15 text-fg-neutral" role="alert">
-          술 정보를 불러오지 못했어요. 다시 선택해 주세요.
-        </p>
-      )}
       {!normalizedQuery && (
         <>
           <p className="m-0 text-13 text-fg-neutral-muted">
@@ -122,8 +88,7 @@ export default function ReviewPickStep({
                   type="button"
                   key={alcohol.alcoholId}
                   className="min-h-40 rounded-full border border-stroke-neutral-weak px-12 text-13 text-fg-neutral focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring disabled:opacity-45"
-                  disabled={loadingId !== null}
-                  onClick={() => void selectAlcohol(alcohol.alcoholId)}
+                  onClick={() => onPick(alcohol.alcoholId)}
                 >
                   {alcohol.korName}
                 </button>
@@ -169,8 +134,7 @@ export default function ReviewPickStep({
                   key={alcohol.alcoholId}
                   type="button"
                   className="flex min-h-74 w-full items-center gap-12 border-b border-stroke-neutral-subtle py-10 text-left text-fg-neutral transition-colors hover:text-fg-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring disabled:opacity-45"
-                  disabled={loadingId !== null}
-                  onClick={() => void selectAlcohol(alcohol.alcoholId)}
+                  onClick={() => onPick(alcohol.alcoholId)}
                 >
                   <AlcoholImage
                     imageUrl={alcohol.imageUrl}

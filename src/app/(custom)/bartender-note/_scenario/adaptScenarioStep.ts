@@ -9,9 +9,9 @@ import type {
   ScenarioQuestion,
   ScenarioStepResponse,
 } from './model';
-import type { QuestionOption } from '../_data/questionnaire';
+import type { MockQuestionOption } from './mockQuestionnaire';
 
-function adaptOption(option: QuestionOption): ScenarioOption {
+function adaptOption(option: MockQuestionOption): ScenarioOption {
   if (typeof option.id !== 'string' || typeof option.title !== 'string') {
     throw new Error('보기 ID와 문구가 필요합니다.');
   }

@@ -1,6 +1,7 @@
 # Phase 1 — 단계 요청·응답과 목 API
 
-> **상태:** Phase 1 구현 완료 · 코드 검토 대기  
+> **상태:** Phase 1 구현·검토 완료 · dbd96766 커밋
+>
 > **기준:** 2026-10-24에 합의한 단계별 요청 흐름  
 > **전제:** 아래 필드는 프론트 내부 계약이다. 실제 Product API의 주소·인증·요청·응답 계약은 미확정이다.
 
@@ -210,15 +211,15 @@ sequenceDiagram
 
 라우트 내부의 \_scenario/에서 시작한다.
 
-| 파일                                                                                      | 책임                                                                                              |
-| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| \_scenario/model.ts                                                                       | 위의 객체 interface와 입력·답변 값의 union                                                        |
-| \_scenario/scenarioApi.ts                                                                 | 호출부가 사용할 비동기 조회 함수. 목 호출과 어댑터 연결                                           |
-| \_scenario/mockScenario.ts                                                                | 목 ID·질문·누적 답변 분기·중간/최종 후보 원본                                                     |
-| \_scenario/adaptScenarioStep.ts                                                           | 응답 검증과 화면용 모델 변환 한 곳                                                                |
-| [\_data/questionnaire.ts](<../../src/app/(custom)/bartender-note/_data/questionnaire.ts>) | QuestionOption을 interface로 선언하고 안정된 id 추가. 기존 화면과 목 소스가 같은 문구·설명을 공유 |
+| 파일                                                                                           | 책임                                                                              |
+| ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| \_scenario/model.ts                                                                            | 위의 객체 interface와 입력·답변 값의 union                                        |
+| \_scenario/scenarioApi.ts                                                                      | 호출부가 사용할 비동기 조회 함수. 목 호출과 어댑터 연결                           |
+| \_scenario/mockScenario.ts                                                                     | 목 ID·질문·누적 답변 분기·중간/최종 후보 원본                                     |
+| \_scenario/adaptScenarioStep.ts                                                                | 응답 검증과 화면용 모델 변환 한 곳                                                |
+| [mockQuestionnaire.ts](<../../src/app/(custom)/bartender-note/_scenario/mockQuestionnaire.ts>) | Phase 1에서 보기 ID 보완. Phase 3에서 현재 경로로 옮겨 목 전용 문구 원본으로 사용 |
 
-기존 화면이 아직 localQuestionnaire를 읽으므로 Phase 1에서는 이 원본을 유지하고 목 소스가 재사용한다. Phase 3의 화면 전환 시 질문 데이터를 목 소스로 옮기고 기존 prop과 파일을 제거한다. 문구를 두 파일에 복사해 보관하지 않는다.
+Phase 1에서는 기존 localQuestionnaire를 공유했다. Phase 3 전환에서 문구 원본을 \_scenario/mockQuestionnaire.ts로 옮기고 기존 질문지 prop과 \_data/questionnaire.ts를 제거했다. 문구를 두 파일에 복사해 보관하지 않는다.
 
 Phase 1의 후보는 명시적인 작은 fixture로 중간 결과·0개 결과·완료를 검증한다. Phase 4도 이 작은 fixture를 사용하며, 기존 데모 점수·유사 추천 계산은 사용처를 정리한 뒤 제거하는 최소안을 제안한다. 목 후보를 실제 검색 결과나 서버 추천 품질의 근거로 취급하지 않는다.
 

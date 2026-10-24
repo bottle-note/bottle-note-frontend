@@ -1,6 +1,7 @@
 # Phase 4 — 후보·추천 결과 연결과 기존 코드 정리
 
-> **상태:** 사용자 검토 대기 · 설계 문서만 작성  
+> **상태:** Phase 4 구현 완료 · 코드 검토 대기
+>
 > **선행:** Phase 1~3 검토 완료  
 > **목표:** 술 선택 → 바텐더 내부 상세 → 상세 이동 또는 리뷰 작성
 
@@ -18,6 +19,42 @@ flowchart LR
 ```
 
 **사용자 피드백 반영:** 술을 고르면 바텐더 플로우 안에서 먼저 정보를 보여 준다. 실제 술 상세 페이지 이동은 내부 상세의 명시적인 CTA로 제공한다. 추천·찜·큐레이션·리뷰용 술 선택에 같은 기준을 적용한다.
+
+## 구현과 검증 결과
+
+| 구현      | 결과                                                                                                   |
+| --------- | ------------------------------------------------------------------------------------------------------ |
+| 추천      | 중간 후보 수·최종 목록을 Query 응답에서 표시. 새 ScenarioCandidateList로 내부 상세 진입                |
+| 술 선택   | selection에 ID·출처(api/demo)만 보관. 추천·찜·리뷰는 기존 상세 Query, 큐레이션 데모는 기존 데이터 사용 |
+| 상세·리뷰 | ReviewAlcohol 표시 모델과 기존 변환을 공유. 상세 응답을 로컬 state나 snapshot에 복제하지 않음          |
+| 리뷰 검색 | 선택한 ID만 전달하고 detail 진입. 별도 사전 상세 조회는 제거해 내부 상세 Query 한 곳에서 조회          |
+| 복원      | v2 snapshot에 여정·context·answers·선택 ID/출처·리뷰 초안 저장. 외부 상세에서 돌아오면 내부 상세 복원  |
+| 정리      | 기존 6개 질문 step·Answers·useTasteRecommendation·demoSelection·similar 분기 제거                      |
+| GA4       | 성공 결과는 available/empty. 내부 선택과 외부 상세 CTA를 구분하고 상세 복귀 시 결과 이벤트 중복 방지   |
+
+```mermaid
+flowchart LR
+    S[추천·찜·리뷰 선택] --> ID[술 ID·출처]
+    C[큐레이션 데모 선택] --> ID
+    ID --> DATA[기존 상세 Query 또는 기존 데모]
+    DATA --> DETAIL[바텐더 내부 상세]
+    DETAIL --> CTA[자세히 볼게요 / 리뷰 작성]
+```
+
+| 검증                               | 결과                                                                                                                 |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| 바텐더 테스트                      | 4개 파일 44개 통과. 목 요청·응답, hook, 질문·분기·가격 제출·범위 입력, 내부 상세·찜·리뷰 저장, 복원·이벤트 중복 방지 |
+| TypeScript / 변경 제품 코드 ESLint | 통과                                                                                                                 |
+| GTM 설정 검사                      | 통과. 기존 이벤트·매개변수 키 재사용. 외부 작업공간 변경·게시 없음                                                   |
+| 390×844 브라우저                   | 질문 → 후보 → 내부 상세 → 실제 상세(/alcohols/247) → 내부 상세 복원 → 같은 결과 복귀 → 이전 질문 확인                |
+| 360×640 브라우저                   | 실제 술 검색 3병 선택·추가 제한·선택 취소, 질문 뒤로 가기 시 입력 초기화, 보기 스크롤·고정 CTA·가로 넘침 없음        |
+| 리뷰 브라우저                      | 실제 검색 → 내부 상세 → 리뷰 작성 CTA → 작성 방식 선택 확인                                                          |
+| GA4 브라우저                       | dataLayer에서 start·available 결과·술 선택·실제 상세 CTA 확인. 상세 왕복 후 결과 이벤트 1회 유지                     |
+| 회귀 수정                          | 대사 재생 중 하단 CTA 클릭이 대사 넘기기로 소비되는 문제 재현·수정, 자동 테스트 추가                                 |
+
+브라우저는 실제 API의 검색·상세를 사용했다. 현재 비로그인 세션(/api/auth/session 401)이므로 실제 찜·리뷰 저장과 개인 찜 목록은 브라우저에서 확인하지 않았으며, 해당 경로는 API 대역을 사용하는 컴포넌트 통합 테스트로 검증했다. 숫자 입력은 컴포넌트 테스트, 실제 모바일 키보드·Flutter WebView는 미검증이다.
+
+질문·추천 실행 API는 계속 프론트 목이다. 실제 Product 계약·서버 실행 연동과 GA4 수신 검증은 수행하지 않았다. jsdom의 실제 페이지 이동 미지원 메시지는 기존 링크 테스트에서 출력되며, 실제 이동·복귀는 브라우저로 확인했다.
 
 ## 현재 → 변경
 
@@ -83,10 +120,10 @@ sequenceDiagram
 | 영역           | 최소 설계                                                                                                                                 |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | 후보 목록      | ScenarioCandidateList는 ID·이름·이미지를 받고 onChoose(id) 호출. 목록에서 외부 상세로 가는 Link 제거                                      |
-| 선택 상태      | 기존 chosenId와 journey의 detail/history 재사용. 내부 상세 진입 자체로 snapshot을 저장하지 않음                                           |
+| 선택 상태      | selection에 ID·출처만 저장하고 기존 journey의 detail/history 재사용. 내부 상세 진입 자체로 snapshot을 저장하지 않음                       |
 | 실제 술 정보   | 기존 AlcoholsApi.getAlcoholDetails와 alcoholDetailKeys의 캐시 재사용. Query는 선택 ID로 조회하고 기존 상세 조회의 사용자 구분 기준을 따름 |
 | 상세 표시      | WhiskeyDetail의 카드·애니메이션·하단 액션 유지. 기존 reviewAlcoholFromDetails 변환을 재사용해 데모 Whiskey 이외의 술도 표시               |
-| 리뷰 검색      | ReviewPickStep이 이미 조회한 상세 캐시를 재사용. 선택 후 review-mode 대신 detail로 진입                                                   |
+| 리뷰 검색      | ReviewPickStep은 선택 ID만 전달. detail의 기존 상세 Query에서 조회하고 캐시 재사용                                                        |
 | 데이터 범위    | 이름·이미지·종류·지역·도수·평가·태그 중 응답에 있는 정보 표시. 기존 데모 가격은 해당 데모 경로에서만 사용                                 |
 | 찜             | 내부 상세의 기존 찜 동작 재사용. 찜 목록에서는 데모 유무에 따른 외부 직행 분기 제거                                                       |
 | 하단 CTA       | ‘자세히 볼게요’, ‘리뷰 작성’ 최대 2개. 찜은 카드 안의 기존 액션 유지                                                                      |
@@ -100,11 +137,11 @@ sequenceDiagram
 
 ## 기존 snapshot에 최소 정보만
 
-| 저장할 것                                | 저장하지 않을 것 |
-| ---------------------------------------- | ---------------- |
-| 전체 여정의 step과 history, 선택한 술 ID | 질문 응답 목록   |
-| scenario의 context와 누적 answers        | 위스키 후보 응답 |
-| 다른 리뷰·큐레이션 흐름의 기존 상태      | Query 캐시 사본  |
+| 저장할 것                                     | 저장하지 않을 것 |
+| --------------------------------------------- | ---------------- |
+| 전체 여정의 step과 history, 선택한 술 ID·출처 | 질문 응답 목록   |
+| scenario의 context와 누적 answers             | 위스키 후보 응답 |
+| 다른 리뷰·큐레이션 흐름의 기존 상태           | Query 캐시 사본  |
 
 기존 snapshot의 answers/likedLookups 필드를 scenario의 context와 answers로 교체한다. 선택 중인 술 이름은 Phase 3 입력 UI에서만 사용하므로 최상위 likedLookups는 제거한다. 같은 sessionStorage 저장 경로와 30분 복원 기준을 재사용한다. 저장 키만 새 버전으로 구분해 이전 임시 형식과 섞이지 않게 한다.
 
@@ -112,14 +149,14 @@ sequenceDiagram
 
 ## 데모 추천과 함께 정리할 코드
 
-| 현재                                                       | 정리 방향                                                             |
-| ---------------------------------------------------------- | --------------------------------------------------------------------- |
-| useTasteRecommendation의 answers·추천 계산·baseWhiskeyName | useScenarioFlow와 응답 표시로 대체한 뒤 hook 제거                     |
-| CandidateList의 exact/similar 분기와 조건 요약             | 취향 추천 부분 제거. 큐레이션·찜 목록 역할만 유지                     |
-| favorites가 answers.unit에 의존                            | 기존 초기값인 glass를 찜 목록의 표시 기본값으로 두어 취향 답변과 분리 |
-| Step의 여섯 질문과 similar                                 | scenario 질문 영역과 recommendations 결과로 정리                      |
-| 데모 점수·추천 이유·유사 후보 계산                         | 새 목에 이식하지 않고 사용처가 없어진 demoSelection.ts 제거           |
-| 데모 술·큐레이션 데이터                                    | 다른 큐레이션·찜·리뷰 흐름의 사용 범위에서 유지                       |
+| 현재                                                       | 정리 방향                                                                   |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------- |
+| useTasteRecommendation의 answers·추천 계산·baseWhiskeyName | useScenarioFlow와 응답 표시로 대체한 뒤 hook 제거                           |
+| CandidateList의 exact/similar 분기와 조건 요약             | 취향 추천 부분 제거. 큐레이션·찜 목록 역할만 유지                           |
+| favorites가 answers.unit에 의존                            | 찜 목록은 API의 이름·이미지·종류를 표시하고 취향 답변의 가격 단위 의존 제거 |
+| Step의 여섯 질문과 similar                                 | scenario 질문 영역과 recommendations 결과로 정리                            |
+| 데모 점수·추천 이유·유사 후보 계산                         | 새 목에 이식하지 않고 사용처가 없어진 demoSelection.ts 제거                 |
+| 데모 술·큐레이션 데이터                                    | 다른 큐레이션·찜·리뷰 흐름의 사용 범위에서 유지                             |
 
 단순성을 우선해 목의 후보는 Phase 1의 작은 fixture로 재현한다. ‘기존 데모 추천 계산을 목으로 옮긴다’는 초기 계획은 이식 없이 정리하는 것으로 단순화한다. 목은 질문 분기와 중간/최종 후보 응답을 재현하는 데 필요한 정도만 갖는다.
 
@@ -145,8 +182,8 @@ sequenceDiagram
 | [BartenderExperience.tsx](<../../src/app/(custom)/bartender-note/_components/BartenderExperience.tsx>)                                                                                                                                   | 후보 수·최종 결과 표시. 모든 술 선택을 detail로 연결, 선택 ID 기준 조회·외부 이동·복원 연결  |
 | [CandidateList.tsx](<../../src/app/(custom)/bartender-note/_components/CandidateList.tsx>)                                                                                                                                               | 취향 추천 분기와 DemoRecommendation/Answers 의존 제거. 찜 목록의 외부 상세 직행 제거         |
 | [WhiskeyDetail.tsx](<../../src/app/(custom)/bartender-note/_components/WhiskeyDetail.tsx>), [reviewAlcohol.ts](<../../src/app/(custom)/bartender-note/_components/reviewAlcohol.ts>)                                                     | 기존 내부 상세가 실제 API 정보도 표시하도록 입력·변환 재사용. 실제 이미지와 선택적 필드 처리 |
-| [ReviewPickStep.tsx](<../../src/app/(custom)/bartender-note/_components/ReviewPickStep.tsx>), [ReviewFlow.tsx](<../../src/app/(custom)/bartender-note/_components/ReviewFlow.tsx>)                                                       | 기존 검색·상세 캐시 재사용, 선택 후 내부 상세를 거쳐 리뷰 작성                               |
-| [useTasteRecommendation.ts](<../../src/app/(custom)/bartender-note/_components/useTasteRecommendation.ts>), [\_data/demoSelection.ts](<../../src/app/(custom)/bartender-note/_data/demoSelection.ts>)                                    | 사용처 제거 후 삭제                                                                          |
+| [ReviewPickStep.tsx](<../../src/app/(custom)/bartender-note/_components/ReviewPickStep.tsx>), [ReviewFlow.tsx](<../../src/app/(custom)/bartender-note/_components/ReviewFlow.tsx>)                                                       | 기존 검색 재사용, 선택 ID로 내부 상세에서 조회한 후 리뷰 작성                                |
+| `useTasteRecommendation.ts`, `_data/demoSelection.ts`                                                                                                                                                                                    | 사용처 제거 후 삭제                                                                          |
 | [types.ts](<../../src/app/(custom)/bartender-note/_components/types.ts>), [stepMeta.ts](<../../src/app/(custom)/bartender-note/_components/stepMeta.ts>), [dialogue.ts](<../../src/app/(custom)/bartender-note/_components/dialogue.ts>) | 과거 질문·similar·데모 추천 이유 의존 제거. 결과 대사는 후보 수 기준                         |
 | [bartenderSnapshot.ts](<../../src/app/(custom)/bartender-note/_components/bartenderSnapshot.ts>)                                                                                                                                         | 시나리오 context·answers 저장·복원, 불필요한 likedLookups 제거                               |
 | [useTrackRecommendResult.ts](<../../src/app/(custom)/bartender-note/_components/useTrackRecommendResult.ts>), [analytics/types.ts](../../src/utils/analytics/types.ts)                                                                   | 새 답변·후보 결과 기준으로 기존 이벤트 호출부와 허용 값 조정                                 |
@@ -168,6 +205,6 @@ Phase 1~2 기반 코드 위에서 Phase 3 화면과 이 Phase의 기존 답변 �
 | 후보가 없는 완료 응답      | 빈 결과 안내, 이전 질문·처음으로 이동 가능              |
 | 내부 상세에서 찜·리뷰 작성 | 기존 API 동작 유지, 바텐더 안에서 진행                  |
 
-구현 후 타입 검사와 바텐더 컴포넌트 통합 테스트를 실행한다. 브라우저에서는 질문 완료·내부 상세·외부 상세 이동·복귀와 찜·리뷰 검색 경로를 확인하고, 관련 GA4 이벤트의 조건과 값도 점검한다. 목 응답 검증과 실제 Product API 연동 검증은 구분한다. 이 문서 작성에서는 제품 코드·테스트·브라우저·외부 GTM 설정을 변경하지 않는다.
+구현 후 타입 검사와 바텐더 컴포넌트 통합 테스트를 실행한다. 브라우저에서는 질문 완료·내부 상세·외부 상세 이동·복귀와 찜·리뷰 검색 경로를 확인하고, 관련 GA4 이벤트의 조건과 값도 점검한다. 목 응답 검증과 실제 Product API 연동 검증은 구분한다. 코드·자동 테스트·브라우저 검증을 완료했으며, 외부 GTM 설정은 변경하지 않았다.
 
 **반영한 결정:** 추천·찜·큐레이션·리뷰에서 고른 술은 바텐더 내부 상세로 통일한다. 실제 상세는 명시적인 CTA로 이동하고, 리뷰 작성도 바텐더 내부에서 이어 간다. 중간 후보 수·최종 후보 목록과 누적 답변 구조는 기존 설계대로 유지한다.

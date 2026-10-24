@@ -1,6 +1,7 @@
 # Phase 3 — 현재 질문을 화면에 표시
 
-> **상태:** 사용자 검토 완료 · 구현 전  
+> **상태:** Phase 3 구현 완료 · 코드 검토 대기
+>
 > **선행:** [Phase 1](./phase-1-scenario-source.md), [Phase 2](./phase-2-scenario-flow.md) 검토 완료  
 > **목표:** 응답의 질문을 기존 대사창과 입력 UI로 표시
 
@@ -15,6 +16,27 @@ flowchart TD
 ```
 
 화면은 현재 질문과 답변 콜백을 받는다. 다음 질문 ID나 분기 규칙을 결정하지 않는다. 기존 RecommendationFlow를 한 질문을 표시하는 ScenarioQuestionView로 교체한다.
+
+## 구현 결과
+
+| 영역                                                                                                     | 현재 구현                                                                          |
+| -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [ScenarioQuestionView.tsx](<../../src/app/(custom)/bartender-note/_components/ScenarioQuestionView.tsx>) | choice·range·alcohol-select·price-select를 응답의 입력 설정으로 표시               |
+| LikesStep                                                                                                | 검색·선택 취소·최대 개수. 선택 ID·표시명은 로컬 입력 상태, 확인 시 alcoholIds 제출 |
+| 질문·대사                                                                                                | question.prompt를 그대로 표시. 질문 ID로 입력·대사·스크롤 초기화                   |
+| 프레임                                                                                                   | 질문 N 표시, 질문 영역의 백분율 막대 제거. BarScene 유지                           |
+| 목 문구                                                                                                  | \_scenario/mockQuestionnaire.ts로 이동. 기존 질문지 prop과 RecommendationFlow 제거 |
+| CTA                                                                                                      | 대사 재생 중에도 하단 액션이 첫 클릭에 실행되도록 캡처 영역 수정                   |
+
+```mermaid
+flowchart LR
+    RESPONSE[현재 질문 응답] --> PROMPT[대사창: prompt]
+    RESPONSE --> INPUT[input.kind의 입력 UI]
+    INPUT --> CONFIRM[확정한 값만 answer로 전달]
+    CONFIRM --> QUERY[누적 답변의 다음 Query]
+```
+
+숫자 범위는 실제 입력 컴포넌트 통합 테스트로 검증했다. 현재 6개 질문 목에서는 도수 보기를 유지하므로 브라우저의 숫자 범위 질문은 검증 대상에 포함하지 않았다. 전체 테스트·브라우저 결과는 [Phase 4 검증 결과](./phase-4-scenario-results.md#구현과-검증-결과)에 기록한다.
 
 ## 현재 코드에서 바꿀 것
 
@@ -100,7 +122,7 @@ flowchart LR
 
 | 파일                                                                                                                                                                                               | 변경                                                                                                        |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| [RecommendationFlow.tsx](<../../src/app/(custom)/bartender-note/_components/RecommendationFlow.tsx>)                                                                                               | ScenarioQuestionView.tsx로 교체. question과 onAnswer 중심으로 props 변경, input.kind별 UI 표시              |
+| `RecommendationFlow.tsx`                                                                                                                                                                           | ScenarioQuestionView.tsx로 교체. question과 onAnswer 중심으로 props 변경, input.kind별 UI 표시              |
 | [LikesStep.tsx](<../../src/app/(custom)/bartender-note/_components/LikesStep.tsx>)                                                                                                                 | Answers·updateAnswers·likedLookups 의존 제거. 선택 중인 술을 내부에서 관리하고 IDs만 제출                   |
 | [FlowControls.tsx](<../../src/app/(custom)/bartender-note/_components/FlowControls.tsx>)                                                                                                           | Option을 interface로 정의하고 선택적 id 추가. OptionList에 disabled prop 지원. 다른 사용처는 기존 호출 유지 |
 | [BartenderExperience.tsx](<../../src/app/(custom)/bartender-note/_components/BartenderExperience.tsx>)                                                                                             | hook 한 번 호출. 같은 응답으로 대사·질문·조회 상태를 전달하고 진입·이전 처리 연결                           |
@@ -108,7 +130,7 @@ flowchart LR
 | [types.ts](<../../src/app/(custom)/bartender-note/_components/types.ts>), [stepMeta.ts](<../../src/app/(custom)/bartender-note/_components/stepMeta.ts>)                                           | scenario step, 질문 번호 표시 연결. 여섯 질문 step·questionSteps와 고정 진행률 제거                         |
 | [BartenderFrame.tsx](<../../src/app/(custom)/bartender-note/_components/BartenderFrame.tsx>), [useDialoguePlayback.ts](<../../src/app/(custom)/bartender-note/_components/useDialoguePlayback.ts>) | 선택적 questionId로 재생·스크롤 초기화. progress가 없으면 막대 미표시                                       |
 | [CurationFlow.tsx](<../../src/app/(custom)/bartender-note/_components/CurationFlow.tsx>)                                                                                                           | 취향 추천 시작 콜백으로 연결                                                                                |
-| [page.tsx](<../../src/app/(custom)/bartender-note/page.tsx>), [\_data/questionnaire.ts](<../../src/app/(custom)/bartender-note/_data/questionnaire.ts>)                                            | 질문지 prop 제거, 목 context 전달. 문구 원본을 목 소스로 옮긴 뒤 legacy 질문지 제거                         |
+| [page.tsx](<../../src/app/(custom)/bartender-note/page.tsx>), [mockQuestionnaire.ts](<../../src/app/(custom)/bartender-note/_scenario/mockQuestionnaire.ts>)                                       | 질문지 prop 제거, 목 context 전달. 문구 원본을 목 소스로 옮긴 뒤 legacy 질문지 제거                         |
 
 범위·가격 입력은 우선 질문 View 안에 둔다. 이미 별도 책임과 검색 흐름이 있는 LikesStep은 재사용한다. 컴포넌트를 입력마다 일괄 분리하지 않는다.
 
@@ -125,6 +147,6 @@ Phase 3의 화면 전환은 Phase 4의 추천·상세 이동·snapshot 등 기�
 | 숫자 범위 입력 후 확인             | min/max를 제출하고 다음 질문 표시         |
 | 이전 질문으로 복귀                 | 캐시 활용 또는 재조회 후 입력을 다시 선택 |
 
-화면 연결 후 컴포넌트 통합 테스트와 브라우저로 위 동작을 확인한다. 긴 대사, 보기 스크롤, 검색 키보드와 하단 행동 영역도 기존 모바일 레이아웃에서 확인한다. 이번에는 문서만 작성하며 제품 코드·자동 테스트·브라우저 실행은 하지 않는다.
+화면 연결 후 컴포넌트 통합 테스트와 브라우저로 위 동작을 확인한다. 긴 대사, 보기 스크롤, 검색 키보드와 하단 행동 영역도 기존 모바일 레이아웃에서 확인한다. 합의한 최소 구현과 관련 자동 테스트·브라우저 검증을 완료했다. 실제 모바일 키보드와 Flutter WebView는 별도 검증이 필요하다.
 
 **이번 검토의 핵심:** 응답 문구를 그대로 대사창에 표시하고, 입력 종류별 UI에서 완성한 답변만 hook에 전달한다. 총질문수 없는 현재 모델에서는 ‘질문 N’만 표시한다.

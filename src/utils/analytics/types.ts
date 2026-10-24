@@ -113,7 +113,7 @@ export interface GA4EventMap {
   };
   bartender_recommend_result: {
     mode: 'taste' | 'situation';
-    result_state: 'exact' | 'similar' | 'empty';
+    result_state: 'exact' | 'similar' | 'available' | 'empty';
   };
   bartender_select_alcohol: {
     alcohol_id: string;

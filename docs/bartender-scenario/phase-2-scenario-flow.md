@@ -1,6 +1,7 @@
 # Phase 2 — 누적 답변과 질문 진행
 
-> **상태:** 사용자 검토 완료 · 구현 전  
+> **상태:** Phase 2 구현·검토 완료
+>
 > **선행:** [Phase 1 — 단계 요청·응답과 목 API](./phase-1-scenario-source.md) 검토 완료  
 > **원칙:** 정상 흐름을 만족하는 가장 단순한 구조
 
@@ -16,6 +17,34 @@ flowchart LR
 ```
 
 **진행 관리에는 로컬 상태 answers 하나만 둔다.** 현재 질문·후보·완료 여부·로딩·오류는 Query 결과를 사용한다.
+
+## 구현 결과
+
+| 코드                                                                                                                 | 구현한 책임                                          |
+| -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [useScenarioFlow.ts](<../../src/app/(custom)/bartender-note/_scenario/useScenarioFlow.ts>)                           | context·active를 받고 answers 하나와 단계 Query 관리 |
+| [useScenarioFlow.vitest.test.tsx](<../../src/app/(custom)/bartender-note/_scenario/useScenarioFlow.vitest.test.tsx>) | 실제 목 API와 hook을 작은 소비자 화면에서 함께 검증  |
+
+```mermaid
+flowchart LR
+    ANSWER[answer: 현재 질문 ID·값 추가] --> Q[context·누적 답변의 Query]
+    BACK[back: 마지막 답변 제거] --> Q
+    RESTORE[restore: 저장한 답변으로 교체] --> Q
+    RESET[reset: 답변 비우기] --> Q
+    Q --> VIEW[질문·후보·완료·로딩·오류]
+```
+
+| 호출부에서 사용할 값                    | 의미                                                           |
+| --------------------------------------- | -------------------------------------------------------------- |
+| answers                                 | snapshot에 저장할 누적 답변                                    |
+| query                                   | data·isFetching·isError 등 TanStack Query 결과                 |
+| canAnswer                               | 활성 화면이고 조회·오류 상태가 아니며 현재 질문이 있을 때 true |
+| canGoBack                               | answers.length > 0                                             |
+| answer / back / reset / restore / retry | 아래 설계의 동작 구현. retry는 Query의 refetch 사용            |
+
+질문 응답을 별도로 저장하는 state·요청용 effect·로컬 질문 history는 추가하지 않았다. 실제 화면·전체 여정·snapshot 연결은 Phase 3~4에서 진행한다.
+
+**소비자 통합 테스트 5개:** 비활성→시작, 순차 답변→완료→이전 질문, 종류 변경→새 분기→초기화, 실패→같은 답변으로 재시도, 빈 Query 캐시에서 답변 복원. 실제 Product API·브라우저 검증은 화면 연결 이후 수행한다.
 
 ## 현재 코드에서 무엇이 바뀌는가
 
@@ -112,13 +141,13 @@ flowchart LR
 
 ## 파일별 변경 범위
 
-| 파일                                                                                                       | 설계한 변경                                                                                      |
-| ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| \_scenario/useScenarioFlow.ts                                                                              | 이번 Phase의 새 hook. answers와 useQuery, 위의 동작을 한 파일에 둠                               |
-| [useTasteRecommendation.ts](<../../src/app/(custom)/bartender-note/_components/useTasteRecommendation.ts>) | 새 진행 hook으로 답변 책임을 옮길 대상. 기존 추천·검색 표시용 로직 정리는 실제 화면 전환 때 수행 |
-| [useBartenderJourney.ts](<../../src/app/(custom)/bartender-note/_components/useBartenderJourney.ts>)       | 전체 화면 이동 역할 유지. 질문 내부 history를 추가하지 않음                                      |
-| [BartenderExperience.tsx](<../../src/app/(custom)/bartender-note/_components/BartenderExperience.tsx>)     | Phase 3에서 hook 호출과 질문/결과 진입·복귀 연결                                                 |
-| [bartenderSnapshot.ts](<../../src/app/(custom)/bartender-note/_components/bartenderSnapshot.ts>)           | 화면 전환 시 답변 필드를 새 배열로 교체하고 기존 저장·복원 경로 재사용                           |
+| 파일                                                                                                   | 설계한 변경                                                                                      |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| \_scenario/useScenarioFlow.ts                                                                          | 이번 Phase의 새 hook. answers와 useQuery, 위의 동작을 한 파일에 둠                               |
+| `useTasteRecommendation.ts`                                                                            | 새 진행 hook으로 답변 책임을 옮길 대상. 기존 추천·검색 표시용 로직 정리는 실제 화면 전환 때 수행 |
+| [useBartenderJourney.ts](<../../src/app/(custom)/bartender-note/_components/useBartenderJourney.ts>)   | 전체 화면 이동 역할 유지. 질문 내부 history를 추가하지 않음                                      |
+| [BartenderExperience.tsx](<../../src/app/(custom)/bartender-note/_components/BartenderExperience.tsx>) | Phase 3에서 hook 호출과 질문/결과 진입·복귀 연결                                                 |
+| [bartenderSnapshot.ts](<../../src/app/(custom)/bartender-note/_components/bartenderSnapshot.ts>)       | 화면 전환 시 답변 필드를 새 배열로 교체하고 기존 저장·복원 경로 재사용                           |
 
 Phase 2 기반 코드 구현은 hook 추가까지다. 기존 답변 사용처·화면·snapshot을 일부만 교체하지 않고, Phase 3~4에서 관련 사용처를 함께 연결한다.
 

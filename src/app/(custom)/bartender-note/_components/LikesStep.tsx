@@ -1,37 +1,35 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
+import Button from '@/components/ui/Button/Button';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import type { AlcoholLookupItem } from '@/api/alcohol/types';
-import type { Answers } from './types';
 import { FlowAction } from './FlowControls';
-import type { Whiskey } from '../_data/demo';
-
-const MAX_LIKES = 3;
 
 const normalize = (value: string) => value.trim().replace(/\s+/g, ' ');
 
-type Props = {
-  answers: Answers;
-  updateAnswers: (value: Partial<Answers>) => void;
-  whiskies: Whiskey[];
-  likedLookups: AlcoholLookupItem[];
-  rememberLookup: (item: AlcoholLookupItem) => void;
-  onNext: () => void;
-};
+interface SelectedAlcohol {
+  id: number;
+  name: string;
+}
 
-/** 마셔본 술을 최대 3병까지 고른다. 이름을 적으면 서버 술 목록에서 찾는다. */
+interface Props {
+  maxSelections: number;
+  disabled: boolean;
+  onAnswer: (alcoholIds: number[]) => void;
+}
+
+/** 검색 응답은 Query, 선택 중인 ID·표시명은 입력 UI에서 관리한다. */
 export default function LikesStep({
-  answers,
-  updateAnswers,
-  whiskies,
-  likedLookups,
-  rememberLookup,
-  onNext,
+  maxSelections,
+  disabled,
+  onAnswer,
 }: Props) {
+  const [selected, setSelected] = useState<SelectedAlcohol[]>([]);
   const [query, setQuery] = useState('');
   const [lookupQuery, setLookupQuery] = useState('');
-  const full = answers.likedIds.length >= MAX_LIKES;
+  const full = selected.length >= maxSelections;
+  const normalizedQuery = normalize(query);
 
   useEffect(() => {
     const timer = window.setTimeout(
@@ -44,29 +42,15 @@ export default function LikesStep({
   const lookup = useQuery({
     queryKey: ['bartender-note', 'alcohol-lookup', lookupQuery],
     queryFn: ({ signal }) => AlcoholsApi.lookup(lookupQuery, signal),
-    enabled: lookupQuery.length > 0,
+    enabled: lookupQuery.length > 0 && !disabled && !full,
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
   const loading =
-    !!query.trim() && (normalize(query) !== lookupQuery || lookup.isFetching);
+    !!normalizedQuery && (normalizedQuery !== lookupQuery || lookup.isFetching);
   const results: AlcoholLookupItem[] =
-    normalize(query) === lookupQuery ? lookup.data ?? [] : [];
-  const failed = !!lookup.error;
-  const showResults = !!query && !loading && !failed;
-
-  const like = (id: number) => {
-    if (!answers.likedIds.includes(id) && !full)
-      updateAnswers({ likedIds: [...answers.likedIds, id] });
-    setQuery('');
-  };
-  const popular = [...whiskies]
-    .sort((a, b) =>
-      answers.level === '자주 마시는 편이에요'
-        ? (b.rating ?? 0) - (a.rating ?? 0)
-        : 0,
-    )
-    .slice(0, 6);
+    normalizedQuery === lookupQuery ? lookup.data ?? [] : [];
+  const showResults = !!normalizedQuery && !loading && !lookup.isError;
 
   return (
     <>
@@ -77,113 +61,105 @@ export default function LikesStep({
         onChange={(event) => setQuery(event.target.value)}
         placeholder="마셔본 술 이름 검색"
         aria-label="마셔본 술 이름 검색"
-        disabled={full}
+        disabled={full || disabled}
       />
       <p className="m-0 text-13 leading-17 text-fg-neutral-muted">
-        {full
-          ? '3/3병 · 다른 술을 고르려면 선택한 술을 빼 주세요'
-          : `${answers.likedIds.length}/3병 · 선택 사항`}
+        {selected.length}/{maxSelections}병 ·{' '}
+        {full ? '다른 술을 고르려면 선택한 술을 빼 주세요' : '선택 사항'}
       </p>
       <div className="flex flex-wrap gap-5">
-        {answers.likedIds.map((id) => {
-          const name =
-            likedLookups.find((item) => item.alcoholId === id)?.korName ??
-            whiskies.find((whiskey) => whiskey.id === id)?.name;
-          return (
-            name && (
-              <button
-                type="button"
-                key={id}
-                className="min-h-40 rounded border border-stroke-brand-solid bg-bg-brand-weak px-9 py-7 text-12 leading-15 text-fg-brand"
-                onClick={() =>
-                  updateAnswers({
-                    likedIds: answers.likedIds.filter((value) => value !== id),
-                  })
-                }
-              >
-                {name} ×
-              </button>
-            )
-          );
-        })}
+        {selected.map((alcohol) => (
+          <button
+            type="button"
+            key={alcohol.id}
+            disabled={disabled}
+            className="min-h-40 rounded border border-stroke-brand-solid bg-bg-brand-weak px-9 py-7 text-12 leading-15 text-fg-brand disabled:opacity-60"
+            onClick={() =>
+              setSelected((current) =>
+                current.filter(({ id }) => id !== alcohol.id),
+              )
+            }
+          >
+            {alcohol.name} ×
+          </button>
+        ))}
       </div>
-      {!query && !full && (
-        <div className="flex flex-wrap gap-6">
-          {popular.map((whiskey) => (
-            <button
-              key={whiskey.id}
-              type="button"
-              className="min-h-40 rounded-full border border-stroke-neutral-weak px-10 text-13 text-fg-neutral"
-              onClick={() => like(whiskey.id)}
-            >
-              {whiskey.name}
-            </button>
-          ))}
-        </div>
-      )}
-      {showResults && (
-        <p className="m-0 text-13 text-fg-neutral-muted">
-          검색 결과 {results.length}개
-          {results.length === 6 ? ' · 이름을 더 적으면 좁혀져요' : ''}
-        </p>
-      )}
-      {query && loading && (
+      {loading && (
         <p className="text-14 text-fg-neutral-muted" role="status">
           술을 찾고 있어요…
         </p>
       )}
-      {query && !loading && failed && (
-        <div className="flex items-center gap-10 text-14 text-fg-neutral-muted">
+      {!!normalizedQuery && !loading && lookup.isError && (
+        <div
+          role="alert"
+          className="flex items-center gap-10 text-15 text-fg-neutral"
+        >
           <span>검색 중 문제가 생겼어요.</span>
-          <button
-            type="button"
-            className="min-h-40 text-fg-brand underline"
+          <Button
+            size="md"
+            variant="secondary"
+            disabled={disabled}
             onClick={() => void lookup.refetch()}
           >
             다시 시도
-          </button>
+          </Button>
         </div>
-      )}
-      {showResults && results.length === 0 && (
-        <p className="text-15 text-fg-neutral">
-          그 이름으로는 못 찾겠네요. 철자를 조금 바꿔 보시겠어요?
-        </p>
       )}
       {showResults && (
-        <div className="flex flex-col">
-          {results.map((whiskey) => (
-            <button
-              key={whiskey.alcoholId}
-              type="button"
-              className="flex min-h-74 w-full items-center gap-12 border-b border-stroke-neutral-subtle py-10 text-left text-fg-neutral transition-colors hover:text-fg-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
-              onClick={() => {
-                if (!answers.likedIds.includes(whiskey.alcoholId) && !full)
-                  rememberLookup(whiskey);
-                like(whiskey.alcoholId);
-              }}
-            >
-              <AlcoholImage
-                imageUrl={whiskey.imageUrl}
-                outerHeightClass="h-44"
-                outerWidthClass="w-44"
-                innerHeightClass="h-36"
-                innerWidthClass="w-24"
-              />
-              <span className="flex min-w-0 flex-1 flex-col gap-3">
-                <b className="text-14 font-bold leading-18">
-                  {whiskey.korName}
-                </b>
-                <small className="text-12 leading-16 text-fg-neutral-muted">
-                  {whiskey.korCategoryName}
-                  {whiskey.engName ? ` · ${whiskey.engName}` : ''}
-                </small>
-              </span>
-            </button>
-          ))}
-        </div>
+        <>
+          <p className="m-0 text-13 text-fg-neutral-muted">
+            검색 결과 {results.length}개
+          </p>
+          {results.length === 0 && (
+            <p className="text-15 text-fg-neutral">
+              그 이름으로는 못 찾겠네요. 철자를 조금 바꿔 보시겠어요?
+            </p>
+          )}
+          <div className="flex flex-col">
+            {results.map((alcohol) => (
+              <button
+                key={alcohol.alcoholId}
+                type="button"
+                disabled={
+                  disabled ||
+                  full ||
+                  selected.some(({ id }) => id === alcohol.alcoholId)
+                }
+                className="flex min-h-74 w-full items-center gap-12 border-b border-stroke-neutral-subtle py-10 text-left text-fg-neutral transition-colors hover:text-fg-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring disabled:opacity-60"
+                onClick={() => {
+                  setSelected((current) => [
+                    ...current,
+                    { id: alcohol.alcoholId, name: alcohol.korName },
+                  ]);
+                  setQuery('');
+                }}
+              >
+                <AlcoholImage
+                  imageUrl={alcohol.imageUrl}
+                  outerHeightClass="h-44"
+                  outerWidthClass="w-44"
+                  innerHeightClass="h-36"
+                  innerWidthClass="w-24"
+                />
+                <span className="flex min-w-0 flex-1 flex-col gap-3">
+                  <b className="text-14 font-bold leading-18">
+                    {alcohol.korName}
+                  </b>
+                  <small className="text-12 leading-16 text-fg-neutral-muted">
+                    {alcohol.korCategoryName}
+                    {alcohol.engName ? ` · ${alcohol.engName}` : ''}
+                  </small>
+                </span>
+              </button>
+            ))}
+          </div>
+        </>
       )}
-      <FlowAction onClick={onNext}>
-        {answers.likedIds.length ? '이 술을 기억할게요' : '건너뛸게요'}
+      <FlowAction
+        disabled={disabled}
+        onClick={() => onAnswer(selected.map(({ id }) => id))}
+      >
+        {selected.length ? '이 술을 기억할게요' : '건너뛸게요'}
       </FlowAction>
     </>
   );

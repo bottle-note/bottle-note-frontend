@@ -1,20 +1,20 @@
-/** 현재 질문지의 화면 데이터. API 계약이 생기면 이 입력값을 서버 응답으로 교체한다. */
-export interface QuestionOption {
+/** 기존 문구를 옮긴 목 질문지. 실제 Product API 계약이 아니다. */
+export interface MockQuestionOption {
   id: string;
   title: string;
   description?: string;
 }
 
-export interface BartenderQuestionnaire {
-  levels: QuestionOption[];
-  kinds: QuestionOption[];
-  axes: QuestionOption[];
-  americanAxes: QuestionOption[];
-  abvs: QuestionOption[];
-  prices: { glass: QuestionOption[]; bottle: QuestionOption[] };
+export interface MockQuestionnaire {
+  levels: MockQuestionOption[];
+  kinds: MockQuestionOption[];
+  axes: MockQuestionOption[];
+  americanAxes: MockQuestionOption[];
+  abvs: MockQuestionOption[];
+  prices: { glass: MockQuestionOption[]; bottle: MockQuestionOption[] };
 }
 
-export const localQuestionnaire: BartenderQuestionnaire = {
+export const mockQuestionnaire: MockQuestionnaire = {
   levels: [
     {
       id: 'beginner',
