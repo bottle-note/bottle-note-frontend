@@ -6,6 +6,7 @@ import { ROUTES } from '@/constants/routes';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { OptionList, FlowAction } from './FlowControls';
 import BartenderFrame from './BartenderFrame';
+import ScenarioExperience from './ScenarioExperience';
 import RecommendationFlow from './RecommendationFlow';
 import CandidateList, { getCandidates, isCandidateStep } from './CandidateList';
 import WhiskeyDetail from './WhiskeyDetail';
@@ -40,6 +41,7 @@ export default function BartenderExperience({
   curations: Curation[];
 }) {
   const router = useRouter();
+  const [scenarioActive, setScenarioActive] = useState(false);
   const {
     step,
     history,
@@ -82,6 +84,8 @@ export default function BartenderExperience({
 
   // 다른 페이지에 다녀왔으면 보던 화면으로 돌아온다.
   useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('flow') === 'scenario')
+      setScenarioActive(true);
     const saved = takeSnapshot();
     if (!saved) return;
     restoreJourney(saved.journey);
@@ -241,6 +245,19 @@ export default function BartenderExperience({
     baseWhiskeyName,
   });
 
+  if (scenarioActive)
+    return (
+      <ScenarioExperience
+        onLeave={leave}
+        onExit={() => {
+          setScenarioActive(false);
+          const url = new URL(window.location.href);
+          url.searchParams.delete('flow');
+          router.replace(`${url.pathname}${url.search}`, { scroll: false });
+        }}
+      />
+    );
+
   return (
     <BartenderFrame
       step={step}
@@ -271,6 +288,18 @@ export default function BartenderExperience({
                 title: '바텐더님과 함께 리뷰를 쓸게요',
                 description: '지금 드시는 술을 기록해 드려요',
                 action: () => start('review', 'review-pick'),
+              },
+              {
+                title: '위스키 진짜로 추천해주세요',
+                description: '취향을 따라 한 병씩 좁혀볼게요',
+                action: () => {
+                  setScenarioActive(true);
+                  const url = new URL(window.location.href);
+                  url.searchParams.set('flow', 'scenario');
+                  router.replace(`${url.pathname}${url.search}`, {
+                    scroll: false,
+                  });
+                },
               },
             ]}
           />
