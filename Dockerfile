@@ -10,6 +10,8 @@ RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
 ARG ENV_FILE
+ARG APP_ORIGIN
+ARG INTERNAL_SERVER_URL
 WORKDIR /app
 
 # sops 설치 (arm64/amd64 지원)
@@ -28,7 +30,13 @@ COPY . .
 RUN --mount=type=secret,id=age_key,env=SOPS_AGE_KEY \
     if [ -z "$SOPS_AGE_KEY" ]; then echo "Error: SOPS_AGE_KEY is required" && exit 1; fi && \
     sops -d ${ENV_FILE} > .env && \
-    if [ ! -s .env ]; then echo "Error: .env decryption failed" && exit 1; fi
+    if [ ! -s .env ]; then echo "Error: .env decryption failed" && exit 1; fi && \
+    if [ -n "$APP_ORIGIN" ]; then \
+      printf '\nNEXT_PUBLIC_CLIENT_URL=%s\nCLIENT_URL=%s\nNEXTAUTH_URL=%s\n' "$APP_ORIGIN" "$APP_ORIGIN" "$APP_ORIGIN" >> .env; \
+    fi && \
+    if [ -n "$INTERNAL_SERVER_URL" ]; then \
+      printf '\nINTERNAL_SERVER_URL=%s\n' "$INTERNAL_SERVER_URL" >> .env; \
+    fi
 
 RUN pnpm next build
 
