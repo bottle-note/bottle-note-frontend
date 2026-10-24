@@ -6,6 +6,10 @@ import process from 'node:process';
 
 const API_BASE = 'https://tagmanager.googleapis.com/tagmanager/v2';
 const EDIT_SCOPE = 'https://www.googleapis.com/auth/tagmanager.edit.containers';
+const PUBLISH_SCOPES = [
+  'https://www.googleapis.com/auth/tagmanager.edit.containerversions',
+  'https://www.googleapis.com/auth/tagmanager.publish',
+];
 const CONFIG_PATH = path.resolve(process.cwd(), 'gtm.config.json');
 const AUTO_FIELDS = [
   'accountId',
@@ -20,14 +24,30 @@ const AUTO_FIELDS = [
 ];
 
 function parseArgs(argv) {
-  const args = { apply: false, env: 'dev', validate: false };
+  const args = {
+    apply: false,
+    env: 'dev',
+    publish: false,
+    validate: false,
+    versionName: '',
+    versionNotes: '',
+  };
 
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
 
     if (argument === '--') continue;
     if (argument === '--apply') args.apply = true;
-    else if (argument === '--validate') args.validate = true;
+    else if (argument === '--publish') {
+      args.apply = true;
+      args.publish = true;
+    } else if (argument === '--version-name') {
+      args.versionName = argv[index + 1] ?? '';
+      index += 1;
+    } else if (argument === '--version-notes') {
+      args.versionNotes = argv[index + 1] ?? '';
+      index += 1;
+    } else if (argument === '--validate') args.validate = true;
     else if (argument === '--help' || argument === '-h') args.help = true;
     else if (argument === '--env') {
       args.env = argv[index + 1];
@@ -47,12 +67,15 @@ function printHelp() {
   pnpm gtm:validate
   pnpm gtm:sync -- --env dev
   pnpm gtm:sync -- --env dev --apply
+  pnpm gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 
 기본 실행은 GTM을 변경하지 않고 생성/수정 예정 항목만 보여줍니다.
 --apply를 지정해야 작업공간에 반영하며, 컨테이너 게시는 수행하지 않습니다.
+--publish는 반영 후 작업공간 변경을 버전으로 만들어 게시합니다.
+gtm.config.json에서 allowPublish가 true인 환경만 게시할 수 있습니다.
 
 인증:
-  GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/service-account.json`);
+  Application Default Credentials(gcloud 서비스 계정 대행 또는 CI의 Workload Identity Federation)`);
 }
 
 function validateConfig(config) {
@@ -209,16 +232,18 @@ function buildBaseTag(template, name, measurementId) {
   return tag;
 }
 
-async function createApiClient() {
+async function createApiClient({ publish }) {
   const { GoogleAuth } = await import('google-auth-library');
-  const auth = new GoogleAuth({ scopes: [EDIT_SCOPE] });
+  const auth = new GoogleAuth({
+    scopes: publish ? [EDIT_SCOPE, ...PUBLISH_SCOPES] : [EDIT_SCOPE],
+  });
   let client;
 
   try {
     client = await auth.getClient();
   } catch (error) {
     throw new Error(
-      `Google 인증을 찾지 못했습니다. GOOGLE_APPLICATION_CREDENTIALS에 GTM 권한이 있는 서비스 계정 JSON 경로를 지정하세요.\n${error.message}`,
+      `Google 인증을 찾지 못했습니다. docs/gtm-sync.md의 인증 준비를 확인하세요.\n${error.message}`,
     );
   }
 
@@ -308,6 +333,41 @@ async function listResources(api, workspacePath) {
     triggers: triggers.trigger ?? [],
     tags: tags.tag ?? [],
   };
+}
+
+function describeChange(change) {
+  const resource = change.tag ?? change.trigger ?? change.variable;
+  const kind = change.tag ? 'tag' : change.trigger ? 'trigger' : 'variable';
+  return `${change.changeStatus} ${kind} ${resource?.name ?? '(알 수 없음)'}`;
+}
+
+async function publishWorkspace(api, workspace, { versionName, versionNotes }) {
+  const status = await api(`${workspace.path}/status`);
+  const changes = status.workspaceChange ?? [];
+  if ((status.mergeConflict ?? []).length > 0) {
+    throw new Error('작업공간에 병합 충돌이 있어 게시하지 않았습니다.');
+  }
+  if (changes.length === 0) {
+    console.log('\n게시할 작업공간 변경이 없습니다.');
+    return;
+  }
+
+  console.log(`\nPUBLISH 작업공간 변경 ${changes.length}건`);
+  for (const change of changes) console.log(`  ${describeChange(change)}`);
+
+  const created = await api(`${workspace.path}:create_version`, {
+    method: 'POST',
+    body: JSON.stringify({ name: versionName, notes: versionNotes }),
+  });
+  if (created.compilerError || !created.containerVersion) {
+    throw new Error('버전 생성 중 컴파일 오류가 발생해 게시하지 않았습니다.');
+  }
+
+  const version = created.containerVersion;
+  await api(`${version.path}:publish`, { method: 'POST' });
+  console.log(
+    `게시 완료: 버전 ${version.containerVersionId} "${version.name}"`,
+  );
 }
 
 function requireTemplate(resources, kind, name) {
@@ -405,7 +465,16 @@ async function main() {
     throw new Error(`${environment.measurementIdEnv} 환경변수가 필요합니다.`);
   }
 
-  const api = await createApiClient();
+  if (args.publish && !environment.allowPublish) {
+    throw new Error(
+      `${args.env} 환경은 allowPublish가 없어 게시할 수 없습니다. --apply로 반영한 뒤 GTM에서 게시하세요.`,
+    );
+  }
+  if (args.publish && !args.versionName) {
+    throw new Error('--publish에는 --version-name이 필요합니다.');
+  }
+
+  const api = await createApiClient({ publish: args.publish });
   const workspace = await resolveWorkspace(api, environment);
   const resources = await listResources(api, workspace.path);
 
@@ -497,6 +566,11 @@ async function main() {
     fields: ['name', 'type', 'parameter', 'firingTriggerId'],
     idField: 'tagId',
   });
+
+  if (args.publish) {
+    await publishWorkspace(api, workspace, args);
+    return;
+  }
 
   console.log(
     args.apply

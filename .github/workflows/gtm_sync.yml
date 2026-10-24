@@ -1,0 +1,103 @@
+name: GTM Sync
+
+# gtm.config.json을 GTM에 맞춘다.
+# dev는 작업공간 반영 후 게시하고, prod는 작업공간에만 반영해 릴리스 시 사람이 게시한다.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - gtm.config.json
+      - scripts/gtm-sync.mjs
+      - .github/workflows/gtm_sync.yml
+  workflow_dispatch:
+
+concurrency:
+  group: gtm-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  # 비밀 값이 아닌 식별자다. 인증은 Workload Identity Federation으로 키 없이 한다.
+  GTM_WIF_PROVIDER: projects/107395339966/locations/global/workloadIdentityPools/github/providers/bottle-note-frontend
+  GTM_SERVICE_ACCOUNT: gtm-sync@bottle-note-442412.iam.gserviceaccount.com
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: 소스 코드 체크아웃
+        uses: actions/checkout@v7
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: pnpm 설치
+        uses: pnpm/action-setup@v6
+        with:
+          version: 9.15.9
+          run_install: false
+
+      - name: pnpm 캐시 활성화
+        uses: actions/cache@v6
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: 의존성 설치
+        run: pnpm install --frozen-lockfile
+
+      - name: GTM 설정 검사
+        run: pnpm gtm:validate
+
+      - name: Google 인증
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.GTM_WIF_PROVIDER }}
+          service_account: ${{ env.GTM_SERVICE_ACCOUNT }}
+
+      - name: dev 반영 및 게시
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+        run: |
+          set -o pipefail
+          subject="$(git log -1 --format=%s "$COMMIT_SHA")"
+          version_name="$(TZ=Asia/Seoul date +%F) ${subject}"
+          node scripts/gtm-sync.mjs --env dev --publish \
+            --version-name "$version_name" \
+            --version-notes "GitHub Actions GTM Sync: ${COMMIT_URL}" \
+            | tee dev.log
+
+      - name: prod 작업공간 반영
+        run: |
+          set -o pipefail
+          node scripts/gtm-sync.mjs --env prod --apply | tee prod.log
+
+      - name: 실행 요약
+        if: always()
+        run: |
+          {
+            echo "## GTM Sync"
+            echo
+            echo "### dev (반영 및 게시)"
+            echo '```'
+            grep -v '^KEEP' dev.log 2>/dev/null || echo "실행되지 않음"
+            echo '```'
+            echo
+            echo "### prod (작업공간 반영만)"
+            echo '```'
+            grep -v '^KEEP' prod.log 2>/dev/null || echo "실행되지 않음"
+            echo '```'
+            echo
+            echo "> prod 변경은 게시되지 않았습니다. 릴리스할 때 GTM-TVSGX863 Default Workspace를 확인하고 게시하세요."
+          } >> "$GITHUB_STEP_SUMMARY"

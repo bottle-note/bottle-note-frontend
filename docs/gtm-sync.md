@@ -2,20 +2,33 @@
 
 `gtm.config.json`을 기준으로 데이터 영역 변수, 맞춤 이벤트 트리거, GA4 이벤트 태그를 GTM 작업공간에 맞춘다. 같은 이름의 항목이 있으면 수정하고 없으면 생성한다.
 
-## 인증 준비
+## 배포 흐름
 
-1. Google Cloud 프로젝트에서 Tag Manager API를 활성화한다.
-2. 서비스 계정을 만들고 JSON 키를 저장소 바깥에 내려받는다.
-3. GTM 계정에 서비스 계정 이메일을 추가하고 컨테이너 수정 권한을 부여한다.
-4. 터미널에 JSON 키 경로를 설정한다.
+`main`에 `gtm.config.json`, `scripts/gtm-sync.mjs`, `.github/workflows/gtm_sync.yml` 변경이 머지되면 GitHub Actions의 GTM Sync가 실행된다. Actions 화면에서 수동으로 실행할 수도 있다.
+
+| 환경 | 컨테이너       | CI 동작                             | 게시                                          |
+| ---- | -------------- | ----------------------------------- | --------------------------------------------- |
+| dev  | `GTM-M4MMS6DR` | 작업공간 반영 후 버전을 만들어 게시 | 자동                                          |
+| prod | `GTM-TVSGX863` | 작업공간 반영만                     | 릴리스할 때 GTM 화면에서 변경을 확인하고 게시 |
+
+prod는 `gtm.config.json`에 `allowPublish`가 없으므로 CLI가 게시를 거부한다. 태그는 코드보다 먼저 게시해도 이벤트가 오기 전까지 동작하지 않으므로, 릴리스 직전에 게시하면 배포 직후부터 수집된다.
+
+버전 이름은 `YYYY-MM-DD 요약` 형식을 쓰고, 설명에 관련 PR이나 커밋을 남긴다. 문제가 생기면 GTM 버전 탭에서 이전 버전을 다시 게시해 되돌린다.
+
+## 인증
+
+서비스 계정 `gtm-sync@bottle-note-442412.iam.gserviceaccount.com`을 쓰며 키 파일은 만들지 않는다.
+
+- GTM 권한: dev 컨테이너 게시, prod 컨테이너 수정
+- CI: Workload Identity Federation(`github` 풀의 `bottle-note-frontend` 공급자). `bottle-note/bottle-note-frontend` 저장소의 `main` 실행만 서비스 계정을 쓸 수 있다.
+- 로컬: 서비스 계정 토큰 생성자 권한이 있는 계정으로 대행 인증한다.
 
 ```bash
-export GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/gtm-service-account.json
+gcloud auth application-default login \
+  --impersonate-service-account=gtm-sync@bottle-note-442412.iam.gserviceaccount.com
 ```
 
-키 파일은 저장소에 복사하거나 커밋하지 않는다.
-
-## 사용법
+## 로컬 사용법
 
 설정 파일만 검사한다.
 
@@ -29,13 +42,17 @@ GTM과 비교하되 변경하지 않는다.
 pnpm run gtm:sync -- --env dev
 ```
 
-확인한 변경을 개발 작업공간에 반영한다.
+확인한 변경을 작업공간에 반영한다.
 
 ```bash
 pnpm run gtm:sync -- --env dev --apply
 ```
 
-CLI는 작업공간까지만 변경하고 컨테이너를 게시하지 않는다. 적용 후 GTM 미리보기에서 이벤트와 매개변수를 확인하고 UI에서 게시한다.
+dev는 반영 후 바로 게시할 수 있다. CI가 같은 명령을 쓴다.
+
+```bash
+pnpm run gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
+```
 
 운영 측정 ID는 `gtm.config.json`의 `prod.measurementId`에 설정한다. 운영 컨테이너의 작업공간이 여러 개라면 `gtm.config.json`의 `prod.workspaceId`도 지정한다. 운영 페이지에서 GTM 스크립트가 로드되는 것과 GA4 태그가 컨테이너에 게시된 것은 별개로 확인한다.
 
