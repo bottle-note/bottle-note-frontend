@@ -91,6 +91,11 @@ jobs:
           submodules: false
           persist-credentials: false
 
+      - name: copy trusted development environment file
+        run: |
+          mkdir -p .source/git.environment-variables/application.next-js
+          cp .trusted/git.environment-variables/application.next-js/dev.sops.env .source/git.environment-variables/application.next-js/dev.sops.env
+
       - name: build, sign, and verify immutable preview image
         id: build
         uses: bottle-note/bottle-note-frontend/.github/actions/docker-build-push@2f676cc70abc64f87bb5486115560f30c63d6fe9
@@ -103,15 +108,14 @@ jobs:
           source-sha: ${{ github.event.pull_request.head.sha }}
           source-ref: refs/pull/${{ github.event.pull_request.number }}/head
           context: .source
-          dockerfile: .source/Dockerfile.preview
+          dockerfile: .source/Dockerfile
           cache-scope: frontend-preview
           cache-export: 'true'
           build-args: |
             APP_ORIGIN=https://preview.development.bottle-note.com
             INTERNAL_SERVER_URL=http://product-api
-          # Required by the pinned action; Dockerfile.preview never mounts it.
-          sops-age-key: preview-build-has-no-sops-secret
-          env-file: preview-build-has-no-sops.env
+          sops-age-key: ${{ secrets.SOPS_AGE_SECRET_KEY }}
+          env-file: git.environment-variables/application.next-js/dev.sops.env
           sign-image: 'true'
           cosign-key-path: .trusted/git.environment-variables/storage/docker-registry/cosign.key
           cosign-public-key-path: .trusted/git.environment-variables/storage/docker-registry/cosign.pub
@@ -192,5 +196,5 @@ jobs:
             echo "- Channel: \`${PREVIEW_CHANNEL_TAG}\`"
             echo "- Digest: \`${EXPECTED_DIGEST}\`"
             echo '- Signature and channel digest verification: `passed`'
-            echo '- Social provider credentials are intentionally unavailable in preview.'
+            echo '- Development environment file is used with preview origin overrides.'
           } >> "$GITHUB_STEP_SUMMARY"
