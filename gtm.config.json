@@ -11,7 +11,8 @@
       "accountId": "6370682004",
       "containerPublicId": "GTM-M4MMS6DR",
       "measurementId": "G-EES9MR11MY",
-      "baseTagName": "Google Tag - GA4 Dev"
+      "baseTagName": "Google Tag - GA4 Dev",
+      "allowPublish": true
     },
     "prod": {
       "accountId": "6370682004",
