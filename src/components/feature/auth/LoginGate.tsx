@@ -2,10 +2,13 @@
 
 import type { ReactNode } from 'react';
 import Button from '@/components/ui/Button/Button';
+import type { LoginGatePage } from '@/utils/analytics/types';
 import { GuestLoginPrompt } from './GuestLoginPrompt';
+import { useLoginGateTracking } from './useLoginGateTracking';
 
 type LoginGateProps = {
   // 공통
+  gatePage: LoginGatePage;
   onLogin: () => void;
   children?: ReactNode;
   id?: string;
@@ -29,7 +32,15 @@ type LoginGateProps = {
 );
 
 export function LoginGate(props: LoginGateProps) {
-  const { onLogin, children, id, variant = 'clear' } = props;
+  const { gatePage, onLogin, children, id, variant = 'clear' } = props;
+  const isAuthLoading = props.variant === 'blur' && !!props.isAuthLoading;
+  const { ref: promptRef, trackClick } = useLoginGateTracking(gatePage, {
+    enabled: !isAuthLoading,
+  });
+  const handleLogin = () => {
+    trackClick();
+    onLogin();
+  };
 
   // Clear 방식: 콘텐츠 공개 + 하단 버튼
   if (variant === 'clear') {
@@ -39,8 +50,11 @@ export function LoginGate(props: LoginGateProps) {
     return (
       <>
         {children}
-        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-stroke-neutral-subtle bg-bg-layer-default px-20 py-16 safe-area-bottom">
-          <Button onClick={onLogin}>
+        <div
+          ref={promptRef}
+          className="fixed bottom-0 left-0 right-0 z-50 border-t border-stroke-neutral-subtle bg-bg-layer-default px-20 py-16 safe-area-bottom"
+        >
+          <Button onClick={handleLogin}>
             {label || buttonLabel || '로그인하기'}
           </Button>
         </div>
@@ -56,7 +70,6 @@ export function LoginGate(props: LoginGateProps) {
     buttonLabel = '로그인하기',
     visibleHeight = 'min-h-260',
     gradientStartPercent = 42,
-    isAuthLoading = false,
   } = blurProps;
 
   return (
@@ -74,7 +87,7 @@ export function LoginGate(props: LoginGateProps) {
           } as React.CSSProperties
         }
       >
-        <div className="w-full">
+        <div ref={promptRef} className="w-full">
           {isAuthLoading ? (
             <div aria-hidden="true" className="h-88 animate-pulse" />
           ) : (
@@ -82,7 +95,7 @@ export function LoginGate(props: LoginGateProps) {
               title={title}
               description={description}
               buttonLabel={buttonLabel}
-              onLogin={onLogin}
+              onLogin={handleLogin}
             />
           )}
         </div>

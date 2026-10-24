@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef, type ReactNode } from 'react';
 
 import { GuestLoginPrompt } from '@/components/feature/auth/GuestLoginPrompt';
+import { useLoginGateTracking } from '@/components/feature/auth/useLoginGateTracking';
 import { GUEST_GATED_CONTENT_CLASS } from '../_constants';
 
 interface GuestAlcoholDetailGateProps {
@@ -25,6 +26,10 @@ export function GuestAlcoholDetailGate({
   isAuthLoading = false,
 }: GuestAlcoholDetailGateProps) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const { ref: promptRef, trackClick } = useLoginGateTracking(
+    'alcohol_detail',
+    { enabled: !isAuthLoading },
+  );
 
   useLayoutEffect(() => {
     const content = contentRef.current;
@@ -54,7 +59,10 @@ export function GuestAlcoholDetailGate({
             'linear-gradient(to bottom, transparent 0%, var(--color-bg-layer-default) 42%, var(--color-bg-layer-default) 100%)',
         }}
       />
-      <div className="pointer-events-none relative z-10 w-full bg-bg-layer-default px-20 py-20">
+      <div
+        ref={promptRef}
+        className="pointer-events-none relative z-10 w-full bg-bg-layer-default px-20 py-20"
+      >
         {isAuthLoading ? (
           <div aria-hidden="true" className="h-88 animate-pulse" />
         ) : (
@@ -62,7 +70,10 @@ export function GuestAlcoholDetailGate({
             title={title}
             description={description}
             buttonLabel={buttonLabel}
-            onLogin={onLogin}
+            onLogin={() => {
+              trackClick();
+              onLogin();
+            }}
           />
         )}
       </div>

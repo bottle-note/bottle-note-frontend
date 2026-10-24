@@ -14,6 +14,19 @@ export type LoginTrigger =
 
 export type LoginMethod = 'kakao' | 'apple';
 
+// 게스트에게 콘텐츠 일부만 보여주고 로그인을 요구하는 게이트의 위치
+export type LoginGatePage =
+  | 'alcohol_detail'
+  | 'explore_whiskey'
+  | 'explore_review'
+  | 'curation_list'
+  | 'curation_detail'
+  | 'import_clearance_list'
+  | 'import_clearance_detail'
+  | 'importer_list'
+  | 'importer_detail'
+  | 'home_recent';
+
 // 다른 화면과 구분해야 하는 진입 위치. 값이 없으면 기존 화면(술 상세, 리뷰 작성 페이지)이다.
 export type FeatureSource = 'bartender_note';
 
@@ -23,6 +36,7 @@ export interface GA4EventMap {
   login: {
     method: LoginMethod;
     trigger?: LoginTrigger;
+    gate_page?: LoginGatePage;
   };
   sign_up: {
     method: LoginMethod;
@@ -91,6 +105,20 @@ export interface GA4EventMap {
   };
   login_prompt_converted: {
     trigger: LoginTrigger;
+  };
+  // 게스트 로그인 게이트: 화면 진입 → 게이트 도달 → 로그인 CTA 클릭
+  login_gate_page_view: {
+    gate_page: LoginGatePage;
+  };
+  login_gate_reach: {
+    gate_page: LoginGatePage;
+    // false면 스크롤 없이 첫 화면에서 게이트가 보였다.
+    scrolled_to_reach: boolean;
+    seconds_since_view: number;
+  };
+  login_gate_click: {
+    gate_page: LoginGatePage;
+    seconds_since_view: number;
   };
 
   // 🟢 3순위 — 소셜/기타

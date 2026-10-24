@@ -19,7 +19,7 @@ import {
   isValidReturnUrl,
 } from '@/utils/loginRedirect';
 import { getLoginHistoryDirection } from '@/utils/loginHistory';
-import { consumeLoginTrigger } from '@/utils/loginTrigger';
+import { consumeLoginContext } from '@/utils/loginTrigger';
 import SocialLoginBtn from './_components/SocialLoginBtn';
 import LogoWhite from 'public/bottle_note_logo_white.svg';
 
@@ -43,7 +43,7 @@ export default function Login() {
     if (cancelMbtiLogin(returnTo)) return;
 
     clearReturnToUrl();
-    consumeLoginTrigger();
+    consumeLoginContext();
     // 쿼리 진입은 replace, 저장소를 사용하는 모달 진입은 push 방식이다.
     if (returnToParam === null && entry?.hasPreviousPage) {
       router.back();

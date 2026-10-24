@@ -311,11 +311,12 @@ export default function ImporterDetail() {
       <div className="grid h-dvh grid-rows-[auto_minmax(0,1fr)] pb-[var(--safe-area-bottom)]">
         {heroSection}
         <LoginGate
+          gatePage="importer_detail"
           variant="blur"
           title="더 알고 싶으신가요?"
           description="로그인하고 이 수입사 정보를 무료로 확인하세요"
           buttonLabel="로그인하고 보기"
-          onLogin={() => bridgeToLogin()}
+          onLogin={() => bridgeToLogin({ gatePage: 'importer_detail' })}
           visibleHeight="min-h-0"
           gradientStartPercent={80}
         >

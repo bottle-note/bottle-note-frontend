@@ -243,6 +243,7 @@ export default function ImportClearanceList() {
         )}
         {shouldGateGuestList && (
           <GuestListGate
+            gatePage="import_clearance_list"
             title="더 많은 수입 정보가 궁금하신가요?"
             description="로그인하고 전체 수입통관 내역을 더 확인해보세요."
           />

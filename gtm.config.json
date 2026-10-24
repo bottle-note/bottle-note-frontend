@@ -21,7 +21,7 @@
     }
   },
   "events": [
-    { "name": "login", "parameters": ["method", "trigger"] },
+    { "name": "login", "parameters": ["method", "trigger", "gate_page"] },
     { "name": "sign_up", "parameters": ["method", "trigger"] },
     {
       "name": "rate_alcohol",
@@ -68,6 +68,15 @@
     },
     { "name": "login_prompt_shown", "parameters": ["trigger"] },
     { "name": "login_prompt_converted", "parameters": ["trigger"] },
+    { "name": "login_gate_page_view", "parameters": ["gate_page"] },
+    {
+      "name": "login_gate_reach",
+      "parameters": ["gate_page", "scrolled_to_reach", "seconds_since_view"]
+    },
+    {
+      "name": "login_gate_click",
+      "parameters": ["gate_page", "seconds_since_view"]
+    },
     { "name": "tarot_start", "parameters": [] },
     { "name": "tarot_complete", "parameters": ["result_alcohol_id"] },
     {

@@ -385,6 +385,7 @@ export const ReviewExplorerList = ({
           {isLoggedIn && <div ref={targetRef} className="h-40" />}
           {shouldGateGuestList && (
             <GuestListGate
+              gatePage="explore_review"
               key={measurementCacheKey}
               title="더 많은 리뷰가 궁금하신가요?"
               description="로그인하고 다양한 테이스팅 경험을 더 만나보세요."

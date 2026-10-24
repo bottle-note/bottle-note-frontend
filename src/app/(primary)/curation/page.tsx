@@ -318,6 +318,7 @@ export default function CurationPage() {
                 {activeData && activeData.length > 0 && renderFeedItems()}
                 {shouldGateGuestFeed && (
                   <GuestListGate
+                    gatePage="curation_list"
                     key={`${currentTab.id}-${trimmedSearchKeyword}-${sortType}`}
                     title="더 많은 이야기가 궁금하신가요?"
                     description="로그인하고 보틀노트의 시음회와 큐레이션을 만나보세요."

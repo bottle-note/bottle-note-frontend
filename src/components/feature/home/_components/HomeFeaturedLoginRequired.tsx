@@ -2,15 +2,22 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button/Button';
-import { ROUTES } from '@/constants/routes';
+import { useLoginGateTracking } from '@/components/feature/auth/useLoginGateTracking';
+import { useLoginBridge } from '@/hooks/useLoginBridge';
 
-export function HomeFeaturedLoginRequired() {
-  const router = useRouter();
+interface Props {
+  isAuthLoading: boolean;
+}
+
+export function HomeFeaturedLoginRequired({ isAuthLoading }: Props) {
+  const { bridgeToLogin } = useLoginBridge();
+  const { ref: gateRef, trackClick } = useLoginGateTracking('home_recent', {
+    enabled: !isAuthLoading,
+  });
 
   return (
-    <div className="flex flex-col h-full -ml-25">
+    <div ref={gateRef} className="flex flex-col h-full -ml-25">
       <div className="flex flex-col items-center justify-center flex-grow space-y-14">
         <Image
           src="/icon/logo-subcoral.svg"
@@ -27,7 +34,10 @@ export function HomeFeaturedLoginRequired() {
           size="md"
           variant="secondary"
           className="w-237"
-          onClick={() => router.push(ROUTES.LOGIN)}
+          onClick={() => {
+            trackClick();
+            bridgeToLogin({ gatePage: 'home_recent' });
+          }}
         >
           로그인 하러가기
         </Button>

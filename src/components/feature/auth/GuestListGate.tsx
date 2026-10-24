@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 
-import { ROUTES } from '@/constants/routes';
 import { useNavLayout } from '@/components/ui/Layout/NavLayout';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useLoginBridge } from '@/hooks/useLoginBridge';
+import type { LoginGatePage } from '@/utils/analytics/types';
 import { GuestLoginPrompt } from './GuestLoginPrompt';
+import { useLoginGateTracking } from './useLoginGateTracking';
 
 export const GUEST_LIST_PAGE_SIZE = 3;
 
@@ -30,40 +31,27 @@ export const useGuestPagedSession = (
 };
 
 interface GuestListGateProps {
+  gatePage: LoginGatePage;
   title: string;
   description: string;
 }
 
-export function GuestListGate({ title, description }: GuestListGateProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+export function GuestListGate({
+  gatePage,
+  title,
+  description,
+}: GuestListGateProps) {
+  const { bridgeToLogin } = useLoginBridge();
   const { isNavbarSuppressed, isNavigationVisible } = useNavLayout();
   const [isActive, setIsActive] = useState(false);
-  const gateRef = useRef<HTMLDivElement>(null);
+  const { ref: gateRef, trackClick } = useLoginGateTracking(gatePage, {
+    onReach: () => setIsActive(true),
+  });
   const isNavbarVisible = isNavigationVisible && !isNavbarSuppressed;
 
-  useEffect(() => {
-    const gate = gateRef.current;
-    if (!gate) return;
-
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return;
-
-      setIsActive(true);
-      observer.disconnect();
-    });
-
-    observer.observe(gate);
-
-    return () => observer.disconnect();
-  }, []);
-
   const handleLogin = () => {
-    const query = searchParams.toString();
-    const returnTo = query ? `${pathname}?${query}` : pathname;
-
-    router.replace(`${ROUTES.LOGIN}?returnTo=${encodeURIComponent(returnTo)}`);
+    trackClick();
+    bridgeToLogin({ gatePage });
   };
 
   return (
