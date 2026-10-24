@@ -710,7 +710,7 @@ describe('바텐더 노트 공통 이동', () => {
 
 it('네 번째 추천 블록은 서버 시나리오를 조회한다', async () => {
   vi.mocked(ScenarioApi.get).mockResolvedValue({
-    scenarioId: 1,
+    scenarioId: 3,
     versionId: 1,
     title: '추천',
     state: 'QUESTION',
@@ -727,7 +727,7 @@ it('네 번째 추천 블록은 서버 시나리오를 조회한다', async () =
   renderExperience();
   await choose('위스키 진짜로 추천해주세요');
   expect(await screen.findByText('현재 후보 12병')).toBeInTheDocument();
-  expect(ScenarioApi.get).toHaveBeenCalledWith(1, expect.anything());
+  expect(ScenarioApi.get).toHaveBeenCalledWith(3, expect.anything());
   expect(trackCampaignEvent).toHaveBeenCalledWith(
     'bartender-note-type-d',
     'VIEW',

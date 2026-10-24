@@ -105,7 +105,7 @@ function response(request?: ScenarioRequest): ScenarioResponse {
       )
     : [];
   return {
-    scenarioId: 1,
+    scenarioId: 3,
     title: '추천',
     versionId: 1,
     state: result ? 'USER_FINISHED' : 'QUESTION',
@@ -161,6 +161,30 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('실제 시나리오 계약을 쓰는 네 번째 추천', () => {
+  it('삭제된 시나리오의 저장 답변을 사용하지 않고 새 단일 시나리오를 조회한다', async () => {
+    localStorage.setItem(
+      `bartender-note:${campaign}:1:user:7`,
+      JSON.stringify({
+        owner: 'user:7',
+        scenarioId: 1,
+        versionId: 1,
+        answers: [{ questionId: 1, optionId: 'old-option' }],
+        mode: 'RESULT',
+        scrollTop: 0,
+        questionTitles: {},
+        started: true,
+        finished: true,
+        resultShown: true,
+      }),
+    );
+    mount();
+    expect(
+      await screen.findByRole('button', { name: /^처음 마셔요/ }),
+    ).toBeInTheDocument();
+    expect(ScenarioApi.get).toHaveBeenCalledWith(3, expect.anything());
+    expect(ScenarioApi.evaluate).not.toHaveBeenCalled();
+  });
+
   it('서버의 선택지 ID만 보내고 갱신 중에는 현재 질문을 유지하며 중복 클릭을 막는다', async () => {
     let resolve!: (r: ScenarioResponse) => void;
     vi.mocked(ScenarioApi.evaluate).mockImplementationOnce(
@@ -173,7 +197,7 @@ describe('실제 시나리오 계약을 쓰는 네 번째 추천', () => {
     await choose('처음 마셔요');
     await waitFor(() =>
       expect(ScenarioApi.evaluate).toHaveBeenCalledWith(
-        1,
+        3,
         expect.objectContaining({
           versionId: 1,
           answers: [{ questionId: 11, optionId: 'signed-choice' }],
@@ -204,7 +228,7 @@ describe('실제 시나리오 계약을 쓰는 네 번째 추천', () => {
     await choose('추천 더 볼게요');
     await waitFor(() => expect(screen.getAllByRole('link')).toHaveLength(25));
     expect(ScenarioApi.evaluate).toHaveBeenCalledWith(
-      1,
+      3,
       expect.objectContaining({
         mode: 'RESULT',
         answers: [],
@@ -234,7 +258,7 @@ describe('실제 시나리오 계약을 쓰는 네 번째 추천', () => {
     await choose('바로 추천받을래요');
     expect(await screen.findByText('추천 25병')).toBeInTheDocument();
     expect(ScenarioApi.evaluate).toHaveBeenLastCalledWith(
-      1,
+      3,
       expect.objectContaining({
         mode: 'RESULT',
         answers: [],
@@ -252,7 +276,7 @@ describe('실제 시나리오 계약을 쓰는 네 번째 추천', () => {
     await screen.findByText('추천 5병');
     await waitFor(() =>
       expect(
-        JSON.parse(localStorage.getItem(`bartender-note:${campaign}:1:user:7`)!)
+        JSON.parse(localStorage.getItem(`bartender-note:${campaign}:3:user:7`)!)
           .mode,
       ).toBe('RESULT'),
     );
@@ -269,10 +293,10 @@ describe('실제 시나리오 계약을 쓰는 네 번째 추천', () => {
 
   it('저장한 정의의 버전 충돌은 샘플 결과 대신 복구 화면을 보여준다', async () => {
     localStorage.setItem(
-      `bartender-note:${campaign}:1:user:7`,
+      `bartender-note:${campaign}:3:user:7`,
       JSON.stringify({
         owner: 'user:7',
-        scenarioId: 1,
+        scenarioId: 3,
         versionId: 1,
         answers: [],
         mode: 'RESULT',
@@ -353,7 +377,7 @@ describe('실제 시나리오 계약을 쓰는 네 번째 추천', () => {
     await choose('13000원 초과');
     expect(await screen.findByText('추천 3병')).toBeInTheDocument();
     expect(ScenarioApi.evaluate).toHaveBeenLastCalledWith(
-      1,
+      3,
       expect.objectContaining({
         answers: [
           { questionId: 11, optionId: 'signed-choice' },
@@ -390,7 +414,7 @@ describe('실제 시나리오 계약을 쓰는 네 번째 추천', () => {
     await waitFor(() => expect(screen.getAllByRole('link')).toHaveLength(25));
     await waitFor(() =>
       expect(
-        JSON.parse(localStorage.getItem(`bartender-note:${campaign}:1:user:7`)!)
+        JSON.parse(localStorage.getItem(`bartender-note:${campaign}:3:user:7`)!)
           .pageCount,
       ).toBe(2),
     );

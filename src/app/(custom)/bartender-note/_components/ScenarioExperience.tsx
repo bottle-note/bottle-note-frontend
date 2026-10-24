@@ -19,7 +19,7 @@ import {
   type ScenarioSnapshot,
 } from './bartenderSnapshot';
 
-const SCENARIO_ID = Number(process.env.NEXT_PUBLIC_BARTENDER_SCENARIO_ID || 1);
+const SCENARIO_ID = Number(process.env.NEXT_PUBLIC_BARTENDER_SCENARIO_ID || 3);
 
 type Props = { onExit: () => void; onLeave: () => void };
 
