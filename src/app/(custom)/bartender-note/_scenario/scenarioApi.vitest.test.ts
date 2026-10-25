@@ -135,7 +135,15 @@ describe('실제 서버 DTO → 화면 모델', () => {
         question: null,
         completed: true,
         candidates: {
-          items: [{ id: 247, name: '글렌피딕 12년', imageUrl: null }],
+          items: [
+            {
+              id: 247,
+              name: '글렌피딕 12년',
+              imageUrl: null,
+              category: '싱글 몰트',
+              abv: '40',
+            },
+          ],
           totalCount: 675,
           nextCursor: 'opaque-cursor',
         },

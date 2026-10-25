@@ -399,6 +399,7 @@ describe('바텐더 노트 취향 추천', () => {
     expect(await screen.findByText('질문 5')).toBeInTheDocument();
     await choose('5~10만 원');
     expect(await screen.findByText('추천 1병')).toBeInTheDocument();
+    expect(screen.getByText('싱글 몰트 · 40%')).toBeInTheDocument();
     expect(
       screen.queryByRole('link', { name: /글렌피딕/ }),
     ).not.toBeInTheDocument();

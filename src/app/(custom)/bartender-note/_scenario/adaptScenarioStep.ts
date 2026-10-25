@@ -63,6 +63,8 @@ function adaptCandidate(candidate: ScenarioCandidateDto): ScenarioCandidate {
     id: candidate.alcoholId,
     name: candidate.korName,
     imageUrl: candidate.imageUrl,
+    category: candidate.korCategory,
+    abv: candidate.abv?.replace(/%$/, '').trim() || null,
   };
 }
 
