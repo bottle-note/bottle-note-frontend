@@ -3,43 +3,92 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/constants/routes';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useAlcoholDetailQuery } from '@/queries/useAlcoholDetailQuery';
+import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import { trackGA4Event } from '@/utils/analytics/ga4';
-import { OptionList, FlowAction } from './FlowControls';
+import { ApiError } from '@/utils/ApiError';
+import {
+  OptionList,
+  FlowAction,
+  FlowNavigation,
+  FlowTextAction,
+} from './FlowControls';
 import BartenderFrame from './BartenderFrame';
-import RecommendationFlow from './RecommendationFlow';
-import CandidateList, { getCandidates, isCandidateStep } from './CandidateList';
+import ScenarioQuestionView from './ScenarioQuestionView';
+import ScenarioCandidateList from './ScenarioCandidateList';
+import CandidateList, { isCandidateStep } from './CandidateList';
 import WhiskeyDetail from './WhiskeyDetail';
 import CurationFlow from './CurationFlow';
 import ReviewFlow from './ReviewFlow';
+import {
+  reviewAlcoholFromDetails,
+  reviewAlcoholFromWhiskey,
+} from './reviewAlcohol';
 import { getDialogue, type Notice } from './dialogue';
-import { getBackLabel, getStepHeader } from './stepMeta';
+import { getStepHeader } from './stepMeta';
 import { useBartenderPicks } from './useBartenderPicks';
 import { useBartenderJourney } from './useBartenderJourney';
-import { useTasteRecommendation } from './useTasteRecommendation';
 import { useReviewDraft } from './useReviewDraft';
 import { useReviewSubmit, ReviewSubmitError } from './useReviewSubmit';
 import { useBartenderPose } from './useBartenderPose';
 import { useTrackRecommendResult } from './useTrackRecommendResult';
 import { saveSnapshot, takeSnapshot } from './bartenderSnapshot';
-import type { ReviewDraft, Step } from './types';
+import type { AlcoholSelection, ReviewDraft, Step } from './types';
+import type { ScenarioContext } from '../_scenario/model';
+import { useScenarioFlow } from '../_scenario/useScenarioFlow';
 import type { Curation, Situation, Whiskey } from '../_data/demo';
 
-/** 목록 단계별로 술을 고른 경로. */
 const SELECT_SOURCE = {
   recommendations: 'taste',
-  similar: 'taste',
   'curation-list': 'situation',
   favorites: 'picks',
 } as const;
 
+function LoadingStep() {
+  return (
+    <div role="status" className="flex flex-col gap-12">
+      <span className="text-15">정보를 불러오고 있어요…</span>
+      <SkeletonBase height={48} count={3} />
+    </div>
+  );
+}
+
+function StepError({
+  onRetry,
+  onRestart,
+  versionConflict = false,
+}: {
+  onRetry: () => void;
+  onRestart?: () => void;
+  versionConflict?: boolean;
+}) {
+  return (
+    <>
+      <p role="alert" className="m-0 text-15 text-fg-neutral">
+        {versionConflict
+          ? '질문지가 업데이트됐어요. 처음부터 다시 시작해 주세요.'
+          : '정보를 불러오지 못했어요. 다시 시도해 주세요.'}
+      </p>
+      {!versionConflict && <FlowAction onClick={onRetry}>다시 시도</FlowAction>}
+      {onRestart && (
+        <FlowTextAction onClick={onRestart}>처음부터 다시 시작</FlowTextAction>
+      )}
+    </>
+  );
+}
+
 export default function BartenderExperience({
   whiskies,
   curations,
+  scenarioContext,
 }: {
   whiskies: Whiskey[];
   curations: Curation[];
+  scenarioContext: ScenarioContext;
 }) {
   const router = useRouter();
+  const { user, isLoading: authLoading } = useAuthSession();
   const {
     step,
     history,
@@ -49,16 +98,11 @@ export default function BartenderExperience({
     restart: restartJourney,
     restore: restoreJourney,
   } = useBartenderJourney();
-  const {
-    answers,
-    likedLookups,
-    recommendation,
-    baseWhiskeyName,
-    updateAnswers,
-    rememberLookup,
-    reset: resetTaste,
-    restore: restoreTaste,
-  } = useTasteRecommendation(whiskies);
+  const [context, setContext] = useState(scenarioContext);
+  const flow = useScenarioFlow({
+    context,
+    active: step === 'scenario' || step === 'recommendations',
+  });
   const {
     review,
     lastMode: lastReviewMode,
@@ -68,7 +112,7 @@ export default function BartenderExperience({
     reset: resetReview,
     restore: restoreReview,
   } = useReviewDraft();
-  const [chosenId, setChosenId] = useState<number | null>(null);
+  const [selection, setSelection] = useState<AlcoholSelection | null>(null);
   const [situation, setSituation] = useState<Situation>('home');
   const [curationId, setCurationId] = useState<number | null>(null);
   const [postedReviewId, setPostedReviewId] = useState<number | null>(null);
@@ -76,71 +120,122 @@ export default function BartenderExperience({
   const picks = useBartenderPicks();
   const submit = useReviewSubmit();
   const bartender = useBartenderPose(step);
-  const selected = whiskies.find((whiskey) => whiskey.id === chosenId);
-  // 리뷰 작성 시작은 술 하나에 한 번만 보낸다.
+  const requiresAlcohol =
+    step === 'detail' || (step.startsWith('review-') && step !== 'review-pick');
+  const alcoholQuery = useAlcoholDetailQuery({
+    alcoholId: selection?.source === 'api' ? String(selection.id) : '',
+    viewerId: user?.userId ?? null,
+    enabled: requiresAlcohol && !authLoading,
+  });
+  const demo =
+    selection?.source === 'demo'
+      ? whiskies.find(({ id }) => id === selection.id)
+      : undefined;
+  const selected = demo
+    ? reviewAlcoholFromWhiskey(demo)
+    : alcoholQuery.data
+      ? reviewAlcoholFromDetails(alcoholQuery.data)
+      : undefined;
   const reviewStartedFor = useRef<number | null>(null);
+  const curation = curations.find((item) => item.id === curationId);
+  const tracking = useTrackRecommendResult({
+    step,
+    context,
+    answers: flow.answers,
+    response: flow.query.data,
+    isSuccess: flow.query.isSuccess,
+    curationId,
+    situation,
+  });
 
-  // 다른 페이지에 다녀왔으면 보던 화면으로 돌아온다.
   useEffect(() => {
     const saved = takeSnapshot();
     if (!saved) return;
     restoreJourney(saved.journey);
-    restoreTaste(saved);
+    setContext(saved.scenario.context);
+    flow.restore(saved.scenario.answers, saved.scenario.versionId);
     restoreReview(saved.review, saved.lastReviewMode);
-    setChosenId(saved.chosenId);
+    setSelection(saved.selection);
     setSituation(saved.situation);
     setCurationId(saved.curationId);
     setPostedReviewId(saved.postedReviewId);
+    tracking.restore(saved);
   }, []);
-  /** 바텐더 노트 밖으로 나가기 직전에 지금 화면을 남겨 둔다. */
-  const leave = () => {
+
+  useEffect(() => {
+    if (
+      step === 'scenario' &&
+      flow.query.isSuccess &&
+      flow.query.data.completed
+    ) {
+      setNotice(null);
+      moveStep('recommendations');
+    }
+  }, [step, flow.query.isSuccess, flow.query.data?.completed]);
+
+  const leave = () =>
     saveSnapshot({
       journey: { step, history },
-      answers,
-      likedLookups,
+      scenario: { context, answers: flow.answers, versionId: flow.versionId },
       review: { ...review, photos: [] },
       lastReviewMode,
-      chosenId,
+      selection,
       situation,
       curationId,
       postedReviewId,
     });
-  };
-
-  // 바텐더의 알림 대사는 다른 단계로 넘어가면 사라진다.
   const move = (next: Step) => {
     setNotice(null);
     moveStep(next);
   };
   const back = () => {
     setNotice(null);
+    if (step === 'scenario' && flow.canGoBack) {
+      flow.back();
+      return;
+    }
+    if (step === 'recommendations') flow.back();
     backStep();
   };
   const restart = (next?: Step) => {
     setNotice(null);
     restartJourney(next);
   };
-
   const home = () => {
     restart();
-    resetTaste();
+    flow.reset();
     resetReview();
-    setChosenId(null);
+    setSelection(null);
     reviewStartedFor.current = null;
+    tracking.reset();
   };
-  const chooseWhiskey = (whiskey: Whiskey, next: Step) => {
-    setChosenId(whiskey.id);
-    move(next);
+  const startScenario = () => {
+    flow.reset();
+    setSelection(null);
+    tracking.reset();
+    trackGA4Event('bartender_start', { entry: 'recommend' });
+    move('scenario');
   };
-  const toggleFavorite = async (id: number) => {
+  const chooseAlcohol = (next: AlcoholSelection) => {
+    if (step === 'recommendations' || isCandidateStep(step)) {
+      trackGA4Event('bartender_select_alcohol', {
+        alcohol_id: String(next.id),
+        source: SELECT_SOURCE[step],
+      });
+    }
+    setSelection(next);
+    move('detail');
+  };
+  const toggleFavorite = async () => {
+    if (!selected) return;
     trackGA4Event('add_to_picks', {
-      alcohol_id: String(id),
-      alcohol_name: selected?.name ?? '',
-      action: picks.isPicked(id) ? 'remove' : 'add',
+      alcohol_id: String(selected.id),
+      alcohol_name: selected.name,
+      action: picks.isPicked(selected.id) ? 'remove' : 'add',
       source: 'bartender_note',
     });
     try {
-      const picked = await picks.toggle(id);
+      const picked = await picks.toggle(selected.id);
       setNotice(picked ? 'pick-added' : 'pick-removed');
     } catch {
       setNotice('pick-failed');
@@ -157,7 +252,6 @@ export default function BartenderExperience({
       source: 'bartender_note',
     });
   };
-  /** 리뷰가 저장되면 완료 화면으로, 저장하지 못하면 미리보기에 남아 다시 누르게 한다. */
   const postReview = async () => {
     if (!selected) return;
     const alcoholId = String(selected.id);
@@ -191,67 +285,60 @@ export default function BartenderExperience({
       setNotice('review-failed');
     }
   };
-  /** 실제 술 상세 페이지로 나간다. 돌아오면 지금 화면을 이어 본다. */
-  const openAlcoholPage = (alcoholId: number, source: 'detail' | 'picks') => {
+  const openAlcoholPage = () => {
+    if (!selection) return;
     trackGA4Event('bartender_open_alcohol_page', {
-      alcohol_id: String(alcoholId),
-      source,
+      alcohol_id: String(selection.id),
+      source: 'detail',
     });
     leave();
   };
-  const start = (
-    entry: 'recommend' | 'situation' | 'review' | 'picks',
-    next: Step,
-  ) => {
+  const start = (entry: 'situation' | 'review' | 'picks', next: Step) => {
     trackGA4Event('bartender_start', { entry });
     move(next);
   };
 
-  const curation = curations.find((item) => item.id === curationId);
-  const pickedItems = picks.items.map((alcohol) => ({
-    alcohol,
-    whiskey: whiskies.find((whiskey) => whiskey.id === alcohol.alcoholId),
-  }));
-  const { exact, similar } = recommendation;
-  useTrackRecommendResult({
-    step,
-    answers,
-    exactCount: exact.length,
-    similarCount: similar.length,
-    curationId,
-    situation,
-  });
-
   const header = getStepHeader(step, {
     curationTitle: curation?.title,
     reviewMode: review.mode,
+    questionNumber: flow.answers.length + 1,
   });
-  const dialogueLines = getDialogue({
-    step,
-    detailOrigin: previous,
-    selected,
-    curation,
-    recommendationReason: recommendation.meta.get(chosenId ?? -1)?.why,
-    notice,
-    exactCount: exact.length,
-    similarCount: similar.length,
-    level: answers.level,
-    kind: answers.kind,
-    likedCount: answers.likedIds.length,
-    baseWhiskeyName,
-  });
+  const scenarioStep = step === 'scenario' || step === 'recommendations';
+  const scenarioData = flow.query.data;
+  const dialogueLines =
+    scenarioStep && flow.query.isError && !flow.query.isFetchNextPageError
+      ? ['질문을 불러오지 못했어요. 다시 시도해 주세요.']
+      : scenarioStep && !scenarioData
+        ? ['질문을 준비하고 있어요.']
+        : step === 'scenario' && scenarioData?.question
+          ? [scenarioData.question.prompt]
+          : getDialogue({
+              step,
+              detailOrigin: previous,
+              selected,
+              curation,
+              notice,
+              candidateCount: scenarioData?.candidates?.totalCount ?? 0,
+            });
 
   return (
     <BartenderFrame
       step={step}
+      questionId={step === 'scenario' ? scenarioData?.question?.id : undefined}
       title={header.title}
       subtitle={header.subtitle}
       progress={header.progress}
       lines={dialogueLines}
       pose={bartender.pose}
-      onBack={previous ? back : undefined}
-      backLabel={getBackLabel(step, previous)}
-      onClose={home}
+      onBack={
+        previous || (step === 'scenario' && flow.canGoBack) ? back : undefined
+      }
+      backLabel={
+        (step === 'scenario' && flow.canGoBack) || step === 'recommendations'
+          ? '이전 질문'
+          : '이전 단계'
+      }
+      onClose={() => router.push(ROUTES.HOME)}
     >
       {step === 'intro' && (
         <>
@@ -260,7 +347,7 @@ export default function BartenderExperience({
               {
                 title: '위스키 추천해 주세요',
                 description: '몇 가지 여쭤보고 골라 드려요',
-                action: () => start('recommend', 'level'),
+                action: startScenario,
               },
               {
                 title: '상황에 맞게 추천해 주세요',
@@ -274,56 +361,87 @@ export default function BartenderExperience({
               },
             ]}
           />
-          {pickedItems.length > 0 && (
-            <FlowAction onClick={() => start('picks', 'favorites')}>
-              {`찜한 술 ${pickedItems.length}${picks.hasMore ? '병 이상' : '병'} 볼게요`}
-            </FlowAction>
+          {picks.items.length > 0 && (
+            <FlowNavigation>
+              <FlowTextAction
+                onClick={() => start('picks', 'favorites')}
+              >{`찜한 술 ${picks.items.length}${picks.hasMore ? '병 이상' : '병'} 보기`}</FlowTextAction>
+            </FlowNavigation>
           )}
         </>
       )}
-      <RecommendationFlow
-        step={step}
-        answers={answers}
-        updateAnswers={updateAnswers}
-        whiskies={whiskies}
-        likedLookups={likedLookups}
-        rememberLookup={rememberLookup}
-        move={move}
-      />
+      {scenarioStep &&
+        (flow.query.isError && !flow.query.isFetchNextPageError ? (
+          <StepError
+            onRetry={() => void flow.retry()}
+            onRestart={startScenario}
+            versionConflict={
+              flow.query.error instanceof ApiError &&
+              flow.query.error.response.status === 409
+            }
+          />
+        ) : !scenarioData ? (
+          <LoadingStep />
+        ) : (
+          <>
+            {step === 'scenario' && scenarioData.question && (
+              <>
+                {scenarioData.candidates && (
+                  <p className="m-0 text-13 text-fg-neutral-muted">
+                    현재 후보 {scenarioData.candidates.totalCount}병
+                  </p>
+                )}
+                <ScenarioQuestionView
+                  key={scenarioData.question.id}
+                  question={scenarioData.question}
+                  disabled={!flow.canAnswer}
+                  onAnswer={flow.answer}
+                />
+              </>
+            )}
+            {step === 'recommendations' &&
+              scenarioData.completed &&
+              scenarioData.candidates && (
+                <ScenarioCandidateList
+                  candidates={scenarioData.candidates}
+                  onChoose={(id) => chooseAlcohol({ id, source: 'api' })}
+                  home={home}
+                  loadMore={() => void flow.query.fetchNextPage()}
+                  loadingMore={flow.query.isFetchingNextPage}
+                  loadMoreError={flow.query.isFetchNextPageError}
+                />
+              )}
+          </>
+        ))}
       {isCandidateStep(step) && (
         <CandidateList
           step={step}
-          candidates={getCandidates(step, {
-            recommendation,
-            answers,
-            curation,
-            whiskies,
-            pickedItems,
-            hasMorePicks: picks.hasMore,
-          })}
           curation={curation}
-          onChoose={(whiskey) => {
-            trackGA4Event('bartender_select_alcohol', {
-              alcohol_id: String(whiskey.id),
-              source: SELECT_SOURCE[step],
-            });
-            chooseWhiskey(whiskey, 'detail');
-          }}
+          whiskies={whiskies}
+          pickedItems={picks.items}
+          hasMorePicks={picks.hasMore}
+          onChoose={chooseAlcohol}
           move={move}
           home={home}
           onLeave={leave}
-          onOpenAlcoholPage={(id) => openAlcoholPage(id, 'picks')}
         />
       )}
+      {requiresAlcohol &&
+        !selected &&
+        (alcoholQuery.isError ? (
+          <StepError onRetry={() => void alcoholQuery.refetch()} />
+        ) : (
+          <LoadingStep />
+        ))}
       {step === 'detail' && selected && (
         <WhiskeyDetail
-          whiskey={selected}
+          key={`${selection?.source}:${selected.id}`}
+          alcohol={selected}
           isPicked={picks.isPicked(selected.id)}
           isTogglingPick={picks.isToggling}
-          onTogglePick={() => toggleFavorite(selected.id)}
+          onTogglePick={() => void toggleFavorite()}
           onWriteReview={() => move('review-mode')}
-          onBack={back}
-          onLeave={() => openAlcoholPage(selected.id, 'detail')}
+          onLeave={openAlcoholPage}
         />
       )}
       <CurationFlow
@@ -334,32 +452,35 @@ export default function BartenderExperience({
         setCurationId={setCurationId}
         move={move}
         home={home}
+        onStartScenario={startScenario}
       />
-      <ReviewFlow
-        step={step}
-        review={review}
-        updateReview={updateReview}
-        selected={selected}
-        whiskies={whiskies}
-        move={move}
-        home={home}
-        chooseWhiskey={chooseWhiskey}
-        lastReviewMode={lastReviewMode}
-        chooseMode={chooseReviewMode}
-        postReview={postReview}
-        isPosting={submit.isPending}
-        onViewPostedReview={() => {
-          if (postedReviewId === null) return;
-          leave();
-          router.push(ROUTES.REVIEW.DETAIL(postedReviewId));
-        }}
-        startAnotherReview={() => {
-          startAnother();
-          setChosenId(null);
-          reviewStartedFor.current = null;
-          restart('review-pick');
-        }}
-      />
+      {(!requiresAlcohol || selected) && (
+        <ReviewFlow
+          step={step}
+          review={review}
+          updateReview={updateReview}
+          selected={selected}
+          move={move}
+          home={home}
+          onPickAlcohol={(id) => chooseAlcohol({ id, source: 'api' })}
+          lastReviewMode={lastReviewMode}
+          chooseMode={chooseReviewMode}
+          postReview={postReview}
+          isPosting={submit.isPending}
+          onViewPostedReview={() => {
+            if (postedReviewId !== null) {
+              leave();
+              router.push(ROUTES.REVIEW.DETAIL(postedReviewId));
+            }
+          }}
+          startAnotherReview={() => {
+            startAnother();
+            setSelection(null);
+            reviewStartedFor.current = null;
+            restart('review-pick');
+          }}
+        />
+      )}
     </BartenderFrame>
   );
 }

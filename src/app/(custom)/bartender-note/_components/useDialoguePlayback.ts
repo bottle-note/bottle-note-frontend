@@ -47,7 +47,11 @@ function paginateDialogue(value: string, fits: (text: string) => boolean) {
  * 대사창의 진행. 첫 화면에서는 인사 동작 뒤에 말을 시작하고,
  * 한 글자씩 타이핑한 뒤 다음 페이지로 넘어간다. 누르면 타이핑을 끝내거나 다음 페이지로 간다.
  */
-export function useDialoguePlayback(step: Step, lines: string[]) {
+export function useDialoguePlayback(
+  step: Step,
+  lines: string[],
+  questionId?: number,
+) {
   const dialogueRef = useRef<HTMLButtonElement>(null);
   const rulerRef = useRef<HTMLSpanElement>(null);
   const [dialogueWidth, setDialogueWidth] = useState(0);
@@ -61,14 +65,17 @@ export function useDialoguePlayback(step: Step, lines: string[]) {
   const [sceneReady, setSceneReady] = useState(false);
   const text = pages[page] ?? '';
   const dialogueKey = lines.join('\u0000');
-  const currentDialogueKey = `${step}\u0000${dialogueKey}`;
+  const currentDialogueKey = `${step}\u0000${questionId ?? ''}\u0000${dialogueKey}`;
   const introSkipped = skippedIntroKey === currentDialogueKey;
   const introReady = introPhase === 'ready';
   const isTyping = introReady && typed < text.length;
   const optionsVisible =
     introReady && typed >= text.length && page === pages.length - 1;
 
-  useLayoutEffect(() => setSkippedIntroKey(null), [step, dialogueKey]);
+  useLayoutEffect(
+    () => setSkippedIntroKey(null),
+    [step, dialogueKey, questionId],
+  );
 
   useEffect(() => {
     const element = dialogueRef.current;
@@ -109,7 +116,7 @@ export function useDialoguePlayback(step: Step, lines: string[]) {
   useEffect(() => {
     setPage(0);
     setTyped(0);
-  }, [step, dialogueKey]);
+  }, [step, dialogueKey, questionId]);
 
   useEffect(() => {
     if (step !== 'intro' || prefersReducedMotion() || introSkipped) {

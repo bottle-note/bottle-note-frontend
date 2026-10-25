@@ -9,6 +9,12 @@ export const metadata = {
 
 export default function BartenderNotePage() {
   return (
-    <BartenderExperience whiskies={demoWhiskies} curations={demoCurations} />
+    <BartenderExperience
+      whiskies={demoWhiskies}
+      curations={demoCurations}
+      scenarioContext={{
+        scenarioId: Number(process.env.BARTENDER_SCENARIO_ID ?? 3),
+      }}
+    />
   );
 }

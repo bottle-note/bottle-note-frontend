@@ -1,13 +1,7 @@
 export type Step =
   | 'intro'
-  | 'level'
-  | 'likes'
-  | 'kind'
-  | 'axis'
-  | 'abv'
-  | 'price'
+  | 'scenario'
   | 'recommendations'
-  | 'similar'
   | 'situation'
   | 'curations'
   | 'curation-empty'
@@ -27,15 +21,10 @@ export type Step =
   | 'review-preview'
   | 'review-done';
 
-export type Answers = {
-  level: string;
-  likedIds: number[];
-  kind: string;
-  axis: string;
-  abv: string;
-  unit: 'glass' | 'bottle';
-  price: string;
-};
+export interface AlcoholSelection {
+  id: number;
+  source: 'api' | 'demo';
+}
 
 export type ReviewDraft = {
   mode: 'quick' | 'detail';
@@ -53,16 +42,6 @@ export type ReviewDraft = {
   unit: 'glass' | 'bottle';
   price: string;
   public: boolean;
-};
-
-export const initialAnswers: Answers = {
-  level: '',
-  likedIds: [],
-  kind: '',
-  axis: '',
-  abv: '',
-  unit: 'glass',
-  price: '',
 };
 
 export const initialReview: ReviewDraft = {
