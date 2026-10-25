@@ -71,6 +71,7 @@ export function useBartenderPicks() {
   return {
     items,
     hasMore: picks.data?.hasMore ?? false,
+    isLoading: picks.isLoading,
     isPicked,
     toggle,
     isToggling: mutation.isPending,
