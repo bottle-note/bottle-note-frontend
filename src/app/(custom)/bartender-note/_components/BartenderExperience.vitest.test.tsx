@@ -30,9 +30,15 @@ import { trackGA4Event } from '@/utils/analytics/ga4';
 
 vi.mock('@/utils/analytics/ga4', () => ({ trackGA4Event: vi.fn() }));
 
-const { back, push } = vi.hoisted(() => ({ back: vi.fn(), push: vi.fn() }));
+const { back, push, replace } = vi.hoisted(() => ({
+  back: vi.fn(),
+  push: vi.fn(),
+  replace: vi.fn(),
+}));
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ back, push, replace: vi.fn() }),
+  useRouter: () => ({ back, push, replace }),
+  usePathname: () => '/bartender-note',
+  useSearchParams: () => new URLSearchParams(),
 }));
 // 사진은 S3 업로드 URL로 올라간다. 테스트에서는 올린 결과 주소만 돌려준다.
 vi.mock('@/utils/S3Upload', () => ({
@@ -43,11 +49,14 @@ vi.mock('@/utils/S3Upload', () => ({
     })),
   ),
 }));
-// 바텐더 노트는 로그인한 사용자 기준으로 동작한다.
+// 기본은 로그인한 사용자다. 비로그인 시나리오는 auth.loggedIn을 바꾼다.
+const auth = vi.hoisted(() => ({ loggedIn: true }));
 vi.mock('@/hooks/auth/useAuthSession', () => ({
   useAuthSession: () => ({
-    user: { sub: 'tester', profile: null, userId: 7 },
-    isLoggedIn: true,
+    user: auth.loggedIn
+      ? { sub: 'tester', profile: null, userId: 7 }
+      : undefined,
+    isLoggedIn: auth.loggedIn,
     isLoading: false,
   }),
 }));
@@ -335,6 +344,8 @@ beforeEach(() => {
   mockScenarioApi();
   back.mockClear();
   push.mockClear();
+  replace.mockClear();
+  auth.loggedIn = true;
   window.sessionStorage.clear();
   serverPicks = [];
   stubPickApi();
@@ -720,7 +731,7 @@ describe('바텐더 노트 찜', () => {
     expect(push).toHaveBeenCalledWith('/');
     unmount();
     renderExperience();
-    await press('찜한 술 1병 보기');
+    await press('찜한 술 보기');
     await press(/글렌피딕 12년/);
 
     expect(
@@ -739,7 +750,7 @@ describe('바텐더 노트 찜', () => {
     ];
     renderExperience();
 
-    await press('찜한 술 2병 보기');
+    await press('찜한 술 보기');
 
     expect(
       await screen.findByRole('button', { name: /탈리스커 10년/ }),
@@ -931,6 +942,133 @@ describe('바텐더 노트 리뷰', () => {
   });
 });
 
+describe('바텐더 노트 비로그인 행동', () => {
+  const LOGIN_URL = '/login?returnTo=%2Fbartender-note';
+
+  /** 로그인 화면으로 갔다가 로그인을 마치고 바텐더 노트로 돌아온다. */
+  function returnAfterLogin(unmount: () => void) {
+    unmount();
+    auth.loggedIn = true;
+    renderExperience();
+  }
+
+  it('리뷰 쓰기를 누르면 로그인 화면으로 가고, 로그인 후 리뷰할 술 고르기에서 이어진다', async () => {
+    auth.loggedIn = false;
+    const { unmount } = renderExperience();
+
+    await choose('바텐더님과 함께 리뷰를 쓸게요');
+
+    expect(replace).toHaveBeenCalledWith(LOGIN_URL);
+    expect(trackGA4Event).toHaveBeenCalledWith('login_prompt_shown', {
+      trigger: 'review_write',
+    });
+    returnAfterLogin(unmount);
+
+    expect(
+      await screen.findByRole('searchbox', { name: '술 이름 또는 종류 검색' }),
+    ).toBeInTheDocument();
+    await press('이전 단계');
+    expect(
+      await screen.findByRole('button', { name: /^위스키 추천해 주세요/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('찜한 술 보기를 누르면 로그인 화면으로 가고, 로그인 후 찜 목록을 보여 준다', async () => {
+    auth.loggedIn = false;
+    serverPicks = [pickItem(900, '탈리스커 10년')];
+    const { unmount } = renderExperience();
+
+    await press('찜한 술 보기');
+
+    expect(replace).toHaveBeenCalledWith(LOGIN_URL);
+    expect(MyBottleApi.getPicks).not.toHaveBeenCalled();
+    returnAfterLogin(unmount);
+
+    expect(
+      await screen.findByRole('button', { name: /탈리스커 10년/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('찜한 술이 없으면 로그인 후 빈 찜 목록을 알리고 취향 추천으로 이어 준다', async () => {
+    auth.loggedIn = false;
+    const { unmount } = renderExperience();
+
+    await press('찜한 술 보기');
+    returnAfterLogin(unmount);
+
+    expect(await screen.findByText('찜한 술이 없어요.')).toBeInTheDocument();
+    expect(dialogue()).toHaveTextContent('아직 찜해 둔 술이 없네요.');
+    await press('위스키 추천해 주세요');
+    await choose('상관없어요');
+    expect(trackGA4Event).toHaveBeenCalledWith('bartender_start', {
+      entry: 'recommend',
+    });
+  });
+
+  it('술 상세에서 찜을 누르면 로그인 화면으로 가고, 로그인 후 같은 술 상세로 돌아온다', async () => {
+    auth.loggedIn = false;
+    const { unmount } = renderExperience();
+    await openHomeCurationDetail('글렌피딕 12년');
+
+    await press('찜하기');
+
+    expect(replace).toHaveBeenCalledWith(LOGIN_URL);
+    expect(AlcoholsApi.putPick).not.toHaveBeenCalled();
+    returnAfterLogin(unmount);
+
+    expect(
+      await screen.findByRole('heading', { name: '글렌피딕 12년' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '찜하기' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+  });
+
+  it('술 상세에서 리뷰 작성을 누르면 로그인 화면으로 가고, 로그인 후 리뷰 방식 고르기에서 이어진다', async () => {
+    auth.loggedIn = false;
+    const { unmount } = renderExperience();
+    await openHomeCurationDetail('글렌피딕 12년');
+
+    await press('리뷰 작성');
+
+    expect(replace).toHaveBeenCalledWith(LOGIN_URL);
+    returnAfterLogin(unmount);
+
+    expect(await screen.findByText('어떻게 남길까요')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /내 느낌 한 줄로 쓸게요/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('로그인하지 않고 돌아오면 보던 화면에 머문다', async () => {
+    auth.loggedIn = false;
+    const { unmount } = renderExperience();
+
+    await choose('바텐더님과 함께 리뷰를 쓸게요');
+    unmount();
+    renderExperience();
+
+    expect(
+      await screen.findByRole('button', { name: /^위스키 추천해 주세요/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('searchbox', { name: '술 이름 또는 종류 검색' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('로그인한 사용자는 로그인 화면을 거치지 않고 바로 다음 단계로 간다', async () => {
+    renderExperience();
+
+    await choose('바텐더님과 함께 리뷰를 쓸게요');
+
+    expect(
+      await screen.findByRole('searchbox', { name: '술 이름 또는 종류 검색' }),
+    ).toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
+  });
+});
+
 describe('바텐더 노트 공통 이동', () => {
   it('추천 상세에 다녀와 빈 캐시로 복원해도 원래 후보로 돌아가고 결과 이벤트는 중복되지 않는다', async () => {
     const { unmount } = renderExperience();
@@ -987,7 +1125,7 @@ describe('바텐더 노트 공통 이동', () => {
       new Error('조회 실패'),
     );
     renderExperience();
-    await press('찜한 술 1병 보기');
+    await press('찜한 술 보기');
     await press(/탈리스커 10년/);
     await screen.findByRole('alert');
     await press('다시 시도');

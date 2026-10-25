@@ -4,10 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useLoginBridge } from '@/hooks/useLoginBridge';
 import { useAlcoholDetailQuery } from '@/queries/useAlcoholDetailQuery';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { ApiError } from '@/utils/ApiError';
+import type { LoginTrigger } from '@/utils/analytics/types';
 import {
   OptionList,
   FlowAction,
@@ -88,7 +90,8 @@ export default function BartenderExperience({
   scenarioContext: ScenarioContext;
 }) {
   const router = useRouter();
-  const { user, isLoading: authLoading } = useAuthSession();
+  const { user, isLoggedIn, isLoading: authLoading } = useAuthSession();
+  const { bridgeToLogin } = useLoginBridge();
   const {
     step,
     history,
@@ -117,6 +120,7 @@ export default function BartenderExperience({
   const [curationId, setCurationId] = useState<number | null>(null);
   const [postedReviewId, setPostedReviewId] = useState<number | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
+  const [resumeAfterLogin, setResumeAfterLogin] = useState<Step | null>(null);
   const picks = useBartenderPicks();
   const submit = useReviewSubmit();
   const bartender = useBartenderPose(step);
@@ -159,8 +163,15 @@ export default function BartenderExperience({
     setSituation(saved.situation);
     setCurationId(saved.curationId);
     setPostedReviewId(saved.postedReviewId);
+    setResumeAfterLogin(saved.resumeAfterLogin ?? null);
     tracking.restore(saved);
   }, []);
+
+  useEffect(() => {
+    if (!resumeAfterLogin || authLoading) return;
+    if (isLoggedIn) move(resumeAfterLogin);
+    setResumeAfterLogin(null);
+  }, [resumeAfterLogin, authLoading, isLoggedIn]);
 
   useEffect(() => {
     if (
@@ -173,7 +184,7 @@ export default function BartenderExperience({
     }
   }, [step, flow.query.isSuccess, flow.query.data?.completed]);
 
-  const leave = () =>
+  const leave = (resume?: Step) =>
     saveSnapshot({
       journey: { step, history },
       scenario: { context, answers: flow.answers, versionId: flow.versionId },
@@ -183,7 +194,15 @@ export default function BartenderExperience({
       situation,
       curationId,
       postedReviewId,
+      resumeAfterLogin: resume,
     });
+  /** 비로그인이면 지금 화면을 남겨 두고 로그인 화면으로 보낸다. 로그인 후 resume 단계를 연다. */
+  const requireLogin = (trigger: LoginTrigger, resume?: Step) => {
+    if (isLoggedIn) return false;
+    leave(resume);
+    bridgeToLogin({ trigger });
+    return true;
+  };
   const move = (next: Step) => {
     setNotice(null);
     moveStep(next);
@@ -227,7 +246,7 @@ export default function BartenderExperience({
     move('detail');
   };
   const toggleFavorite = async () => {
-    if (!selected) return;
+    if (!selected || requireLogin('picks')) return;
     trackGA4Event('add_to_picks', {
       alcohol_id: String(selected.id),
       alcohol_name: selected.name,
@@ -295,7 +314,13 @@ export default function BartenderExperience({
   };
   const start = (entry: 'situation' | 'review' | 'picks', next: Step) => {
     trackGA4Event('bartender_start', { entry });
+    if (entry === 'review' && requireLogin('review_write', next)) return;
+    if (entry === 'picks' && requireLogin('picks', next)) return;
     move(next);
+  };
+  const writeReview = () => {
+    if (requireLogin('review_write', 'review-mode')) return;
+    move('review-mode');
   };
 
   const header = getStepHeader(step, {
@@ -319,6 +344,7 @@ export default function BartenderExperience({
               curation,
               notice,
               candidateCount: scenarioData?.candidates?.totalCount ?? 0,
+              pickCount: picks.isLoading ? undefined : picks.items.length,
             });
 
   return (
@@ -361,13 +387,11 @@ export default function BartenderExperience({
               },
             ]}
           />
-          {picks.items.length > 0 && (
-            <FlowNavigation>
-              <FlowTextAction
-                onClick={() => start('picks', 'favorites')}
-              >{`찜한 술 ${picks.items.length}${picks.hasMore ? '병 이상' : '병'} 보기`}</FlowTextAction>
-            </FlowNavigation>
-          )}
+          <FlowNavigation>
+            <FlowTextAction onClick={() => start('picks', 'favorites')}>
+              찜한 술 보기
+            </FlowTextAction>
+          </FlowNavigation>
         </>
       )}
       {scenarioStep &&
@@ -413,7 +437,8 @@ export default function BartenderExperience({
               )}
           </>
         ))}
-      {isCandidateStep(step) && (
+      {step === 'favorites' && picks.isLoading && <LoadingStep />}
+      {isCandidateStep(step) && !(step === 'favorites' && picks.isLoading) && (
         <CandidateList
           step={step}
           curation={curation}
@@ -423,7 +448,8 @@ export default function BartenderExperience({
           onChoose={chooseAlcohol}
           move={move}
           home={home}
-          onLeave={leave}
+          onLeave={() => leave()}
+          onStartScenario={startScenario}
         />
       )}
       {requiresAlcohol &&
@@ -440,7 +466,7 @@ export default function BartenderExperience({
           isPicked={picks.isPicked(selected.id)}
           isTogglingPick={picks.isToggling}
           onTogglePick={() => void toggleFavorite()}
-          onWriteReview={() => move('review-mode')}
+          onWriteReview={writeReview}
           onLeave={openAlcoholPage}
         />
       )}

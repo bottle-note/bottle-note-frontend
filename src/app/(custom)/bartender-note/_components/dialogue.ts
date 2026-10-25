@@ -17,6 +17,8 @@ export type DialogueInput = {
   curation?: Curation;
   notice?: Notice | null;
   candidateCount: number;
+  /** 불러온 찜 수. 아직 불러오는 중이면 비워 둔다. */
+  pickCount?: number;
 };
 
 const notices: Record<Notice, string> = {
@@ -36,7 +38,7 @@ function detailReason({ detailOrigin, selected, curation }: DialogueInput) {
 }
 
 export function getDialogue(input: DialogueInput): string[] {
-  const { step, candidateCount, curation, selected } = input;
+  const { step, candidateCount, pickCount, curation, selected } = input;
   if (input.notice) return [notices[input.notice]];
   const reason = detailReason(input);
   const dialogue: Record<Step, string[]> = {
@@ -57,7 +59,11 @@ export function getDialogue(input: DialogueInput): string[] {
     'curation-list': [
       curation?.description ?? '큐레이션에 담긴 순서대로 보여 드릴게요.',
     ],
-    favorites: ['찜해 둔 술입니다.\n오늘은 어느 쪽으로 드릴까요?'],
+    favorites: [
+      pickCount === 0
+        ? '아직 찜해 둔 술이 없네요.\n취향에 맞는 술부터 찾아볼까요?'
+        : '찜해 둔 술입니다.\n오늘은 어느 쪽으로 드릴까요?',
+    ],
     detail: [
       selected
         ? reason ??

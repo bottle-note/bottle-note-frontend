@@ -20,6 +20,8 @@ export interface BartenderSnapshot {
   situation: Situation;
   curationId: number | null;
   postedReviewId: number | null;
+  /** 로그인하러 나갈 때 이어서 열 단계. 로그인한 채로 돌아온 경우에만 연다. */
+  resumeAfterLogin?: Step;
 }
 
 export function saveSnapshot(snapshot: BartenderSnapshot) {

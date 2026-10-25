@@ -1,7 +1,12 @@
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import { ROUTES } from '@/constants/routes';
 import type { AlcoholSelection, Step } from './types';
-import { FlowNavigation, FlowTextAction, FlowTextLink } from './FlowControls';
+import {
+  FlowAction,
+  FlowNavigation,
+  FlowTextAction,
+  FlowTextLink,
+} from './FlowControls';
 import { WhiskeyRow } from './WhiskeyRow';
 import type { PickedAlcohol } from './useBartenderPicks';
 import type { Curation, Whiskey } from '../_data/demo';
@@ -21,6 +26,7 @@ export default function CandidateList({
   move,
   home,
   onLeave,
+  onStartScenario,
 }: {
   step: CandidateStep;
   curation?: Curation;
@@ -31,6 +37,7 @@ export default function CandidateList({
   move: (next: Step) => void;
   home: () => void;
   onLeave: () => void;
+  onStartScenario: () => void;
 }) {
   const curationItems = (curation?.whiskeyIds ?? []).flatMap((id) => {
     const whiskey = whiskies.find((item) => item.id === id);
@@ -105,6 +112,9 @@ export default function CandidateList({
               </button>
             ))}
       </div>
+      {step === 'favorites' && empty && (
+        <FlowAction onClick={onStartScenario}>위스키 추천해 주세요</FlowAction>
+      )}
       <FlowNavigation>
         {step === 'curation-list' && (
           <FlowTextAction onClick={() => move('situation')}>
