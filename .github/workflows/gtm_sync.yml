@@ -37,7 +37,7 @@ jobs:
       - name: Node.js 설정
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: 'lts/*'
 
       - name: pnpm 설치
         uses: pnpm/action-setup@v6
@@ -60,7 +60,7 @@ jobs:
         run: pnpm gtm:validate
 
       - name: Google 인증
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ env.GTM_WIF_PROVIDER }}
           service_account: ${{ env.GTM_SERVICE_ACCOUNT }}
