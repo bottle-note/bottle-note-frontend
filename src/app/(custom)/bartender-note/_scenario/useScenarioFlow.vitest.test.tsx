@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { MOCK_SCENARIO_CONTEXT } from './mockScenario';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { SCENARIO_CONTEXT, mockScenarioApi } from './__fixtures__/scenario';
 import type { ScenarioAnswer } from './model';
 import * as scenarioApi from './scenarioApi';
 import { useScenarioFlow } from './useScenarioFlow';
@@ -16,7 +16,7 @@ function ScenarioHarness({
   active = true,
   savedAnswers = [],
 }: ScenarioHarnessProps) {
-  const flow = useScenarioFlow({ context: MOCK_SCENARIO_CONTEXT, active });
+  const flow = useScenarioFlow({ context: SCENARIO_CONTEXT, active });
   const { data } = flow.query;
   const question = data?.question;
   const input = question?.input;
@@ -42,7 +42,7 @@ function ScenarioHarness({
                 <button
                   key={option.id}
                   type="button"
-                  disabled={!flow.canAnswer}
+                  disabled={!flow.canAnswer || option.disabled}
                   onClick={() =>
                     flow.answer({ kind: 'choice', choiceId: option.id })
                   }
@@ -123,7 +123,7 @@ function ScenarioHarness({
       <button type="button" onClick={flow.reset}>
         처음부터
       </button>
-      <button type="button" onClick={() => flow.restore(savedAnswers)}>
+      <button type="button" onClick={() => flow.restore(savedAnswers, 3)}>
         저장한 답변 복원
       </button>
     </>
@@ -157,10 +157,10 @@ async function choose(name: string) {
 }
 
 async function reachKinds() {
-  await choose('위스키 잘 몰라요');
-  await choose('건너뛰기');
+  await screen.findByRole('button', { name: '버번' });
 }
 
+beforeEach(() => mockScenarioApi());
 afterEach(() => vi.restoreAllMocks());
 
 describe('시나리오 진행 hook의 소비자 흐름', () => {
@@ -172,7 +172,7 @@ describe('시나리오 진행 hook의 소비자 흐름', () => {
     expect(screen.getByRole('button', { name: '이전 질문' })).toBeDisabled();
 
     rerenderScenario({ active: true });
-    await screen.findByRole('button', { name: '위스키 잘 몰라요' });
+    await screen.findByRole('button', { name: '싱글 몰트' });
     expect(request).toHaveBeenCalledTimes(1);
     rerenderScenario({ active: false });
     expect(request).toHaveBeenCalledTimes(1);
@@ -184,12 +184,13 @@ describe('시나리오 진행 hook의 소비자 흐름', () => {
     await choose('버번');
     await choose('부드러운·밀');
     await choose('44~46% · 적당히');
-    await choose('병으로 살 때 · 5~10만 원');
+    await choose('병');
+    await choose('5~10만 원');
     await screen.findByRole('heading', { name: '추천 완료' });
     expect(screen.getByText('메이커스 마크')).toBeInTheDocument();
 
     await choose('이전 질문');
-    await choose('바에서 한 잔 · 상관없어요');
+    await choose('상관없어요');
     await screen.findByRole('heading', { name: '추천 완료' });
     expect(screen.getByText('메이커스 마크')).toBeInTheDocument();
   });
@@ -207,36 +208,38 @@ describe('시나리오 진행 hook의 소비자 흐름', () => {
     ).not.toBeInTheDocument();
     await choose('상관없어요');
     await choose('상관없어요');
-    await choose('바에서 한 잔 · 상관없어요');
-    await screen.findByText('추천 후보가 없어요');
+    await choose('잔');
+    await choose('상관없어요');
+    await screen.findByText('불렛 라이');
 
     await choose('처음부터');
-    await screen.findByRole('button', { name: '위스키 잘 몰라요' });
+    await screen.findByRole('button', { name: '싱글 몰트' });
     expect(screen.getByRole('button', { name: '이전 질문' })).toBeDisabled();
   });
 
   it('조회 실패 후 다시 시도하면 답변을 유지한 채 다음 질문을 받는다', async () => {
     const request = vi.spyOn(scenarioApi, 'getScenarioStep');
     renderScenario();
-    await screen.findByRole('button', { name: '위스키 잘 몰라요' });
+    await screen.findByRole('button', { name: '싱글 몰트' });
     request.mockRejectedValueOnce(new Error('조회 실패'));
-    await choose('위스키 잘 몰라요');
+    await choose('싱글 몰트');
     await screen.findByRole('alert');
     expect(
-      screen.queryByRole('button', { name: '위스키 잘 몰라요' }),
+      screen.queryByRole('button', { name: '싱글 몰트' }),
     ).not.toBeInTheDocument();
     expect(request).toHaveBeenCalledTimes(2);
 
     await choose('다시 시도');
-    await screen.findByRole('button', { name: '건너뛰기' });
+    await screen.findByRole('button', { name: '피트·스모키' });
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
   it('Query 캐시가 없는 새 화면에서도 저장한 답변을 복원해 이어 간다', async () => {
     const savedAnswers: ScenarioAnswer[] = [
-      { questionId: 101, value: { kind: 'choice', choiceId: 'beginner' } },
-      { questionId: 102, value: { kind: 'alcohols', alcoholIds: [] } },
-      { questionId: 103, value: { kind: 'choice', choiceId: 'bourbon' } },
+      {
+        questionId: 11,
+        value: { kind: 'choice', choiceId: 'mock:11:bourbon' },
+      },
     ];
     const { rerenderScenario } = renderScenario({
       active: false,
@@ -246,7 +249,7 @@ describe('시나리오 진행 hook의 소비자 흐름', () => {
     rerenderScenario({ active: true, savedAnswers });
     await screen.findByRole('button', { name: '부드러운·밀' });
     expect(
-      screen.queryByRole('button', { name: '위스키 잘 몰라요' }),
+      screen.queryByRole('button', { name: '싱글 몰트' }),
     ).not.toBeInTheDocument();
     await choose('이전 질문');
     await screen.findByRole('button', { name: '라이' });

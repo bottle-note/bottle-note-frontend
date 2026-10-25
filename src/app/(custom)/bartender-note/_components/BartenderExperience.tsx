@@ -7,6 +7,7 @@ import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useAlcoholDetailQuery } from '@/queries/useAlcoholDetailQuery';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import { trackGA4Event } from '@/utils/analytics/ga4';
+import { ApiError } from '@/utils/ApiError';
 import {
   OptionList,
   FlowAction,
@@ -53,13 +54,26 @@ function LoadingStep() {
   );
 }
 
-function StepError({ onRetry }: { onRetry: () => void }) {
+function StepError({
+  onRetry,
+  onRestart,
+  versionConflict = false,
+}: {
+  onRetry: () => void;
+  onRestart?: () => void;
+  versionConflict?: boolean;
+}) {
   return (
     <>
       <p role="alert" className="m-0 text-15 text-fg-neutral">
-        정보를 불러오지 못했어요. 다시 시도해 주세요.
+        {versionConflict
+          ? '질문지가 업데이트됐어요. 처음부터 다시 시작해 주세요.'
+          : '정보를 불러오지 못했어요. 다시 시도해 주세요.'}
       </p>
-      <FlowAction onClick={onRetry}>다시 시도</FlowAction>
+      {!versionConflict && <FlowAction onClick={onRetry}>다시 시도</FlowAction>}
+      {onRestart && (
+        <FlowTextAction onClick={onRestart}>처음부터 다시 시작</FlowTextAction>
+      )}
     </>
   );
 }
@@ -139,7 +153,7 @@ export default function BartenderExperience({
     if (!saved) return;
     restoreJourney(saved.journey);
     setContext(saved.scenario.context);
-    flow.restore(saved.scenario.answers);
+    flow.restore(saved.scenario.answers, saved.scenario.versionId);
     restoreReview(saved.review, saved.lastReviewMode);
     setSelection(saved.selection);
     setSituation(saved.situation);
@@ -162,7 +176,7 @@ export default function BartenderExperience({
   const leave = () =>
     saveSnapshot({
       journey: { step, history },
-      scenario: { context, answers: flow.answers },
+      scenario: { context, answers: flow.answers, versionId: flow.versionId },
       review: { ...review, photos: [] },
       lastReviewMode,
       selection,
@@ -292,7 +306,7 @@ export default function BartenderExperience({
   const scenarioStep = step === 'scenario' || step === 'recommendations';
   const scenarioData = flow.query.data;
   const dialogueLines =
-    scenarioStep && flow.query.isError
+    scenarioStep && flow.query.isError && !flow.query.isFetchNextPageError
       ? ['질문을 불러오지 못했어요. 다시 시도해 주세요.']
       : scenarioStep && !scenarioData
         ? ['질문을 준비하고 있어요.']
@@ -357,8 +371,15 @@ export default function BartenderExperience({
         </>
       )}
       {scenarioStep &&
-        (flow.query.isError ? (
-          <StepError onRetry={() => void flow.retry()} />
+        (flow.query.isError && !flow.query.isFetchNextPageError ? (
+          <StepError
+            onRetry={() => void flow.retry()}
+            onRestart={startScenario}
+            versionConflict={
+              flow.query.error instanceof ApiError &&
+              flow.query.error.response.status === 409
+            }
+          />
         ) : !scenarioData ? (
           <LoadingStep />
         ) : (
@@ -385,6 +406,9 @@ export default function BartenderExperience({
                   candidates={scenarioData.candidates}
                   onChoose={(id) => chooseAlcohol({ id, source: 'api' })}
                   home={home}
+                  loadMore={() => void flow.query.fetchNextPage()}
+                  loadingMore={flow.query.isFetchingNextPage}
+                  loadMoreError={flow.query.isFetchNextPageError}
                 />
               )}
           </>

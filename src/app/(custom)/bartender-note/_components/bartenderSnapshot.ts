@@ -2,14 +2,18 @@ import type { AlcoholSelection, ReviewDraft, Step } from './types';
 import type { ScenarioAnswer, ScenarioContext } from '../_scenario/model';
 import type { Situation } from '../_data/demo';
 
-const STORAGE_KEY = 'bartender-note:snapshot:v2';
+const STORAGE_KEY = 'bartender-note:snapshot:v3';
 /** 다른 페이지에 다녀온 뒤 이어 보기를 허용하는 시간. 지나면 처음 화면부터 시작한다. */
 const RESUME_WITHIN_MS = 30 * 60 * 1000;
 
 /** 바텐더 노트 밖으로 나갈 때 남겨 두는 화면 상태. 사진 파일은 저장할 수 없어 비워 둔다. */
 export interface BartenderSnapshot {
   journey: { step: Step; history: Step[] };
-  scenario: { context: ScenarioContext; answers: ScenarioAnswer[] };
+  scenario: {
+    context: ScenarioContext;
+    answers: ScenarioAnswer[];
+    versionId: number | null;
+  };
   review: ReviewDraft;
   lastReviewMode: ReviewDraft['mode'];
   selection: AlcoholSelection | null;

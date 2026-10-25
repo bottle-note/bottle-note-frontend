@@ -19,14 +19,14 @@ flowchart TD
 
 ## 구현 결과
 
-| 영역                                                                                                     | 현재 구현                                                                          |
-| -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| [ScenarioQuestionView.tsx](<../../src/app/(custom)/bartender-note/_components/ScenarioQuestionView.tsx>) | choice·range·alcohol-select·price-select를 응답의 입력 설정으로 표시               |
-| LikesStep                                                                                                | 검색·선택 취소·최대 개수. 선택 ID·표시명은 로컬 입력 상태, 확인 시 alcoholIds 제출 |
-| 질문·대사                                                                                                | question.prompt를 그대로 표시. 질문 ID로 입력·대사·스크롤 초기화                   |
-| 프레임                                                                                                   | 질문 N 표시, 질문 영역의 백분율 막대 제거. BarScene 유지                           |
-| 목 문구                                                                                                  | \_scenario/mockQuestionnaire.ts로 이동. 기존 질문지 prop과 RecommendationFlow 제거 |
-| CTA                                                                                                      | 대사 재생 중에도 하단 액션이 첫 클릭에 실행되도록 캡처 영역 수정                   |
+| 영역                                                                                                     | 현재 구현                                                                                          |
+| -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| [ScenarioQuestionView.tsx](<../../src/app/(custom)/bartender-note/_components/ScenarioQuestionView.tsx>) | choice·range·alcohol-select·price-select를 응답의 입력 설정으로 표시                               |
+| LikesStep                                                                                                | 검색·선택 취소·최대 개수. 선택 ID·표시명은 로컬 입력 상태, 확인 시 alcoholIds 제출                 |
+| 질문·대사                                                                                                | question.prompt를 그대로 표시. 질문 ID로 입력·대사·스크롤 초기화                                   |
+| 프레임                                                                                                   | 질문 N 표시, 질문 영역의 백분율 막대 제거. BarScene 유지                                           |
+| 목 문구                                                                                                  | 목 소스로 이동. 실제 API 연결 후 테스트 fixture로 한정. 기존 질문지 prop과 RecommendationFlow 제거 |
+| CTA                                                                                                      | 대사 재생 중에도 하단 액션이 첫 클릭에 실행되도록 캡처 영역 수정                                   |
 
 ```mermaid
 flowchart LR
@@ -130,7 +130,7 @@ flowchart LR
 | [types.ts](<../../src/app/(custom)/bartender-note/_components/types.ts>), [stepMeta.ts](<../../src/app/(custom)/bartender-note/_components/stepMeta.ts>)                                           | scenario step, 질문 번호 표시 연결. 여섯 질문 step·questionSteps와 고정 진행률 제거                         |
 | [BartenderFrame.tsx](<../../src/app/(custom)/bartender-note/_components/BartenderFrame.tsx>), [useDialoguePlayback.ts](<../../src/app/(custom)/bartender-note/_components/useDialoguePlayback.ts>) | 선택적 questionId로 재생·스크롤 초기화. progress가 없으면 막대 미표시                                       |
 | [CurationFlow.tsx](<../../src/app/(custom)/bartender-note/_components/CurationFlow.tsx>)                                                                                                           | 취향 추천 시작 콜백으로 연결                                                                                |
-| [page.tsx](<../../src/app/(custom)/bartender-note/page.tsx>), [mockQuestionnaire.ts](<../../src/app/(custom)/bartender-note/_scenario/mockQuestionnaire.ts>)                                       | 질문지 prop 제거, 목 context 전달. 문구 원본을 목 소스로 옮긴 뒤 legacy 질문지 제거                         |
+| [page.tsx](<../../src/app/(custom)/bartender-note/page.tsx>), [테스트 fixture](<../../src/app/(custom)/bartender-note/_scenario/__fixtures__/scenario.ts>)                                         | 질문지 prop 제거, 목 context 전달. 문구 원본을 목 소스로 옮긴 뒤 legacy 질문지 제거                         |
 
 범위·가격 입력은 우선 질문 View 안에 둔다. 이미 별도 책임과 검색 흐름이 있는 LikesStep은 재사용한다. 컴포넌트를 입력마다 일괄 분리하지 않는다.
 

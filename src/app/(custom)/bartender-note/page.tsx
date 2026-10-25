@@ -1,6 +1,5 @@
 import BartenderExperience from './_components/BartenderExperience';
 import { demoCurations, demoWhiskies } from './_data/demo';
-import { MOCK_SCENARIO_CONTEXT } from './_scenario/mockScenario';
 
 export const metadata = {
   title: '바텐더 노트 | 보틀노트',
@@ -13,7 +12,9 @@ export default function BartenderNotePage() {
     <BartenderExperience
       whiskies={demoWhiskies}
       curations={demoCurations}
-      scenarioContext={MOCK_SCENARIO_CONTEXT}
+      scenarioContext={{
+        scenarioId: Number(process.env.BARTENDER_SCENARIO_ID ?? 3),
+      }}
     />
   );
 }

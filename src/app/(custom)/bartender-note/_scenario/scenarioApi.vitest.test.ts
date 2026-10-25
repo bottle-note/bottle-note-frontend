@@ -1,267 +1,290 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { ScenarioEvaluationResponseDto } from '@/api/scenario/types';
 import { adaptScenarioStep } from './adaptScenarioStep';
-import {
-  MOCK_SCENARIO_CONTEXT,
-  type MockScenarioStepResponse,
-} from './mockScenario';
-import type {
-  ScenarioAnswer,
-  ScenarioAnswerValue,
-  ScenarioStepResponse,
-} from './model';
+import { ScenarioApi } from '@/api/scenario/scenario.api';
+import { SCENARIO_CONTEXT, mockScenarioApi } from './__fixtures__/scenario';
 import { getScenarioStep } from './scenarioApi';
 
-const start = (answers: ScenarioAnswer[] = []) =>
-  getScenarioStep({ context: MOCK_SCENARIO_CONTEXT, answers });
-
-/** 화면이 받은 질문 ID로 답변을 누적하는 호출 흐름을 재현한다. */
-async function answerThrough(values: ScenarioAnswerValue[]) {
-  const answers: ScenarioAnswer[] = [];
-  let response = await start();
-  for (const value of values) {
-    if (!response.question) throw new Error('답할 질문이 없습니다.');
-    answers.push({ questionId: response.question.id, value });
-    response = await start(answers);
-  }
-  return { answers, response };
-}
-
-const firstAnswers: ScenarioAnswerValue[] = [
-  { kind: 'choice', choiceId: 'beginner' },
-  { kind: 'alcohols', alcoholIds: [] },
-];
-
-function choiceIds(response: ScenarioStepResponse): string[] {
-  if (response.question?.input.kind !== 'choice') {
-    throw new Error('보기 질문이 아닙니다.');
-  }
-  return response.question.input.options.map(({ id }) => id);
-}
-
-describe('시나리오 목 API의 누적 답변 흐름', () => {
-  it('빈 답변은 첫 질문과 표시할 보기를 반환하고 후보 미제공은 null로 구분한다', async () => {
-    const response = await start();
-    expect(response.completed).toBe(false);
-    expect(response.candidates).toBeNull();
-    expect(response.question?.prompt).toContain('얼마나 드셔보셨어요?');
-    expect(response.question?.input).toMatchObject({
-      kind: 'choice',
-      allowAny: false,
-      options: [
-        { id: 'beginner', label: '위스키 잘 몰라요' },
-        { id: 'occasional', label: '몇 번 마셔봤어요' },
-        { id: 'experienced', label: '자주 마시는 편이에요' },
-      ],
-    });
-  });
-
-  it('마셔본 술·종류·향·도수·병 가격에 답하면 질문이 끝나고 후보를 반환한다', async () => {
-    const { answers, response } = await answerThrough([
-      { kind: 'choice', choiceId: 'experienced' },
-      { kind: 'alcohols', alcoholIds: [247, 575] },
-      { kind: 'choice', choiceId: 'bourbon' },
-      { kind: 'choice', choiceId: 'soft-wheat' },
-      { kind: 'choice', choiceId: 'medium' },
+const rawQuestion: ScenarioEvaluationResponseDto = {
+  scenarioId: 3,
+  title: '실제 계약 fixture',
+  versionId: 3,
+  state: 'QUESTION',
+  nextQuestionId: 11,
+  path: [11],
+  answers: [],
+  candidateCount: 675,
+  question: {
+    questionId: 11,
+    title: '어떤 종류의 위스키를 찾으세요?',
+    options: [
       {
-        kind: 'price',
-        unit: 'bottle',
-        selection: { kind: 'choice', choiceId: 'bottle-50000-100000' },
+        optionId: 'opaque.signed-choice.value',
+        label: '싱글 몰트',
+        kind: 'CHOICE',
+        min: null,
+        max: null,
+        minExclusive: false,
+        candidateCount: 387,
+        selectable: true,
       },
-    ]);
+      {
+        optionId: 'opaque.signed-range.value',
+        label: '43% 초과 ~ 46% 이하',
+        kind: 'NUMBER_RANGE',
+        min: 43,
+        max: 46,
+        minExclusive: true,
+        candidateCount: 32,
+        selectable: true,
+      },
+      {
+        optionId: 'opaque.signed-any.value',
+        label: '상관없어요',
+        kind: 'ANY',
+        min: null,
+        max: null,
+        minExclusive: false,
+        candidateCount: 675,
+        selectable: true,
+      },
+      {
+        optionId: 'opaque.disabled.value',
+        label: '기타',
+        kind: 'CHOICE',
+        min: null,
+        max: null,
+        minExclusive: false,
+        candidateCount: 0,
+        selectable: false,
+      },
+    ],
+  },
+  candidates: { content: [], pagination: { hasNext: false, nextCursor: null } },
+};
 
-    expect(response).toEqual({
-      question: null,
-      completed: true,
-      candidates: {
-        items: [{ id: 575, name: '메이커스 마크', imageUrl: null }],
-        totalCount: 1,
+describe('실제 서버 DTO → 화면 모델', () => {
+  it('서버가 발급한 모든 종류의 optionId를 기존 choice 보기에 그대로 담는다', () => {
+    const response = adaptScenarioStep(rawQuestion);
+    expect(response.question).toEqual({
+      id: 11,
+      prompt: rawQuestion.question!.title,
+      input: {
+        kind: 'choice',
+        allowAny: false,
+        options: [
+          {
+            id: 'opaque.signed-choice.value',
+            label: '싱글 몰트',
+            description: '387병',
+            disabled: false,
+          },
+          {
+            id: 'opaque.signed-range.value',
+            label: '43% 초과 ~ 46% 이하',
+            description: '32병',
+            disabled: false,
+          },
+          {
+            id: 'opaque.signed-any.value',
+            label: '상관없어요',
+            description: '675병',
+            disabled: false,
+          },
+          {
+            id: 'opaque.disabled.value',
+            label: '기타',
+            description: '0병 · 현재 조건에 맞는 위스키가 없어요',
+            disabled: true,
+          },
+        ],
       },
     });
-    // 같은 요청의 재시도는 이전 호출의 진행 상태에 영향을 받지 않는다.
-    await expect(start(answers)).resolves.toEqual(response);
-    await expect(start()).resolves.toMatchObject({ completed: false });
+    expect(response.completed).toBe(false);
+    expect(response.candidates).toEqual({
+      items: [],
+      totalCount: 675,
+      nextCursor: null,
+    });
   });
 
-  it.each([
-    ['single-malt', 'peat-smoke', false, 1],
-    ['bourbon', 'vanilla-caramel', true, 1],
-    ['rye', 'spice-rye', false, 0],
-  ])(
-    '%s 종류는 해당 향 보기와 중간 후보 수를 제공한다',
-    async (kindId, expectedOption, hasWheat, totalCount) => {
-      const { response } = await answerThrough([
-        ...firstAnswers,
-        { kind: 'choice', choiceId: kindId },
-      ]);
-      expect(choiceIds(response)).toContain(expectedOption);
-      expect(choiceIds(response).includes('soft-wheat')).toBe(hasWheat);
-      expect(choiceIds(response)).not.toContain('any');
-      expect(response.question?.input).toMatchObject({ allowAny: true });
-      expect(response.candidates?.totalCount).toBe(totalCount);
+  it.each(['SCENARIO_END', 'USER_FINISHED'] as const)(
+    '%s는 question=null인 완료 응답으로 변환한다',
+    (state) => {
+      const response = adaptScenarioStep({
+        ...rawQuestion,
+        state,
+        question: null,
+        nextQuestionId: state === 'USER_FINISHED' ? 11 : null,
+        candidates: {
+          content: [
+            {
+              alcoholId: 247,
+              korName: '글렌피딕 12년',
+              engName: 'Glenfiddich',
+              imageUrl: null,
+              korCategory: '싱글 몰트',
+              abv: '40',
+            },
+          ],
+          pagination: { hasNext: true, nextCursor: 'opaque-cursor' },
+        },
+      });
+      expect(response).toEqual({
+        versionId: 3,
+        question: null,
+        completed: true,
+        candidates: {
+          items: [{ id: 247, name: '글렌피딕 12년', imageUrl: null }],
+          totalCount: 675,
+          nextCursor: 'opaque-cursor',
+        },
+      });
     },
   );
 
-  it('건너뛰기·상관없음을 명시적으로 받고 빈 후보도 정상 완료한다', async () => {
-    const { response } = await answerThrough([
-      ...firstAnswers,
-      { kind: 'choice', choiceId: 'rye' },
-      { kind: 'any' },
-      { kind: 'any' },
-      { kind: 'price', unit: 'glass', selection: { kind: 'any' } },
-    ]);
-    expect(response).toEqual({
+  it('빈 후보도 정상 완료하며 전체 수를 목록 길이로 다시 계산하지 않는다', () => {
+    expect(
+      adaptScenarioStep({
+        ...rawQuestion,
+        state: 'SCENARIO_END',
+        question: null,
+        nextQuestionId: null,
+        candidateCount: 0,
+      }),
+    ).toEqual({
+      versionId: 3,
       question: null,
-      candidates: { items: [], totalCount: 0 },
       completed: true,
+      candidates: { items: [], totalCount: 0, nextCursor: null },
     });
-
-    const { response: unrestricted } = await answerThrough([
-      ...firstAnswers,
-      { kind: 'any' },
-    ]);
-    expect(unrestricted.candidates?.totalCount).toBe(3);
   });
 
-  it('앞선 종류를 바꾸면 질문 ID도 바뀌고 옛 경로의 향 답변은 거절한다', async () => {
-    const { answers, response: bourbon } = await answerThrough([
-      ...firstAnswers,
-      { kind: 'choice', choiceId: 'bourbon' },
-    ]);
-    const changed: ScenarioAnswer[] = [
-      ...answers.slice(0, 2),
-      {
-        questionId: answers[2].questionId,
-        value: { kind: 'choice', choiceId: 'rye' },
-      },
-    ];
-    const rye = await start(changed);
-    expect(rye.question?.id).not.toBe(bourbon.question?.id);
-    await expect(
-      start([
-        ...changed,
-        { questionId: bourbon.question!.id, value: { kind: 'any' } },
-      ]),
-    ).rejects.toThrow('질문 경로');
-    await expect(start(changed.slice(0, 2))).resolves.toMatchObject({
+  it.each([
+    { ...rawQuestion, state: 'UNKNOWN' },
+    { ...rawQuestion, question: null },
+    { ...rawQuestion, state: 'SCENARIO_END' },
+    { ...rawQuestion, question: { ...rawQuestion.question, title: undefined } },
+    { ...rawQuestion, candidates: null },
+    {
+      ...rawQuestion,
       question: {
-        input: {
-          kind: 'choice',
-          options: expect.arrayContaining([
-            { id: 'rye', label: '라이', description: expect.any(String) },
-          ]),
-        },
+        ...rawQuestion.question,
+        options: [{ ...rawQuestion.question!.options[0], kind: 'UNSUPPORTED' }],
       },
+    },
+  ])('필수 정보 누락·미지원 상태·입력 종류는 오류로 전달한다', (response) => {
+    expect(() =>
+      adaptScenarioStep(response as ScenarioEvaluationResponseDto),
+    ).toThrow();
+  });
+});
+
+beforeEach(() => mockScenarioApi());
+afterEach(() => vi.restoreAllMocks());
+
+describe('실제 시나리오 API 요청 연결', () => {
+  it('최초 조회는 GET하고, 이후에는 조회한 버전과 누적 optionId로 평가한다', async () => {
+    const first = await getScenarioStep({
+      context: SCENARIO_CONTEXT,
+      answers: [],
     });
+    expect(ScenarioApi.get).toHaveBeenCalledWith(3, undefined);
+    expect(ScenarioApi.evaluate).not.toHaveBeenCalled();
+    if (first.question?.input.kind !== 'choice')
+      throw new Error('보기 질문 필요');
+    const choiceId = first.question.input.options[0].id;
+    const next = await getScenarioStep({
+      context: SCENARIO_CONTEXT,
+      versionId: first.versionId,
+      answers: [
+        { questionId: first.question.id, value: { kind: 'choice', choiceId } },
+      ],
+    });
+    expect(ScenarioApi.evaluate).toHaveBeenCalledWith(
+      3,
+      {
+        versionId: 3,
+        answers: [{ questionId: 11, optionId: choiceId }],
+        mode: 'QUESTION',
+      },
+      undefined,
+    );
+    expect(next.question?.id).toBe(12);
   });
 
-  it('지원하지 않는 시나리오·중복 답변·없는 보기·다른 단위의 가격 보기를 거절한다', async () => {
+  it('첫 질문으로 돌아와도 기존 버전으로 빈 답변을 평가한다', async () => {
+    await getScenarioStep({
+      context: SCENARIO_CONTEXT,
+      answers: [],
+      versionId: 3,
+    });
+    expect(ScenarioApi.get).not.toHaveBeenCalled();
+    expect(ScenarioApi.evaluate).toHaveBeenCalledWith(
+      3,
+      {
+        versionId: 3,
+        answers: [],
+        mode: 'QUESTION',
+      },
+      undefined,
+    );
+  });
+
+  it('버전 없는 복원이나 서버 보기가 아닌 답변은 전송하지 않는다', async () => {
     await expect(
       getScenarioStep({
-        context: { ...MOCK_SCENARIO_CONTEXT, scenarioId: 999 },
-        answers: [],
+        context: SCENARIO_CONTEXT,
+        answers: [
+          {
+            questionId: 11,
+            value: { kind: 'choice', choiceId: 'signed-option' },
+          },
+        ],
       }),
-    ).rejects.toThrow('시나리오');
-
-    const { answers } = await answerThrough([firstAnswers[0]]);
-    await expect(start([...answers, ...answers])).rejects.toThrow('질문 경로');
+    ).rejects.toThrow('버전');
     await expect(
-      start([
-        {
-          questionId: answers[0].questionId,
-          value: { kind: 'choice', choiceId: 'missing' },
-        },
-      ]),
+      getScenarioStep({
+        context: SCENARIO_CONTEXT,
+        versionId: 3,
+        answers: [{ questionId: 11, value: { kind: 'any' } }],
+      }),
     ).rejects.toThrow('보기');
-    await expect(
-      answerThrough([
-        ...firstAnswers,
-        { kind: 'any' },
-        { kind: 'any' },
-        { kind: 'any' },
-        {
-          kind: 'price',
-          unit: 'glass',
-          selection: { kind: 'choice', choiceId: 'bottle-under-50000' },
-        },
-      ]),
-    ).rejects.toThrow('보기');
+    expect(ScenarioApi.evaluate).not.toHaveBeenCalled();
   });
 
-  it('취소된 요청은 응답을 반환하지 않는다', async () => {
+  it('결과 더 보기는 같은 버전·누적 답변과 RESULT·cursor를 전송한다', async () => {
+    vi.mocked(ScenarioApi.evaluate).mockResolvedValueOnce({
+      ...rawQuestion,
+      state: 'SCENARIO_END',
+      question: null,
+      nextQuestionId: null,
+    });
+    await getScenarioStep({
+      context: SCENARIO_CONTEXT,
+      versionId: 3,
+      answers: [],
+      cursor: 'signed-cursor',
+    });
+    expect(ScenarioApi.evaluate).toHaveBeenCalledWith(
+      3,
+      {
+        versionId: 3,
+        answers: [],
+        mode: 'RESULT',
+        cursor: 'signed-cursor',
+      },
+      undefined,
+    );
+  });
+
+  it('취소된 요청은 결과를 전달하지 않는다', async () => {
     const controller = new AbortController();
     const result = getScenarioStep(
-      { context: MOCK_SCENARIO_CONTEXT, answers: [] },
+      { context: SCENARIO_CONTEXT, answers: [] },
       controller.signal,
     );
     controller.abort();
     await expect(result).rejects.toMatchObject({ name: 'AbortError' });
-    await expect(
-      getScenarioStep(
-        { context: MOCK_SCENARIO_CONTEXT, answers: [] },
-        controller.signal,
-      ),
-    ).rejects.toMatchObject({ name: 'AbortError' });
-  });
-});
-
-describe('시나리오 응답 경계', () => {
-  it('제공된 전체 후보 수를 목록 길이로 바꾸지 않는다', () => {
-    const response = adaptScenarioStep({
-      completed: true,
-      question: null,
-      candidates: {
-        items: [{ id: 247, name: '글렌피딕 12년', imageUrl: null }],
-        totalCount: 10,
-      },
-    });
-    expect(response.candidates?.totalCount).toBe(10);
-    expect(response.candidates?.items).toHaveLength(1);
-  });
-
-  it('숫자 범위 입력 설정도 표시용 응답으로 전달한다', () => {
-    const input = {
-      kind: 'range',
-      min: 40,
-      max: 60,
-      step: 1,
-      unit: '%',
-      allowAny: true,
-    } as const;
-    expect(
-      adaptScenarioStep({
-        completed: false,
-        candidates: null,
-        question: { id: 900, title: '도수를 골라 주세요', input },
-      }).question,
-    ).toEqual({ id: 900, prompt: '도수를 골라 주세요', input });
-  });
-
-  it.each([
-    { completed: false, question: null, candidates: null },
-    { completed: true, question: null, candidates: null },
-    {
-      completed: true,
-      question: {
-        id: 1,
-        title: '질문',
-        input: { kind: 'choice', choices: [], allowAny: true },
-      },
-      candidates: { items: [], totalCount: 0 },
-    },
-    {
-      completed: false,
-      question: {
-        id: 1,
-        input: { kind: 'choice', choices: [], allowAny: true },
-      },
-      candidates: null,
-    },
-    {
-      completed: false,
-      question: { id: 1, title: '질문', input: { kind: 'unsupported' } },
-      candidates: null,
-    },
-  ])('질문 정보 누락·모순된 완료 상태·미지원 입력을 거절한다: %j', (raw) => {
-    expect(() => adaptScenarioStep(raw as MockScenarioStepResponse)).toThrow();
   });
 });

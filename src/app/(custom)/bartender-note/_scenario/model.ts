@@ -1,12 +1,13 @@
-/** 프론트 내부 계약. 실제 Product API의 요청·응답 스키마가 아니다. */
+/** 화면이 사용할 시나리오. Product API는 scenarioId로 조회한다. */
 export interface ScenarioContext {
-  groupId: number;
   scenarioId: number;
 }
 
 export interface ScenarioStepRequest {
   context: ScenarioContext;
   answers: ScenarioAnswer[];
+  versionId?: number | null;
+  cursor?: string;
 }
 
 export interface ScenarioAnswer {
@@ -15,6 +16,7 @@ export interface ScenarioAnswer {
 }
 
 export interface ScenarioStepResponse {
+  versionId: number;
   question: ScenarioQuestion | null;
   candidates: ScenarioCandidates | null;
   completed: boolean;
@@ -30,6 +32,7 @@ export interface ScenarioOption {
   id: string;
   label: string;
   description?: string;
+  disabled?: boolean;
 }
 
 export interface ScenarioChoiceInput {
@@ -110,6 +113,7 @@ export type ScenarioAnswerValue =
 export interface ScenarioCandidates {
   items: ScenarioCandidate[];
   totalCount: number;
+  nextCursor: string | null;
 }
 
 export interface ScenarioCandidate {

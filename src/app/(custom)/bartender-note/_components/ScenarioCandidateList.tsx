@@ -7,10 +7,16 @@ export default function ScenarioCandidateList({
   candidates,
   onChoose,
   home,
+  loadMore,
+  loadingMore,
+  loadMoreError,
 }: {
   candidates: ScenarioCandidates;
   onChoose: (id: number) => void;
   home: () => void;
+  loadMore: () => void;
+  loadingMore: boolean;
+  loadMoreError: boolean;
 }) {
   return (
     <>
@@ -59,7 +65,21 @@ export default function ScenarioCandidateList({
           </button>
         ))}
       </div>
+      {loadMoreError && (
+        <p role="alert" className="m-0 text-15 text-fg-neutral">
+          다음 추천을 불러오지 못했어요. 다시 시도하거나 처음부터 시작해 주세요.
+        </p>
+      )}
       <FlowNavigation>
+        {candidates.nextCursor && (
+          <FlowTextAction onClick={loadMore} disabled={loadingMore}>
+            {loadingMore
+              ? '불러오는 중…'
+              : loadMoreError
+                ? '다시 불러오기'
+                : '추천 더 보기'}
+          </FlowTextAction>
+        )}
         <FlowTextAction onClick={home}>처음으로</FlowTextAction>
       </FlowNavigation>
     </>

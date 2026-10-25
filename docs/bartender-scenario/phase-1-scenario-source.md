@@ -31,7 +31,7 @@ flowchart LR
 | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | [model.ts](<../../src/app/(custom)/bartender-note/_scenario/model.ts>)                         | 객체는 interface, 종류 조합은 union. 질문·보기·답변·후보의 내부 계약                 |
 | [scenarioApi.ts](<../../src/app/(custom)/bartender-note/_scenario/scenarioApi.ts>)             | getScenarioStep(request, signal?) 제공. 현재 목 호출 후 어댑터 적용                  |
-| [mockScenario.ts](<../../src/app/(custom)/bartender-note/_scenario/mockScenario.ts>)           | 명시적인 테스트 context, 누적 답변 경로 검증, 일반·버번·라이 향 질문, 중간·최종 후보 |
+| [테스트 fixture](<../../src/app/(custom)/bartender-note/_scenario/__fixtures__/scenario.ts>)   | 명시적인 테스트 context, 누적 답변 경로 검증, 일반·버번·라이 향 질문, 중간·최종 후보 |
 | [adaptScenarioStep.ts](<../../src/app/(custom)/bartender-note/_scenario/adaptScenarioStep.ts>) | title → prompt, choices → options. 완료 상태·필수 정보·지원 입력 확인                |
 | 기존 questionnaire.ts                                                                          | 문구·설명 유지, 보기의 고정 ID 추가. 기존 화면과 목이 공유                           |
 
@@ -211,15 +211,14 @@ sequenceDiagram
 
 라우트 내부의 \_scenario/에서 시작한다.
 
-| 파일                                                                                           | 책임                                                                              |
-| ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| \_scenario/model.ts                                                                            | 위의 객체 interface와 입력·답변 값의 union                                        |
-| \_scenario/scenarioApi.ts                                                                      | 호출부가 사용할 비동기 조회 함수. 목 호출과 어댑터 연결                           |
-| \_scenario/mockScenario.ts                                                                     | 목 ID·질문·누적 답변 분기·중간/최종 후보 원본                                     |
-| \_scenario/adaptScenarioStep.ts                                                                | 응답 검증과 화면용 모델 변환 한 곳                                                |
-| [mockQuestionnaire.ts](<../../src/app/(custom)/bartender-note/_scenario/mockQuestionnaire.ts>) | Phase 1에서 보기 ID 보완. Phase 3에서 현재 경로로 옮겨 목 전용 문구 원본으로 사용 |
+| 파일                                                                                         | 책임                                                                  |
+| -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| \_scenario/model.ts                                                                          | 위의 객체 interface와 입력·답변 값의 union                            |
+| \_scenario/scenarioApi.ts                                                                    | 호출부가 사용할 비동기 조회 함수. 목 호출과 어댑터 연결               |
+| \_scenario/adaptScenarioStep.ts                                                              | 응답 검증과 화면용 모델 변환 한 곳                                    |
+| [테스트 fixture](<../../src/app/(custom)/bartender-note/_scenario/__fixtures__/scenario.ts>) | 서버 DTO 전환 후 질문·보기를 목 응답에 직접 정의. 별도 목 질문지 제거 |
 
-Phase 1에서는 기존 localQuestionnaire를 공유했다. Phase 3 전환에서 문구 원본을 \_scenario/mockQuestionnaire.ts로 옮기고 기존 질문지 prop과 \_data/questionnaire.ts를 제거했다. 문구를 두 파일에 복사해 보관하지 않는다.
+Phase 1에서는 기존 localQuestionnaire를 공유했다. Phase 3 전환에서 문구 원본을 별도 목 질문지로 옮기고 기존 질문지 prop과 \_data/questionnaire.ts를 제거했다. 서버 DTO 전환 후에는 별도 목 질문지를 제거하고 질문·보기를 직접 구성했다. 실제 API 연결 후 이 데이터는 테스트 fixture로만 사용한다.
 
 Phase 1의 후보는 명시적인 작은 fixture로 중간 결과·0개 결과·완료를 검증한다. Phase 4도 이 작은 fixture를 사용하며, 기존 데모 점수·유사 추천 계산은 사용처를 정리한 뒤 제거하는 최소안을 제안한다. 목 후보를 실제 검색 결과나 서버 추천 품질의 근거로 취급하지 않는다.
 

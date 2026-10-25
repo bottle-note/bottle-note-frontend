@@ -168,6 +168,7 @@ export default function ScenarioQuestionView({
               id: option.id,
               title: option.label,
               description: option.description,
+              disabled: option.disabled,
               action: () => onAnswer({ kind: 'choice', choiceId: option.id }),
             })),
             ...(input.allowAny

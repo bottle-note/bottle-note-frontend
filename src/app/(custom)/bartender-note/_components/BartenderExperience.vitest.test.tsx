@@ -16,9 +16,14 @@ import { MyBottleApi } from '@/api/my-bottle/my-bottle.api';
 import type { PickMyBottleItem } from '@/api/my-bottle/types';
 import { RateApi } from '@/api/rate/rate.api';
 import { ReviewApi } from '@/api/review/review.api';
+import { ScenarioApi } from '@/api/scenario/scenario.api';
+import { ApiError } from '@/utils/ApiError';
 import BartenderExperience from './BartenderExperience';
 import type { Curation, Whiskey } from '../_data/demo';
-import { MOCK_SCENARIO_CONTEXT } from '../_scenario/mockScenario';
+import {
+  SCENARIO_CONTEXT,
+  mockScenarioApi,
+} from '../_scenario/__fixtures__/scenario';
 import { demoWhiskies } from '../_data/demo';
 import * as scenarioApi from '../_scenario/scenarioApi';
 import { trackGA4Event } from '@/utils/analytics/ga4';
@@ -268,7 +273,7 @@ function renderExperience() {
       <BartenderExperience
         whiskies={whiskies}
         curations={curations}
-        scenarioContext={MOCK_SCENARIO_CONTEXT}
+        scenarioContext={SCENARIO_CONTEXT}
       />
     </QueryClientProvider>,
   );
@@ -299,11 +304,10 @@ async function answerTasteQuestions(answers: {
   price: string;
 }) {
   await choose('위스키 추천해 주세요');
-  await choose('몇 번 마셔봤어요');
-  await press('건너뛸게요');
   await choose(answers.kind);
   await choose(answers.axis);
   await choose(answers.abv);
+  await choose('잔');
   await choose(answers.price);
 }
 
@@ -328,6 +332,7 @@ async function openHomeCurationDetail(name: string) {
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  mockScenarioApi();
   back.mockClear();
   push.mockClear();
   window.sessionStorage.clear();
@@ -386,14 +391,12 @@ describe('바텐더 노트 취향 추천', () => {
     await choose('위스키 추천해 주세요');
     expect(await screen.findByText('질문 1')).toBeInTheDocument();
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-    await choose('몇 번 마셔봤어요');
-    await press('건너뛸게요');
     await choose('싱글 몰트');
     expect(await screen.findByText('현재 후보 1병')).toBeInTheDocument();
     await choose('피트·스모키');
     await choose('상관없어요');
-    expect(await screen.findByText('질문 6')).toBeInTheDocument();
-    await press('병으로 살 때');
+    await choose('병');
+    expect(await screen.findByText('질문 5')).toBeInTheDocument();
     await choose('5~10만 원');
     expect(await screen.findByText('추천 1병')).toBeInTheDocument();
     expect(
@@ -416,47 +419,43 @@ describe('바텐더 노트 취향 추천', () => {
 
   it('빈 후보 결과에서 이전 질문으로 돌아가 답변을 다시 고를 수 있다', async () => {
     renderExperience();
-    await answerTasteQuestions({
-      kind: '라이',
-      axis: '상관없어요',
-      abv: '상관없어요',
-      price: '상관없어요',
+    await choose('위스키 추천해 주세요');
+    await choose('라이');
+    await choose('상관없어요');
+    await choose('상관없어요');
+    await choose('잔');
+    vi.spyOn(scenarioApi, 'getScenarioStep').mockResolvedValueOnce({
+      versionId: 3,
+      question: null,
+      completed: true,
+      candidates: { items: [], totalCount: 0, nextCursor: null },
     });
+    await choose('상관없어요');
     expect(await screen.findByText('추천 후보가 없어요')).toBeInTheDocument();
     await press('이전 질문');
-    expect(await screen.findByText('질문 6')).toBeInTheDocument();
+    expect(await screen.findByText('질문 5')).toBeInTheDocument();
     await choose('1.5만 원 이하');
-    expect(await screen.findByText('추천 후보가 없어요')).toBeInTheDocument();
+    expect(await screen.findByText('추천 1병')).toBeInTheDocument();
   });
 
-  it('마셔본 술 선택은 확인 시 ID로 제출하고 질문 대사는 응답을 사용한다', async () => {
-    const lookup = vi
-      .spyOn(AlcoholsApi, 'lookup')
-      .mockResolvedValue([lookupItem]);
+  it('서버 ANY 보기도 기존 choiceId 답변으로 누적하고 중복 보기 없이 표시한다', async () => {
     const request = vi.spyOn(scenarioApi, 'getScenarioStep');
     renderExperience();
     await choose('위스키 추천해 주세요');
-    await choose('자주 마시는 편이에요');
-    fireEvent.change(
-      await screen.findByRole('searchbox', { name: '마셔본 술 이름 검색' }),
-      { target: { value: '탈리스커' } },
-    );
-    await press(/탈리스커 10년.*Talisker 10/);
-    expect(lookup).toHaveBeenCalledWith('탈리스커', expect.anything());
+    expect(await screen.findByRole('button', { name: /^기타/ })).toBeDisabled();
+    await choose('상관없어요');
+    await screen.findByText('질문 2');
     expect(
-      await screen.findByRole('button', { name: '탈리스커 10년 ×' }),
-    ).toBeInTheDocument();
-    expect(screen.getByText('1/3병 · 선택 사항')).toBeInTheDocument();
-    await press('이 술을 기억할게요');
-    await choose('싱글 몰트');
-    await waitFor(() =>
-      expect(dialogue()).toHaveTextContent('오늘은 어떤 결로 가실까요?'),
-    );
-    expect(request).toHaveBeenCalledWith(
+      await screen.findAllByRole('button', { name: /^상관없어요/ }),
+    ).toHaveLength(1);
+    expect(request).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        answers: expect.arrayContaining([
-          { questionId: 102, value: { kind: 'alcohols', alcoholIds: [900] } },
-        ]),
+        answers: [
+          {
+            questionId: 11,
+            value: { kind: 'choice', choiceId: 'mock:11:any' },
+          },
+        ],
       }),
       expect.anything(),
     );
@@ -465,8 +464,6 @@ describe('바텐더 노트 취향 추천', () => {
   it('종류를 다시 고르면 향 질문과 보기가 바뀌고 입력 중인 값은 초기화한다', async () => {
     renderExperience();
     await choose('위스키 추천해 주세요');
-    await choose('몇 번 마셔봤어요');
-    await press('건너뛸게요');
     await choose('버번');
     expect(
       await screen.findByRole('button', { name: /^부드러운·밀/ }),
@@ -486,52 +483,145 @@ describe('바텐더 노트 취향 추천', () => {
     renderExperience();
     await choose('위스키 추천해 주세요');
     request.mockRejectedValueOnce(new Error('질문 조회 실패'));
-    await choose('몇 번 마셔봤어요');
+    await choose('싱글 몰트');
     expect(await screen.findByRole('alert')).toHaveTextContent(
       '정보를 불러오지 못했어요',
     );
     await press('다시 시도');
     expect(
-      await screen.findByRole('searchbox', { name: '마셔본 술 이름 검색' }),
+      await screen.findByRole('button', { name: /^피트·스모키/ }),
     ).toBeInTheDocument();
   });
 
-  it('대사 재생 중에도 하단 CTA의 첫 클릭으로 다음 질문에 답할 수 있다', async () => {
-    window.matchMedia = vi.fn().mockReturnValue({ matches: false });
+  it('게시 버전이 바뀌면 처음부터 다시 조회하고 이전 답변을 보내지 않는다', async () => {
     renderExperience();
     await choose('위스키 추천해 주세요');
-    await choose('몇 번 마셔봤어요');
-    await press('건너뛸게요');
+    vi.mocked(ScenarioApi.evaluate).mockRejectedValueOnce(
+      new ApiError('게시 버전 변경', new Response(null, { status: 409 })),
+    );
+    await choose('싱글 몰트');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      '질문지가 업데이트됐어요',
+    );
+    await press('처음부터 다시 시작');
+    await choose('버번');
     expect(
-      await screen.findByRole('button', { name: /^싱글 몰트/ }),
+      await screen.findByRole('button', { name: /^부드러운·밀/ }),
+    ).toBeInTheDocument();
+    expect(ScenarioApi.get).toHaveBeenCalledTimes(2);
+    expect(ScenarioApi.evaluate).toHaveBeenLastCalledWith(
+      3,
+      {
+        versionId: 3,
+        answers: [{ questionId: 11, optionId: 'mock:11:bourbon' }],
+        mode: 'QUESTION',
+      },
+      expect.anything(),
+    );
+  });
+
+  it('추천 더 보기는 목록을 유지하며 실패 후 같은 cursor로 재시도한다', async () => {
+    const evaluate = vi.mocked(ScenarioApi.evaluate);
+    const fixture = evaluate.getMockImplementation()!;
+    evaluate.mockImplementation(async (id, request, signal) => {
+      const response = await fixture(id, request, signal);
+      if (response.state === 'SCENARIO_END') {
+        return {
+          ...response,
+          candidates: {
+            content: response.candidates.content.slice(0, 1),
+            pagination: { hasNext: true, nextCursor: 'signed-next-page' },
+          },
+        };
+      }
+      return response;
+    });
+    renderExperience();
+    await answerTasteQuestions({
+      kind: '상관없어요',
+      axis: '상관없어요',
+      abv: '상관없어요',
+      price: '상관없어요',
+    });
+    await screen.findByText('추천 4병');
+    evaluate.mockRejectedValueOnce(new Error('다음 페이지 실패'));
+    await press('추천 더 보기');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      '다음 추천을 불러오지 못했어요',
+    );
+    expect(
+      screen.getByRole('button', { name: /글렌피딕 12년/ }),
+    ).toBeInTheDocument();
+    evaluate.mockImplementationOnce(async (id, request, signal) => {
+      const response = await fixture(id, request, signal);
+      return {
+        ...response,
+        candidates: {
+          content: response.candidates.content.slice(1),
+          pagination: { hasNext: false, nextCursor: null },
+        },
+      };
+    });
+    await press('다시 불러오기');
+    expect(
+      await screen.findByRole('button', { name: /불렛 라이/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /글렌피딕 12년/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '추천 더 보기' }),
+    ).not.toBeInTheDocument();
+    expect(evaluate).toHaveBeenLastCalledWith(
+      3,
+      expect.objectContaining({
+        versionId: 3,
+        mode: 'RESULT',
+        cursor: 'signed-next-page',
+        answers: expect.any(Array),
+      }),
+      expect.anything(),
+    );
+  });
+
+  it('대사 재생 중에도 하단 CTA의 첫 클릭으로 리뷰 작성을 시작할 수 있다', async () => {
+    window.matchMedia = vi.fn().mockReturnValue({ matches: false });
+    renderExperience();
+    await openHomeCurationDetail('글렌피딕 12년');
+    await press('리뷰 작성');
+    expect(
+      await screen.findByRole('button', { name: /^내 느낌 한 줄/ }),
     ).toBeInTheDocument();
   });
 
-  it('잔·병 단위는 입력 중에만 바뀌고 가격 선택 시 하나의 답변으로 제출한다', async () => {
+  it('잔·병 선택과 예산은 서버가 제공한 별도 질문의 답변으로 제출한다', async () => {
     const request = vi.spyOn(scenarioApi, 'getScenarioStep');
     renderExperience();
     await choose('위스키 추천해 주세요');
-    await choose('몇 번 마셔봤어요');
-    await press('건너뛸게요');
     await choose('상관없어요');
     await choose('상관없어요');
     await choose('상관없어요');
-    await screen.findByRole('button', { name: '병으로 살 때' });
-    const callsBeforeUnit = request.mock.calls.length;
-    await press('병으로 살 때');
-    expect(request).toHaveBeenCalledTimes(callsBeforeUnit);
-    await choose('5~10만 원');
-    await screen.findByText('추천 3병');
+    await choose('병');
+    await screen.findByText('질문 5');
     expect(request).toHaveBeenLastCalledWith(
       expect.objectContaining({
         answers: expect.arrayContaining([
           {
-            questionId: 106,
-            value: {
-              kind: 'price',
-              unit: 'bottle',
-              selection: { kind: 'choice', choiceId: 'bottle-50000-100000' },
-            },
+            questionId: 15,
+            value: { kind: 'choice', choiceId: 'mock:15:bottle' },
+          },
+        ]),
+      }),
+      expect.anything(),
+    );
+    await choose('5~10만 원');
+    await screen.findByText('추천 4병');
+    expect(request).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        answers: expect.arrayContaining([
+          {
+            questionId: 17,
+            value: { kind: 'choice', choiceId: 'mock:17:bottle-50000-100000' },
           },
         ]),
       }),
@@ -884,7 +974,7 @@ describe('바텐더 노트 공통 이동', () => {
     await screen.findByText('추천 1병');
     expect(results()).toHaveLength(1);
     await press('이전 질문');
-    await screen.findByText('질문 6');
+    await screen.findByText('질문 5');
     await choose('1.5만 원 이하');
     await screen.findByText('추천 1병');
     await waitFor(() => expect(results()).toHaveLength(2));
@@ -954,9 +1044,9 @@ describe('바텐더 노트 공통 이동', () => {
     renderExperience();
 
     await choose('위스키 추천해 주세요');
-    await choose('몇 번 마셔봤어요');
+    await choose('싱글 몰트');
     expect(
-      await screen.findByRole('searchbox', { name: '마셔본 술 이름 검색' }),
+      await screen.findByRole('button', { name: /^피트·스모키/ }),
     ).toBeInTheDocument();
 
     await press('이전 질문');
