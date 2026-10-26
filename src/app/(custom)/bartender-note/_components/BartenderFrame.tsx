@@ -1,11 +1,23 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { ArrowLeft } from 'lucide-react';
 import BarScene, { type Pose } from './BarScene';
 import { useDialoguePlayback } from './useDialoguePlayback';
 import { ActionDockContext } from './FlowControls';
 import type { Step } from './types';
+
+const DialogueSettledContext = createContext(true);
+
+/** 바텐더가 지금 대사를 끝까지 말했는지. 대답은 말이 끝난 뒤에 내놓는다. */
+export const useDialogueSettled = () => useContext(DialogueSettledContext);
 
 type Props = {
   step: Step;
@@ -142,14 +154,16 @@ export default function BartenderFrame({
             )}
           </button>
         </div>
-        <ActionDockContext.Provider value={actionDock}>
-          <section
-            ref={contentRef}
-            className="flex min-h-0 flex-1 flex-col gap-12 overflow-y-auto overscroll-contain px-20 pb-20 pt-14 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-200 [&>*]:shrink-0"
-          >
-            {children}
-          </section>
-        </ActionDockContext.Provider>
+        <DialogueSettledContext.Provider value={dialogue.optionsVisible}>
+          <ActionDockContext.Provider value={actionDock}>
+            <section
+              ref={contentRef}
+              className="flex min-h-0 flex-1 flex-col gap-12 overflow-y-auto overscroll-contain px-20 pb-20 pt-14 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-200 [&>*]:shrink-0"
+            >
+              {children}
+            </section>
+          </ActionDockContext.Provider>
+        </DialogueSettledContext.Provider>
         <div
           ref={setActionDock}
           role="group"

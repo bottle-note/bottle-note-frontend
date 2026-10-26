@@ -151,6 +151,21 @@ export interface GA4EventMap {
     alcohol_id: string;
     source: 'detail' | 'picks';
   };
+  bartender_show_other_candidates: Record<string, never>;
+  bartender_story_start: {
+    alcohol_id: string;
+    trigger: 'offer' | 'replay';
+  };
+  bartender_story_complete: {
+    alcohol_id: string;
+  };
+  bartender_story_skip: {
+    alcohol_id: string;
+    stage: 'offer' | 'telling';
+  };
+  bartender_story_full_text: {
+    alcohol_id: string;
+  };
 
   // 공유
   share: {

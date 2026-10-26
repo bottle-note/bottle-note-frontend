@@ -3,6 +3,8 @@ import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import Button from '@/components/ui/Button/Button';
 import type { ScenarioCandidates } from '../_scenario/model';
 
+const STAGGERED_ROWS = 8;
+
 /** 서버가 정한 후보 순서를 그대로 표시한다. 술 선택은 바텐더 내부 상세로 이어진다. */
 export default function ScenarioCandidateList({
   candidates,
@@ -43,7 +45,13 @@ export default function ScenarioCandidateList({
               key={alcohol.id}
               type="button"
               onClick={() => onChoose(alcohol.id)}
-              className="group flex min-h-64 w-full items-center gap-12 border-b border-stroke-neutral-subtle py-10 text-left text-fg-neutral transition-colors last:border-b-0 focus-visible:rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
+              // 처음 보이는 행만 차례로 올라온다. 더 불러온 행은 기다리지 않고 바로 붙는다.
+              style={
+                index < STAGGERED_ROWS
+                  ? { animationDelay: `${index * 60}ms` }
+                  : undefined
+              }
+              className="group flex min-h-64 w-full items-center gap-12 border-b border-stroke-neutral-subtle py-10 text-left text-fg-neutral transition-colors last:border-b-0 focus-visible:rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring motion-safe:duration-300 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:fill-mode-both"
             >
               <b
                 aria-hidden="true"

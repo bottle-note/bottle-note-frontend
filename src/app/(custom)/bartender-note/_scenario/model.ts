@@ -122,4 +122,8 @@ export interface ScenarioCandidate {
   imageUrl: string | null;
   category: string | null;
   abv: string | null;
+  /** 테이스팅 태그. 지금은 결과 첫 페이지의 1위 후보만 채운다. */
+  tags?: string[];
+  /** 정리한 설명 문단. 1위 후보만 채우고, 설명이 없으면 비워 둔다. */
+  descriptionParagraphs?: string[];
 }

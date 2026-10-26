@@ -18,6 +18,8 @@ export type DialogueInput = {
   notice?: Notice | null;
   /** 좁혀진 후보 수는 대사에도 쓰지 않는다. 있는지 여부만 받는다. */
   hasCandidates: boolean;
+  /** 추천 결과 1위의 이름. 첫 잔을 건넬 때 부른다. */
+  firstPickName?: string;
   /** 불러온 찜 수. 아직 불러오는 중이면 비워 둔다. */
   pickCount?: number;
 };
@@ -38,8 +40,16 @@ function detailReason({ detailOrigin, selected, curation }: DialogueInput) {
   return undefined;
 }
 
+/** 추천 결과 1위를 건네는 인사. */
+export function firstPickGreeting(name?: string) {
+  return name
+    ? `먼저 이 한 잔부터 드려 볼게요.\n${name}입니다.`
+    : '먼저 이 한 잔부터 드려 볼게요.';
+}
+
 export function getDialogue(input: DialogueInput): string[] {
-  const { step, hasCandidates, pickCount, curation, selected } = input;
+  const { step, hasCandidates, firstPickName, pickCount, curation, selected } =
+    input;
   if (input.notice) return [notices[input.notice]];
   const reason = detailReason(input);
   const dialogue: Record<Step, string[]> = {
@@ -47,9 +57,10 @@ export function getDialogue(input: DialogueInput): string[] {
       '어서 오십시오. 편한 자리에 앉으시면 됩니다.\n오늘은 어떻게 도와드릴까요?',
     ],
     scenario: ['질문을 준비하고 있어요.'],
+    'first-pick': [firstPickGreeting(firstPickName)],
     recommendations: [
       hasCandidates
-        ? '이렇게 골라 봤습니다.\n마음에 드는 위스키가 있나요?'
+        ? '다른 후보도 함께 보여 드릴게요.\n마음에 드는 위스키가 있나요?'
         : '추천 후보가 없어요.\n이전 질문으로 돌아가 다시 골라 볼까요?',
     ],
     situation: ['어떤 자리인가요?\n자리에 맞는 큐레이션으로 안내해 드릴게요.'],
@@ -95,4 +106,66 @@ export function getDialogue(input: DialogueInput): string[] {
     ],
   };
   return dialogue[step];
+}
+
+/** 첫 잔 이야기의 진행. 들을지 묻고, 문장씩 들려주고, 맺는다. */
+export type StoryPhase = 'offer' | 'telling' | 'told' | 'declined' | 'settled';
+
+const STORY_COPY = {
+  offer: [
+    '이 병엔 얽힌 이야기가 좀 있어요. 들어 보시겠어요?',
+    '잔 채우는 동안 이 술 얘기 하나 해 드릴까요?',
+    '이 친구, 사연이 꽤 재밌거든요. 잠깐 들어 보실래요?',
+  ],
+  telling: ['음, 어디서부터 말씀드릴까요…', '잠깐만요, 이 병 얘기라면…'],
+  closing: [
+    '제 얘기는 여기까지예요.\n나머지는 한 모금이 알려 줄 거예요.',
+    '이야기는 이쯤 하고요.\n직접 맛보시는 게 제일 정확하죠.',
+  ],
+  more: '더 긴 이야기는 전체 글에 적어 뒀어요.\n천천히 읽어 보세요.',
+  declined: '알겠습니다. 편하게 둘러보세요.',
+};
+
+/** 같은 술에는 늘 같은 말을 하도록 술 id로 고른다. */
+const byId = (lines: string[], id: number) => lines[id % lines.length];
+
+/** 이야기를 듣지 않았거나 다시 들어왔을 때 다시 권하는 말풍선. */
+export const storyLater = (heard: boolean) =>
+  heard
+    ? '이야기를 다시 들려 드릴까요?'
+    : '이 술 이야기가 궁금해지면 언제든 말씀하세요.';
+
+/** 카드 아래에서 이야기를 들을지 묻는 말풍선. */
+export const storyOffer = (alcoholId: number) =>
+  byId(STORY_COPY.offer, alcoholId);
+
+/**
+ * 첫 잔 단계의 대사창. 설명 원문은 카드 아래 말풍선으로 들려주고,
+ * 대사창은 받는 말과 맺는 말만 한다. 문단이 더 있으면 전체 글로 안내한다.
+ */
+export function getStoryDialogue({
+  phase,
+  alcoholId,
+  greeting,
+  paragraphs,
+}: {
+  phase: StoryPhase;
+  alcoholId: number;
+  greeting: string;
+  paragraphs: string[];
+}): string[] {
+  switch (phase) {
+    case 'telling':
+      return [byId(STORY_COPY.telling, alcoholId)];
+    case 'told':
+      return [
+        paragraphs.length > 1
+          ? STORY_COPY.more
+          : byId(STORY_COPY.closing, alcoholId),
+      ];
+    case 'declined':
+      return [STORY_COPY.declined];
+    default:
+      return [greeting];
+  }
 }

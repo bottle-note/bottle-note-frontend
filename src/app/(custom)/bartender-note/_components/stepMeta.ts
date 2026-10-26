@@ -17,6 +17,7 @@ const REVIEW = '리뷰 쓰기';
 const STEP_META: Record<Step, StepMeta> = {
   intro: { title: NOTE, pose: 'greet' },
   scenario: { title: NOTE, pose: 'idle' },
+  'first-pick': { title: PICKS, pose: 'serve', progress: 100 },
   recommendations: { title: PICKS, pose: 'think', progress: 100 },
   situation: { title: SITUATION, pose: 'think' },
   curations: { title: SITUATION, subtitle: '상황별 큐레이션', pose: 'idle' },
