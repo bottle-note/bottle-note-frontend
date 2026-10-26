@@ -457,7 +457,11 @@ describe('바텐더 노트 취향 추천', () => {
     const request = vi.spyOn(scenarioApi, 'getScenarioStep');
     renderExperience();
     await choose('위스키 추천해 주세요');
-    expect(await screen.findByRole('button', { name: /^기타/ })).toBeDisabled();
+    await screen.findByRole('button', { name: /^싱글 몰트/ });
+    // 고를 수 없는 보기는 비활성으로도 보이지 않는다
+    expect(
+      screen.queryByRole('button', { name: /^기타/ }),
+    ).not.toBeInTheDocument();
     await choose('상관없어요');
     await screen.findByText('질문 2');
     expect(

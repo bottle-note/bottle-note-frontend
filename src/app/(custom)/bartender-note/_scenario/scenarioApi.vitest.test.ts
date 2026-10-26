@@ -64,7 +64,7 @@ const rawQuestion: ScenarioEvaluationResponseDto = {
 };
 
 describe('실제 서버 DTO → 화면 모델', () => {
-  it('서버가 발급한 모든 종류의 optionId를 기존 choice 보기에 그대로 담는다', () => {
+  it('서버가 발급한 모든 종류의 optionId를 기존 choice 보기에 담고, 고를 수 없는 보기는 뺀다', () => {
     const response = adaptScenarioStep(rawQuestion);
     expect(response.question).toEqual({
       id: 11,
@@ -73,27 +73,9 @@ describe('실제 서버 DTO → 화면 모델', () => {
         kind: 'choice',
         allowAny: false,
         options: [
-          {
-            id: 'opaque.signed-choice.value',
-            label: '싱글 몰트',
-            disabled: false,
-          },
-          {
-            id: 'opaque.signed-range.value',
-            label: '43% 초과 ~ 46% 이하',
-            disabled: false,
-          },
-          {
-            id: 'opaque.signed-any.value',
-            label: '상관없어요',
-            disabled: false,
-          },
-          {
-            id: 'opaque.disabled.value',
-            label: '기타',
-            description: '현재 조건에 맞는 위스키가 없어요',
-            disabled: true,
-          },
+          { id: 'opaque.signed-choice.value', label: '싱글 몰트' },
+          { id: 'opaque.signed-range.value', label: '43% 초과 ~ 46% 이하' },
+          { id: 'opaque.signed-any.value', label: '상관없어요' },
         ],
       },
     });

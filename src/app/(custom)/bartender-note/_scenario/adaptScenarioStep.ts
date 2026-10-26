@@ -22,15 +22,8 @@ function adaptOption(option: ScenarioOptionDto): ScenarioOption {
   ) {
     throw new Error('보기 ID·문구·종류·후보 수·선택 가능 여부가 필요합니다.');
   }
-  return {
-    id: option.optionId,
-    label: option.label,
-    // 좁혀진 후보 수는 화면에 보이지 않는다. 고를 수 없는 이유만 알린다.
-    description: option.selectable
-      ? undefined
-      : '현재 조건에 맞는 위스키가 없어요',
-    disabled: !option.selectable,
-  };
+  // 좁혀진 후보 수는 화면에 보이지 않는다.
+  return { id: option.optionId, label: option.label };
 }
 
 function adaptQuestion(question: ScenarioQuestionDto): ScenarioQuestion {
@@ -47,7 +40,11 @@ function adaptQuestion(question: ScenarioQuestionDto): ScenarioQuestion {
     prompt: question.title,
     input: {
       kind: 'choice',
-      options: question.options.map(adaptOption),
+      // 고를 수 없는 보기는 화면에 내놓지 않는다. 형식 검사는 모든 보기에 한다.
+      options: question.options.flatMap((option) => {
+        const adapted = adaptOption(option);
+        return option.selectable ? [adapted] : [];
+      }),
       // ANY도 서버가 발급한 optionId를 가진 보기다. 화면에서 별도로 만들지 않는다.
       allowAny: false,
     },
