@@ -343,7 +343,7 @@ export default function BartenderExperience({
               selected,
               curation,
               notice,
-              candidateCount: scenarioData?.candidates?.totalCount ?? 0,
+              hasCandidates: (scenarioData?.candidates?.totalCount ?? 0) > 0,
               pickCount: picks.isLoading ? undefined : picks.items.length,
             });
 
@@ -409,19 +409,12 @@ export default function BartenderExperience({
         ) : (
           <>
             {step === 'scenario' && scenarioData.question && (
-              <>
-                {scenarioData.candidates && (
-                  <p className="m-0 text-13 text-fg-neutral-muted">
-                    현재 후보 {scenarioData.candidates.totalCount}병
-                  </p>
-                )}
-                <ScenarioQuestionView
-                  key={scenarioData.question.id}
-                  question={scenarioData.question}
-                  disabled={!flow.canAnswer}
-                  onAnswer={flow.answer}
-                />
-              </>
+              <ScenarioQuestionView
+                key={scenarioData.question.id}
+                question={scenarioData.question}
+                disabled={!flow.canAnswer}
+                onAnswer={flow.answer}
+              />
             )}
             {step === 'recommendations' &&
               scenarioData.completed &&

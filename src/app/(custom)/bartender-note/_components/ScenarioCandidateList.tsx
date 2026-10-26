@@ -22,9 +22,7 @@ export default function ScenarioCandidateList({
   return (
     <div className="space-y-12">
       <p className="m-0 text-13 font-extrabold text-fg-brand">
-        {candidates.totalCount
-          ? `추천 ${candidates.totalCount}병`
-          : '추천 후보가 없어요'}
+        {candidates.totalCount ? '바텐더가 고른 술' : '추천 후보가 없어요'}
       </p>
       {candidates.totalCount === 0 ? (
         <p className="text-15 text-fg-neutral">

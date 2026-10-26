@@ -16,7 +16,8 @@ export type DialogueInput = {
   selected?: Pick<Whiskey, 'name' | 'tags'>;
   curation?: Curation;
   notice?: Notice | null;
-  candidateCount: number;
+  /** 좁혀진 후보 수는 대사에도 쓰지 않는다. 있는지 여부만 받는다. */
+  hasCandidates: boolean;
   /** 불러온 찜 수. 아직 불러오는 중이면 비워 둔다. */
   pickCount?: number;
 };
@@ -38,7 +39,7 @@ function detailReason({ detailOrigin, selected, curation }: DialogueInput) {
 }
 
 export function getDialogue(input: DialogueInput): string[] {
-  const { step, candidateCount, pickCount, curation, selected } = input;
+  const { step, hasCandidates, pickCount, curation, selected } = input;
   if (input.notice) return [notices[input.notice]];
   const reason = detailReason(input);
   const dialogue: Record<Step, string[]> = {
@@ -47,8 +48,8 @@ export function getDialogue(input: DialogueInput): string[] {
     ],
     scenario: ['질문을 준비하고 있어요.'],
     recommendations: [
-      candidateCount > 0
-        ? `후보 ${candidateCount}병을 골랐습니다.\n마음에 드는 위스키가 있나요?`
+      hasCandidates
+        ? '이렇게 골라 봤습니다.\n마음에 드는 위스키가 있나요?'
         : '추천 후보가 없어요.\n이전 질문으로 돌아가 다시 골라 볼까요?',
     ],
     situation: ['어떤 자리인가요?\n자리에 맞는 큐레이션으로 안내해 드릴게요.'],

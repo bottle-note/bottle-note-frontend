@@ -25,7 +25,10 @@ function adaptOption(option: ScenarioOptionDto): ScenarioOption {
   return {
     id: option.optionId,
     label: option.label,
-    description: `${option.candidateCount}병${option.selectable ? '' : ' · 현재 조건에 맞는 위스키가 없어요'}`,
+    // 좁혀진 후보 수는 화면에 보이지 않는다. 고를 수 없는 이유만 알린다.
+    description: option.selectable
+      ? undefined
+      : '현재 조건에 맞는 위스키가 없어요',
     disabled: !option.selectable,
   };
 }

@@ -403,13 +403,16 @@ describe('바텐더 노트 취향 추천', () => {
     expect(await screen.findByText('질문 1')).toBeInTheDocument();
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     await choose('싱글 몰트');
-    expect(await screen.findByText('현재 후보 1병')).toBeInTheDocument();
+    await screen.findByText('질문 2');
+    // 좁혀진 후보 수는 질문·보기·목록 어디에도 보이지 않는다
+    expect(screen.queryByText(/\d+병/)).not.toBeInTheDocument();
     await choose('피트·스모키');
     await choose('상관없어요');
     await choose('병');
     expect(await screen.findByText('질문 5')).toBeInTheDocument();
     await choose('5~10만 원');
-    expect(await screen.findByText('추천 1병')).toBeInTheDocument();
+    expect(await screen.findByText('바텐더가 고른 술')).toBeInTheDocument();
+    expect(screen.queryByText(/\d+병/)).not.toBeInTheDocument();
     expect(screen.getByText('싱글 몰트 · 40%')).toBeInTheDocument();
     expect(
       screen.queryByRole('link', { name: /글렌피딕/ }),
@@ -447,7 +450,7 @@ describe('바텐더 노트 취향 추천', () => {
     await press('이전 질문');
     expect(await screen.findByText('질문 5')).toBeInTheDocument();
     await choose('1.5만 원 이하');
-    expect(await screen.findByText('추천 1병')).toBeInTheDocument();
+    expect(await screen.findByText('바텐더가 고른 술')).toBeInTheDocument();
   });
 
   it('서버 ANY 보기도 기존 choiceId 답변으로 누적하고 중복 보기 없이 표시한다', async () => {
@@ -555,7 +558,7 @@ describe('바텐더 노트 취향 추천', () => {
       abv: '상관없어요',
       price: '상관없어요',
     });
-    await screen.findByText('추천 4병');
+    await screen.findByText('바텐더가 고른 술');
     evaluate.mockRejectedValueOnce(new Error('다음 페이지 실패'));
     await press('추천 더 보기');
     expect(await screen.findByRole('alert')).toHaveTextContent(
@@ -627,7 +630,7 @@ describe('바텐더 노트 취향 추천', () => {
       expect.anything(),
     );
     await choose('5~10만 원');
-    await screen.findByText('추천 4병');
+    await screen.findByText('바텐더가 고른 술');
     expect(request).toHaveBeenLastCalledWith(
       expect.objectContaining({
         answers: expect.arrayContaining([
@@ -1078,7 +1081,7 @@ describe('바텐더 노트 공통 이동', () => {
       abv: '상관없어요',
       price: '상관없어요',
     });
-    await screen.findByText('추천 1병');
+    await screen.findByText('바텐더가 고른 술');
     const results = () =>
       vi
         .mocked(trackGA4Event)
@@ -1110,12 +1113,12 @@ describe('바텐더 노트 공통 이동', () => {
     renderExperience();
     await screen.findByRole('heading', { name: '글렌피딕 12년' });
     await press('이전 단계');
-    await screen.findByText('추천 1병');
+    await screen.findByText('바텐더가 고른 술');
     expect(results()).toHaveLength(1);
     await press('이전 질문');
     await screen.findByText('질문 5');
     await choose('1.5만 원 이하');
-    await screen.findByText('추천 1병');
+    await screen.findByText('바텐더가 고른 술');
     await waitFor(() => expect(results()).toHaveLength(2));
   });
 
