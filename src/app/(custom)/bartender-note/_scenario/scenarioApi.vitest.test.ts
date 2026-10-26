@@ -76,25 +76,22 @@ describe('실제 서버 DTO → 화면 모델', () => {
           {
             id: 'opaque.signed-choice.value',
             label: '싱글 몰트',
-            description: '387병',
             disabled: false,
           },
           {
             id: 'opaque.signed-range.value',
             label: '43% 초과 ~ 46% 이하',
-            description: '32병',
             disabled: false,
           },
           {
             id: 'opaque.signed-any.value',
             label: '상관없어요',
-            description: '675병',
             disabled: false,
           },
           {
             id: 'opaque.disabled.value',
             label: '기타',
-            description: '0병 · 현재 조건에 맞는 위스키가 없어요',
+            description: '현재 조건에 맞는 위스키가 없어요',
             disabled: true,
           },
         ],
