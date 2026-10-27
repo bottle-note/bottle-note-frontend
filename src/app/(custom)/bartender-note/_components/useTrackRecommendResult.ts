@@ -35,7 +35,7 @@ export function useTrackRecommendResult({
   useEffect(() => {
     let viewed: { key: string; result: Result } | null = null;
     if (
-      step === 'recommendations' &&
+      (step === 'first-pick' || step === 'recommendations') &&
       isSuccess &&
       response?.completed &&
       response.candidates
@@ -74,7 +74,7 @@ export function useTrackRecommendResult({
 
   const restore = (saved: BartenderSnapshot) => {
     const steps = [...saved.journey.history, saved.journey.step];
-    if (steps.includes('recommendations')) {
+    if (steps.includes('first-pick') || steps.includes('recommendations')) {
       lastResult.current = scenarioKey(
         saved.scenario.context,
         saved.scenario.answers,

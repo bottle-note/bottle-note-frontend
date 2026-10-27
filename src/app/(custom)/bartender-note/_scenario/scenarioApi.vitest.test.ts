@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ScenarioEvaluationResponseDto } from '@/api/scenario/types';
 import { adaptScenarioStep } from './adaptScenarioStep';
+import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { ScenarioApi } from '@/api/scenario/scenario.api';
 import { SCENARIO_CONTEXT, mockScenarioApi } from './__fixtures__/scenario';
 import { getScenarioStep } from './scenarioApi';
@@ -64,7 +65,7 @@ const rawQuestion: ScenarioEvaluationResponseDto = {
 };
 
 describe('실제 서버 DTO → 화면 모델', () => {
-  it('서버가 발급한 모든 종류의 optionId를 기존 choice 보기에 그대로 담는다', () => {
+  it('서버가 발급한 모든 종류의 optionId를 기존 choice 보기에 담고, 고를 수 없는 보기는 뺀다', () => {
     const response = adaptScenarioStep(rawQuestion);
     expect(response.question).toEqual({
       id: 11,
@@ -73,27 +74,9 @@ describe('실제 서버 DTO → 화면 모델', () => {
         kind: 'choice',
         allowAny: false,
         options: [
-          {
-            id: 'opaque.signed-choice.value',
-            label: '싱글 몰트',
-            disabled: false,
-          },
-          {
-            id: 'opaque.signed-range.value',
-            label: '43% 초과 ~ 46% 이하',
-            disabled: false,
-          },
-          {
-            id: 'opaque.signed-any.value',
-            label: '상관없어요',
-            disabled: false,
-          },
-          {
-            id: 'opaque.disabled.value',
-            label: '기타',
-            description: '현재 조건에 맞는 위스키가 없어요',
-            disabled: true,
-          },
+          { id: 'opaque.signed-choice.value', label: '싱글 몰트' },
+          { id: 'opaque.signed-range.value', label: '43% 초과 ~ 46% 이하' },
+          { id: 'opaque.signed-any.value', label: '상관없어요' },
         ],
       },
     });
@@ -281,6 +264,74 @@ describe('실제 시나리오 API 요청 연결', () => {
       },
       undefined,
     );
+  });
+
+  describe('1위 후보 태그', () => {
+    const finished: ScenarioEvaluationResponseDto = {
+      ...rawQuestion,
+      state: 'SCENARIO_END',
+      question: null,
+      nextQuestionId: null,
+      candidates: {
+        content: [247, 600].map((alcoholId) => ({
+          alcoholId,
+          korName: `술 ${alcoholId}`,
+          engName: '',
+          imageUrl: null,
+          korCategory: '싱글 몰트',
+          abv: '40%',
+        })),
+        pagination: { hasNext: true, nextCursor: 'signed-cursor' },
+      },
+    };
+    const details = (tags: string[] | null) =>
+      ({
+        data: { alcohols: { alcoholsTastingTags: tags } },
+      }) as Awaited<ReturnType<typeof AlcoholsApi.getAlcoholDetails>>;
+
+    it('결과 첫 페이지는 1위만 술 상세에서 태그를 채운다', async () => {
+      vi.mocked(ScenarioApi.evaluate).mockResolvedValueOnce(finished);
+      const lookup = vi
+        .spyOn(AlcoholsApi, 'getAlcoholDetails')
+        .mockResolvedValue(details(['피트', '스모키']));
+      const { candidates } = await getScenarioStep({
+        context: SCENARIO_CONTEXT,
+        versionId: 3,
+        answers: [],
+      });
+      expect(lookup).toHaveBeenCalledTimes(1);
+      expect(lookup).toHaveBeenCalledWith('247');
+      expect(candidates?.items.map(({ tags }) => tags)).toEqual([
+        ['피트', '스모키'],
+        undefined,
+      ]);
+    });
+
+    it('추천 더 보기 페이지는 태그를 조회하지 않는다', async () => {
+      vi.mocked(ScenarioApi.evaluate).mockResolvedValueOnce(finished);
+      const lookup = vi.spyOn(AlcoholsApi, 'getAlcoholDetails');
+      await getScenarioStep({
+        context: SCENARIO_CONTEXT,
+        versionId: 3,
+        answers: [],
+        cursor: 'signed-cursor',
+      });
+      expect(lookup).not.toHaveBeenCalled();
+    });
+
+    it('술 상세 조회가 실패해도 결과는 태그 없이 전달한다', async () => {
+      vi.mocked(ScenarioApi.evaluate).mockResolvedValueOnce(finished);
+      vi.spyOn(AlcoholsApi, 'getAlcoholDetails').mockRejectedValue(
+        new Error('상세 조회 실패'),
+      );
+      const { candidates } = await getScenarioStep({
+        context: SCENARIO_CONTEXT,
+        versionId: 3,
+        answers: [],
+      });
+      expect(candidates?.items[0]).not.toHaveProperty('tags');
+      expect(candidates?.items).toHaveLength(2);
+    });
   });
 
   it('취소된 요청은 결과를 전달하지 않는다', async () => {
