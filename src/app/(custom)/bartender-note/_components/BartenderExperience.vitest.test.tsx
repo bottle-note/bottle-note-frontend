@@ -400,7 +400,7 @@ beforeEach(() => {
 });
 
 describe('바텐더 노트 취향 추천', () => {
-  it('응답의 질문·보기로 진행하고 1위를 먼저 건넨 뒤 내부 상세와 CTA를 보여 준다', async () => {
+  it('응답의 질문·보기로 진행하고 1위를 상세 그대로 먼저 건넨다', async () => {
     renderExperience();
     await choose('위스키 추천해 주세요');
     expect(await screen.findByText('질문 1')).toBeInTheDocument();
@@ -419,7 +419,7 @@ describe('바텐더 노트 취향 추천', () => {
       within(card).getByRole('heading', { name: '글렌피딕 12년' }),
     ).toBeInTheDocument();
     expect(within(card).getByText('싱글 몰트 · 40%')).toBeInTheDocument();
-    // 후보 응답에 없는 태그는 1위 술 상세에서 채우고, 가로 카드에는 세 개까지 둔다
+    // 첫 잔도 상세와 같은 술 상세 조회로 그리고, 가로 카드에 태그는 세 개까지 둔다
     expect(
       within(within(card).getByRole('list', { name: '테이스팅 태그' }))
         .getAllByRole('listitem')
@@ -427,11 +427,8 @@ describe('바텐더 노트 취향 추천', () => {
     ).toEqual(['사과', '배', '바닐라']);
     expect(dialogue()).toHaveTextContent('글렌피딕 12년입니다.');
     expect(screen.queryByText(/\d+병/)).not.toBeInTheDocument();
-    await press('이 술 자세히 볼게요');
-    expect(
-      await screen.findByRole('heading', { name: '글렌피딕 12년', level: 1 }),
-    ).toBeInTheDocument();
     expect(AlcoholsApi.getAlcoholDetails).toHaveBeenCalledWith('247');
+    expect(within(card).getByRole('button', { name: '찜하기' })).toBeEnabled();
     expect(screen.getByRole('link', { name: '자세히 볼게요' })).toHaveAttribute(
       'href',
       '/alcohols/247',
@@ -440,8 +437,13 @@ describe('바텐더 노트 취향 추천', () => {
       screen.getByRole('button', { name: '리뷰 작성' }),
     ).toBeInTheDocument();
     expect(screen.queryByText('대략 가격')).not.toBeInTheDocument();
-    await press('이전 단계');
-    expect(await firstPick()).toBeInTheDocument();
+    // 첫 잔을 건넨 것만으로는 술을 골랐다고 기록하지 않는다
+    expect(trackGA4Event).not.toHaveBeenCalledWith(
+      'bartender_select_alcohol',
+      expect.anything(),
+    );
+    await press('이전 질문');
+    expect(await screen.findByText('질문 5')).toBeInTheDocument();
   });
 
   it('첫 잔에서 다른 후보 목록을 보고, 뒤로 가면 첫 잔과 마지막 질문 순서로 돌아간다', async () => {
@@ -499,12 +501,10 @@ describe('바텐더 노트 취향 추천', () => {
     expect(
       screen.queryByRole('button', { name: '다른 술도 보여주세요' }),
     ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: '이 술 자세히 볼게요' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '리뷰 작성' })).toBeEnabled();
   });
 
-  it('1위 술 상세 조회가 실패해도 태그 없이 첫 잔을 건넨다', async () => {
+  it('1위 술 상세 조회가 실패하면 바텐더 안에서 다시 시도해 첫 잔을 건넨다', async () => {
     vi.mocked(AlcoholsApi.getAlcoholDetails).mockRejectedValueOnce(
       new Error('상세 조회 실패'),
     );
@@ -515,13 +515,11 @@ describe('바텐더 노트 취향 추천', () => {
       abv: '상관없어요',
       price: '상관없어요',
     });
+    await press('다시 시도');
     const card = await firstPick();
     expect(
       within(card).getByRole('heading', { name: '글렌피딕 12년' }),
     ).toBeInTheDocument();
-    expect(
-      within(card).queryByRole('list', { name: '테이스팅 태그' }),
-    ).not.toBeInTheDocument();
   });
 
   it('빈 후보 결과에서 이전 질문으로 돌아가 답변을 다시 고를 수 있다', async () => {
@@ -750,7 +748,7 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     abv: '상관없어요',
     price: '상관없어요',
   };
-  /** 1위 술 상세의 설명만 바꾼다. 1위 상세는 결과를 받을 때 가장 먼저 조회한다. */
+  /** 1위 술 상세의 설명만 바꾼다. 1위 상세는 첫 잔을 건넬 때 가장 먼저 조회한다. */
   const withLeadDescription = (description: string) => {
     const details = vi.mocked(AlcoholsApi.getAlcoholDetails);
     const original = details.getMockImplementation()!;
@@ -838,7 +836,7 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     ).toBeInTheDocument();
   });
 
-  it('다음에 듣겠다고 하면 답하고, 상세에 다녀와도 같은 술은 다시 묻지 않는다', async () => {
+  it('다음에 듣겠다고 하면 답하고, 다른 후보를 보고 돌아와도 같은 술은 다시 묻지 않는다', async () => {
     renderExperience();
     await answerTasteQuestions(anyAnswers);
     await firstPick();
@@ -853,8 +851,8 @@ describe('바텐더 노트 첫 잔 이야기', () => {
       alcohol_id: '247',
       stage: 'offer',
     });
-    await press('이 술 자세히 볼게요');
-    await screen.findByRole('heading', { name: '글렌피딕 12년', level: 1 });
+    await press('다른 술도 보여주세요');
+    await screen.findByText('바텐더가 고른 술');
     await press('이전 단계');
     await firstPick();
     expect(
@@ -916,6 +914,49 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     expect(
       screen.queryByRole('button', { name: '전체 글 보기' }),
     ).not.toBeInTheDocument();
+  });
+
+  it('추천 목록에서 고른 술도 같은 화면에서 이야기를 들려주고, 대답으로 목록에 돌아간다', async () => {
+    renderExperience();
+    await answerTasteQuestions(anyAnswers);
+    await firstPick();
+    await press('다른 술도 보여주세요');
+    await screen.findByText('바텐더가 고른 술');
+    const rows = screen
+      .getAllByRole('button')
+      .filter((button) => /^\d/.test(button.textContent ?? ''));
+    fireEvent.click(rows[1]);
+    const card = await screen.findByRole('region', { name: '추천 후보' });
+    expect(trackGA4Event).toHaveBeenCalledWith('bartender_select_alcohol', {
+      alcohol_id: expect.any(String),
+      source: 'taste',
+    });
+    expect(conversation()).toHaveTextContent('이 병도 잘 맞으실 거예요.');
+    expect(within(card).getByRole('button', { name: '찜하기' })).toBeEnabled();
+    fireEvent.click(
+      await within(conversation()).findByRole('button', {
+        name: '들려주세요',
+      }),
+    );
+    await waitFor(() =>
+      expect(conversation()).toHaveTextContent('바다 향이 나는 위스키'),
+    );
+    await press('다른 술도 볼게요');
+    expect(await screen.findByText('바텐더가 고른 술')).toBeInTheDocument();
+  });
+
+  it('찜에서 고른 술은 찜한 술이라고 건네고, 대답으로 찜 목록에 돌아간다', async () => {
+    serverPicks = [pickItem(900, '탈리스커 10년')];
+    renderExperience();
+    await press('찜한 술 보기');
+    await press(/탈리스커 10년/);
+    await screen.findByRole('region', { name: '내가 찜한 술' });
+    expect(conversation()).toHaveTextContent('찜해 두신 병이에요.');
+    expect(dialogue()).toHaveTextContent('찜해 두신 병이네요.');
+    await press('다른 찜도 볼게요');
+    expect(
+      await screen.findByRole('button', { name: /탈리스커 10년/ }),
+    ).toBeInTheDocument();
   });
 
   it('첫 잔에서 다른 후보를 보면 그 선택을 기록한다', async () => {
@@ -1356,7 +1397,7 @@ describe('바텐더 노트 비로그인 행동', () => {
 });
 
 describe('바텐더 노트 공통 이동', () => {
-  it('추천 상세에 다녀와 빈 캐시로 복원해도 원래 후보로 돌아가고 결과 이벤트는 중복되지 않는다', async () => {
+  it('첫 잔에서 술 상세 페이지에 다녀와 빈 캐시로 복원해도 같은 첫 잔으로 돌아가고 결과 이벤트는 중복되지 않는다', async () => {
     const { unmount } = renderExperience();
     await answerTasteQuestions({
       kind: '싱글 몰트',
@@ -1374,12 +1415,7 @@ describe('바텐더 노트 공통 이동', () => {
       mode: 'taste',
       result_state: 'available',
     });
-    await press('이 술 자세히 볼게요');
     await screen.findByRole('heading', { name: '글렌피딕 12년', level: 1 });
-    expect(trackGA4Event).toHaveBeenCalledWith('bartender_select_alcohol', {
-      alcohol_id: '247',
-      source: 'taste',
-    });
     expect(
       vi
         .mocked(trackGA4Event)
@@ -1394,8 +1430,6 @@ describe('바텐더 노트 공통 이동', () => {
     });
     unmount();
     renderExperience();
-    await screen.findByRole('heading', { name: '글렌피딕 12년' });
-    await press('이전 단계');
     await firstPick();
     expect(results()).toHaveLength(1);
     await press('이전 질문');

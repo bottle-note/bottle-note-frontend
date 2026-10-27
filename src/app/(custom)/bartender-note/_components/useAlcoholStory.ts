@@ -3,8 +3,10 @@ import { trackGA4Event } from '@/utils/analytics/ga4';
 import type { Pose } from './BarScene';
 import { getStoryDialogue, type StoryPhase } from './dialogue';
 import { prefersReducedMotion } from './prefersReducedMotion';
-import { toSentences } from '../_scenario/descriptionParagraphs';
-import type { ScenarioCandidate } from '../_scenario/model';
+import {
+  toDescriptionParagraphs,
+  toSentences,
+} from '../_scenario/descriptionParagraphs';
 
 /** 첫 문장을 떠올리는 뜸. 이 동안 말풍선 자리에 입력 중 표시를 둔다. */
 const SENTENCE_MS = 900;
@@ -32,7 +34,7 @@ export type StoryMessage = { from: 'bartender' | 'me'; text: string };
 type StoryState = {
   phase: StoryPhase;
   heard: boolean;
-  /** 카드 아래에서 들을지 물었는지. 다시 들어오면 묻지 않는다. */
+  /** 카드 아래에서 들을지 물었는지. 같은 술에 다시 들어오면 묻지 않는다. */
   asked: boolean;
   /** 「들려주세요」 뒤로 주고받은 말. */
   messages: StoryMessage[];
@@ -52,23 +54,23 @@ const initialState: StoryState = {
 };
 
 /**
- * 첫 잔을 건넨 뒤 바텐더가 그 술 이야기를 들려줄지 묻고, 첫 문단을 문장씩 이어 들려준다.
+ * 술을 건넨 뒤 바텐더가 그 술 이야기를 들려줄지 묻고, 설명 첫 문단을 문장씩 이어 들려준다.
  * 술마다 진행을 기억해 상세에 다녀와도 같은 술을 다시 묻지 않는다.
  * 페이지를 벗어났다 돌아오면(스냅샷 복원) 다시 묻는다.
  */
-export function useFirstPickStory({
-  candidate,
+export function useAlcoholStory({
+  alcohol,
   active,
   greeting,
 }: {
-  candidate: ScenarioCandidate | undefined;
-  /** 첫 잔 단계를 보고 있는지. */
+  alcohol: { id: number; description?: string } | undefined;
+  /** 술 이야기 화면을 보고 있는지. */
   active: boolean;
   greeting: string;
 }) {
   const [states, setStates] = useState<Record<number, StoryState>>({});
-  const paragraphs = candidate?.descriptionParagraphs;
-  const id = candidate?.id;
+  const paragraphs = toDescriptionParagraphs(alcohol?.description);
+  const id = alcohol?.id;
   const state =
     id !== undefined && paragraphs ? states[id] ?? initialState : undefined;
   const sentences = paragraphs ? toSentences(paragraphs[0]) : [];
@@ -187,6 +189,6 @@ export function useFirstPickStory({
   return { story, reset };
 }
 
-export type FirstPickStory = NonNullable<
-  ReturnType<typeof useFirstPickStory>['story']
+export type AlcoholStory = NonNullable<
+  ReturnType<typeof useAlcoholStory>['story']
 >;
