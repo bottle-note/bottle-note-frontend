@@ -99,7 +99,7 @@ pnpm run gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 | `bartender_recommend_result`      | 취향 추천 결과(첫 잔 또는 목록)나 큐레이션 목록을 처음 보는 시점         | `mode`, `result_state`  | 같은 답변·큐레이션 결과당 1회 |
 | `bartender_select_alcohol`        | 첫 잔·추천 목록·큐레이션·찜에서 술을 골라 바텐더 상세로 이동             | `alcohol_id`, `source`  | 선택당 1회                    |
 | `bartender_open_alcohol_page`     | 바텐더 상세나 찜에서 실제 술 상세 페이지로 이동                          | `alcohol_id`, `source`  | 클릭당 1회                    |
-| `bartender_show_other_candidates` | 첫 잔에서 「다른 후보」 선택                                             | 없음                    | 클릭당 1회                    |
+| `bartender_show_other_candidates` | 첫 잔 대화에서 「다른 술도 보여주세요」 선택                             | 없음                    | 클릭당 1회                    |
 | `bartender_story_start`           | 첫 잔 이야기를 「들려주세요」, 「이야기 듣기」 또는 「다시 듣기」로 시작 | `alcohol_id`, `trigger` | 클릭당 1회                    |
 | `bartender_story_complete`        | 첫 문단의 마지막 문장 말풍선까지 들음                                    | `alcohol_id`            | 들려주기 1회당 1회            |
 | `bartender_story_skip`            | 「다음에요」(제안) 또는 「그만 들을게요」(이야기 중) 선택                | `alcohol_id`, `stage`   | 클릭당 1회                    |

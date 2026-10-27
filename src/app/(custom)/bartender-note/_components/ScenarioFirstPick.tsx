@@ -17,8 +17,9 @@ const appear =
 
 /**
  * 추천 결과의 1위를 바텐더가 건네는 대화로 보여 준다.
- * 카드 아래에서 이야기를 들을지 묻고, 설명 첫 문단을 문장씩 말풍선으로 들려준다.
+ * 카드 아래에서 이야기를 들을지 묻고, 설명 첫 문단을 문장씩 말풍선으로 이어 들려준다.
  * 대답 버튼은 바텐더 말이 끝난 뒤 가장 최근 바텐더 말풍선 아랫단에 달린다.
+ * 다른 후보 보기도 대답 중 하나로 내놓는다.
  */
 export default function ScenarioFirstPick({
   candidate,
@@ -42,14 +43,17 @@ export default function ScenarioFirstPick({
   const offerVisible = Boolean(
     story?.asked && (settled || story.messages.length),
   );
+  // 이야기하는 동안은 끝까지 이어지고, 멈추는 대답만 입력 중 표시에 단다
+  const telling = story?.phase === 'telling';
   const replies =
-    story && settled && !story.pending ? (
+    story && !telling && settled && !story.pending ? (
       <StoryReplies
         story={story}
         onOpenFullText={() => {
           story.openFullText();
           setFullTextOpen(true);
         }}
+        onShowOthers={onShowOthers}
       />
     ) : null;
   // 대답은 그 대답을 부른 말풍선에 단다. 내가 마지막으로 말했으면 바텐더가 다시 권한다
@@ -102,8 +106,32 @@ export default function ScenarioFirstPick({
             {storyLater(story.heard)}
           </BartenderBubble>
         )}
+        {!story && onShowOthers && settled && (
+          <BartenderBubble
+            className={appear}
+            actions={
+              <ReplyGroup>
+                <ShowOthersRow onClick={onShowOthers} />
+              </ReplyGroup>
+            }
+          >
+            다른 술도 궁금하시면 말씀하세요.
+          </BartenderBubble>
+        )}
         {story?.pending && (
-          <BartenderBubble>
+          <BartenderBubble
+            actions={
+              telling && (
+                <ReplyGroup>
+                  <ReplyRow>
+                    <Reply tone="muted" onClick={story.skip}>
+                      그만 들을게요
+                    </Reply>
+                  </ReplyRow>
+                </ReplyGroup>
+              )
+            }
+          >
             <span
               role="status"
               aria-label="이야기를 이어 가는 중"
@@ -127,26 +155,9 @@ export default function ScenarioFirstPick({
         <FlowTextAction onClick={home}>처음으로</FlowTextAction>
       </nav>
       <FlowDock>
-        <div className="flex gap-8">
-          <Button
-            size="lg"
-            variant="primary"
-            className="min-w-0 flex-[3]"
-            onClick={onChoose}
-          >
-            이 술 자세히 볼게요
-          </Button>
-          {onShowOthers && (
-            <Button
-              size="lg"
-              variant="secondary"
-              className="min-w-0 flex-[2]"
-              onClick={onShowOthers}
-            >
-              다른 후보
-            </Button>
-          )}
-        </div>
+        <Button size="lg" variant="primary" fullWidth onClick={onChoose}>
+          이 술 자세히 볼게요
+        </Button>
       </FlowDock>
       {story && (
         <BottomSheet
@@ -322,18 +333,50 @@ function Reply({
   );
 }
 
-/** 이야기에 대한 내 대답. 진행에 따라 듣기·이어 듣기·다시 듣기로 바뀐다. */
+function ReplyGroup({ children }: { children: ReactNode }) {
+  return (
+    <div
+      role="group"
+      aria-label="내 대답"
+      className={`flex flex-col border-t border-stroke-neutral-subtle ${appear}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function ReplyRow({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex border-t border-stroke-neutral-subtle first:border-t-0">
+      {children}
+    </div>
+  );
+}
+
+function ShowOthersRow({ onClick }: { onClick: () => void }) {
+  return (
+    <ReplyRow>
+      <Reply tone="primary" onClick={onClick}>
+        다른 술도 보여주세요<span aria-hidden="true">›</span>
+      </Reply>
+    </ReplyRow>
+  );
+}
+
+/** 이야기에 대한 내 대답. 진행에 따라 듣기·다시 듣기로 바뀌고, 다른 후보가 있으면 함께 내놓는다. */
 function StoryReplies({
   story,
   onOpenFullText,
+  onShowOthers,
 }: {
   story: FirstPickStory;
   onOpenFullText: () => void;
+  onShowOthers?: () => void;
 }) {
-  const replies = (() => {
-    switch (story.phase) {
-      case 'offer':
-        return (
+  return (
+    <ReplyGroup>
+      <ReplyRow>
+        {story.phase === 'offer' ? (
           <>
             <Reply tone="muted" onClick={story.skip}>
               다음에요
@@ -342,20 +385,7 @@ function StoryReplies({
               들려주세요
             </Reply>
           </>
-        );
-      case 'telling':
-        return (
-          <>
-            <Reply tone="muted" onClick={story.skip}>
-              그만 들을게요
-            </Reply>
-            <Reply tone="primary" onClick={story.next}>
-              계속 들려주세요<span aria-hidden="true">›</span>
-            </Reply>
-          </>
-        );
-      default:
-        return (
+        ) : (
           <>
             <Reply tone="primary" onClick={story.listen}>
               {story.heard ? '다시 듣기' : '이야기 듣기'}
@@ -364,16 +394,9 @@ function StoryReplies({
               전체 글 보기
             </Reply>
           </>
-        );
-    }
-  })();
-  return (
-    <div
-      role="group"
-      aria-label="내 대답"
-      className={`flex border-t border-stroke-neutral-subtle ${appear}`}
-    >
-      {replies}
-    </div>
+        )}
+      </ReplyRow>
+      {onShowOthers && <ShowOthersRow onClick={onShowOthers} />}
+    </ReplyGroup>
   );
 }
