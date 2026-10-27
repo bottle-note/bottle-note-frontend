@@ -453,7 +453,7 @@ describe('바텐더 노트 취향 추천', () => {
       price: '상관없어요',
     });
     await firstPick();
-    await press('다른 후보');
+    await press('다른 술도 보여주세요');
     expect(await screen.findByText('바텐더가 고른 술')).toBeInTheDocument();
     // 목록은 1위부터 같은 모양의 행으로 보여 준다
     const rows = screen
@@ -497,7 +497,7 @@ describe('바텐더 노트 취향 추천', () => {
     });
     await firstPick();
     expect(
-      screen.queryByRole('button', { name: '다른 후보' }),
+      screen.queryByRole('button', { name: '다른 술도 보여주세요' }),
     ).not.toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: '이 술 자세히 볼게요' }),
@@ -655,7 +655,7 @@ describe('바텐더 노트 취향 추천', () => {
       price: '상관없어요',
     });
     await firstPick();
-    await press('다른 후보');
+    await press('다른 술도 보여주세요');
     await screen.findByText('바텐더가 고른 술');
     evaluate.mockRejectedValueOnce(new Error('다음 페이지 실패'));
     await press('추천 더 보기');
@@ -806,7 +806,7 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     });
   });
 
-  it('첫 문단을 한 문장씩 들려주고, 문단이 더 있으면 전체 글로 안내한다', async () => {
+  it('첫 문단을 한 문장씩 이어 들려주고, 문단이 더 있으면 전체 글로 안내한다', async () => {
     withLeadDescription(
       '첫 문장입니다. 둘째 \n문장입니다.\n\n \n\n다음 문단입니다.',
     );
@@ -814,17 +814,11 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     await answerTasteQuestions(anyAnswers);
     await firstPick();
     await press('들려주세요');
-    await waitFor(() =>
-      expect(conversation()).toHaveTextContent('첫 문장입니다.'),
-    );
-    expect(conversation()).not.toHaveTextContent('둘째');
-    expect(events('bartender_story_complete')).toHaveLength(0);
-    await press('계속 들려주세요');
-    // 문단 안의 줄바꿈은 공백으로 합친다
+    // 더 청하지 않아도 다음 문장이 이어지고, 문단 안의 줄바꿈은 공백으로 합친다
     await waitFor(() =>
       expect(conversation()).toHaveTextContent('둘째 문장입니다.'),
     );
-    expect(conversation()).toHaveTextContent('나: 계속 들려주세요');
+    expect(conversation()).toHaveTextContent('첫 문장입니다.');
     expect(conversation()).not.toHaveTextContent('다음 문단입니다.');
     await waitFor(() =>
       expect(dialogue()).toHaveTextContent(
@@ -877,9 +871,22 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     withLeadDescription('첫 문장입니다. 둘째 문장입니다.');
     renderExperience();
     await answerTasteQuestions(anyAnswers);
+    // 문장 사이의 뜸이 있어야 도중에 멈출 수 있다
+    window.matchMedia = vi.fn().mockReturnValue({ matches: false });
     await firstPick();
-    await press('들려주세요');
-    await press('그만 들을게요');
+    fireEvent.click(
+      await within(conversation()).findByRole(
+        'button',
+        { name: '들려주세요' },
+        { timeout: 5000 },
+      ),
+    );
+    // 이야기하는 동안의 대답은 멈추는 것 하나뿐이다
+    const stop = await screen.findByRole('button', { name: '그만 들을게요' });
+    expect(
+      screen.queryByRole('button', { name: '다시 듣기' }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(stop);
     await waitFor(() =>
       expect(conversation()).toHaveTextContent(
         '이 술 이야기가 궁금해지면 언제든 말씀하세요.',
@@ -893,11 +900,16 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     expect(events('bartender_story_complete')).toHaveLength(0);
   });
 
-  it('설명이 없는 술은 이야기를 꺼내지 않는다', async () => {
+  it('설명이 없는 술은 이야기를 꺼내지 않고 다른 후보만 권한다', async () => {
     withLeadDescription(' \n\n ');
     renderExperience();
     await answerTasteQuestions(anyAnswers);
     await firstPick();
+    expect(
+      await within(conversation()).findByRole('button', {
+        name: '다른 술도 보여주세요',
+      }),
+    ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: '들려주세요' }),
     ).not.toBeInTheDocument();
@@ -910,7 +922,7 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     renderExperience();
     await answerTasteQuestions(anyAnswers);
     await firstPick();
-    await press('다른 후보');
+    await press('다른 술도 보여주세요');
     await screen.findByText('바텐더가 고른 술');
     expect(events('bartender_show_other_candidates')).toHaveLength(1);
   });
