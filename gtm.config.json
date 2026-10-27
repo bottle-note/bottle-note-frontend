@@ -98,6 +98,17 @@
       "name": "bartender_open_alcohol_page",
       "parameters": ["alcohol_id", "source"]
     },
+    { "name": "bartender_show_other_candidates", "parameters": [] },
+    {
+      "name": "bartender_story_start",
+      "parameters": ["alcohol_id", "trigger"]
+    },
+    { "name": "bartender_story_complete", "parameters": ["alcohol_id"] },
+    {
+      "name": "bartender_story_skip",
+      "parameters": ["alcohol_id", "stage"]
+    },
+    { "name": "bartender_story_full_text", "parameters": ["alcohol_id"] },
     {
       "name": "share",
       "parameters": [

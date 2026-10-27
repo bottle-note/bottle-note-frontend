@@ -320,6 +320,9 @@ async function answerTasteQuestions(answers: {
   await choose(answers.price);
 }
 
+/** 추천 결과에서 1위를 먼저 건네는 카드. */
+const firstPick = () => screen.findByRole('region', { name: '오늘의 첫 잔' });
+
 /** 술 상세에서 리뷰 작성을 시작해 한 줄 리뷰를 쓰고 별점 단계까지 간다. */
 async function writeQuickReview(text: string) {
   await press('리뷰 작성');
@@ -397,29 +400,36 @@ beforeEach(() => {
 });
 
 describe('바텐더 노트 취향 추천', () => {
-  it('응답의 질문·보기로 진행하고 후보 선택 후 내부 상세와 CTA를 보여 준다', async () => {
+  it('응답의 질문·보기로 진행하고 1위를 먼저 건넨 뒤 내부 상세와 CTA를 보여 준다', async () => {
     renderExperience();
     await choose('위스키 추천해 주세요');
     expect(await screen.findByText('질문 1')).toBeInTheDocument();
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     await choose('싱글 몰트');
     await screen.findByText('질문 2');
-    // 좁혀진 후보 수는 질문·보기·목록 어디에도 보이지 않는다
+    // 좁혀진 후보 수는 질문·보기·결과 어디에도 보이지 않는다
     expect(screen.queryByText(/\d+병/)).not.toBeInTheDocument();
     await choose('피트·스모키');
     await choose('상관없어요');
     await choose('병');
     expect(await screen.findByText('질문 5')).toBeInTheDocument();
     await choose('5~10만 원');
-    expect(await screen.findByText('바텐더가 고른 술')).toBeInTheDocument();
+    const card = await firstPick();
+    expect(
+      within(card).getByRole('heading', { name: '글렌피딕 12년' }),
+    ).toBeInTheDocument();
+    expect(within(card).getByText('싱글 몰트 · 40%')).toBeInTheDocument();
+    // 후보 응답에 없는 태그는 1위 술 상세에서 채우고, 가로 카드에는 세 개까지 둔다
+    expect(
+      within(within(card).getByRole('list', { name: '테이스팅 태그' }))
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual(['사과', '배', '바닐라']);
+    expect(dialogue()).toHaveTextContent('글렌피딕 12년입니다.');
     expect(screen.queryByText(/\d+병/)).not.toBeInTheDocument();
-    expect(screen.getByText('싱글 몰트 · 40%')).toBeInTheDocument();
+    await press('이 술 자세히 볼게요');
     expect(
-      screen.queryByRole('link', { name: /글렌피딕/ }),
-    ).not.toBeInTheDocument();
-    await press(/글렌피딕 12년/);
-    expect(
-      await screen.findByRole('heading', { name: '글렌피딕 12년' }),
+      await screen.findByRole('heading', { name: '글렌피딕 12년', level: 1 }),
     ).toBeInTheDocument();
     expect(AlcoholsApi.getAlcoholDetails).toHaveBeenCalledWith('247');
     expect(screen.getByRole('link', { name: '자세히 볼게요' })).toHaveAttribute(
@@ -430,6 +440,88 @@ describe('바텐더 노트 취향 추천', () => {
       screen.getByRole('button', { name: '리뷰 작성' }),
     ).toBeInTheDocument();
     expect(screen.queryByText('대략 가격')).not.toBeInTheDocument();
+    await press('이전 단계');
+    expect(await firstPick()).toBeInTheDocument();
+  });
+
+  it('첫 잔에서 다른 후보 목록을 보고, 뒤로 가면 첫 잔과 마지막 질문 순서로 돌아간다', async () => {
+    renderExperience();
+    await answerTasteQuestions({
+      kind: '상관없어요',
+      axis: '상관없어요',
+      abv: '상관없어요',
+      price: '상관없어요',
+    });
+    await firstPick();
+    await press('다른 후보');
+    expect(await screen.findByText('바텐더가 고른 술')).toBeInTheDocument();
+    // 목록은 1위부터 같은 모양의 행으로 보여 준다
+    const rows = screen
+      .getAllByRole('button')
+      .filter((button) => /^\d/.test(button.textContent ?? ''));
+    expect(rows[0]).toHaveTextContent('글렌피딕 12년');
+    expect(rows).toHaveLength(4);
+    await press('이전 단계');
+    await firstPick();
+    // 첫 잔과 목록을 오가도 같은 결과 이벤트는 한 번만 보낸다
+    expect(
+      vi
+        .mocked(trackGA4Event)
+        .mock.calls.filter(([event]) => event === 'bartender_recommend_result'),
+    ).toHaveLength(1);
+    await press('이전 질문');
+    expect(await screen.findByText('질문 5')).toBeInTheDocument();
+  });
+
+  it('후보가 1위 한 병뿐이면 다른 후보 보기를 내놓지 않는다', async () => {
+    const evaluate = vi.mocked(ScenarioApi.evaluate);
+    const fixture = evaluate.getMockImplementation()!;
+    evaluate.mockImplementation(async (id, request, signal) => {
+      const response = await fixture(id, request, signal);
+      return response.state === 'SCENARIO_END'
+        ? {
+            ...response,
+            candidates: {
+              ...response.candidates,
+              content: response.candidates.content.slice(0, 1),
+            },
+          }
+        : response;
+    });
+    renderExperience();
+    await answerTasteQuestions({
+      kind: '상관없어요',
+      axis: '상관없어요',
+      abv: '상관없어요',
+      price: '상관없어요',
+    });
+    await firstPick();
+    expect(
+      screen.queryByRole('button', { name: '다른 후보' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '이 술 자세히 볼게요' }),
+    ).toBeInTheDocument();
+  });
+
+  it('1위 술 상세 조회가 실패해도 태그 없이 첫 잔을 건넨다', async () => {
+    vi.mocked(AlcoholsApi.getAlcoholDetails).mockRejectedValueOnce(
+      new Error('상세 조회 실패'),
+    );
+    renderExperience();
+    await answerTasteQuestions({
+      kind: '상관없어요',
+      axis: '상관없어요',
+      abv: '상관없어요',
+      price: '상관없어요',
+    });
+    const card = await firstPick();
+    expect(
+      within(card).getByRole('heading', { name: '글렌피딕 12년' }),
+    ).toBeInTheDocument();
+    expect(
+      within(card).queryByRole('list', { name: '테이스팅 태그' }),
+    ).not.toBeInTheDocument();
   });
 
   it('빈 후보 결과에서 이전 질문으로 돌아가 답변을 다시 고를 수 있다', async () => {
@@ -450,7 +542,7 @@ describe('바텐더 노트 취향 추천', () => {
     await press('이전 질문');
     expect(await screen.findByText('질문 5')).toBeInTheDocument();
     await choose('1.5만 원 이하');
-    expect(await screen.findByText('바텐더가 고른 술')).toBeInTheDocument();
+    expect(await firstPick()).toBeInTheDocument();
   });
 
   it('서버 ANY 보기도 기존 choiceId 답변으로 누적하고 중복 보기 없이 표시한다', async () => {
@@ -562,6 +654,8 @@ describe('바텐더 노트 취향 추천', () => {
       abv: '상관없어요',
       price: '상관없어요',
     });
+    await firstPick();
+    await press('다른 후보');
     await screen.findByText('바텐더가 고른 술');
     evaluate.mockRejectedValueOnce(new Error('다음 페이지 실패'));
     await press('추천 더 보기');
@@ -634,7 +728,7 @@ describe('바텐더 노트 취향 추천', () => {
       expect.anything(),
     );
     await choose('5~10만 원');
-    await screen.findByText('바텐더가 고른 술');
+    await firstPick();
     expect(request).toHaveBeenLastCalledWith(
       expect.objectContaining({
         answers: expect.arrayContaining([
@@ -646,6 +740,179 @@ describe('바텐더 노트 취향 추천', () => {
       }),
       expect.anything(),
     );
+  });
+});
+
+describe('바텐더 노트 첫 잔 이야기', () => {
+  const anyAnswers = {
+    kind: '상관없어요',
+    axis: '상관없어요',
+    abv: '상관없어요',
+    price: '상관없어요',
+  };
+  /** 1위 술 상세의 설명만 바꾼다. 1위 상세는 결과를 받을 때 가장 먼저 조회한다. */
+  const withLeadDescription = (description: string) => {
+    const details = vi.mocked(AlcoholsApi.getAlcoholDetails);
+    const original = details.getMockImplementation()!;
+    details.mockImplementationOnce(async (id) => {
+      const response = await original(id);
+      return {
+        ...response,
+        data: {
+          ...response.data,
+          alcohols: { ...response.data.alcohols, description },
+        },
+      };
+    });
+  };
+  const events = (name: string) =>
+    vi.mocked(trackGA4Event).mock.calls.filter(([event]) => event === name);
+
+  const conversation = () =>
+    screen.getByRole('log', { name: '노트와 나눈 대화' });
+
+  it('들려달라고 하면 카드 아래 말풍선으로 들려주고, 다 들으면 맺은 뒤 다시 듣기와 전체 글을 남긴다', async () => {
+    renderExperience();
+    await answerTasteQuestions(anyAnswers);
+    await firstPick();
+    expect(conversation()).toHaveTextContent('오늘의 첫 잔이에요.');
+    // 대답은 하단이 아니라 묻는 말풍선에 달린다
+    expect(
+      await within(conversation()).findByRole('button', { name: '들려주세요' }),
+    ).toBeInTheDocument();
+    await press('들려주세요');
+    await waitFor(() =>
+      expect(conversation()).toHaveTextContent('바다 향이 나는 위스키'),
+    );
+    expect(conversation()).toHaveTextContent('나: 들려주세요');
+    expect(trackGA4Event).toHaveBeenCalledWith('bartender_story_start', {
+      alcohol_id: '247',
+      trigger: 'offer',
+    });
+    // 한 문장뿐이라 그 문장으로 이야기가 끝난다
+    expect(trackGA4Event).toHaveBeenCalledWith('bartender_story_complete', {
+      alcohol_id: '247',
+    });
+    await waitFor(() =>
+      expect(dialogue()).toHaveTextContent('이야기는 이쯤 하고요.'),
+    );
+    expect(
+      await screen.findByRole('button', { name: '전체 글 보기' }),
+    ).toBeInTheDocument();
+    await press('다시 듣기');
+    expect(trackGA4Event).toHaveBeenLastCalledWith('bartender_story_start', {
+      alcohol_id: '247',
+      trigger: 'replay',
+    });
+  });
+
+  it('첫 문단을 한 문장씩 들려주고, 문단이 더 있으면 전체 글로 안내한다', async () => {
+    withLeadDescription(
+      '첫 문장입니다. 둘째 \n문장입니다.\n\n \n\n다음 문단입니다.',
+    );
+    renderExperience();
+    await answerTasteQuestions(anyAnswers);
+    await firstPick();
+    await press('들려주세요');
+    await waitFor(() =>
+      expect(conversation()).toHaveTextContent('첫 문장입니다.'),
+    );
+    expect(conversation()).not.toHaveTextContent('둘째');
+    expect(events('bartender_story_complete')).toHaveLength(0);
+    await press('계속 들려주세요');
+    // 문단 안의 줄바꿈은 공백으로 합친다
+    await waitFor(() =>
+      expect(conversation()).toHaveTextContent('둘째 문장입니다.'),
+    );
+    expect(conversation()).toHaveTextContent('나: 계속 들려주세요');
+    expect(conversation()).not.toHaveTextContent('다음 문단입니다.');
+    await waitFor(() =>
+      expect(dialogue()).toHaveTextContent(
+        '더 긴 이야기는 전체 글에 적어 뒀어요.',
+      ),
+    );
+    expect(events('bartender_story_complete')).toHaveLength(1);
+    await press('전체 글 보기');
+    expect(
+      await screen.findByRole('heading', { name: '글렌피딕 12년', level: 3 }),
+    ).toBeInTheDocument();
+    expect(trackGA4Event).toHaveBeenCalledWith('bartender_story_full_text', {
+      alcohol_id: '247',
+    });
+    expect(
+      screen.getByText('다음 문단입니다.', { selector: 'p' }),
+    ).toBeInTheDocument();
+  });
+
+  it('다음에 듣겠다고 하면 답하고, 상세에 다녀와도 같은 술은 다시 묻지 않는다', async () => {
+    renderExperience();
+    await answerTasteQuestions(anyAnswers);
+    await firstPick();
+    await press('다음에요');
+    await waitFor(() =>
+      expect(conversation()).toHaveTextContent(
+        '이 술 이야기가 궁금해지면 언제든 말씀하세요.',
+      ),
+    );
+    expect(conversation()).toHaveTextContent('나: 다음에요');
+    expect(trackGA4Event).toHaveBeenCalledWith('bartender_story_skip', {
+      alcohol_id: '247',
+      stage: 'offer',
+    });
+    await press('이 술 자세히 볼게요');
+    await screen.findByRole('heading', { name: '글렌피딕 12년', level: 1 });
+    await press('이전 단계');
+    await firstPick();
+    expect(
+      screen.queryByRole('button', { name: '들려주세요' }),
+    ).not.toBeInTheDocument();
+    expect(conversation()).not.toHaveTextContent('나: 다음에요');
+    expect(
+      await screen.findByRole('button', { name: '이야기 듣기' }),
+    ).toBeEnabled();
+    expect(dialogue()).toHaveTextContent('글렌피딕 12년입니다.');
+  });
+
+  it('이야기 도중 그만 들을 수 있다', async () => {
+    withLeadDescription('첫 문장입니다. 둘째 문장입니다.');
+    renderExperience();
+    await answerTasteQuestions(anyAnswers);
+    await firstPick();
+    await press('들려주세요');
+    await press('그만 들을게요');
+    await waitFor(() =>
+      expect(conversation()).toHaveTextContent(
+        '이 술 이야기가 궁금해지면 언제든 말씀하세요.',
+      ),
+    );
+    expect(conversation()).not.toHaveTextContent('둘째 문장입니다.');
+    expect(trackGA4Event).toHaveBeenCalledWith('bartender_story_skip', {
+      alcohol_id: '247',
+      stage: 'telling',
+    });
+    expect(events('bartender_story_complete')).toHaveLength(0);
+  });
+
+  it('설명이 없는 술은 이야기를 꺼내지 않는다', async () => {
+    withLeadDescription(' \n\n ');
+    renderExperience();
+    await answerTasteQuestions(anyAnswers);
+    await firstPick();
+    expect(
+      screen.queryByRole('button', { name: '들려주세요' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '전체 글 보기' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('첫 잔에서 다른 후보를 보면 그 선택을 기록한다', async () => {
+    renderExperience();
+    await answerTasteQuestions(anyAnswers);
+    await firstPick();
+    await press('다른 후보');
+    await screen.findByText('바텐더가 고른 술');
+    expect(events('bartender_show_other_candidates')).toHaveLength(1);
   });
 });
 
@@ -1085,7 +1352,7 @@ describe('바텐더 노트 공통 이동', () => {
       abv: '상관없어요',
       price: '상관없어요',
     });
-    await screen.findByText('바텐더가 고른 술');
+    await firstPick();
     const results = () =>
       vi
         .mocked(trackGA4Event)
@@ -1095,8 +1362,8 @@ describe('바텐더 노트 공통 이동', () => {
       mode: 'taste',
       result_state: 'available',
     });
-    await press(/글렌피딕 12년/);
-    await screen.findByRole('heading', { name: '글렌피딕 12년' });
+    await press('이 술 자세히 볼게요');
+    await screen.findByRole('heading', { name: '글렌피딕 12년', level: 1 });
     expect(trackGA4Event).toHaveBeenCalledWith('bartender_select_alcohol', {
       alcohol_id: '247',
       source: 'taste',
@@ -1117,12 +1384,12 @@ describe('바텐더 노트 공통 이동', () => {
     renderExperience();
     await screen.findByRole('heading', { name: '글렌피딕 12년' });
     await press('이전 단계');
-    await screen.findByText('바텐더가 고른 술');
+    await firstPick();
     expect(results()).toHaveLength(1);
     await press('이전 질문');
     await screen.findByText('질문 5');
     await choose('1.5만 원 이하');
-    await screen.findByText('바텐더가 고른 술');
+    await firstPick();
     await waitFor(() => expect(results()).toHaveLength(2));
   });
 
