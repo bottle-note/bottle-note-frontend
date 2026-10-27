@@ -150,9 +150,15 @@ function renderScenario(props: ScenarioHarnessProps = {}) {
   };
 }
 
+/** 다음 질문을 받는 동안 앞 질문의 같은 이름 버튼이 비활성으로 남으므로, 누를 수 있는 버튼을 다시 찾는다. */
 async function choose(name: string) {
-  const button = await screen.findByRole('button', { name });
-  await waitFor(() => expect(button).toBeEnabled());
+  const button = await waitFor(() => {
+    const enabled = screen
+      .getAllByRole('button', { name })
+      .find((candidate) => !(candidate as HTMLButtonElement).disabled);
+    expect(enabled).toBeDefined();
+    return enabled!;
+  });
   fireEvent.click(button);
 }
 

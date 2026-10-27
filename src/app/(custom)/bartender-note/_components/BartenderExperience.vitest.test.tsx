@@ -293,16 +293,18 @@ const dialogue = () =>
 
 /** 선택지 버튼은 제목과 설명을 함께 읽으므로 제목으로 시작하는 버튼을 고른다. */
 async function choose(title: string) {
-  const button = await screen.findByRole('button', {
-    name: (name) => name === title || name.startsWith(`${title} `),
-  });
-  await waitFor(() => expect(button).toBeEnabled());
-  fireEvent.click(button);
+  await press((name) => name === title || name.startsWith(`${title} `));
 }
 
-async function press(name: string | RegExp) {
-  const button = await screen.findByRole('button', { name });
-  await waitFor(() => expect(button).toBeEnabled());
+/** 다음 질문을 받는 동안 앞 질문의 같은 이름 버튼이 비활성으로 남으므로, 누를 수 있는 버튼을 다시 찾는다. */
+async function press(name: string | RegExp | ((name: string) => boolean)) {
+  const button = await waitFor(() => {
+    const enabled = screen
+      .getAllByRole('button', { name })
+      .find((candidate) => !(candidate as HTMLButtonElement).disabled);
+    expect(enabled).toBeDefined();
+    return enabled!;
+  });
   fireEvent.click(button);
 }
 
@@ -504,7 +506,7 @@ describe('바텐더 노트 취향 추천', () => {
     expect(screen.getByRole('button', { name: '리뷰 작성' })).toBeEnabled();
   });
 
-  it('1위 술 상세 조회가 실패하면 바텐더 안에서 다시 시도해 첫 잔을 건넨다', async () => {
+  it('1위 술 상세를 미리 받지 못해도 결과로 넘어가 첫 잔에서 다시 조회한다', async () => {
     vi.mocked(AlcoholsApi.getAlcoholDetails).mockRejectedValueOnce(
       new Error('상세 조회 실패'),
     );
@@ -515,7 +517,6 @@ describe('바텐더 노트 취향 추천', () => {
       abv: '상관없어요',
       price: '상관없어요',
     });
-    await press('다시 시도');
     const card = await firstPick();
     expect(
       within(card).getByRole('heading', { name: '글렌피딕 12년' }),
@@ -568,6 +569,35 @@ describe('바텐더 노트 취향 추천', () => {
       }),
       expect.anything(),
     );
+  });
+
+  it('다음 질문을 받는 동안 방금 답한 질문과 고른 보기를 그대로 두고, 오면 바로 바꾼다', async () => {
+    const real = scenarioApi.getScenarioStep;
+    const request = vi.spyOn(scenarioApi, 'getScenarioStep');
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    renderExperience();
+    await choose('위스키 추천해 주세요');
+    await screen.findByText('질문 1');
+    request.mockImplementationOnce(async (...args) => {
+      await gate;
+      return real(...args);
+    });
+    await choose('싱글 몰트');
+    // 로딩 화면으로 바꾸지 않고, 고른 보기만 고른 모습으로 남긴다
+    const picked = screen.getByRole('button', { name: /^싱글 몰트/ });
+    expect(picked).toHaveAttribute('aria-pressed', 'true');
+    expect(picked).toBeDisabled();
+    expect(screen.getByText('질문 1')).toBeInTheDocument();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(dialogue()).not.toHaveTextContent('질문을 준비하고 있어요.');
+    release();
+    expect(await screen.findByText('질문 2')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^싱글 몰트/ }),
+    ).not.toBeInTheDocument();
   });
 
   it('종류를 다시 고르면 향 질문과 보기가 바뀌고 입력 중인 값은 초기화한다', async () => {
@@ -748,19 +778,21 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     abv: '상관없어요',
     price: '상관없어요',
   };
-  /** 1위 술 상세의 설명만 바꾼다. 1위 상세는 첫 잔을 건넬 때 가장 먼저 조회한다. */
+  /** 1위 술(247) 상세의 설명만 바꾼다. 결과 전에 미리 받고 첫 잔에서 다시 받아도 같은 설명이다. */
   const withLeadDescription = (description: string) => {
     const details = vi.mocked(AlcoholsApi.getAlcoholDetails);
     const original = details.getMockImplementation()!;
-    details.mockImplementationOnce(async (id) => {
+    details.mockImplementation(async (id) => {
       const response = await original(id);
-      return {
-        ...response,
-        data: {
-          ...response.data,
-          alcohols: { ...response.data.alcohols, description },
-        },
-      };
+      return id === '247'
+        ? {
+            ...response,
+            data: {
+              ...response.data,
+              alcohols: { ...response.data.alcohols, description },
+            },
+          }
+        : response;
     });
   };
   const events = (name: string) =>

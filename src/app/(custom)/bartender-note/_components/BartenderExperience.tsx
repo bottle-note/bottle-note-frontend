@@ -2,10 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useLoginBridge } from '@/hooks/useLoginBridge';
-import { useAlcoholDetailQuery } from '@/queries/useAlcoholDetailQuery';
+import {
+  alcoholDetailKeys,
+  fetchAlcoholDetail,
+  useAlcoholDetailQuery,
+} from '@/queries/useAlcoholDetailQuery';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { ApiError } from '@/utils/ApiError';
@@ -52,6 +57,9 @@ const SELECT_SOURCE = {
   'curation-list': 'situation',
   favorites: 'picks',
 } as const;
+
+/** 다음 질문이 이보다 늦으면 생각하는 자세를 보인다. */
+const THINKING_DELAY_MS = 400;
 
 /** 시나리오 응답을 읽는 단계. 질문과 추천 결과가 같은 조회를 쓴다. */
 const isScenarioStep = (step: Step) =>
@@ -112,9 +120,22 @@ export default function BartenderExperience({
     restore: restoreJourney,
   } = useBartenderJourney();
   const [context, setContext] = useState(scenarioContext);
+  const queryClient = useQueryClient();
   const flow = useScenarioFlow({
     context,
     active: isScenarioStep(step),
+    // 첫 잔은 술 상세로 그리므로, 1위 상세를 받아 둔 뒤 결과로 넘어가 로딩 화면을 거치지 않는다.
+    // 실패해도 결과는 보여 주고, 첫 잔에서 다시 조회한다.
+    prepareResult: async (result) => {
+      const lead = result.candidates?.items[0];
+      if (!lead) return;
+      const alcoholId = String(lead.id);
+      await queryClient.prefetchQuery({
+        queryKey: alcoholDetailKeys.detail(alcoholId, user?.userId ?? null),
+        queryFn: () => fetchAlcoholDetail(alcoholId),
+        retry: false,
+      });
+    },
   });
   const firstPick = flow.query.data?.candidates?.items[0];
   const {
@@ -135,6 +156,7 @@ export default function BartenderExperience({
   const picks = useBartenderPicks();
   const submit = useReviewSubmit();
   const bartender = useBartenderPose(step);
+  const [thinking, setThinking] = useState(false);
   /** 고른 술을 바텐더가 건네고 이야기를 들려주는 단계. 추천 1위도 상세와 같은 화면이다. */
   const talkStep = step === 'first-pick' || step === 'detail';
   const requiresAlcohol =
@@ -179,6 +201,16 @@ export default function BartenderExperience({
     setResumeAfterLogin(saved.resumeAfterLogin ?? null);
     tracking.restore(saved);
   }, []);
+
+  // 다음 질문이 늦을 때만 바텐더가 생각하는 자세를 취한다. 빠르면 그대로 넘어간다
+  useEffect(() => {
+    if (!flow.pending) {
+      setThinking(false);
+      return undefined;
+    }
+    const timer = window.setTimeout(() => setThinking(true), THINKING_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [flow.pending]);
 
   useEffect(() => {
     if (!resumeAfterLogin || authLoading) return;
@@ -345,7 +377,8 @@ export default function BartenderExperience({
   const header = getStepHeader(step, {
     curationTitle: curation?.title,
     reviewMode: review.mode,
-    questionNumber: flow.answers.length + 1,
+    // 다음 질문을 받는 동안은 방금 답한 질문의 번호를 둔다
+    questionNumber: flow.answers.length + (flow.pending ? 0 : 1),
   });
   const scenarioStep = isScenarioStep(step);
   /** 시나리오 응답을 그대로 그리는 단계. 첫 잔은 고른 술의 상세로 그린다. */
@@ -398,7 +431,9 @@ export default function BartenderExperience({
       subtitle={header.subtitle}
       progress={header.progress}
       lines={dialogueLines}
-      pose={talkStory?.pose ?? bartender.pose}
+      pose={
+        talkStory?.pose ?? (thinking && scenarioView ? 'think' : bartender.pose)
+      }
       onBack={
         previous || (step === 'scenario' && flow.canGoBack) ? back : undefined
       }
@@ -452,6 +487,7 @@ export default function BartenderExperience({
                 key={scenarioData.question.id}
                 question={scenarioData.question}
                 disabled={!flow.canAnswer}
+                pendingAnswer={flow.pendingAnswer}
                 onAnswer={flow.answer}
               />
             )}
