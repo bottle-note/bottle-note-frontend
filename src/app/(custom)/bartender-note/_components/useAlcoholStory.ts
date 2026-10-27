@@ -3,11 +3,23 @@ import { trackGA4Event } from '@/utils/analytics/ga4';
 import type { Pose } from './BarScene';
 import { getStoryDialogue, type StoryPhase } from './dialogue';
 import { prefersReducedMotion } from './prefersReducedMotion';
-import { toSentences } from '../_scenario/descriptionParagraphs';
-import type { ScenarioCandidate } from '../_scenario/model';
+import {
+  toDescriptionParagraphs,
+  toSentences,
+} from '../_scenario/descriptionParagraphs';
 
-/** 다음 문장을 떠올리는 뜸. 이 동안 말풍선 자리에 입력 중 표시를 둔다. */
+/** 첫 문장을 떠올리는 뜸. 이 동안 말풍선 자리에 입력 중 표시를 둔다. */
 const SENTENCE_MS = 900;
+/** 다음 문장은 앞 문장을 읽을 만큼 기다렸다 잇는다. */
+const READ_MS_PER_CHAR = 60;
+const READ_MS_MIN = 1500;
+const READ_MS_MAX = 4500;
+
+const readingMs = (sentence: string) =>
+  Math.min(
+    READ_MS_MAX,
+    Math.max(READ_MS_MIN, sentence.length * READ_MS_PER_CHAR),
+  );
 
 const STORY_POSE: Record<StoryPhase, Pose> = {
   offer: 'serve',
@@ -22,13 +34,13 @@ export type StoryMessage = { from: 'bartender' | 'me'; text: string };
 type StoryState = {
   phase: StoryPhase;
   heard: boolean;
-  /** 카드 아래에서 들을지 물었는지. 다시 들어오면 묻지 않는다. */
+  /** 카드 아래에서 들을지 물었는지. 같은 술에 다시 들어오면 묻지 않는다. */
   asked: boolean;
   /** 「들려주세요」 뒤로 주고받은 말. */
   messages: StoryMessage[];
   /** 들려준 문장 수. */
   told: number;
-  /** 다음 문장을 떠올리는 중인지. */
+  /** 다음 문장을 떠올리는 중인지. 이야기하는 동안은 끝까지 이어진다. */
   pending: boolean;
 };
 
@@ -42,23 +54,23 @@ const initialState: StoryState = {
 };
 
 /**
- * 첫 잔을 건넨 뒤 바텐더가 그 술 이야기를 들려줄지 묻고, 첫 문단을 문장씩 들려준다.
+ * 술을 건넨 뒤 바텐더가 그 술 이야기를 들려줄지 묻고, 설명 첫 문단을 문장씩 이어 들려준다.
  * 술마다 진행을 기억해 상세에 다녀와도 같은 술을 다시 묻지 않는다.
  * 페이지를 벗어났다 돌아오면(스냅샷 복원) 다시 묻는다.
  */
-export function useFirstPickStory({
-  candidate,
+export function useAlcoholStory({
+  alcohol,
   active,
   greeting,
 }: {
-  candidate: ScenarioCandidate | undefined;
-  /** 첫 잔 단계를 보고 있는지. */
+  alcohol: { id: number; description?: string } | undefined;
+  /** 술 이야기 화면을 보고 있는지. */
   active: boolean;
   greeting: string;
 }) {
   const [states, setStates] = useState<Record<number, StoryState>>({});
-  const paragraphs = candidate?.descriptionParagraphs;
-  const id = candidate?.id;
+  const paragraphs = toDescriptionParagraphs(alcohol?.description);
+  const id = alcohol?.id;
   const state =
     id !== undefined && paragraphs ? states[id] ?? initialState : undefined;
   const sentences = paragraphs ? toSentences(paragraphs[0]) : [];
@@ -105,16 +117,20 @@ export function useFirstPickStory({
             { from: 'bartender', text: sentences[state.told] },
           ],
           told,
-          pending: false,
+          pending: !last,
           ...(last && { phase: 'told', heard: true }),
         });
       },
-      prefersReducedMotion() ? 0 : SENTENCE_MS,
+      prefersReducedMotion()
+        ? 0
+        : state.told
+          ? readingMs(sentences[state.told - 1])
+          : SENTENCE_MS,
     );
     return () => window.clearTimeout(timer);
-    // 뜸이 끝나면 다음 문장 하나만 붙인다
+    // 뜸이 끝나면 다음 문장 하나만 붙이고, 그 문장을 읽을 동안 다시 기다린다
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, state?.pending, id]);
+  }, [active, state?.pending, state?.told, id]);
 
   const reset = () => setStates({});
   if (!state || !paragraphs || id === undefined) return { story: null, reset };
@@ -156,8 +172,6 @@ export function useFirstPickStory({
         pending: true,
       });
     },
-    /** 다음 문장을 청한다. */
-    next: () => update({ messages: say('계속 들려주세요'), pending: true }),
     skip: () => {
       trackGA4Event('bartender_story_skip', {
         alcohol_id: alcoholId,
@@ -175,6 +189,6 @@ export function useFirstPickStory({
   return { story, reset };
 }
 
-export type FirstPickStory = NonNullable<
-  ReturnType<typeof useFirstPickStory>['story']
+export type AlcoholStory = NonNullable<
+  ReturnType<typeof useAlcoholStory>['story']
 >;

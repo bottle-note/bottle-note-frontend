@@ -93,16 +93,16 @@ pnpm run gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 
 ## 바텐더 노트 이벤트 기준
 
-| 이벤트                            | 발화 조건                                                                | 매개변수                | 중복 방지                     |
-| --------------------------------- | ------------------------------------------------------------------------ | ----------------------- | ----------------------------- |
-| `bartender_start`                 | 첫 화면에서 추천·상황별·리뷰·찜 흐름을 시작                              | `entry`                 | 선택당 1회                    |
-| `bartender_recommend_result`      | 취향 추천 결과(첫 잔 또는 목록)나 큐레이션 목록을 처음 보는 시점         | `mode`, `result_state`  | 같은 답변·큐레이션 결과당 1회 |
-| `bartender_select_alcohol`        | 첫 잔·추천 목록·큐레이션·찜에서 술을 골라 바텐더 상세로 이동             | `alcohol_id`, `source`  | 선택당 1회                    |
-| `bartender_open_alcohol_page`     | 바텐더 상세나 찜에서 실제 술 상세 페이지로 이동                          | `alcohol_id`, `source`  | 클릭당 1회                    |
-| `bartender_show_other_candidates` | 첫 잔에서 「다른 후보」 선택                                             | 없음                    | 클릭당 1회                    |
-| `bartender_story_start`           | 첫 잔 이야기를 「들려주세요」, 「이야기 듣기」 또는 「다시 듣기」로 시작 | `alcohol_id`, `trigger` | 클릭당 1회                    |
-| `bartender_story_complete`        | 첫 문단의 마지막 문장 말풍선까지 들음                                    | `alcohol_id`            | 들려주기 1회당 1회            |
-| `bartender_story_skip`            | 「다음에요」(제안) 또는 「그만 들을게요」(이야기 중) 선택                | `alcohol_id`, `stage`   | 클릭당 1회                    |
-| `bartender_story_full_text`       | 「전체 글 보기」로 설명 전체 시트를 엶                                   | `alcohol_id`            | 클릭당 1회                    |
+| 이벤트                            | 발화 조건                                                             | 매개변수                | 중복 방지                     |
+| --------------------------------- | --------------------------------------------------------------------- | ----------------------- | ----------------------------- |
+| `bartender_start`                 | 첫 화면에서 추천·상황별·리뷰·찜 흐름을 시작                           | `entry`                 | 선택당 1회                    |
+| `bartender_recommend_result`      | 취향 추천 결과(첫 잔 또는 목록)나 큐레이션 목록을 처음 보는 시점      | `mode`, `result_state`  | 같은 답변·큐레이션 결과당 1회 |
+| `bartender_select_alcohol`        | 추천 목록·큐레이션·찜에서 술을 골라 바텐더 상세로 이동                | `alcohol_id`, `source`  | 선택당 1회                    |
+| `bartender_open_alcohol_page`     | 바텐더 상세나 찜에서 실제 술 상세 페이지로 이동                       | `alcohol_id`, `source`  | 클릭당 1회                    |
+| `bartender_show_other_candidates` | 첫 잔 대화에서 「다른 술도 보여주세요」 선택                          | 없음                    | 클릭당 1회                    |
+| `bartender_story_start`           | 술 이야기를 「들려주세요」, 「이야기 듣기」 또는 「다시 듣기」로 시작 | `alcohol_id`, `trigger` | 클릭당 1회                    |
+| `bartender_story_complete`        | 첫 문단의 마지막 문장 말풍선까지 들음                                 | `alcohol_id`            | 들려주기 1회당 1회            |
+| `bartender_story_skip`            | 「다음에요」(제안) 또는 「그만 들을게요」(이야기 중) 선택             | `alcohol_id`, `stage`   | 클릭당 1회                    |
+| `bartender_story_full_text`       | 「전체 글 보기」로 설명 전체 시트를 엶                                | `alcohol_id`            | 클릭당 1회                    |
 
-첫 잔에서 바로 고른 비율은 `bartender_select_alcohol`(`source: taste`)과 `bartender_show_other_candidates`를 함께 본다. 이야기는 설명이 있는 술에만 제안하므로, 제안 수는 결과 이벤트 수와 같지 않다. GA4 맞춤 측정기준에는 `entry`, `mode`, `result_state`, `source`, `trigger`, `stage`처럼 값이 제한된 항목만 등록하고 `alcohol_id`는 등록하지 않는다.
+첫 잔은 상세와 같은 화면이라 건네는 것만으로 `bartender_select_alcohol`을 보내지 않는다. 첫 잔에서 바로 행동한 비율은 결과 이벤트 대비 `write_review_start`·`bartender_open_alcohol_page`·`add_to_picks`와 `bartender_show_other_candidates`를 함께 본다. 이야기는 첫 잔과 모든 바텐더 상세에서 설명이 있는 술에만 제안하므로, 제안 수는 결과 이벤트 수와 같지 않다. GA4 맞춤 측정기준에는 `entry`, `mode`, `result_state`, `source`, `trigger`, `stage`처럼 값이 제한된 항목만 등록하고 `alcohol_id`는 등록하지 않는다.

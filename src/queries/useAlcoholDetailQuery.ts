@@ -7,6 +7,12 @@ export const alcoholDetailKeys = {
     ['alcoholDetail', alcoholId, viewerId] as const,
 };
 
+/** 상세를 보여 주기 전에 미리 받아 둘 때도 같은 조회를 쓴다. */
+export const fetchAlcoholDetail = async (
+  alcoholId: string,
+): Promise<AlcoholDetailsResponse> =>
+  (await AlcoholsApi.getAlcoholDetails(alcoholId)).data;
+
 interface UseAlcoholDetailQueryOptions {
   alcoholId: string;
   viewerId: number | null;
@@ -22,8 +28,7 @@ export function useAlcoholDetailQuery({
 }: UseAlcoholDetailQueryOptions) {
   return useQuery({
     queryKey: alcoholDetailKeys.detail(alcoholId, viewerId),
-    queryFn: async (): Promise<AlcoholDetailsResponse> =>
-      (await AlcoholsApi.getAlcoholDetails(alcoholId)).data,
+    queryFn: () => fetchAlcoholDetail(alcoholId),
     enabled: enabled && Boolean(alcoholId),
     initialData,
     // 상세 진입마다 브라우저 조회를 한 번 유지하고, 캐시는 그동안 화면에 사용한다.

@@ -17,6 +17,8 @@ import type {
 interface Props {
   question: ScenarioQuestion;
   disabled: boolean;
+  /** 다음 질문을 받는 동안 이 질문에 고른 답. */
+  pendingAnswer?: ScenarioAnswerValue;
   onAnswer: (value: ScenarioAnswerValue) => void;
 }
 
@@ -155,6 +157,7 @@ function PriceQuestion({
 export default function ScenarioQuestionView({
   question,
   disabled,
+  pendingAnswer,
   onAnswer,
 }: Props) {
   const { input } = question;
@@ -169,6 +172,9 @@ export default function ScenarioQuestionView({
               title: option.label,
               description: option.description,
               disabled: option.disabled,
+              selected:
+                pendingAnswer?.kind === 'choice' &&
+                pendingAnswer.choiceId === option.id,
               action: () => onAnswer({ kind: 'choice', choiceId: option.id }),
             })),
             ...(input.allowAny
@@ -176,6 +182,7 @@ export default function ScenarioQuestionView({
                   {
                     id: 'any',
                     title: '상관없어요',
+                    selected: pendingAnswer?.kind === 'any',
                     action: () => onAnswer({ kind: 'any' }),
                   },
                 ]

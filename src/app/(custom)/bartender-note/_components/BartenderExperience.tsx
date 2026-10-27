@@ -2,10 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useLoginBridge } from '@/hooks/useLoginBridge';
-import { useAlcoholDetailQuery } from '@/queries/useAlcoholDetailQuery';
+import {
+  alcoholDetailKeys,
+  fetchAlcoholDetail,
+  useAlcoholDetailQuery,
+} from '@/queries/useAlcoholDetailQuery';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { ApiError } from '@/utils/ApiError';
@@ -20,14 +25,18 @@ import BartenderFrame from './BartenderFrame';
 import ScenarioQuestionView from './ScenarioQuestionView';
 import ScenarioCandidateList from './ScenarioCandidateList';
 import CandidateList, { isCandidateStep } from './CandidateList';
-import WhiskeyDetail from './WhiskeyDetail';
 import CurationFlow from './CurationFlow';
 import ReviewFlow from './ReviewFlow';
 import {
   reviewAlcoholFromDetails,
   reviewAlcoholFromWhiskey,
 } from './reviewAlcohol';
-import { firstPickGreeting, getDialogue, type Notice } from './dialogue';
+import {
+  getDialogue,
+  getTalkCopy,
+  type Notice,
+  type TalkOrigin,
+} from './dialogue';
 import { getStepHeader } from './stepMeta';
 import { useBartenderPicks } from './useBartenderPicks';
 import { useBartenderJourney } from './useBartenderJourney';
@@ -35,8 +44,8 @@ import { useReviewDraft } from './useReviewDraft';
 import { useReviewSubmit, ReviewSubmitError } from './useReviewSubmit';
 import { useBartenderPose } from './useBartenderPose';
 import { useTrackRecommendResult } from './useTrackRecommendResult';
-import ScenarioFirstPick from './ScenarioFirstPick';
-import { useFirstPickStory } from './useFirstPickStory';
+import AlcoholTalk from './AlcoholTalk';
+import { useAlcoholStory } from './useAlcoholStory';
 import { saveSnapshot, takeSnapshot } from './bartenderSnapshot';
 import type { AlcoholSelection, ReviewDraft, Step } from './types';
 import type { ScenarioContext } from '../_scenario/model';
@@ -44,11 +53,13 @@ import { useScenarioFlow } from '../_scenario/useScenarioFlow';
 import type { Curation, Situation, Whiskey } from '../_data/demo';
 
 const SELECT_SOURCE = {
-  'first-pick': 'taste',
   recommendations: 'taste',
   'curation-list': 'situation',
   favorites: 'picks',
 } as const;
+
+/** 다음 질문이 이보다 늦으면 생각하는 자세를 보인다. */
+const THINKING_DELAY_MS = 400;
 
 /** 시나리오 응답을 읽는 단계. 질문과 추천 결과가 같은 조회를 쓴다. */
 const isScenarioStep = (step: Step) =>
@@ -109,17 +120,24 @@ export default function BartenderExperience({
     restore: restoreJourney,
   } = useBartenderJourney();
   const [context, setContext] = useState(scenarioContext);
+  const queryClient = useQueryClient();
   const flow = useScenarioFlow({
     context,
     active: isScenarioStep(step),
+    // 첫 잔은 술 상세로 그리므로, 1위 상세를 받아 둔 뒤 결과로 넘어가 로딩 화면을 거치지 않는다.
+    // 실패해도 결과는 보여 주고, 첫 잔에서 다시 조회한다.
+    prepareResult: async (result) => {
+      const lead = result.candidates?.items[0];
+      if (!lead) return;
+      const alcoholId = String(lead.id);
+      await queryClient.prefetchQuery({
+        queryKey: alcoholDetailKeys.detail(alcoholId, user?.userId ?? null),
+        queryFn: () => fetchAlcoholDetail(alcoholId),
+        retry: false,
+      });
+    },
   });
   const firstPick = flow.query.data?.candidates?.items[0];
-  const { story, reset: resetStory } = useFirstPickStory({
-    candidate: firstPick,
-    active: step === 'first-pick',
-    greeting: firstPickGreeting(firstPick?.name),
-  });
-  const firstPickStory = step === 'first-pick' ? story : null;
   const {
     review,
     lastMode: lastReviewMode,
@@ -138,8 +156,11 @@ export default function BartenderExperience({
   const picks = useBartenderPicks();
   const submit = useReviewSubmit();
   const bartender = useBartenderPose(step);
+  const [thinking, setThinking] = useState(false);
+  /** 고른 술을 바텐더가 건네고 이야기를 들려주는 단계. 추천 1위도 상세와 같은 화면이다. */
+  const talkStep = step === 'first-pick' || step === 'detail';
   const requiresAlcohol =
-    step === 'detail' || (step.startsWith('review-') && step !== 'review-pick');
+    talkStep || (step.startsWith('review-') && step !== 'review-pick');
   const alcoholQuery = useAlcoholDetailQuery({
     alcoholId: selection?.source === 'api' ? String(selection.id) : '',
     viewerId: user?.userId ?? null,
@@ -181,6 +202,16 @@ export default function BartenderExperience({
     tracking.restore(saved);
   }, []);
 
+  // 다음 질문이 늦을 때만 바텐더가 생각하는 자세를 취한다. 빠르면 그대로 넘어간다
+  useEffect(() => {
+    if (!flow.pending) {
+      setThinking(false);
+      return undefined;
+    }
+    const timer = window.setTimeout(() => setThinking(true), THINKING_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [flow.pending]);
+
   useEffect(() => {
     if (!resumeAfterLogin || authLoading) return;
     if (isLoggedIn) move(resumeAfterLogin);
@@ -195,11 +226,9 @@ export default function BartenderExperience({
     ) {
       setNotice(null);
       // 후보가 있으면 1위를 먼저 건넨다. 없으면 바로 빈 결과를 보여 준다.
-      moveStep(
-        flow.query.data.candidates?.items.length
-          ? 'first-pick'
-          : 'recommendations',
-      );
+      const lead = flow.query.data.candidates?.items[0];
+      if (lead) setSelection({ id: lead.id, source: 'api' });
+      moveStep(lead ? 'first-pick' : 'recommendations');
     }
   }, [step, flow.query.isSuccess, flow.query.data?.completed]);
 
@@ -258,11 +287,7 @@ export default function BartenderExperience({
     move('scenario');
   };
   const chooseAlcohol = (next: AlcoholSelection) => {
-    if (
-      step === 'first-pick' ||
-      step === 'recommendations' ||
-      isCandidateStep(step)
-    ) {
+    if (step === 'recommendations' || isCandidateStep(step)) {
       trackGA4Event('bartender_select_alcohol', {
         alcohol_id: String(next.id),
         source: SELECT_SOURCE[step],
@@ -352,33 +377,51 @@ export default function BartenderExperience({
   const header = getStepHeader(step, {
     curationTitle: curation?.title,
     reviewMode: review.mode,
-    questionNumber: flow.answers.length + 1,
+    // 다음 질문을 받는 동안은 방금 답한 질문의 번호를 둔다
+    questionNumber: flow.answers.length + (flow.pending ? 0 : 1),
   });
   const scenarioStep = isScenarioStep(step);
+  /** 시나리오 응답을 그대로 그리는 단계. 첫 잔은 고른 술의 상세로 그린다. */
+  const scenarioView = scenarioStep && step !== 'first-pick';
   const scenarioData = flow.query.data;
   /** 결과에서 뒤로 가면 마지막 질문으로 돌아가는지. 목록 → 첫 잔은 단계만 되돌린다. */
   const backToQuestion =
     (step === 'scenario' && flow.canGoBack) ||
     (scenarioStep && previous === 'scenario');
+  const stepLines = getDialogue({
+    step,
+    detailOrigin: previous,
+    selected,
+    curation,
+    notice,
+    hasCandidates: (scenarioData?.candidates?.totalCount ?? 0) > 0,
+    firstPickName: firstPick?.name,
+    pickCount: picks.isLoading ? undefined : picks.items.length,
+  });
+  const { story, reset: resetStory } = useAlcoholStory({
+    alcohol: selected,
+    active: talkStep,
+    greeting: stepLines[0],
+  });
+  const talkStory = talkStep ? story : null;
+  const talkOrigin: TalkOrigin =
+    step === 'first-pick'
+      ? 'first-pick'
+      : previous === 'recommendations' ||
+          previous === 'favorites' ||
+          previous === 'curation-list'
+        ? previous
+        : 'other';
   const dialogueLines =
-    scenarioStep && flow.query.isError && !flow.query.isFetchNextPageError
+    scenarioView && flow.query.isError && !flow.query.isFetchNextPageError
       ? ['질문을 불러오지 못했어요. 다시 시도해 주세요.']
-      : scenarioStep && !scenarioData
+      : scenarioView && !scenarioData
         ? ['질문을 준비하고 있어요.']
         : step === 'scenario' && scenarioData?.question
           ? [scenarioData.question.prompt]
-          : firstPickStory && !notice
-            ? firstPickStory.lines
-            : getDialogue({
-                step,
-                detailOrigin: previous,
-                selected,
-                curation,
-                notice,
-                hasCandidates: (scenarioData?.candidates?.totalCount ?? 0) > 0,
-                firstPickName: firstPick?.name,
-                pickCount: picks.isLoading ? undefined : picks.items.length,
-              });
+          : talkStory && !notice
+            ? talkStory.lines
+            : stepLines;
 
   return (
     <BartenderFrame
@@ -388,7 +431,9 @@ export default function BartenderExperience({
       subtitle={header.subtitle}
       progress={header.progress}
       lines={dialogueLines}
-      pose={firstPickStory?.pose ?? bartender.pose}
+      pose={
+        talkStory?.pose ?? (thinking && scenarioView ? 'think' : bartender.pose)
+      }
       onBack={
         previous || (step === 'scenario' && flow.canGoBack) ? back : undefined
       }
@@ -423,7 +468,7 @@ export default function BartenderExperience({
           </FlowNavigation>
         </>
       )}
-      {scenarioStep &&
+      {scenarioView &&
         (flow.query.isError && !flow.query.isFetchNextPageError ? (
           <StepError
             onRetry={() => void flow.retry()}
@@ -442,27 +487,8 @@ export default function BartenderExperience({
                 key={scenarioData.question.id}
                 question={scenarioData.question}
                 disabled={!flow.canAnswer}
+                pendingAnswer={flow.pendingAnswer}
                 onAnswer={flow.answer}
-              />
-            )}
-            {step === 'first-pick' && scenarioData.completed && firstPick && (
-              <ScenarioFirstPick
-                key={firstPick.id}
-                candidate={firstPick}
-                story={firstPickStory}
-                onChoose={() =>
-                  chooseAlcohol({ id: firstPick.id, source: 'api' })
-                }
-                onShowOthers={
-                  scenarioData.candidates!.items.length > 1 ||
-                  scenarioData.candidates!.nextCursor
-                    ? () => {
-                        trackGA4Event('bartender_show_other_candidates');
-                        move('recommendations');
-                      }
-                    : undefined
-                }
-                home={home}
               />
             )}
             {step === 'recommendations' &&
@@ -501,15 +527,29 @@ export default function BartenderExperience({
         ) : (
           <LoadingStep />
         ))}
-      {step === 'detail' && selected && (
-        <WhiskeyDetail
+      {talkStep && selected && (
+        <AlcoholTalk
           key={`${selection?.source}:${selected.id}`}
           alcohol={selected}
+          copy={getTalkCopy(talkOrigin, curation?.title)}
+          story={talkStory}
+          onShowOthers={
+            step === 'first-pick'
+              ? (scenarioData?.candidates?.items.length ?? 0) > 1 ||
+                scenarioData?.candidates?.nextCursor
+                ? () => {
+                    trackGA4Event('bartender_show_other_candidates');
+                    move('recommendations');
+                  }
+                : undefined
+              : back
+          }
           isPicked={picks.isPicked(selected.id)}
           isTogglingPick={picks.isToggling}
           onTogglePick={() => void toggleFavorite()}
           onWriteReview={writeReview}
           onLeave={openAlcoholPage}
+          home={home}
         />
       )}
       <CurationFlow

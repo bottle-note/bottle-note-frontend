@@ -37,6 +37,8 @@ function detailReason({ detailOrigin, selected, curation }: DialogueInput) {
   if (!selected) return undefined;
   if (detailOrigin === 'curation-list')
     return `「${curation?.title}」에 담긴 병이에요.\n${selected.tags.slice(0, 2).join('·')} 향이 중심입니다.`;
+  if (detailOrigin === 'favorites')
+    return '찜해 두신 병이네요.\n오늘은 이걸로 드릴까요?';
   return undefined;
 }
 
@@ -108,7 +110,52 @@ export function getDialogue(input: DialogueInput): string[] {
   return dialogue[step];
 }
 
-/** 첫 잔 이야기의 진행. 들을지 묻고, 문장씩 들려주고, 맺는다. */
+/** 술 이야기 화면에 들어온 곳. 화면은 같고 말만 달라진다. */
+export type TalkOrigin =
+  | 'first-pick'
+  | 'recommendations'
+  | 'favorites'
+  | 'curation-list'
+  | 'other';
+
+/** 술 이야기 화면의 첫 말풍선, 카드 이름표, 들어온 목록으로 돌아가는 대답. */
+export function getTalkCopy(
+  origin: TalkOrigin,
+  curationTitle?: string,
+): { opening: string; label: string; more?: string } {
+  switch (origin) {
+    case 'first-pick':
+      return {
+        opening: '오늘의 첫 잔이에요.',
+        label: '오늘의 첫 잔',
+        more: '다른 술도 보여주세요',
+      };
+    case 'recommendations':
+      return {
+        opening: '이 병도 잘 맞으실 거예요.',
+        label: '추천 후보',
+        more: '다른 술도 볼게요',
+      };
+    case 'favorites':
+      return {
+        opening: '찜해 두신 병이에요.',
+        label: '내가 찜한 술',
+        more: '다른 찜도 볼게요',
+      };
+    case 'curation-list':
+      return {
+        opening: curationTitle
+          ? `「${curationTitle}」에 담긴 병이에요.`
+          : '큐레이션에 담긴 병이에요.',
+        label: curationTitle ?? '큐레이션',
+        more: '이 큐레이션 더 볼게요',
+      };
+    default:
+      return { opening: '좋은 선택이에요.', label: '고른 술' };
+  }
+}
+
+/** 술 이야기의 진행. 들을지 묻고, 문장씩 들려주고, 맺는다. */
 export type StoryPhase = 'offer' | 'telling' | 'told' | 'declined' | 'settled';
 
 const STORY_COPY = {
@@ -129,6 +176,9 @@ const STORY_COPY = {
 /** 같은 술에는 늘 같은 말을 하도록 술 id로 고른다. */
 const byId = (lines: string[], id: number) => lines[id % lines.length];
 
+/** 들려줄 이야기가 없을 때 다른 술로 이끄는 말풍선. */
+export const STORY_NONE = '다른 병도 궁금하시면 말씀하세요.';
+
 /** 이야기를 듣지 않았거나 다시 들어왔을 때 다시 권하는 말풍선. */
 export const storyLater = (heard: boolean) =>
   heard
@@ -140,7 +190,7 @@ export const storyOffer = (alcoholId: number) =>
   byId(STORY_COPY.offer, alcoholId);
 
 /**
- * 첫 잔 단계의 대사창. 설명 원문은 카드 아래 말풍선으로 들려주고,
+ * 술 이야기 화면의 대사창. 설명 원문은 카드 아래 말풍선으로 들려주고,
  * 대사창은 받는 말과 맺는 말만 한다. 문단이 더 있으면 전체 글로 안내한다.
  */
 export function getStoryDialogue({

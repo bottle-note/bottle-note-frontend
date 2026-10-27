@@ -1,7 +1,7 @@
 export type Step =
   | 'intro'
   | 'scenario'
-  /** 추천 결과의 1위를 먼저 건네는 단계. 나머지 후보는 recommendations에서 본다. */
+  /** 추천 결과의 1위를 먼저 건네는 단계. 상세와 같은 화면이고, 나머지 후보는 recommendations에서 본다. */
   | 'first-pick'
   | 'recommendations'
   | 'situation'

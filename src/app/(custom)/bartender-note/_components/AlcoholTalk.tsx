@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import Link from 'next/link';
+import { Heart } from 'lucide-react';
+import { ROUTES } from '@/constants/routes';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
-import Button from '@/components/ui/Button/Button';
+import Button, { buttonVariants } from '@/components/ui/Button/Button';
 import BottomSheet from '@/components/ui/Modal/BottomSheet';
 import { useDialogueSettled } from './BartenderFrame';
-import { storyLater, storyOffer } from './dialogue';
+import { STORY_NONE, storyLater, storyOffer } from './dialogue';
 import { FlowDock, FlowTextAction } from './FlowControls';
 import { prefersReducedMotion } from './prefersReducedMotion';
-import type { FirstPickStory, StoryMessage } from './useFirstPickStory';
-import type { ScenarioCandidate } from '../_scenario/model';
+import type { ReviewAlcohol } from './reviewAlcohol';
+import type { AlcoholStory, StoryMessage } from './useAlcoholStory';
+import { WhiskeyImage } from './WhiskeyRow';
 
 /** 가로 카드 한 줄에 들어가는 만큼만 보인다. */
 const TAG_LIMIT = 3;
@@ -16,25 +20,42 @@ const appear =
   'motion-safe:duration-300 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2';
 
 /**
- * 추천 결과의 1위를 바텐더가 건네는 대화로 보여 준다.
- * 카드 아래에서 이야기를 들을지 묻고, 설명 첫 문단을 문장씩 말풍선으로 들려준다.
+ * 고른 술을 바텐더가 건네는 대화로 보여 준다. 추천 1위와 목록·찜·큐레이션에서 고른 술이 같은 화면을 쓴다.
+ * 카드 아래에서 이야기를 들을지 묻고, 설명 첫 문단을 문장씩 말풍선으로 이어 들려준다.
  * 대답 버튼은 바텐더 말이 끝난 뒤 가장 최근 바텐더 말풍선 아랫단에 달린다.
+ * 들어온 목록으로 돌아가는 것도 대답 중 하나로 내놓는다.
  */
-export default function ScenarioFirstPick({
-  candidate,
+export default function AlcoholTalk({
+  alcohol,
+  copy,
   story,
-  onChoose,
   onShowOthers,
+  isPicked,
+  isTogglingPick,
+  onTogglePick,
+  onWriteReview,
+  onLeave,
   home,
 }: {
-  candidate: ScenarioCandidate;
+  alcohol: ReviewAlcohol;
+  /** 들어온 곳마다 달라지는 말. */
+  copy: { opening: string; label: string; more?: string };
   /** 설명이 있는 술만 이야기를 들려준다. */
-  story: FirstPickStory | null;
-  onChoose: () => void;
-  /** 다른 후보가 없으면 비워 둔다. */
+  story: AlcoholStory | null;
+  /** 돌아갈 목록이 없으면 비워 둔다. */
   onShowOthers?: () => void;
+  isPicked: boolean;
+  isTogglingPick: boolean;
+  onTogglePick: () => void;
+  onWriteReview: () => void;
+  /** 실제 술 상세 페이지로 나가기 직전에 부른다. */
+  onLeave: () => void;
   home: () => void;
 }) {
+  const others =
+    copy.more && onShowOthers
+      ? { label: copy.more, onClick: onShowOthers }
+      : undefined;
   const settled = useDialogueSettled();
   const [fullTextOpen, setFullTextOpen] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
@@ -42,14 +63,17 @@ export default function ScenarioFirstPick({
   const offerVisible = Boolean(
     story?.asked && (settled || story.messages.length),
   );
+  // 이야기하는 동안은 끝까지 이어지고, 멈추는 대답만 입력 중 표시에 단다
+  const telling = story?.phase === 'telling';
   const replies =
-    story && settled && !story.pending ? (
+    story && !telling && settled && !story.pending ? (
       <StoryReplies
         story={story}
         onOpenFullText={() => {
           story.openFullText();
           setFullTextOpen(true);
         }}
+        others={others}
       />
     ) : null;
   // 대답은 그 대답을 부른 말풍선에 단다. 내가 마지막으로 말했으면 바텐더가 다시 권한다
@@ -81,11 +105,17 @@ export default function ScenarioFirstPick({
         aria-label="노트와 나눈 대화"
         className="flex flex-col gap-8"
       >
-        <BartenderBubble>오늘의 첫 잔이에요.</BartenderBubble>
-        <FirstPickCard candidate={candidate} />
+        <BartenderBubble>{copy.opening}</BartenderBubble>
+        <AlcoholCard
+          alcohol={alcohol}
+          label={copy.label}
+          isPicked={isPicked}
+          isTogglingPick={isTogglingPick}
+          onTogglePick={onTogglePick}
+        />
         {story && offerVisible && (
           <BartenderBubble className={appear} actions={offerReplies}>
-            {storyOffer(candidate.id)}
+            {storyOffer(alcohol.id)}
           </BartenderBubble>
         )}
         {story?.messages.map((message, index, messages) => (
@@ -102,8 +132,32 @@ export default function ScenarioFirstPick({
             {storyLater(story.heard)}
           </BartenderBubble>
         )}
+        {!story && others && settled && (
+          <BartenderBubble
+            className={appear}
+            actions={
+              <ReplyGroup>
+                <ShowOthersRow {...others} />
+              </ReplyGroup>
+            }
+          >
+            {STORY_NONE}
+          </BartenderBubble>
+        )}
         {story?.pending && (
-          <BartenderBubble>
+          <BartenderBubble
+            actions={
+              telling && (
+                <ReplyGroup>
+                  <ReplyRow>
+                    <Reply tone="muted" onClick={story.skip}>
+                      그만 들을게요
+                    </Reply>
+                  </ReplyRow>
+                </ReplyGroup>
+              )
+            }
+          >
             <span
               role="status"
               aria-label="이야기를 이어 가는 중"
@@ -127,25 +181,21 @@ export default function ScenarioFirstPick({
         <FlowTextAction onClick={home}>처음으로</FlowTextAction>
       </nav>
       <FlowDock>
-        <div className="flex gap-8">
-          <Button
-            size="lg"
-            variant="primary"
-            className="min-w-0 flex-[3]"
-            onClick={onChoose}
+        <div className="grid grid-cols-2 gap-8">
+          <Link
+            href={ROUTES.ALCOHOL.DETAIL(alcohol.id)}
+            onClick={onLeave}
+            className={buttonVariants({
+              size: 'lg',
+              variant: 'secondary',
+              fullWidth: true,
+            })}
           >
-            이 술 자세히 볼게요
+            자세히 볼게요
+          </Link>
+          <Button size="lg" variant="primary" onClick={onWriteReview}>
+            리뷰 작성
           </Button>
-          {onShowOthers && (
-            <Button
-              size="lg"
-              variant="secondary"
-              className="min-w-0 flex-[2]"
-              onClick={onShowOthers}
-            >
-              다른 후보
-            </Button>
-          )}
         </div>
       </FlowDock>
       {story && (
@@ -167,7 +217,7 @@ export default function ScenarioFirstPick({
                   이 술 이야기
                 </span>
                 <h3 className="m-0 break-keep text-17 font-extrabold leading-24">
-                  {candidate.name}
+                  {alcohol.name}
                 </h3>
               </div>
               <button
@@ -196,35 +246,60 @@ export default function ScenarioFirstPick({
   );
 }
 
-function FirstPickCard({ candidate }: { candidate: ScenarioCandidate }) {
-  const metadata = [candidate.category, candidate.abv && `${candidate.abv}%`]
+function AlcoholCard({
+  alcohol,
+  label,
+  isPicked,
+  isTogglingPick,
+  onTogglePick,
+}: {
+  alcohol: ReviewAlcohol;
+  label: string;
+  isPicked: boolean;
+  isTogglingPick: boolean;
+  onTogglePick: () => void;
+}) {
+  const metadata = [alcohol.category, alcohol.abv && `${alcohol.abv}%`]
     .filter(Boolean)
     .join(' · ');
-  const tags = candidate.tags?.slice(0, TAG_LIMIT) ?? [];
+  const tags = alcohol.tags.slice(0, TAG_LIMIT);
   return (
     <section
-      aria-label="오늘의 첫 잔"
-      className="ml-34 flex items-center gap-12 rounded-xl border border-stroke-neutral-subtle bg-bg-neutral-weak p-10 motion-safe:duration-500 motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95"
+      aria-label={label}
+      className="relative ml-34 flex items-center gap-12 rounded-xl border border-stroke-neutral-subtle bg-bg-neutral-weak p-10 motion-safe:duration-500 motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95"
     >
       <span aria-hidden="true">
-        <AlcoholImage
-          imageUrl={candidate.imageUrl ?? ''}
-          outerHeightClass="h-64"
-          outerWidthClass="w-64"
-          // 술 이미지는 여백을 둔 정사각형이라 안쪽도 정사각형으로 둬야 병이 작아지지 않는다
-          innerHeightClass="h-58"
-          innerWidthClass="w-58"
-          priority
-        />
+        {alcohol.demoWhiskey ? (
+          <WhiskeyImage whiskey={alcohol.demoWhiskey} size={64} />
+        ) : (
+          <AlcoholImage
+            imageUrl={alcohol.imageUrl ?? ''}
+            outerHeightClass="h-64"
+            outerWidthClass="w-64"
+            // 술 이미지는 여백을 둔 정사각형이라 안쪽도 정사각형으로 둬야 병이 작아지지 않는다
+            innerHeightClass="h-58"
+            innerWidthClass="w-58"
+            priority
+          />
+        )}
       </span>
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <p className="m-0 text-11 font-extrabold text-fg-brand">오늘의 첫 잔</p>
-        <h2 className="m-0 line-clamp-2 break-keep text-17 font-extrabold leading-22">
-          {candidate.name}
-        </h2>
+      <div className="flex min-w-0 flex-1 flex-col gap-2 pr-32">
+        <p className="m-0 truncate text-11 font-extrabold text-fg-brand">
+          {label}
+        </p>
+        <h1 className="m-0 line-clamp-2 break-keep text-17 font-extrabold leading-22">
+          {alcohol.name}
+        </h1>
         {metadata && (
           <p className="m-0 text-12 text-fg-neutral-muted">{metadata}</p>
         )}
+        <p
+          className={`m-0 text-12 ${alcohol.rating === null ? 'text-fg-neutral-muted' : 'text-fg-rating'}`}
+        >
+          {alcohol.rating === null
+            ? '아직 평가가 없어요'
+            : `★ ${alcohol.rating.toFixed(1)}${alcohol.reviewCount ? ` · 리뷰 ${alcohol.reviewCount}건` : ''}`}
+        </p>
         {tags.length > 0 && (
           <ul
             aria-label="테이스팅 태그"
@@ -241,6 +316,20 @@ function FirstPickCard({ candidate }: { candidate: ScenarioCandidate }) {
           </ul>
         )}
       </div>
+      <button
+        type="button"
+        aria-label={isPicked ? '찜 취소' : '찜하기'}
+        aria-pressed={isPicked}
+        disabled={isTogglingPick}
+        onClick={onTogglePick}
+        className="absolute right-0 top-0 grid h-40 w-40 place-items-center text-fg-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring disabled:opacity-45"
+      >
+        <Heart
+          aria-hidden="true"
+          className="h-18 w-18"
+          fill={isPicked ? 'currentColor' : 'none'}
+        />
+      </button>
     </section>
   );
 }
@@ -322,18 +411,57 @@ function Reply({
   );
 }
 
-/** 이야기에 대한 내 대답. 진행에 따라 듣기·이어 듣기·다시 듣기로 바뀐다. */
+function ReplyGroup({ children }: { children: ReactNode }) {
+  return (
+    <div
+      role="group"
+      aria-label="내 대답"
+      className={`flex flex-col border-t border-stroke-neutral-subtle ${appear}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function ReplyRow({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex border-t border-stroke-neutral-subtle first:border-t-0">
+      {children}
+    </div>
+  );
+}
+
+function ShowOthersRow({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <ReplyRow>
+      <Reply tone="primary" onClick={onClick}>
+        {label}
+        <span aria-hidden="true">›</span>
+      </Reply>
+    </ReplyRow>
+  );
+}
+
+/** 이야기에 대한 내 대답. 진행에 따라 듣기·다시 듣기로 바뀌고, 돌아갈 목록이 있으면 함께 내놓는다. */
 function StoryReplies({
   story,
   onOpenFullText,
+  others,
 }: {
-  story: FirstPickStory;
+  story: AlcoholStory;
   onOpenFullText: () => void;
+  others?: { label: string; onClick: () => void };
 }) {
-  const replies = (() => {
-    switch (story.phase) {
-      case 'offer':
-        return (
+  return (
+    <ReplyGroup>
+      <ReplyRow>
+        {story.phase === 'offer' ? (
           <>
             <Reply tone="muted" onClick={story.skip}>
               다음에요
@@ -342,20 +470,7 @@ function StoryReplies({
               들려주세요
             </Reply>
           </>
-        );
-      case 'telling':
-        return (
-          <>
-            <Reply tone="muted" onClick={story.skip}>
-              그만 들을게요
-            </Reply>
-            <Reply tone="primary" onClick={story.next}>
-              계속 들려주세요<span aria-hidden="true">›</span>
-            </Reply>
-          </>
-        );
-      default:
-        return (
+        ) : (
           <>
             <Reply tone="primary" onClick={story.listen}>
               {story.heard ? '다시 듣기' : '이야기 듣기'}
@@ -364,16 +479,9 @@ function StoryReplies({
               전체 글 보기
             </Reply>
           </>
-        );
-    }
-  })();
-  return (
-    <div
-      role="group"
-      aria-label="내 대답"
-      className={`flex border-t border-stroke-neutral-subtle ${appear}`}
-    >
-      {replies}
-    </div>
+        )}
+      </ReplyRow>
+      {others && <ShowOthersRow {...others} />}
+    </ReplyGroup>
   );
 }
