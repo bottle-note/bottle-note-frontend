@@ -52,10 +52,7 @@ describe('Navbar suppression', () => {
     render(<Navbar isSuppressed />);
 
     const navbar = screen.getByRole('navigation', { hidden: true });
-    expect(navbar).toHaveClass(
-      'pointer-events-none',
-      'translate-y-[calc(100%+var(--navbar-margin-bottom))]',
-    );
+    expect(navbar).toHaveClass('pointer-events-none', 'translate-y-full');
     expect(navbar).toHaveAttribute('aria-hidden', 'true');
     expect(navbar.querySelector('button')).toHaveAttribute('tabindex', '-1');
   });

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
@@ -118,42 +118,36 @@ function Navbar({
     <nav
       aria-hidden={!shouldShowNavbar}
       className={cn(
-        `scroll-navigation-motion fixed left-0 right-0 mx-auto w-full px-16 z-10 transition-transform`,
+        'scroll-navigation-motion fixed bottom-0 left-0 right-0 mx-auto w-full z-10 transition-transform border-t border-stroke-neutral-subtle bg-bg-layer-default',
         shouldShowNavbar
           ? 'translate-y-0'
-          : 'pointer-events-none translate-y-[calc(100%+var(--navbar-margin-bottom))]',
+          : 'pointer-events-none translate-y-full',
         maxWidth ? `max-w-[${maxWidth}]` : 'max-w-content',
       )}
-      style={{ bottom: 'var(--navbar-margin-bottom)' }}
+      style={{ paddingBottom: 'var(--safe-area-bottom)' }}
     >
-      <section className="h-70 flex justify-between bg-bg-layer-floating text-fg-neutral py-16 px-26 rounded-[13px] drop-shadow-[0_3px_3px_rgba(0,0,0,0.30)]">
-        {navItems.map((menu, index) => (
-          <React.Fragment key={menu.link}>
-            <button
-              className={`flex flex-col items-center space-y-4 ${isMounted && !isActive(menu.link) ? 'opacity-40' : ''}`}
-              tabIndex={shouldShowNavbar ? undefined : -1}
-              onClick={() => handleNavigation(menu)}
-              onTouchEnd={() =>
-                handleWebViewMessage('triggerHaptic', { type: 'light' })
-              }
-            >
-              <div className="flex flex-col items-center justify-center space-y-2">
-                <Image
-                  src={menu.icon}
-                  alt={menu.name}
-                  width={26}
-                  height={26}
-                  style={{ width: 26, height: 26 }}
-                />
-                <span className="text-10 font-medium text-fg-brand">
-                  {menu.name}
-                </span>
-              </div>
-            </button>
-            {index !== navItems.length - 1 && (
-              <span className="border-[0.01rem] border-stroke-neutral-subtle" />
-            )}
-          </React.Fragment>
+      <section className="h-[var(--navbar-height)] grid grid-cols-5 text-fg-neutral">
+        {navItems.map((menu) => (
+          <button
+            key={menu.link}
+            className={`flex flex-col items-center justify-center space-y-2 ${isMounted && !isActive(menu.link) ? 'opacity-40' : ''}`}
+            tabIndex={shouldShowNavbar ? undefined : -1}
+            onClick={() => handleNavigation(menu)}
+            onTouchEnd={() =>
+              handleWebViewMessage('triggerHaptic', { type: 'light' })
+            }
+          >
+            <Image
+              src={menu.icon}
+              alt={menu.name}
+              width={26}
+              height={26}
+              style={{ width: 26, height: 26 }}
+            />
+            <span className="text-10 font-medium text-fg-brand">
+              {menu.name}
+            </span>
+          </button>
         ))}
       </section>
     </nav>

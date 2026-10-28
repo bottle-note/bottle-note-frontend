@@ -16,7 +16,7 @@ function AppStorePromptBanner({
   return (
     <aside
       aria-label="BottleNote 앱 안내"
-      className="fixed bottom-[calc(var(--navbar-margin-bottom)+var(--navbar-height)+12px)] left-1/2 z-20 flex min-h-64 w-[calc(100%-32px)] max-w-[436px] -translate-x-1/2 items-center gap-8 rounded-xl border border-stroke-neutral-basement bg-bg-layer-floating p-8 pl-12 drop-shadow-[0_7px_22px_rgba(65,49,41,0.13)] animate-in fade-in slide-in-from-bottom-2 duration-300"
+      className="fixed bottom-[calc(var(--navbar-total-space)+12px)] left-1/2 z-20 flex min-h-64 w-[calc(100%-32px)] max-w-[436px] -translate-x-1/2 items-center gap-8 rounded-xl border border-stroke-neutral-basement bg-bg-layer-floating p-8 pl-12 drop-shadow-[0_7px_22px_rgba(65,49,41,0.13)] animate-in fade-in slide-in-from-bottom-2 duration-300"
     >
       <span className="hidden h-36 w-36 shrink-0 items-center justify-center rounded-lg bg-bg-brand-weak min-[360px]:flex">
         <Image

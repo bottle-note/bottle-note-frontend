@@ -1,4 +1,5 @@
 import React, { Children } from 'react';
+import { STICKY_BOTTOM_CTA_PADDING_CLASS } from '@/components/ui/Layout/StickyBottomCta';
 import ImagesForm from './ImagesForm';
 import PriceForm from './PriceForm';
 import AddressForm from './AddressForm';
@@ -30,7 +31,9 @@ interface Props {
 
 function ReviewForm({ alcoholTastingTags }: Props) {
   return (
-    <section className="px-20 pt-36 pb-[var(--sticky-cta-space)] relative">
+    <section
+      className={`px-20 pt-36 ${STICKY_BOTTOM_CTA_PADDING_CLASS} relative`}
+    >
       <Section>
         <RatingForm />
         <ContentForm />
