@@ -17,8 +17,8 @@ export function HomeFeaturedLoginRequired({ isAuthLoading }: Props) {
   });
 
   return (
-    <div ref={gateRef} className="flex flex-col h-full -ml-25">
-      <div className="flex flex-col items-center justify-center flex-grow space-y-14">
+    <div ref={gateRef} className="flex flex-col">
+      <div className="flex flex-col items-center justify-center space-y-14 py-60">
         <Image
           src="/icon/logo-subcoral.svg"
           alt="logo"

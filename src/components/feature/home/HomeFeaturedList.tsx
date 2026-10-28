@@ -4,15 +4,21 @@ import React from 'react';
 import { useHomeFeaturedQuery } from '@/queries/useHomeFeaturedQuery';
 import { useCurrentUserQuery } from '@/queries/useCurrentUserQuery';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
-import { LoadingStateSkeleton } from '@/components/ui/Loading/Skeletons/custom/PopularSkeleton';
+import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import type { HomeFeaturedType } from '@/types/HomeFeatured';
+import type { HomeSection } from '@/utils/analytics/types';
 import { HOME_FEATURED_CONFIG } from '@/constants/home';
 
-import { HomeFeaturedDescription } from './_components/HomeFeaturedDescription';
-import { HomeFeaturedItemList } from './_components/HomeFeaturedItemList';
+import HomeSectionHeader from './HomeSectionHeader';
+import { HomeRankList } from './_components/HomeRankList';
 import { HomeFeaturedEmptyState } from './_components/HomeFeaturedEmptyState';
 import { HomeFeaturedErrorState } from './_components/HomeFeaturedErrorState';
 import { HomeFeaturedLoginRequired } from './_components/HomeFeaturedLoginRequired';
+
+const SECTION_BY_TYPE: Partial<Record<HomeFeaturedType, HomeSection>> = {
+  'view-week': 'weekly_top',
+  recent: 'recent_viewed',
+};
 
 interface Props {
   type?: HomeFeaturedType;
@@ -20,7 +26,7 @@ interface Props {
 
 function HomeFeaturedList({ type = 'week' }: Props) {
   const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
-  const { requiresAuth } = HOME_FEATURED_CONFIG[type];
+  const { requiresAuth, titleLabel, titleText } = HOME_FEATURED_CONFIG[type];
 
   // 로그인이 필요한 타입인데 로그인하지 않은 경우 쿼리 비활성화
   const shouldFetchData = !requiresAuth || isLoggedIn;
@@ -40,47 +46,41 @@ function HomeFeaturedList({ type = 'week' }: Props) {
     enabled: requiresAuth && isLoggedIn && !isLoading,
   });
 
-  // 로그인 필요 상태
   if (requiresAuth && !isLoggedIn) {
-    return (
-      <div className="h-321">
-        <HomeFeaturedLoginRequired isAuthLoading={isAuthLoading} />
-      </div>
-    );
+    return <HomeFeaturedLoginRequired isAuthLoading={isAuthLoading} />;
   }
 
-  // 로딩 상태
   if (isLoading) {
     return (
-      <div className="h-321">
-        <LoadingStateSkeleton />
+      <div className="space-y-14 px-20" aria-busy="true">
+        <SkeletonBase height={17} width={120} />
+        <SkeletonBase count={2} height={24} width={270} />
+        <SkeletonBase count={5} height={88} />
       </div>
     );
   }
 
-  // 에러 상태
   if (isError) {
-    return (
-      <div className="h-321">
-        <HomeFeaturedErrorState onRetry={() => refetch()} />
-      </div>
-    );
+    return <HomeFeaturedErrorState onRetry={() => refetch()} />;
   }
 
-  // 빈 상태
   if (!featuredList || featuredList.length === 0) {
-    return (
-      <div className="h-321">
-        <HomeFeaturedEmptyState type={type} />
-      </div>
-    );
+    return <HomeFeaturedEmptyState type={type} />;
   }
 
-  // 데이터 있음
+  const title = [
+    titleText[0].replace('{nickname}', currentUser?.nickname ?? ''),
+    titleText[1],
+  ].join('\n');
+
   return (
-    <div className="h-321">
-      <HomeFeaturedDescription type={type} nickname={currentUser?.nickname} />
-      <HomeFeaturedItemList items={featuredList} />
+    <div className="space-y-8">
+      <HomeSectionHeader label={titleLabel} title={title} />
+      <HomeRankList
+        items={featuredList}
+        section={SECTION_BY_TYPE[type] ?? 'weekly_top'}
+        ranked={type !== 'recent'}
+      />
     </div>
   );
 }
