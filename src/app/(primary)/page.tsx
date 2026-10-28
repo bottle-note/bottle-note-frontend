@@ -6,6 +6,8 @@ import { generateWebSiteSchema } from '@/utils/seo/generateWebSiteSchema';
 import HomeQuickLinks from '@/components/feature/home/HomeQuickLinks';
 import HomeFeaturedSection from '@/components/feature/home/HomeFeaturedSection';
 import HomeCategorySection from '@/components/feature/home/HomeCategorySection';
+import HomeCurationSection from '@/components/feature/home/HomeCurationSection';
+import HomeReviewSection from '@/components/feature/home/HomeReviewSection';
 import type { Banner } from '@/api/banner/types';
 import type { ApiResponse } from '@/api/_shared/types';
 import { SSR_CALLER_HEADER } from '@/constants/common';
@@ -56,7 +58,9 @@ export default async function Home() {
 
         <div className="space-y-40 pt-28 pb-[var(--navbar-total-space)]">
           <HomeFeaturedSection />
+          <HomeCurationSection />
           <HomeCategorySection />
+          <HomeReviewSection />
         </div>
       </NavLayout>
     </>

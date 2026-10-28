@@ -6,6 +6,7 @@ interface Props {
   /** 줄바꿈(\n)으로 두 줄 제목을 나눈다. */
   title: string;
   moreHref?: string;
+  moreLabel?: string;
   onMoreClick?: () => void;
 }
 
@@ -14,6 +15,7 @@ export default function HomeSectionHeader({
   label,
   title,
   moreHref,
+  moreLabel = '전체 보기',
   onMoreClick,
 }: Props) {
   return (
@@ -32,7 +34,7 @@ export default function HomeSectionHeader({
           onClick={onMoreClick}
           className="flex min-h-44 shrink-0 items-center gap-2 text-13 text-fg-neutral-muted"
         >
-          전체 보기
+          {moreLabel}
           <ArrowUpRight aria-hidden size={14} />
         </Link>
       )}

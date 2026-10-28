@@ -7,7 +7,10 @@ import {
   CURATION_V2_SPEC_CODES,
   type CurationV2SortType,
 } from '@/api/curation-v2/constants';
-import type { CurationV2FeedItem } from '@/api/curation-v2/types';
+import {
+  CURATION_FEED_KIND_LABEL,
+  getCurationFeedKind,
+} from '@/api/curation-v2/feedKind';
 import { SORT_ORDER } from '@/api/_shared/types';
 import TabbedListPageHeader from '@/components/feature/TabbedListPage/TabbedListPageHeader';
 import { useTabbedListNavigation } from '@/hooks/useTabbedListNavigation';
@@ -52,15 +55,6 @@ const SORT_ORDER_BY_TYPE: Record<CurationV2SortType, SORT_ORDER> = {
   [CURATION_V2_SORT_TYPES.EXPOSURE_START_DATE]: SORT_ORDER.DESC,
   [CURATION_V2_SORT_TYPES.DISPLAY_ORDER]: SORT_ORDER.ASC,
 };
-
-const hasPairingPayload = (item: CurationV2FeedItem) =>
-  Array.isArray(item.payload) &&
-  item.payload.some(
-    (payloadItem) =>
-      typeof payloadItem === 'object' &&
-      payloadItem !== null &&
-      'pairings' in payloadItem,
-  );
 
 export default function CurationPage() {
   const {
@@ -204,7 +198,7 @@ export default function CurationPage() {
           <CurationFeedCard
             key={curation.id}
             curation={curation}
-            badgeLabel={hasPairingPayload(curation) ? '페어링' : '큐레이션'}
+            badgeLabel={CURATION_FEED_KIND_LABEL[getCurationFeedKind(curation)]}
             priority={index === 0}
           />
         ));

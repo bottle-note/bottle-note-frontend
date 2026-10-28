@@ -109,10 +109,11 @@ pnpm run gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 
 ## 홈 이벤트 기준
 
-| 이벤트                  | 발화 조건                                       | 매개변수                         | 중복 방지  |
-| ----------------------- | ----------------------------------------------- | -------------------------------- | ---------- |
-| `home_quick_link_click` | 배너 아래 바로가기 선택                         | `link`                           | 클릭당 1회 |
-| `home_item_click`       | 홈 섹션의 항목(주간 TOP 5, 최근 본 위스키) 선택 | `section`, `item_id`, `position` | 클릭당 1회 |
-| `add_to_picks`          | 홈 목록에서 찜 추가·취소                        | 기존 매개변수 + `source: home`   | 클릭당 1회 |
+| 이벤트                  | 발화 조건                                                        | 매개변수                         | 중복 방지  |
+| ----------------------- | ---------------------------------------------------------------- | -------------------------------- | ---------- |
+| `home_quick_link_click` | 배너 아래 바로가기 선택                                          | `link`                           | 클릭당 1회 |
+| `home_item_click`       | 홈 섹션 항목(주간 TOP 5, 최근 본 위스키, 에디터 추천, 리뷰) 선택 | `section`, `item_id`, `position` | 클릭당 1회 |
+| `home_more_click`       | 섹션의 「전체 보기」 선택                                        | `section`                        | 클릭당 1회 |
+| `add_to_picks`          | 홈 목록에서 찜 추가·취소                                         | 기존 매개변수 + `source: home`   | 클릭당 1회 |
 
-`link`는 `bartender_note`·`taste_test`·`tarot`·`my_records`, `section`은 `weekly_top`·`recent_viewed`이며 큐레이션·리뷰·둘러보기 섹션이 붙으면 같은 이벤트에 값을 더한다. `position`은 섹션 안에서 1부터 센다. GA4 맞춤 측정기준에는 `link`, `section`만 등록하고 `item_id`는 등록하지 않는다.
+`link`는 `bartender_note`·`taste_test`·`tarot`·`my_records`, `section`은 `weekly_top`·`recent_viewed`·`curation`·`review`이며 둘러보기 섹션이 붙으면 같은 이벤트에 값을 더한다. `item_id`는 섹션에 따라 주류 ID, 큐레이션 ID, 리뷰 ID다. `position`은 섹션 안에서 1부터 센다. GA4 맞춤 측정기준에는 `link`, `section`만 등록하고 `item_id`는 등록하지 않는다.
