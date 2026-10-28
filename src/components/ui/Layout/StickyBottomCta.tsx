@@ -5,7 +5,9 @@ import Button, { buttonVariants } from '@/components/ui/Button/Button';
  * 이 컴포넌트를 렌더하는 화면의 스크롤 루트에는 반드시 이 클래스를 페어로
  * 줘야 한다. 안 그러면 마지막 콘텐츠가 이 고정 바에 가려진다.
  */
-export const STICKY_BOTTOM_CTA_PADDING_CLASS = 'pb-[var(--sticky-cta-space)]';
+// 버튼 52px + 바닥 여백 + 간격 16px
+export const STICKY_BOTTOM_CTA_PADDING_CLASS =
+  'pb-[calc(52px+var(--floating-bottom-offset)+16px)]';
 
 type StickyBottomCtaProps =
   | { label: string; disabled?: boolean; onClick: () => void; href?: never }
@@ -20,7 +22,7 @@ export const StickyBottomCta = forwardRef<HTMLDivElement, StickyBottomCtaProps>(
       <div
         ref={ref}
         className="fixed-content z-20 px-20"
-        style={{ bottom: 'var(--navbar-margin-bottom)' }}
+        style={{ bottom: 'var(--floating-bottom-offset)' }}
       >
         {typeof props.href !== 'string' || disabled ? (
           <Button btnName={label} onClick={props.onClick} disabled={disabled} />

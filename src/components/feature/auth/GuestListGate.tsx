@@ -72,7 +72,7 @@ export function GuestListGate({
             style={{
               bottom: isNavbarVisible
                 ? 'calc(var(--navbar-total-space) + 16px)'
-                : 'var(--navbar-margin-bottom)',
+                : 'var(--floating-bottom-offset)',
             }}
           >
             <div

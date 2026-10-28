@@ -173,23 +173,18 @@
 
     /* Component heights */
     --search-bar-height: 56px;
-    --search-fixed-area-height: 70px;
-    --tab-height: 81px;
     --logo-header-expanded-height: calc(91px + var(--safe-area-top));
     --logo-header-collapsed-height: calc(var(--header-height-with-safe) + 32px);
     --logo-header-slide-distance: calc(
       var(--logo-header-expanded-height) - var(--logo-header-collapsed-height)
     );
 
-    /* Navbar (px 단위 통일) */
-    --navbar-height: 70px;
-    --navbar-margin-bottom: max(24px, calc(var(--safe-area-bottom) + 8px));
-    --navbar-total-space: calc(
-      var(--navbar-height) + var(--navbar-margin-bottom)
-    );
+    /* Navbar (px 단위 통일): 화면 하단에 붙고 safe area만큼 아래로 늘어난다 */
+    --navbar-height: 64px;
+    --navbar-total-space: calc(var(--navbar-height) + var(--safe-area-bottom));
 
-    /* Sticky CTA 버튼 영역 확보용 (버튼 52px + bottom 여백 + 간격) */
-    --sticky-cta-space: calc(52px + var(--navbar-margin-bottom) + 16px);
+    /* 하단에 떠 있는 요소(CTA·안내)와 화면 바닥 사이 여백 */
+    --floating-bottom-offset: max(24px, calc(var(--safe-area-bottom) + 8px));
   }
 }
 

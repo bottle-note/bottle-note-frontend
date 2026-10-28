@@ -101,7 +101,7 @@ export default function ReplyForm({ textareaRef, handleCreateReply }: Props) {
       style={{
         bottom: isVisible
           ? 'calc(var(--navbar-total-space) + 8px)'
-          : 'calc(var(--safe-area-bottom, 32px) + 8px)',
+          : 'var(--floating-bottom-offset)',
       }}
     >
       <div className="flex items-center rounded-lg border border-stroke-neutral-subtle bg-bg-layer-floating px-12 py-8 shadow-md">
