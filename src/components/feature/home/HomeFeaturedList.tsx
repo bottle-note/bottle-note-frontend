@@ -26,11 +26,7 @@ interface Props {
 
 function HomeFeaturedList({ type = 'week' }: Props) {
   const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
-  const {
-    requiresAuth,
-    titleLabel,
-    title: titleTemplate,
-  } = HOME_FEATURED_CONFIG[type];
+  const { requiresAuth, title: titleTemplate } = HOME_FEATURED_CONFIG[type];
 
   // 로그인이 필요한 타입인데 로그인하지 않은 경우 쿼리 비활성화
   const shouldFetchData = !requiresAuth || isLoggedIn;
@@ -79,7 +75,8 @@ function HomeFeaturedList({ type = 'week' }: Props) {
 
   return (
     <div className="space-y-8">
-      <SectionHeader label={titleLabel} title={title} />
+      {/* 책갈피 탭 이름이 섹션 이름을 대신해 라벨 없이 제목만 둔다. */}
+      <SectionHeader title={title} />
       <HomeRankList
         items={featuredList}
         section={SECTION_BY_TYPE[type] ?? 'weekly_top'}
