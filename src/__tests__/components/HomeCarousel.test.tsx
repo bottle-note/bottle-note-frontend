@@ -234,7 +234,7 @@ describe('HomeCarousel - 배너 넘김 컨트롤', () => {
     render(<HomeCarousel banners={imageBanners} />);
 
     const pager = screen.getByRole('group', { name: '배너 넘기기' });
-    expect(pager).toHaveTextContent('01 / 02');
+    expect(pager).toHaveTextContent('1 / 2');
     expect(screen.getAllByRole('button', { name: '다음 배너' })).toHaveLength(
       1,
     );
@@ -245,7 +245,7 @@ describe('HomeCarousel - 배너 넘김 컨트롤', () => {
     expect(mockCarouselApi.scrollPrev).toHaveBeenCalledTimes(1);
 
     selectSlide(1);
-    expect(pager).toHaveTextContent('02 / 02');
+    expect(pager).toHaveTextContent('2 / 2');
   });
 
   it('자동 넘김을 멈췄다가 다시 시작할 수 있다', () => {

@@ -311,42 +311,39 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
         <div
           role="group"
           aria-label="배너 넘기기"
-          className="absolute bottom-12 right-12 z-10 flex h-32 items-center bg-palette-static-white pl-12 pr-4 text-12 text-palette-neutral-900"
+          className="absolute bottom-12 right-12 z-10 flex h-28 items-center rounded-full bg-bg-overlay-muted pl-10 pr-2 text-11 text-palette-static-white backdrop-blur-sm"
         >
-          <span aria-live="polite" className="mr-6 tabular-nums">
-            <b>{String(currentPosition).padStart(2, '0')}</b>
-            <span className="text-palette-neutral-700">
-              {' '}
-              / {String(visibleCount).padStart(2, '0')}
-            </span>
+          <span aria-live="polite" className="mr-2 tabular-nums">
+            <b>{currentPosition}</b>
+            <span className="opacity-70"> / {visibleCount}</span>
           </span>
           <button
             type="button"
             aria-label="이전 배너"
             onClick={() => api?.scrollPrev()}
-            className="flex h-32 w-28 items-center justify-center"
+            className="flex h-28 w-22 items-center justify-center"
           >
-            <ChevronLeft aria-hidden size={14} strokeWidth={2} />
+            <ChevronLeft aria-hidden size={13} strokeWidth={2} />
           </button>
           <button
             type="button"
             aria-label="다음 배너"
             onClick={() => api?.scrollNext()}
-            className="flex h-32 w-28 items-center justify-center"
+            className="flex h-28 w-22 items-center justify-center"
           >
-            <ChevronRight aria-hidden size={14} strokeWidth={2} />
+            <ChevronRight aria-hidden size={13} strokeWidth={2} />
           </button>
           <button
             type="button"
             aria-label={isPlaying ? '자동 넘김 멈추기' : '자동 넘김 시작'}
             aria-pressed={!isPlaying}
             onClick={toggleAutoplay}
-            className="flex h-32 w-28 items-center justify-center"
+            className="flex h-28 w-22 items-center justify-center"
           >
             {isPlaying ? (
-              <Pause aria-hidden size={12} fill="currentColor" />
+              <Pause aria-hidden size={10} fill="currentColor" />
             ) : (
-              <Play aria-hidden size={12} fill="currentColor" />
+              <Play aria-hidden size={10} fill="currentColor" />
             )}
           </button>
         </div>
