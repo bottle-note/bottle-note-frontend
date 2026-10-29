@@ -16,6 +16,7 @@ import {
   internalApiHeaders,
 } from '@/shared/api/internalApi';
 import { filterBannersByDate } from './_utils/filterBannersByDate';
+import { getHomeCurations } from './_utils/getHomeCurations';
 
 async function getBanners(): Promise<Banner[]> {
   try {
@@ -35,7 +36,10 @@ async function getBanners(): Promise<Banner[]> {
 }
 
 export default async function Home() {
-  const banners = await getBanners();
+  const [banners, curations] = await Promise.all([
+    getBanners(),
+    getHomeCurations(),
+  ]);
   const webSiteSchemas = generateWebSiteSchema();
 
   return (
@@ -57,7 +61,7 @@ export default async function Home() {
         <HomeQuickLinks />
 
         <div className="space-y-40 pt-28 pb-[var(--navbar-total-space)]">
-          <HomeCurationSection />
+          <HomeCurationSection curations={curations} />
           <HomeFeaturedSection />
           <HomeCategorySection />
           <HomeReviewSection />

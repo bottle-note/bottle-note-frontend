@@ -16,7 +16,8 @@ import HomeQuickLinks from './HomeQuickLinks';
 import HomeFeaturedSection from './HomeFeaturedSection';
 import HomeCurationSection from './HomeCurationSection';
 import HomeReviewSection from './HomeReviewSection';
-import { CurationV2Api } from '@/api/curation-v2/curation-v2.api';
+import type { HomeCuration } from '@/app/(primary)/_utils/getHomeCurations';
+import type { CurationV2Payload } from '@/api/curation-v2/types';
 import { ExploreApi } from '@/api/explore/explore.api';
 import type { ExploreReview } from '@/api/explore/types';
 
@@ -45,14 +46,15 @@ vi.mock('@/api/alcohol/alcohol.api', () => ({
   },
 }));
 
-vi.mock('@/api/curation-v2/curation-v2.api', () => ({
-  CurationV2Api: { getFeed: vi.fn() },
-}));
 vi.mock('@/api/explore/explore.api', () => ({
   ExploreApi: { getReviews: vi.fn() },
 }));
 
-const curationItem = (id: number, name: string, payload: unknown) => ({
+const curationItem = (
+  id: number,
+  name: string,
+  payload: CurationV2Payload,
+) => ({
   id,
   name,
   description: `${name} 설명`,
@@ -84,8 +86,6 @@ const review = (id: number, alcoholName: string): ExploreReview => ({
   replyCount: 0,
   hasReplyByMe: false,
 });
-
-const feedResponse = (items: unknown[]) => ({ data: { items } }) as never;
 
 const alcohol = (id: number, korName: string): Alcohol => ({
   alcoholId: id,
@@ -223,50 +223,31 @@ describe('홈 주간 TOP 5', () => {
 });
 
 describe('홈 에디터 추천', () => {
-  it('시음회·큐레이션·페어링·프로그램을 종류 배지와 함께 보여주고 선택과 전체 보기를 기록한다', async () => {
-    vi.mocked(CurationV2Api.getFeed).mockResolvedValue(
-      feedResponse([
-        curationItem(1, '가을 위스키', [{ alcohol: { korName: 'A' } }]),
-        curationItem(2, '치즈와 위스키', [{ pairings: [] }]),
-        curationItem(3, '증류소 투어', {
-          eventStartDate: '2026-11-01',
-          eventEndDate: '2026-11-02',
-          placeName: '서울',
-        }),
-        curationItem(4, '11월 시음회', {
-          eventDate: '2026-11-15',
-          capacity: 20,
-          isRecruiting: true,
-        }),
-      ]),
-    );
-    renderWithQuery(<HomeCurationSection />);
+  const curations: HomeCuration[] = [
+    { ...curationItem(4, '11월 시음회', {}), specCode: 'WHISKY_TASTING_EVENT' },
+    { ...curationItem(3, '증류소 투어', {}), specCode: 'PROGRAM' },
+    { ...curationItem(1, '가을 위스키', []), specCode: 'RECOMMENDED_WHISKY' },
+    { ...curationItem(2, '치즈와 위스키', []), specCode: 'WHISKY_PAIRING' },
+  ];
+
+  it('서버에서 받은 순서대로 종류 배지와 함께 보여주고 선택과 전체 보기를 기록한다', () => {
+    render(<HomeCurationSection curations={curations} />);
 
     expect(screen.getByText("EDITOR'S PICK")).toBeInTheDocument();
-    const cards = await screen.findAllByRole('listitem');
+    const cards = screen.getAllByRole('listitem');
     expect(cards.map((card) => card.textContent)).toEqual([
+      expect.stringContaining('시음회11월 시음회'),
+      expect.stringContaining('프로그램증류소 투어'),
       expect.stringContaining('큐레이션가을 위스키'),
       expect.stringContaining('페어링치즈와 위스키'),
-      expect.stringContaining('프로그램증류소 투어'),
-      expect.stringContaining('시음회11월 시음회'),
     ]);
-    expect(CurationV2Api.getFeed).toHaveBeenCalledWith(
-      expect.objectContaining({
-        code: [
-          'WHISKY_TASTING_EVENT',
-          'RECOMMENDED_WHISKY',
-          'WHISKY_PAIRING',
-          'PROGRAM',
-        ],
-      }),
-    );
 
-    const pairing = within(cards[1]).getByRole('link');
-    expect(pairing).toHaveAttribute('href', ROUTES.CURATION.DETAIL(2));
-    fireEvent.click(pairing);
+    const program = within(cards[1]).getByRole('link');
+    expect(program).toHaveAttribute('href', ROUTES.CURATION.DETAIL(3));
+    fireEvent.click(program);
     expect(trackGA4Event).toHaveBeenCalledWith('home_item_click', {
       section: 'curation',
-      item_id: '2',
+      item_id: '3',
       position: 2,
     });
 
@@ -278,27 +259,10 @@ describe('홈 에디터 추천', () => {
     });
   });
 
-  it('노출할 큐레이션이 없으면 섹션을 숨긴다', async () => {
-    vi.mocked(CurationV2Api.getFeed).mockResolvedValue(feedResponse([]));
-    renderWithQuery(<HomeCurationSection />);
+  it('노출할 큐레이션이 없으면 섹션을 숨긴다', () => {
+    render(<HomeCurationSection curations={[]} />);
 
-    await waitFor(() => expect(CurationV2Api.getFeed).toHaveBeenCalled());
-    await waitFor(() =>
-      expect(screen.queryByText("EDITOR'S PICK")).not.toBeInTheDocument(),
-    );
-  });
-
-  it('불러오지 못하면 다시 시도할 수 있다', async () => {
-    vi.mocked(CurationV2Api.getFeed)
-      .mockRejectedValueOnce(new Error('fail'))
-      .mockResolvedValueOnce(
-        feedResponse([curationItem(1, '가을 위스키', [])]),
-      );
-    renderWithQuery(<HomeCurationSection />);
-
-    fireEvent.click(await screen.findByRole('button', { name: '다시 시도' }));
-
-    expect(await screen.findByText('가을 위스키')).toBeInTheDocument();
+    expect(screen.queryByText("EDITOR'S PICK")).not.toBeInTheDocument();
   });
 });
 

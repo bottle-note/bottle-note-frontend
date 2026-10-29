@@ -2,32 +2,33 @@
 
 import Link from 'next/link';
 import BaseImage from '@/components/ui/Display/BaseImage';
-import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import {
-  CURATION_FEED_KIND_LABEL,
-  getCurationFeedKind,
-} from '@/api/curation-v2/feedKind';
-import type { CurationV2FeedItem } from '@/api/curation-v2/types';
+  CURATION_V2_SPEC_CODES,
+  type CurationV2SpecCode,
+} from '@/api/curation-v2/constants';
+import type { HomeCuration } from '@/app/(primary)/_utils/getHomeCurations';
 import { ROUTES } from '@/constants/routes';
-import { useHomeCurationsQuery } from '@/queries/useHomeCurationsQuery';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 
 import HomeSectionHeader from './HomeSectionHeader';
-import { HomeFeaturedErrorState } from './_components/HomeFeaturedErrorState';
 
 const SECTION_LABEL = "EDITOR'S PICK";
 const SECTION_TITLE = '보틀노트 에디터가 직접 골라봤어요✨';
 
-/** 에디터 추천: 시음회·큐레이션·페어링·프로그램을 가로로 넘기는 커버 카드. 비어 있으면 섹션을 숨긴다. */
-export default function HomeCurationSection() {
-  const {
-    data: curations,
-    isLoading,
-    isError,
-    refetch,
-  } = useHomeCurationsQuery();
+const KIND_LABEL: Record<CurationV2SpecCode, string> = {
+  [CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT]: '시음회',
+  [CURATION_V2_SPEC_CODES.PROGRAM]: '프로그램',
+  [CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY]: '큐레이션',
+  [CURATION_V2_SPEC_CODES.WHISKY_PAIRING]: '페어링',
+};
 
-  if (!isLoading && !isError && (!curations || curations.length === 0)) {
+interface Props {
+  curations: HomeCuration[];
+}
+
+/** 에디터 추천: 서버에서 미리 받은 시음회·프로그램·큐레이션·페어링을 가로로 넘기는 커버 카드. 비어 있으면 섹션을 숨긴다. */
+export default function HomeCurationSection({ curations }: Props) {
+  if (curations.length === 0) {
     return null;
   }
 
@@ -41,32 +42,23 @@ export default function HomeCurationSection() {
           trackGA4Event('home_more_click', { section: 'curation' })
         }
       />
-      {isLoading && (
-        <div className="flex gap-12 overflow-hidden px-20" aria-busy="true">
-          <SkeletonBase width={260} height={240} />
-          <SkeletonBase width={260} height={240} />
-        </div>
-      )}
-      {isError && <HomeFeaturedErrorState onRetry={() => refetch()} />}
-      {curations && curations.length > 0 && (
-        <ul className="flex gap-12 overflow-x-auto px-20 scrollbar-hide">
-          {curations.map((curation, index) => (
-            <li key={curation.id} className="w-260 shrink-0">
-              <HomeCurationCard
-                curation={curation}
-                position={index + 1}
-                priority={index === 0}
-              />
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul className="flex gap-12 overflow-x-auto px-20 scrollbar-hide">
+        {curations.map((curation, index) => (
+          <li key={curation.id} className="w-260 shrink-0">
+            <HomeCurationCard
+              curation={curation}
+              position={index + 1}
+              priority={index === 0}
+            />
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
 
 interface CardProps {
-  curation: CurationV2FeedItem;
+  curation: HomeCuration;
   position: number;
   priority: boolean;
 }
@@ -94,7 +86,7 @@ function HomeCurationCard({ curation, position, priority }: CardProps) {
           className="object-cover"
         />
         <span className="absolute left-10 top-10 bg-palette-static-white px-8 text-11 font-bold leading-22 text-palette-neutral-900">
-          {CURATION_FEED_KIND_LABEL[getCurationFeedKind(curation)]}
+          {KIND_LABEL[curation.specCode]}
         </span>
       </span>
       <span className="line-clamp-1 text-16 font-bold leading-22">
