@@ -179,17 +179,16 @@ describe('홈 주간 TOP 5', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('탭과 겹치는 라벨 없이 제목과 함께 1~5위를 순서대로 보여주고 선택한 위스키를 기록한다', async () => {
+  it('탭 위 섹션 머리와 함께 1~5위를 순서대로 보여주고 선택한 위스키를 기록한다', async () => {
     renderWithQuery(<HomeFeaturedSection />);
 
+    expect(screen.getByText('WEEKLY TOP 5')).toBeInTheDocument();
     expect(
-      await screen.findByRole('heading', {
+      screen.getByRole('heading', {
         name: '이번 주 사람들이 가장 많이 본 위스키🔥',
       }),
     ).toBeInTheDocument();
-    // 탭 이름과 겹치는 라벨은 보여주지 않는다.
-    expect(screen.queryByText('주간 조회수 TOP 5')).not.toBeInTheDocument();
-    const items = screen.getAllByRole('listitem');
+    const items = await screen.findAllByRole('listitem');
     expect(items).toHaveLength(5);
     items.forEach((item, index) => {
       expect(item).toHaveTextContent(`0${index + 1}`);
@@ -223,6 +222,11 @@ describe('홈 주간 TOP 5', () => {
 
     fireEvent.click(screen.getByRole('button', { name: '최근에 본 위스키' }));
 
+    // 탭을 바꾸면 탭 위 섹션 머리도 바뀐다.
+    expect(screen.getByText('VIEW HISTORY')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: '내가 최근 본 위스키🥃' }),
+    ).toBeInTheDocument();
     expect(
       await screen.findByText('로그인 후 확인 가능한 서비스 입니다.'),
     ).toBeInTheDocument();
