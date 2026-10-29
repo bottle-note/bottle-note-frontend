@@ -1,17 +1,9 @@
-import type { ApiResponse } from '@/api/_shared/types';
+import { CurationV2Api } from '@/api/curation-v2/curation-v2.api';
 import {
   CURATION_V2_SPEC_CODES,
   type CurationV2SpecCode,
 } from '@/api/curation-v2/constants';
-import type {
-  CurationV2FeedData,
-  CurationV2FeedItem,
-} from '@/api/curation-v2/types';
-import { SSR_CALLER_HEADER } from '@/constants/common';
-import {
-  getInternalServerOrigin,
-  internalApiHeaders,
-} from '@/shared/api/internalApi';
+import type { CurationV2FeedItem } from '@/api/curation-v2/types';
 
 export interface HomeEditorPick extends CurationV2FeedItem {
   specCode: CurationV2SpecCode;
@@ -26,7 +18,7 @@ export const EDITOR_PICK_SPEC_CODES: readonly CurationV2SpecCode[] = [
 ];
 // 네 종류가 모두 보이도록 종류마다 같은 수만 받는다.
 const SIZE_PER_CODE = 2;
-const REVALIDATE_SECONDS = 60 * 60;
+const CACHE = { revalidate: 60 * 60, tags: ['home-editor-picks'] };
 
 /**
  * 피드 응답에는 항목의 spec이 없어서, 종류별로 따로 요청해 요청한 코드로 종류를 붙인다.
@@ -35,25 +27,13 @@ const REVALIDATE_SECONDS = 60 * 60;
 async function fetchCurationFeedBySpec(
   code: CurationV2SpecCode,
 ): Promise<HomeEditorPick[]> {
-  try {
-    const query = new URLSearchParams({ code, size: String(SIZE_PER_CODE) });
-    const res = await fetch(
-      `${getInternalServerOrigin()}/api/v2/curations/feed?${query}`,
-      {
-        headers: internalApiHeaders({ ...SSR_CALLER_HEADER }),
-        next: { revalidate: REVALIDATE_SECONDS },
-      },
-    );
-    if (!res.ok) return [];
+  const result = await CurationV2Api.server.getFeed(
+    { code: [code], size: SIZE_PER_CODE },
+    CACHE,
+  );
+  if (result.status !== 'ok') return [];
 
-    const json: ApiResponse<CurationV2FeedData> = await res.json();
-    return (json.data?.items ?? []).map((item) => ({
-      ...item,
-      specCode: code,
-    }));
-  } catch {
-    return [];
-  }
+  return result.data.items.map((item) => ({ ...item, specCode: code }));
 }
 
 export async function fetchHomeEditorPicks(): Promise<HomeEditorPick[]> {

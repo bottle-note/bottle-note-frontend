@@ -15,7 +15,7 @@ const item = (id: number) => ({
 });
 
 const ok = (ids: number[]) =>
-  new Response(JSON.stringify({ data: { items: ids.map(item) } }));
+  new Response(JSON.stringify({ data: { items: ids.map(item) }, errors: [] }));
 
 describe('fetchHomeEditorPicks', () => {
   beforeEach(() => {
@@ -48,7 +48,9 @@ describe('fetchHomeEditorPicks', () => {
       const params = new URL(url).searchParams;
       expect(params.getAll('code')).toHaveLength(1);
       expect(params.get('size')).toBe('2');
-      expect(init).toMatchObject({ next: { revalidate: 3600 } });
+      expect(init).toMatchObject({
+        next: { revalidate: 3600, tags: ['home-editor-picks'] },
+      });
     });
     expect(curations.map(({ id, specCode }) => [id, specCode])).toEqual([
       [1, 'WHISKY_TASTING_EVENT'],
