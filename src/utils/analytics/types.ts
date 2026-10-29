@@ -192,6 +192,9 @@ export interface GA4EventMap {
     item_id: string;
     position: number;
   };
+  home_more_click: {
+    section: HomeSection;
+  };
 
   // 공유
   share: {

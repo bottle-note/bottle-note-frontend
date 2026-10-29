@@ -1,5 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import type { Alcohol } from '@/api/alcohol/types';
@@ -8,6 +14,12 @@ import useModalStore from '@/store/modalStore';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import HomeQuickLinks from './HomeQuickLinks';
 import HomeFeaturedSection from './HomeFeaturedSection';
+import HomeEditorPickSection from './HomeEditorPickSection';
+import HomeReviewSection from './HomeReviewSection';
+import type { HomeEditorPick } from '@/app/(primary)/_utils/fetchHomeEditorPicks';
+import type { CurationV2Payload } from '@/api/curation-v2/types';
+import { ExploreApi } from '@/api/explore/explore.api';
+import type { ExploreReview } from '@/api/explore/types';
 
 const { authState } = vi.hoisted(() => ({
   authState: { isLoggedIn: false },
@@ -33,6 +45,47 @@ vi.mock('@/api/alcohol/alcohol.api', () => ({
     putPick: vi.fn(),
   },
 }));
+
+vi.mock('@/api/explore/explore.api', () => ({
+  ExploreApi: { getReviews: vi.fn() },
+}));
+
+const curationItem = (
+  id: number,
+  name: string,
+  payload: CurationV2Payload,
+) => ({
+  id,
+  name,
+  description: `${name} 설명`,
+  coverImageUrl: '',
+  imageUrls: [],
+  exposureStartDate: '2026-10-01',
+  exposureEndDate: '2026-12-31',
+  displayOrder: id,
+  createAt: '2026-10-01',
+  payload,
+});
+
+const review = (id: number, alcoholName: string): ExploreReview => ({
+  userInfo: { userId: id, nickName: `작성자${id}`, userProfileImage: null },
+  isMyReview: false,
+  alcoholId: id,
+  alcoholName,
+  reviewId: id,
+  reviewContent: `${alcoholName} 리뷰 본문`,
+  reviewRating: 4.5,
+  reviewTags: ['오크', '바닐라'],
+  createAt: '2026-10-20',
+  modifiedAt: '2026-10-20',
+  totalImageCount: 0,
+  reviewImages: [],
+  isBestReview: false,
+  likeCount: 3,
+  isLikedByMe: false,
+  replyCount: 0,
+  hasReplyByMe: false,
+});
 
 const alcohol = (id: number, korName: string): Alcohol => ({
   alcoholId: id,
@@ -110,6 +163,20 @@ describe('홈 바로가기', () => {
 });
 
 describe('홈 주간 TOP 5', () => {
+  it('책갈피 탭은 주간 TOP 5와 최근에 본 위스키만 보여준다', () => {
+    renderWithQuery(<HomeFeaturedSection />);
+
+    expect(
+      screen.getByRole('button', { name: '주간 TOP 5' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '최근에 본 위스키' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '시음회' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('운영 문구와 함께 1~5위를 순서대로 보여주고 선택한 위스키를 기록한다', async () => {
     renderWithQuery(<HomeFeaturedSection />);
 
@@ -152,5 +219,100 @@ describe('홈 주간 TOP 5', () => {
       await screen.findByText('로그인 후 확인 가능한 서비스 입니다.'),
     ).toBeInTheDocument();
     expect(AlcoholsApi.getHistory).not.toHaveBeenCalled();
+  });
+});
+
+describe('홈 에디터 추천', () => {
+  const curations: HomeEditorPick[] = [
+    { ...curationItem(4, '11월 시음회', {}), specCode: 'WHISKY_TASTING_EVENT' },
+    { ...curationItem(3, '증류소 투어', {}), specCode: 'PROGRAM' },
+    { ...curationItem(1, '가을 위스키', []), specCode: 'RECOMMENDED_WHISKY' },
+    { ...curationItem(2, '치즈와 위스키', []), specCode: 'WHISKY_PAIRING' },
+  ];
+
+  it('서버에서 받은 순서대로 종류 배지와 함께 보여주고 선택과 전체 보기를 기록한다', () => {
+    render(<HomeEditorPickSection editorPicks={curations} />);
+
+    expect(screen.getByText("EDITOR'S PICK")).toBeInTheDocument();
+    const cards = screen.getAllByRole('listitem');
+    expect(cards.map((card) => card.textContent)).toEqual([
+      expect.stringContaining('시음회11월 시음회'),
+      expect.stringContaining('프로그램증류소 투어'),
+      expect.stringContaining('큐레이션가을 위스키'),
+      expect.stringContaining('페어링치즈와 위스키'),
+    ]);
+
+    const program = within(cards[1]).getByRole('link');
+    expect(program).toHaveAttribute('href', ROUTES.CURATION.DETAIL(3));
+    fireEvent.click(program);
+    expect(trackGA4Event).toHaveBeenCalledWith('home_item_click', {
+      section: 'curation',
+      item_id: '3',
+      position: 2,
+    });
+
+    const more = screen.getByRole('link', { name: /전체 보기/ });
+    expect(more).toHaveAttribute('href', ROUTES.CURATION.BASE);
+    fireEvent.click(more);
+    expect(trackGA4Event).toHaveBeenCalledWith('home_more_click', {
+      section: 'curation',
+    });
+  });
+
+  it('노출할 큐레이션이 없으면 섹션을 숨긴다', () => {
+    render(<HomeEditorPickSection editorPicks={[]} />);
+
+    expect(screen.queryByText("EDITOR'S PICK")).not.toBeInTheDocument();
+  });
+});
+
+describe('홈 인기 리뷰', () => {
+  it('인기순 리뷰 3개를 보여주고 리뷰 상세와 둘러보기 리뷰 탭으로 연결한다', async () => {
+    vi.mocked(ExploreApi.getReviews).mockResolvedValue({
+      data: {
+        items: [
+          review(31, '스프링뱅크 10년'),
+          review(32, '라프로익 10년'),
+          review(33, '야마자키 12년'),
+        ],
+      },
+    } as never);
+    renderWithQuery(<HomeReviewSection />);
+
+    const items = await screen.findAllByRole('listitem');
+    expect(screen.getByText('한 잔에 담긴 이야기')).toBeInTheDocument();
+    expect(ExploreApi.getReviews).toHaveBeenCalledWith({
+      sortType: 'POPULAR',
+      sortOrder: 'DESC',
+      size: 3,
+    });
+    expect(items).toHaveLength(3);
+
+    const second = within(items[1]).getByRole('link');
+    expect(second).toHaveAttribute('href', ROUTES.REVIEW.DETAIL(32));
+    expect(second).toHaveTextContent('라프로익 10년 리뷰 본문');
+    fireEvent.click(second);
+    expect(trackGA4Event).toHaveBeenCalledWith('home_item_click', {
+      section: 'review',
+      item_id: '32',
+      position: 2,
+    });
+
+    expect(screen.getByRole('link', { name: /리뷰 더 보기/ })).toHaveAttribute(
+      'href',
+      `${ROUTES.EXPLORE.BASE}?tab=REVIEW_WHISKEY`,
+    );
+  });
+
+  it('리뷰가 없으면 섹션을 숨긴다', async () => {
+    vi.mocked(ExploreApi.getReviews).mockResolvedValue({
+      data: { items: [] },
+    } as never);
+    renderWithQuery(<HomeReviewSection />);
+
+    await waitFor(() => expect(ExploreApi.getReviews).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(screen.queryByText('한 잔에 담긴 이야기')).not.toBeInTheDocument(),
+    );
   });
 });

@@ -114,6 +114,7 @@
       "name": "home_item_click",
       "parameters": ["section", "item_id", "position"]
     },
+    { "name": "home_more_click", "parameters": ["section"] },
     {
       "name": "share",
       "parameters": [
