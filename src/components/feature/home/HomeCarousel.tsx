@@ -4,6 +4,7 @@ import { useRef, useState, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Autoplay from 'embla-carousel-autoplay';
+import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import {
   Carousel,
   CarouselContent,
@@ -202,6 +203,7 @@ interface HomeCarouselProps {
 export default function HomeCarousel({ banners }: HomeCarouselProps) {
   const [api, setApi] = useState<CarouselApi | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [failedBannerIds, setFailedBannerIds] = useState<Set<number>>(
     new Set(),
   );
@@ -251,63 +253,101 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
     return null;
   }
 
+  // 불러오지 못한 배너는 건너뛰므로 보이는 배너 기준으로 순서를 센다.
+  const visibleBanners = banners.filter(
+    (banner) => !failedBannerIds.has(banner.id),
+  );
+  const visibleCount = visibleBanners.length;
+  const currentPosition =
+    visibleBanners.findIndex(
+      (banner) => banner.id === banners[selectedIndex]?.id,
+    ) + 1;
+
+  const toggleAutoplay = () => {
+    const autoplay = autoplayRef.current;
+    if (isPlaying) {
+      autoplay.stop();
+    } else {
+      autoplay.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
   return (
-    <Carousel
-      opts={{
-        align: 'start',
-        loop: true,
-      }}
-      plugins={[autoplayRef.current]}
-      setApi={setApi}
-      className="w-full bg-bg-layer-default"
-    >
-      <CarouselContent className="!ml-0">
-        {banners.map((banner, index) => (
-          <CarouselItem key={banner.id} className="!pl-0">
-            <div
-              className="relative w-full h-227 overflow-hidden flex items-center justify-center"
-              style={
-                failedBannerIds.has(banner.id)
-                  ? { visibility: 'hidden', height: 0 }
-                  : undefined
-              }
-            >
-              <BannerImage
-                banner={banner}
-                isActive={index === selectedIndex}
-                isPriority={index === 0}
-                onError={() => handleBannerError(banner.id)}
-              />
-              <BannerOverlay banner={banner} />
-              <button
-                type="button"
-                onClick={() => api && api.scrollPrev()}
-                className="absolute bottom-12 right-[68.45px] z-10 flex h-[35.56px] w-[35.56px] items-center justify-center rounded-full bg-bg-overlay text-palette-static-white"
+    <div className="relative">
+      <Carousel
+        opts={{
+          align: 'start',
+          loop: true,
+        }}
+        plugins={[autoplayRef.current]}
+        setApi={setApi}
+        className="w-full bg-bg-layer-default"
+      >
+        <CarouselContent className="!ml-0">
+          {banners.map((banner, index) => (
+            <CarouselItem key={banner.id} className="!pl-0">
+              <div
+                className="relative w-full h-227 overflow-hidden flex items-center justify-center"
+                style={
+                  failedBannerIds.has(banner.id)
+                    ? { visibility: 'hidden', height: 0 }
+                    : undefined
+                }
               >
-                <Image
-                  src="/icon/arrow-left-white.svg"
-                  alt="arrowIcon"
-                  width={24}
-                  height={24}
+                <BannerImage
+                  banner={banner}
+                  isActive={index === selectedIndex}
+                  isPriority={index === 0}
+                  onError={() => handleBannerError(banner.id)}
                 />
-              </button>
-              <button
-                type="button"
-                onClick={() => api && api.scrollNext()}
-                className="absolute bottom-12 right-12 z-10 flex h-[35.56px] w-[35.56px] items-center justify-center rounded-full bg-bg-overlay text-palette-static-white"
-              >
-                <Image
-                  src="/icon/arrow-left-white.svg"
-                  alt="arrowIcon"
-                  width={24}
-                  height={24}
-                  className="rotate-180"
-                />
-              </button>
-            </div>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-    </Carousel>
+                <BannerOverlay banner={banner} />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
+      {visibleCount > 1 && (
+        <div
+          role="group"
+          aria-label="배너 넘기기"
+          className="absolute bottom-12 right-12 z-10 flex h-28 items-center rounded-full bg-bg-overlay-muted pl-10 pr-2 text-11 text-palette-static-white backdrop-blur-sm"
+        >
+          <span aria-live="polite" className="mr-2 tabular-nums">
+            <b>{currentPosition}</b>
+            <span className="opacity-70"> / {visibleCount}</span>
+          </span>
+          <button
+            type="button"
+            aria-label="이전 배너"
+            onClick={() => api?.scrollPrev()}
+            className="flex h-28 w-22 items-center justify-center"
+          >
+            <ChevronLeft aria-hidden size={13} strokeWidth={2} />
+          </button>
+          <button
+            type="button"
+            aria-label="다음 배너"
+            onClick={() => api?.scrollNext()}
+            className="flex h-28 w-22 items-center justify-center"
+          >
+            <ChevronRight aria-hidden size={13} strokeWidth={2} />
+          </button>
+          <button
+            type="button"
+            aria-label={isPlaying ? '자동 넘김 멈추기' : '자동 넘김 시작'}
+            aria-pressed={!isPlaying}
+            onClick={toggleAutoplay}
+            className="flex h-28 w-22 items-center justify-center"
+          >
+            {isPlaying ? (
+              <Pause aria-hidden size={10} fill="currentColor" />
+            ) : (
+              <Play aria-hidden size={10} fill="currentColor" />
+            )}
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

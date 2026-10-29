@@ -1,4 +1,4 @@
-import { act, fireEvent, render } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import HomeCarousel from '@/components/feature/home/HomeCarousel';
 import type { Banner } from '@/api/banner/types';
 
@@ -45,9 +45,11 @@ jest.mock('embla-carousel-react', () => ({
   default: () => [jest.fn(), mockCarouselApi],
 }));
 
+const mockAutoplay = { play: jest.fn(), stop: jest.fn() };
+
 jest.mock('embla-carousel-autoplay', () => ({
   __esModule: true,
-  default: () => ({}),
+  default: () => mockAutoplay,
 }));
 
 const createBanner = (overrides: Partial<Banner> = {}): Banner => ({
@@ -213,5 +215,54 @@ describe('HomeCarousel - 비디오 배너 poster 및 지연 로딩', () => {
     const { container } = render(<HomeCarousel banners={[]} />);
 
     expect(container.innerHTML).toBe('');
+  });
+});
+
+describe('HomeCarousel - 배너 넘김 컨트롤', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockSelectedIndex = 0;
+    mockSelectHandlers.clear();
+  });
+
+  const imageBanners = [
+    createBanner({ id: 1, mediaType: 'IMAGE', imageUrl: '/a.webp' }),
+    createBanner({ id: 2, mediaType: 'IMAGE', imageUrl: '/b.webp' }),
+  ];
+
+  it('배너 오른쪽 아래 하나의 컨트롤로 현재 순서를 보여주고 이전·다음으로 넘긴다', () => {
+    render(<HomeCarousel banners={imageBanners} />);
+
+    const pager = screen.getByRole('group', { name: '배너 넘기기' });
+    expect(pager).toHaveTextContent('1 / 2');
+    expect(screen.getAllByRole('button', { name: '다음 배너' })).toHaveLength(
+      1,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: '다음 배너' }));
+    expect(mockCarouselApi.scrollNext).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: '이전 배너' }));
+    expect(mockCarouselApi.scrollPrev).toHaveBeenCalledTimes(1);
+
+    selectSlide(1);
+    expect(pager).toHaveTextContent('2 / 2');
+  });
+
+  it('자동 넘김을 멈췄다가 다시 시작할 수 있다', () => {
+    render(<HomeCarousel banners={imageBanners} />);
+
+    fireEvent.click(screen.getByRole('button', { name: '자동 넘김 멈추기' }));
+    expect(mockAutoplay.stop).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByRole('button', { name: '자동 넘김 시작' }));
+    expect(mockAutoplay.play).toHaveBeenCalledTimes(1);
+  });
+
+  it('배너가 하나면 넘김 컨트롤을 보여주지 않는다', () => {
+    render(<HomeCarousel banners={[imageBanners[0]]} />);
+
+    expect(
+      screen.queryByRole('group', { name: '배너 넘기기' }),
+    ).not.toBeInTheDocument();
   });
 });

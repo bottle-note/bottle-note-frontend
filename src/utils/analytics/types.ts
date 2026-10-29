@@ -28,7 +28,23 @@ export type LoginGatePage =
   | 'home_recent';
 
 // 다른 화면과 구분해야 하는 진입 위치. 값이 없으면 기존 화면(술 상세, 리뷰 작성 페이지)이다.
-export type FeatureSource = 'bartender_note';
+export type FeatureSource = 'bartender_note' | 'home';
+
+// 홈 바로가기
+export type HomeQuickLink =
+  | 'bartender_note'
+  | 'taste_test'
+  | 'tarot'
+  | 'my_records';
+
+// 홈 섹션. weekly_top·recent_viewed는 책갈피 탭, category·region은 둘러보기 탭이다.
+export type HomeSection =
+  | 'weekly_top'
+  | 'recent_viewed'
+  | 'curation'
+  | 'review'
+  | 'category'
+  | 'region';
 
 // GA4 이벤트별 파라미터 타입 정의
 export interface GA4EventMap {
@@ -165,6 +181,19 @@ export interface GA4EventMap {
   };
   bartender_story_full_text: {
     alcohol_id: string;
+  };
+
+  // 홈
+  home_quick_link_click: {
+    link: HomeQuickLink;
+  };
+  home_item_click: {
+    section: HomeSection;
+    item_id: string;
+    position: number;
+  };
+  home_more_click: {
+    section: HomeSection;
   };
 
   // 공유

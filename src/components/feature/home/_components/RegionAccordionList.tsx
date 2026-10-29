@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
 import { useRegionsQuery } from '@/queries/useRegionsQuery';
 import { groupRegions } from '@/utils/regionGrouper';
 import { getRegionFlagUrl } from '@/constants/regionFlags';
@@ -11,6 +12,7 @@ import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import SkeletonList from '@/components/ui/Loading/Skeletons/SkeletonList';
 import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 
 const buildRegionHref = (regionId: number | '') =>
   `/explore?regionIds=${regionId}&tab=EXPLORER_WHISKEY`;
@@ -48,35 +50,46 @@ function RegionRowContent({
   const isBottleFallback = currentImageUrl === '/bottle.svg';
 
   return (
-    <div className="flex items-center gap-10">
+    <span className="flex min-w-0 flex-1 items-center gap-14">
       <Image
         src={currentImageUrl}
-        alt={group.displayName}
-        width={26}
-        height={26}
+        alt=""
+        width={28}
+        height={28}
         onError={handleImageError}
-        className={`w-26 h-26 rounded-lg ${
+        className={`h-28 w-28 shrink-0 rounded-lg ${
           isBottleFallback
             ? 'bg-palette-static-white object-cover p-4'
             : 'bg-palette-static-white object-contain p-2'
         }`}
       />
-      <div className="gap-4 flex items-center">
-        <span className="text-13 font-extrabold text-fg-neutral">
+      <span className="flex min-w-0 items-baseline gap-6">
+        <span className="text-16 font-bold text-fg-neutral">
           {group.displayName}
         </span>
-        <span className="text-11 text-fg-neutral-muted">{group.engName}</span>
-      </div>
-    </div>
+        <span className="truncate text-12 text-fg-neutral-muted">
+          {group.engName}
+        </span>
+      </span>
+    </span>
   );
 }
 
+const trackRegionClick = (regionId: number | '', position: number) =>
+  trackGA4Event('home_item_click', {
+    section: 'region',
+    item_id: String(regionId),
+    position,
+  });
+
 function RegionRow({
   group,
+  position,
   isOpen,
   onToggle,
 }: {
   group: RegionGroup;
+  position: number;
   isOpen: boolean;
   onToggle: () => void;
 }) {
@@ -86,15 +99,21 @@ function RegionRow({
 
   if (!hasChildren) {
     return (
-      <li className="rounded-xl border border-stroke-neutral-basement px-10 py-14">
+      <li className="border-b border-stroke-neutral-basement">
         <Link
           href={buildRegionHref(group.parent.regionId)}
-          className="flex w-full items-center justify-between"
+          onClick={() => trackRegionClick(group.parent.regionId, position)}
+          className="flex min-h-64 w-full items-center gap-14"
         >
           <RegionRowContent
             group={group}
             imageUrl={imageUrl}
             fallbackImageUrl={fallbackImageUrl}
+          />
+          <ArrowUpRight
+            aria-hidden
+            size={16}
+            className="shrink-0 text-fg-neutral-muted"
           />
         </Link>
       </li>
@@ -102,13 +121,13 @@ function RegionRow({
   }
 
   return (
-    <li className="flex flex-col rounded-xl border border-stroke-neutral-basement px-10 py-14">
+    <li className="border-b border-stroke-neutral-basement">
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={isOpen}
         aria-label={`${group.displayName} 하위 지역 ${isOpen ? '접기' : '펼치기'}`}
-        className="flex w-full items-center justify-between"
+        className="flex min-h-64 w-full items-center gap-14 text-left"
       >
         <RegionRowContent
           group={group}
@@ -117,43 +136,33 @@ function RegionRow({
         />
         <SemanticIcon
           src="/icon/arrow-down-gray.svg"
-          width={22}
-          height={22}
-          className={`text-fg-neutral-muted transition-transform duration-200 ${
+          width={20}
+          height={20}
+          className={`shrink-0 text-fg-neutral-muted transition-transform duration-200 ${
             isOpen ? 'rotate-180' : ''
           }`}
         />
       </button>
 
       <AnimatedCollapse isOpen={isOpen}>
-        <ul className="flex flex-col gap-10 px-8 pt-10">
-          {/* /전체 항목 */}
+        <ul className="flex flex-wrap gap-8 pb-18 pl-42">
           <li>
             <Link
               href={buildRegionHref(group.parent.regionId)}
-              className="flex items-center justify-between border-b border-dashed border-stroke-neutral-basement py-8"
+              onClick={() => trackRegionClick(group.parent.regionId, position)}
+              className="block rounded-full bg-bg-neutral-solid px-14 text-13 font-semibold leading-34 text-fg-neutral-inverted"
             >
-              <span className="text-13 font-bold text-fg-neutral">
-                {group.parent.korName}
-              </span>
+              전체
             </Link>
           </li>
-
-          {/* 하위 지역들 */}
           {group.children.map((child) => (
             <li key={child.regionId}>
               <Link
                 href={buildRegionHref(child.regionId)}
-                className="flex items-center justify-between border-b border-dashed border-stroke-neutral-basement py-8"
+                onClick={() => trackRegionClick(child.regionId, position)}
+                className="block rounded-full border border-stroke-neutral-subtle px-14 text-13 leading-32 text-fg-neutral"
               >
-                <div className="gap-4 flex items-center">
-                  <span className="text-13 font-bold text-fg-neutral">
-                    {child.korName}
-                  </span>
-                  <span className="text-11 text-fg-neutral-muted">
-                    {child.engName}
-                  </span>
-                </div>
+                {child.korName.replace(`${group.displayName}/`, '')}
               </Link>
             </li>
           ))}
@@ -183,25 +192,22 @@ export default function RegionAccordionList() {
 
   if (isLoading) {
     return (
-      <SkeletonList count={8} gap={8}>
-        <li className="flex items-center justify-between rounded-xl border border-stroke-neutral-basement px-10 py-14">
-          <div className="flex items-center gap-10">
-            <SkeletonBase width={26} height={26} borderRadius="8px" />
-            <div className="flex items-center gap-4">
-              <SkeletonBase width={56} height={14} />
-            </div>
-          </div>
-        </li>
+      <SkeletonList count={8} gap={0}>
+        <div className="flex min-h-64 items-center gap-14 border-b border-stroke-neutral-basement">
+          <SkeletonBase width={28} height={28} borderRadius="8px" />
+          <SkeletonBase width={80} height={16} />
+        </div>
       </SkeletonList>
     );
   }
 
   return (
-    <ul className="space-y-8">
-      {regionGroups.map((group) => (
+    <ul>
+      {regionGroups.map((group, index) => (
         <RegionRow
           key={group.parent.regionId}
           group={group}
+          position={index + 1}
           isOpen={openRegionId === group.parent.regionId}
           onToggle={() =>
             setOpenRegionId((prev) =>

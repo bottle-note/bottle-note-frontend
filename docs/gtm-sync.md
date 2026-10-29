@@ -106,3 +106,14 @@ pnpm run gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 | `bartender_story_full_text`       | 「전체 글 보기」로 설명 전체 시트를 엶                                | `alcohol_id`            | 클릭당 1회                    |
 
 첫 잔은 상세와 같은 화면이라 건네는 것만으로 `bartender_select_alcohol`을 보내지 않는다. 첫 잔에서 바로 행동한 비율은 결과 이벤트 대비 `write_review_start`·`bartender_open_alcohol_page`·`add_to_picks`와 `bartender_show_other_candidates`를 함께 본다. 이야기는 첫 잔과 모든 바텐더 상세에서 설명이 있는 술에만 제안하므로, 제안 수는 결과 이벤트 수와 같지 않다. GA4 맞춤 측정기준에는 `entry`, `mode`, `result_state`, `source`, `trigger`, `stage`처럼 값이 제한된 항목만 등록하고 `alcohol_id`는 등록하지 않는다.
+
+## 홈 이벤트 기준
+
+| 이벤트                  | 발화 조건                                                                             | 매개변수                         | 중복 방지  |
+| ----------------------- | ------------------------------------------------------------------------------------- | -------------------------------- | ---------- |
+| `home_quick_link_click` | 배너 아래 바로가기 선택                                                               | `link`                           | 클릭당 1회 |
+| `home_item_click`       | 홈 섹션 항목(주간 TOP 5, 최근 본 위스키, 에디터 추천, 카테고리, 국가·지역, 리뷰) 선택 | `section`, `item_id`, `position` | 클릭당 1회 |
+| `home_more_click`       | 섹션의 「전체 보기」 선택                                                             | `section`                        | 클릭당 1회 |
+| `add_to_picks`          | 홈 목록에서 찜 추가·취소                                                              | 기존 매개변수 + `source: home`   | 클릭당 1회 |
+
+`link`는 `bartender_note`·`taste_test`·`tarot`·`my_records`, `section`은 `weekly_top`·`recent_viewed`·`curation`·`category`·`region`·`review`다. `item_id`는 섹션에 따라 주류 ID, 큐레이션 ID, 카테고리 영문명, 지역 ID, 리뷰 ID다. 국가별 보기의 `position`은 나라 행 순서이며 하위 지역 칩을 눌러도 그 나라의 순서를 보낸다. `position`은 섹션 안에서 1부터 센다. GA4 맞춤 측정기준에는 `link`, `section`만 등록하고 `item_id`는 등록하지 않는다.

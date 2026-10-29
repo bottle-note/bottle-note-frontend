@@ -4,6 +4,7 @@ import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useDebouncedToggle } from '@/hooks/useDebouncedToggle';
 import { trackGA4Event } from '@/utils/analytics/ga4';
+import type { FeatureSource } from '@/utils/analytics/types';
 import SemanticIcon from '@/components/ui/Display/SemanticIcon';
 
 const PICK_DEBOUNCE_DELAY_MS = 500;
@@ -20,6 +21,7 @@ interface Props {
   alcoholId: number;
   alcoholName?: string;
   fontSize?: string;
+  source?: FeatureSource;
 }
 
 const AlcoholPickButton = ({
@@ -34,6 +36,7 @@ const AlcoholPickButton = ({
   tone = 'brandContrast',
   size = 18,
   fontSize = 'text-12',
+  source,
 }: Props) => {
   const { isLoggedIn } = useAuthSession();
 
@@ -65,6 +68,7 @@ const AlcoholPickButton = ({
       alcohol_id: String(alcoholId),
       alcohol_name: alcoholName,
       action: newPickState ? 'add' : 'remove',
+      ...(source && { source }),
     });
     handleToggle(newPickState);
   };

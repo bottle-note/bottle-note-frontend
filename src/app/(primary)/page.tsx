@@ -3,9 +3,11 @@ import NavLayout from '@/components/ui/Layout/NavLayout';
 import AutoHideLogoHeader from '@/components/ui/Navigation/AutoHideLogoHeader';
 import JsonLd from '@/components/seo/JsonLd';
 import { generateWebSiteSchema } from '@/utils/seo/generateWebSiteSchema';
-import { MbtiPromoCard } from '@/components/feature/home/MbtiPromoCard';
+import HomeQuickLinks from '@/components/feature/home/HomeQuickLinks';
 import HomeFeaturedSection from '@/components/feature/home/HomeFeaturedSection';
-import HomeCategorySection from '@/components/feature/home/HomeCategorySection';
+import HomeExploreSection from '@/components/feature/home/HomeExploreSection';
+import HomeEditorPickSection from '@/components/feature/home/HomeEditorPickSection';
+import HomeReviewSection from '@/components/feature/home/HomeReviewSection';
 import type { Banner } from '@/api/banner/types';
 import type { ApiResponse } from '@/api/_shared/types';
 import { SSR_CALLER_HEADER } from '@/constants/common';
@@ -14,6 +16,7 @@ import {
   internalApiHeaders,
 } from '@/shared/api/internalApi';
 import { filterBannersByDate } from './_utils/filterBannersByDate';
+import { fetchHomeEditorPicks } from './_utils/fetchHomeEditorPicks';
 
 async function getBanners(): Promise<Banner[]> {
   try {
@@ -33,7 +36,10 @@ async function getBanners(): Promise<Banner[]> {
 }
 
 export default async function Home() {
-  const banners = await getBanners();
+  const [banners, editorPicks] = await Promise.all([
+    getBanners(),
+    fetchHomeEditorPicks(),
+  ]);
   const webSiteSchemas = generateWebSiteSchema();
 
   return (
@@ -50,13 +56,15 @@ export default async function Home() {
       <NavLayout>
         <AutoHideLogoHeader />
 
-        <MbtiPromoCard />
-
         <HomeCarousel banners={banners} />
 
-        <div className="pt-22 pb-80">
+        <HomeQuickLinks />
+
+        <div className="space-y-40 pt-28 pb-[var(--navbar-total-space)]">
+          <HomeEditorPickSection editorPicks={editorPicks} />
           <HomeFeaturedSection />
-          <HomeCategorySection />
+          <HomeExploreSection />
+          <HomeReviewSection />
         </div>
       </NavLayout>
     </>

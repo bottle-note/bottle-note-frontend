@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/apiClient';
+import { fetchPublicApiOnServer } from '@/shared/api/internalApi';
 import { CurationV2Api } from './curation-v2.api';
 import { SORT_ORDER } from '@/api/_shared/types';
 import { CURATION_V2_SORT_TYPES, CURATION_V2_SPEC_CODES } from './constants';
@@ -7,6 +8,10 @@ jest.mock('@/shared/api/apiClient', () => ({
   apiClient: {
     get: jest.fn(),
   },
+}));
+
+jest.mock('@/shared/api/internalApi', () => ({
+  fetchPublicApiOnServer: jest.fn(),
 }));
 
 const mockGet = apiClient.get as jest.Mock;
@@ -101,5 +106,25 @@ describe('CurationV2Api.getDetail', () => {
       authRequired: false,
       baseUrl: 'bottle-api/v2',
     });
+  });
+});
+
+describe('CurationV2Api.server.getFeed', () => {
+  it('서버에서 spec 코드와 개수로 v2 피드를 캐시 옵션과 함께 조회한다', async () => {
+    const result = { status: 'ok', data: { items: [] } };
+    (fetchPublicApiOnServer as jest.Mock).mockResolvedValue(result);
+    const cache = { revalidate: 3600, tags: ['home-editor-picks'] };
+
+    await expect(
+      CurationV2Api.server.getFeed(
+        { code: [CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT], size: 2 },
+        cache,
+      ),
+    ).resolves.toBe(result);
+
+    expect(fetchPublicApiOnServer).toHaveBeenCalledWith(
+      '/v2/curations/feed?code=WHISKY_TASTING_EVENT&size=2',
+      cache,
+    );
   });
 });

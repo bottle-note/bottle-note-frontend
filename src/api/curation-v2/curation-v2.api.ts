@@ -76,6 +76,19 @@ export const CurationV2Api = {
   // ========== 서버사이드 API (메타데이터 생성, 비로그인 공개 데이터) ==========
   server: {
     /**
+     * 큐레이션 v2 피드 첫 페이지를 조회합니다. 홈처럼 서버에서 미리 그리는 화면에서 사용합니다.
+     */
+    getFeed(
+      { code, size }: Pick<CurationV2FeedParams, 'code' | 'size'>,
+      cache: PublicApiCacheOptions,
+    ): Promise<PublicApiResult<CurationV2FeedData>> {
+      return fetchPublicApiOnServer<CurationV2FeedData>(
+        `/v2/curations/feed?${buildQueryParams({ code, size })}`,
+        cache,
+      );
+    },
+
+    /**
      * 큐레이션 상세를 조회합니다.
      */
     getDetail(
