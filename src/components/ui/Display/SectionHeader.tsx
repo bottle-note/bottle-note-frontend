@@ -3,15 +3,15 @@ import { ArrowUpRight } from 'lucide-react';
 
 interface Props {
   label: string;
-  /** 줄바꿈(\n)으로 두 줄 제목을 나눈다. */
+  /** 한 줄로 보여준다. 닉네임처럼 길이가 바뀌는 문구가 넘치면 끝을 말줄임한다. */
   title: string;
   moreHref?: string;
   moreLabel?: string;
   onMoreClick?: () => void;
 }
 
-/** 홈 섹션 머리: 브랜드색 라벨과 선택적인 「전체 보기」 링크를 한 줄에, 그 아래 제목 */
-export default function HomeSectionHeader({
+/** 섹션 머리: 브랜드색 라벨과 선택적인 「전체 보기」 링크를 한 줄에, 그 아래 한 줄 제목 */
+export default function SectionHeader({
   label,
   title,
   moreHref,
@@ -33,7 +33,7 @@ export default function HomeSectionHeader({
           </Link>
         )}
       </div>
-      <h2 className="whitespace-pre-line text-20 font-bold leading-28 text-fg-neutral">
+      <h2 className="truncate text-20 font-bold leading-28 text-fg-neutral">
         {title}
       </h2>
     </header>

@@ -183,6 +183,11 @@ describe('홈 주간 TOP 5', () => {
     renderWithQuery(<HomeFeaturedSection />);
 
     expect(await screen.findByText('주간 조회수 TOP 5')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', {
+        name: '이번 주 사람들이 가장 많이 본 위스키🔥',
+      }),
+    ).toBeInTheDocument();
     const items = screen.getAllByRole('listitem');
     expect(items).toHaveLength(5);
     items.forEach((item, index) => {

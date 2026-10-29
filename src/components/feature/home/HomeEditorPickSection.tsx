@@ -10,7 +10,7 @@ import type { HomeEditorPick } from '@/app/(primary)/_utils/fetchHomeEditorPicks
 import { ROUTES } from '@/constants/routes';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 
-import HomeSectionHeader from './HomeSectionHeader';
+import SectionHeader from '@/components/ui/Display/SectionHeader';
 
 const SECTION_LABEL = "EDITOR'S PICK";
 const SECTION_TITLE = '보틀노트 에디터가 직접 골라봤어요✨';
@@ -34,7 +34,7 @@ export default function HomeEditorPickSection({ editorPicks }: Props) {
 
   return (
     <section aria-label="에디터 추천" className="space-y-14">
-      <HomeSectionHeader
+      <SectionHeader
         label={SECTION_LABEL}
         title={SECTION_TITLE}
         moreHref={ROUTES.CURATION.BASE}

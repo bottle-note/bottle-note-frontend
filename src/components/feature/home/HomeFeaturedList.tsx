@@ -9,7 +9,7 @@ import type { HomeFeaturedType } from '@/types/HomeFeatured';
 import type { HomeSection } from '@/utils/analytics/types';
 import { HOME_FEATURED_CONFIG } from '@/constants/home';
 
-import HomeSectionHeader from './HomeSectionHeader';
+import SectionHeader from '@/components/ui/Display/SectionHeader';
 import { HomeRankList } from './_components/HomeRankList';
 import { HomeFeaturedEmptyState } from './_components/HomeFeaturedEmptyState';
 import { HomeFeaturedErrorState } from './_components/HomeFeaturedErrorState';
@@ -26,7 +26,11 @@ interface Props {
 
 function HomeFeaturedList({ type = 'week' }: Props) {
   const { isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
-  const { requiresAuth, titleLabel, titleText } = HOME_FEATURED_CONFIG[type];
+  const {
+    requiresAuth,
+    titleLabel,
+    title: titleTemplate,
+  } = HOME_FEATURED_CONFIG[type];
 
   // 로그인이 필요한 타입인데 로그인하지 않은 경우 쿼리 비활성화
   const shouldFetchData = !requiresAuth || isLoggedIn;
@@ -68,14 +72,14 @@ function HomeFeaturedList({ type = 'week' }: Props) {
     return <HomeFeaturedEmptyState type={type} />;
   }
 
-  const title = [
-    titleText[0].replace('{nickname}', currentUser?.nickname ?? ''),
-    titleText[1],
-  ].join('\n');
+  const title = titleTemplate.replace(
+    '{nickname}',
+    currentUser?.nickname ?? '',
+  );
 
   return (
     <div className="space-y-8">
-      <HomeSectionHeader label={titleLabel} title={title} />
+      <SectionHeader label={titleLabel} title={title} />
       <HomeRankList
         items={featuredList}
         section={SECTION_BY_TYPE[type] ?? 'weekly_top'}

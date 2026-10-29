@@ -1,7 +1,7 @@
 'use client';
 
 import CategoryList from '@/components/feature/home/CategoryList';
-import HomeSectionHeader from '@/components/feature/home/HomeSectionHeader';
+import SectionHeader from '@/components/ui/Display/SectionHeader';
 import HomeTabSection from '@/components/feature/home/HomeTabSection';
 import RegionAccordionList from '@/components/feature/home/_components/RegionAccordionList';
 
@@ -14,9 +14,9 @@ const TAB_LIST = [
 export default function HomeExploreSection() {
   return (
     <section aria-label="위스키 둘러보기" className="space-y-20">
-      <HomeSectionHeader
+      <SectionHeader
         label="EXPLORE"
-        title={'싱글 몰트부터 버번까지\n취향대로 골라보세요🗺️'}
+        title="싱글 몰트부터 버번까지 골라보세요🗺️"
       />
       <HomeTabSection tabList={TAB_LIST} contentClassName="px-20">
         {(currentTab) => {
