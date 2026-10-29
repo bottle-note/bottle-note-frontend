@@ -12,6 +12,8 @@ interface Props<T extends TabItem> {
   tabList: T[];
   scroll?: boolean;
   contentClassName?: string;
+  /** 탭 위에 둘 섹션 머리. 고른 탭에 따라 바꿀 수 있다. */
+  renderHeader?: (currentTab: T) => React.ReactNode;
   children: (currentTab: T) => React.ReactNode;
 }
 
@@ -19,6 +21,7 @@ export default function HomeTabSection<T extends TabItem>({
   tabList,
   scroll = false,
   contentClassName,
+  renderHeader,
   children,
 }: Props<T>) {
   const {
@@ -30,7 +33,8 @@ export default function HomeTabSection<T extends TabItem>({
   } = useTab({ tabList, scroll });
 
   return (
-    <article className="space-y-30">
+    <article className="space-y-16">
+      {renderHeader?.(currentTab)}
       <Tab
         variant="bookmark"
         tabList={tabs}

@@ -10,7 +10,7 @@ import { ROUTES } from '@/constants/routes';
 import { useHomeReviewsQuery } from '@/queries/useHomeReviewsQuery';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 
-import HomeSectionHeader from './HomeSectionHeader';
+import SectionHeader from '@/components/ui/Display/SectionHeader';
 import { HomeFeaturedErrorState } from './_components/HomeFeaturedErrorState';
 
 const SECTION_LABEL = 'REVIEW';
@@ -27,7 +27,7 @@ export default function HomeReviewSection() {
 
   return (
     <section aria-label="인기 리뷰" className="space-y-8">
-      <HomeSectionHeader
+      <SectionHeader
         label={SECTION_LABEL}
         title={SECTION_TITLE}
         moreHref={`${ROUTES.EXPLORE.BASE}?tab=${REVIEW_EXPLORE_TAB_ID}`}

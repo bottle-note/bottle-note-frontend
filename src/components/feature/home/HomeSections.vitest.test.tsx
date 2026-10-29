@@ -16,6 +16,7 @@ import HomeQuickLinks from './HomeQuickLinks';
 import HomeFeaturedSection from './HomeFeaturedSection';
 import HomeEditorPickSection from './HomeEditorPickSection';
 import HomeReviewSection from './HomeReviewSection';
+import HomeExploreSection from './HomeExploreSection';
 import type { HomeEditorPick } from '@/app/(primary)/_utils/fetchHomeEditorPicks';
 import type { CurationV2Payload } from '@/api/curation-v2/types';
 import { ExploreApi } from '@/api/explore/explore.api';
@@ -43,6 +44,7 @@ vi.mock('@/api/alcohol/alcohol.api', () => ({
     getWeeklyViewPopular: vi.fn(),
     getHistory: vi.fn(),
     putPick: vi.fn(),
+    getRegion: vi.fn(),
   },
 }));
 
@@ -177,11 +179,16 @@ describe('홈 주간 TOP 5', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('운영 문구와 함께 1~5위를 순서대로 보여주고 선택한 위스키를 기록한다', async () => {
+  it('탭 위 섹션 머리와 함께 1~5위를 순서대로 보여주고 선택한 위스키를 기록한다', async () => {
     renderWithQuery(<HomeFeaturedSection />);
 
-    expect(await screen.findByText('주간 조회수 TOP 5')).toBeInTheDocument();
-    const items = screen.getAllByRole('listitem');
+    expect(screen.getByText('WEEKLY TOP 5')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', {
+        name: '이번 주 사람들이 가장 많이 본 위스키🔥',
+      }),
+    ).toBeInTheDocument();
+    const items = await screen.findAllByRole('listitem');
     expect(items).toHaveLength(5);
     items.forEach((item, index) => {
       expect(item).toHaveTextContent(`0${index + 1}`);
@@ -215,6 +222,11 @@ describe('홈 주간 TOP 5', () => {
 
     fireEvent.click(screen.getByRole('button', { name: '최근에 본 위스키' }));
 
+    // 탭을 바꾸면 탭 위 섹션 머리도 바뀐다.
+    expect(screen.getByText('VIEW HISTORY')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: '내가 최근 본 위스키🥃' }),
+    ).toBeInTheDocument();
     expect(
       await screen.findByText('로그인 후 확인 가능한 서비스 입니다.'),
     ).toBeInTheDocument();
@@ -314,5 +326,95 @@ describe('홈 인기 리뷰', () => {
     await waitFor(() =>
       expect(screen.queryByText('한 잔에 담긴 이야기')).not.toBeInTheDocument(),
     );
+  });
+});
+
+describe('홈 둘러보기(카테고리·국가별)', () => {
+  beforeEach(() => {
+    vi.mocked(AlcoholsApi.getRegion).mockResolvedValue({
+      data: [
+        {
+          regionId: 1,
+          korName: '스코틀랜드/전체',
+          engName: 'Scotland',
+          imageUrl: null,
+          parentId: null,
+          sortOrder: 1,
+        },
+        {
+          regionId: 2,
+          korName: '아일라',
+          engName: 'Islay',
+          imageUrl: null,
+          parentId: 1,
+          sortOrder: 2,
+        },
+        {
+          regionId: 3,
+          korName: '스페이사이드',
+          engName: 'Speyside',
+          imageUrl: null,
+          parentId: 1,
+          sortOrder: 3,
+        },
+        {
+          regionId: 9,
+          korName: '일본',
+          engName: 'Japan',
+          imageUrl: null,
+          parentId: null,
+          sortOrder: 9,
+        },
+      ],
+    } as never);
+  });
+
+  it('카테고리를 목록으로 보여주고 선택한 카테고리 필터로 연결하며 기록한다', () => {
+    renderWithQuery(<HomeExploreSection />);
+
+    expect(screen.getByText('EXPLORE')).toBeInTheDocument();
+    const singleMalt = screen.getByRole('link', { name: /싱글몰트/ });
+    const href = new URL(
+      singleMalt.getAttribute('href') ?? '',
+      'http://localhost',
+    );
+    expect(href.pathname).toBe(ROUTES.EXPLORE.BASE);
+    expect(href.searchParams.get('tab')).toBe('EXPLORER_WHISKEY');
+    expect(href.searchParams.get('category')).toBeTruthy();
+
+    fireEvent.click(singleMalt);
+    expect(trackGA4Event).toHaveBeenCalledWith(
+      'home_item_click',
+      expect.objectContaining({ section: 'category', position: 1 }),
+    );
+  });
+
+  it('국가별 보기에서 하위 지역이 있는 나라는 펼쳐 지역을 고르고, 없는 나라는 바로 이동한다', async () => {
+    renderWithQuery(<HomeExploreSection />);
+
+    fireEvent.click(screen.getByRole('button', { name: '국가별 보기' }));
+
+    // 스코틀랜드는 처음부터 펼쳐져 있다.
+    const scotland = await screen.findByRole('button', {
+      name: '스코틀랜드 하위 지역 접기',
+    });
+    expect(scotland).toHaveAttribute('aria-expanded', 'true');
+    const islay = screen.getByRole('link', { name: '아일라' });
+    expect(islay.getAttribute('href')).toContain('regionIds=2');
+    fireEvent.click(islay);
+    expect(trackGA4Event).toHaveBeenCalledWith('home_item_click', {
+      section: 'region',
+      item_id: '2',
+      position: 1,
+    });
+
+    expect(
+      screen.getByRole('link', { name: /일본/ }).getAttribute('href'),
+    ).toContain('regionIds=9');
+
+    fireEvent.click(scotland);
+    expect(
+      screen.getByRole('button', { name: '스코틀랜드 하위 지역 펼치기' }),
+    ).toHaveAttribute('aria-expanded', 'false');
   });
 });

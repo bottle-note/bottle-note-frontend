@@ -5,7 +5,7 @@ import JsonLd from '@/components/seo/JsonLd';
 import { generateWebSiteSchema } from '@/utils/seo/generateWebSiteSchema';
 import HomeQuickLinks from '@/components/feature/home/HomeQuickLinks';
 import HomeFeaturedSection from '@/components/feature/home/HomeFeaturedSection';
-import HomeCategorySection from '@/components/feature/home/HomeCategorySection';
+import HomeExploreSection from '@/components/feature/home/HomeExploreSection';
 import HomeEditorPickSection from '@/components/feature/home/HomeEditorPickSection';
 import HomeReviewSection from '@/components/feature/home/HomeReviewSection';
 import type { Banner } from '@/api/banner/types';
@@ -63,7 +63,7 @@ export default async function Home() {
         <div className="space-y-40 pt-28 pb-[var(--navbar-total-space)]">
           <HomeEditorPickSection editorPicks={editorPicks} />
           <HomeFeaturedSection />
-          <HomeCategorySection />
+          <HomeExploreSection />
           <HomeReviewSection />
         </div>
       </NavLayout>
