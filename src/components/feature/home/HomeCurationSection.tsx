@@ -16,9 +16,9 @@ import HomeSectionHeader from './HomeSectionHeader';
 import { HomeFeaturedErrorState } from './_components/HomeFeaturedErrorState';
 
 const SECTION_LABEL = "EDITOR'S PICK";
-const SECTION_TITLE = '보틀노트 에디터가\n직접 골라봤어요✨';
+const SECTION_TITLE = '보틀노트 에디터가 직접 골라봤어요✨';
 
-/** 에디터 추천: 큐레이션·페어링·프로그램을 가로로 넘기는 커버 카드. 비어 있으면 섹션을 숨긴다. */
+/** 에디터 추천: 시음회·큐레이션·페어링·프로그램을 가로로 넘기는 커버 카드. 비어 있으면 섹션을 숨긴다. */
 export default function HomeCurationSection() {
   const {
     data: curations,

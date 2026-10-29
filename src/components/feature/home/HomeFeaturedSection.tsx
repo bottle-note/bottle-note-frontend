@@ -2,34 +2,25 @@
 
 import HomeFeaturedList from '@/components/feature/home/HomeFeaturedList';
 import HomeTabSection from '@/components/feature/home/HomeTabSection';
-import HomeTastingEventPreview from '@/components/feature/home/HomeTastingEventPreview';
 import type { HomeFeaturedConfigKey } from '@/constants/home';
 
-type HomeFeaturedTabId = HomeFeaturedConfigKey | 'tasting-event';
-
 interface FeaturedMenuItem {
-  id: HomeFeaturedTabId;
+  id: HomeFeaturedConfigKey;
   name: string;
 }
 
+// 시음회는 에디터 추천 섹션에서 함께 보여준다.
 const TAB_LIST: FeaturedMenuItem[] = [
   { id: 'view-week', name: '주간 TOP 5' },
   { id: 'recent', name: '최근에 본 위스키' },
-  { id: 'tasting-event', name: '시음회' },
 ];
 
 export default function HomeFeaturedSection() {
   return (
     <HomeTabSection tabList={TAB_LIST} scroll>
-      {(currentTab) =>
-        currentTab.id === 'tasting-event' ? (
-          <div className="pl-20">
-            <HomeTastingEventPreview key={currentTab.id} />
-          </div>
-        ) : (
-          <HomeFeaturedList key={currentTab.id} type={currentTab.id} />
-        )
-      }
+      {(currentTab) => (
+        <HomeFeaturedList key={currentTab.id} type={currentTab.id} />
+      )}
     </HomeTabSection>
   );
 }

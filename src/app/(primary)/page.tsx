@@ -57,8 +57,8 @@ export default async function Home() {
         <HomeQuickLinks />
 
         <div className="space-y-40 pt-28 pb-[var(--navbar-total-space)]">
-          <HomeFeaturedSection />
           <HomeCurationSection />
+          <HomeFeaturedSection />
           <HomeCategorySection />
           <HomeReviewSection />
         </div>

@@ -4,13 +4,13 @@ import { CURATION_V2_SPEC_CODES } from '@/api/curation-v2/constants';
 import type { CurationV2FeedItem } from '@/api/curation-v2/types';
 import { curationV2Keys } from '@/queries/curationV2Keys';
 
-// 시음회는 홈 책갈피 탭에서 따로 보여준다.
 const HOME_CURATION_CODES = [
+  CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT,
   CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY,
   CURATION_V2_SPEC_CODES.WHISKY_PAIRING,
   CURATION_V2_SPEC_CODES.PROGRAM,
 ] as const;
-const HOME_CURATION_SIZE = 6;
+const HOME_CURATION_SIZE = 8;
 
 /** 홈 에디터 추천: 큐레이션 피드 첫 페이지만 쓴다. */
 export const useHomeCurationsQuery = () =>

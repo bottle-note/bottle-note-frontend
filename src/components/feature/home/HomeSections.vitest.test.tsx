@@ -163,6 +163,20 @@ describe('홈 바로가기', () => {
 });
 
 describe('홈 주간 TOP 5', () => {
+  it('책갈피 탭은 주간 TOP 5와 최근에 본 위스키만 보여준다', () => {
+    renderWithQuery(<HomeFeaturedSection />);
+
+    expect(
+      screen.getByRole('button', { name: '주간 TOP 5' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '최근에 본 위스키' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '시음회' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('운영 문구와 함께 1~5위를 순서대로 보여주고 선택한 위스키를 기록한다', async () => {
     renderWithQuery(<HomeFeaturedSection />);
 
@@ -209,7 +223,7 @@ describe('홈 주간 TOP 5', () => {
 });
 
 describe('홈 에디터 추천', () => {
-  it('큐레이션·페어링·프로그램을 종류 배지와 함께 보여주고 선택과 전체 보기를 기록한다', async () => {
+  it('시음회·큐레이션·페어링·프로그램을 종류 배지와 함께 보여주고 선택과 전체 보기를 기록한다', async () => {
     vi.mocked(CurationV2Api.getFeed).mockResolvedValue(
       feedResponse([
         curationItem(1, '가을 위스키', [{ alcohol: { korName: 'A' } }]),
@@ -218,6 +232,11 @@ describe('홈 에디터 추천', () => {
           eventStartDate: '2026-11-01',
           eventEndDate: '2026-11-02',
           placeName: '서울',
+        }),
+        curationItem(4, '11월 시음회', {
+          eventDate: '2026-11-15',
+          capacity: 20,
+          isRecruiting: true,
         }),
       ]),
     );
@@ -229,10 +248,16 @@ describe('홈 에디터 추천', () => {
       expect.stringContaining('큐레이션가을 위스키'),
       expect.stringContaining('페어링치즈와 위스키'),
       expect.stringContaining('프로그램증류소 투어'),
+      expect.stringContaining('시음회11월 시음회'),
     ]);
     expect(CurationV2Api.getFeed).toHaveBeenCalledWith(
       expect.objectContaining({
-        code: ['RECOMMENDED_WHISKY', 'WHISKY_PAIRING', 'PROGRAM'],
+        code: [
+          'WHISKY_TASTING_EVENT',
+          'RECOMMENDED_WHISKY',
+          'WHISKY_PAIRING',
+          'PROGRAM',
+        ],
       }),
     );
 
