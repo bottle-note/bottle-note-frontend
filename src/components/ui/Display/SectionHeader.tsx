@@ -20,7 +20,9 @@ export default function SectionHeader({
 }: Props) {
   return (
     <header className="px-20">
-      <div className="flex min-h-44 items-center justify-between gap-12">
+      <div
+        className={`flex items-center justify-between gap-12 ${moreHref ? 'min-h-44' : 'pb-6'}`}
+      >
         <p className="text-13 font-extrabold text-fg-brand-primary">{label}</p>
         {moreHref && (
           <Link
