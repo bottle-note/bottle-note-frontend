@@ -6,7 +6,7 @@ import {
   CURATION_V2_SPEC_CODES,
   type CurationV2SpecCode,
 } from '@/api/curation-v2/constants';
-import type { HomeCuration } from '@/app/(primary)/_utils/getHomeCurations';
+import type { HomeEditorPick } from '@/app/(primary)/_utils/fetchHomeEditorPicks';
 import { ROUTES } from '@/constants/routes';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 
@@ -23,12 +23,12 @@ const KIND_LABEL: Record<CurationV2SpecCode, string> = {
 };
 
 interface Props {
-  curations: HomeCuration[];
+  editorPicks: HomeEditorPick[];
 }
 
 /** 에디터 추천: 서버에서 미리 받은 시음회·프로그램·큐레이션·페어링을 가로로 넘기는 커버 카드. 비어 있으면 섹션을 숨긴다. */
-export default function HomeCurationSection({ curations }: Props) {
-  if (curations.length === 0) {
+export default function HomeEditorPickSection({ editorPicks }: Props) {
+  if (editorPicks.length === 0) {
     return null;
   }
 
@@ -43,10 +43,10 @@ export default function HomeCurationSection({ curations }: Props) {
         }
       />
       <ul className="flex gap-12 overflow-x-auto px-20 scrollbar-hide">
-        {curations.map((curation, index) => (
-          <li key={curation.id} className="w-260 shrink-0">
-            <HomeCurationCard
-              curation={curation}
+        {editorPicks.map((editorPick, index) => (
+          <li key={editorPick.id} className="w-260 shrink-0">
+            <HomeEditorPickCard
+              editorPick={editorPick}
               position={index + 1}
               priority={index === 0}
             />
@@ -58,19 +58,19 @@ export default function HomeCurationSection({ curations }: Props) {
 }
 
 interface CardProps {
-  curation: HomeCuration;
+  editorPick: HomeEditorPick;
   position: number;
   priority: boolean;
 }
 
-function HomeCurationCard({ curation, position, priority }: CardProps) {
+function HomeEditorPickCard({ editorPick, position, priority }: CardProps) {
   return (
     <Link
-      href={ROUTES.CURATION.DETAIL(curation.id)}
+      href={ROUTES.CURATION.DETAIL(editorPick.id)}
       onClick={() =>
         trackGA4Event('home_item_click', {
           section: 'curation',
-          item_id: String(curation.id),
+          item_id: String(editorPick.id),
           position,
         })
       }
@@ -78,7 +78,7 @@ function HomeCurationCard({ curation, position, priority }: CardProps) {
     >
       <span className="relative block h-170 w-260 overflow-hidden bg-bg-neutral-weak">
         <BaseImage
-          src={curation.coverImageUrl}
+          src={editorPick.coverImageUrl}
           alt=""
           fill
           priority={priority}
@@ -86,14 +86,14 @@ function HomeCurationCard({ curation, position, priority }: CardProps) {
           className="object-cover"
         />
         <span className="absolute left-10 top-10 bg-palette-static-white px-8 text-11 font-bold leading-22 text-palette-neutral-900">
-          {KIND_LABEL[curation.specCode]}
+          {KIND_LABEL[editorPick.specCode]}
         </span>
       </span>
       <span className="line-clamp-1 text-16 font-bold leading-22">
-        {curation.name}
+        {editorPick.name}
       </span>
       <span className="line-clamp-2 text-13 leading-19 text-fg-neutral-muted">
-        {curation.description}
+        {editorPick.description}
       </span>
     </Link>
   );

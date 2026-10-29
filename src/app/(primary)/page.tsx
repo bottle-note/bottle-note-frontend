@@ -6,7 +6,7 @@ import { generateWebSiteSchema } from '@/utils/seo/generateWebSiteSchema';
 import HomeQuickLinks from '@/components/feature/home/HomeQuickLinks';
 import HomeFeaturedSection from '@/components/feature/home/HomeFeaturedSection';
 import HomeCategorySection from '@/components/feature/home/HomeCategorySection';
-import HomeCurationSection from '@/components/feature/home/HomeCurationSection';
+import HomeEditorPickSection from '@/components/feature/home/HomeEditorPickSection';
 import HomeReviewSection from '@/components/feature/home/HomeReviewSection';
 import type { Banner } from '@/api/banner/types';
 import type { ApiResponse } from '@/api/_shared/types';
@@ -16,7 +16,7 @@ import {
   internalApiHeaders,
 } from '@/shared/api/internalApi';
 import { filterBannersByDate } from './_utils/filterBannersByDate';
-import { getHomeCurations } from './_utils/getHomeCurations';
+import { fetchHomeEditorPicks } from './_utils/fetchHomeEditorPicks';
 
 async function getBanners(): Promise<Banner[]> {
   try {
@@ -36,9 +36,9 @@ async function getBanners(): Promise<Banner[]> {
 }
 
 export default async function Home() {
-  const [banners, curations] = await Promise.all([
+  const [banners, editorPicks] = await Promise.all([
     getBanners(),
-    getHomeCurations(),
+    fetchHomeEditorPicks(),
   ]);
   const webSiteSchemas = generateWebSiteSchema();
 
@@ -61,7 +61,7 @@ export default async function Home() {
         <HomeQuickLinks />
 
         <div className="space-y-40 pt-28 pb-[var(--navbar-total-space)]">
-          <HomeCurationSection curations={curations} />
+          <HomeEditorPickSection editorPicks={editorPicks} />
           <HomeFeaturedSection />
           <HomeCategorySection />
           <HomeReviewSection />

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getHomeCurations } from './getHomeCurations';
+import { fetchHomeEditorPicks } from './fetchHomeEditorPicks';
 
 const item = (id: number) => ({
   id,
@@ -17,7 +17,7 @@ const item = (id: number) => ({
 const ok = (ids: number[]) =>
   new Response(JSON.stringify({ data: { items: ids.map(item) } }));
 
-describe('getHomeCurations', () => {
+describe('fetchHomeEditorPicks', () => {
   beforeEach(() => {
     vi.stubEnv('INTERNAL_SERVER_URL', 'http://product-api.internal');
     vi.stubEnv('API_SERVER_WARP_URL', '');
@@ -41,7 +41,7 @@ describe('getHomeCurations', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    const curations = await getHomeCurations();
+    const curations = await fetchHomeEditorPicks();
 
     expect(fetchMock).toHaveBeenCalledTimes(4);
     fetchMock.mock.calls.forEach(([url, init]) => {
@@ -76,7 +76,7 @@ describe('getHomeCurations', () => {
       }),
     );
 
-    const curations = await getHomeCurations();
+    const curations = await fetchHomeEditorPicks();
 
     expect(curations.map(({ id, specCode }) => [id, specCode])).toEqual([
       [7, 'RECOMMENDED_WHISKY'],

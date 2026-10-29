@@ -14,9 +14,9 @@ import useModalStore from '@/store/modalStore';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import HomeQuickLinks from './HomeQuickLinks';
 import HomeFeaturedSection from './HomeFeaturedSection';
-import HomeCurationSection from './HomeCurationSection';
+import HomeEditorPickSection from './HomeEditorPickSection';
 import HomeReviewSection from './HomeReviewSection';
-import type { HomeCuration } from '@/app/(primary)/_utils/getHomeCurations';
+import type { HomeEditorPick } from '@/app/(primary)/_utils/fetchHomeEditorPicks';
 import type { CurationV2Payload } from '@/api/curation-v2/types';
 import { ExploreApi } from '@/api/explore/explore.api';
 import type { ExploreReview } from '@/api/explore/types';
@@ -223,7 +223,7 @@ describe('홈 주간 TOP 5', () => {
 });
 
 describe('홈 에디터 추천', () => {
-  const curations: HomeCuration[] = [
+  const curations: HomeEditorPick[] = [
     { ...curationItem(4, '11월 시음회', {}), specCode: 'WHISKY_TASTING_EVENT' },
     { ...curationItem(3, '증류소 투어', {}), specCode: 'PROGRAM' },
     { ...curationItem(1, '가을 위스키', []), specCode: 'RECOMMENDED_WHISKY' },
@@ -231,7 +231,7 @@ describe('홈 에디터 추천', () => {
   ];
 
   it('서버에서 받은 순서대로 종류 배지와 함께 보여주고 선택과 전체 보기를 기록한다', () => {
-    render(<HomeCurationSection curations={curations} />);
+    render(<HomeEditorPickSection editorPicks={curations} />);
 
     expect(screen.getByText("EDITOR'S PICK")).toBeInTheDocument();
     const cards = screen.getAllByRole('listitem');
@@ -260,7 +260,7 @@ describe('홈 에디터 추천', () => {
   });
 
   it('노출할 큐레이션이 없으면 섹션을 숨긴다', () => {
-    render(<HomeCurationSection curations={[]} />);
+    render(<HomeEditorPickSection editorPicks={[]} />);
 
     expect(screen.queryByText("EDITOR'S PICK")).not.toBeInTheDocument();
   });

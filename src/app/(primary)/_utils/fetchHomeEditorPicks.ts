@@ -13,12 +13,12 @@ import {
   internalApiHeaders,
 } from '@/shared/api/internalApi';
 
-export interface HomeCuration extends CurationV2FeedItem {
+export interface HomeEditorPick extends CurationV2FeedItem {
   specCode: CurationV2SpecCode;
 }
 
 // 날짜가 정해진 행사를 먼저 보여준다. 같은 종류 안에서는 서버 순서를 따른다.
-export const HOME_CURATION_CODES: readonly CurationV2SpecCode[] = [
+export const EDITOR_PICK_SPEC_CODES: readonly CurationV2SpecCode[] = [
   CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT,
   CURATION_V2_SPEC_CODES.PROGRAM,
   CURATION_V2_SPEC_CODES.RECOMMENDED_WHISKY,
@@ -32,7 +32,9 @@ const REVALIDATE_SECONDS = 60 * 60;
  * 피드 응답에는 항목의 spec이 없어서, 종류별로 따로 요청해 요청한 코드로 종류를 붙인다.
  * 한 종류가 실패해도 나머지는 보여준다.
  */
-async function fetchFeed(code: CurationV2SpecCode): Promise<HomeCuration[]> {
+async function fetchCurationFeedBySpec(
+  code: CurationV2SpecCode,
+): Promise<HomeEditorPick[]> {
   try {
     const query = new URLSearchParams({ code, size: String(SIZE_PER_CODE) });
     const res = await fetch(
@@ -54,7 +56,9 @@ async function fetchFeed(code: CurationV2SpecCode): Promise<HomeCuration[]> {
   }
 }
 
-export async function getHomeCurations(): Promise<HomeCuration[]> {
-  const feeds = await Promise.all(HOME_CURATION_CODES.map(fetchFeed));
+export async function fetchHomeEditorPicks(): Promise<HomeEditorPick[]> {
+  const feeds = await Promise.all(
+    EDITOR_PICK_SPEC_CODES.map(fetchCurationFeedBySpec),
+  );
   return feeds.flat();
 }
