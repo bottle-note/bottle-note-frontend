@@ -20,16 +20,16 @@ const TAB_LIST: FeaturedMenuItem[] = [
 
 export default function HomeFeaturedSection() {
   return (
-    <HomeTabSection tabList={TAB_LIST} scroll contentClassName="pb-59 pl-25">
-      {(currentTab) => (
-        <>
-          {currentTab.id === 'tasting-event' ? (
+    <HomeTabSection tabList={TAB_LIST} scroll>
+      {(currentTab) =>
+        currentTab.id === 'tasting-event' ? (
+          <div className="pl-20">
             <HomeTastingEventPreview key={currentTab.id} />
-          ) : (
-            <HomeFeaturedList key={currentTab.id} type={currentTab.id} />
-          )}
-        </>
-      )}
+          </div>
+        ) : (
+          <HomeFeaturedList key={currentTab.id} type={currentTab.id} />
+        )
+      }
     </HomeTabSection>
   );
 }

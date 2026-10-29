@@ -109,6 +109,11 @@
       "parameters": ["alcohol_id", "stage"]
     },
     { "name": "bartender_story_full_text", "parameters": ["alcohol_id"] },
+    { "name": "home_quick_link_click", "parameters": ["link"] },
+    {
+      "name": "home_item_click",
+      "parameters": ["section", "item_id", "position"]
+    },
     {
       "name": "share",
       "parameters": [
