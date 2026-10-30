@@ -18,6 +18,10 @@ import {
 import { filterBannersByDate } from './_utils/filterBannersByDate';
 import { fetchHomeEditorPicks } from './_utils/fetchHomeEditorPicks';
 
+// 빌드 환경(CI)에서는 내부 API에 접근할 수 없어 미리 만들면 배너·에디터 추천이 빈 채로 배포된다.
+// 요청 시 렌더링하고, API 응답은 각 fetch의 revalidate 캐시를 그대로 쓴다.
+export const dynamic = 'force-dynamic';
+
 async function getBanners(): Promise<Banner[]> {
   try {
     const baseUrl = `${getInternalServerOrigin()}/api/v1`;
