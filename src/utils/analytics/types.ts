@@ -35,7 +35,7 @@ export type HomeQuickLink =
   | 'bartender_note'
   | 'taste_test'
   | 'tarot'
-  | 'my_records';
+  | 'whisky_search';
 
 // 홈 섹션. weekly_top·recent_viewed는 책갈피 탭, category·region은 둘러보기 탭이다.
 export type HomeSection =
@@ -195,6 +195,9 @@ export interface GA4EventMap {
   home_more_click: {
     section: HomeSection;
   };
+
+  // 상단 바
+  header_search_click: Record<string, never>;
 
   // 공유
   share: {
