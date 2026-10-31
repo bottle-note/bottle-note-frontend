@@ -14,7 +14,9 @@ import { useExploreSort } from '../_hooks/useExploreSort';
 const mockPush = jest.fn();
 
 jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: mockPush }),
+  useRouter: () => ({ push: mockPush, replace: jest.fn() }),
+  usePathname: () => '/explore',
+  useSearchParams: () => new URLSearchParams('tab=EXPLORER_WHISKEY'),
 }));
 
 jest.mock('@/api/explore/explore.api', () => ({

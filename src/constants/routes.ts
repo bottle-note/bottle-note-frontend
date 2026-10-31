@@ -20,6 +20,8 @@ export const ROUTES = {
     BASE: '/explore',
     WHISKEY_SEARCH: (keyword?: string) =>
       `/explore?tab=EXPLORER_WHISKEY${keyword ? `&keyword=${encodeURIComponent(keyword)}` : ''}`,
+    // 검색창에 바로 입력할 수 있게 포커스한 상태로 연다
+    WHISKEY_SEARCH_FOCUSED: '/explore?tab=EXPLORER_WHISKEY&focus=search',
   },
   CURATION: {
     BASE: '/curation',

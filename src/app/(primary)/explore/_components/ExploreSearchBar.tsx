@@ -20,6 +20,7 @@ interface Props {
   sortPresets?: readonly ExploreSortPreset[];
   selectedSortId?: string;
   onSelectSort?: (presetId: string) => void;
+  autoFocus?: boolean;
 }
 
 export const ExploreSearchBar = ({
@@ -32,6 +33,7 @@ export const ExploreSearchBar = ({
   sortPresets = [],
   selectedSortId,
   onSelectSort,
+  autoFocus,
 }: Props) => {
   const [isOpenSideFilter, setIsOpenSideFilter] = useState(false);
   const { regions } = useRegionsQuery();
@@ -72,6 +74,7 @@ export const ExploreSearchBar = ({
         placeholder="위스키 이름, 테이스팅노트로 검색"
         inputClassName="pr-64"
         clearable
+        autoFocus={autoFocus}
         renderActions={() => (
           <button
             type="button"
