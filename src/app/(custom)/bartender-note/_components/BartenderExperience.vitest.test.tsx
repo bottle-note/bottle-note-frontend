@@ -836,6 +836,31 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     });
   });
 
+  it('이야기를 듣고 술 상세 페이지에 다녀오면 들은 이야기를 펼친 채로 돌려준다', async () => {
+    const { unmount } = renderExperience();
+    await answerTasteQuestions(anyAnswers);
+    await firstPick();
+    await press('들려주세요');
+    await waitFor(() =>
+      expect(conversation()).toHaveTextContent('바다 향이 나는 위스키'),
+    );
+    await screen.findByRole('button', { name: '다시 듣기' });
+    fireEvent.click(screen.getByRole('link', { name: '자세히 볼게요' }));
+    unmount();
+
+    renderExperience();
+    await firstPick();
+    expect(conversation()).toHaveTextContent('나: 들려주세요');
+    expect(conversation()).toHaveTextContent('바다 향이 나는 위스키');
+    // 이미 들은 이야기라 다시 묻지 않고 다시 듣기를 남긴다
+    expect(
+      screen.queryByRole('button', { name: '들려주세요' }),
+    ).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: '다시 듣기' }),
+    ).toBeInTheDocument();
+  });
+
   it('첫 문단을 한 문장씩 이어 들려주고, 문단이 더 있으면 전체 글로 안내한다', async () => {
     withLeadDescription(
       '첫 문장입니다. 둘째 \n문장입니다.\n\n \n\n다음 문단입니다.',

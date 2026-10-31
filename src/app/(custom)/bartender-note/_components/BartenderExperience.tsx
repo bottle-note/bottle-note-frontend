@@ -199,6 +199,7 @@ export default function BartenderExperience({
     setCurationId(saved.curationId);
     setPostedReviewId(saved.postedReviewId);
     setResumeAfterLogin(saved.resumeAfterLogin ?? null);
+    if (saved.stories) storyProgress.restore(saved.stories);
     tracking.restore(saved);
   }, []);
 
@@ -242,6 +243,7 @@ export default function BartenderExperience({
       situation,
       curationId,
       postedReviewId,
+      stories: storyProgress.states,
       resumeAfterLogin: resume,
     });
   /** 비로그인이면 지금 화면을 남겨 두고 로그인 화면으로 보낸다. 로그인 후 resume 단계를 연다. */
@@ -398,7 +400,11 @@ export default function BartenderExperience({
     firstPickName: firstPick?.name,
     pickCount: picks.isLoading ? undefined : picks.items.length,
   });
-  const { story, reset: resetStory } = useAlcoholStory({
+  const {
+    story,
+    reset: resetStory,
+    persisted: storyProgress,
+  } = useAlcoholStory({
     alcohol: selected,
     active: talkStep,
     greeting: stepLines[0],
