@@ -10,12 +10,13 @@ import React, {
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Bell } from 'lucide-react';
+import { Bell, Search } from 'lucide-react';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useNotificationUnreadCount } from '@/queries/useNotificationsQuery';
 import { isDevelopmentDeployment } from '@/lib/environment';
 import useModalStore from '@/store/modalStore';
 import { ROUTES } from '@/constants/routes';
+import { trackGA4Event } from '@/utils/analytics/ga4';
 import Logo from 'public/bottle_note_Icon_logo.svg';
 import Menu from 'public/icon/menu-subcoral.svg';
 import UserIcon from 'public/icon/user-outlined-subcoral.svg';
@@ -111,6 +112,20 @@ const HeaderMenu = () => {
         <Image src={Menu} alt="Settings" />
       </Link>
     </div>
+  );
+};
+
+const HeaderSearch = () => {
+  return (
+    <Link
+      href={ROUTES.EXPLORE.WHISKEY_SEARCH_FOCUSED}
+      prefetch={false}
+      aria-label="위스키 검색"
+      onClick={() => trackGA4Event('header_search_click')}
+      className="inline-flex items-center justify-center pt-8 text-subCoral focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring"
+    >
+      <Search size={22} strokeWidth={2} aria-hidden="true" />
+    </Link>
   );
 };
 
@@ -216,5 +231,6 @@ export const SubHeader = Object.assign(SubHeaderMain, {
   Logo: HeaderLogo,
   Menu: HeaderMenu,
   NotificationBell: HeaderNotificationBell,
+  Search: HeaderSearch,
   Profile: HeaderProfile,
 });
