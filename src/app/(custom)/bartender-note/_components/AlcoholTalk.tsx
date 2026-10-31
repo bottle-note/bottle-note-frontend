@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
@@ -266,7 +267,7 @@ function AlcoholCard({
   return (
     <section
       aria-label={label}
-      className="relative ml-34 flex items-center gap-12 rounded-xl border border-stroke-neutral-subtle bg-bg-neutral-weak p-10 motion-safe:duration-500 motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95"
+      className="relative ml-40 flex items-center gap-12 rounded-xl border border-stroke-neutral-subtle bg-bg-neutral-weak p-10 motion-safe:duration-500 motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95"
     >
       <span aria-hidden="true">
         {alcohol.demoWhiskey ? (
@@ -346,12 +347,13 @@ function BartenderBubble({
 }) {
   return (
     <div className={`flex max-w-[300px] items-start gap-8 ${className}`}>
-      <span
-        aria-hidden="true"
-        className="grid h-26 w-26 shrink-0 place-items-center rounded-full bg-bg-brand-solid text-10 font-extrabold text-fg-brand-contrast"
-      >
-        노트
-      </span>
+      <Image
+        src="/images/bartender-note/note-avatar.webp"
+        alt=""
+        width={32}
+        height={32}
+        className="h-32 w-32 shrink-0 rounded-full"
+      />
       <div className="min-w-0 overflow-hidden rounded-[4px_14px_14px_14px] bg-bg-neutral-weak">
         <p className="m-0 break-keep px-12 py-9 text-14 leading-21">
           <span className="sr-only">노트: </span>
