@@ -115,5 +115,6 @@ pnpm run gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 | `home_item_click`       | 홈 섹션 항목(주간 TOP 5, 최근 본 위스키, 에디터 추천, 카테고리, 국가·지역, 리뷰) 선택 | `section`, `item_id`, `position` | 클릭당 1회 |
 | `home_more_click`       | 섹션의 「전체 보기」 선택                                                             | `section`                        | 클릭당 1회 |
 | `add_to_picks`          | 홈 목록에서 찜 추가·취소                                                              | 기존 매개변수 + `source: home`   | 클릭당 1회 |
+| `header_search_click`   | 상단 바 검색 아이콘 선택(홈·둘러보기·마이페이지 상단 바)                              | 없음                             | 클릭당 1회 |
 
-`link`는 `bartender_note`·`taste_test`·`tarot`·`my_records`, `section`은 `weekly_top`·`recent_viewed`·`curation`·`category`·`region`·`review`다. `item_id`는 섹션에 따라 주류 ID, 큐레이션 ID, 카테고리 영문명, 지역 ID, 리뷰 ID다. 국가별 보기의 `position`은 나라 행 순서이며 하위 지역 칩을 눌러도 그 나라의 순서를 보낸다. `position`은 섹션 안에서 1부터 센다. GA4 맞춤 측정기준에는 `link`, `section`만 등록하고 `item_id`는 등록하지 않는다.
+`link`는 `bartender_note`·`taste_test`·`tarot`·`whisky_search`, `section`은 `weekly_top`·`recent_viewed`·`curation`·`category`·`region`·`review`다. `item_id`는 섹션에 따라 주류 ID, 큐레이션 ID, 카테고리 영문명, 지역 ID, 리뷰 ID다. 국가별 보기의 `position`은 나라 행 순서이며 하위 지역 칩을 눌러도 그 나라의 순서를 보낸다. `position`은 섹션 안에서 1부터 센다. GA4 맞춤 측정기준에는 `link`, `section`만 등록하고 `item_id`는 등록하지 않는다.
