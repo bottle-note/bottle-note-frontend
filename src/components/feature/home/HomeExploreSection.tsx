@@ -16,7 +16,7 @@ export default function HomeExploreSection() {
     <section aria-label="위스키 둘러보기" className="space-y-20">
       <SectionHeader
         label="EXPLORE"
-        title="싱글 몰트부터 버번까지 골라보세요🗺️"
+        title="싱글 몰트부터 버번까지 골라보세요"
       />
       <HomeTabSection tabList={TAB_LIST} contentClassName="px-20">
         {(currentTab) => {

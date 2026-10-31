@@ -13,7 +13,7 @@ import { trackGA4Event } from '@/utils/analytics/ga4';
 import SectionHeader from '@/components/ui/Display/SectionHeader';
 
 const SECTION_LABEL = "EDITOR'S PICK";
-const SECTION_TITLE = '보틀노트 에디터가 직접 골라봤어요✨';
+const SECTION_TITLE = '보틀노트 에디터가 직접 골라봤어요';
 
 const KIND_LABEL: Record<CurationV2SpecCode, string> = {
   [CURATION_V2_SPEC_CODES.WHISKY_TASTING_EVENT]: '시음회',
