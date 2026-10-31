@@ -3,24 +3,16 @@ import Link from 'next/link';
 import Label from '@/components/ui/Display/Label';
 import { truncStr } from '@/utils/truncStr';
 import Star from '@/components/ui/Display/Star';
-import VisibilityToggle from '@/components/ui/Form/VisibilityToggle';
 import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import ProfileImage from '@/components/domain/user/ProfileImage';
-import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { ROUTES } from '@/constants/routes';
 import { LABEL_NAMES } from '@/constants/common';
 
 interface ReviewUserHeaderProps {
   data: ReviewDetailsWithoutAlcoholInfo;
-  onRefresh: () => void;
 }
 
-export default function ReviewUserHeader({
-  data,
-  onRefresh,
-}: ReviewUserHeaderProps) {
-  const { user: userData } = useAuthSession();
-
+export default function ReviewUserHeader({ data }: ReviewUserHeaderProps) {
   return (
     <section className="mx-20">
       <article className="flex items-center justify-between">
@@ -64,15 +56,6 @@ export default function ReviewUserHeader({
               />
             )}
           </div>
-          {data.reviewInfo?.userInfo?.userId === userData?.userId && (
-            <VisibilityToggle
-              initialStatus={data.reviewInfo.status === 'PUBLIC'}
-              reviewId={data?.reviewInfo?.reviewId}
-              handleNotLogin={() => {}}
-              onSuccess={onRefresh}
-              textSize="text-13"
-            />
-          )}
         </article>
       )}
     </section>

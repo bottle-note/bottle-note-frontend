@@ -5,6 +5,7 @@ import { ReviewDetailsWithoutAlcoholInfo } from '@/types/Review';
 import { formatDate } from '@/utils/formatDate';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import ReviewActionDropdown from '@/components/domain/review/ReviewActionDropdown';
+import VisibilityToggle from '@/components/ui/Form/VisibilityToggle';
 import { isLegacyTastingGraphImage } from '@/api/review/tastingProfile';
 import {
   ReviewImageCarousel,
@@ -46,6 +47,7 @@ function ReviewDetails({
       (url) =>
         !data.reviewInfo.tastingProfile || !isLegacyTastingGraphImage(url),
     );
+  const isOwnReview = userData?.userId === data.reviewInfo?.userInfo?.userId;
   const productImages = convertImageUrlsToProductImageArray(
     formatUrl,
     '리뷰 이미지',
@@ -55,7 +57,7 @@ function ReviewDetails({
     <>
       <section className="pt-38">
         <div className="mb-10">
-          <ReviewUserHeader data={data} onRefresh={onRefresh} />
+          <ReviewUserHeader data={data} />
         </div>
         <section className="mx-20 border-b border-stroke-neutral-subtle pb-20">
           <ReviewImageCarousel
@@ -115,11 +117,25 @@ function ReviewDetails({
         ) : (
           <div aria-hidden="true" className="h-64" />
         )}
+
+        {/* 공개 설정은 작성자에게만, 리뷰 맨 아래에 둔다 */}
+        {isOwnReview && (
+          <div className="mx-20 flex items-center justify-between border-t border-stroke-neutral-subtle py-16">
+            <p className="text-14 font-bold text-fg-neutral">공개 설정</p>
+            <VisibilityToggle
+              initialStatus={data.reviewInfo.status === 'PUBLIC'}
+              reviewId={data.reviewInfo.reviewId}
+              handleNotLogin={() => {}}
+              onSuccess={onRefresh}
+              textSize="text-13"
+            />
+          </div>
+        )}
       </section>
       <ReviewActionDropdown
         isShow={isOptionShow}
         onClose={() => setIsOptionShow(false)}
-        isOwnReview={userData?.userId === data.reviewInfo?.userInfo?.userId}
+        isOwnReview={isOwnReview}
         reviewId={String(data.reviewInfo?.reviewId)}
         userId={String(data.reviewInfo?.userInfo?.userId)}
         userNickname={data.reviewInfo?.userInfo?.nickName}
