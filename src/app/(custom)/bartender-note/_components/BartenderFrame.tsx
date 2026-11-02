@@ -74,7 +74,7 @@ export default function BartenderFrame({
     >
       <SafeAreaScreen
         insetBottom={false}
-        className="w-full max-w-[468px] bg-bg-layer-default"
+        className="w-full max-w-content bg-bg-layer-default"
       >
         <header className="relative flex h-56 shrink-0 items-center gap-4 px-8">
           {onBack ? (
@@ -173,7 +173,7 @@ export default function BartenderFrame({
           role="group"
           aria-label="현재 단계 행동"
           data-flow-action-dock
-          className="empty:hidden z-20 flex shrink-0 flex-col gap-12 px-20 pb-[max(28px,var(--safe-area-bottom))] pt-12 [@media(max-height:500px)]:gap-4 [@media(max-height:500px)]:pt-6"
+          className="empty:hidden z-20 flex shrink-0 flex-col gap-12 px-20 pb-safe pt-12 [@media(max-height:500px)]:gap-4 [@media(max-height:500px)]:pt-6"
         />
       </SafeAreaScreen>
     </div>

@@ -2,7 +2,7 @@ import { forwardRef, type HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
 interface SafeAreaScreenProps extends HTMLAttributes<HTMLDivElement> {
-  /** 하단 고정 영역이 직접 `max(여백, var(--safe-area-bottom))`을 두는 화면은 false */
+  /** 하단 고정 영역이 직접 `pb-safe`로 여백을 두는 화면은 false */
   insetBottom?: boolean;
 }
 
