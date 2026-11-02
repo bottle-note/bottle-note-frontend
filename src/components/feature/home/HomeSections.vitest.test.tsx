@@ -147,9 +147,9 @@ describe('홈 바로가기', () => {
     const nav = screen.getByRole('navigation', { name: '바로 가기' });
     const expected = [
       ['바텐더 노트', ROUTES.BARTENDER_NOTE],
-      ['취향 테스트', ROUTES.WHISKEY_MBTI],
-      ['위스키 타로', ROUTES.WHISKEY_TAROT],
       ['위스키 검색', ROUTES.EXPLORE.WHISKEY_SEARCH_FOCUSED],
+      ['리뷰 쓰기', ROUTES.REVIEW.REGISTER_BASE],
+      ['나의 기록', ROUTES.HISTORY.BASE],
     ];
     expected.forEach(([label, href]) => {
       expect(
@@ -160,6 +160,10 @@ describe('홈 바로가기', () => {
     fireEvent.click(within(nav).getByRole('link', { name: /바텐더 노트/ }));
     expect(trackGA4Event).toHaveBeenCalledWith('home_quick_link_click', {
       link: 'bartender_note',
+    });
+    fireEvent.click(within(nav).getByRole('link', { name: /리뷰 쓰기/ }));
+    expect(trackGA4Event).toHaveBeenCalledWith('home_quick_link_click', {
+      link: 'review_write',
     });
   });
 });

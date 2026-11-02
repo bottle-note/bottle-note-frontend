@@ -33,9 +33,9 @@ export type FeatureSource = 'bartender_note' | 'home';
 // 홈 바로가기
 export type HomeQuickLink =
   | 'bartender_note'
-  | 'taste_test'
-  | 'tarot'
-  | 'whisky_search';
+  | 'whisky_search'
+  | 'review_write'
+  | 'my_records';
 
 // 홈 섹션. weekly_top·recent_viewed는 책갈피 탭, category·region은 둘러보기 탭이다.
 export type HomeSection =
