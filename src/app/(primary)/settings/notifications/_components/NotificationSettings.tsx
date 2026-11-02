@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChevronDown } from 'lucide-react';
 import { NotificationSettingsApi } from '@/api/notification/notification.api';
@@ -12,6 +11,7 @@ import type {
 } from '@/api/notification/types';
 import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useRequireLogin } from '@/hooks/auth/useRequireLogin';
 import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import {
@@ -61,7 +61,6 @@ function NotificationSettingsSkeleton() {
 }
 
 export function NotificationSettings() {
-  const router = useRouter();
   const queryClient = useQueryClient();
   const { user, isLoggedIn, isLoading: isAuthLoading } = useAuthSession();
   const userId = !isAuthLoading && isLoggedIn ? user?.userId ?? null : null;
@@ -78,13 +77,7 @@ export function NotificationSettings() {
     const count = enabledCount(list);
     return count === list.length ? 'true' : count === 0 ? 'false' : 'mixed';
   };
-  useEffect(() => {
-    if (!isAuthLoading && !isLoggedIn) {
-      router.replace(
-        `${ROUTES.LOGIN}?returnTo=${encodeURIComponent(ROUTES.SETTINGS.NOTIFICATIONS)}`,
-      );
-    }
-  }, [isAuthLoading, isLoggedIn, router]);
+  useRequireLogin(ROUTES.SETTINGS.NOTIFICATIONS);
 
   const update = useMutation({
     mutationFn: ({ settings }: AccountSettingsUpdate) =>

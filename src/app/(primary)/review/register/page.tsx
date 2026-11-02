@@ -11,6 +11,7 @@ import Button from '@/components/ui/Button/Button';
 import Loading from '@/components/ui/Loading/Loading';
 import { useSingleApiCall } from '@/hooks/useSingleApiCall';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
+import { useRequireLogin } from '@/hooks/auth/useRequireLogin';
 import { useAlcoholDetails } from '@/app/(primary)/review/hook/useAlcoholDetails';
 import { useErrorModal } from '@/hooks/useErrorModal';
 import { useReviewAutoSave } from '@/app/(primary)/review/hook/useReviewAutoSave';
@@ -29,6 +30,7 @@ function ReviewRegister() {
   const { handleModalState } = useModalStore();
   const { isProcessing, executeApiCall } = useSingleApiCall();
   const isKeyboardVisible = useKeyboardVisible();
+  useRequireLogin();
 
   const initialAlcoholId = searchParams.get('alcoholId') || '';
   const initialSearchKeyword = searchParams.get('searchKeyword') || '';

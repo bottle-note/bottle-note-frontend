@@ -386,7 +386,7 @@ describe('알림 수신 설정', () => {
     renderPage();
     await waitFor(() =>
       expect(replace).toHaveBeenCalledWith(
-        '/login?returnTo=%2Fsettings%2Fnotifications',
+        '/login?returnTo=%2Fsettings%2Fnotifications&required=1',
       ),
     );
     expect(NotificationSettingsApi.getSettings).not.toHaveBeenCalled();

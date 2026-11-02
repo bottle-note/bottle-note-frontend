@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -23,6 +23,7 @@ import { SubHeader } from '@/components/ui/Navigation/SubHeader';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useRequireLogin } from '@/hooks/auth/useRequireLogin';
 import { getAuthSnapshot } from '@/lib/auth/session-store';
 import { ApiError } from '@/utils/ApiError';
 import {
@@ -147,13 +148,7 @@ export function NotificationInbox() {
   const [message, setMessage] = useState('');
   const items = list.data?.flatMap((page) => page.data.items) ?? [];
 
-  useEffect(() => {
-    if (!isAuthLoading && !isLoggedIn) {
-      router.replace(
-        `${ROUTES.LOGIN}?returnTo=${encodeURIComponent(ROUTES.NOTIFICATIONS)}`,
-      );
-    }
-  }, [isAuthLoading, isLoggedIn, router]);
+  useRequireLogin(ROUTES.NOTIFICATIONS);
 
   const markRead = useMutation({
     mutationFn: ({ id }: { id: number; userId: number }) =>
