@@ -46,7 +46,7 @@ function AlcoholDetailPage() {
 }
 
 const pressLoginBack = () =>
-  fireEvent.click(screen.getByRole('button', { name: 'arrowIcon' }));
+  fireEvent.click(screen.getByRole('button', { name: '뒤로 가기' }));
 
 describe('로그인 화면 상단 뒤로가기', () => {
   beforeEach(() => {

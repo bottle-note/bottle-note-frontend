@@ -467,7 +467,10 @@ export default function AlcoholDetailPage({
                       label="뒤로가기"
                     />
                   </SubHeader.Left>
-                  <SubHeader.Right onClick={() => setIsShareOpen(true)}>
+                  <SubHeader.Right
+                    onClick={() => setIsShareOpen(true)}
+                    label="공유하기"
+                  >
                     <SemanticIcon
                       src="/icon/externallink-outlined-white.svg"
                       width={23}

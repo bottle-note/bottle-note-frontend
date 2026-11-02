@@ -23,10 +23,16 @@ import UserIcon from 'public/icon/user-outlined-subcoral.svg';
 
 interface HeaderLeftProps {
   children?: ReactNode;
-  onClick?: (e: MouseEvent<HTMLDivElement>) => void;
+  onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
+  // 아이콘만 있는 버튼의 이름. 왼쪽 버튼은 모두 뒤로 가기라 기본값을 둔다
+  label?: string;
 }
 
-const HeaderLeft = ({ children, onClick }: HeaderLeftProps) => {
+const HeaderLeft = ({
+  children,
+  onClick,
+  label = '뒤로 가기',
+}: HeaderLeftProps) => {
   if (!children) return null;
 
   if (!onClick) {
@@ -34,19 +40,14 @@ const HeaderLeft = ({ children, onClick }: HeaderLeftProps) => {
   }
 
   return (
-    <div
+    <button
+      type="button"
+      aria-label={label}
       onClick={onClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          onClick?.(e as unknown as MouseEvent<HTMLDivElement>);
-        }
-      }}
-      role="button"
-      tabIndex={0}
       className="cursor-pointer"
     >
       {children}
-    </div>
+    </button>
   );
 };
 
@@ -70,10 +71,12 @@ const HeaderCenter = ({
 
 interface HeaderRightProps {
   children?: ReactNode;
-  onClick?: (e: MouseEvent<HTMLDivElement>) => void;
+  onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
+  // 아이콘만 있는 버튼이면 무엇을 하는 버튼인지 적는다
+  label?: string;
 }
 
-const HeaderRight = ({ children, onClick }: HeaderRightProps) => {
+const HeaderRight = ({ children, onClick, label }: HeaderRightProps) => {
   if (!children) return null;
 
   if (!onClick) {
@@ -81,19 +84,14 @@ const HeaderRight = ({ children, onClick }: HeaderRightProps) => {
   }
 
   return (
-    <div
+    <button
+      type="button"
+      aria-label={label}
       onClick={onClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          onClick?.(e as unknown as MouseEvent<HTMLDivElement>);
-        }
-      }}
-      role="button"
-      tabIndex={0}
       className="cursor-pointer"
     >
       {children}
-    </div>
+    </button>
   );
 };
 
