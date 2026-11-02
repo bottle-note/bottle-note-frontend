@@ -1,4 +1,5 @@
 import type { AlcoholSelection, ReviewDraft, Step } from './types';
+import type { StoryStates } from './useAlcoholStory';
 import type { ScenarioAnswer, ScenarioContext } from '../_scenario/model';
 import type { Situation } from '../_data/demo';
 
@@ -20,6 +21,8 @@ export interface BartenderSnapshot {
   situation: Situation;
   curationId: number | null;
   postedReviewId: number | null;
+  /** 술 이야기 진행. 술 상세에 다녀와도 들은 이야기를 펼친 채로 돌려준다. */
+  stories?: StoryStates;
   /** 로그인하러 나갈 때 이어서 열 단계. 로그인한 채로 돌아온 경우에만 연다. */
   resumeAfterLogin?: Step;
 }

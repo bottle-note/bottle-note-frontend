@@ -31,7 +31,7 @@ const STORY_POSE: Record<StoryPhase, Pose> = {
 
 export type StoryMessage = { from: 'bartender' | 'me'; text: string };
 
-type StoryState = {
+export type StoryState = {
   phase: StoryPhase;
   heard: boolean;
   /** 카드 아래에서 들을지 물었는지. 같은 술에 다시 들어오면 묻지 않는다. */
@@ -53,10 +53,13 @@ const initialState: StoryState = {
   pending: false,
 };
 
+/** 술 id별 이야기 진행. 페이지를 벗어날 때 스냅샷에 남긴다. */
+export type StoryStates = Record<number, StoryState>;
+
 /**
  * 술을 건넨 뒤 바텐더가 그 술 이야기를 들려줄지 묻고, 설명 첫 문단을 문장씩 이어 들려준다.
  * 술마다 진행을 기억해 상세에 다녀와도 같은 술을 다시 묻지 않는다.
- * 페이지를 벗어났다 돌아오면(스냅샷 복원) 다시 묻는다.
+ * 술 상세 페이지에 다녀오면(스냅샷 복원) 주고받은 말을 그대로 펼쳐 두고, 듣던 중이었으면 이어서 들려준다.
  */
 export function useAlcoholStory({
   alcohol,
@@ -68,7 +71,7 @@ export function useAlcoholStory({
   active: boolean;
   greeting: string;
 }) {
-  const [states, setStates] = useState<Record<number, StoryState>>({});
+  const [states, setStates] = useState<StoryStates>({});
   const paragraphs = toDescriptionParagraphs(alcohol?.description);
   const id = alcohol?.id;
   const state =
@@ -133,7 +136,9 @@ export function useAlcoholStory({
   }, [active, state?.pending, state?.told, id]);
 
   const reset = () => setStates({});
-  if (!state || !paragraphs || id === undefined) return { story: null, reset };
+  const persisted = { states, restore: setStates };
+  if (!state || !paragraphs || id === undefined)
+    return { story: null, reset, persisted };
   const alcoholId = String(id);
   const say = (text: string): StoryMessage[] => [
     ...state.messages,
@@ -186,7 +191,7 @@ export function useAlcoholStory({
     openFullText: () =>
       trackGA4Event('bartender_story_full_text', { alcohol_id: alcoholId }),
   };
-  return { story, reset };
+  return { story, reset, persisted };
 }
 
 export type AlcoholStory = NonNullable<
