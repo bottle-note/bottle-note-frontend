@@ -58,7 +58,7 @@ export default function BartenderFrame({
 
   return (
     <div
-      className="dark flex h-dvh min-h-0 justify-center overflow-hidden bg-bg-layer-basement text-fg-neutral"
+      className="flex h-dvh min-h-0 justify-center overflow-hidden bg-bg-layer-basement text-fg-neutral"
       onClickCapture={(event) => {
         if (
           dialogue.optionsVisible ||
@@ -131,10 +131,11 @@ export default function BartenderFrame({
             talking={dialogue.isTyping}
             onReady={dialogue.markSceneReady}
           />
+          {/* 대사창은 어두운 바 장면 위에 겹치므로 테마와 무관하게 어두운 색을 유지한다 */}
           <button
             type="button"
             ref={dialogue.dialogueRef}
-            className={`absolute inset-x-10 bottom-6 z-10 min-h-56 rounded-md bg-[rgba(20,16,13,0.94)] px-14 py-9 text-left text-14 leading-19 text-[#F5EFE5] shadow-md transition-[opacity,transform] duration-250 motion-reduce:transition-none ${dialogue.introReady ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-8 opacity-0'}`}
+            className={`absolute inset-x-10 bottom-6 z-10 min-h-56 rounded-md bg-palette-oak-1000/[0.94] px-14 py-9 text-left text-14 leading-19 text-palette-oak-50 shadow-md transition-[opacity,transform] duration-250 motion-reduce:transition-none ${dialogue.introReady ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-8 opacity-0'}`}
             aria-label="노트의 대사, 누르면 이어 보기"
           >
             <span className="absolute -top-10 left-10 rounded-sm bg-bg-brand-solid px-8 py-2 text-11 font-extrabold leading-14 text-fg-brand-contrast">

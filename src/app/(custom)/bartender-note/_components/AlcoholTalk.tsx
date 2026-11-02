@@ -204,8 +204,6 @@ export default function AlcoholTalk({
           isOpen={fullTextOpen}
           onClose={() => setFullTextOpen(false)}
           height={70}
-          // 시트는 바텐더 화면 밖에 그려져 어두운 테마를 직접 건다
-          className="dark"
         >
           {/* 대사가 끝나기 전에도 시트 안을 누르면 대사가 넘어가지 않게 한다 */}
           <div
@@ -267,7 +265,7 @@ function AlcoholCard({
   return (
     <section
       aria-label={label}
-      className="relative ml-40 flex items-center gap-12 rounded-xl border border-stroke-neutral-subtle bg-bg-neutral-weak p-10 motion-safe:duration-500 motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95"
+      className="relative ml-40 flex items-center gap-12 rounded-xl border border-stroke-neutral-basement bg-bg-neutral-weak p-10 motion-safe:duration-500 motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95"
     >
       <span aria-hidden="true">
         {alcohol.demoWhiskey ? (
@@ -406,7 +404,7 @@ function Reply({
     <button
       type="button"
       onClick={onClick}
-      className={`flex min-h-40 flex-1 items-center justify-center gap-4 whitespace-nowrap border-l border-stroke-neutral-subtle px-12 text-13 font-bold transition-colors first:border-l-0 hover:bg-bg-brand-weak focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-stroke-focus-ring ${replyTone[tone]}`}
+      className={`flex min-h-40 flex-1 items-center justify-center gap-4 whitespace-nowrap border-l border-stroke-neutral-basement px-12 text-13 font-bold transition-colors first:border-l-0 hover:bg-bg-brand-weak focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-stroke-focus-ring ${replyTone[tone]}`}
     >
       {children}
     </button>
@@ -418,7 +416,7 @@ function ReplyGroup({ children }: { children: ReactNode }) {
     <div
       role="group"
       aria-label="내 대답"
-      className={`flex flex-col border-t border-stroke-neutral-subtle ${appear}`}
+      className={`flex flex-col border-t border-stroke-neutral-basement ${appear}`}
     >
       {children}
     </div>
@@ -427,7 +425,7 @@ function ReplyGroup({ children }: { children: ReactNode }) {
 
 function ReplyRow({ children }: { children: ReactNode }) {
   return (
-    <div className="flex border-t border-stroke-neutral-subtle first:border-t-0">
+    <div className="flex border-t border-stroke-neutral-basement first:border-t-0">
       {children}
     </div>
   );
