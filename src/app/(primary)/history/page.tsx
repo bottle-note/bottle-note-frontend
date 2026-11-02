@@ -17,6 +17,7 @@ import { useHistoryFilterStore } from '@/store/historyFilterStore';
 import { UserApi } from '@/api/user/user.api';
 import type { CurrentUserInfo } from '@/api/user/types';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import { useRequireLogin } from '@/hooks/auth/useRequireLogin';
 import { RATING_NUM_VALUES, PICKS_STATUS } from '@/constants/history';
 import TimelineFull from '@/components/domain/history/TimelineFull';
 import HistoryFilterModal from './_components/filter/HistoryFilterModal';
@@ -24,6 +25,7 @@ import HistoryFilterModal from './_components/filter/HistoryFilterModal';
 export default function History() {
   const queryClient = useQueryClient();
   const { isLoggedIn, user } = useAuthSession();
+  useRequireLogin();
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlKeyword = searchParams.get('keyword') || '';

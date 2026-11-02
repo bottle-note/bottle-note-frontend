@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { isWithinInterval, parseISO } from 'date-fns';
 import List from '@/components/feature/List/List';
@@ -39,15 +39,21 @@ export default function TimelineFull({
   isFetching = false,
 }: TimelineFullProps) {
   const { state: filterState } = useHistoryFilterStore();
-  const [processedHistory, setProcessedHistory] = useState<{
+  const userHistories = data?.userHistories;
+  // 날짜별 묶음은 목록에서 계산한다. 빈 목록마다 새 배열을 의존성으로 쓰면 렌더가 끝없이 반복된다.
+  const processedHistory = useMemo<{
     groupedHistory: Record<string, HistoryType[]>;
     yearMonths: string[];
-  }>({
-    groupedHistory: {},
-    yearMonths: [],
-  });
-
-  const historyList: HistoryType[] = data?.userHistories || [];
+  }>(() => {
+    if (shouldReset || !userHistories?.length) {
+      return { groupedHistory: {}, yearMonths: [] };
+    }
+    const grouped = groupHistoryByDate(userHistories);
+    return {
+      groupedHistory: grouped,
+      yearMonths: Object.keys(grouped).sort((a, b) => b.localeCompare(a)),
+    };
+  }, [userHistories, shouldReset]);
   const subscriptionDate = data?.subscriptionDate || '';
   const isFiltering =
     filterState.ratingPoint.length > 0 ||
@@ -80,31 +86,8 @@ export default function TimelineFull({
   }
 
   useEffect(() => {
-    if (shouldReset) {
-      setProcessedHistory({
-        groupedHistory: {},
-        yearMonths: [],
-      });
-      onResetComplete?.();
-      return;
-    }
-
-    if (historyList.length === 0) {
-      setProcessedHistory({
-        groupedHistory: {},
-        yearMonths: [],
-      });
-      return;
-    }
-
-    const grouped = groupHistoryByDate(historyList);
-    const yearMonths = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
-
-    setProcessedHistory({
-      groupedHistory: grouped,
-      yearMonths,
-    });
-  }, [historyList, shouldReset, onResetComplete]);
+    if (shouldReset) onResetComplete?.();
+  }, [shouldReset, onResetComplete]);
 
   if (isLoading || !data) {
     return (
