@@ -271,12 +271,16 @@
     padding-top: var(--header-height-with-safe);
   }
 
+  .pb-safe-area {
+    padding-bottom: var(--safe-area-bottom);
+  }
+
   .pb-safe {
-    padding-bottom: max(32px, env(safe-area-inset-bottom, 0px));
+    padding-bottom: max(32px, var(--safe-area-bottom));
   }
 
   .pb-safe-lg {
-    padding-bottom: max(64px, calc(env(safe-area-inset-bottom, 0px) + 32px));
+    padding-bottom: max(64px, calc(var(--safe-area-bottom) + 32px));
   }
 
   .pb-navbar {

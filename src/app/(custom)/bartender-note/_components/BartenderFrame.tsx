@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import SafeAreaScreen from '@/components/ui/Layout/SafeAreaScreen';
 import BarScene, { type Pose } from './BarScene';
 import { useDialoguePlayback } from './useDialoguePlayback';
 import { ActionDockContext } from './FlowControls';
@@ -71,7 +72,10 @@ export default function BartenderFrame({
         dialogue.advance();
       }}
     >
-      <div className="flex h-full min-h-0 w-full max-w-[468px] flex-col bg-bg-layer-default">
+      <SafeAreaScreen
+        insetBottom={false}
+        className="w-full max-w-content bg-bg-layer-default"
+      >
         <header className="relative flex h-56 shrink-0 items-center gap-4 px-8">
           {onBack ? (
             <button
@@ -169,9 +173,9 @@ export default function BartenderFrame({
           role="group"
           aria-label="현재 단계 행동"
           data-flow-action-dock
-          className="empty:hidden z-20 flex shrink-0 flex-col gap-12 px-20 pb-[max(28px,var(--safe-area-bottom))] pt-12 [@media(max-height:500px)]:gap-4 [@media(max-height:500px)]:pt-6"
+          className="empty:hidden z-20 flex shrink-0 flex-col gap-12 px-20 pb-safe pt-12 [@media(max-height:500px)]:gap-4 [@media(max-height:500px)]:pt-6"
         />
-      </div>
+      </SafeAreaScreen>
     </div>
   );
 }
