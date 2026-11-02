@@ -204,8 +204,6 @@ export default function AlcoholTalk({
           isOpen={fullTextOpen}
           onClose={() => setFullTextOpen(false)}
           height={70}
-          // 시트는 바텐더 화면 밖에 그려져 어두운 테마를 직접 건다
-          className="dark"
         >
           {/* 대사가 끝나기 전에도 시트 안을 누르면 대사가 넘어가지 않게 한다 */}
           <div
