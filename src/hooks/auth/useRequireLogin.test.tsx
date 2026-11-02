@@ -37,7 +37,7 @@ describe('useRequireLogin', () => {
     });
 
     expect(replace).toHaveBeenCalledWith(
-      '/login?returnTo=%2Freview%2Fregister%3FalcoholId%3D12',
+      '/login?returnTo=%2Freview%2Fregister%3FalcoholId%3D12&required=1',
     );
   });
 
@@ -48,7 +48,9 @@ describe('useRequireLogin', () => {
       clearAuthSession();
     });
 
-    expect(replace).toHaveBeenCalledWith('/login?returnTo=%2Fnotifications');
+    expect(replace).toHaveBeenCalledWith(
+      '/login?returnTo=%2Fnotifications&required=1',
+    );
   });
 
   it('로그인 상태를 확인하는 동안과 로그인한 뒤에는 보내지 않는다', () => {

@@ -17,6 +17,7 @@ import {
   getPendingReturnToUrl,
   setReturnToUrl,
   isValidReturnUrl,
+  LOGIN_REQUIRED_PARAM,
 } from '@/utils/loginRedirect';
 import { getLoginHistoryDirection } from '@/utils/loginHistory';
 import { consumeLoginContext } from '@/utils/loginTrigger';
@@ -28,6 +29,9 @@ const LOGIN_HISTORY_STATE_KEY = '__bottleNoteLogin';
 export default function Login() {
   const router = useRouter();
   const [returnToParam] = useStatefulSearchParams<string | null>('returnTo');
+  const [requiredParam] = useStatefulSearchParams<string | null>(
+    LOGIN_REQUIRED_PARAM,
+  );
   const {
     startKakaoLogin,
     startAppleLogin,
@@ -44,6 +48,12 @@ export default function Login() {
 
     clearReturnToUrl();
     consumeLoginContext();
+    // 로그인이 필요한 페이지에서 넘어왔다면 그 페이지는 다시 로그인으로 보낸다. 들어오기 전 화면으로 간다.
+    if (requiredParam !== null) {
+      if (entry?.hasPreviousPage) router.back();
+      else router.replace(ROUTES.HOME);
+      return;
+    }
     // 쿼리 진입은 replace, 저장소를 사용하는 모달 진입은 push 방식이다.
     if (returnToParam === null && entry?.hasPreviousPage) {
       router.back();

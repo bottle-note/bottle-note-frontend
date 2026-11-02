@@ -3,6 +3,8 @@
  */
 
 export const LOGIN_RETURN_TO_KEY = 'login_return_to';
+// 로그인이 필요한 페이지에서 로그인으로 보낼 때 붙인다. 로그인을 취소하면 그 페이지로 돌아가지 않는다.
+export const LOGIN_REQUIRED_PARAM = 'required';
 export const WHISKEY_MBTI_INTRO_PATH = '/whiskey-mbti';
 
 // 리다이렉트 제외 경로 (무한 루프 방지)

@@ -14,6 +14,7 @@ import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { apiClient } from '@/shared/api/apiClient';
 import useModalStore from '@/store/modalStore';
 import {
+  clearAuthSession,
   getAuthSnapshot,
   resetAuthSessionForTest,
   setAuthenticatedSession,
@@ -573,6 +574,48 @@ describe('Auth business flows', () => {
       render(React.createElement(LoginPage));
 
       await waitFor(() => {
+        expect(routerReplace).toHaveBeenCalledWith('/explore');
+      });
+    });
+
+    describe('로그인 화면 상단 뒤로가기', () => {
+      const routerBack = jest.fn();
+      const renderLogin = (query: string, hasPreviousPage: boolean) => {
+        clearAuthSession();
+        routerBack.mockReset();
+        (useRouter as jest.Mock).mockReturnValue({
+          replace: routerReplace,
+          push: routerPush,
+          back: routerBack,
+        });
+        (useSearchParams as jest.Mock).mockReturnValue(
+          new URLSearchParams(query),
+        );
+        window.history.replaceState(
+          { __bottleNoteLogin: { returnTo: null, hasPreviousPage } },
+          '',
+        );
+        render(React.createElement(LoginPage));
+        fireEvent.click(screen.getByAltText('arrowIcon'));
+      };
+
+      it('로그인이 필요한 페이지에서 넘어왔으면 그 페이지 대신 들어오기 전 화면으로 간다', () => {
+        renderLogin('returnTo=%2Fhistory&required=1', true);
+
+        expect(routerBack).toHaveBeenCalled();
+        expect(routerReplace).not.toHaveBeenCalledWith('/history');
+      });
+
+      it('로그인이 필요한 페이지로 바로 들어왔다가 취소하면 홈으로 간다', () => {
+        renderLogin('returnTo=%2Fhistory&required=1', false);
+
+        expect(routerReplace).toHaveBeenCalledWith('/');
+        expect(routerBack).not.toHaveBeenCalled();
+      });
+
+      it('공개 화면에서 넘어왔으면 지금처럼 그 화면으로 돌아간다', () => {
+        renderLogin('returnTo=%2Fexplore', true);
+
         expect(routerReplace).toHaveBeenCalledWith('/explore');
       });
     });
