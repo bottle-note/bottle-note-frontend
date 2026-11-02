@@ -10,6 +10,8 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
+import { useAuthSession } from '@/hooks/auth/useAuthSession';
+import useModalStore from '@/store/modalStore';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import type { HomeQuickLink } from '@/utils/analytics/types';
 
@@ -18,6 +20,8 @@ interface QuickLinkItem {
   label: string;
   href: string;
   Icon: LucideIcon;
+  // 하단 내비 마이 탭처럼 비로그인이면 이동하지 않고 로그인 모달을 띄운다
+  requiresAuth?: boolean;
 }
 
 const QUICK_LINKS: QuickLinkItem[] = [
@@ -32,12 +36,14 @@ const QUICK_LINKS: QuickLinkItem[] = [
     label: '리뷰 쓰기',
     href: ROUTES.REVIEW.REGISTER_BASE,
     Icon: PenLine,
+    requiresAuth: true,
   },
   {
     id: 'my_records',
     label: '나의 기록',
     href: ROUTES.HISTORY.BASE,
     Icon: BookOpen,
+    requiresAuth: true,
   },
 ];
 
@@ -45,6 +51,9 @@ const trackQuickLink = (link: HomeQuickLink) =>
   trackGA4Event('home_quick_link_click', { link });
 
 export default function HomeQuickLinks() {
+  const { isLoggedIn } = useAuthSession();
+  const { handleLoginModal } = useModalStore();
+
   return (
     <nav aria-label="바로 가기" className="flex flex-col gap-16 px-20 pt-18">
       {/* 새 기능인 바텐더 노트만 캐릭터 이미지가 든 카드로 크게 보여 준다 */}
@@ -80,12 +89,18 @@ export default function HomeQuickLinks() {
         />
       </Link>
       <ul className="grid grid-cols-3">
-        {QUICK_LINKS.map(({ id, label, href, Icon }) => (
+        {QUICK_LINKS.map(({ id, label, href, Icon, requiresAuth }) => (
           <li key={id}>
             <Link
               href={href}
               prefetch={false}
-              onClick={() => trackQuickLink(id)}
+              onClick={(event) => {
+                trackQuickLink(id);
+                if (requiresAuth && !isLoggedIn) {
+                  event.preventDefault();
+                  handleLoginModal();
+                }
+              }}
               className="group flex flex-col items-center gap-8 text-fg-neutral"
             >
               <span className="flex h-48 w-48 items-center justify-center rounded-full bg-bg-neutral-weak transition-colors group-hover:bg-bg-brand-weak">

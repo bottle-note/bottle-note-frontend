@@ -166,6 +166,41 @@ describe('홈 바로가기', () => {
       link: 'review_write',
     });
   });
+
+  it('비로그인이면 리뷰 쓰기·나의 기록은 이동하지 않고 로그인 안내를 띄운다', () => {
+    render(<HomeQuickLinks />);
+    const nav = screen.getByRole('navigation', { name: '바로 가기' });
+
+    ['리뷰 쓰기', '나의 기록'].forEach((label) => {
+      useModalStore.setState((state) => ({
+        loginState: { ...state.loginState, isShowLoginModal: false },
+      }));
+      const moved = fireEvent.click(
+        within(nav).getByRole('link', { name: new RegExp(label) }),
+      );
+      expect(moved).toBe(false);
+      expect(useModalStore.getState().loginState.isShowLoginModal).toBe(true);
+    });
+
+    useModalStore.setState((state) => ({
+      loginState: { ...state.loginState, isShowLoginModal: false },
+    }));
+    expect(
+      fireEvent.click(within(nav).getByRole('link', { name: /위스키 검색/ })),
+    ).toBe(true);
+    expect(useModalStore.getState().loginState.isShowLoginModal).toBe(false);
+  });
+
+  it('로그인 상태면 리뷰 쓰기로 바로 이동한다', () => {
+    authState.isLoggedIn = true;
+    render(<HomeQuickLinks />);
+    const nav = screen.getByRole('navigation', { name: '바로 가기' });
+
+    expect(
+      fireEvent.click(within(nav).getByRole('link', { name: /리뷰 쓰기/ })),
+    ).toBe(true);
+    expect(useModalStore.getState().loginState.isShowLoginModal).toBe(false);
+  });
 });
 
 describe('홈 주간 TOP 5', () => {
