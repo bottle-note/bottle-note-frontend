@@ -533,6 +533,7 @@ export default function ReviewFlow({
       {step === 'review-preview' && (
         <>
           {whiskeySummary}
+          {renderReviewCard()}
           <div
             className="grid grid-cols-2 gap-4 rounded-lg bg-bg-neutral-weak p-4 [&>button]:min-h-40 [&>button]:rounded-md [&>button]:text-13 [&>button]:text-fg-neutral-muted [&>button[aria-pressed=true]]:bg-bg-brand-weak [&>button[aria-pressed=true]]:font-bold [&>button[aria-pressed=true]]:text-fg-brand"
             role="group"
@@ -553,7 +554,6 @@ export default function ReviewFlow({
               비공개
             </button>
           </div>
-          {renderReviewCard()}
           {action(
             isPosting ? '올리고 있어요…' : '이걸로 등록할게요',
             postReview,
