@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import type { AlcoholLookupItem } from '@/api/alcohol/types';
+import { ReviewSearchField } from './ReviewInputs';
 
 const normalize = (value: string) => value.trim().replace(/\s+/g, ' ');
 
@@ -46,9 +47,7 @@ export default function ReviewPickStep({
 
   return (
     <>
-      <input
-        className="h-46 w-full rounded-lg border border-stroke-neutral-weak bg-bg-neutral-weak px-14 text-16 text-fg-neutral outline-none placeholder:text-fg-placeholder focus-visible:border-stroke-focus-ring focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
-        type="search"
+      <ReviewSearchField
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="마시고 있는 술 이름 검색"

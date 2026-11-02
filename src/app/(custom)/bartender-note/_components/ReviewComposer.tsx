@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { TAGS_LIMIT, validateTagText } from '@/constants/review';
 import type { ReviewDraft, Step } from './types';
 import { FlowAction } from './FlowControls';
+import { ReviewSearchField, reviewChip } from './ReviewInputs';
 import type { ReviewAlcohol } from './reviewAlcohol';
 import {
   noteKeywords,
@@ -58,7 +59,7 @@ function TagEditor({
           {reviewTags.map((tag) => (
             <button
               key={tag}
-              className="rounded border border-stroke-brand-solid bg-bg-brand-weak px-7 py-4 text-12 leading-15 text-fg-brand"
+              className={reviewChip.selected}
               type="button"
               aria-label={`${tag} 태그 빼기`}
               onClick={() =>
@@ -73,36 +74,34 @@ function TagEditor({
           ))}
         </div>
       )}
-      <div className="flex gap-8 border-b border-stroke-neutral-weak">
-        <input
-          className="h-40 min-w-0 flex-1 bg-transparent text-14 text-fg-neutral outline-none placeholder:text-fg-placeholder"
-          type="search"
-          value={tagQuery}
-          onChange={(event) => setTagQuery(event.target.value.slice(0, 20))}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              event.preventDefault();
-              addTag(tagQuery);
-            }
-          }}
-          placeholder="태그 검색 또는 직접 입력"
-          aria-label="태그 검색 또는 직접 입력"
-          disabled={reviewTags.length >= TAGS_LIMIT}
-        />
-        <button
-          className="text-13 font-bold text-fg-brand disabled:opacity-45"
-          type="button"
-          onClick={() => addTag(tagQuery)}
-          disabled={!tagQuery.trim() || reviewTags.length >= TAGS_LIMIT}
-        >
-          등록
-        </button>
-      </div>
+      <ReviewSearchField
+        value={tagQuery}
+        onChange={(event) => setTagQuery(event.target.value.slice(0, 20))}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            addTag(tagQuery);
+          }
+        }}
+        placeholder="태그 검색 또는 직접 입력"
+        aria-label="태그 검색 또는 직접 입력"
+        disabled={reviewTags.length >= TAGS_LIMIT}
+        trailing={
+          <button
+            className="shrink-0 text-14 font-bold text-fg-brand disabled:opacity-45"
+            type="button"
+            onClick={() => addTag(tagQuery)}
+            disabled={!tagQuery.trim() || reviewTags.length >= TAGS_LIMIT}
+          >
+            등록
+          </button>
+        }
+      />
       <div className="flex flex-wrap gap-5">
         {tagMatches.map((tag) => (
           <button
             key={tag}
-            className="rounded border border-stroke-neutral-subtle bg-transparent px-7 py-4 text-11 leading-15 text-fg-neutral-muted"
+            className={reviewChip.idle}
             type="button"
             onClick={() => addTag(tag)}
           >
@@ -204,14 +203,14 @@ export default function ReviewComposer({
                 ))}
               </div>
               {keywordTab === '향·맛' && (
-                <input
-                  type="search"
-                  className="mb-10 h-40 w-full border-b border-stroke-neutral-weak bg-transparent text-14 outline-none"
-                  value={keywordSearch}
-                  onChange={(event) => setKeywordSearch(event.target.value)}
-                  placeholder="태그 검색 또는 직접 입력"
-                  aria-label="향·맛 검색"
-                />
+                <div className="mb-10">
+                  <ReviewSearchField
+                    value={keywordSearch}
+                    onChange={(event) => setKeywordSearch(event.target.value)}
+                    placeholder="태그 검색 또는 직접 입력"
+                    aria-label="향·맛 검색"
+                  />
+                </div>
               )}
               <div className="flex flex-wrap gap-5">
                 {(keywordTab === '향·맛'
@@ -225,11 +224,7 @@ export default function ReviewComposer({
                   const active = review.text.includes(phrase);
                   return (
                     <button
-                      className={
-                        active
-                          ? 'rounded border border-stroke-brand-solid bg-bg-brand-weak px-7 py-4 text-12 text-fg-brand'
-                          : 'rounded border border-stroke-neutral-subtle px-7 py-4 text-12 text-fg-neutral-muted'
-                      }
+                      className={active ? reviewChip.selected : reviewChip.idle}
                       type="button"
                       aria-pressed={active}
                       key={word}
@@ -255,7 +250,7 @@ export default function ReviewComposer({
                   validateTagText(keywordSearch.trim()) && (
                     <button
                       type="button"
-                      className="rounded border border-stroke-brand-solid px-7 py-4 text-12 text-fg-brand"
+                      className={reviewChip.add}
                       onClick={() => {
                         const next = `${review.text.trim()}${review.text.trim() ? ' ' : ''}${tagSentence(keywordSearch.trim())}`;
                         if (next.length <= REVIEW_TEXT_MAX)
@@ -313,9 +308,7 @@ export default function ReviewComposer({
             placeholder="예) 사과, 꿀, 은은한 향"
             maxLength={NOTE_FIELD_MAX}
           />
-          <input
-            type="search"
-            className="h-40 w-full border-b border-stroke-neutral-weak bg-transparent text-14 outline-none"
+          <ReviewSearchField
             value={keywordSearch}
             onChange={(event) => setKeywordSearch(event.target.value)}
             placeholder="태그 검색 또는 직접 입력"
@@ -331,8 +324,8 @@ export default function ReviewComposer({
               <button
                 className={
                   review[npfField].split(/\s*,\s*/).includes(word)
-                    ? 'rounded border border-stroke-brand-solid bg-bg-brand-weak px-7 py-4 text-12 text-fg-brand'
-                    : 'rounded border border-stroke-neutral-subtle px-7 py-4 text-12 text-fg-neutral-muted'
+                    ? reviewChip.selected
+                    : reviewChip.idle
                 }
                 type="button"
                 key={word}
@@ -357,7 +350,7 @@ export default function ReviewComposer({
               validateTagText(keywordSearch.trim()) && (
                 <button
                   type="button"
-                  className="rounded border border-stroke-brand-solid px-7 py-4 text-12 text-fg-brand"
+                  className={reviewChip.add}
                   onClick={() => {
                     const next = `${review[npfField]}${review[npfField] ? ', ' : ''}${keywordSearch.trim()}`;
                     if (next.length <= NOTE_FIELD_MAX)

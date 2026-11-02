@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { ChevronDown } from 'lucide-react';
 import AlcoholRatingInput from '@/components/domain/alcohol/AlcoholRatingInput';
 import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
@@ -17,6 +18,7 @@ import ReviewPickStep from './ReviewPickStep';
 import { prefersReducedMotion } from './prefersReducedMotion';
 import RadarPreview from './RadarPreview';
 import ReviewComposer from './ReviewComposer';
+import { reviewChip } from './ReviewInputs';
 import type { ReviewAlcohol } from './reviewAlcohol';
 import {
   flavorFromText,
@@ -132,8 +134,12 @@ export default function ReviewFlow({
               .join(' · ')}
           </small>
         </span>
-        <span className="text-12 text-fg-brand">
-          {infoOpen ? '접기 ⌃' : '술 정보 ⌄'}
+        <span className="flex shrink-0 items-center gap-2 text-13 text-fg-brand">
+          {infoOpen ? '접기' : '술 정보'}
+          <ChevronDown
+            aria-hidden="true"
+            className={`h-18 w-18 transition-transform duration-200 motion-reduce:transition-none ${infoOpen ? 'rotate-180' : ''}`}
+          />
         </span>
       </button>
       <AnimatedCollapse isOpen={infoOpen}>
@@ -215,10 +221,7 @@ export default function ReviewFlow({
       {reviewTags.length > 0 && (
         <div className="flex flex-wrap gap-5">
           {reviewTags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded bg-bg-brand-weak px-7 py-4 text-11 text-fg-brand"
-            >
+            <span key={tag} className={reviewChip.selected}>
               {tag}
             </span>
           ))}
