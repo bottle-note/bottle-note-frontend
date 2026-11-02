@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { X } from 'lucide-react';
 import { useSearchInput } from '@/hooks/useSearchInput';
 import { cn } from '@/lib/utils';
@@ -22,6 +22,7 @@ export interface UnderlineSearchBarProps {
   inputClassName?: string;
   actionsClassName?: string;
   clearable?: boolean;
+  autoFocus?: boolean;
   renderActions?: (actions: UnderlineSearchBarActions) => ReactNode;
 }
 
@@ -37,6 +38,7 @@ export default function UnderlineSearchBar({
   inputClassName = '',
   actionsClassName = '',
   clearable = false,
+  autoFocus = false,
   renderActions,
 }: UnderlineSearchBarProps) {
   const {
@@ -53,6 +55,14 @@ export default function UnderlineSearchBar({
     initialValue,
     value,
   });
+
+  // 포커스 이벤트로 검색 활성 상태를 켜므로, 화면 진입 시 상위 컴포넌트의 상태 초기화가 끝난 다음 프레임에 포커스한다
+  useEffect(() => {
+    if (!autoFocus) return;
+
+    const frame = requestAnimationFrame(() => inputRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [autoFocus, inputRef]);
 
   const clearSearchText = () => {
     handleClear();

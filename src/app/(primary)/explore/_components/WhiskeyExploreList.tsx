@@ -1,5 +1,5 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { ExploreApi } from '@/api/explore/explore.api';
 import type { ExploreAlcohol } from '@/api/explore/types';
@@ -32,6 +32,9 @@ export const WhiskeyExplorerList = ({
   onSearchActiveChange,
 }: WhiskeyExplorerListProps) => {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const shouldFocusSearch = searchParams.get('focus') === 'search';
   const { isLoggedIn, user, isGuest, pageSize } = useGuestPagedSession(10);
   const { handleModalState, handleCloseModal, handleLoginState } =
     useModalStore();
@@ -139,6 +142,16 @@ export const WhiskeyExplorerList = ({
     };
   }, []);
 
+  // 검색 바로가기로 들어와 포커스한 뒤에는 표시를 지워, 상세에서 뒤로 돌아왔을 때 다시 포커스하지 않는다
+  const handleSearchActiveChange = (active: boolean) => {
+    onSearchActiveChange(active);
+    if (!active || !shouldFocusSearch) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('focus');
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   const handleClickInquire = () => {
     handleModalState({
       isShowModal: true,
@@ -164,7 +177,8 @@ export const WhiskeyExplorerList = ({
         initialValue={inputKeyword}
         onValueChange={setInputKeyword}
         isSearchActive={isSearchActive}
-        onSearchActiveChange={onSearchActiveChange}
+        onSearchActiveChange={handleSearchActiveChange}
+        autoFocus={shouldFocusSearch}
         description="이름이나 플레이버 태그를 입력해 검색해보세요."
         filterTarget="whiskey"
         sortPresets={sortPresets}

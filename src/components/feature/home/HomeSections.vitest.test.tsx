@@ -147,8 +147,8 @@ describe('홈 바로가기', () => {
     const nav = screen.getByRole('navigation', { name: '바로 가기' });
     const expected = [
       ['바텐더 노트', ROUTES.BARTENDER_NOTE],
-      ['취향 테스트', ROUTES.WHISKEY_MBTI],
-      ['위스키 타로', ROUTES.WHISKEY_TAROT],
+      ['위스키 검색', ROUTES.EXPLORE.WHISKEY_SEARCH_FOCUSED],
+      ['리뷰 쓰기', ROUTES.REVIEW.REGISTER_BASE],
       ['나의 기록', ROUTES.HISTORY.BASE],
     ];
     expected.forEach(([label, href]) => {
@@ -160,6 +160,10 @@ describe('홈 바로가기', () => {
     fireEvent.click(within(nav).getByRole('link', { name: /바텐더 노트/ }));
     expect(trackGA4Event).toHaveBeenCalledWith('home_quick_link_click', {
       link: 'bartender_note',
+    });
+    fireEvent.click(within(nav).getByRole('link', { name: /리뷰 쓰기/ }));
+    expect(trackGA4Event).toHaveBeenCalledWith('home_quick_link_click', {
+      link: 'review_write',
     });
   });
 });
@@ -185,7 +189,7 @@ describe('홈 주간 TOP 5', () => {
     expect(screen.getByText('WEEKLY TOP 5')).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
-        name: '이번 주 사람들이 가장 많이 본 위스키🔥',
+        name: '이번 주 사람들이 가장 많이 본 위스키',
       }),
     ).toBeInTheDocument();
     const items = await screen.findAllByRole('listitem');
@@ -225,7 +229,7 @@ describe('홈 주간 TOP 5', () => {
     // 탭을 바꾸면 탭 위 섹션 머리도 바뀐다.
     expect(screen.getByText('VIEW HISTORY')).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: '내가 최근 본 위스키🥃' }),
+      screen.getByRole('heading', { name: '내가 최근 본 위스키' }),
     ).toBeInTheDocument();
     expect(
       await screen.findByText('로그인 후 확인 가능한 서비스 입니다.'),
