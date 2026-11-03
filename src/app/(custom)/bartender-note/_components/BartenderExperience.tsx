@@ -12,6 +12,7 @@ import {
   useAlcoholDetailQuery,
 } from '@/queries/useAlcoholDetailQuery';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
+import PromptModal from '@/components/ui/Modal/PromptModal';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { ApiError } from '@/utils/ApiError';
 import type { LoginTrigger } from '@/utils/analytics/types';
@@ -57,6 +58,13 @@ const SELECT_SOURCE = {
   'curation-list': 'situation',
   favorites: 'picks',
 } as const;
+
+/** 비로그인 사용자가 로그인이 필요한 동작을 눌렀을 때 모달에 보여 줄 안내. */
+type BartenderLoginTrigger = Extract<LoginTrigger, 'review_write' | 'picks'>;
+const LOGIN_PROMPT_TEXT: Record<BartenderLoginTrigger, string> = {
+  review_write: '리뷰는 로그인 후 남길 수 있어요.',
+  picks: '찜은 로그인 후 쓸 수 있어요.',
+};
 
 /** 다음 질문이 이보다 늦으면 생각하는 자세를 보인다. */
 const THINKING_DELAY_MS = 400;
@@ -145,6 +153,12 @@ export default function BartenderExperience({
   const [postedReviewId, setPostedReviewId] = useState<number | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [resumeAfterLogin, setResumeAfterLogin] = useState<Step | null>(null);
+  const [loginPrompt, setLoginPrompt] = useState<{
+    trigger: BartenderLoginTrigger;
+    resume?: Step;
+  } | null>(null);
+  // 기기 뒤로 가기 등으로 단계가 바뀌면 그 단계에서 띄운 로그인 안내도 닫는다
+  useEffect(() => setLoginPrompt(null), [step]);
   const picks = useBartenderPicks();
   const submit = useReviewSubmit();
   const bartender = useBartenderPose(step);
@@ -250,12 +264,18 @@ export default function BartenderExperience({
     window.addEventListener('pagehide', save);
     return () => window.removeEventListener('pagehide', save);
   }, []);
-  /** 비로그인이면 지금 화면을 남겨 두고 로그인 화면으로 보낸다. 로그인 후 resume 단계를 연다. */
-  const requireLogin = (trigger: LoginTrigger, resume?: Step) => {
+  /** 비로그인이면 로그인 안내 모달을 띄운다. 로그인을 고르면 지금 화면을 남겨 두고 로그인 후 resume 단계를 연다. */
+  const requireLogin = (trigger: BartenderLoginTrigger, resume?: Step) => {
     if (isLoggedIn) return false;
-    leave(resume);
-    bridgeToLogin({ trigger });
+    trackGA4Event('login_prompt_shown', { trigger });
+    setLoginPrompt({ trigger, resume });
     return true;
+  };
+  const goToLogin = () => {
+    if (!loginPrompt) return;
+    leave(loginPrompt.resume);
+    bridgeToLogin({ trigger: loginPrompt.trigger }, { trackPrompt: false });
+    setLoginPrompt(null);
   };
   const move: typeof journey.move = (next, patch) => {
     setNotice(null);
@@ -585,6 +605,15 @@ export default function BartenderExperience({
             reviewStartedFor.current = null;
             restart('review-pick');
           }}
+        />
+      )}
+      {loginPrompt && (
+        <PromptModal
+          mainText={LOGIN_PROMPT_TEXT[loginPrompt.trigger]}
+          subText="로그인하면 지금 화면에서 바로 이어 갈 수 있어요."
+          actionText="로그인"
+          onAction={goToLogin}
+          onClose={() => setLoginPrompt(null)}
         />
       )}
     </BartenderFrame>

@@ -485,6 +485,9 @@ beforeEach(() => {
   window.sessionStorage.clear();
   // 테스트마다 새 페이지로 들어온 것처럼 바텐더 노트 히스토리 표시를 지운다
   window.history.replaceState(null, '');
+  // 모달은 루트 레이아웃의 #modal에 그린다
+  document.getElementById('modal')?.remove();
+  document.body.insertAdjacentHTML('beforeend', '<div id="modal"></div>');
   serverPicks = [];
   stubPickApi();
   stubCurationApi();
@@ -1521,7 +1524,7 @@ describe('바텐더 노트 리뷰', () => {
 
     await writeQuickReview('사과 향이 산뜻하고 부드러워요');
     await press('별점 없이 넘어갈게요');
-    await press('장소와 가격 건너뛰기');
+    await press('장소·가격 없이 넘어갈게요');
 
     expect(await screen.findByText('다 됐습니다')).toBeInTheDocument();
     expect(
@@ -1575,7 +1578,7 @@ describe('바텐더 노트 리뷰', () => {
     await openCurationDetail('글렌피딕 12년');
     await writeQuickReview('사과 향이 산뜻해요');
     await press('별점 없이 넘어갈게요');
-    await press('장소와 가격 건너뛰기');
+    await press('장소·가격 없이 넘어갈게요');
 
     await press('이걸로 등록할게요');
 
@@ -1609,7 +1612,7 @@ describe('바텐더 노트 리뷰', () => {
     await waitFor(() =>
       expect(dialogue()).toHaveTextContent('어디에서 드셨나요?'),
     );
-    await press('장소와 가격 건너뛰기');
+    await press('장소·가격 없이 넘어갈게요');
     await press('이걸로 등록할게요');
 
     // 완료 대사가 나오는 동안 선택지가 다시 그려지므로 최종 상태를 기다린다.
@@ -1624,6 +1627,42 @@ describe('바텐더 노트 리뷰', () => {
       expect(dialogue()).toHaveTextContent(
         '리뷰는 올렸는데 별점은 저장하지 못했어요.',
       ),
+    );
+  });
+
+  it('장소·가격 단계는 버튼 하나로 넘어가고, 입력하면 문구가 바뀌며 입력한 값을 저장한다', async () => {
+    const register = stubReviewApi();
+    renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+    await writeQuickReview('사과 향이 산뜻해요');
+    await press('별점 없이 넘어갈게요');
+
+    expect(
+      await screen.findByRole('button', { name: '장소·가격 없이 넘어갈게요' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /건너뛰기/ }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole('textbox', { name: /장소/ }), {
+      target: { value: '동네 바' },
+    });
+    await press('보틀(1병)');
+    fireEvent.change(screen.getByRole('textbox', { name: /가격/ }), {
+      target: { value: '85,000' },
+    });
+    await press('다 됐어요');
+    await press('이걸로 등록할게요');
+
+    await waitFor(() =>
+      expect(screen.getByText('✓ 등록됨 · 공개')).toBeInTheDocument(),
+    );
+    expect(register).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sizeType: 'BOTTLE',
+        price: 85000,
+        locationInfo: { locationName: '동네 바' },
+      }),
     );
   });
 
@@ -1672,6 +1711,16 @@ describe('바텐더 노트 리뷰', () => {
 describe('바텐더 노트 비로그인 행동', () => {
   const LOGIN_URL = '/login?returnTo=%2Fbartender-note';
 
+  const REVIEW_PROMPT = '리뷰는 로그인 후 남길 수 있어요.';
+  const PICKS_PROMPT = '찜은 로그인 후 쓸 수 있어요.';
+
+  /** 로그인 안내 모달이 뜨면 로그인을 고른다. 모달 전에는 로그인 화면으로 가지 않는다. */
+  async function acceptLoginPrompt(title: string) {
+    const prompt = await screen.findByRole('dialog', { name: title });
+    expect(replace).not.toHaveBeenCalled();
+    fireEvent.click(within(prompt).getByRole('button', { name: '로그인' }));
+  }
+
   /** 로그인 화면으로 갔다가 로그인을 마치고 바텐더 노트로 돌아온다. */
   function returnAfterLogin(unmount: () => void) {
     unmount();
@@ -1679,16 +1728,20 @@ describe('바텐더 노트 비로그인 행동', () => {
     renderExperience();
   }
 
-  it('리뷰 쓰기를 누르면 로그인 화면으로 가고, 로그인 후 리뷰할 술 고르기에서 이어진다', async () => {
+  it('리뷰 쓰기를 누르면 로그인 안내를 띄우고, 로그인을 고르면 로그인 후 리뷰할 술 고르기에서 이어진다', async () => {
     auth.loggedIn = false;
     const { unmount } = renderExperience();
 
     await choose('바텐더님과 함께 리뷰를 쓸게요');
+    await acceptLoginPrompt(REVIEW_PROMPT);
 
     expect(replace).toHaveBeenCalledWith(LOGIN_URL);
-    expect(trackGA4Event).toHaveBeenCalledWith('login_prompt_shown', {
-      trigger: 'review_write',
-    });
+    // 안내는 모달이 뜰 때 한 번만 센다
+    expect(
+      vi
+        .mocked(trackGA4Event)
+        .mock.calls.filter(([event]) => event === 'login_prompt_shown'),
+    ).toEqual([['login_prompt_shown', { trigger: 'review_write' }]]);
     returnAfterLogin(unmount);
 
     expect(
@@ -1700,12 +1753,13 @@ describe('바텐더 노트 비로그인 행동', () => {
     ).toBeInTheDocument();
   });
 
-  it('찜한 술 보기를 누르면 로그인 화면으로 가고, 로그인 후 찜 목록을 보여 준다', async () => {
+  it('찜한 술 보기를 누르면 로그인 안내를 띄우고, 로그인 후 찜 목록을 보여 준다', async () => {
     auth.loggedIn = false;
     serverPicks = [pickItem(900, '탈리스커 10년')];
     const { unmount } = renderExperience();
 
     await press('찜한 술 보기');
+    await acceptLoginPrompt(PICKS_PROMPT);
 
     expect(replace).toHaveBeenCalledWith(LOGIN_URL);
     expect(MyBottleApi.getPicks).not.toHaveBeenCalled();
@@ -1721,6 +1775,7 @@ describe('바텐더 노트 비로그인 행동', () => {
     const { unmount } = renderExperience();
 
     await press('찜한 술 보기');
+    await acceptLoginPrompt(PICKS_PROMPT);
     returnAfterLogin(unmount);
 
     expect(await screen.findByText('찜한 술이 없어요.')).toBeInTheDocument();
@@ -1732,12 +1787,13 @@ describe('바텐더 노트 비로그인 행동', () => {
     });
   });
 
-  it('술 상세에서 찜을 누르면 로그인 화면으로 가고, 로그인 후 같은 술 상세로 돌아온다', async () => {
+  it('술 상세에서 찜을 누르면 로그인 안내를 띄우고, 로그인 후 같은 술 상세로 돌아온다', async () => {
     auth.loggedIn = false;
     const { unmount } = renderExperience();
     await openCurationDetail('글렌피딕 12년');
 
     await press('찜하기');
+    await acceptLoginPrompt(PICKS_PROMPT);
 
     expect(replace).toHaveBeenCalledWith(LOGIN_URL);
     expect(AlcoholsApi.putPick).not.toHaveBeenCalled();
@@ -1752,12 +1808,13 @@ describe('바텐더 노트 비로그인 행동', () => {
     );
   });
 
-  it('술 상세에서 리뷰 작성을 누르면 로그인 화면으로 가고, 로그인 후 리뷰 방식 고르기에서 이어진다', async () => {
+  it('술 상세에서 리뷰 작성을 누르면 로그인 안내를 띄우고, 로그인 후 리뷰 방식 고르기에서 이어진다', async () => {
     auth.loggedIn = false;
     const { unmount } = renderExperience();
     await openCurationDetail('글렌피딕 12년');
 
     await press('리뷰 작성');
+    await acceptLoginPrompt(REVIEW_PROMPT);
 
     expect(replace).toHaveBeenCalledWith(LOGIN_URL);
     returnAfterLogin(unmount);
@@ -1769,11 +1826,52 @@ describe('바텐더 노트 비로그인 행동', () => {
     ).toBeInTheDocument();
   });
 
+  it('로그인 안내를 닫으면 로그인 화면으로 가지 않고 보던 화면에 머문다', async () => {
+    auth.loggedIn = false;
+    renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+
+    await press('리뷰 작성');
+    const prompt = await screen.findByRole('dialog', { name: REVIEW_PROMPT });
+    fireEvent.click(
+      within(prompt).getByRole('button', { name: '다음에 할게요' }),
+    );
+
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+    );
+    expect(replace).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole('heading', { name: '글렌피딕 12년' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('어떻게 남길까요')).not.toBeInTheDocument();
+  });
+
+  it('로그인 안내가 떠 있을 때 기기 뒤로 가기로 이전 단계에 가면 안내도 닫힌다', async () => {
+    auth.loggedIn = false;
+    renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+
+    await press('리뷰 작성');
+    await screen.findByRole('dialog', { name: REVIEW_PROMPT });
+
+    window.history.back();
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('heading', { name: '글렌피딕 12년' }),
+      ).not.toBeInTheDocument(),
+    );
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
+  });
+
   it('로그인하지 않고 돌아오면 보던 화면에 머문다', async () => {
     auth.loggedIn = false;
     const { unmount } = renderExperience();
 
     await choose('바텐더님과 함께 리뷰를 쓸게요');
+    await acceptLoginPrompt(REVIEW_PROMPT);
     unmount();
     renderExperience();
 
