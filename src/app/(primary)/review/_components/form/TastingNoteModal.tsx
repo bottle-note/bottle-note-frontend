@@ -231,7 +231,7 @@ export default function TastingNoteModal({
           </header>
 
           {/* 콘텐츠 */}
-          <div className="flex-1 overflow-y-auto px-20 pb-safe">
+          <div className="flex-1 overflow-y-auto px-20 pb-safe-scroll">
             {isDirty && isTastingProfileEmpty(draft) ? (
               <p className="mt-16 rounded-lg bg-bg-neutral-weak px-14 py-12 text-15 text-fg-neutral">
                 모든 항목이 0점이면 테이스팅 노트가 저장되지 않아요.

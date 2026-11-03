@@ -208,7 +208,7 @@ export default function AlcoholTalk({
           {/* 대사가 끝나기 전에도 시트 안을 누르면 대사가 넘어가지 않게 한다 */}
           <div
             data-dialogue-control
-            className="flex min-h-0 flex-1 flex-col gap-16 px-20 pb-safe pt-16"
+            className="flex min-h-0 flex-1 flex-col gap-16 px-20 pb-safe-scroll pt-16"
           >
             <div className="flex items-start gap-12">
               <div className="flex min-w-0 flex-1 flex-col gap-2">

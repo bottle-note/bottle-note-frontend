@@ -125,7 +125,7 @@ export default function LikesStep({
                   full ||
                   selected.some(({ id }) => id === alcohol.alcoholId)
                 }
-                className="flex min-h-74 w-full items-center gap-12 border-b border-stroke-neutral-subtle py-10 text-left text-fg-neutral transition-colors hover:text-fg-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring disabled:opacity-60"
+                className="flex min-h-74 w-full items-center gap-12 border-b border-stroke-neutral-subtle py-10 last:border-b-0 text-left text-fg-neutral transition-colors hover:text-fg-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring disabled:opacity-60"
                 onClick={() => {
                   setSelected((current) => [
                     ...current,

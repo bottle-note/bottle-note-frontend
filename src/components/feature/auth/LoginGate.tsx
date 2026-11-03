@@ -52,7 +52,7 @@ export function LoginGate(props: LoginGateProps) {
         {children}
         <div
           ref={promptRef}
-          className="fixed bottom-0 left-0 right-0 z-50 border-t border-stroke-neutral-subtle bg-bg-layer-default px-20 py-16 safe-area-bottom"
+          className="fixed bottom-0 left-0 right-0 z-50 border-t border-stroke-neutral-subtle bg-bg-layer-default px-20 pt-16 pb-safe"
         >
           <Button onClick={handleLogin}>
             {label || buttonLabel || '로그인하기'}
