@@ -150,8 +150,9 @@
   :root {
     --radius: 0.5rem;
 
-    /* 웹 화면 중 시스템 UI(상태 표시줄, 홈 인디케이터)에 가려지는 높이
-     * - iOS: 웹이 시스템 UI 밑까지 그려져서 가려지는 만큼 값이 있다 (하단 34px 등)
+    /* 웹 화면 중 시스템 UI(상태 표시줄, 홈 인디케이터)에 가려지는 높이.
+     * 브라우저가 env()로 알려 주고, 이 값을 padding으로 줘야 내용이 가려지지 않는다.
+     * - iOS: 웹이 시스템 UI 밑까지 그려져(layout.tsx viewportFit: 'cover') 값이 있다 (하단 34px 등)
      * - Android 앱: 앱이 시스템 UI 자리를 비우고 그 사이에만 웹을 그려서 0 */
     --safe-area-top: env(safe-area-inset-top, 0px);
     --safe-area-bottom: env(safe-area-inset-bottom, 0px);
