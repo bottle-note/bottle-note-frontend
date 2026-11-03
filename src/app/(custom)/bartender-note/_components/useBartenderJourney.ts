@@ -119,7 +119,7 @@ export function useBartenderJourney(
    * 처음 열릴 때 지나온 길을 맞춘다.
    * 새로고침·뒤로 가기로 돌아오면 브라우저가 기억한 항목에서, 링크로 새로 들어오면 남겨 둔 길을 다시 쌓아 이어 간다.
    */
-  const init = (saved?: JourneyState) => {
+  const init = (saved?: JourneyState): { isNewVisit: boolean } => {
     const entry = indexOf(window.history.state);
     if (entry !== undefined) {
       if (saved && entry < saved.stack.length) {
@@ -128,12 +128,14 @@ export function useBartenderJourney(
         apply({ stack: [START], index: 0 });
         rewind(entry, 0);
       }
-      return;
+      return { isNewVisit: false };
     }
     window.history.replaceState({ [KEY]: { index: 0 } }, '');
-    if (!saved) return;
+    // 브라우저가 기억한 항목도, 남겨 둔 길도 없으면 새로 들어온 것이다
+    if (!saved) return { isNewVisit: true };
     apply({ stack: saved.stack.slice(0, saved.index + 1), index: saved.index });
     rewind(0, saved.index);
+    return { isNewVisit: false };
   };
 
   const position = journey.stack[journey.index];

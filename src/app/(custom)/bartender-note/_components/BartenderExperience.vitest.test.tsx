@@ -31,8 +31,13 @@ import {
 } from '../_scenario/__fixtures__/scenario';
 import * as scenarioApi from '../_scenario/scenarioApi';
 import { trackGA4Event } from '@/utils/analytics/ga4';
+import { trackCampaignEvent } from '@/api/campaign-content/campaign-content.api';
 
 vi.mock('@/utils/analytics/ga4', () => ({ trackGA4Event: vi.fn() }));
+// 캠페인 이벤트는 전송 큐를 거치는 네트워크 요청이다. 어떤 코드·종류를 보냈는지만 본다.
+vi.mock('@/api/campaign-content/campaign-content.api', () => ({
+  trackCampaignEvent: vi.fn(),
+}));
 const { back, push, replace } = vi.hoisted(() => ({
   back: vi.fn(),
   push: vi.fn(),
@@ -492,6 +497,7 @@ beforeEach(() => {
   stubPickApi();
   stubCurationApi();
   vi.mocked(trackGA4Event).mockClear();
+  vi.mocked(trackCampaignEvent).mockClear();
   vi.spyOn(AlcoholsApi, 'getWeeklyViewPopular').mockResolvedValue({
     success: true,
     code: 200,
@@ -2181,5 +2187,186 @@ describe('바텐더 노트 화면 안 이전으로', () => {
     expect(
       await screen.findByRole('button', { name: /탈리스커 10년/ }),
     ).toBeInTheDocument();
+  });
+});
+
+describe('바텐더 노트 캠페인 지표', () => {
+  const RECOMMEND = 'bartender-note-recommend';
+  const CURATION = 'bartender-note-curation';
+  const REVIEW = 'bartender-note-review';
+  const sent = (code?: string) =>
+    vi
+      .mocked(trackCampaignEvent)
+      .mock.calls.filter(([sentCode]) => !code || sentCode === code)
+      .map(([sentCode, type]) => (code ? type : `${sentCode}:${type}`));
+  const TASTE = {
+    kind: '싱글 몰트',
+    axis: '피트·스모키',
+    abv: '상관없어요',
+    price: '상관없어요',
+  };
+
+  it('새로 들어오면 세 흐름 모두 조회를 한 번 보내고, 새로고침·처음으로 돌아가도 다시 보내지 않는다', async () => {
+    const { unmount } = renderExperience();
+    await screen.findByRole('button', { name: /^위스키 추천해 주세요/ });
+    expect(sent()).toEqual([
+      `${RECOMMEND}:VIEW`,
+      `${CURATION}:VIEW`,
+      `${REVIEW}:VIEW`,
+    ]);
+
+    await choose('큐레이션으로 추천해 주세요');
+    await screen.findByRole('button', { name: '집에서 여는 첫 병' });
+    await press('처음으로');
+    await screen.findByRole('button', { name: /^위스키 추천해 주세요/ });
+
+    fireEvent(window, new Event('pagehide'));
+    unmount();
+    renderExperience();
+    await screen.findByRole('button', { name: /^위스키 추천해 주세요/ });
+
+    expect(sent().filter((event) => event.endsWith(':VIEW'))).toHaveLength(3);
+  });
+
+  it('추천은 시작·첫 잔 완료·로그인한 상세 결과를 한 번씩 보내고, 다른 후보 상세를 더 봐도 늘지 않는다', async () => {
+    renderExperience();
+    await answerTasteQuestions({
+      kind: '상관없어요',
+      axis: '상관없어요',
+      abv: '상관없어요',
+      price: '상관없어요',
+    });
+    await firstPick();
+    await waitFor(() =>
+      expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']),
+    );
+
+    await press('다른 술도 보여주세요');
+    await screen.findByText('바텐더가 고른 술');
+    // 1위가 아닌 두 번째 후보의 상세를 연다
+    const rows = screen
+      .getAllByRole('button')
+      .filter((button) => /^\d/.test(button.textContent ?? ''));
+    fireEvent.click(rows[1]);
+    await screen.findByRole('button', { name: '리뷰 작성' });
+
+    expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
+    expect(sent(CURATION)).toEqual(['VIEW']);
+    expect(sent(REVIEW)).toEqual(['VIEW']);
+  });
+
+  it('추천 후보가 없어도 질문을 끝까지 답하면 완료를 보낸다', async () => {
+    renderExperience();
+    await choose('위스키 추천해 주세요');
+    await choose('라이');
+    await choose('상관없어요');
+    await choose('상관없어요');
+    await choose('잔');
+    vi.spyOn(scenarioApi, 'getScenarioStep').mockResolvedValueOnce({
+      versionId: 3,
+      question: null,
+      completed: true,
+      candidates: { items: [], totalCount: 0, nextCursor: null },
+    });
+    await choose('상관없어요');
+    await screen.findByText('추천 후보가 없어요');
+
+    await waitFor(() =>
+      expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH']),
+    );
+  });
+
+  it('큐레이션은 술 목록이 보이면 완료, 로그인한 상세에서 결과를 보낸다', async () => {
+    renderExperience();
+    await choose('큐레이션으로 추천해 주세요');
+    await choose('집에서 여는 첫 병');
+    await screen.findByRole('button', { name: /조니워커 블랙/ });
+    await waitFor(() =>
+      expect(sent(CURATION)).toEqual(['VIEW', 'START', 'FINISH']),
+    );
+
+    await press(/조니워커 블랙/);
+    await screen.findByRole('heading', { name: '조니워커 블랙' });
+    await waitFor(() =>
+      expect(sent(CURATION)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']),
+    );
+    expect(sent(RECOMMEND)).toEqual(['VIEW']);
+  });
+
+  it('비로그인으로 추천·큐레이션 상세를 보면 결과를 보내지 않는다', async () => {
+    auth.loggedIn = false;
+    renderExperience();
+    await openCurationDetail('조니워커 블랙');
+    await waitFor(() =>
+      expect(sent(CURATION)).toEqual(['VIEW', 'START', 'FINISH']),
+    );
+    await press('처음으로');
+    await answerTasteQuestions(TASTE);
+    await firstPick();
+    await waitFor(() =>
+      expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH']),
+    );
+    await screen.findByRole('heading', { name: '글렌피딕 12년', level: 1 });
+
+    expect(sent().some((event) => event.endsWith(':RESULT'))).toBe(false);
+  });
+
+  it('리뷰 시작은 비로그인이어도 로그인 안내 전에 센다', async () => {
+    auth.loggedIn = false;
+    renderExperience();
+    await choose('바텐더님과 함께 리뷰를 쓸게요');
+    await screen.findByRole('dialog', { name: '지금 드신 술, 기록해 둘까요?' });
+
+    expect(sent(REVIEW)).toEqual(['VIEW', 'START']);
+  });
+
+  it('리뷰는 미리보기에서 완료, 등록 성공에서 결과를 보내고, 다른 술 기록은 새 시도로 센다', async () => {
+    stubReviewApi();
+    vi.spyOn(AlcoholsApi, 'lookup').mockResolvedValue([lookupItem]);
+    renderExperience();
+    await choose('바텐더님과 함께 리뷰를 쓸게요');
+    fireEvent.change(
+      await screen.findByRole('searchbox', { name: '술 이름 또는 종류 검색' }),
+      { target: { value: '탈리스커' } },
+    );
+    await press(/탈리스커 10년/);
+    await screen.findByRole('heading', { name: '탈리스커 10년' });
+    await writeQuickReview('바다 향이 짭짤해요');
+    await press('별점 없이 넘어갈게요');
+    await press('장소·가격 없이 넘어갈게요');
+    await screen.findByText('다 됐습니다');
+    expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH']);
+
+    await press('이걸로 등록할게요');
+    await screen.findByText('등록 완료');
+    expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
+
+    await choose('다른 술도 기록할게요');
+    await screen.findByRole('searchbox', { name: '술 이름 또는 종류 검색' });
+    expect(sent(REVIEW)).toEqual([
+      'VIEW',
+      'START',
+      'FINISH',
+      'RESULT',
+      'START',
+    ]);
+    // 리뷰할 술 상세를 거쳐도 추천·큐레이션 결과로 세지 않는다
+    expect(sent(RECOMMEND)).toEqual(['VIEW']);
+    expect(sent(CURATION)).toEqual(['VIEW']);
+  });
+
+  it('추천 상세에서 이어 쓴 리뷰는 리뷰 캠페인에 넣지 않는다', async () => {
+    stubReviewApi();
+    renderExperience();
+    await answerTasteQuestions(TASTE);
+    await firstPick();
+    await writeQuickReview('사과 향이 산뜻해요');
+    await press('별점 없이 넘어갈게요');
+    await press('장소·가격 없이 넘어갈게요');
+    await press('이걸로 등록할게요');
+    await screen.findByText('등록 완료');
+
+    expect(sent(REVIEW)).toEqual(['VIEW']);
+    expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
   });
 });

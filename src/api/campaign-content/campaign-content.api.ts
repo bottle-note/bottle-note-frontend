@@ -1,6 +1,11 @@
 import { apiClient } from '@/shared/api/apiClient';
 
-export type CampaignCode = 'whiskey-mbti' | 'whiskey-tarot';
+export type CampaignCode =
+  | 'whiskey-mbti'
+  | 'whiskey-tarot'
+  | 'bartender-note-recommend'
+  | 'bartender-note-review'
+  | 'bartender-note-curation';
 export type CampaignEventType = 'VIEW' | 'START' | 'FINISH' | 'RESULT';
 
 // Serializing requests lets the initial VIEW response establish the visitor
