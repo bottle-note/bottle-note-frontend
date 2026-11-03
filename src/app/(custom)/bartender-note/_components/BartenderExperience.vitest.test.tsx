@@ -33,7 +33,6 @@ import * as scenarioApi from '../_scenario/scenarioApi';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 
 vi.mock('@/utils/analytics/ga4', () => ({ trackGA4Event: vi.fn() }));
-
 const { back, push, replace } = vi.hoisted(() => ({
   back: vi.fn(),
   push: vi.fn(),
@@ -1156,6 +1155,87 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     await press('다른 술도 보여주세요');
     await screen.findByText('바텐더가 고른 술');
     expect(events('bartender_show_other_candidates')).toHaveLength(1);
+  });
+});
+
+// HYE-83: 끝까지 들은 이야기는 다시 왔을 때 나눈 대화를 한 번에 펼쳐 둔다
+describe('바텐더 노트 들은 이야기 다시 보기', () => {
+  const conversation = () =>
+    screen.getByRole('log', { name: '노트와 나눈 대화' });
+  const STORY = '바다 향이 나는 위스키';
+
+  /** 술 상세에서 이야기를 끝까지 듣는다. */
+  async function hearStory() {
+    await press('들려주세요');
+    await within(conversation()).findByRole('button', { name: '다시 듣기' });
+  }
+
+  /** 들었던 대화가 기다림 없이 다 펼쳐져 있는지 */
+  async function expectExpanded() {
+    // 대답은 마지막 말풍선에 달려, 보이면 펼친 대화가 다 그려진 것이다
+    expect(
+      await within(conversation()).findByRole('button', { name: '다시 듣기' }),
+    ).toBeInTheDocument();
+    expect(conversation()).toHaveTextContent('이 술 얘기 하나 해 드릴까요?');
+    expect(conversation()).toHaveTextContent('나: 들려주세요');
+    expect(conversation()).toHaveTextContent(STORY);
+    expect(
+      screen.queryByRole('status', { name: '이야기를 이어 가는 중' }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(conversation()).queryByRole('button', { name: '들려주세요' }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(conversation()).getByRole('button', { name: '전체 글 보기' }),
+    ).toBeInTheDocument();
+  }
+
+  it('끝까지 들은 술에 처음부터 다시 오면 나눈 대화를 한 번에 펼쳐 둔다', async () => {
+    renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+    await hearStory();
+
+    await press('처음으로');
+    await openCurationDetail('글렌피딕 12년');
+
+    await expectExpanded();
+  });
+
+  it('술 목록에 갔다가 같은 술로 돌아와도 펼쳐 둔다', async () => {
+    renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+    await hearStory();
+
+    await press('이 큐레이션 더 볼게요');
+    await press(/글렌피딕 12년/);
+
+    await expectExpanded();
+  });
+
+  it('같은 탭에서 바텐더 노트를 다시 열어도 펼쳐 둔다', async () => {
+    const { unmount } = renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+    await hearStory();
+    unmount();
+
+    renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+
+    await expectExpanded();
+  });
+
+  it('끝까지 듣지 않은 술은 처음부터 다시 오면 지금처럼 들을지 묻는다', async () => {
+    renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+    await press('다음에요');
+
+    await press('처음으로');
+    await openCurationDetail('글렌피딕 12년');
+
+    expect(
+      await within(conversation()).findByRole('button', { name: '들려주세요' }),
+    ).toBeInTheDocument();
+    expect(conversation()).not.toHaveTextContent(STORY);
   });
 });
 
