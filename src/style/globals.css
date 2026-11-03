@@ -150,9 +150,9 @@
   :root {
     --radius: 0.5rem;
 
-    /* 화면 위아래에서 시스템 UI(상태 표시줄, 홈 인디케이터)가 차지하는 높이
-     * - iOS: 실제 높이가 들어온다 (하단 34px 등)
-     * - Android 앱: 앱이 이 자리를 미리 비워 두므로 0 */
+    /* 웹 화면 중 시스템 UI(상태 표시줄, 홈 인디케이터)에 가려지는 높이
+     * - iOS: 웹이 시스템 UI 밑까지 그려져서 가려지는 만큼 값이 있다 (하단 34px 등)
+     * - Android 앱: 앱이 시스템 UI 자리를 비우고 그 사이에만 웹을 그려서 0 */
     --safe-area-top: env(safe-area-inset-top, 0px);
     --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 
