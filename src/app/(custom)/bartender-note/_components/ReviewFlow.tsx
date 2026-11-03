@@ -7,17 +7,17 @@ import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import TastingRadarChart from '@/app/(primary)/review/_components/form/TastingRadarChart';
 import { TASTING_AXES, TASTING_MAX_VALUE } from '@/constants/tastingNote';
 import type { ReviewDraft, Step } from './types';
-import {
-  OptionList,
-  FlowAction,
-  FlowNavigation,
-  FlowTextAction,
-} from './FlowControls';
+import { OptionList, FlowAction } from './FlowControls';
 import ReviewPickStep from './ReviewPickStep';
 import { prefersReducedMotion } from './prefersReducedMotion';
 import RadarPreview from './RadarPreview';
 import ReviewComposer from './ReviewComposer';
-import { reviewChip } from './ReviewInputs';
+import {
+  ReviewFieldLabel,
+  ReviewSegmented,
+  reviewChip,
+  reviewTextInput,
+} from './ReviewInputs';
 import type { ReviewAlcohol } from './reviewAlcohol';
 import {
   flavorFromText,
@@ -449,94 +449,66 @@ export default function ReviewFlow({
       {step === 'review-where' && (
         <>
           {whiskeySummary}
-          <label
-            className="text-13 font-bold text-fg-neutral"
-            htmlFor="reviewPlace"
-          >
-            장소 (선택)
-          </label>
-          <input
-            id="reviewPlace"
-            className="h-46 w-full rounded-lg border border-stroke-neutral-weak bg-bg-neutral-weak px-14 text-16 text-fg-neutral outline-none placeholder:text-fg-placeholder focus-visible:border-stroke-focus-ring focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
-            value={review.place}
-            onChange={(event) => updateReview({ place: event.target.value })}
-            placeholder="바 이름이나 집"
-          />
-          <label
-            className="text-13 font-bold text-fg-neutral"
-            htmlFor="reviewPrice"
-          >
-            가격 (선택)
-          </label>
-          <div
-            className="grid grid-cols-2 gap-4 rounded-lg bg-bg-neutral-weak p-4 [&>button]:min-h-40 [&>button]:rounded-md [&>button]:text-13 [&>button]:text-fg-neutral-muted [&>button[aria-pressed=true]]:bg-bg-brand-weak [&>button[aria-pressed=true]]:font-bold [&>button[aria-pressed=true]]:text-fg-brand"
-            role="group"
-            aria-label="가격 단위"
-          >
-            <button
-              type="button"
-              aria-pressed={review.unit === 'glass'}
-              onClick={() => updateReview({ unit: 'glass' })}
-            >
-              1잔
-            </button>
-            <button
-              type="button"
-              aria-pressed={review.unit === 'bottle'}
-              onClick={() => updateReview({ unit: 'bottle' })}
-            >
-              보틀(1병)
-            </button>
+          <div className="flex flex-col gap-8">
+            <ReviewFieldLabel htmlFor="reviewPlace" optional>
+              장소
+            </ReviewFieldLabel>
+            <input
+              id="reviewPlace"
+              className={reviewTextInput}
+              value={review.place}
+              onChange={(event) => updateReview({ place: event.target.value })}
+              placeholder="바 이름이나 집"
+            />
           </div>
-          <input
-            id="reviewPrice"
-            className="h-46 w-full rounded-lg border border-stroke-neutral-weak bg-bg-neutral-weak px-14 text-16 text-fg-neutral outline-none placeholder:text-fg-placeholder focus-visible:border-stroke-focus-ring focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
-            inputMode="numeric"
-            value={review.price}
-            onChange={(event) =>
-              updateReview({
-                price: event.target.value.replace(/\D/g, ''),
-              })
-            }
-            placeholder="금액 (원)"
-          />
-          <FlowNavigation>
-            <FlowTextAction
-              onClick={() => {
-                updateReview({ place: '', price: '' });
-                move('review-preview');
-              }}
-            >
-              장소와 가격 건너뛰기
-            </FlowTextAction>
-          </FlowNavigation>
-          {action('다 됐어요', () => move('review-preview'))}
+          <div className="flex flex-col gap-8">
+            <ReviewFieldLabel htmlFor="reviewPrice" optional>
+              가격
+            </ReviewFieldLabel>
+            <ReviewSegmented
+              label="가격 단위"
+              value={review.unit}
+              options={[
+                { value: 'glass', label: '1잔' },
+                { value: 'bottle', label: '보틀(1병)' },
+              ]}
+              onChange={(unit) => updateReview({ unit })}
+            />
+            <input
+              id="reviewPrice"
+              className={reviewTextInput}
+              inputMode="numeric"
+              value={review.price}
+              onChange={(event) =>
+                updateReview({
+                  price: event.target.value.replace(/\D/g, ''),
+                })
+              }
+              placeholder="금액 (원)"
+            />
+          </div>
+          {/* 장소·가격은 선택 입력이라 버튼 하나로 넘어간다. 다른 단계처럼 입력 여부에 따라 문구만 바꾼다 */}
+          {action(
+            review.place.trim() || review.price
+              ? '다 됐어요'
+              : '장소·가격 없이 넘어갈게요',
+            () => move('review-preview'),
+          )}
         </>
       )}
       {step === 'review-preview' && (
         <>
           {whiskeySummary}
           {renderReviewCard()}
-          <div
-            className="grid grid-cols-2 gap-4 rounded-lg bg-bg-neutral-weak p-4 [&>button]:min-h-40 [&>button]:rounded-md [&>button]:text-13 [&>button]:text-fg-neutral-muted [&>button[aria-pressed=true]]:bg-bg-brand-weak [&>button[aria-pressed=true]]:font-bold [&>button[aria-pressed=true]]:text-fg-brand"
-            role="group"
-            aria-label="리뷰 공개 범위"
-          >
-            <button
-              type="button"
-              aria-pressed={review.public}
-              onClick={() => updateReview({ public: true })}
-            >
-              공개
-            </button>
-            <button
-              type="button"
-              aria-pressed={!review.public}
-              onClick={() => updateReview({ public: false })}
-            >
-              비공개
-            </button>
-          </div>
+          <ReviewSegmented
+            label="리뷰 공개 범위"
+            value={review.public ? 'public' : 'private'}
+            options={[
+              { value: 'public', label: '공개' },
+              { value: 'private', label: '비공개' },
+            ]}
+            onChange={(value) => updateReview({ public: value === 'public' })}
+          />
           {action(
             isPosting ? '올리고 있어요…' : '이걸로 등록할게요',
             postReview,

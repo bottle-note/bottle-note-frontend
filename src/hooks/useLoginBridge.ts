@@ -13,9 +13,15 @@ export const useLoginBridge = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const bridgeToLogin = ({ trigger, gatePage }: LoginContext = {}) => {
+  /**
+   * trackPrompt: 로그인 안내를 이미 화면(모달 등)에서 보여 주고 이벤트를 보냈다면 false로 넘겨 중복 발화를 막는다.
+   */
+  const bridgeToLogin = (
+    { trigger, gatePage }: LoginContext = {},
+    { trackPrompt = true }: { trackPrompt?: boolean } = {},
+  ) => {
     setLoginContext({ trigger, gatePage });
-    if (trigger) {
+    if (trigger && trackPrompt) {
       trackGA4Event('login_prompt_shown', { trigger });
     }
     const returnTo = `${pathname}${searchParams?.toString() ? `?${searchParams.toString()}` : ''}`;

@@ -12,6 +12,7 @@ import {
   useAlcoholDetailQuery,
 } from '@/queries/useAlcoholDetailQuery';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
+import PromptModal from '@/components/ui/Modal/PromptModal';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { ApiError } from '@/utils/ApiError';
 import type { LoginTrigger } from '@/utils/analytics/types';
@@ -57,6 +58,36 @@ const SELECT_SOURCE = {
   'curation-list': 'situation',
   favorites: 'picks',
 } as const;
+
+/**
+ * 비로그인 사용자가 로그인이 필요한 동작을 눌렀을 때 모달에 보여 줄 안내.
+ * 게스트 게이트처럼 막는 말보다 로그인하면 얻는 것을 앞세운다.
+ * 찜하기와 찜한 술 보기는 GA 트리거(picks)는 같고 문구만 다르다.
+ */
+const LOGIN_PROMPT = {
+  review: {
+    trigger: 'review_write',
+    title: '지금 드신 술, 기록해 둘까요?',
+    description: '로그인하면 쓰던 자리에서 바로 이어 쓸 수 있어요.',
+    action: '로그인하고 기록하기',
+  },
+  pick: {
+    trigger: 'picks',
+    title: '마음에 든 술, 모아 둘까요?',
+    description: '로그인하면 찜한 술을 언제든 다시 볼 수 있어요.',
+    action: '로그인하고 찜하기',
+  },
+  pickList: {
+    trigger: 'picks',
+    title: '찜한 술, 한눈에 볼까요?',
+    description: '로그인하면 찜한 술을 한곳에 모아 볼 수 있어요.',
+    action: '로그인하고 찜한 술 보기',
+  },
+} satisfies Record<
+  string,
+  { trigger: LoginTrigger; title: string; description: string; action: string }
+>;
+type LoginPromptKind = keyof typeof LOGIN_PROMPT;
 
 /** 다음 질문이 이보다 늦으면 생각하는 자세를 보인다. */
 const THINKING_DELAY_MS = 400;
@@ -145,6 +176,12 @@ export default function BartenderExperience({
   const [postedReviewId, setPostedReviewId] = useState<number | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [resumeAfterLogin, setResumeAfterLogin] = useState<Step | null>(null);
+  const [loginPrompt, setLoginPrompt] = useState<{
+    kind: LoginPromptKind;
+    resume?: Step;
+  } | null>(null);
+  // 기기 뒤로 가기 등으로 단계가 바뀌면 그 단계에서 띄운 로그인 안내도 닫는다
+  useEffect(() => setLoginPrompt(null), [step]);
   const picks = useBartenderPicks();
   const submit = useReviewSubmit();
   const bartender = useBartenderPose(step);
@@ -250,12 +287,23 @@ export default function BartenderExperience({
     window.addEventListener('pagehide', save);
     return () => window.removeEventListener('pagehide', save);
   }, []);
-  /** 비로그인이면 지금 화면을 남겨 두고 로그인 화면으로 보낸다. 로그인 후 resume 단계를 연다. */
-  const requireLogin = (trigger: LoginTrigger, resume?: Step) => {
+  /** 비로그인이면 로그인 안내 모달을 띄운다. 로그인을 고르면 지금 화면을 남겨 두고 로그인 후 resume 단계를 연다. */
+  const requireLogin = (kind: LoginPromptKind, resume?: Step) => {
     if (isLoggedIn) return false;
-    leave(resume);
-    bridgeToLogin({ trigger });
+    trackGA4Event('login_prompt_shown', {
+      trigger: LOGIN_PROMPT[kind].trigger,
+    });
+    setLoginPrompt({ kind, resume });
     return true;
+  };
+  const goToLogin = () => {
+    if (!loginPrompt) return;
+    leave(loginPrompt.resume);
+    bridgeToLogin(
+      { trigger: LOGIN_PROMPT[loginPrompt.kind].trigger },
+      { trackPrompt: false },
+    );
+    setLoginPrompt(null);
   };
   const move: typeof journey.move = (next, patch) => {
     setNotice(null);
@@ -297,7 +345,7 @@ export default function BartenderExperience({
     move('detail', { selection: next });
   };
   const toggleFavorite = async () => {
-    if (!selected || requireLogin('picks')) return;
+    if (!selected || requireLogin('pick')) return;
     trackGA4Event('add_to_picks', {
       alcohol_id: String(selected.id),
       alcohol_name: selected.name,
@@ -366,14 +414,14 @@ export default function BartenderExperience({
   };
   const start = (entry: 'situation' | 'review' | 'picks', next: Step) => {
     trackGA4Event('bartender_start', { entry });
-    if (entry === 'review' && requireLogin('review_write', next)) return;
-    if (entry === 'picks' && requireLogin('picks', next)) return;
+    if (entry === 'review' && requireLogin('review', next)) return;
+    if (entry === 'picks' && requireLogin('pickList', next)) return;
     // 큐레이션은 매번 첫 페이지부터 보여 준다
     if (entry === 'situation') curationChoices.reset();
     move(next);
   };
   const writeReview = () => {
-    if (requireLogin('review_write', 'review-mode')) return;
+    if (requireLogin('review', 'review-mode')) return;
     move('review-mode');
   };
 
@@ -585,6 +633,15 @@ export default function BartenderExperience({
             reviewStartedFor.current = null;
             restart('review-pick');
           }}
+        />
+      )}
+      {loginPrompt && (
+        <PromptModal
+          mainText={LOGIN_PROMPT[loginPrompt.kind].title}
+          subText={LOGIN_PROMPT[loginPrompt.kind].description}
+          actionText={LOGIN_PROMPT[loginPrompt.kind].action}
+          onAction={goToLogin}
+          onClose={() => setLoginPrompt(null)}
         />
       )}
     </BartenderFrame>
