@@ -9,6 +9,7 @@ const STAGGERED_ROWS = 8;
 export default function ScenarioCandidateList({
   candidates,
   onChoose,
+  back,
   home,
   loadMore,
   loadingMore,
@@ -16,6 +17,8 @@ export default function ScenarioCandidateList({
 }: {
   candidates: ScenarioCandidates;
   onChoose: (id: number) => void;
+  /** 돌아갈 단계가 없으면 비워 둔다. */
+  back?: () => void;
   home: () => void;
   loadMore: () => void;
   loadingMore: boolean;
@@ -105,6 +108,16 @@ export default function ScenarioCandidateList({
               : loadMoreError
                 ? '다시 불러오기'
                 : '추천 더 보기'}
+          </Button>
+        )}
+        {back && (
+          <Button
+            size="md"
+            variant="text"
+            className="min-w-0 flex-1"
+            onClick={back}
+          >
+            이전으로
           </Button>
         )}
         <Button

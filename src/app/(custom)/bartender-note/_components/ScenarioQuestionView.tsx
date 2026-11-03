@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import {
   FlowAction,
   FlowNavigation,
@@ -20,13 +20,19 @@ interface Props {
   /** 이 질문에 고른 답. 다음 질문을 받는 중이거나 되돌아온 질문이면 표시한다. */
   selectedAnswer?: ScenarioAnswerValue;
   onAnswer: (value: ScenarioAnswerValue) => void;
+  /** 직전 질문으로 돌아간다. 돌아갈 질문이 없으면 비워 둔다. */
+  back?: () => void;
 }
 
 function RangeQuestion({
   input,
   disabled,
   onAnswer,
-}: { input: ScenarioRangeInput } & Pick<Props, 'disabled' | 'onAnswer'>) {
+  backAction,
+}: { input: ScenarioRangeInput; backAction?: ReactNode } & Pick<
+  Props,
+  'disabled' | 'onAnswer'
+>) {
   const formRef = useRef<HTMLFormElement>(null);
   const [min, setMin] = useState(String(input.min));
   const [max, setMax] = useState(String(input.max));
@@ -79,14 +85,17 @@ function RangeQuestion({
       >
         다음
       </FlowAction>
-      {input.allowAny && (
+      {(input.allowAny || backAction) && (
         <FlowNavigation>
-          <FlowTextAction
-            disabled={disabled}
-            onClick={() => onAnswer({ kind: 'any' })}
-          >
-            상관없어요
-          </FlowTextAction>
+          {input.allowAny && (
+            <FlowTextAction
+              disabled={disabled}
+              onClick={() => onAnswer({ kind: 'any' })}
+            >
+              상관없어요
+            </FlowTextAction>
+          )}
+          {backAction}
         </FlowNavigation>
       )}
     </>
@@ -154,12 +163,35 @@ function PriceQuestion({
 }
 
 /** 응답의 입력 종류를 표시하고 확정된 답변만 전달한다. 분기·다음 질문은 결정하지 않는다. */
-export default function ScenarioQuestionView({
+export default function ScenarioQuestionView({ back, ...props }: Props) {
+  const backAction = back && (
+    <FlowTextAction onClick={back}>이전으로</FlowTextAction>
+  );
+  const { input } = props.question;
+  // 숫자 범위는 '상관없어요'와 한 줄에 둔다
+  if (input.kind === 'range')
+    return (
+      <RangeQuestion
+        input={input}
+        disabled={props.disabled}
+        onAnswer={props.onAnswer}
+        backAction={backAction}
+      />
+    );
+  return (
+    <>
+      <QuestionInput {...props} />
+      {backAction && <FlowNavigation>{backAction}</FlowNavigation>}
+    </>
+  );
+}
+
+function QuestionInput({
   question,
   disabled,
   selectedAnswer,
   onAnswer,
-}: Props) {
+}: Omit<Props, 'back'>) {
   const { input } = question;
   switch (input.kind) {
     case 'choice':
@@ -189,10 +221,6 @@ export default function ScenarioQuestionView({
               : []),
           ]}
         />
-      );
-    case 'range':
-      return (
-        <RangeQuestion input={input} disabled={disabled} onAnswer={onAnswer} />
       );
     case 'alcohol-select':
       return (

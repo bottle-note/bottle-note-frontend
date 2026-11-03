@@ -262,6 +262,8 @@ export default function BartenderExperience({
     journey.move(next, patch);
   };
   const back = journey.back;
+  /** 화면 안 '이전으로'. 직전이 처음 화면이면 '처음으로'와 같은 곳이라 두지 않는다. */
+  const stepBack = previous && previous.step !== 'intro' ? back : undefined;
   const restart: typeof journey.restart = (next, patch) => {
     setNotice(null);
     journey.restart(next, patch);
@@ -491,6 +493,7 @@ export default function BartenderExperience({
                 disabled={!flow.canAnswer}
                 selectedAnswer={flow.selectedAnswer}
                 onAnswer={answerQuestion}
+                back={stepBack}
               />
             )}
             {step === 'recommendations' &&
@@ -499,6 +502,7 @@ export default function BartenderExperience({
                 <ScenarioCandidateList
                   candidates={scenarioData.candidates}
                   onChoose={(id) => chooseAlcohol({ id, source: 'api' })}
+                  back={stepBack}
                   home={home}
                   loadMore={() => void flow.query.fetchNextPage()}
                   loadingMore={flow.query.isFetchingNextPage}
@@ -516,6 +520,7 @@ export default function BartenderExperience({
           hasMorePicks={picks.hasMore}
           onChoose={chooseAlcohol}
           move={move}
+          back={stepBack}
           home={home}
           onLeave={() => leave()}
           onStartScenario={startScenario}
@@ -550,6 +555,7 @@ export default function BartenderExperience({
           onTogglePick={() => void toggleFavorite()}
           onWriteReview={writeReview}
           onLeave={openAlcoholPage}
+          back={stepBack}
           home={home}
         />
       )}

@@ -101,6 +101,7 @@ export default function CandidateList({
   hasMorePicks,
   onChoose,
   move,
+  back,
   home,
   onLeave,
   onStartScenario,
@@ -111,6 +112,8 @@ export default function CandidateList({
   hasMorePicks: boolean;
   onChoose: (selection: AlcoholSelection) => void;
   move: (next: Step) => void;
+  /** 돌아갈 단계가 없으면 비워 둔다. */
+  back?: () => void;
   home: () => void;
   onLeave: () => void;
   onStartScenario: () => void;
@@ -124,6 +127,7 @@ export default function CandidateList({
         </p>
         <FlowAction onClick={curationDetail.retry}>다시 시도</FlowAction>
         <FlowNavigation>
+          {back && <FlowTextAction onClick={back}>이전으로</FlowTextAction>}
           <FlowTextAction onClick={home}>처음으로</FlowTextAction>
         </FlowNavigation>
       </>
@@ -203,6 +207,7 @@ export default function CandidateList({
             큐레이션 전체 보기
           </FlowTextLink>
         )}
+        {back && <FlowTextAction onClick={back}>이전으로</FlowTextAction>}
         <FlowTextAction onClick={home}>처음으로</FlowTextAction>
       </FlowNavigation>
     </>

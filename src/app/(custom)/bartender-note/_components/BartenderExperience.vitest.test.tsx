@@ -1960,3 +1960,106 @@ describe('바텐더 노트 공통 이동', () => {
     expect(push).toHaveBeenCalledWith('/');
   });
 });
+
+describe('바텐더 노트 화면 안 이전으로', () => {
+  const prevButton = () => screen.queryByRole('button', { name: '이전으로' });
+
+  it('첫 질문에는 두지 않고, 다음 질문부터 눌러 앞 질문으로 돌아가면 고른 답이 선택돼 있다', async () => {
+    renderExperience();
+    await choose('위스키 추천해 주세요');
+    await screen.findByText('질문 1');
+    expect(prevButton()).not.toBeInTheDocument();
+
+    await choose('싱글 몰트');
+    await screen.findByText('질문 2');
+    await press('이전으로');
+
+    await screen.findByText('질문 1');
+    expect(
+      await screen.findByRole('button', { name: /^싱글 몰트/ }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    expect(prevButton()).not.toBeInTheDocument();
+  });
+
+  it('첫 잔·추천 목록·목록에서 고른 술에서 누르면 한 단계씩 되짚는다', async () => {
+    renderExperience();
+    await answerTasteQuestions({
+      kind: '상관없어요',
+      axis: '상관없어요',
+      abv: '상관없어요',
+      price: '상관없어요',
+    });
+    await firstPick();
+    await press('다른 술도 보여주세요');
+    await screen.findByText('바텐더가 고른 술');
+    const rows = screen
+      .getAllByRole('button')
+      .filter((button) => /^\d/.test(button.textContent ?? ''));
+    fireEvent.click(rows[1]);
+    await screen.findByRole('region', { name: '추천 후보' });
+
+    await press('이전으로');
+    expect(await screen.findByText('바텐더가 고른 술')).toBeInTheDocument();
+    await press('이전으로');
+    await firstPick();
+    await press('이전으로');
+    expect(await screen.findByText('질문 5')).toBeInTheDocument();
+    // 되돌아온 마지막 질문에도 고른 답이 선택돼 있다
+    expect(
+      screen
+        .getAllByRole('button', { name: /^상관없어요/ })
+        .some((button) => button.getAttribute('aria-pressed') === 'true'),
+    ).toBe(true);
+  });
+
+  it('빈 추천 결과에서 누르면 마지막 질문으로 돌아간다', async () => {
+    renderExperience();
+    await choose('위스키 추천해 주세요');
+    await choose('라이');
+    await choose('상관없어요');
+    await choose('상관없어요');
+    await choose('잔');
+    vi.spyOn(scenarioApi, 'getScenarioStep').mockResolvedValueOnce({
+      versionId: 3,
+      question: null,
+      completed: true,
+      candidates: { items: [], totalCount: 0, nextCursor: null },
+    });
+    await choose('상관없어요');
+    await screen.findByText('추천 후보가 없어요');
+
+    await press('이전으로');
+    expect(await screen.findByText('질문 5')).toBeInTheDocument();
+  });
+
+  it('큐레이션 고르기에는 두지 않고, 큐레이션 술 목록에서 누르면 큐레이션 고르기로 돌아간다', async () => {
+    renderExperience();
+    await choose('큐레이션으로 추천해 주세요');
+    await screen.findByRole('button', { name: '집에서 여는 첫 병' });
+    expect(prevButton()).not.toBeInTheDocument();
+
+    await choose('집에서 여는 첫 병');
+    await screen.findByRole('button', { name: /글렌피딕 12년/ });
+    await press('이전으로');
+
+    expect(
+      await screen.findByRole('button', { name: '집에서 여는 첫 병' }),
+    ).toBeInTheDocument();
+  });
+
+  it('찜 목록에는 두지 않고, 찜에서 고른 술에서 누르면 찜 목록으로 돌아간다', async () => {
+    serverPicks = [pickItem(900, '탈리스커 10년')];
+    renderExperience();
+    await press('찜한 술 보기');
+    await screen.findByRole('button', { name: /탈리스커 10년/ });
+    expect(prevButton()).not.toBeInTheDocument();
+
+    await press(/탈리스커 10년/);
+    await screen.findByRole('region', { name: '내가 찜한 술' });
+    await press('이전으로');
+
+    expect(
+      await screen.findByRole('button', { name: /탈리스커 10년/ }),
+    ).toBeInTheDocument();
+  });
+});
