@@ -1280,6 +1280,25 @@ describe('바텐더 노트 큐레이션 추천', () => {
     expect(screen.queryByText('보틀노트에 없는 술')).not.toBeInTheDocument();
   });
 
+  it('큐레이션 술 목록에서 뒤로 가면 보던 큐레이션 페이지로 돌아간다', async () => {
+    renderExperience();
+
+    await choose('큐레이션으로 추천해 주세요');
+    await screen.findByRole('button', { name: '집에서 여는 첫 병' });
+    await press('다른 큐레이션 보기');
+    await choose('피트 입문 두 잔');
+    await screen.findByRole('button', { name: /라프로익 10년/ });
+
+    await press('이전 단계');
+
+    expect(
+      await screen.findByRole('button', { name: '피트 입문 두 잔' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '집에서 여는 첫 병' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('큐레이션 목록을 불러오지 못하면 다시 시도할 수 있다', async () => {
     vi.mocked(CurationV2Api.getFeed).mockRejectedValueOnce(
       new Error('network'),
