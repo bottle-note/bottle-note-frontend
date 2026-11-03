@@ -1,6 +1,7 @@
 import { ChevronRight } from 'lucide-react';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import Button from '@/components/ui/Button/Button';
+import { FlowTextAction } from './FlowControls';
 import type { ScenarioCandidates } from '../_scenario/model';
 
 const STAGGERED_ROWS = 8;
@@ -94,40 +95,25 @@ export default function ScenarioCandidateList({
           다음 추천을 불러오지 못했어요. 다시 시도하거나 처음부터 시작해 주세요.
         </p>
       )}
-      <nav aria-label="다른 보기" className="flex items-center gap-12 pt-8">
-        {candidates.nextCursor && (
-          <Button
-            size="md"
-            variant="secondary"
-            className="min-w-0 flex-[2]"
-            onClick={loadMore}
-            disabled={loadingMore}
-          >
-            {loadingMore
-              ? '불러오는 중…'
-              : loadMoreError
-                ? '다시 불러오기'
-                : '추천 더 보기'}
-          </Button>
-        )}
-        {back && (
-          <Button
-            size="md"
-            variant="text"
-            className="min-w-0 flex-1"
-            onClick={back}
-          >
-            이전으로
-          </Button>
-        )}
+      {candidates.nextCursor && (
         <Button
           size="md"
-          variant="text"
-          className="min-w-0 flex-1"
-          onClick={home}
+          variant="secondary"
+          fullWidth
+          onClick={loadMore}
+          disabled={loadingMore}
         >
-          처음으로
+          {loadingMore
+            ? '불러오는 중…'
+            : loadMoreError
+              ? '다시 불러오기'
+              : '추천 더 보기'}
         </Button>
+      )}
+      {/* 첫 잔 화면과 같은 이동 줄 */}
+      <nav aria-label="다른 보기" className="flex gap-x-16">
+        {back && <FlowTextAction onClick={back}>이전으로</FlowTextAction>}
+        <FlowTextAction onClick={home}>처음으로</FlowTextAction>
       </nav>
     </div>
   );
