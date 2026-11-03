@@ -2409,6 +2409,17 @@ describe('바텐더 노트 캠페인 지표', () => {
     await screen.findByText('등록 완료');
     expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
 
+    expect(trackGA4Event).toHaveBeenCalledWith('write_review_start', {
+      alcohol_id: '900',
+      source: 'bartender_note',
+      entry_flow: 'direct',
+    });
+    expect(trackGA4Event).toHaveBeenCalledWith('write_review_complete', {
+      alcohol_id: '900',
+      source: 'bartender_note',
+      entry_flow: 'direct',
+    });
+
     await choose('다른 술도 기록할게요');
     await screen.findByRole('searchbox', { name: '술 이름 또는 종류 검색' });
     expect(sent(REVIEW)).toEqual([
@@ -2423,18 +2434,151 @@ describe('바텐더 노트 캠페인 지표', () => {
     expect(sent(CURATION)).toEqual(['VIEW']);
   });
 
-  it('추천 상세에서 이어 쓴 리뷰는 리뷰 캠페인에 넣지 않는다', async () => {
+  it.each(['recommend', 'curation', 'picks'] as const)(
+    '%s에서 이어 쓴 리뷰를 별도 집계하고 GA4에 같은 유입 경로를 보낸다',
+    async (entryFlow) => {
+      stubReviewApi();
+      serverPicks = [pickItem(900, '탈리스커 10년')];
+      renderExperience();
+      if (entryFlow === 'recommend') {
+        await answerTasteQuestions(TASTE);
+        await firstPick();
+      } else if (entryFlow === 'curation') {
+        await openCurationDetail('조니워커 블랙');
+      } else {
+        await press('찜한 술 보기');
+        await press(/탈리스커 10년/);
+      }
+      const originEvents = sent().filter((event) => !event.startsWith(REVIEW));
+      await writeQuickReview('사과 향이 산뜻해요');
+      await press('별점 없이 넘어갈게요');
+      await press('장소·가격 없이 넘어갈게요');
+      await screen.findByText('다 됐습니다');
+      expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH']);
+      await press('이걸로 등록할게요');
+      await screen.findByText('등록 완료');
+
+      expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
+      expect(sent().filter((event) => !event.startsWith(REVIEW))).toEqual(
+        originEvents,
+      );
+      for (const event of ['write_review_start', 'write_review_complete']) {
+        expect(trackGA4Event).toHaveBeenCalledWith(
+          event,
+          expect.objectContaining({
+            source: 'bartender_note',
+            entry_flow: entryFlow,
+          }),
+        );
+      }
+    },
+  );
+
+  it('추천에서 리뷰를 열었다 돌아와도 추천 시도를 보존해 목록에서 결과를 보낸다', async () => {
+    renderExperience();
+    await answerTasteQuestions({
+      kind: '상관없어요',
+      axis: '상관없어요',
+      abv: '상관없어요',
+      price: '상관없어요',
+    });
+    await firstPick();
+    await press('리뷰 작성');
+    await screen.findByText('어떻게 남길까요');
+    expect(sent(REVIEW)).toEqual(['VIEW', 'START']);
+    await press('이전 단계');
+    await firstPick();
+    await press('리뷰 작성');
+    await screen.findByText('어떻게 남길까요');
+    expect(sent(REVIEW)).toEqual(['VIEW', 'START']);
+    await press('이전 단계');
+    await firstPick();
+    await press('다른 술도 보여주세요');
+    await screen.findByText('바텐더가 고른 술');
+
+    await waitFor(() =>
+      expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']),
+    );
+    expect(sent(REVIEW)).toEqual(['VIEW', 'START']);
+  });
+
+  it('추천에서 리뷰 로그인·새로고침 후에도 유입 경로와 리뷰 시도를 복원한다', async () => {
+    auth.loggedIn = false;
     stubReviewApi();
+    let view = renderExperience();
+    await answerTasteQuestions(TASTE);
+    await firstPick();
+    await press('리뷰 작성');
+    const prompt = await screen.findByRole('dialog', {
+      name: '지금 드신 술, 기록해 둘까요?',
+    });
+    expect(sent(REVIEW)).toEqual(['VIEW', 'START']);
+    fireEvent.click(
+      within(prompt).getByRole('button', { name: '로그인하고 기록하기' }),
+    );
+    view.unmount();
+    auth.loggedIn = true;
+    view = renderExperience();
+    await choose('내 느낌 한 줄로 쓸게요');
+    fireEvent.change(
+      await screen.findByRole('textbox', { name: '리뷰 본문' }),
+      {
+        target: { value: '로그인 뒤에도 쓰던 리뷰를 이어갑니다' },
+      },
+    );
+    await press('다 썼어요');
+    await press(/다 그렸어요|그래프 없이 넘어갈게요/);
+    await press('사진 없이 넘어갈게요');
+    await press('별점 없이 넘어갈게요');
+    await press('장소·가격 없이 넘어갈게요');
+    await screen.findByText('다 됐습니다');
+    expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH']);
+    fireEvent(window, new Event('pagehide'));
+    view.unmount();
+    view = renderExperience();
+    await screen.findByText('다 됐습니다');
+    expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH']);
+    await press('이걸로 등록할게요');
+    await screen.findByText('등록 완료');
+    expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
+    expect(trackGA4Event).toHaveBeenCalledWith(
+      'write_review_complete',
+      expect.objectContaining({ entry_flow: 'recommend' }),
+    );
+    // 등록 뒤 지나온 브라우저 히스토리를 되감는 작업까지 끝난 상태에서 새로고침한다.
+    await waitFor(() =>
+      expect(window.history.state?.bartenderNote?.index).toBe(1),
+    );
+    fireEvent(window, new Event('pagehide'));
+    view.unmount();
+    renderExperience();
+    await screen.findByText('등록 완료');
+    expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
+    expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH']);
+  });
+
+  it('추천에서 리뷰 저장 실패·재시도에도 유입 경로를 유지하고 결과는 성공 때만 보낸다', async () => {
+    const save = stubReviewApi().mockRejectedValueOnce(new Error('저장 실패'));
     renderExperience();
     await answerTasteQuestions(TASTE);
     await firstPick();
-    await writeQuickReview('사과 향이 산뜻해요');
+    await writeQuickReview('실패해도 같은 리뷰를 다시 저장합니다');
     await press('별점 없이 넘어갈게요');
     await press('장소·가격 없이 넘어갈게요');
     await press('이걸로 등록할게요');
+    await waitFor(() =>
+      expect(trackGA4Event).toHaveBeenCalledWith('write_review_failed', {
+        alcohol_id: expect.any(String),
+        failure_type: 'review_save',
+        source: 'bartender_note',
+        entry_flow: 'recommend',
+      }),
+    );
+    expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH']);
+    await press('이걸로 등록할게요');
     await screen.findByText('등록 완료');
-
-    expect(sent(REVIEW)).toEqual(['VIEW']);
+    expect(save).toHaveBeenCalledTimes(2);
+    expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
     expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH']);
   });
 });

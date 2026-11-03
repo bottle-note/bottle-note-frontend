@@ -15,7 +15,7 @@ import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import PromptModal from '@/components/ui/Modal/PromptModal';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { ApiError } from '@/utils/ApiError';
-import type { LoginTrigger } from '@/utils/analytics/types';
+import type { LoginTrigger, ReviewEntryFlow } from '@/utils/analytics/types';
 import {
   OptionList,
   FlowAction,
@@ -65,6 +65,14 @@ const CAMPAIGN_BY_ENTRY = {
   review: 'review',
   picks: null,
 } as const;
+
+const REVIEW_ENTRY_BY_ORIGIN: Record<TalkOrigin, ReviewEntryFlow> = {
+  'first-pick': 'recommend',
+  recommendations: 'recommend',
+  'curation-list': 'curation',
+  favorites: 'picks',
+  other: 'direct',
+};
 
 /**
  * 비로그인 사용자가 로그인이 필요한 동작을 눌렀을 때 모달에 보여 줄 안내.
@@ -233,7 +241,7 @@ export default function BartenderExperience({
     // 새로고침·로그인 왕복·술 상세 페이지 복귀는 새 진입이 아니다
     if (isNewVisit) campaign.view();
     if (!saved) return;
-    campaign.restore(saved.campaign);
+    campaign.restore(saved.campaign, saved.reviewCampaign);
     setContext(saved.scenario.context);
     flow.restore(
       saved.scenario.answers,
@@ -293,7 +301,7 @@ export default function BartenderExperience({
     if (step === 'review-preview') campaign.reach('review', 'FINISH');
   }, [step, !!selected, flow.query.data?.completed, !!curation]);
 
-  // 캠페인 결과는 로그인한 사용자에게만 보낸다. 진행 중인 흐름 것만 나간다
+  // 추천·큐레이션 결과는 로그인한 사용자에게만 보낸다. 리뷰 시도와 독립적으로 유지한다
   const hasCandidates = (flow.query.data?.candidates?.totalCount ?? 0) > 0;
   useEffect(() => {
     if (authLoading || !isLoggedIn) return;
@@ -320,6 +328,7 @@ export default function BartenderExperience({
       stories: storyProgress.states,
       resumeAfterLogin: resume,
       campaign: campaign.current(),
+      reviewCampaign: campaign.currentReview(),
     });
   // 새로고침해도 보던 단계에서 이어 가도록 페이지를 떠나기 직전에 남겨 둔다
   const leaveRef = useRef(leave);
@@ -418,11 +427,13 @@ export default function BartenderExperience({
     trackGA4Event('write_review_start', {
       alcohol_id: String(selected.id),
       source: 'bartender_note',
+      entry_flow: campaign.reviewEntryFlow(),
     });
   };
   const postReview = async () => {
     if (!selected) return;
     const alcoholId = String(selected.id);
+    const entryFlow = campaign.reviewEntryFlow();
     setNotice(null);
     try {
       const { reviewId, ratingSaved } = await submit.mutateAsync({
@@ -432,12 +443,14 @@ export default function BartenderExperience({
       trackGA4Event('write_review_complete', {
         alcohol_id: alcoholId,
         source: 'bartender_note',
+        entry_flow: entryFlow,
       });
       if (!ratingSaved)
         trackGA4Event('write_review_failed', {
           alcohol_id: alcoholId,
           failure_type: 'rating_save',
           source: 'bartender_note',
+          entry_flow: entryFlow,
         });
       reviewStartedFor.current = null;
       campaign.reach('review', 'RESULT');
@@ -451,6 +464,7 @@ export default function BartenderExperience({
         failure_type:
           error instanceof ReviewSubmitError ? error.stage : 'review_save',
         source: 'bartender_note',
+        entry_flow: entryFlow,
       });
       setNotice('review-failed');
     }
@@ -474,6 +488,8 @@ export default function BartenderExperience({
     move(next);
   };
   const writeReview = () => {
+    if (!selected) return;
+    campaign.startReview(REVIEW_ENTRY_BY_ORIGIN[talkOrigin], selected.id);
     if (requireLogin('review', 'review-mode')) return;
     move('review-mode');
   };

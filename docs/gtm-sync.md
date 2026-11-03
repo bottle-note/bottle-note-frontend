@@ -107,6 +107,23 @@ pnpm run gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 
 첫 잔은 상세와 같은 화면이라 건네는 것만으로 `bartender_select_alcohol`을 보내지 않는다. 첫 잔에서 바로 행동한 비율은 결과 이벤트 대비 `write_review_start`·`bartender_open_alcohol_page`·`add_to_picks`와 `bartender_show_other_candidates`를 함께 본다. 비로그인 사용자가 다른 후보를 누르면 `bartender_show_other_candidates` 뒤에 `login_prompt_shown`(`trigger: other_candidates`)이 나가고, 로그인하면 후보 목록이 열린다. 이야기는 첫 잔과 모든 바텐더 상세에서 설명이 있는 술에만 제안하므로, 제안 수는 결과 이벤트 수와 같지 않다. GA4 맞춤 측정기준에는 `entry`, `mode`, `result_state`, `source`, `trigger`, `stage`처럼 값이 제한된 항목만 등록하고 `alcohol_id`는 등록하지 않는다.
 
+### 리뷰 유입 경로와 캠페인 집계
+
+바텐더 노트의 `write_review_start`·`write_review_complete`·`write_review_failed`는 기존 `source: bartender_note`에 `entry_flow`를 함께 보낸다. 바텐더 밖의 기존 리뷰 작성 이벤트에는 경로 값을 추가하지 않는다. GTM 데이터 영역에 이전 값이 남아 일반 리뷰로 섞이지 않도록, 리뷰 이벤트 전달 시 없는 `source`·`entry_flow`는 `null`로 명시적으로 비운다.
+
+- `direct`: 첫 화면의 리뷰 메뉴 또는 등록 완료 후 「다른 술도 기록할게요」에서 시작한 리뷰.
+- `recommend`: 추천 첫 잔 또는 다른 추천 후보에서 이어 쓴 리뷰.
+- `curation`: 큐레이션의 술 상세에서 이어 쓴 리뷰.
+- `picks`: 찜한 술의 상세에서 이어 쓴 리뷰.
+
+리뷰 작성 방식(한 줄·노즈/팔레트/피니시)을 고르면 `write_review_start`, 리뷰 저장이 성공하면 `write_review_complete`, 이미지 업로드·리뷰 저장·별점 저장이 실패하면 해당 `failure_type`의 `write_review_failed`를 보낸다. 경로는 리뷰 시도와 함께 보존해 로그인 왕복·새로고침·저장 재시도 후에도 유지한다. 별점만 저장에 실패한 경우 리뷰 자체는 성공이므로 완료와 별점 실패를 함께 보낸다.
+
+어드민 캠페인과 GA4는 별도 측정이다. `bartender-note-review`의 `START`는 리뷰 메뉴 또는 술 상세의 리뷰 작성 선택(로그인 안내 전), `FINISH`는 미리보기 도달, `RESULT`는 실제 리뷰 저장 성공이다. 추천·큐레이션·찜에서 이어 쓴 리뷰도 포함하며, 원래 추천·큐레이션 시도는 보존한다. 같은 술의 리뷰에 돌아오거나 새로고침해도 동일 시도의 완료·결과를 추가로 보내지 않고, 다른 술의 리뷰나 「다른 술도 기록할게요」는 새 시도로 센다. 추천 `RESULT`는 다른 후보 목록 열람, 큐레이션 `RESULT`는 술 상세 열람이라는 기존 의미를 유지한다.
+
+리뷰 캠페인은 이 변경 적용 뒤 직접 리뷰 진입뿐 아니라 모든 바텐더 리뷰 경로를 포함한다. 적용 전후 집계 범위가 다르므로 과거 수치를 같은 모집단으로 비교하지 않는다. 기존 데이터는 소급 변경하지 않는다.
+
+`entry_flow`는 값이 제한된 이벤트 범위 맞춤 측정기준으로 GA4에 별도 등록해야 경로별 보고에 사용할 수 있다. 이 PR의 `gtm.config.json` 변경은 세 리뷰 이벤트의 전달 매개변수 정의이며, PR 생성만으로 GTM 게시나 GA4 맞춤 측정기준 등록이 완료되는 것은 아니다. 병합 뒤 위 배포 흐름에 따라 GTM 반영·게시와 GA4 수신을 각각 확인한다.
+
 ## 홈 이벤트 기준
 
 | 이벤트                  | 발화 조건                                                                             | 매개변수                         | 중복 방지  |
