@@ -33,17 +33,6 @@ import * as scenarioApi from '../_scenario/scenarioApi';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 
 vi.mock('@/utils/analytics/ga4', () => ({ trackGA4Event: vi.fn() }));
-// vaul Drawer는 jsdom에서 닫힘 전환이 끝나지 않아 시트가 남는다. 열림·닫힘만 재현한다.
-vi.mock('@/components/ui/Modal/BottomSheet', () => ({
-  default: ({
-    isOpen,
-    children,
-  }: {
-    isOpen: boolean;
-    children: React.ReactNode;
-  }) => (isOpen ? <div role="dialog">{children}</div> : null),
-}));
-
 const { back, push, replace } = vi.hoisted(() => ({
   back: vi.fn(),
   push: vi.fn(),
@@ -1169,77 +1158,84 @@ describe('바텐더 노트 첫 잔 이야기', () => {
   });
 });
 
-// HYE-83: 전체 글로 읽은 이야기는 다시 왔을 때 펼친 채로 둔다
-describe('바텐더 노트 전체 글 다시 보기', () => {
+// HYE-83: 끝까지 들은 이야기는 다시 왔을 때 나눈 대화를 한 번에 펼쳐 둔다
+describe('바텐더 노트 들은 이야기 다시 보기', () => {
   const conversation = () =>
     screen.getByRole('log', { name: '노트와 나눈 대화' });
-  const EXPANDED = '지난번에 읽으신 이야기예요';
+  const STORY = '바다 향이 나는 위스키';
 
-  /** 술 상세에서 이야기를 미루고 전체 글을 열어 읽은 뒤 닫는다. */
-  async function readFullText() {
-    await press('다음에요');
-    await press('전체 글 보기');
-    const sheet = await screen.findByRole('dialog');
-    await within(sheet).findByRole('heading', {
-      name: '글렌피딕 12년',
-      level: 3,
-    });
-    // 헤더에도 「닫기」가 있어 시트 안의 닫기를 누른다
-    fireEvent.click(within(sheet).getByRole('button', { name: '닫기' }));
-    await waitFor(() =>
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
-    );
+  /** 술 상세에서 이야기를 끝까지 듣는다. */
+  async function hearStory() {
+    await press('들려주세요');
+    await within(conversation()).findByRole('button', { name: '다시 듣기' });
   }
 
-  it('전체 글을 읽은 술에 다시 오면 들을지 묻지 않고 전체 글을 펼쳐 둔다', async () => {
-    renderExperience();
-    await openCurationDetail('글렌피딕 12년');
-    await readFullText();
-    // 방금 연 글은 대화 중간에 끼워 넣지 않는다
-    expect(conversation()).not.toHaveTextContent(EXPANDED);
-
-    await press('처음으로');
-    await openCurationDetail('글렌피딕 12년');
-
-    await waitFor(() => expect(conversation()).toHaveTextContent(EXPANDED));
-    expect(conversation()).toHaveTextContent('바다 향이 나는 위스키');
+  /** 들었던 대화가 기다림 없이 다 펼쳐져 있는지 */
+  async function expectExpanded() {
+    // 대답은 마지막 말풍선에 달려, 보이면 펼친 대화가 다 그려진 것이다
+    expect(
+      await within(conversation()).findByRole('button', { name: '다시 듣기' }),
+    ).toBeInTheDocument();
+    expect(conversation()).toHaveTextContent('이 술 얘기 하나 해 드릴까요?');
+    expect(conversation()).toHaveTextContent('나: 들려주세요');
+    expect(conversation()).toHaveTextContent(STORY);
+    expect(
+      screen.queryByRole('status', { name: '이야기를 이어 가는 중' }),
+    ).not.toBeInTheDocument();
     expect(
       within(conversation()).queryByRole('button', { name: '들려주세요' }),
     ).not.toBeInTheDocument();
     expect(
-      await within(conversation()).findByRole('button', {
-        name: '이야기 듣기',
-      }),
-    ).toBeInTheDocument();
-    expect(
       within(conversation()).getByRole('button', { name: '전체 글 보기' }),
     ).toBeInTheDocument();
-  });
+  }
 
-  it('전체 글을 읽지 않은 술은 지금처럼 들을지 묻는다', async () => {
+  it('끝까지 들은 술에 처음부터 다시 오면 나눈 대화를 한 번에 펼쳐 둔다', async () => {
     renderExperience();
     await openCurationDetail('글렌피딕 12년');
-    await readFullText();
+    await hearStory();
 
     await press('처음으로');
-    await openCurationDetail('조니워커 블랙');
+    await openCurationDetail('글렌피딕 12년');
 
-    expect(
-      await within(conversation()).findByRole('button', { name: '들려주세요' }),
-    ).toBeInTheDocument();
-    expect(conversation()).not.toHaveTextContent(EXPANDED);
+    await expectExpanded();
   });
 
-  it('같은 탭에서 바텐더 노트를 다시 열어도 읽은 전체 글을 펼쳐 둔다', async () => {
+  it('술 목록에 갔다가 같은 술로 돌아와도 펼쳐 둔다', async () => {
+    renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+    await hearStory();
+
+    await press('이 큐레이션 더 볼게요');
+    await press(/글렌피딕 12년/);
+
+    await expectExpanded();
+  });
+
+  it('같은 탭에서 바텐더 노트를 다시 열어도 펼쳐 둔다', async () => {
     const { unmount } = renderExperience();
     await openCurationDetail('글렌피딕 12년');
-    await readFullText();
+    await hearStory();
     unmount();
 
     renderExperience();
     await openCurationDetail('글렌피딕 12년');
 
-    await waitFor(() => expect(conversation()).toHaveTextContent(EXPANDED));
+    await expectExpanded();
+  });
+
+  it('끝까지 듣지 않은 술은 처음부터 다시 오면 지금처럼 들을지 묻는다', async () => {
+    renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+    await press('다음에요');
+
+    await press('처음으로');
+    await openCurationDetail('글렌피딕 12년');
+
+    expect(
+      await within(conversation()).findByRole('button', { name: '들려주세요' }),
+    ).toBeInTheDocument();
+    expect(conversation()).not.toHaveTextContent(STORY);
   });
 });
 

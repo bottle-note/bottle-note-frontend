@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import type { Pose } from './BarScene';
 import { getStoryDialogue, type StoryPhase } from './dialogue';
-import { loadFullTextReads, saveFullTextReads } from './fullTextReads';
+import { loadHeardStories, saveHeardStories } from './heardStories';
 import { prefersReducedMotion } from './prefersReducedMotion';
 import {
   toDescriptionParagraphs,
@@ -54,12 +54,18 @@ const initialState: StoryState = {
   pending: false,
 };
 
-/** 전체 글을 이미 읽은 술은 들을지 묻지 않고 맺은 상태로 시작한다. */
-const readState: StoryState = {
-  ...initialState,
+/** 끝까지 들은 이야기를 다시 왔을 때의 모습. 처음 들었던 대화를 기다림 없이 다 펼쳐 둔다. */
+const heardState = (sentences: string[]): StoryState => ({
   phase: 'settled',
-  asked: false,
-};
+  heard: true,
+  asked: true,
+  messages: [
+    { from: 'me', text: '들려주세요' },
+    ...sentences.map((text) => ({ from: 'bartender' as const, text })),
+  ],
+  told: sentences.length,
+  pending: false,
+});
 
 /** 술 id별 이야기 진행. 페이지를 벗어날 때 스냅샷에 남긴다. */
 export type StoryStates = Record<number, StoryState>;
@@ -80,31 +86,28 @@ export function useAlcoholStory({
   greeting: string;
 }) {
   const [states, setStates] = useState<StoryStates>({});
-  // 처음 그릴 때는 술 이야기 화면이 아니라 서버 렌더와 어긋나지 않는다
-  const [fullTextReads, setFullTextReads] = useState<number[]>(() =>
-    typeof window === 'undefined' ? [] : loadFullTextReads(),
+  // 이야기 화면은 처음 그릴 때 나오지 않아 서버 렌더와 어긋나지 않는다
+  const [heardIds, setHeardIds] = useState<number[]>(() =>
+    typeof window === 'undefined' ? [] : loadHeardStories(),
   );
   const paragraphs = toDescriptionParagraphs(alcohol?.description);
   const id = alcohol?.id;
-  const fullTextRead = id !== undefined && fullTextReads.includes(id);
-  const state =
-    id !== undefined && paragraphs
-      ? states[id] ?? (fullTextRead ? readState : initialState)
-      : undefined;
   const sentences = paragraphs ? toSentences(paragraphs[0]) : [];
+  /** '처음으로'로 진행을 지워도 이 탭에서 끝까지 들은 이야기는 펼쳐 둔다. */
+  const heardBefore = id !== undefined && heardIds.includes(id);
+  const startState = heardBefore ? heardState(sentences) : initialState;
+  const state =
+    id !== undefined && paragraphs ? states[id] ?? startState : undefined;
 
   const update = (next: Partial<StoryState>) => {
     if (id === undefined) return;
     setStates((current) => ({
       ...current,
-      [id]: {
-        ...(current[id] ?? (fullTextRead ? readState : initialState)),
-        ...next,
-      },
+      [id]: { ...(current[id] ?? startState), ...next },
     }));
   };
 
-  // 주고받은 말은 방금 들은 자리에만 남긴다. 다시 들어오면 첫 잔 인사로 돌아간다.
+  // 다시 들어오면 끝까지 들은 이야기는 다 펼쳐 두고, 아니면 첫 잔 인사로 돌아간다.
   useEffect(() => {
     if (active || id === undefined) return;
     setStates((current) => {
@@ -112,16 +115,20 @@ export function useAlcoholStory({
       if (!previous || previous.phase === 'settled') return current;
       return {
         ...current,
-        [id]: {
-          ...previous,
-          phase: 'settled',
-          asked: false,
-          messages: [],
-          told: 0,
-          pending: false,
-        },
+        [id]: previous.heard
+          ? heardState(sentences)
+          : {
+              ...previous,
+              phase: 'settled',
+              asked: false,
+              messages: [],
+              told: 0,
+              pending: false,
+            },
       };
     });
+    // 떠나는 순간의 술 설명으로 펼칠 대화를 만든다
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, id]);
 
   useEffect(() => {
@@ -130,8 +137,14 @@ export function useAlcoholStory({
       () => {
         const told = state.told + 1;
         const last = told >= sentences.length;
-        if (last)
+        if (last) {
           trackGA4Event('bartender_story_complete', { alcohol_id: String(id) });
+          if (!heardIds.includes(id)) {
+            const next = [...heardIds, id];
+            setHeardIds(next);
+            saveHeardStories(next);
+          }
+        }
         update({
           messages: [
             ...state.messages,
@@ -167,8 +180,6 @@ export function useAlcoholStory({
     phase: state.phase,
     heard: state.heard,
     asked: state.asked,
-    /** 이 탭에서 전체 글을 열어 본 적이 있는지 */
-    fullTextRead,
     messages: state.messages,
     pending: state.pending,
     paragraphs,
@@ -208,13 +219,8 @@ export function useAlcoholStory({
         pending: false,
       });
     },
-    openFullText: () => {
-      trackGA4Event('bartender_story_full_text', { alcohol_id: alcoholId });
-      if (fullTextRead) return;
-      const next = [...fullTextReads, id];
-      setFullTextReads(next);
-      saveFullTextReads(next);
-    },
+    openFullText: () =>
+      trackGA4Event('bartender_story_full_text', { alcohol_id: alcoholId }),
   };
   return { story, reset, persisted };
 }
