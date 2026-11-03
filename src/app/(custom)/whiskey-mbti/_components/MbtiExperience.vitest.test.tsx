@@ -160,7 +160,7 @@ describe('Whiskey MBTI campaign', () => {
     expect(sessionStorage.getItem('whiskey-mbti-progress')).toContain('INTJ-A');
 
     fireEvent.click(screen.getByRole('button', { name: '결과 보기' }));
-    fireEvent.click(await screen.findByRole('button', { name: '로그인' }));
+    fireEvent.click(await screen.findByRole('button', { name: '로그인하기' }));
     expect(push).toHaveBeenCalledWith('/login');
     unmount();
     auth.isLoggedIn = true;

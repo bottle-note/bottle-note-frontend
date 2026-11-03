@@ -40,7 +40,7 @@ describe('LoginModal returnTo 사용자 시나리오', () => {
 
     render(<LoginModal handleClose={handleClose} />);
 
-    screen.getByRole('button', { name: '로그인' }).click();
+    screen.getByRole('button', { name: '로그인하기' }).click();
 
     expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(
       '/explore?tab=EXPLORER_WHISKEY&keywords=macallan&regionIds=12',
@@ -56,7 +56,7 @@ describe('LoginModal returnTo 사용자 시나리오', () => {
       <LoginModal handleClose={handleClose} returnTo="/inquire/register" />,
     );
 
-    screen.getByRole('button', { name: '로그인' }).click();
+    screen.getByRole('button', { name: '로그인하기' }).click();
 
     expect(sessionStorage.getItem(LOGIN_RETURN_TO_KEY)).toBe(
       '/inquire/register',
