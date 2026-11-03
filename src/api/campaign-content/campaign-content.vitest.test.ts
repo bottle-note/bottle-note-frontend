@@ -41,6 +41,29 @@ describe('campaign content events', () => {
     );
   });
 
+  it('sequences events across campaign codes so later codes reuse the first visitor cookie', async () => {
+    let resolveView!: (response: Response) => void;
+    vi.mocked(fetch).mockReturnValueOnce(
+      new Promise<Response>((resolve) => {
+        resolveView = resolve;
+      }),
+    );
+    const { trackCampaignEvent } = await import('./campaign-content.api');
+
+    trackCampaignEvent('bartender-note-recommend', 'VIEW');
+    trackCampaignEvent('bartender-note-curation', 'VIEW');
+    trackCampaignEvent('bartender-note-review', 'VIEW');
+    expect(fetch).toHaveBeenCalledTimes(1);
+
+    resolveView({ ok: true } as Response);
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(3));
+    expect(vi.mocked(fetch).mock.calls.map(([url]) => url)).toEqual([
+      '/bottle-api/v1/campaign-contents/bartender-note-recommend/events',
+      '/bottle-api/v1/campaign-contents/bartender-note-curation/events',
+      '/bottle-api/v1/campaign-contents/bartender-note-review/events',
+    ]);
+  });
+
   it('failed events do not throw or prevent later events', async () => {
     vi.mocked(fetch).mockRejectedValueOnce(new Error('offline'));
     const { trackCampaignEvent } = await import('./campaign-content.api');
