@@ -45,3 +45,25 @@ describe('시나리오 숫자 범위 입력', () => {
     expect(onAnswer).toHaveBeenLastCalledWith({ kind: 'any' });
   });
 });
+
+describe('시나리오 질문의 이전으로', () => {
+  it('숫자 범위 질문은 상관없어요와 같은 줄에 두고, 누르면 돌아간다', () => {
+    const back = vi.fn();
+    render(
+      <ScenarioQuestionView
+        disabled={false}
+        onAnswer={vi.fn()}
+        back={back}
+        question={{
+          id: 902,
+          prompt: '도수를 골라 주세요',
+          input: { kind: 'range', min: 40, max: 60, step: 1, allowAny: true },
+        }}
+      />,
+    );
+    const nav = screen.getByRole('navigation', { name: '다른 보기' });
+    expect(nav).toHaveTextContent('상관없어요');
+    fireEvent.click(screen.getByRole('button', { name: '이전으로' }));
+    expect(back).toHaveBeenCalledTimes(1);
+  });
+});

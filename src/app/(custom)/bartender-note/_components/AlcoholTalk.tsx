@@ -35,6 +35,7 @@ export default function AlcoholTalk({
   onTogglePick,
   onWriteReview,
   onLeave,
+  back,
   home,
 }: {
   alcohol: ReviewAlcohol;
@@ -50,6 +51,8 @@ export default function AlcoholTalk({
   onWriteReview: () => void;
   /** 실제 술 상세 페이지로 나가기 직전에 부른다. */
   onLeave: () => void;
+  /** 돌아갈 단계가 없으면 비워 둔다. */
+  back?: () => void;
   home: () => void;
 }) {
   const others =
@@ -177,7 +180,8 @@ export default function AlcoholTalk({
         <div ref={endRef} />
       </div>
       {/* 고를 목록이 아니라 대화라 FlowNavigation의 구분선을 두지 않는다 */}
-      <nav aria-label="다른 보기" className="flex">
+      <nav aria-label="다른 보기" className="flex gap-x-16">
+        {back && <FlowTextAction onClick={back}>이전으로</FlowTextAction>}
         <FlowTextAction onClick={home}>처음으로</FlowTextAction>
       </nav>
       <FlowDock>
