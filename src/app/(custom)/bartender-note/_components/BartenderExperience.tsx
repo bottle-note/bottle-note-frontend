@@ -378,7 +378,6 @@ export default function BartenderExperience({
   };
 
   const header = getStepHeader(step, {
-    curationTitle: curation?.title,
     reviewMode: review.mode,
     // 다음 질문을 받는 동안은 방금 답한 질문의 번호를 둔다
     questionNumber: flow.answers.length + (flow.pending ? 0 : 1),

@@ -1252,6 +1252,9 @@ describe('바텐더 노트 큐레이션 추천', () => {
       await screen.findByRole('button', { name: '집에서 여는 첫 병' }),
     ).toBeInTheDocument();
     expect(
+      within(screen.getByRole('banner')).getByText('보틀노트 큐레이션'),
+    ).toBeInTheDocument();
+    expect(
       screen.getByRole('button', { name: '선물 5만 원대' }),
     ).toBeInTheDocument();
     expect(
@@ -1267,9 +1270,14 @@ describe('바텐더 노트 큐레이션 추천', () => {
 
     await choose('집에서 여는 첫 병');
 
+    const banner = screen.getByRole('banner');
     expect(
-      await within(screen.getByRole('banner')).findByText('집에서 여는 첫 병'),
+      await within(banner).findByText('보틀노트 큐레이션'),
     ).toBeInTheDocument();
+    // 큐레이션 흐름 헤더는 서브타이틀 없이 고정한다
+    expect(
+      within(banner).queryByText('집에서 여는 첫 병'),
+    ).not.toBeInTheDocument();
     const row = screen.getByRole('button', { name: /조니워커 블랙/ });
     expect(row).toHaveTextContent('블렌디드 · 40% · ★ 3.6');
     expect(within(row).getByText('스모키')).toBeInTheDocument();
