@@ -1711,14 +1711,26 @@ describe('바텐더 노트 리뷰', () => {
 describe('바텐더 노트 비로그인 행동', () => {
   const LOGIN_URL = '/login?returnTo=%2Fbartender-note';
 
-  const REVIEW_PROMPT = '리뷰는 로그인 후 남길 수 있어요.';
-  const PICKS_PROMPT = '찜은 로그인 후 쓸 수 있어요.';
+  const REVIEW_PROMPT = {
+    title: '지금 드신 술, 기록해 둘까요?',
+    action: '로그인하고 기록하기',
+  };
+  const PICKS_PROMPT = {
+    title: '마음에 든 술, 모아 둘까요?',
+    action: '로그인하고 찜하기',
+  };
 
   /** 로그인 안내 모달이 뜨면 로그인을 고른다. 모달 전에는 로그인 화면으로 가지 않는다. */
-  async function acceptLoginPrompt(title: string) {
+  async function acceptLoginPrompt({
+    title,
+    action,
+  }: {
+    title: string;
+    action: string;
+  }) {
     const prompt = await screen.findByRole('dialog', { name: title });
     expect(replace).not.toHaveBeenCalled();
-    fireEvent.click(within(prompt).getByRole('button', { name: '로그인' }));
+    fireEvent.click(within(prompt).getByRole('button', { name: action }));
   }
 
   /** 로그인 화면으로 갔다가 로그인을 마치고 바텐더 노트로 돌아온다. */
@@ -1832,7 +1844,9 @@ describe('바텐더 노트 비로그인 행동', () => {
     await openCurationDetail('글렌피딕 12년');
 
     await press('리뷰 작성');
-    const prompt = await screen.findByRole('dialog', { name: REVIEW_PROMPT });
+    const prompt = await screen.findByRole('dialog', {
+      name: REVIEW_PROMPT.title,
+    });
     fireEvent.click(
       within(prompt).getByRole('button', { name: '다음에 할게요' }),
     );
@@ -1853,7 +1867,7 @@ describe('바텐더 노트 비로그인 행동', () => {
     await openCurationDetail('글렌피딕 12년');
 
     await press('리뷰 작성');
-    await screen.findByRole('dialog', { name: REVIEW_PROMPT });
+    await screen.findByRole('dialog', { name: REVIEW_PROMPT.title });
 
     window.history.back();
 

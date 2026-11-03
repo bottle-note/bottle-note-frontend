@@ -59,11 +59,25 @@ const SELECT_SOURCE = {
   favorites: 'picks',
 } as const;
 
-/** 비로그인 사용자가 로그인이 필요한 동작을 눌렀을 때 모달에 보여 줄 안내. */
+/**
+ * 비로그인 사용자가 로그인이 필요한 동작을 눌렀을 때 모달에 보여 줄 안내.
+ * 게스트 게이트처럼 막는 말보다 로그인하면 얻는 것을 앞세운다. 찜은 찜하기와 찜한 술 보기 모두에 쓴다.
+ */
 type BartenderLoginTrigger = Extract<LoginTrigger, 'review_write' | 'picks'>;
-const LOGIN_PROMPT_TEXT: Record<BartenderLoginTrigger, string> = {
-  review_write: '리뷰는 로그인 후 남길 수 있어요.',
-  picks: '찜은 로그인 후 쓸 수 있어요.',
+const LOGIN_PROMPT: Record<
+  BartenderLoginTrigger,
+  { title: string; description: string; action: string }
+> = {
+  review_write: {
+    title: '지금 드신 술, 기록해 둘까요?',
+    description: '로그인하면 쓰던 자리에서 바로 이어 쓸 수 있어요.',
+    action: '로그인하고 기록하기',
+  },
+  picks: {
+    title: '마음에 든 술, 모아 둘까요?',
+    description: '로그인하면 찜한 술을 언제든 다시 볼 수 있어요.',
+    action: '로그인하고 찜하기',
+  },
 };
 
 /** 다음 질문이 이보다 늦으면 생각하는 자세를 보인다. */
@@ -609,9 +623,9 @@ export default function BartenderExperience({
       )}
       {loginPrompt && (
         <PromptModal
-          mainText={LOGIN_PROMPT_TEXT[loginPrompt.trigger]}
-          subText="로그인하면 지금 화면에서 바로 이어 갈 수 있어요."
-          actionText="로그인"
+          mainText={LOGIN_PROMPT[loginPrompt.trigger].title}
+          subText={LOGIN_PROMPT[loginPrompt.trigger].description}
+          actionText={LOGIN_PROMPT[loginPrompt.trigger].action}
           onAction={goToLogin}
           onClose={() => setLoginPrompt(null)}
         />
