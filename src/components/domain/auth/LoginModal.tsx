@@ -26,9 +26,10 @@ function LoginModal({ handleClose, returnTo }: Props) {
 
   return (
     <PromptModal
-      mainText="로그인이 필요한 서비스입니다."
-      subText="로그인 하시겠습니까?"
-      actionText="로그인"
+      // 어떤 동작에서 떴는지 모르고, 세션이 만료된 사용자에게도 뜨므로 어느 경우에도 맞는 말로 둔다
+      mainText="로그인하고 이어서 할까요?"
+      subText="간편 로그인으로 3초면 시작할 수 있어요."
+      actionText="로그인하기"
       onAction={handleLoginClick}
       onClose={handleClose}
     />
