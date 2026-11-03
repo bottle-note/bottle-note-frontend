@@ -32,6 +32,9 @@ export type LoginGatePage =
 // 다른 화면과 구분해야 하는 진입 위치. 값이 없으면 기존 화면(술 상세, 리뷰 작성 페이지)이다.
 export type FeatureSource = 'bartender_note' | 'home';
 
+// 바텐더 노트 안에서 리뷰를 시작한 경로. 일반 리뷰 작성 페이지에는 보내지 않는다.
+export type ReviewEntryFlow = 'direct' | 'recommend' | 'curation' | 'picks';
+
 // 홈 바로가기
 export type HomeQuickLink =
   | 'bartender_note'
@@ -67,15 +70,18 @@ export interface GA4EventMap {
   write_review_start: {
     alcohol_id: string;
     source?: FeatureSource;
+    entry_flow?: ReviewEntryFlow;
   };
   write_review_complete: {
     alcohol_id: string;
     source?: FeatureSource;
+    entry_flow?: ReviewEntryFlow;
   };
   write_review_failed: {
     alcohol_id: string;
     failure_type: 'image_upload' | 'rating_save' | 'review_save';
     source?: FeatureSource;
+    entry_flow?: ReviewEntryFlow;
   };
   add_to_picks: {
     alcohol_id: string;

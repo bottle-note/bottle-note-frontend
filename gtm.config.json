@@ -28,14 +28,17 @@
       "name": "rate_alcohol",
       "parameters": ["alcohol_id", "alcohol_name"]
     },
-    { "name": "write_review_start", "parameters": ["alcohol_id", "source"] },
+    {
+      "name": "write_review_start",
+      "parameters": ["alcohol_id", "source", "entry_flow"]
+    },
     {
       "name": "write_review_complete",
-      "parameters": ["alcohol_id", "source"]
+      "parameters": ["alcohol_id", "source", "entry_flow"]
     },
     {
       "name": "write_review_failed",
-      "parameters": ["alcohol_id", "failure_type", "source"]
+      "parameters": ["alcohol_id", "failure_type", "source", "entry_flow"]
     },
     {
       "name": "add_to_picks",
