@@ -2228,7 +2228,7 @@ describe('바텐더 노트 캠페인 지표', () => {
     expect(sent().filter((event) => event.endsWith(':VIEW'))).toHaveLength(3);
   });
 
-  it('추천은 시작·첫 잔 완료·로그인한 상세 결과를 한 번씩 보내고, 다른 후보 상세를 더 봐도 늘지 않는다', async () => {
+  it('추천은 첫 잔에서 완료, 다른 후보 목록에서 결과를 한 번씩 보내고, 후보 상세를 더 봐도 늘지 않는다', async () => {
     renderExperience();
     await answerTasteQuestions({
       kind: '상관없어요',
@@ -2238,11 +2238,14 @@ describe('바텐더 노트 캠페인 지표', () => {
     });
     await firstPick();
     await waitFor(() =>
-      expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']),
+      expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH']),
     );
 
     await press('다른 술도 보여주세요');
     await screen.findByText('바텐더가 고른 술');
+    await waitFor(() =>
+      expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']),
+    );
     // 1위가 아닌 두 번째 후보의 상세를 연다
     const rows = screen
       .getAllByRole('button')
@@ -2253,6 +2256,71 @@ describe('바텐더 노트 캠페인 지표', () => {
     expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
     expect(sent(CURATION)).toEqual(['VIEW']);
     expect(sent(REVIEW)).toEqual(['VIEW']);
+  });
+
+  it('비로그인은 첫 잔까지 보고, 다른 후보는 로그인 안내를 거쳐 로그인 후 목록에서 결과를 보낸다', async () => {
+    auth.loggedIn = false;
+    const { unmount } = renderExperience();
+    await answerTasteQuestions({
+      kind: '상관없어요',
+      axis: '상관없어요',
+      abv: '상관없어요',
+      price: '상관없어요',
+    });
+    await firstPick();
+
+    await press('다른 술도 보여주세요');
+    const prompt = await screen.findByRole('dialog', {
+      name: '다른 술도 골라 드릴까요?',
+    });
+    expect(screen.queryByText('바텐더가 고른 술')).not.toBeInTheDocument();
+    expect(trackGA4Event).toHaveBeenCalledWith('login_prompt_shown', {
+      trigger: 'other_candidates',
+    });
+    fireEvent.click(
+      within(prompt).getByRole('button', { name: '로그인하고 더 보기' }),
+    );
+    expect(replace).toHaveBeenCalledWith('/login?returnTo=%2Fbartender-note');
+    expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH']);
+
+    unmount();
+    auth.loggedIn = true;
+    renderExperience();
+
+    expect(await screen.findByText('바텐더가 고른 술')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']),
+    );
+    // 목록에서 뒤로 가면 첫 잔으로 돌아간다
+    await press('이전 단계');
+    expect(await firstPick()).toBeInTheDocument();
+  });
+
+  it('비로그인이 다른 후보 로그인 안내를 닫으면 첫 잔에 머문다', async () => {
+    auth.loggedIn = false;
+    renderExperience();
+    await answerTasteQuestions({
+      kind: '상관없어요',
+      axis: '상관없어요',
+      abv: '상관없어요',
+      price: '상관없어요',
+    });
+    await firstPick();
+    await press('다른 술도 보여주세요');
+    const prompt = await screen.findByRole('dialog', {
+      name: '다른 술도 골라 드릴까요?',
+    });
+    fireEvent.click(
+      within(prompt).getByRole('button', { name: '다음에 할게요' }),
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('dialog', { name: '다른 술도 골라 드릴까요?' }),
+      ).not.toBeInTheDocument(),
+    );
+    expect(await firstPick()).toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
   });
 
   it('추천 후보가 없어도 질문을 끝까지 답하면 완료를 보낸다', async () => {
@@ -2367,6 +2435,6 @@ describe('바텐더 노트 캠페인 지표', () => {
     await screen.findByText('등록 완료');
 
     expect(sent(REVIEW)).toEqual(['VIEW']);
-    expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
+    expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH']);
   });
 });

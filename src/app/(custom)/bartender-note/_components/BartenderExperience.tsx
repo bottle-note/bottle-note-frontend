@@ -90,6 +90,13 @@ const LOGIN_PROMPT = {
     description: '로그인하면 찜한 술을 한곳에 모아 볼 수 있어요.',
     action: '로그인하고 찜한 술 보기',
   },
+  /** 추천 첫 잔은 누구나 보고, 나머지 후보는 로그인 후에 보여 준다. */
+  otherCandidates: {
+    trigger: 'other_candidates',
+    title: '다른 술도 골라 드릴까요?',
+    description: '로그인하면 바텐더가 고른 술을 모두 볼 수 있어요.',
+    action: '로그인하고 더 보기',
+  },
 } satisfies Record<
   string,
   { trigger: LoginTrigger; title: string; description: string; action: string }
@@ -286,12 +293,16 @@ export default function BartenderExperience({
     if (step === 'review-preview') campaign.reach('review', 'FINISH');
   }, [step, !!selected, flow.query.data?.completed, !!curation]);
 
-  // 캠페인 결과: 추천·큐레이션은 로그인한 사용자에게 술 상세가 보일 때. 진행 중인 흐름 것만 보낸다
+  // 캠페인 결과는 로그인한 사용자에게만 보낸다. 진행 중인 흐름 것만 나간다
+  const hasCandidates = (flow.query.data?.candidates?.totalCount ?? 0) > 0;
   useEffect(() => {
-    if (!talkStep || !selected || authLoading || !isLoggedIn) return;
-    campaign.reach('recommend', 'RESULT');
-    campaign.reach('curation', 'RESULT');
-  }, [talkStep, !!selected, authLoading, isLoggedIn]);
+    if (authLoading || !isLoggedIn) return;
+    // 추천: 첫 잔 다음의 후보 목록. 비로그인은 로그인해야 이 목록을 본다
+    if (step === 'recommendations' && hasCandidates)
+      campaign.reach('recommend', 'RESULT');
+    // 큐레이션: 고른 술의 상세
+    if (step === 'detail' && selected) campaign.reach('curation', 'RESULT');
+  }, [step, hasCandidates, !!selected, authLoading, isLoggedIn]);
 
   const leave = (resume?: Step) =>
     saveSnapshot({
@@ -633,6 +644,8 @@ export default function BartenderExperience({
                 scenarioData?.candidates?.nextCursor
                 ? () => {
                     trackGA4Event('bartender_show_other_candidates');
+                    if (requireLogin('otherCandidates', 'recommendations'))
+                      return;
                     move('recommendations');
                   }
                 : undefined
