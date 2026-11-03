@@ -11,7 +11,6 @@ type StepMeta = {
 
 const NOTE = '바텐더 노트';
 const PICKS = '바텐더 추천';
-const SITUATION = '상황별 추천';
 const REVIEW = '리뷰 쓰기';
 
 const STEP_META: Record<Step, StepMeta> = {
@@ -19,9 +18,7 @@ const STEP_META: Record<Step, StepMeta> = {
   scenario: { title: NOTE, pose: 'idle' },
   'first-pick': { title: PICKS, pose: 'serve', progress: 100 },
   recommendations: { title: PICKS, pose: 'think', progress: 100 },
-  situation: { title: SITUATION, pose: 'think' },
-  curations: { title: SITUATION, subtitle: '상황별 큐레이션', pose: 'idle' },
-  'curation-empty': { title: SITUATION, pose: 'bow' },
+  curations: { title: '큐레이션 추천', pose: 'idle' },
   'curation-list': { title: PICKS, pose: 'idle', progress: 100 },
   favorites: { title: '찜한 술', pose: 'idle' },
   detail: { title: '오늘의 한 잔', pose: 'serve' },

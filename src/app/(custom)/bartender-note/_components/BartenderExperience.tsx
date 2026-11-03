@@ -27,10 +27,11 @@ import ScenarioCandidateList from './ScenarioCandidateList';
 import CandidateList, { isCandidateStep } from './CandidateList';
 import CurationFlow from './CurationFlow';
 import ReviewFlow from './ReviewFlow';
+import { reviewAlcoholFromDetails } from './reviewAlcohol';
 import {
-  reviewAlcoholFromDetails,
-  reviewAlcoholFromWhiskey,
-} from './reviewAlcohol';
+  useBartenderCuration,
+  useCurationChoices,
+} from './useBartenderCurations';
 import {
   getDialogue,
   getTalkCopy,
@@ -50,7 +51,6 @@ import { saveSnapshot, takeSnapshot } from './bartenderSnapshot';
 import type { AlcoholSelection, ReviewDraft, Step } from './types';
 import type { ScenarioContext } from '../_scenario/model';
 import { useScenarioFlow } from '../_scenario/useScenarioFlow';
-import type { Curation, Situation, Whiskey } from '../_data/demo';
 
 const SELECT_SOURCE = {
   recommendations: 'taste',
@@ -99,12 +99,8 @@ function StepError({
 }
 
 export default function BartenderExperience({
-  whiskies,
-  curations,
   scenarioContext,
 }: {
-  whiskies: Whiskey[];
-  curations: Curation[];
   scenarioContext: ScenarioContext;
 }) {
   const router = useRouter();
@@ -148,7 +144,6 @@ export default function BartenderExperience({
     restore: restoreReview,
   } = useReviewDraft();
   const [selection, setSelection] = useState<AlcoholSelection | null>(null);
-  const [situation, setSituation] = useState<Situation>('home');
   const [curationId, setCurationId] = useState<number | null>(null);
   const [postedReviewId, setPostedReviewId] = useState<number | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
@@ -166,17 +161,13 @@ export default function BartenderExperience({
     viewerId: user?.userId ?? null,
     enabled: requiresAlcohol && !authLoading,
   });
-  const demo =
-    selection?.source === 'demo'
-      ? whiskies.find(({ id }) => id === selection.id)
-      : undefined;
-  const selected = demo
-    ? reviewAlcoholFromWhiskey(demo)
-    : alcoholQuery.data
-      ? reviewAlcoholFromDetails(alcoholQuery.data)
-      : undefined;
+  const selected = alcoholQuery.data
+    ? reviewAlcoholFromDetails(alcoholQuery.data)
+    : undefined;
   const reviewStartedFor = useRef<number | null>(null);
-  const curation = curations.find((item) => item.id === curationId);
+  const curationChoices = useCurationChoices({ enabled: step === 'curations' });
+  const curationDetail = useBartenderCuration(curationId);
+  const curation = curationDetail.curation;
   const tracking = useTrackRecommendResult({
     step,
     context,
@@ -184,7 +175,7 @@ export default function BartenderExperience({
     response: flow.query.data,
     isSuccess: flow.query.isSuccess,
     curationId,
-    situation,
+    curationsEmpty: curationChoices.state === 'empty',
   });
 
   useEffect(() => {
@@ -195,7 +186,6 @@ export default function BartenderExperience({
     flow.restore(saved.scenario.answers, saved.scenario.versionId);
     restoreReview(saved.review, saved.lastReviewMode);
     setSelection(saved.selection);
-    setSituation(saved.situation);
     setCurationId(saved.curationId);
     setPostedReviewId(saved.postedReviewId);
     setResumeAfterLogin(saved.resumeAfterLogin ?? null);
@@ -240,7 +230,6 @@ export default function BartenderExperience({
       review: { ...review, photos: [] },
       lastReviewMode,
       selection,
-      situation,
       curationId,
       postedReviewId,
       stories: storyProgress.states,
@@ -369,6 +358,8 @@ export default function BartenderExperience({
     trackGA4Event('bartender_start', { entry });
     if (entry === 'review' && requireLogin('review_write', next)) return;
     if (entry === 'picks' && requireLogin('picks', next)) return;
+    // 큐레이션은 매번 첫 페이지부터 보여 준다
+    if (entry === 'situation') curationChoices.reset();
     move(next);
   };
   const writeReview = () => {
@@ -394,7 +385,8 @@ export default function BartenderExperience({
     step,
     detailOrigin: previous,
     selected,
-    curation,
+    curationTitle: curation?.title,
+    curationsState: curationChoices.state,
     notice,
     hasCandidates: (scenarioData?.candidates?.totalCount ?? 0) > 0,
     firstPickName: firstPick?.name,
@@ -456,9 +448,10 @@ export default function BartenderExperience({
                 action: startScenario,
               },
               {
-                title: '상황에 맞게 추천해 주세요',
-                description: '집 · 바 · 계절 · 선물 큐레이션으로',
-                action: () => start('situation', 'situation'),
+                title: '큐레이션으로 추천해 주세요',
+                description: '주제별로 모은 위스키에서 골라 드려요',
+                // GTM 기준을 지키려고 entry 값은 'situation'을 유지한다
+                action: () => start('situation', 'curations'),
               },
               {
                 title: '바텐더님과 함께 리뷰를 쓸게요',
@@ -515,8 +508,7 @@ export default function BartenderExperience({
       {isCandidateStep(step) && !(step === 'favorites' && picks.isLoading) && (
         <CandidateList
           step={step}
-          curation={curation}
-          whiskies={whiskies}
+          curationDetail={curationDetail}
           pickedItems={picks.items}
           hasMorePicks={picks.hasMore}
           onChoose={chooseAlcohol}
@@ -560,9 +552,7 @@ export default function BartenderExperience({
       )}
       <CurationFlow
         step={step}
-        curations={curations}
-        situation={situation}
-        setSituation={setSituation}
+        choices={curationChoices}
         setCurationId={setCurationId}
         move={move}
         home={home}

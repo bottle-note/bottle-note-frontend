@@ -13,7 +13,6 @@ import {
   FlowNavigation,
   FlowTextAction,
 } from './FlowControls';
-import { WhiskeyImage } from './WhiskeyRow';
 import ReviewPickStep from './ReviewPickStep';
 import { prefersReducedMotion } from './prefersReducedMotion';
 import RadarPreview from './RadarPreview';
@@ -105,18 +104,15 @@ export default function ReviewFlow({
       {label}
     </FlowAction>
   );
-  const bottleImage = (size: 40 | 44) =>
-    selected?.demoWhiskey ? (
-      <WhiskeyImage whiskey={selected.demoWhiskey} size={size} />
-    ) : (
-      <AlcoholImage
-        imageUrl={selected?.imageUrl ?? ''}
-        outerHeightClass={size === 40 ? 'h-40' : 'h-44'}
-        outerWidthClass={size === 40 ? 'w-40' : 'w-44'}
-        innerHeightClass={size === 40 ? 'h-32' : 'h-36'}
-        innerWidthClass="w-24"
-      />
-    );
+  const bottleImage = (size: 40 | 44) => (
+    <AlcoholImage
+      imageUrl={selected?.imageUrl ?? ''}
+      outerHeightClass={size === 40 ? 'h-40' : 'h-44'}
+      outerWidthClass={size === 40 ? 'w-40' : 'w-44'}
+      innerHeightClass={size === 40 ? 'h-32' : 'h-36'}
+      innerWidthClass="w-24"
+    />
+  );
   const whiskeySummary = selected && (
     <div className="rounded-lg border border-stroke-neutral-subtle">
       <button
@@ -158,19 +154,6 @@ export default function ReviewFlow({
               ? '평가 없음'
               : `★ ${selected.rating.toFixed(1)}${selected.ratingCount ? ` · 평가 ${selected.ratingCount}건` : ''}`}
           </p>
-          {(selected.glassPrice !== undefined ||
-            selected.bottlePrice !== undefined) && (
-            <p className="mb-0 mt-4">
-              대략 가격 ·{' '}
-              {selected.glassPrice
-                ? `한 잔 ${selected.glassPrice.toLocaleString()}원`
-                : '한 잔 정보 없음'}{' '}
-              ·{' '}
-              {selected.bottlePrice
-                ? `한 병 ${selected.bottlePrice.toLocaleString()}원`
-                : '한 병 정보 없음'}
-            </p>
-          )}
           {selected.tags.length > 0 && (
             <p className="mb-0 mt-8">
               {selected.tags.slice(0, 10).join(' · ')}

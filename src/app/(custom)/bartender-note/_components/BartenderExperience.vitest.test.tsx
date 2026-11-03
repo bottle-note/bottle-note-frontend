@@ -17,14 +17,18 @@ import type { PickMyBottleItem } from '@/api/my-bottle/types';
 import { RateApi } from '@/api/rate/rate.api';
 import { ReviewApi } from '@/api/review/review.api';
 import { ScenarioApi } from '@/api/scenario/scenario.api';
+import { CurationV2Api } from '@/api/curation-v2/curation-v2.api';
+import type {
+  CurationAlcohol,
+  CurationV2DetailItem,
+  CurationV2FeedItem,
+} from '@/api/curation-v2/types';
 import { ApiError } from '@/utils/ApiError';
 import BartenderExperience from './BartenderExperience';
-import type { Curation, Whiskey } from '../_data/demo';
 import {
   SCENARIO_CONTEXT,
   mockScenarioApi,
 } from '../_scenario/__fixtures__/scenario';
-import { demoWhiskies } from '../_data/demo';
 import * as scenarioApi from '../_scenario/scenarioApi';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 
@@ -61,90 +65,218 @@ vi.mock('@/hooks/auth/useAuthSession', () => ({
   }),
 }));
 
-const whiskies: Whiskey[] = [
+/** 술 상세 대역이 돌려줄 술. 시나리오 fixture가 쓰는 247·7007·575·504도 담는다. */
+type TestAlcohol = {
+  id: number;
+  name: string;
+  category: string;
+  abv: number;
+  rating: number | null;
+  tags: string[];
+};
+
+const alcohols: TestAlcohol[] = [
   {
     id: 101,
     name: '라프로익 10년',
     category: '싱글 몰트',
-    region: '아일라',
     abv: 40,
     rating: 4.0,
     tags: ['피트', '스모키', '바닷바람'],
-    bottlePrice: 89000,
-    glassPrice: 22000,
   },
   {
     id: 102,
     name: '아드벡 10년',
     category: '싱글 몰트',
-    region: '아일라',
     abv: 46,
     rating: 4.2,
     tags: ['피트', '스모키', '레몬'],
-    bottlePrice: 106000,
-    glassPrice: 24000,
   },
   {
     id: 103,
     name: '글렌피딕 12년',
     category: '싱글 몰트',
-    region: '스페이사이드',
     abv: 40,
     rating: 3.7,
     tags: ['사과', '배', '바닐라'],
-    bottlePrice: 68000,
-    glassPrice: 18000,
   },
   {
     id: 104,
     name: '조니워커 블랙',
     category: '블렌디드',
-    region: '스코틀랜드',
     abv: 40,
     rating: 3.6,
     tags: ['스모키', '바닐라', '과일'],
-    bottlePrice: 48000,
-    glassPrice: 14000,
   },
   {
     id: 105,
     name: '메이커스 마크',
     category: '버번',
-    region: '켄터키',
     abv: 45,
     rating: 3.8,
     tags: ['바닐라', '캐러멜', '오크'],
-    bottlePrice: 52000,
-    glassPrice: 15000,
+  },
+  {
+    id: 247,
+    name: '글렌피딕 12년',
+    category: '싱글 몰트',
+    abv: 40,
+    rating: 4.1,
+    tags: ['사과', '배', '바닐라', '과일'],
+  },
+  {
+    id: 7007,
+    name: '듀어스 12년',
+    category: '블렌디드',
+    abv: 40,
+    rating: 3.4,
+    tags: ['바닐라', '꿀', '과일', '부드러운'],
+  },
+  {
+    id: 575,
+    name: '메이커스 마크',
+    category: '버번',
+    abv: 45,
+    rating: 4,
+    tags: ['바닐라', '캐러멜', '오크', '부드러운'],
+  },
+  {
+    id: 504,
+    name: '불렛 라이',
+    category: '라이',
+    abv: 45,
+    rating: null,
+    tags: ['시나몬', '후추', '호밀', '스파이시'],
   },
 ];
 
-const curations: Curation[] = [
+/** GET /v2/curations/{id} payload의 술 한 항목. alcoholId가 null이면 보틀노트에 없는 술이다. */
+function curationAlcohol(id: number): CurationAlcohol {
+  const alcohol = alcohols.find((item) => item.id === id)!;
+  return {
+    stats: {
+      rating: alcohol.rating,
+      reviewCount: 3,
+      totalRatingsCount: alcohol.rating === null ? 0 : 12,
+      totalPickCount: 1,
+    },
+    source: 'BOTTLE_NOTE',
+    alcohol: {
+      alcoholId: alcohol.id,
+      korName: alcohol.name,
+      engName: '',
+      imageUrl: '',
+      abv: String(alcohol.abv),
+      regionName: '스코틀랜드',
+      korCategory: alcohol.category,
+      selectedTags: alcohol.tags,
+      volume: '700ml',
+    },
+    comment: null,
+  };
+}
+
+const unlistedAlcohol: CurationAlcohol = {
+  stats: null,
+  source: 'MANUAL',
+  alcohol: {
+    alcoholId: null,
+    korName: '보틀노트에 없는 술',
+    korCategory: '싱글 몰트',
+    abv: '43',
+    selectedTags: [],
+  },
+  comment: null,
+};
+
+/** 큐레이션 목록 첫 페이지 3개와 다음 페이지 1개. */
+const curationFixtures: {
+  id: number;
+  name: string;
+  payload: CurationAlcohol[];
+}[] = [
   {
     id: 1,
-    situation: 'home',
-    unit: 'bottle',
-    title: '집에서 여는 첫 병',
-    description: '처음엔 탄산, 다음엔 얼음, 마지막엔 그대로.',
-    whiskeyIds: [103, 104],
+    name: '집에서 여는 첫 병',
+    payload: [curationAlcohol(103), curationAlcohol(104)],
   },
   {
     id: 2,
-    situation: 'gift',
-    unit: 'bottle',
-    title: '선물 5만 원대',
-    description: '고마운 마음을 전하기 좋은 병.',
-    whiskeyIds: [104, 105],
+    name: '선물 5만 원대',
+    payload: [curationAlcohol(104), curationAlcohol(105)],
   },
   {
     id: 3,
-    situation: 'gift',
-    unit: 'bottle',
-    title: '선물 10만 원대',
-    description: '조금 더 신경 쓴 선물.',
-    whiskeyIds: [101, 102],
+    name: '선물 10만 원대',
+    payload: [curationAlcohol(101), curationAlcohol(102)],
+  },
+  {
+    id: 4,
+    name: '피트 입문 두 잔',
+    payload: [unlistedAlcohol, curationAlcohol(101)],
   },
 ];
+
+function curationItem(
+  fixture: (typeof curationFixtures)[number],
+): CurationV2DetailItem {
+  const item: CurationV2FeedItem = {
+    id: fixture.id,
+    name: fixture.name,
+    description: '큐레이션 설명은 길어서 바텐더 노트에는 보이지 않는다.',
+    coverImageUrl: '',
+    imageUrls: [],
+    exposureStartDate: '2026-10-01',
+    exposureEndDate: '2026-12-31',
+    displayOrder: fixture.id,
+    createAt: '2026-10-01T00:00:00',
+    payload: fixture.payload,
+  };
+  return {
+    ...item,
+    spec: {
+      id: 1,
+      code: 'RECOMMENDED_WHISKY',
+      name: '추천 위스키',
+      container: 'LIST',
+      responseSpec: {},
+    },
+  };
+}
+
+/** 큐레이션 피드·상세 대역. 피드는 커서로 3개씩 나눠 준다. */
+function stubCurationApi(fixtures = curationFixtures) {
+  const getFeed = vi
+    .spyOn(CurationV2Api, 'getFeed')
+    .mockImplementation(async ({ cursor, size = 10 }) => {
+      const start = cursor ? Number(cursor) : 0;
+      const items = fixtures.slice(start, start + size).map(curationItem);
+      const hasNext = start + size < fixtures.length;
+      return {
+        success: true,
+        code: 200,
+        data: { items },
+        errors: [],
+        meta: {
+          ...meta,
+          pagination: {
+            hasNext,
+            nextCursor: hasNext ? String(start + size) : null,
+          },
+        },
+      };
+    });
+  const getDetail = vi
+    .spyOn(CurationV2Api, 'getDetail')
+    .mockImplementation(async (id) => ({
+      success: true,
+      code: 200,
+      data: curationItem(fixtures.find((item) => item.id === Number(id))!),
+      errors: [],
+      meta,
+    }));
+  return { getFeed, getDetail };
+}
 
 const lookupItem: AlcoholLookupItem = {
   alcoholId: 900,
@@ -227,9 +359,9 @@ function stubPickApi() {
   return vi
     .spyOn(AlcoholsApi, 'putPick')
     .mockImplementation(async ({ alcoholId, isPicked }) => {
-      const whiskey = whiskies.find(({ id }) => id === Number(alcoholId));
+      const alcohol = alcohols.find(({ id }) => id === Number(alcoholId));
       serverPicks = isPicked
-        ? [pickItem(Number(alcoholId), whiskey?.name ?? ''), ...serverPicks]
+        ? [pickItem(Number(alcoholId), alcohol?.name ?? ''), ...serverPicks]
         : serverPicks.filter(
             (item) => item.baseMyBottleInfo.alcoholId !== Number(alcoholId),
           );
@@ -279,11 +411,7 @@ function renderExperience() {
   });
   return render(
     <QueryClientProvider client={client}>
-      <BartenderExperience
-        whiskies={whiskies}
-        curations={curations}
-        scenarioContext={SCENARIO_CONTEXT}
-      />
+      <BartenderExperience scenarioContext={SCENARIO_CONTEXT} />
     </QueryClientProvider>,
   );
 }
@@ -337,9 +465,13 @@ async function writeQuickReview(text: string) {
   await press('사진 없이 넘어갈게요');
 }
 
-async function openHomeCurationDetail(name: string) {
-  await choose('상황에 맞게 추천해 주세요');
-  await choose('집에서 마실 한 병');
+/** 큐레이션 목록 → 큐레이션의 술 목록 → 술 상세 순서로 연다. */
+async function openCurationDetail(
+  name: string,
+  curation = '집에서 여는 첫 병',
+) {
+  await choose('큐레이션으로 추천해 주세요');
+  await choose(curation);
   await press(new RegExp(name));
   await screen.findByRole('heading', { name });
 }
@@ -354,6 +486,7 @@ beforeEach(() => {
   window.sessionStorage.clear();
   serverPicks = [];
   stubPickApi();
+  stubCurationApi();
   vi.mocked(trackGA4Event).mockClear();
   vi.spyOn(AlcoholsApi, 'getWeeklyViewPopular').mockResolvedValue({
     success: true,
@@ -363,9 +496,7 @@ beforeEach(() => {
     meta,
   });
   vi.spyOn(AlcoholsApi, 'getAlcoholDetails').mockImplementation(async (id) => {
-    const whiskey = [...whiskies, ...demoWhiskies].find(
-      (item) => item.id === Number(id),
-    );
+    const alcohol = alcohols.find((item) => item.id === Number(id));
     const data =
       Number(id) === 900
         ? lookupDetails
@@ -374,12 +505,12 @@ beforeEach(() => {
             alcohols: {
               ...lookupDetails.alcohols,
               alcoholId: Number(id),
-              korName: whiskey!.name,
-              korCategory: whiskey!.category,
-              abv: String(whiskey!.abv),
-              rating: whiskey!.rating ?? 0,
-              totalRatingsCount: whiskey!.rating === null ? 0 : 12,
-              alcoholsTastingTags: whiskey!.tags,
+              korName: alcohol!.name,
+              korCategory: alcohol!.category,
+              abv: String(alcohol!.abv),
+              rating: alcohol!.rating ?? 0,
+              totalRatingsCount: alcohol!.rating === null ? 0 : 12,
+              alcoholsTastingTags: alcohol!.tags,
             },
           };
     return { success: true, code: 200, data, errors: [], meta };
@@ -728,7 +859,7 @@ describe('바텐더 노트 취향 추천', () => {
   it('대사 재생 중에도 하단 CTA의 첫 클릭으로 리뷰 작성을 시작할 수 있다', async () => {
     window.matchMedia = vi.fn().mockReturnValue({ matches: false });
     renderExperience();
-    await openHomeCurationDetail('글렌피딕 12년');
+    await openCurationDetail('글렌피딕 12년');
     await press('리뷰 작성');
     expect(
       await screen.findByRole('button', { name: /^내 느낌 한 줄/ }),
@@ -1026,16 +1157,40 @@ describe('바텐더 노트 첫 잔 이야기', () => {
   });
 });
 
-describe('바텐더 노트 상황별 추천', () => {
-  it('큐레이션이 하나뿐인 상황은 바로 술 목록을 보여 주고 술 상세로 이어진다', async () => {
+describe('바텐더 노트 큐레이션 추천', () => {
+  const events = (name: string) =>
+    vi.mocked(trackGA4Event).mock.calls.filter(([event]) => event === name);
+
+  it('큐레이션 제목 3개를 보여 주고, 고른 큐레이션의 술 목록에서 술 상세로 이어진다', async () => {
     renderExperience();
 
-    await choose('상황에 맞게 추천해 주세요');
-    await choose('집에서 마실 한 병');
+    await choose('큐레이션으로 추천해 주세요');
+
+    expect(
+      await screen.findByRole('button', { name: '집에서 여는 첫 병' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '선물 5만 원대' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '선물 10만 원대' }),
+    ).toBeInTheDocument();
+    // 긴 설명은 보이지 않고 제목만 보인다
+    expect(
+      screen.queryByText(/큐레이션 설명은 길어서/),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '피트 입문 두 잔' }),
+    ).not.toBeInTheDocument();
+
+    await choose('집에서 여는 첫 병');
 
     expect(
       await within(screen.getByRole('banner')).findByText('집에서 여는 첫 병'),
     ).toBeInTheDocument();
+    const row = screen.getByRole('button', { name: /조니워커 블랙/ });
+    expect(row).toHaveTextContent('블렌디드 · 40% · ★ 3.6');
+    expect(within(row).getByText('스모키')).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: '큐레이션 전체 보기' }),
     ).toHaveAttribute('href', '/curation/1');
@@ -1059,32 +1214,105 @@ describe('바텐더 노트 상황별 추천', () => {
     expect(dialogue()).toHaveTextContent(
       '「집에서 여는 첫 병」에 담긴 병이에요.',
     );
+    expect(AlcoholsApi.getAlcoholDetails).toHaveBeenCalledWith('104');
+    expect(events('bartender_select_alcohol')).toEqual([
+      ['bartender_select_alcohol', { alcohol_id: '104', source: 'situation' }],
+    ]);
   });
 
-  it('큐레이션이 여러 개인 상황은 큐레이션을 고르게 한다', async () => {
+  // HYE-91: 큐레이션 경로만 데모 데이터를 써서 설명이 없었고, 이야기를 권하지 않았다
+  it('큐레이션에서 고른 술의 상세에 설명이 있으면 이야기를 들을지 묻는다', async () => {
     renderExperience();
 
-    await choose('상황에 맞게 추천해 주세요');
-    await choose('선물용 위스키 추천');
-    await choose('선물 10만 원대');
+    await openCurationDetail('글렌피딕 12년');
 
+    const conversation = screen.getByRole('log', { name: '노트와 나눈 대화' });
     expect(
-      await screen.findByRole('button', { name: /아드벡 10년/ }),
-    ).toBeInTheDocument();
-    expect(
-      within(screen.getByRole('banner')).getByText('선물 10만 원대'),
+      await within(conversation).findByRole('button', { name: '들려주세요' }),
     ).toBeInTheDocument();
   });
 
-  it('큐레이션이 없는 상황은 취향 질문으로 이어갈 수 있다', async () => {
+  it('다른 큐레이션 보기로 다음 페이지를 받고, 마지막 페이지에서는 처음 큐레이션으로 돌아간다', async () => {
     renderExperience();
 
-    await choose('상황에 맞게 추천해 주세요');
-    await choose('바에서 마실 한 잔');
+    await choose('큐레이션으로 추천해 주세요');
+    await screen.findByRole('button', { name: '집에서 여는 첫 병' });
+    await press('다른 큐레이션 보기');
 
-    expect(dialogue()).toHaveTextContent(
-      '이 자리의 큐레이션은 지금 준비 중이에요.',
+    expect(
+      await screen.findByRole('button', { name: '피트 입문 두 잔' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '집에서 여는 첫 병' }),
+    ).not.toBeInTheDocument();
+    expect(CurationV2Api.getFeed).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        cursor: '3',
+        size: 3,
+        code: ['RECOMMENDED_WHISKY', 'WHISKY_PAIRING'],
+      }),
     );
+    expect(
+      screen.queryByRole('button', { name: '다른 큐레이션 보기' }),
+    ).not.toBeInTheDocument();
+
+    await press('처음 큐레이션부터 보기');
+
+    expect(
+      await screen.findByRole('button', { name: '집에서 여는 첫 병' }),
+    ).toBeInTheDocument();
+    // 받아 둔 페이지는 다시 조회하지 않는다
+    expect(CurationV2Api.getFeed).toHaveBeenCalledTimes(2);
+  });
+
+  it('보틀노트에 없는 술(alcoholId 없음)은 큐레이션 술 목록에서 뺀다', async () => {
+    renderExperience();
+
+    await choose('큐레이션으로 추천해 주세요');
+    await screen.findByRole('button', { name: '집에서 여는 첫 병' });
+    await press('다른 큐레이션 보기');
+    await choose('피트 입문 두 잔');
+
+    const row = await screen.findByRole('button', { name: /라프로익 10년/ });
+    expect(row).toHaveTextContent('1');
+    expect(screen.queryByText('보틀노트에 없는 술')).not.toBeInTheDocument();
+  });
+
+  it('큐레이션 목록을 불러오지 못하면 다시 시도할 수 있다', async () => {
+    vi.mocked(CurationV2Api.getFeed).mockRejectedValueOnce(
+      new Error('network'),
+    );
+    renderExperience();
+
+    await choose('큐레이션으로 추천해 주세요');
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      '큐레이션을 불러오지 못했어요.',
+    );
+    await press('다시 시도');
+
+    expect(
+      await screen.findByRole('button', { name: '집에서 여는 첫 병' }),
+    ).toBeInTheDocument();
+  });
+
+  it('보여 줄 큐레이션이 없으면 취향 질문으로 이어갈 수 있다', async () => {
+    stubCurationApi([]);
+    renderExperience();
+
+    await choose('큐레이션으로 추천해 주세요');
+
+    await waitFor(() =>
+      expect(dialogue()).toHaveTextContent(
+        '지금은 보여 드릴 큐레이션이 없어요.',
+      ),
+    );
+    expect(events('bartender_recommend_result')).toEqual([
+      [
+        'bartender_recommend_result',
+        { mode: 'situation', result_state: 'empty' },
+      ],
+    ]);
     await press('취향으로 골라 주세요');
 
     expect(await screen.findByText('질문 1')).toBeInTheDocument();
@@ -1094,7 +1322,7 @@ describe('바텐더 노트 상황별 추천', () => {
 describe('바텐더 노트 찜', () => {
   it('술 상세에서 찜하면 서버에 저장하고 처음 화면의 찜 목록에서 다시 볼 수 있다', async () => {
     const { unmount } = renderExperience();
-    await openHomeCurationDetail('글렌피딕 12년');
+    await openCurationDetail('글렌피딕 12년');
 
     await press('찜하기');
 
@@ -1162,7 +1390,7 @@ describe('바텐더 노트 찜', () => {
       new Error('찜하기 업데이트에 실패했습니다.'),
     );
     renderExperience();
-    await openHomeCurationDetail('글렌피딕 12년');
+    await openCurationDetail('글렌피딕 12년');
 
     await press('찜하기');
 
@@ -1180,7 +1408,7 @@ describe('바텐더 노트 리뷰', () => {
   it('술 상세에서 리뷰를 간편하게 작성해 등록하면 서버에 저장하고 내 리뷰로 갈 수 있다', async () => {
     const register = stubReviewApi();
     renderExperience();
-    await openHomeCurationDetail('글렌피딕 12년');
+    await openCurationDetail('글렌피딕 12년');
 
     await writeQuickReview('사과 향이 산뜻하고 부드러워요');
     await press('별점 없이 넘어갈게요');
@@ -1229,7 +1457,7 @@ describe('바텐더 노트 리뷰', () => {
       new Error('리뷰 등록에 실패했습니다.'),
     );
     renderExperience();
-    await openHomeCurationDetail('글렌피딕 12년');
+    await openCurationDetail('글렌피딕 12년');
     await writeQuickReview('사과 향이 산뜻해요');
     await press('별점 없이 넘어갈게요');
     await press('장소와 가격 건너뛰기');
@@ -1256,7 +1484,7 @@ describe('바텐더 노트 리뷰', () => {
       new Error('별점 등록에 실패했습니다.'),
     );
     renderExperience();
-    await openHomeCurationDetail('글렌피딕 12년');
+    await openCurationDetail('글렌피딕 12년');
     await writeQuickReview('사과 향이 산뜻해요');
 
     const rating = await screen.findByRole('slider', { name: '내 별점' });
@@ -1392,7 +1620,7 @@ describe('바텐더 노트 비로그인 행동', () => {
   it('술 상세에서 찜을 누르면 로그인 화면으로 가고, 로그인 후 같은 술 상세로 돌아온다', async () => {
     auth.loggedIn = false;
     const { unmount } = renderExperience();
-    await openHomeCurationDetail('글렌피딕 12년');
+    await openCurationDetail('글렌피딕 12년');
 
     await press('찜하기');
 
@@ -1412,7 +1640,7 @@ describe('바텐더 노트 비로그인 행동', () => {
   it('술 상세에서 리뷰 작성을 누르면 로그인 화면으로 가고, 로그인 후 리뷰 방식 고르기에서 이어진다', async () => {
     auth.loggedIn = false;
     const { unmount } = renderExperience();
-    await openHomeCurationDetail('글렌피딕 12년');
+    await openCurationDetail('글렌피딕 12년');
 
     await press('리뷰 작성');
 
@@ -1420,8 +1648,9 @@ describe('바텐더 노트 비로그인 행동', () => {
     returnAfterLogin(unmount);
 
     expect(await screen.findByText('어떻게 남길까요')).toBeInTheDocument();
+    // 돌아오면 고른 술의 상세를 다시 받은 뒤 리뷰 방식을 보여 준다
     expect(
-      screen.getByRole('button', { name: /내 느낌 한 줄로 쓸게요/ }),
+      await screen.findByRole('button', { name: /내 느낌 한 줄로 쓸게요/ }),
     ).toBeInTheDocument();
   });
 
@@ -1515,7 +1744,7 @@ describe('바텐더 노트 공통 이동', () => {
 
   it('술 상세 페이지에 다녀오면 보던 술 상세로 돌아오고 이전 목록으로 갈 수 있다', async () => {
     const { unmount } = renderExperience();
-    await openHomeCurationDetail('글렌피딕 12년');
+    await openCurationDetail('글렌피딕 12년');
 
     fireEvent.click(screen.getByRole('link', { name: '자세히 볼게요' }));
     unmount();
@@ -1544,7 +1773,7 @@ describe('바텐더 노트 공통 이동', () => {
     const now = Date.now();
     vi.spyOn(Date, 'now').mockReturnValue(now);
     const { unmount } = renderExperience();
-    await openHomeCurationDetail('글렌피딕 12년');
+    await openCurationDetail('글렌피딕 12년');
 
     fireEvent.click(screen.getByRole('link', { name: '자세히 볼게요' }));
     unmount();
