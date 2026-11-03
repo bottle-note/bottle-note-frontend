@@ -58,6 +58,8 @@ export default function AlcoholTalk({
       : undefined;
   const settled = useDialogueSettled();
   const [fullTextOpen, setFullTextOpen] = useState(false);
+  // 전체 글을 읽은 술에 다시 오면 펼쳐 둔다. 이번에 처음 연 글은 대화 중간에 끼워 넣지 않는다
+  const [fullTextExpanded] = useState(() => Boolean(story?.fullTextRead));
   const endRef = useRef<HTMLDivElement>(null);
   // 묻는 말풍선은 대사창 인사가 끝난 뒤에 붙고, 대답은 바텐더 말이 다 끝난 뒤에 올라온다
   const offerVisible = Boolean(
@@ -113,6 +115,20 @@ export default function AlcoholTalk({
           isTogglingPick={isTogglingPick}
           onTogglePick={onTogglePick}
         />
+        {story && fullTextExpanded && (
+          <BartenderBubble>
+            <span className="flex flex-col gap-8">
+              <span className="text-12 font-extrabold text-fg-brand">
+                지난번에 읽으신 이야기예요
+              </span>
+              {story.paragraphs.map((paragraph) => (
+                <span key={paragraph} className="block break-keep">
+                  {paragraph}
+                </span>
+              ))}
+            </span>
+          </BartenderBubble>
+        )}
         {story && offerVisible && (
           <BartenderBubble className={appear} actions={offerReplies}>
             {storyOffer(alcohol.id)}

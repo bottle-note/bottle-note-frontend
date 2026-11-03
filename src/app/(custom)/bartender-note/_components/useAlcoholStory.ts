@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import type { Pose } from './BarScene';
 import { getStoryDialogue, type StoryPhase } from './dialogue';
+import { loadFullTextReads, saveFullTextReads } from './fullTextReads';
 import { prefersReducedMotion } from './prefersReducedMotion';
 import {
   toDescriptionParagraphs,
@@ -53,6 +54,13 @@ const initialState: StoryState = {
   pending: false,
 };
 
+/** 전체 글을 이미 읽은 술은 들을지 묻지 않고 맺은 상태로 시작한다. */
+const readState: StoryState = {
+  ...initialState,
+  phase: 'settled',
+  asked: false,
+};
+
 /** 술 id별 이야기 진행. 페이지를 벗어날 때 스냅샷에 남긴다. */
 export type StoryStates = Record<number, StoryState>;
 
@@ -72,17 +80,27 @@ export function useAlcoholStory({
   greeting: string;
 }) {
   const [states, setStates] = useState<StoryStates>({});
+  // 처음 그릴 때는 술 이야기 화면이 아니라 서버 렌더와 어긋나지 않는다
+  const [fullTextReads, setFullTextReads] = useState<number[]>(() =>
+    typeof window === 'undefined' ? [] : loadFullTextReads(),
+  );
   const paragraphs = toDescriptionParagraphs(alcohol?.description);
   const id = alcohol?.id;
+  const fullTextRead = id !== undefined && fullTextReads.includes(id);
   const state =
-    id !== undefined && paragraphs ? states[id] ?? initialState : undefined;
+    id !== undefined && paragraphs
+      ? states[id] ?? (fullTextRead ? readState : initialState)
+      : undefined;
   const sentences = paragraphs ? toSentences(paragraphs[0]) : [];
 
   const update = (next: Partial<StoryState>) => {
     if (id === undefined) return;
     setStates((current) => ({
       ...current,
-      [id]: { ...(current[id] ?? initialState), ...next },
+      [id]: {
+        ...(current[id] ?? (fullTextRead ? readState : initialState)),
+        ...next,
+      },
     }));
   };
 
@@ -149,6 +167,8 @@ export function useAlcoholStory({
     phase: state.phase,
     heard: state.heard,
     asked: state.asked,
+    /** 이 탭에서 전체 글을 열어 본 적이 있는지 */
+    fullTextRead,
     messages: state.messages,
     pending: state.pending,
     paragraphs,
@@ -188,8 +208,13 @@ export function useAlcoholStory({
         pending: false,
       });
     },
-    openFullText: () =>
-      trackGA4Event('bartender_story_full_text', { alcohol_id: alcoholId }),
+    openFullText: () => {
+      trackGA4Event('bartender_story_full_text', { alcohol_id: alcoholId });
+      if (fullTextRead) return;
+      const next = [...fullTextReads, id];
+      setFullTextReads(next);
+      saveFullTextReads(next);
+    },
   };
   return { story, reset, persisted };
 }
