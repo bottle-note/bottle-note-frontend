@@ -484,6 +484,8 @@ beforeEach(() => {
   replace.mockClear();
   auth.loggedIn = true;
   window.sessionStorage.clear();
+  // 테스트마다 새 페이지로 들어온 것처럼 바텐더 노트 히스토리 표시를 지운다
+  window.history.replaceState(null, '');
   serverPicks = [];
   stubPickApi();
   stubCurationApi();
@@ -1450,6 +1452,12 @@ describe('바텐더 노트 리뷰', () => {
 
     await choose('내 리뷰 볼게요');
     expect(push).toHaveBeenCalledWith('/review/77');
+
+    // 완료 뒤 기기 뒤로 가기는 미리보기가 아닌 처음 화면으로 간다
+    window.history.back();
+    expect(
+      await screen.findByRole('button', { name: /^위스키 추천해 주세요/ }),
+    ).toBeInTheDocument();
   });
 
   it('리뷰 저장에 실패하면 미리보기에 남아 다시 등록할 수 있다', async () => {
@@ -1783,6 +1791,50 @@ describe('바텐더 노트 공통 이동', () => {
     expect(
       await screen.findByRole('button', { name: /^위스키 추천해 주세요/ }),
     ).toBeInTheDocument();
+  });
+
+  it('기기 뒤로 가기로 이전 질문에 돌아가면 그때 고른 답을 표시하고, 첫 질문 다음은 처음 화면이다', async () => {
+    renderExperience();
+    await choose('위스키 추천해 주세요');
+    await choose('싱글 몰트');
+    await choose('피트·스모키');
+    await screen.findByText('질문 3');
+
+    window.history.back();
+    await screen.findByText('질문 2');
+    expect(
+      await screen.findByRole('button', { name: /^피트·스모키/ }),
+    ).toHaveAttribute('aria-pressed', 'true');
+
+    window.history.back();
+    await screen.findByText('질문 1');
+    expect(
+      await screen.findByRole('button', { name: /^싱글 몰트/ }),
+    ).toHaveAttribute('aria-pressed', 'true');
+
+    window.history.back();
+    expect(
+      await screen.findByRole('button', { name: /^위스키 추천해 주세요/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('새로고침해도 보던 질문에서 이어 가고, 뒤로 가면 앞 질문과 고른 답이 나온다', async () => {
+    const { unmount } = renderExperience();
+    await choose('위스키 추천해 주세요');
+    await choose('싱글 몰트');
+    await choose('피트·스모키');
+    await screen.findByText('질문 3');
+
+    fireEvent(window, new Event('pagehide'));
+    unmount();
+    renderExperience();
+
+    expect(await screen.findByText('질문 3')).toBeInTheDocument();
+    await press('이전 질문');
+    await screen.findByText('질문 2');
+    expect(
+      await screen.findByRole('button', { name: /^피트·스모키/ }),
+    ).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('뒤로 가기는 이전 질문으로, 닫기는 제품 홈으로 이동한다', async () => {

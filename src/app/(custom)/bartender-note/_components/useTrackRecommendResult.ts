@@ -74,7 +74,9 @@ export function useTrackRecommendResult({
   ]);
 
   const restore = (saved: BartenderSnapshot) => {
-    const steps = [...saved.journey.history, saved.journey.step];
+    const steps = saved.journey.stack
+      .slice(0, saved.journey.index + 1)
+      .map(({ step }) => step);
     if (steps.includes('first-pick') || steps.includes('recommendations')) {
       lastResult.current = scenarioKey(
         saved.scenario.context,

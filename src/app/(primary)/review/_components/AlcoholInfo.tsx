@@ -272,7 +272,7 @@ function AlcoholTastingTags({ tags }: AlcoholTastingTagsProps) {
         >
           <X aria-hidden className="h-24 w-24" />
         </button>
-        <ul className="flex flex-wrap gap-8 overflow-y-auto px-20 pb-safe pt-24">
+        <ul className="flex flex-wrap gap-8 overflow-y-auto px-20 pb-safe-scroll pt-24">
           {uniqueTags.map((tag) => (
             <li
               key={tag}

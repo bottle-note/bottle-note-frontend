@@ -150,20 +150,13 @@
   :root {
     --radius: 0.5rem;
 
-    /* Safe area insets */
-    /* Android WebView fallback (JS에서 감지 시 설정됨) */
-    --android-safe-area-top: 0px;
-    --android-safe-area-bottom: 0px;
-
-    /* iOS env() 우선, Android fallback 적용 */
-    --safe-area-top: max(
-      env(safe-area-inset-top, 0px),
-      var(--android-safe-area-top)
-    );
-    --safe-area-bottom: max(
-      env(safe-area-inset-bottom, 0px),
-      var(--android-safe-area-bottom)
-    );
+    /* 웹 화면 중 시스템 UI(상태 표시줄, 홈 인디케이터)에 가려지는 높이.
+     * 브라우저가 env()로 알려 주고, 이 값을 padding으로 줘야 내용이 가려지지 않는다.
+     * - iOS: 웹이 시스템 UI 밑까지 그려져(layout.tsx viewportFit: 'cover') 값이 있다 (하단 34px 등)
+     * - Android 앱: 앱이 시스템 UI 자리를 비우고 그 사이에만 웹을 그려서 0
+     * FIXME(HYE-95): Android 앱도 웹이 이 여백을 맡도록 통일한다 */
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 
     /* Header heights */
     --header-height: 20px;
@@ -183,8 +176,11 @@
     --navbar-height: 64px;
     --navbar-total-space: calc(var(--navbar-height) + var(--safe-area-bottom));
 
-    /* 하단에 떠 있는 요소(CTA·안내)와 화면 바닥 사이 여백 */
-    --floating-bottom-offset: max(24px, calc(var(--safe-area-bottom) + 8px));
+    /* 하단 버튼 규칙: 화면이 그려지는 맨 아래(safe area 위)에서 12px 띄운다 */
+    --bottom-cta-gap: 12px;
+    --floating-bottom-offset: calc(
+      var(--safe-area-bottom) + var(--bottom-cta-gap)
+    );
   }
 }
 
@@ -275,7 +271,13 @@
     padding-bottom: var(--safe-area-bottom);
   }
 
+  /* 화면 하단에 붙은 버튼 영역: safe area 위로 12px */
   .pb-safe {
+    padding-bottom: calc(var(--safe-area-bottom) + var(--bottom-cta-gap));
+  }
+
+  /* 버튼이 아닌 스크롤 목록·본문의 끝 여백 */
+  .pb-safe-scroll {
     padding-bottom: max(32px, var(--safe-area-bottom));
   }
 

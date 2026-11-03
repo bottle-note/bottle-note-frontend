@@ -151,7 +151,7 @@ export default function AlcoholSearchBottomSheet({
         </div>
       </article>
 
-      <div className="flex-1 overflow-y-auto px-20 pb-safe">
+      <div className="flex-1 overflow-y-auto px-20 pb-safe-scroll">
         {isLoading || isSearching ? (
           <div className="space-y-8">
             {['a', 'b', 'c', 'd', 'e'].map((id) => (

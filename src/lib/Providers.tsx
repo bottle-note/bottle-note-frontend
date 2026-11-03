@@ -9,7 +9,6 @@ import { AuthProvider } from '@/lib/auth/AuthProvider';
 import { ThemeProvider } from '@/lib/theme/ThemeProvider';
 import { NotificationPollingBridge } from '@/components/domain/notification/NotificationPollingBridge';
 import { FocusScrollProvider } from './FocusScrollProvider';
-import { SafeAreaProvider } from './SafeAreaProvider';
 
 interface Props {
   children: ReactNode;
@@ -37,15 +36,13 @@ export const Providers = ({ children }: Props) => {
     <ThemeProvider>
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
-          <SafeAreaProvider>
-            <FocusScrollProvider>
-              <AuthInitializer />
-              <NotificationPollingBridge />
-              {children}
-              <Modal />
-              {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
-            </FocusScrollProvider>
-          </SafeAreaProvider>
+          <FocusScrollProvider>
+            <AuthInitializer />
+            <NotificationPollingBridge />
+            {children}
+            <Modal />
+            {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
+          </FocusScrollProvider>
         </QueryClientProvider>
       </AuthProvider>
     </ThemeProvider>

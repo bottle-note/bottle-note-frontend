@@ -49,7 +49,7 @@ import AlcoholTalk from './AlcoholTalk';
 import { useAlcoholStory } from './useAlcoholStory';
 import { saveSnapshot, takeSnapshot } from './bartenderSnapshot';
 import type { AlcoholSelection, ReviewDraft, Step } from './types';
-import type { ScenarioContext } from '../_scenario/model';
+import type { ScenarioAnswerValue, ScenarioContext } from '../_scenario/model';
 import { useScenarioFlow } from '../_scenario/useScenarioFlow';
 
 const SELECT_SOURCE = {
@@ -106,15 +106,13 @@ export default function BartenderExperience({
   const router = useRouter();
   const { user, isLoggedIn, isLoading: authLoading } = useAuthSession();
   const { bridgeToLogin } = useLoginBridge();
-  const {
-    step,
-    history,
-    previous,
-    move: moveStep,
-    back: backStep,
-    restart: restartJourney,
-    restore: restoreJourney,
-  } = useBartenderJourney();
+  const journey = useBartenderJourney((to) => {
+    // 기기·화면 뒤로 가기 모두 여기로 온다. 그 지점의 답 수로 질문을 맞춘다
+    setNotice(null);
+    flow.goTo(to.answers);
+  });
+  const { step, previous } = journey;
+  const selection = journey.position.selection;
   const [context, setContext] = useState(scenarioContext);
   const queryClient = useQueryClient();
   const flow = useScenarioFlow({
@@ -143,7 +141,6 @@ export default function BartenderExperience({
     reset: resetReview,
     restore: restoreReview,
   } = useReviewDraft();
-  const [selection, setSelection] = useState<AlcoholSelection | null>(null);
   const [curationId, setCurationId] = useState<number | null>(null);
   const [postedReviewId, setPostedReviewId] = useState<number | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
@@ -180,12 +177,15 @@ export default function BartenderExperience({
 
   useEffect(() => {
     const saved = takeSnapshot();
+    journey.init(saved?.journey);
     if (!saved) return;
-    restoreJourney(saved.journey);
     setContext(saved.scenario.context);
-    flow.restore(saved.scenario.answers, saved.scenario.versionId);
+    flow.restore(
+      saved.scenario.answers,
+      saved.scenario.versionId,
+      saved.scenario.trail,
+    );
     restoreReview(saved.review, saved.lastReviewMode);
-    setSelection(saved.selection);
     setCurationId(saved.curationId);
     setPostedReviewId(saved.postedReviewId);
     setResumeAfterLogin(saved.resumeAfterLogin ?? null);
@@ -217,24 +217,39 @@ export default function BartenderExperience({
     ) {
       setNotice(null);
       // 후보가 있으면 1위를 먼저 건넨다. 없으면 바로 빈 결과를 보여 준다.
+      // 마지막 질문 자리를 결과로 바꿔, 결과에서 뒤로 가면 마지막 질문이 나온다.
       const lead = flow.query.data.candidates?.items[0];
-      if (lead) setSelection({ id: lead.id, source: 'api' });
-      moveStep(lead ? 'first-pick' : 'recommendations');
+      journey.replace(
+        lead ? 'first-pick' : 'recommendations',
+        lead ? { selection: { id: lead.id, source: 'api' } } : undefined,
+      );
     }
   }, [step, flow.query.isSuccess, flow.query.data?.completed]);
 
   const leave = (resume?: Step) =>
     saveSnapshot({
-      journey: { step, history },
-      scenario: { context, answers: flow.answers, versionId: flow.versionId },
+      journey: journey.journey,
+      scenario: {
+        context,
+        answers: flow.answers,
+        trail: flow.trail,
+        versionId: flow.versionId,
+      },
       review: { ...review, photos: [] },
       lastReviewMode,
-      selection,
       curationId,
       postedReviewId,
       stories: storyProgress.states,
       resumeAfterLogin: resume,
     });
+  // 새로고침해도 보던 단계에서 이어 가도록 페이지를 떠나기 직전에 남겨 둔다
+  const leaveRef = useRef(leave);
+  leaveRef.current = leave;
+  useEffect(() => {
+    const save = () => leaveRef.current();
+    window.addEventListener('pagehide', save);
+    return () => window.removeEventListener('pagehide', save);
+  }, []);
   /** 비로그인이면 지금 화면을 남겨 두고 로그인 화면으로 보낸다. 로그인 후 resume 단계를 연다. */
   const requireLogin = (trigger: LoginTrigger, resume?: Step) => {
     if (isLoggedIn) return false;
@@ -242,40 +257,35 @@ export default function BartenderExperience({
     bridgeToLogin({ trigger });
     return true;
   };
-  const move = (next: Step) => {
+  const move: typeof journey.move = (next, patch) => {
     setNotice(null);
-    moveStep(next);
+    journey.move(next, patch);
   };
-  const back = () => {
+  const back = journey.back;
+  const restart: typeof journey.restart = (next, patch) => {
     setNotice(null);
-    if (step === 'scenario' && flow.canGoBack) {
-      flow.back();
-      return;
-    }
-    // 결과에서 질문으로 돌아갈 때만 마지막 답을 지운다. 목록 → 첫 잔은 답을 유지한다.
-    if (previous === 'scenario' && isScenarioStep(step)) flow.back();
-    backStep();
-  };
-  const restart = (next?: Step) => {
-    setNotice(null);
-    restartJourney(next);
+    journey.restart(next, patch);
   };
   const home = () => {
     restart();
     flow.reset();
     resetReview();
-    setSelection(null);
     reviewStartedFor.current = null;
     tracking.reset();
     resetStory();
   };
   const startScenario = () => {
     flow.reset();
-    setSelection(null);
     tracking.reset();
     resetStory();
     trackGA4Event('bartender_start', { entry: 'recommend' });
-    move('scenario');
+    move('scenario', { answers: 0, selection: null });
+  };
+  /** 답할 때마다 지나온 길에 남겨, 뒤로 가기로 이전 질문에 돌아갈 수 있게 한다. */
+  const answerQuestion = (value: ScenarioAnswerValue) => {
+    if (!flow.canAnswer) return;
+    flow.answer(value);
+    move('scenario', { answers: flow.answers.length + 1 });
   };
   const chooseAlcohol = (next: AlcoholSelection) => {
     if (step === 'recommendations' || isCandidateStep(step)) {
@@ -284,8 +294,7 @@ export default function BartenderExperience({
         source: SELECT_SOURCE[step],
       });
     }
-    setSelection(next);
-    move('detail');
+    move('detail', { selection: next });
   };
   const toggleFavorite = async () => {
     if (!selected || requireLogin('picks')) return;
@@ -334,7 +343,8 @@ export default function BartenderExperience({
         });
       reviewStartedFor.current = null;
       setPostedReviewId(reviewId);
-      restart('review-done');
+      // 등록한 리뷰로 돌아가 다시 등록하지 않게, 뒤로 가기는 처음 화면으로 간다
+      restart('review-done', { selection });
       if (!ratingSaved) setNotice('rating-failed');
     } catch (error) {
       trackGA4Event('write_review_failed', {
@@ -377,13 +387,9 @@ export default function BartenderExperience({
   /** 시나리오 응답을 그대로 그리는 단계. 첫 잔은 고른 술의 상세로 그린다. */
   const scenarioView = scenarioStep && step !== 'first-pick';
   const scenarioData = flow.query.data;
-  /** 결과에서 뒤로 가면 마지막 질문으로 돌아가는지. 목록 → 첫 잔은 단계만 되돌린다. */
-  const backToQuestion =
-    (step === 'scenario' && flow.canGoBack) ||
-    (scenarioStep && previous === 'scenario');
   const stepLines = getDialogue({
     step,
-    detailOrigin: previous,
+    detailOrigin: previous?.step,
     selected,
     curationTitle: curation?.title,
     curationsState: curationChoices.state,
@@ -405,10 +411,10 @@ export default function BartenderExperience({
   const talkOrigin: TalkOrigin =
     step === 'first-pick'
       ? 'first-pick'
-      : previous === 'recommendations' ||
-          previous === 'favorites' ||
-          previous === 'curation-list'
-        ? previous
+      : previous?.step === 'recommendations' ||
+          previous?.step === 'favorites' ||
+          previous?.step === 'curation-list'
+        ? previous.step
         : 'other';
   const dialogueLines =
     scenarioView && flow.query.isError && !flow.query.isFetchNextPageError
@@ -432,10 +438,8 @@ export default function BartenderExperience({
       pose={
         talkStory?.pose ?? (thinking && scenarioView ? 'think' : bartender.pose)
       }
-      onBack={
-        previous || (step === 'scenario' && flow.canGoBack) ? back : undefined
-      }
-      backLabel={backToQuestion ? '이전 질문' : '이전 단계'}
+      onBack={previous ? back : undefined}
+      backLabel={previous?.step === 'scenario' ? '이전 질문' : '이전 단계'}
       onClose={() => router.push(ROUTES.HOME)}
     >
       {step === 'intro' && (
@@ -486,8 +490,8 @@ export default function BartenderExperience({
                 key={scenarioData.question.id}
                 question={scenarioData.question}
                 disabled={!flow.canAnswer}
-                pendingAnswer={flow.pendingAnswer}
-                onAnswer={flow.answer}
+                selectedAnswer={flow.selectedAnswer}
+                onAnswer={answerQuestion}
               />
             )}
             {step === 'recommendations' &&
@@ -579,7 +583,6 @@ export default function BartenderExperience({
           }}
           startAnotherReview={() => {
             startAnother();
-            setSelection(null);
             reviewStartedFor.current = null;
             restart('review-pick');
           }}
