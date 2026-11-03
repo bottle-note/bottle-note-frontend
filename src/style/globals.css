@@ -150,10 +150,9 @@
   :root {
     --radius: 0.5rem;
 
-    /* Safe area insets
-     * iOS 앱·Safari: WebView가 화면 끝까지 그려지고 env()가 실제 값을 준다.
-     * Android 앱: 네이티브가 상태 표시줄·내비 바 자리를 WebView 밖으로 비워 두므로 env()는 0이다.
-     * 웹은 env()만 믿고 Android용 보정을 따로 더하지 않는다. */
+    /* 화면 위아래에서 시스템 UI(상태 표시줄, 홈 인디케이터)가 차지하는 높이
+     * - iOS: 실제 높이가 들어온다 (하단 34px 등)
+     * - Android 앱: 앱이 이 자리를 미리 비워 두므로 0 */
     --safe-area-top: env(safe-area-inset-top, 0px);
     --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 
