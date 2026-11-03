@@ -1,6 +1,7 @@
 import type { ReviewDraft, Step } from './types';
 import type { JourneyState } from './useBartenderJourney';
 import type { StoryStates } from './useAlcoholStory';
+import type { CampaignAttempt } from './useBartenderCampaign';
 import type { ScenarioAnswer, ScenarioContext } from '../_scenario/model';
 
 // v5: 상황 단계(situation·curation-empty)를 없애고 큐레이션 API로 바꿨다
@@ -26,6 +27,8 @@ export interface BartenderSnapshot {
   stories?: StoryStates;
   /** 로그인하러 나갈 때 이어서 열 단계. 로그인한 채로 돌아온 경우에만 연다. */
   resumeAfterLogin?: Step;
+  /** 진행 중인 캠페인 시도. 돌아와서 같은 완료·결과를 다시 보내지 않게 남긴다. */
+  campaign?: CampaignAttempt | null;
 }
 
 export function saveSnapshot(snapshot: BartenderSnapshot) {

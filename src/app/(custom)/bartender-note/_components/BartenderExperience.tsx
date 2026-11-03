@@ -46,6 +46,7 @@ import { useReviewDraft } from './useReviewDraft';
 import { useReviewSubmit, ReviewSubmitError } from './useReviewSubmit';
 import { useBartenderPose } from './useBartenderPose';
 import { useTrackRecommendResult } from './useTrackRecommendResult';
+import { useBartenderCampaign } from './useBartenderCampaign';
 import AlcoholTalk from './AlcoholTalk';
 import { useAlcoholStory } from './useAlcoholStory';
 import { saveSnapshot, takeSnapshot } from './bartenderSnapshot';
@@ -57,6 +58,12 @@ const SELECT_SOURCE = {
   recommendations: 'taste',
   'curation-list': 'situation',
   favorites: 'picks',
+} as const;
+
+const CAMPAIGN_BY_ENTRY = {
+  situation: 'curation',
+  review: 'review',
+  picks: null,
 } as const;
 
 /**
@@ -82,6 +89,13 @@ const LOGIN_PROMPT = {
     title: '찜한 술, 한눈에 볼까요?',
     description: '로그인하면 찜한 술을 한곳에 모아 볼 수 있어요.',
     action: '로그인하고 찜한 술 보기',
+  },
+  /** 추천 첫 잔은 누구나 보고, 나머지 후보는 로그인 후에 보여 준다. */
+  otherCandidates: {
+    trigger: 'other_candidates',
+    title: '다른 술도 골라 드릴까요?',
+    description: '로그인하면 바텐더가 고른 술을 모두 볼 수 있어요.',
+    action: '로그인하고 더 보기',
   },
 } satisfies Record<
   string,
@@ -211,11 +225,15 @@ export default function BartenderExperience({
     curationId,
     curationsEmpty: curationChoices.state === 'empty',
   });
+  const campaign = useBartenderCampaign();
 
   useEffect(() => {
     const saved = takeSnapshot();
-    journey.init(saved?.journey);
+    const { isNewVisit } = journey.init(saved?.journey);
+    // 새로고침·로그인 왕복·술 상세 페이지 복귀는 새 진입이 아니다
+    if (isNewVisit) campaign.view();
     if (!saved) return;
+    campaign.restore(saved.campaign);
     setContext(saved.scenario.context);
     flow.restore(
       saved.scenario.answers,
@@ -263,6 +281,29 @@ export default function BartenderExperience({
     }
   }, [step, flow.query.isSuccess, flow.query.data?.completed]);
 
+  // 캠페인 완료: 추천은 첫 잔이 보이거나 빈 결과에 닿을 때, 큐레이션은 술 목록이 보일 때, 리뷰는 미리보기
+  useEffect(() => {
+    if (
+      (step === 'first-pick' && selected) ||
+      (step === 'recommendations' && flow.query.data?.completed)
+    )
+      campaign.reach('recommend', 'FINISH');
+    if (step === 'curation-list' && curation)
+      campaign.reach('curation', 'FINISH');
+    if (step === 'review-preview') campaign.reach('review', 'FINISH');
+  }, [step, !!selected, flow.query.data?.completed, !!curation]);
+
+  // 캠페인 결과는 로그인한 사용자에게만 보낸다. 진행 중인 흐름 것만 나간다
+  const hasCandidates = (flow.query.data?.candidates?.totalCount ?? 0) > 0;
+  useEffect(() => {
+    if (authLoading || !isLoggedIn) return;
+    // 추천: 첫 잔 다음의 후보 목록. 비로그인은 로그인해야 이 목록을 본다
+    if (step === 'recommendations' && hasCandidates)
+      campaign.reach('recommend', 'RESULT');
+    // 큐레이션: 고른 술의 상세
+    if (step === 'detail' && selected) campaign.reach('curation', 'RESULT');
+  }, [step, hasCandidates, !!selected, authLoading, isLoggedIn]);
+
   const leave = (resume?: Step) =>
     saveSnapshot({
       journey: journey.journey,
@@ -278,6 +319,7 @@ export default function BartenderExperience({
       postedReviewId,
       stories: storyProgress.states,
       resumeAfterLogin: resume,
+      campaign: campaign.current(),
     });
   // 새로고침해도 보던 단계에서 이어 가도록 페이지를 떠나기 직전에 남겨 둔다
   const leaveRef = useRef(leave);
@@ -323,6 +365,12 @@ export default function BartenderExperience({
     reviewStartedFor.current = null;
     tracking.reset();
     resetStory();
+    campaign.end();
+  };
+  /** 처음 화면이나 다른 흐름(빈 큐레이션·빈 찜 목록)에서 추천을 새로 시작한다. 같은 추천 안의 다시 시작은 startScenario만 쓴다. */
+  const startRecommend = () => {
+    campaign.start('recommend');
+    startScenario();
   };
   const startScenario = () => {
     flow.reset();
@@ -392,6 +440,7 @@ export default function BartenderExperience({
           source: 'bartender_note',
         });
       reviewStartedFor.current = null;
+      campaign.reach('review', 'RESULT');
       setPostedReviewId(reviewId);
       // 등록한 리뷰로 돌아가 다시 등록하지 않게, 뒤로 가기는 처음 화면으로 간다
       restart('review-done', { selection });
@@ -416,6 +465,8 @@ export default function BartenderExperience({
   };
   const start = (entry: 'situation' | 'review' | 'picks', next: Step) => {
     trackGA4Event('bartender_start', { entry });
+    // 리뷰 시작은 로그인 안내 전에 센다. 찜한 술 보기는 재지 않는다
+    campaign.start(CAMPAIGN_BY_ENTRY[entry]);
     if (entry === 'review' && requireLogin('review', next)) return;
     if (entry === 'picks' && requireLogin('pickList', next)) return;
     // 큐레이션은 매번 첫 페이지부터 보여 준다
@@ -498,7 +549,7 @@ export default function BartenderExperience({
               {
                 title: '위스키 추천해 주세요',
                 description: '몇 가지 여쭤보고 골라 드려요',
-                action: startScenario,
+                action: startRecommend,
               },
               {
                 title: '큐레이션으로 추천해 주세요',
@@ -571,7 +622,7 @@ export default function BartenderExperience({
           back={stepBack}
           home={home}
           onLeave={() => leave()}
-          onStartScenario={startScenario}
+          onStartScenario={startRecommend}
         />
       )}
       {requiresAlcohol &&
@@ -593,6 +644,8 @@ export default function BartenderExperience({
                 scenarioData?.candidates?.nextCursor
                 ? () => {
                     trackGA4Event('bartender_show_other_candidates');
+                    if (requireLogin('otherCandidates', 'recommendations'))
+                      return;
                     move('recommendations');
                   }
                 : undefined
@@ -613,7 +666,7 @@ export default function BartenderExperience({
         setCurationId={setCurationId}
         move={move}
         home={home}
-        onStartScenario={startScenario}
+        onStartScenario={startRecommend}
       />
       {(!requiresAlcohol || selected) && (
         <ReviewFlow
@@ -637,6 +690,8 @@ export default function BartenderExperience({
           startAnotherReview={() => {
             startAnother();
             reviewStartedFor.current = null;
+            // 다른 술 리뷰는 새 시도로 센다
+            campaign.start('review');
             restart('review-pick');
           }}
         />

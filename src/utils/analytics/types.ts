@@ -10,7 +10,9 @@ export type LoginTrigger =
   | 'comment'
   | 'picks'
   | 'mypage'
-  | 'review_write';
+  | 'review_write'
+  // 바텐더 노트 추천 첫 잔 다음의 후보 목록
+  | 'other_candidates';
 
 export type LoginMethod = 'kakao' | 'apple';
 

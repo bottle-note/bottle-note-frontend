@@ -1,11 +1,19 @@
 import { apiClient } from '@/shared/api/apiClient';
 
-export type CampaignCode = 'whiskey-mbti' | 'whiskey-tarot';
+export type CampaignCode =
+  | 'whiskey-mbti'
+  | 'whiskey-tarot'
+  | 'bartender-note-recommend'
+  | 'bartender-note-review'
+  | 'bartender-note-curation';
 export type CampaignEventType = 'VIEW' | 'START' | 'FINISH' | 'RESULT';
 
 // Serializing requests lets the initial VIEW response establish the visitor
-// cookie before a quick START is sent. Nothing in the UI waits for this queue.
-const pendingByCode = new Map<CampaignCode, Promise<void>>();
+// cookie before a quick START is sent. The visitor cookie is shared by every
+// campaign code, so one queue serves all codes: a page that sends several VIEWs
+// at once (bartender note) still lands them on the same visitor. Nothing in the
+// UI waits for this queue.
+let pending: Promise<void> | null = null;
 
 async function sendEvent(code: CampaignCode, type: CampaignEventType) {
   const endpoint = `/campaign-contents/${code}/events`;
@@ -34,12 +42,8 @@ export function trackCampaignEvent(
   code: CampaignCode,
   type: CampaignEventType,
 ): void {
-  const pending = pendingByCode.get(code);
   const next = pending
     ? pending.then(() => sendEvent(code, type))
     : sendEvent(code, type);
-  pendingByCode.set(
-    code,
-    next.catch(() => {}),
-  );
+  pending = next.catch(() => {});
 }

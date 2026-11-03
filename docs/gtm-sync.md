@@ -105,7 +105,7 @@ pnpm run gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 | `bartender_story_skip`            | 「다음에요」(제안) 또는 「그만 들을게요」(이야기 중) 선택             | `alcohol_id`, `stage`   | 클릭당 1회                    |
 | `bartender_story_full_text`       | 「전체 글 보기」로 설명 전체 시트를 엶                                | `alcohol_id`            | 클릭당 1회                    |
 
-첫 잔은 상세와 같은 화면이라 건네는 것만으로 `bartender_select_alcohol`을 보내지 않는다. 첫 잔에서 바로 행동한 비율은 결과 이벤트 대비 `write_review_start`·`bartender_open_alcohol_page`·`add_to_picks`와 `bartender_show_other_candidates`를 함께 본다. 이야기는 첫 잔과 모든 바텐더 상세에서 설명이 있는 술에만 제안하므로, 제안 수는 결과 이벤트 수와 같지 않다. GA4 맞춤 측정기준에는 `entry`, `mode`, `result_state`, `source`, `trigger`, `stage`처럼 값이 제한된 항목만 등록하고 `alcohol_id`는 등록하지 않는다.
+첫 잔은 상세와 같은 화면이라 건네는 것만으로 `bartender_select_alcohol`을 보내지 않는다. 첫 잔에서 바로 행동한 비율은 결과 이벤트 대비 `write_review_start`·`bartender_open_alcohol_page`·`add_to_picks`와 `bartender_show_other_candidates`를 함께 본다. 비로그인 사용자가 다른 후보를 누르면 `bartender_show_other_candidates` 뒤에 `login_prompt_shown`(`trigger: other_candidates`)이 나가고, 로그인하면 후보 목록이 열린다. 이야기는 첫 잔과 모든 바텐더 상세에서 설명이 있는 술에만 제안하므로, 제안 수는 결과 이벤트 수와 같지 않다. GA4 맞춤 측정기준에는 `entry`, `mode`, `result_state`, `source`, `trigger`, `stage`처럼 값이 제한된 항목만 등록하고 `alcohol_id`는 등록하지 않는다.
 
 ## 홈 이벤트 기준
 
