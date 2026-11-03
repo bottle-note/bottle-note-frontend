@@ -12,7 +12,6 @@ import { FlowDock, FlowTextAction } from './FlowControls';
 import { prefersReducedMotion } from './prefersReducedMotion';
 import type { ReviewAlcohol } from './reviewAlcohol';
 import type { AlcoholStory, StoryMessage } from './useAlcoholStory';
-import { WhiskeyImage } from './WhiskeyRow';
 
 /** 가로 카드 한 줄에 들어가는 만큼만 보인다. */
 const TAG_LIMIT = 3;
@@ -268,19 +267,15 @@ function AlcoholCard({
       className="relative ml-40 flex items-center gap-12 rounded-xl border border-stroke-neutral-basement bg-bg-neutral-weak p-10 motion-safe:duration-500 motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95"
     >
       <span aria-hidden="true">
-        {alcohol.demoWhiskey ? (
-          <WhiskeyImage whiskey={alcohol.demoWhiskey} size={64} />
-        ) : (
-          <AlcoholImage
-            imageUrl={alcohol.imageUrl ?? ''}
-            outerHeightClass="h-64"
-            outerWidthClass="w-64"
-            // 술 이미지는 여백을 둔 정사각형이라 안쪽도 정사각형으로 둬야 병이 작아지지 않는다
-            innerHeightClass="h-58"
-            innerWidthClass="w-58"
-            priority
-          />
-        )}
+        <AlcoholImage
+          imageUrl={alcohol.imageUrl ?? ''}
+          outerHeightClass="h-64"
+          outerWidthClass="w-64"
+          // 술 이미지는 여백을 둔 정사각형이라 안쪽도 정사각형으로 둬야 병이 작아지지 않는다
+          innerHeightClass="h-58"
+          innerWidthClass="w-58"
+          priority
+        />
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-2 pr-32">
         <p className="m-0 truncate text-11 font-extrabold text-fg-brand">

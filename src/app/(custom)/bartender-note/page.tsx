@@ -1,5 +1,4 @@
 import BartenderExperience from './_components/BartenderExperience';
-import { demoCurations, demoWhiskies } from './_data/demo';
 
 export const metadata = {
   title: '바텐더 노트 | 보틀노트',
@@ -10,8 +9,6 @@ export const metadata = {
 export default function BartenderNotePage() {
   return (
     <BartenderExperience
-      whiskies={demoWhiskies}
-      curations={demoCurations}
       scenarioContext={{
         scenarioId: Number(process.env.BARTENDER_SCENARIO_ID ?? 3),
       }}

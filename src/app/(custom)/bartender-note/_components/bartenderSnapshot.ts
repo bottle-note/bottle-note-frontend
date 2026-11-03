@@ -2,9 +2,9 @@ import type { ReviewDraft, Step } from './types';
 import type { JourneyState } from './useBartenderJourney';
 import type { StoryStates } from './useAlcoholStory';
 import type { ScenarioAnswer, ScenarioContext } from '../_scenario/model';
-import type { Situation } from '../_data/demo';
 
-const STORAGE_KEY = 'bartender-note:snapshot:v4';
+// v5: 상황 단계(situation·curation-empty)를 없애고 큐레이션 API로 바꿨다
+const STORAGE_KEY = 'bartender-note:snapshot:v5';
 /** 다른 페이지에 다녀온 뒤 이어 보기를 허용하는 시간. 지나면 처음 화면부터 시작한다. */
 const RESUME_WITHIN_MS = 30 * 60 * 1000;
 
@@ -20,7 +20,6 @@ export interface BartenderSnapshot {
   };
   review: ReviewDraft;
   lastReviewMode: ReviewDraft['mode'];
-  situation: Situation;
   curationId: number | null;
   postedReviewId: number | null;
   /** 술 이야기 진행. 술 상세에 다녀와도 들은 이야기를 펼친 채로 돌려준다. */

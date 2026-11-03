@@ -21,7 +21,7 @@ export function useTrackRecommendResult({
   response,
   isSuccess,
   curationId,
-  situation,
+  curationsEmpty,
 }: {
   step: Step;
   context: ScenarioContext;
@@ -29,7 +29,8 @@ export function useTrackRecommendResult({
   response: ScenarioStepResponse | undefined;
   isSuccess: boolean;
   curationId: number | null;
-  situation: string;
+  /** 큐레이션 목록을 받았는데 비어 있는지 */
+  curationsEmpty: boolean;
 }) {
   const lastResult = useRef<string | null>(null);
   useEffect(() => {
@@ -53,9 +54,9 @@ export function useTrackRecommendResult({
         key: `curation:${curationId}`,
         result: { mode: 'situation', result_state: 'exact' },
       };
-    } else if (step === 'curation-empty') {
+    } else if (step === 'curations' && curationsEmpty) {
       viewed = {
-        key: `curation-empty:${situation}`,
+        key: 'curations-empty',
         result: { mode: 'situation', result_state: 'empty' },
       };
     }
@@ -69,7 +70,7 @@ export function useTrackRecommendResult({
     response,
     isSuccess,
     curationId,
-    situation,
+    curationsEmpty,
   ]);
 
   const restore = (saved: BartenderSnapshot) => {
@@ -83,8 +84,6 @@ export function useTrackRecommendResult({
       );
     } else if (steps.includes('curation-list')) {
       lastResult.current = `curation:${saved.curationId}`;
-    } else if (steps.includes('curation-empty')) {
-      lastResult.current = `curation-empty:${saved.situation}`;
     }
   };
   return {

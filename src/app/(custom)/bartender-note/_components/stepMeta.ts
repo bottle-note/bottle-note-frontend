@@ -11,18 +11,16 @@ type StepMeta = {
 
 const NOTE = '바텐더 노트';
 const PICKS = '바텐더 추천';
-const SITUATION = '상황별 추천';
 const REVIEW = '리뷰 쓰기';
+const CURATION = '보틀노트 큐레이션';
 
 const STEP_META: Record<Step, StepMeta> = {
   intro: { title: NOTE, pose: 'greet' },
   scenario: { title: NOTE, pose: 'idle' },
   'first-pick': { title: PICKS, pose: 'serve', progress: 100 },
   recommendations: { title: PICKS, pose: 'think', progress: 100 },
-  situation: { title: SITUATION, pose: 'think' },
-  curations: { title: SITUATION, subtitle: '상황별 큐레이션', pose: 'idle' },
-  'curation-empty': { title: SITUATION, pose: 'bow' },
-  'curation-list': { title: PICKS, pose: 'idle', progress: 100 },
+  curations: { title: CURATION, pose: 'idle' },
+  'curation-list': { title: CURATION, pose: 'idle', progress: 100 },
   favorites: { title: '찜한 술', pose: 'idle' },
   detail: { title: '오늘의 한 잔', pose: 'serve' },
   'review-pick': { title: REVIEW, subtitle: '어떤 술인가요', pose: 'idle' },
@@ -62,11 +60,9 @@ function reviewProgressSteps(mode: ReviewDraft['mode']): Step[] {
 export function getStepHeader(
   step: Step,
   {
-    curationTitle,
     reviewMode,
     questionNumber,
   }: {
-    curationTitle?: string;
     reviewMode: ReviewDraft['mode'];
     questionNumber?: number;
   },
@@ -75,11 +71,7 @@ export function getStepHeader(
   const reviewSteps = reviewProgressSteps(reviewMode);
   const review = reviewSteps.indexOf(step);
   const subtitle =
-    step === 'scenario'
-      ? `질문 ${questionNumber}`
-      : step === 'curation-list'
-        ? curationTitle ?? ''
-        : meta.subtitle ?? '';
+    step === 'scenario' ? `질문 ${questionNumber}` : meta.subtitle ?? '';
   const progress =
     step === 'scenario'
       ? undefined

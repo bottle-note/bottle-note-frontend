@@ -1,5 +1,6 @@
 import type { Step } from './types';
-import type { Curation, Whiskey } from '../_data/demo';
+import type { ReviewAlcohol } from './reviewAlcohol';
+import type { CurationsState } from './useBartenderCurations';
 
 /** 바텐더가 방금 일어난 일을 알리는 대사. 다른 단계로 넘어가면 사라진다. */
 export type Notice =
@@ -13,8 +14,10 @@ export type DialogueInput = {
   step: Step;
   /** 상세 직전 단계. 추천 이유와 큐레이션 설명 중 무엇을 말할지 정한다. */
   detailOrigin?: Step;
-  selected?: Pick<Whiskey, 'name' | 'tags'>;
-  curation?: Curation;
+  selected?: Pick<ReviewAlcohol, 'name' | 'tags'>;
+  curationTitle?: string;
+  /** 큐레이션 목록 조회 상태. 목록이 비면 취향 추천으로 잇는다. */
+  curationsState?: CurationsState;
   notice?: Notice | null;
   /** 좁혀진 후보 수는 대사에도 쓰지 않는다. 있는지 여부만 받는다. */
   hasCandidates: boolean;
@@ -33,10 +36,20 @@ const notices: Record<Notice, string> = {
     '리뷰는 올렸는데 별점은 저장하지 못했어요.\n술 상세 페이지에서 별점을 다시 남겨 주세요.',
 };
 
-function detailReason({ detailOrigin, selected, curation }: DialogueInput) {
+function detailReason({
+  detailOrigin,
+  selected,
+  curationTitle,
+}: DialogueInput) {
   if (!selected) return undefined;
-  if (detailOrigin === 'curation-list')
-    return `「${curation?.title}」에 담긴 병이에요.\n${selected.tags.slice(0, 2).join('·')} 향이 중심입니다.`;
+  if (detailOrigin === 'curation-list') {
+    const opening = curationTitle
+      ? `「${curationTitle}」에 담긴 병이에요.`
+      : '큐레이션에 담긴 병이에요.';
+    return selected.tags.length > 0
+      ? `${opening}\n${selected.tags.slice(0, 2).join('·')} 향이 중심입니다.`
+      : opening;
+  }
   if (detailOrigin === 'favorites')
     return '찜해 두신 병이네요.\n오늘은 이걸로 드릴까요?';
   return undefined;
@@ -50,8 +63,14 @@ export function firstPickGreeting(name?: string) {
 }
 
 export function getDialogue(input: DialogueInput): string[] {
-  const { step, hasCandidates, firstPickName, pickCount, curation, selected } =
-    input;
+  const {
+    step,
+    hasCandidates,
+    firstPickName,
+    pickCount,
+    curationsState,
+    selected,
+  } = input;
   if (input.notice) return [notices[input.notice]];
   const reason = detailReason(input);
   const dialogue: Record<Step, string[]> = {
@@ -65,14 +84,17 @@ export function getDialogue(input: DialogueInput): string[] {
         ? '다른 후보도 함께 보여 드릴게요.\n마음에 드는 위스키가 있나요?'
         : '추천 후보가 없어요.\n이전 질문으로 돌아가 다시 골라 볼까요?',
     ],
-    situation: ['어떤 자리인가요?\n자리에 맞는 큐레이션으로 안내해 드릴게요.'],
-    curations: ['이런 큐레이션이 있어요.\n어느 쪽이 끌리세요?'],
-    'curation-empty': [
-      '이 자리의 큐레이션은 지금 준비 중이에요.\n대신 취향을 여쭤보고 골라 드릴까요?',
+    curations: [
+      curationsState === 'empty'
+        ? '지금은 보여 드릴 큐레이션이 없어요.\n대신 취향을 여쭤보고 골라 드릴까요?'
+        : curationsState === 'error'
+          ? '큐레이션을 불러오지 못했어요.\n다시 시도해 주세요.'
+          : curationsState === 'loading'
+            ? '큐레이션을 준비하고 있어요.'
+            : '이런 큐레이션이 있어요.\n어느 쪽이 끌리세요?',
     ],
-    'curation-list': [
-      curation?.description ?? '큐레이션에 담긴 순서대로 보여 드릴게요.',
-    ],
+    // 큐레이션 설명은 길어 말풍선에 담지 않는다. 제목은 상단에 보인다
+    'curation-list': ['큐레이션에 담긴 순서대로 보여 드릴게요.'],
     favorites: [
       pickCount === 0
         ? '아직 찜해 둔 술이 없네요.\n취향에 맞는 술부터 찾아볼까요?'
