@@ -1715,9 +1715,13 @@ describe('바텐더 노트 비로그인 행동', () => {
     title: '지금 드신 술, 기록해 둘까요?',
     action: '로그인하고 기록하기',
   };
-  const PICKS_PROMPT = {
+  const PICK_PROMPT = {
     title: '마음에 든 술, 모아 둘까요?',
     action: '로그인하고 찜하기',
+  };
+  const PICK_LIST_PROMPT = {
+    title: '찜한 술, 한눈에 볼까요?',
+    action: '로그인하고 찜한 술 보기',
   };
 
   /** 로그인 안내 모달이 뜨면 로그인을 고른다. 모달 전에는 로그인 화면으로 가지 않는다. */
@@ -1771,9 +1775,13 @@ describe('바텐더 노트 비로그인 행동', () => {
     const { unmount } = renderExperience();
 
     await press('찜한 술 보기');
-    await acceptLoginPrompt(PICKS_PROMPT);
+    await acceptLoginPrompt(PICK_LIST_PROMPT);
 
     expect(replace).toHaveBeenCalledWith(LOGIN_URL);
+    // 찜한 술 보기도 찜하기와 같은 GA 트리거로 센다
+    expect(trackGA4Event).toHaveBeenCalledWith('login_prompt_shown', {
+      trigger: 'picks',
+    });
     expect(MyBottleApi.getPicks).not.toHaveBeenCalled();
     returnAfterLogin(unmount);
 
@@ -1787,7 +1795,7 @@ describe('바텐더 노트 비로그인 행동', () => {
     const { unmount } = renderExperience();
 
     await press('찜한 술 보기');
-    await acceptLoginPrompt(PICKS_PROMPT);
+    await acceptLoginPrompt(PICK_LIST_PROMPT);
     returnAfterLogin(unmount);
 
     expect(await screen.findByText('찜한 술이 없어요.')).toBeInTheDocument();
@@ -1805,7 +1813,7 @@ describe('바텐더 노트 비로그인 행동', () => {
     await openCurationDetail('글렌피딕 12년');
 
     await press('찜하기');
-    await acceptLoginPrompt(PICKS_PROMPT);
+    await acceptLoginPrompt(PICK_PROMPT);
 
     expect(replace).toHaveBeenCalledWith(LOGIN_URL);
     expect(AlcoholsApi.putPick).not.toHaveBeenCalled();
