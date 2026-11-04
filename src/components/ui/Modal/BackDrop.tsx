@@ -1,14 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
+import { createPortal } from 'react-dom';
 import { useBlockScroll } from '@/hooks/useBlockScroll';
+import { cn } from '@/lib/utils';
 
 interface Props {
   isShow: boolean;
   isModal?: boolean;
   children: React.ReactNode;
   onBackdropClick?: () => void;
+  className?: string;
 }
 
 function BackDrop({
@@ -16,6 +18,7 @@ function BackDrop({
   isModal = true,
   children,
   onBackdropClick,
+  className,
 }: Props) {
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget && onBackdropClick) {
@@ -24,7 +27,12 @@ function BackDrop({
   };
   const ModalContents = (
     <div
-      className={`fixed inset-0 z-40 ${isModal && 'bg-bg-overlay'} ${isShow ? 'block' : 'hidden'}`}
+      className={cn(
+        'fixed inset-0 z-40',
+        isModal && 'bg-bg-overlay',
+        isShow ? 'block' : 'hidden',
+        className,
+      )}
       onClick={handleBackdropClick}
       onKeyDown={(e) => {
         if (e.key === 'Escape' && onBackdropClick) {
@@ -51,7 +59,7 @@ function BackDrop({
   }, [isShow]);
 
   if (isBrowser) {
-    return ReactDOM.createPortal(
+    return createPortal(
       ModalContents,
       document.getElementById('modal') as Element,
     ) as React.ReactNode;
