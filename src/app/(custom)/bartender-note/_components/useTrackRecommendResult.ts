@@ -22,6 +22,7 @@ export function useTrackRecommendResult({
   isSuccess,
   curationId,
   curationsEmpty,
+  scenarioUnavailable,
 }: {
   step: Step;
   context: ScenarioContext;
@@ -31,6 +32,8 @@ export function useTrackRecommendResult({
   curationId: number | null;
   /** 큐레이션 목록을 받았는데 비어 있는지 */
   curationsEmpty: boolean;
+  /** 질문 추천 화면이 준비 중 안내로 바뀌었는지 */
+  scenarioUnavailable: boolean;
 }) {
   const lastResult = useRef<string | null>(null);
   useEffect(() => {
@@ -54,6 +57,11 @@ export function useTrackRecommendResult({
         key: `curation:${curationId}`,
         result: { mode: 'situation', result_state: 'exact' },
       };
+    } else if (scenarioUnavailable) {
+      viewed = {
+        key: `scenario-unavailable:${context.scenarioId}`,
+        result: { mode: 'taste', result_state: 'unavailable' },
+      };
     } else if (step === 'curations' && curationsEmpty) {
       viewed = {
         key: 'curations-empty',
@@ -71,6 +79,7 @@ export function useTrackRecommendResult({
     isSuccess,
     curationId,
     curationsEmpty,
+    scenarioUnavailable,
   ]);
 
   const restore = (saved: BartenderSnapshot) => {

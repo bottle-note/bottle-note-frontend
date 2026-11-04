@@ -52,7 +52,10 @@ import { useAlcoholStory } from './useAlcoholStory';
 import { saveSnapshot, takeSnapshot } from './bartenderSnapshot';
 import type { AlcoholSelection, ReviewDraft, Step } from './types';
 import type { ScenarioAnswerValue, ScenarioContext } from '../_scenario/model';
-import { useScenarioFlow } from '../_scenario/useScenarioFlow';
+import {
+  isScenarioUnavailable,
+  useScenarioFlow,
+} from '../_scenario/useScenarioFlow';
 
 const SELECT_SOURCE = {
   recommendations: 'taste',
@@ -124,6 +127,41 @@ function LoadingStep() {
       <span className="text-15">정보를 불러오고 있어요…</span>
       <SkeletonBase height={48} count={3} />
     </div>
+  );
+}
+
+/** 처음 화면과 준비 중 안내가 같은 문구로 권하는 추천 방법. */
+const CURATION_OPTION = {
+  title: '큐레이션으로 추천해 주세요',
+  description: '주제별로 모은 위스키에서 골라 드려요',
+};
+const REVIEW_OPTION = {
+  title: '바텐더님과 함께 리뷰를 쓸게요',
+  description: '지금 드시는 술을 기록해 드려요',
+};
+
+/** 질문 추천이 준비 중일 때. 다시 시도해도 같아서 다른 방법으로 안내한다. */
+function ScenarioUnavailable({
+  onCuration,
+  onReview,
+  home,
+}: {
+  onCuration: () => void;
+  onReview: () => void;
+  home: () => void;
+}) {
+  return (
+    <>
+      <OptionList
+        items={[
+          { ...CURATION_OPTION, action: onCuration },
+          { ...REVIEW_OPTION, action: onReview },
+        ]}
+      />
+      <FlowNavigation>
+        <FlowTextAction onClick={home}>처음으로</FlowTextAction>
+      </FlowNavigation>
+    </>
   );
 }
 
@@ -224,6 +262,13 @@ export default function BartenderExperience({
   const curationChoices = useCurationChoices({ enabled: step === 'curations' });
   const curationDetail = useBartenderCuration(curationId);
   const curation = curationDetail.curation;
+  /** 질문·결과를 보던 중 시나리오가 404였다. 미리 확인하기 전에 눌렀거나 진행 중에 게시가 내려간 경우다. */
+  const scenarioClosed =
+    isScenarioStep(step) &&
+    step !== 'first-pick' &&
+    flow.query.isError &&
+    !flow.query.isFetchNextPageError &&
+    isScenarioUnavailable(flow.query.error);
   const tracking = useTrackRecommendResult({
     step,
     context,
@@ -232,6 +277,7 @@ export default function BartenderExperience({
     isSuccess: flow.query.isSuccess,
     curationId,
     curationsEmpty: curationChoices.state === 'empty',
+    scenarioUnavailable: scenarioClosed,
   });
   const campaign = useBartenderCampaign();
 
@@ -513,6 +559,7 @@ export default function BartenderExperience({
     hasCandidates: (scenarioData?.candidates?.totalCount ?? 0) > 0,
     firstPickName: firstPick?.name,
     pickCount: picks.isLoading ? undefined : picks.items.length,
+    scenarioUnavailable: flow.unavailable,
   });
   const {
     story,
@@ -532,8 +579,9 @@ export default function BartenderExperience({
           previous?.step === 'curation-list'
         ? previous.step
         : 'other';
-  const dialogueLines =
-    scenarioView && flow.query.isError && !flow.query.isFetchNextPageError
+  const dialogueLines = scenarioClosed
+    ? ['질문 추천은 지금 준비하고 있어요.\n대신 다른 방법으로 골라 드릴게요.']
+    : scenarioView && flow.query.isError && !flow.query.isFetchNextPageError
       ? ['질문을 불러오지 못했어요. 다시 시도해 주세요.']
       : scenarioView && !scenarioData
         ? ['질문을 준비하고 있어요.']
@@ -564,18 +612,20 @@ export default function BartenderExperience({
             items={[
               {
                 title: '위스키 추천해 주세요',
-                description: '몇 가지 여쭤보고 골라 드려요',
+                // 준비 중이면 메뉴는 그대로 두고 누를 수 없게 한다. 확인 전에는 지금처럼 들어간다
+                description: flow.unavailable
+                  ? '지금은 준비하고 있어요'
+                  : '몇 가지 여쭤보고 골라 드려요',
+                disabled: flow.unavailable,
                 action: startRecommend,
               },
               {
-                title: '큐레이션으로 추천해 주세요',
-                description: '주제별로 모은 위스키에서 골라 드려요',
+                ...CURATION_OPTION,
                 // GTM 기준을 지키려고 entry 값은 'situation'을 유지한다
                 action: () => start('situation', 'curations'),
               },
               {
-                title: '바텐더님과 함께 리뷰를 쓸게요',
-                description: '지금 드시는 술을 기록해 드려요',
+                ...REVIEW_OPTION,
                 action: () => start('review', 'review-pick'),
               },
             ]}
@@ -588,7 +638,13 @@ export default function BartenderExperience({
         </>
       )}
       {scenarioView &&
-        (flow.query.isError && !flow.query.isFetchNextPageError ? (
+        (scenarioClosed ? (
+          <ScenarioUnavailable
+            onCuration={() => start('situation', 'curations')}
+            onReview={() => start('review', 'review-pick')}
+            home={home}
+          />
+        ) : flow.query.isError && !flow.query.isFetchNextPageError ? (
           <StepError
             onRetry={() => void flow.retry()}
             onRestart={startScenario}
@@ -638,7 +694,14 @@ export default function BartenderExperience({
           back={stepBack}
           home={home}
           onLeave={() => leave()}
-          onStartScenario={startRecommend}
+          emptyPicksAction={
+            flow.unavailable
+              ? {
+                  label: CURATION_OPTION.title,
+                  onClick: () => start('situation', 'curations'),
+                }
+              : { label: '위스키 추천해 주세요', onClick: startRecommend }
+          }
         />
       )}
       {requiresAlcohol &&
@@ -683,6 +746,9 @@ export default function BartenderExperience({
         move={move}
         home={home}
         onStartScenario={startRecommend}
+        scenarioUnavailable={flow.unavailable}
+        onStartReview={() => start('review', 'review-pick')}
+        onShowPicks={() => start('picks', 'favorites')}
       />
       {(!requiresAlcohol || selected) && (
         <ReviewFlow

@@ -105,6 +105,8 @@ pnpm run gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 | `bartender_story_skip`            | 「다음에요」(제안) 또는 「그만 들을게요」(이야기 중) 선택             | `alcohol_id`, `stage`   | 클릭당 1회                    |
 | `bartender_story_full_text`       | 「전체 글 보기」로 설명 전체 시트를 엶                                | `alcohol_id`            | 클릭당 1회                    |
 
+`bartender_recommend_result`의 `result_state`는 `exact`·`similar`·`available`·`empty`·`unavailable`이다. `unavailable`은 질문·결과 화면에서 시나리오 조회가 404(없음·비활성·게시본 없음, 진행 중 게시 내림)여서 결과 대신 큐레이션·리뷰를 권한 경우이며 `mode: taste`로 시나리오당 1회 보낸다. 이때 추천 캠페인 FINISH는 보내지 않는다. 첫 화면에서 추천 메뉴가 비활성으로 보이는 것만으로는 보내지 않는다.
+
 첫 잔은 상세와 같은 화면이라 건네는 것만으로 `bartender_select_alcohol`을 보내지 않는다. 첫 잔에서 바로 행동한 비율은 결과 이벤트 대비 `write_review_start`·`bartender_open_alcohol_page`·`add_to_picks`와 `bartender_show_other_candidates`를 함께 본다. 비로그인 사용자가 다른 후보를 누르면 `bartender_show_other_candidates` 뒤에 `login_prompt_shown`(`trigger: other_candidates`)이 나가고, 로그인하면 후보 목록이 열린다. 이야기는 첫 잔과 모든 바텐더 상세에서 설명이 있는 술에만 제안하므로, 제안 수는 결과 이벤트 수와 같지 않다. GA4 맞춤 측정기준에는 `entry`, `mode`, `result_state`, `source`, `trigger`, `stage`처럼 값이 제한된 항목만 등록하고 `alcohol_id`는 등록하지 않는다.
 
 ### 리뷰 유입 경로와 캠페인 집계

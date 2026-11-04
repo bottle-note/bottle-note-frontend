@@ -170,12 +170,12 @@ beforeEach(() => mockScenarioApi());
 afterEach(() => vi.restoreAllMocks());
 
 describe('시나리오 진행 hook의 소비자 흐름', () => {
-  it('비활성 상태에서는 조회하지 않고 진입한 뒤 첫 질문을 표시한다', async () => {
+  it('비활성 상태에서는 첫 질문만 미리 받아 두고, 진입하면 다시 조회하지 않고 표시한다', async () => {
     const request = vi.spyOn(scenarioApi, 'getScenarioStep');
     const { rerenderScenario } = renderScenario({ active: false });
     expect(screen.getByText('시나리오 대기 중')).toBeInTheDocument();
-    expect(request).not.toHaveBeenCalled();
     expect(screen.getByRole('button', { name: '이전 질문' })).toBeDisabled();
+    await waitFor(() => expect(request).toHaveBeenCalledTimes(1));
 
     rerenderScenario({ active: true });
     await screen.findByRole('button', { name: '싱글 몰트' });
