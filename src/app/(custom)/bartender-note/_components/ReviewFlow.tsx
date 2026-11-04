@@ -6,18 +6,15 @@ import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import TastingRadarChart from '@/app/(primary)/review/_components/form/TastingRadarChart';
 import { TASTING_AXES, TASTING_MAX_VALUE } from '@/constants/tastingNote';
+import SearchBarLink from '@/components/feature/Search/SearchBarLink';
 import type { ReviewDraft, Step } from './types';
 import { OptionList, FlowAction } from './FlowControls';
 import ReviewPickStep from './ReviewPickStep';
+import PlaceSearchStep from './PlaceSearchStep';
 import { prefersReducedMotion } from './prefersReducedMotion';
 import RadarPreview from './RadarPreview';
 import ReviewComposer from './ReviewComposer';
-import {
-  ReviewFieldLabel,
-  ReviewSegmented,
-  reviewChip,
-  reviewTextInput,
-} from './ReviewInputs';
+import { OptionTitle, ReviewSegmented, reviewChip } from './ReviewInputs';
 import type { ReviewAlcohol } from './reviewAlcohol';
 import {
   flavorFromText,
@@ -65,6 +62,8 @@ type Props = {
   updateReview: (value: Partial<ReviewDraft>) => void;
   selected?: ReviewAlcohol;
   move: (next: Step) => void;
+  /** 한 단계 되짚는다. 장소를 고르면 장소·가격 단계로 돌아갈 때 쓴다. */
+  back: () => void;
   home: () => void;
   onPickAlcohol: (alcoholId: number) => void;
   lastReviewMode: ReviewDraft['mode'];
@@ -81,6 +80,7 @@ export default function ReviewFlow({
   updateReview,
   selected,
   move,
+  back,
   home,
   onPickAlcohol,
   lastReviewMode,
@@ -222,8 +222,8 @@ export default function ReviewFlow({
       )}
       <small className="text-13 text-fg-neutral-muted">
         {[
-          review.place,
-          review.price
+          review.place?.name,
+          review.price && review.unit
             ? `${Number(review.price).toLocaleString()}원 / ${review.unit === 'glass' ? '1잔' : '보틀'}`
             : '',
           review.photos.length ? `사진 ${review.photos.length}장` : '',
@@ -449,22 +449,28 @@ export default function ReviewFlow({
       {step === 'review-where' && (
         <>
           {whiskeySummary}
-          <div className="flex flex-col gap-8">
-            <ReviewFieldLabel htmlFor="reviewPlace" optional>
-              장소
-            </ReviewFieldLabel>
-            <input
-              id="reviewPlace"
-              className={reviewTextInput}
-              value={review.place}
-              onChange={(event) => updateReview({ place: event.target.value })}
-              placeholder="바 이름이나 집"
+          <section className="flex flex-col gap-8">
+            <OptionTitle iconSrc="/icon/marker-subcoral.svg">장소</OptionTitle>
+            <SearchBarLink
+              ariaLabel={
+                review.place ? `장소 ${review.place.name} 바꾸기` : '장소 검색'
+              }
+              placeholder="장소 검색"
+              keyword={review.place?.name}
+              onOpen={() => move('review-place')}
+              onClear={() => updateReview({ place: null })}
             />
-          </div>
-          <div className="flex flex-col gap-8">
-            <ReviewFieldLabel htmlFor="reviewPrice" optional>
-              가격
-            </ReviewFieldLabel>
+            {review.place && (
+              <p className="m-0 px-4 text-13 text-fg-neutral-muted">
+                {[review.place.category, review.place.address]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </p>
+            )}
+          </section>
+          <section className="flex flex-col gap-8">
+            <OptionTitle iconSrc="/icon/money-subcoral.svg">가격</OptionTitle>
+            {/* 선택 입력이라 고른 단위를 다시 누르면 해제한다. 단위가 없으면 금액도 비운다 */}
             <ReviewSegmented
               label="가격 단위"
               value={review.unit}
@@ -472,29 +478,45 @@ export default function ReviewFlow({
                 { value: 'glass', label: '1잔' },
                 { value: 'bottle', label: '보틀(1병)' },
               ]}
-              onChange={(unit) => updateReview({ unit })}
-            />
-            <input
-              id="reviewPrice"
-              className={reviewTextInput}
-              inputMode="numeric"
-              value={review.price}
-              onChange={(event) =>
-                updateReview({
-                  price: event.target.value.replace(/\D/g, ''),
-                })
+              onChange={(unit) =>
+                updateReview(
+                  unit === review.unit ? { unit: null, price: '' } : { unit },
+                )
               }
-              placeholder="금액 (원)"
             />
-          </div>
+            <div className="flex h-28 items-center border-b border-stroke-brand-solid text-15 has-[:disabled]:opacity-45">
+              <input
+                aria-label="가격"
+                className="h-full min-w-0 flex-1 bg-transparent pr-8 text-15 text-fg-neutral outline-none placeholder:text-fg-neutral-muted focus-visible:ring-2 focus-visible:ring-stroke-focus-ring"
+                inputMode="numeric"
+                disabled={!review.unit}
+                value={review.price}
+                onChange={(event) =>
+                  updateReview({
+                    price: event.target.value.replace(/\D/g, ''),
+                  })
+                }
+                placeholder="얼마에 마셨는지 기록해보세요!"
+              />
+              <span className="shrink-0 text-fg-brand">원</span>
+            </div>
+          </section>
           {/* 장소·가격은 선택 입력이라 버튼 하나로 넘어간다. 다른 단계처럼 입력 여부에 따라 문구만 바꾼다 */}
           {action(
-            review.place.trim() || review.price
+            review.place || review.price
               ? '다 됐어요'
               : '장소·가격 없이 넘어갈게요',
             () => move('review-preview'),
           )}
         </>
+      )}
+      {step === 'review-place' && (
+        <PlaceSearchStep
+          onPick={(place) => {
+            updateReview({ place });
+            back();
+          }}
+        />
       )}
       {step === 'review-preview' && (
         <>
@@ -528,7 +550,7 @@ export default function ReviewFlow({
             {
               title: '다른 술도 기록할게요',
               description: review.place
-                ? `「${review.place}」 장소는 이어서 채워 둘게요`
+                ? `「${review.place.name}」 장소는 이어서 채워 둘게요`
                 : '지금 자리에서 마신 다른 술',
               action: startAnotherReview,
             },
