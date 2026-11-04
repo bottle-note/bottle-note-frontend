@@ -25,6 +25,8 @@ export type DialogueInput = {
   firstPickName?: string;
   /** 불러온 찜 수. 아직 불러오는 중이면 비워 둔다. */
   pickCount?: number;
+  /** 질문 추천(시나리오)이 준비 중이다. 빈 큐레이션·빈 찜에서 다른 길을 권한다. */
+  scenarioUnavailable?: boolean;
 };
 
 const notices: Record<Notice, string> = {
@@ -70,6 +72,7 @@ export function getDialogue(input: DialogueInput): string[] {
     pickCount,
     curationsState,
     selected,
+    scenarioUnavailable,
   } = input;
   if (input.notice) return [notices[input.notice]];
   const reason = detailReason(input);
@@ -86,7 +89,9 @@ export function getDialogue(input: DialogueInput): string[] {
     ],
     curations: [
       curationsState === 'empty'
-        ? '지금은 보여 드릴 큐레이션이 없어요.\n대신 취향을 여쭤보고 골라 드릴까요?'
+        ? scenarioUnavailable
+          ? '지금은 보여 드릴 큐레이션이 없어요.\n오늘 드신 술을 함께 기록해 볼까요?'
+          : '지금은 보여 드릴 큐레이션이 없어요.\n대신 취향을 여쭤보고 골라 드릴까요?'
         : curationsState === 'error'
           ? '큐레이션을 불러오지 못했어요.\n다시 시도해 주세요.'
           : curationsState === 'loading'
@@ -97,7 +102,9 @@ export function getDialogue(input: DialogueInput): string[] {
     'curation-list': ['큐레이션에 담긴 순서대로 보여 드릴게요.'],
     favorites: [
       pickCount === 0
-        ? '아직 찜해 둔 술이 없네요.\n취향에 맞는 술부터 찾아볼까요?'
+        ? scenarioUnavailable
+          ? '아직 찜해 둔 술이 없네요.\n큐레이션에서 끌리는 술부터 찾아볼까요?'
+          : '아직 찜해 둔 술이 없네요.\n취향에 맞는 술부터 찾아볼까요?'
         : '찜해 둔 술입니다.\n오늘은 어느 쪽으로 드릴까요?',
     ],
     detail: [

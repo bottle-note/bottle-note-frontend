@@ -104,7 +104,7 @@ export default function CandidateList({
   back,
   home,
   onLeave,
-  onStartScenario,
+  emptyPicksAction,
 }: {
   step: CandidateStep;
   curationDetail: ReturnType<typeof useBartenderCuration>;
@@ -116,7 +116,8 @@ export default function CandidateList({
   back?: () => void;
   home: () => void;
   onLeave: () => void;
-  onStartScenario: () => void;
+  /** 찜이 비었을 때 권하는 추천. 질문 추천이 준비 중이면 큐레이션으로 바뀐다. */
+  emptyPicksAction: { label: string; onClick: () => void };
 }) {
   const { curation } = curationDetail;
   if (step === 'curation-list' && !curation) {
@@ -191,7 +192,9 @@ export default function CandidateList({
             ))}
       </div>
       {step === 'favorites' && empty && (
-        <FlowAction onClick={onStartScenario}>위스키 추천해 주세요</FlowAction>
+        <FlowAction onClick={emptyPicksAction.onClick}>
+          {emptyPicksAction.label}
+        </FlowAction>
       )}
       <FlowNavigation>
         {step === 'curation-list' && (

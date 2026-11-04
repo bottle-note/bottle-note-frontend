@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import {
+  infiniteQueryOptions,
   useInfiniteQuery,
   useQueryClient,
   type QueryKey,
 } from '@tanstack/react-query';
+import { ApiError } from '@/utils/ApiError';
 import type {
   ScenarioAnswer,
   ScenarioAnswerValue,
@@ -11,6 +13,13 @@ import type {
   ScenarioStepResponse,
 } from './model';
 import { getScenarioStep } from './scenarioApi';
+
+/**
+ * 없거나 비활성이거나 게시본이 없는 시나리오(404). 진행 중에 게시가 내려가도 같다.
+ * 다시 시도해도 같은 결과라 재시도 대신 다른 추천 방법으로 안내한다.
+ */
+export const isScenarioUnavailable = (error: unknown) =>
+  error instanceof ApiError && error.response.status === 404;
 
 /** 조회 키 끝의 [버전, 답변]. */
 const sessionOf = (key: QueryKey) =>
@@ -38,21 +47,39 @@ export function useScenarioFlow({
   }>({ trail: [], count: 0, versionId: null });
   const answers = trail.slice(0, count);
   const queryKey = ['bartender-note', 'scenario-step', context.scenarioId];
+  /** 답변·버전 하나에 대한 조회. 첫 질문(답 없음·버전 없음)은 게시 여부 확인과 같은 캐시를 쓴다. */
+  const stepQuery = (
+    stepAnswers: ScenarioAnswer[],
+    stepVersionId: number | null,
+  ) =>
+    infiniteQueryOptions({
+      queryKey: [...queryKey, stepVersionId, stepAnswers],
+      initialPageParam: undefined as string | undefined,
+      queryFn: async ({ signal, pageParam }) => {
+        const step = await getScenarioStep(
+          {
+            context,
+            answers: stepAnswers,
+            versionId: stepVersionId,
+            cursor: pageParam,
+          },
+          signal,
+        );
+        if (step.completed && !pageParam) await prepareResult?.(step);
+        return step;
+      },
+      getNextPageParam: (lastPage: ScenarioStepResponse) =>
+        lastPage.completed
+          ? lastPage.candidates?.nextCursor ?? undefined
+          : undefined,
+      retry: false,
+      // 서명된 보기를 고르는 동안 자동 재조회로 질문이 교체되지 않게 한다.
+      staleTime: Infinity,
+    });
+  // 화면에 들어오면 첫 질문을 미리 받아 게시 여부를 안다. 추천을 시작하면 같은 캐시를 그대로 쓴다.
+  const firstStep = useInfiniteQuery(stepQuery([], null));
   const query = useInfiniteQuery({
-    queryKey: [...queryKey, versionId, answers],
-    initialPageParam: undefined as string | undefined,
-    queryFn: async ({ signal, pageParam }) => {
-      const step = await getScenarioStep(
-        { context, answers, versionId, cursor: pageParam },
-        signal,
-      );
-      if (step.completed && !pageParam) await prepareResult?.(step);
-      return step;
-    },
-    getNextPageParam: (lastPage) =>
-      lastPage.completed
-        ? lastPage.candidates?.nextCursor ?? undefined
-        : undefined,
+    ...stepQuery(answers, versionId),
     select: ({ pages }) => {
       const first = pages[0];
       const last = pages[pages.length - 1];
@@ -81,9 +108,6 @@ export function useScenarioFlow({
         : undefined;
     },
     enabled: active,
-    retry: false,
-    // 서명된 보기를 고르는 동안 자동 재조회로 질문이 교체되지 않게 한다.
-    staleTime: Infinity,
   });
 
   const canAnswer =
@@ -115,6 +139,8 @@ export function useScenarioFlow({
     }));
   const back = () => goTo(count - 1);
   const reset = () => {
+    // 아직 답하지 않았으면 미리 받아 둔 첫 질문을 그대로 쓴다
+    if (trail.length === 0 && versionId === null) return;
     void client.invalidateQueries({ queryKey, refetchType: 'none' });
     void client.resetQueries({
       queryKey: [...queryKey, null, []],
@@ -148,6 +174,8 @@ export function useScenarioFlow({
         ? remembered?.value
         : undefined,
     versionId: versionId ?? query.data?.versionId ?? null,
+    /** 첫 질문 조회가 404였다. 확인 중이거나 다른 오류면 false라 지금처럼 진입할 수 있다. */
+    unavailable: isScenarioUnavailable(firstStep.error),
     query,
     canAnswer,
     canGoBack: answers.length > 0,

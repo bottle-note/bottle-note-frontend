@@ -15,6 +15,10 @@ type Props = {
   move: (next: Step) => void;
   home: () => void;
   onStartScenario: () => void;
+  /** 질문 추천이 준비 중이면, 빈 큐레이션에서 추천 대신 리뷰 쓰기와 찜으로 안내한다. */
+  scenarioUnavailable: boolean;
+  onStartReview: () => void;
+  onShowPicks: () => void;
 };
 
 /** 큐레이션 목록. 고르면 그 큐레이션에 담긴 술 목록으로 간다. */
@@ -25,6 +29,9 @@ export default function CurationFlow({
   move,
   home,
   onStartScenario,
+  scenarioUnavailable,
+  onStartReview,
+  onShowPicks,
 }: Props) {
   if (step !== 'curations') return null;
   if (choices.state === 'loading')
@@ -47,7 +54,17 @@ export default function CurationFlow({
       </>
     );
   if (choices.state === 'empty')
-    return (
+    return scenarioUnavailable ? (
+      <>
+        <FlowAction onClick={onStartReview}>
+          바텐더님과 함께 리뷰를 쓸게요
+        </FlowAction>
+        <FlowNavigation>
+          <FlowTextAction onClick={onShowPicks}>찜한 술 보기</FlowTextAction>
+          <FlowTextAction onClick={home}>처음으로</FlowTextAction>
+        </FlowNavigation>
+      </>
+    ) : (
       <>
         <FlowAction onClick={onStartScenario}>취향으로 골라 주세요</FlowAction>
         <FlowNavigation>

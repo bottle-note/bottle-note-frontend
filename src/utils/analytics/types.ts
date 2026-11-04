@@ -165,7 +165,8 @@ export interface GA4EventMap {
   };
   bartender_recommend_result: {
     mode: 'taste' | 'situation';
-    result_state: 'exact' | 'similar' | 'available' | 'empty';
+    /** unavailable: 질문 추천이 준비 중(시나리오 404)이라 결과 대신 다른 추천을 안내했다 */
+    result_state: 'exact' | 'similar' | 'available' | 'empty' | 'unavailable';
   };
   bartender_select_alcohol: {
     alcohol_id: string;

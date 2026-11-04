@@ -1437,6 +1437,144 @@ describe('바텐더 노트 큐레이션 추천', () => {
   });
 });
 
+describe('바텐더 노트 질문 추천 준비 중', () => {
+  /** 없거나 비활성이거나 게시본이 없는 시나리오, 또는 진행 중에 게시가 내려간 시나리오의 응답. */
+  const notFound = () =>
+    new ApiError('시나리오 없음', new Response(null, { status: 404 }));
+  const closeScenario = () =>
+    vi.mocked(ScenarioApi.get).mockRejectedValue(notFound());
+  const recommendMenu = () =>
+    screen.findByRole('button', { name: /^위스키 추천해 주세요/ });
+  const results = () =>
+    vi
+      .mocked(trackGA4Event)
+      .mock.calls.filter(([event]) => event === 'bartender_recommend_result');
+
+  it('첫 질문을 받지 못하면(404) 추천 메뉴를 남겨 두되 누를 수 없게 하고 준비 중이라고 알린다', async () => {
+    closeScenario();
+    renderExperience();
+
+    await waitFor(async () =>
+      expect(await recommendMenu()).toHaveAccessibleName(
+        '위스키 추천해 주세요 지금은 준비하고 있어요',
+      ),
+    );
+    expect(await recommendMenu()).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /^큐레이션으로 추천해 주세요/ }),
+    ).toBeEnabled();
+    // 첫 화면에서는 아직 결과를 본 것이 아니다
+    expect(results()).toEqual([]);
+  });
+
+  it('첫 질문 미리 받기가 404가 아닌 오류면 추천을 시작할 수 있고, 들어가면 다시 받아 온다', async () => {
+    vi.mocked(ScenarioApi.get).mockRejectedValueOnce(
+      new ApiError('서버 오류', new Response(null, { status: 500 })),
+    );
+    renderExperience();
+
+    await waitFor(() => expect(ScenarioApi.get).toHaveBeenCalledTimes(1));
+    expect(await recommendMenu()).toBeEnabled();
+    expect(
+      screen.getByText('몇 가지 여쭤보고 골라 드려요'),
+    ).toBeInTheDocument();
+    await choose('위스키 추천해 주세요');
+
+    expect(await screen.findByText('질문 1')).toBeInTheDocument();
+    expect(ScenarioApi.get).toHaveBeenCalledTimes(2);
+  });
+
+  it('큐레이션도 비어 있으면 리뷰 쓰기를 권하고 찜한 술 보기와 처음으로를 남긴다', async () => {
+    closeScenario();
+    stubCurationApi([]);
+    renderExperience();
+    await waitFor(async () => expect(await recommendMenu()).toBeDisabled());
+
+    await choose('큐레이션으로 추천해 주세요');
+
+    await waitFor(() =>
+      expect(dialogue()).toHaveTextContent(
+        '오늘 드신 술을 함께 기록해 볼까요?',
+      ),
+    );
+    expect(
+      screen.queryByRole('button', { name: '취향으로 골라 주세요' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '찜한 술 보기' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '처음으로' }),
+    ).toBeInTheDocument();
+    await press('바텐더님과 함께 리뷰를 쓸게요');
+
+    expect(
+      await screen.findByRole('searchbox', { name: '술 이름 또는 종류 검색' }),
+    ).toBeInTheDocument();
+  });
+
+  it('찜한 술이 없으면 큐레이션 추천을 권한다', async () => {
+    closeScenario();
+    renderExperience();
+    await waitFor(async () => expect(await recommendMenu()).toBeDisabled());
+
+    await press('찜한 술 보기');
+
+    expect(await screen.findByText('찜한 술이 없어요.')).toBeInTheDocument();
+    expect(dialogue()).toHaveTextContent(
+      '큐레이션에서 끌리는 술부터 찾아볼까요?',
+    );
+    await press('큐레이션으로 추천해 주세요');
+
+    expect(
+      await screen.findByRole('button', { name: '집에서 여는 첫 병' }),
+    ).toBeInTheDocument();
+  });
+
+  it('답하던 중 게시가 내려가면(404) 다시 시도 없이 다른 추천을 권하고 결과를 한 번만 기록한다', async () => {
+    renderExperience();
+    await choose('위스키 추천해 주세요');
+    vi.mocked(ScenarioApi.evaluate).mockRejectedValueOnce(notFound());
+    await choose('싱글 몰트');
+
+    await waitFor(() =>
+      expect(dialogue()).toHaveTextContent('질문 추천은 지금 준비하고 있어요.'),
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '다시 시도' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^바텐더님과 함께 리뷰를 쓸게요/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '처음으로' }),
+    ).toBeInTheDocument();
+    expect(results()).toEqual([
+      [
+        'bartender_recommend_result',
+        { mode: 'taste', result_state: 'unavailable' },
+      ],
+    ]);
+    // 추천을 끝까지 받지 못했으므로 캠페인 완료는 보내지 않는다
+    expect(
+      vi
+        .mocked(trackCampaignEvent)
+        .mock.calls.filter(
+          ([code, type]) =>
+            code === 'bartender-note-recommend' && type === 'FINISH',
+        ),
+    ).toEqual([]);
+
+    await choose('큐레이션으로 추천해 주세요');
+
+    expect(
+      await screen.findByRole('button', { name: '집에서 여는 첫 병' }),
+    ).toBeInTheDocument();
+    expect(results()).toHaveLength(1);
+  });
+});
+
 describe('바텐더 노트 찜', () => {
   it('술 상세에서 찜하면 서버에 저장하고 처음 화면의 찜 목록에서 다시 볼 수 있다', async () => {
     const { unmount } = renderExperience();
