@@ -1,3 +1,5 @@
+import type { PlaceLocation } from '@/lib/kakao/kakaoPlaces';
+
 export type Step =
   | 'intro'
   | 'scenario'
@@ -48,14 +50,7 @@ export type ReviewDraft = {
 };
 
 /** 장소 검색에서 고른 곳. 리뷰의 locationInfo로 그대로 보낸다. */
-export interface ReviewPlace {
-  name: string;
-  address: string;
-  category: string | null;
-  mapUrl: string | null;
-  latitude: string | null;
-  longitude: string | null;
-}
+export type ReviewPlace = PlaceLocation;
 
 export const initialReview: ReviewDraft = {
   mode: 'quick',

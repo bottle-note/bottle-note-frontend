@@ -4,11 +4,16 @@ import { CircleX } from 'lucide-react';
 import useModalStore from '@/store/modalStore';
 import { KakaoPlace } from '@/types/Review';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
+import {
+  loadKakaoMapsSDK,
+  searchKakaoPlaces,
+  toPlaceLocation,
+} from '@/lib/kakao/kakaoPlaces';
 import RecentSearch from '@/components/feature/Search/RecentSearch';
 import SearchIcon from 'public/icon/search-subcoral.svg';
 
 interface Props {
-  handleSaveData: (place: KakaoPlace, category?: string | null) => void;
+  handleSaveData: (place: KakaoPlace) => void;
 }
 
 export default function KakaoAddressMap({ handleSaveData }: Props) {
@@ -21,36 +26,26 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
   const [isOnSearch, setIsOnSearch] = useState(true);
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID}&autoload=false&libraries=services`;
-    document.head.appendChild(script);
-
     const onLoadKakaoMap = () => {
-      window.kakao.maps.load(() => {
-        const ps = new window.kakao.maps.services.Places();
+      function getListItem(
+        index: number,
+        place: KakaoPlace,
+        totalCount: number,
+      ) {
+        const { category } = toPlaceLocation(place);
+        const el = document.createElement('li');
+        let itemStr = `<div><div class="title_row"><div><span class="title">${place.place_name}</span>`;
 
-        function getListItem(
-          index: number,
-          place: KakaoPlace,
-          totalCount: number,
-        ) {
-          let category = null;
-          const el = document.createElement('li');
-          let itemStr = `<div><div class="title_row"><div><span class="title">${place.place_name}</span>`;
+        if (category) {
+          itemStr += `<span class="category">${category}</span></div>`;
+        }
 
-          if (place.category_name) {
-            const categoryArr = place.category_name.split(' > ');
-            category = categoryArr[categoryArr.length - 1];
-            itemStr += `<span class="category">${category}</span></div>`;
-          }
+        if (place.place_url) {
+          itemStr += `<span class="url" onClick="window.open('${place.place_url}', '_blank')">지도</span></div>`;
+        }
 
-          if (place.place_url) {
-            itemStr += `<span class="url" onClick="window.open('${place.place_url}', '_blank')">지도</span></div>`;
-          }
-
-          if (place.road_address_name) {
-            itemStr += `<div class="row">
+        if (place.road_address_name) {
+          itemStr += `<div class="row">
                 <div class="label">도로명</div>
                 <div class="detail">${place.road_address_name}</div>
               </div>
@@ -59,143 +54,147 @@ export default function KakaoAddressMap({ handleSaveData }: Props) {
                 <div class="detail">${place.address_name}</div>
               </div>
             `;
-          } else {
-            itemStr += `<div class="row">
+        } else {
+          itemStr += `<div class="row">
                 <div class="label">지번</div>
                 <div class="detail">${place.address_name}</div>
               </div>`;
-          }
+        }
 
-          if (place.phone) {
-            itemStr += `<div class="row">
+        if (place.phone) {
+          itemStr += `<div class="row">
                   <div class="label">전화</div>
                   <div class="detail">${place.phone}</div>
                 </div>`;
-          }
-
-          el.innerHTML = itemStr;
-          el.className = 'item';
-
-          el.style.borderTop = '1px solid var(--color-stroke-neutral-subtle)';
-          if (index === totalCount - 1) {
-            el.style.borderBottom =
-              '1px solid var(--color-stroke-neutral-subtle)';
-          }
-
-          el.style.padding = '10px 0';
-
-          const titleRowElements = el.querySelector(
-            '.title_row',
-          ) as HTMLElement;
-          titleRowElements.style.display = 'flex';
-          titleRowElements.style.alignItems = 'center';
-          titleRowElements.style.justifyContent = 'space-between';
-
-          const titleElements = el.querySelector('.title') as HTMLElement;
-          titleElements.style.color = 'var(--color-fg-neutral)';
-          titleElements.style.fontSize = '14px';
-          titleElements.style.fontWeight = 'bold';
-          titleElements.style.marginRight = '10px';
-
-          const categoryElements = el.querySelector('.category') as HTMLElement;
-          categoryElements.style.color = 'var(--color-fg-neutral-muted)';
-          categoryElements.style.fontSize = '14px';
-
-          const urlElements = el.querySelector('.url') as HTMLElement;
-          urlElements.style.color = 'var(--color-fg-brand)';
-          urlElements.style.fontSize = '12px';
-
-          const rowElement = el.getElementsByClassName('row');
-          Array.from(rowElement).forEach((element) => {
-            const htmlElement = element as HTMLElement;
-            htmlElement.style.display = 'flex';
-            htmlElement.style.alignItems = 'center';
-            htmlElement.style.marginTop = '5px';
-          });
-
-          const labelElement = el.getElementsByClassName('label');
-          Array.from(labelElement).forEach((element) => {
-            const htmlElement = element as HTMLElement;
-            htmlElement.style.marginRight = '10px';
-            htmlElement.style.border =
-              '2px solid var(--color-stroke-neutral-subtle)';
-            htmlElement.style.color = 'var(--color-fg-neutral-muted)';
-            htmlElement.style.fontSize = '12px';
-            htmlElement.style.width = '50px';
-            htmlElement.style.display = 'flex';
-            htmlElement.style.justifyContent = 'center';
-            htmlElement.style.alignItems = 'center';
-            htmlElement.style.height = '100%';
-          });
-
-          const detailElement = el.getElementsByClassName('detail');
-          Array.from(detailElement).forEach((element) => {
-            const htmlElement = element as HTMLElement;
-            htmlElement.style.color = 'var(--color-fg-neutral)';
-            htmlElement.style.fontSize = '12px';
-          });
-
-          el.addEventListener('click', () => handleSaveData(place, category));
-
-          return el;
         }
 
-        function removeAllChildNods(el: any) {
-          while (el.hasChildNodes()) {
-            el.removeChild(el.lastChild);
-          }
+        el.innerHTML = itemStr;
+        el.className = 'item';
+
+        el.style.borderTop = '1px solid var(--color-stroke-neutral-subtle)';
+        if (index === totalCount - 1) {
+          el.style.borderBottom =
+            '1px solid var(--color-stroke-neutral-subtle)';
         }
 
-        function displayPlaces(places: any) {
-          const listEl = document.getElementById('placesList');
-          const fragment = document.createDocumentFragment();
-          removeAllChildNods(listEl);
+        el.style.padding = '10px 0';
 
-          for (let i = 0; i < places.length; i++) {
-            const itemEl = getListItem(i, places[i], places.length);
-            fragment.appendChild(itemEl);
-          }
-          listEl?.appendChild(fragment);
-          if (listEl) {
-            listEl.style.paddingBottom = '10rem';
-          }
+        const titleRowElements = el.querySelector('.title_row') as HTMLElement;
+        titleRowElements.style.display = 'flex';
+        titleRowElements.style.alignItems = 'center';
+        titleRowElements.style.justifyContent = 'space-between';
+
+        const titleElements = el.querySelector('.title') as HTMLElement;
+        titleElements.style.color = 'var(--color-fg-neutral)';
+        titleElements.style.fontSize = '14px';
+        titleElements.style.fontWeight = 'bold';
+        titleElements.style.marginRight = '10px';
+
+        const categoryElements = el.querySelector('.category') as HTMLElement;
+        categoryElements.style.color = 'var(--color-fg-neutral-muted)';
+        categoryElements.style.fontSize = '14px';
+
+        const urlElements = el.querySelector('.url') as HTMLElement;
+        urlElements.style.color = 'var(--color-fg-brand)';
+        urlElements.style.fontSize = '12px';
+
+        const rowElement = el.getElementsByClassName('row');
+        Array.from(rowElement).forEach((element) => {
+          const htmlElement = element as HTMLElement;
+          htmlElement.style.display = 'flex';
+          htmlElement.style.alignItems = 'center';
+          htmlElement.style.marginTop = '5px';
+        });
+
+        const labelElement = el.getElementsByClassName('label');
+        Array.from(labelElement).forEach((element) => {
+          const htmlElement = element as HTMLElement;
+          htmlElement.style.marginRight = '10px';
+          htmlElement.style.border =
+            '2px solid var(--color-stroke-neutral-subtle)';
+          htmlElement.style.color = 'var(--color-fg-neutral-muted)';
+          htmlElement.style.fontSize = '12px';
+          htmlElement.style.width = '50px';
+          htmlElement.style.display = 'flex';
+          htmlElement.style.justifyContent = 'center';
+          htmlElement.style.alignItems = 'center';
+          htmlElement.style.height = '100%';
+        });
+
+        const detailElement = el.getElementsByClassName('detail');
+        Array.from(detailElement).forEach((element) => {
+          const htmlElement = element as HTMLElement;
+          htmlElement.style.color = 'var(--color-fg-neutral)';
+          htmlElement.style.fontSize = '12px';
+        });
+
+        el.addEventListener('click', () => handleSaveData(place));
+
+        return el;
+      }
+
+      function removeAllChildNods(el: any) {
+        while (el.hasChildNodes()) {
+          el.removeChild(el.lastChild);
         }
+      }
 
-        function placesSearchCB(data: any, status: any) {
-          if (status === window.kakao.maps.services.Status.OK) {
-            displayPlaces(data);
+      function displayPlaces(places: KakaoPlace[]) {
+        const listEl = document.getElementById('placesList');
+        const fragment = document.createDocumentFragment();
+        removeAllChildNods(listEl);
+
+        for (let i = 0; i < places.length; i++) {
+          const itemEl = getListItem(i, places[i], places.length);
+          fragment.appendChild(itemEl);
+        }
+        listEl?.appendChild(fragment);
+        if (listEl) {
+          listEl.style.paddingBottom = '10rem';
+        }
+      }
+
+      function searchPlaces() {
+        const keyword = keywordRef.current?.value || '';
+        if (!keyword.trim()) {
+          handleModalState({
+            isShowModal: true,
+            mainText: '도로명 주소 혹은 상호명을 입력해주세요:)',
+          });
+          return false;
+        }
+        searchKakaoPlaces(keyword)
+          .then(({ places }) => {
+            if (places.length === 0) {
+              alert('검색 결과가 존재하지 않습니다.');
+              return;
+            }
+            displayPlaces(places);
             setIsOnSearch(false);
-          } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
-            alert('검색 결과가 존재하지 않습니다.');
-          } else if (status === window.kakao.maps.services.Status.ERROR) {
+          })
+          .catch(() =>
             handleModalState({
               isShowModal: true,
               mainText: '검색 결과 중 오류가 발생했습니다.',
-            });
-          }
-        }
+            }),
+          );
+        SearchHistory.save(keyword);
+      }
 
-        function searchPlaces() {
-          const keyword = keywordRef.current?.value || '';
-          if (!keyword.trim()) {
-            handleModalState({
-              isShowModal: true,
-              mainText: '도로명 주소 혹은 상호명을 입력해주세요:)',
-            });
-            return false;
-          }
-          ps.keywordSearch(keyword, placesSearchCB);
-          SearchHistory.save(keyword);
-        }
-
-        const searchForm = document.getElementById('form');
-        searchForm?.addEventListener('submit', function (e) {
-          e.preventDefault();
-          searchPlaces();
-        });
+      const searchForm = document.getElementById('form');
+      searchForm?.addEventListener('submit', function (e) {
+        e.preventDefault();
+        searchPlaces();
       });
     };
-    script.addEventListener('load', onLoadKakaoMap);
+    loadKakaoMapsSDK()
+      .then(onLoadKakaoMap)
+      .catch(() =>
+        handleModalState({
+          isShowModal: true,
+          mainText: '지도를 불러오지 못했습니다.',
+        }),
+      );
   }, []);
 
   const onSearch = (keyword: string) => {
