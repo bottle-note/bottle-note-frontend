@@ -18,7 +18,6 @@ export type LoginMethod = 'kakao' | 'apple';
 
 // 게스트에게 콘텐츠 일부만 보여주고 로그인을 요구하는 게이트의 위치
 export type LoginGatePage =
-  | 'alcohol_detail'
   | 'explore_whiskey'
   | 'explore_review'
   | 'curation_list'

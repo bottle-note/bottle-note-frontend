@@ -1,11 +1,7 @@
 import JsonLd from '@/components/seo/JsonLd';
 import { getAlcoholSeoData } from '@/shared/seo/seoData';
-import {
-  generateAlcoholPageSchema,
-  generateAlcoholSchema,
-} from '@/utils/seo/generateAlcoholSchema';
+import { generateAlcoholSchema } from '@/utils/seo/generateAlcoholSchema';
 import AlcoholDetailPage from './_components/AlcoholDetailPage';
-import { GUEST_GATED_CONTENT_CLASS } from './_constants';
 
 interface Props {
   params: { id: string };
@@ -18,17 +14,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <>
-      {alcohol && (
-        <>
-          <JsonLd data={generateAlcoholSchema(alcohol)} />
-          <JsonLd
-            data={generateAlcoholPageSchema(
-              alcohol,
-              `.${GUEST_GATED_CONTENT_CLASS}`,
-            )}
-          />
-        </>
-      )}
+      {alcohol && <JsonLd data={generateAlcoholSchema(alcohol)} />}
       <AlcoholDetailPage
         key={params.id}
         initialData={result.status === 'ok' ? result.data : undefined}
