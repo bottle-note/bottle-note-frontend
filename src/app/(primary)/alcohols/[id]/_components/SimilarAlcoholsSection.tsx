@@ -28,22 +28,19 @@ const toAlcoholItem = (item: ExploreAlcohol): Alcohol => ({
 interface Props {
   alcoholId: number;
   alcoholName: string;
-  selectedTags: string[];
+  tags: string[];
   showBottomBorder: boolean;
 }
 
 export default function SimilarAlcoholsSection({
   alcoholId,
   alcoholName,
-  selectedTags,
+  tags,
   showBottomBorder,
 }: Props) {
-  const { data, isPending, isError } = useSimilarAlcohols(
-    alcoholId,
-    selectedTags,
-  );
-  const keyword = selectedTags.join(' ');
-  const hasTags = selectedTags.length > 0;
+  const { data, isPending, isError } = useSimilarAlcohols(alcoholId, tags);
+  const keyword = tags.join(' ');
+  const hasTags = tags.length > 0;
   // 요청이 실패하면 목록 자리만 비운다. 상세 본문과 바텐더 진입은 그대로 둔다.
   const showList = hasTags && !isError;
 
@@ -106,18 +103,14 @@ export default function SimilarAlcoholsSection({
               </ul>
             ) : (
               <p className="mx-20 py-24 text-center text-15 text-fg-neutral">
-                고른 태그가 모두 겹치는 위스키가 없어요
+                비슷한 위스키를 찾지 못했어요
               </p>
             )}
           </div>
         </>
       )}
       <Link
-        href={similarEntryHref({
-          alcoholId,
-          name: alcoholName,
-          tags: selectedTags,
-        })}
+        href={similarEntryHref({ alcoholId, name: alcoholName, tags })}
         onClick={() =>
           trackGA4Event('bartender_entry_click', { source: 'alcohol_detail' })
         }

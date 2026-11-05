@@ -112,10 +112,6 @@ export interface GA4EventMap {
     alcohol_name: string;
   };
   // 주류 상세의 비슷한 위스키 추천. alcohol_id는 보고 있던 상세의 위스키다.
-  similar_tag_select: {
-    alcohol_id: string;
-    action: 'select' | 'deselect';
-  };
   similar_alcohol_click: {
     alcohol_id: string;
     target_alcohol_id: string;

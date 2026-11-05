@@ -157,7 +157,6 @@ const similarByKeyword: Record<string, ExploreAlcohol[]> = {
     exploreAlcohol(482, '스프링뱅크 10년'),
     exploreAlcohol(389, '카듀 12년'),
   ],
-  '보리 시나몬': [exploreAlcohol(215, '글렌로시 10년')],
 };
 
 afterEach(() => {
@@ -201,7 +200,7 @@ it('회원은 받은 리뷰를 모두 보고 리뷰 더 보기로 전체 리뷰�
   ).not.toBeInTheDocument();
 });
 
-it('앞의 두 태그로 비슷한 위스키를 보여 주고, 태그를 바꾸면 그 태그가 모두 겹치는 위스키로 바꾼다', async () => {
+it('앞의 두 태그가 겹치는 위스키를 비슷한 위스키로 보여 주고, 탐색과 바텐더 노트로 잇는다', async () => {
   renderPage({ isLoggedIn: false });
 
   const similar = await screen.findByRole('region', {
@@ -211,22 +210,16 @@ it('앞의 두 태그로 비슷한 위스키를 보여 주고, 태그를 바꾸�
   expect(
     within(similar).queryByText('스프링뱅크 10년'),
   ).not.toBeInTheDocument();
-  expect(screen.getByRole('button', { name: '보리' })).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
-
-  // 세 번째 태그를 고르면 먼저 고른 태그가 빠져 두 개만 남는다
-  fireEvent.click(screen.getByRole('button', { name: '씨리얼' }));
-  fireEvent.click(screen.getByRole('button', { name: '시나몬' }));
-  expect(await within(similar).findByText('글렌로시 10년')).toBeInTheDocument();
-  expect(within(similar).queryByText('카듀 12년')).not.toBeInTheDocument();
+  // 태그는 읽기 전용이다
+  expect(
+    screen.queryByRole('button', { name: '보리' }),
+  ).not.toBeInTheDocument();
 
   expect(
     within(similar).getByRole('link', { name: /더 보기/ }),
   ).toHaveAttribute(
     'href',
-    `/explore?tab=EXPLORER_WHISKEY&keyword=${encodeURIComponent('보리 시나몬')}`,
+    `/explore?tab=EXPLORER_WHISKEY&keyword=${encodeURIComponent('보리 씨리얼')}`,
   );
   const bartender = new URL(
     within(similar)
@@ -239,17 +232,18 @@ it('앞의 두 태그로 비슷한 위스키를 보여 주고, 태그를 바꾸�
     from: 'similar',
     alcoholId: '482',
     name: '스프링뱅크 10년',
-    tags: '보리,시나몬',
+    tags: '보리,씨리얼',
   });
 });
 
-it('고른 태그가 모두 겹치는 위스키가 없으면 안내 문구를 보여 준다', async () => {
+it('태그가 겹치는 다른 위스키가 없으면 안내 문구를 보여 준다', async () => {
+  jest.spyOn(ExploreApi, 'getAlcohols').mockResolvedValue({
+    data: { items: [exploreAlcohol(482, '스프링뱅크 10년')] },
+  } as unknown as Awaited<ReturnType<typeof ExploreApi.getAlcohols>>);
   renderPage({ isLoggedIn: false });
 
-  fireEvent.click(await screen.findByRole('button', { name: '보리' }));
-
   expect(
-    await screen.findByText('고른 태그가 모두 겹치는 위스키가 없어요'),
+    await screen.findByText('비슷한 위스키를 찾지 못했어요'),
   ).toBeInTheDocument();
 });
 

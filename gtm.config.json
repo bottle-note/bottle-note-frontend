@@ -55,10 +55,6 @@
       "parameters": ["alcohol_id", "alcohol_name"]
     },
     {
-      "name": "similar_tag_select",
-      "parameters": ["alcohol_id", "action"]
-    },
-    {
       "name": "similar_alcohol_click",
       "parameters": ["alcohol_id", "target_alcohol_id", "position"]
     },
