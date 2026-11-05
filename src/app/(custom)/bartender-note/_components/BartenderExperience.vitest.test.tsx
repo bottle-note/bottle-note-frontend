@@ -2833,6 +2833,35 @@ describe('바텐더 노트 비슷한 위스키', () => {
     ]);
   });
 
+  it('로그인을 그만두고 주류 상세에서 새로 넘어오면 예전 화면 대신 비슷한 위스키부터 연다', async () => {
+    auth.loggedIn = false;
+    stubExplore([101, 102, 104]);
+    window.history.replaceState(null, '', '/bartender-note');
+    const view = renderExperience();
+
+    await choose('바텐더님과 함께 리뷰를 쓸게요');
+    const prompt = await screen.findByRole('dialog', {
+      name: '지금 드신 술, 기록해 둘까요?',
+    });
+    fireEvent.click(
+      within(prompt).getByRole('button', { name: '로그인하고 기록하기' }),
+    );
+
+    // 로그인 화면에서 뒤로 나간 뒤, 주류 상세의 비슷한 위스키 링크로 새로 들어온다
+    view.unmount();
+    window.history.replaceState(
+      null,
+      '',
+      '/bartender-note?from=similar&alcoholId=101&tags=피트,스모키',
+    );
+    renderExperience({ similarEntry: entry });
+
+    expect(
+      await screen.findByRole('button', { name: /아드벡 10년/ }),
+    ).toBeInTheDocument();
+    window.history.replaceState(null, '', '/');
+  });
+
   it('겹치는 위스키가 없으면 다른 추천으로 잇는다', async () => {
     stubExplore([101]);
 

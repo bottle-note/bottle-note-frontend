@@ -119,6 +119,9 @@ const LOGIN_PROMPT = {
 >;
 type LoginPromptKind = keyof typeof LOGIN_PROMPT;
 
+/** 로그인 화면이 돌아올 주소(returnTo)와 같은 모양의 지금 주소. */
+const currentUrl = () => `${window.location.pathname}${window.location.search}`;
+
 /** 다음 질문이 이보다 늦으면 생각하는 자세를 보인다. */
 const THINKING_DELAY_MS = 400;
 
@@ -304,8 +307,10 @@ export default function BartenderExperience({
     const saved = takeSnapshot();
     const { isNewVisit, started } = journey.init(
       saved?.journey,
-      // 로그인하고 돌아온 길이면 주소에 비슷한 위스키 진입이 남아 있어도 보던 화면을 잇는다
-      similarEntry && !saved?.loginReturn ? 'similar' : undefined,
+      // 로그인하고 같은 주소로 돌아왔으면 비슷한 위스키 진입이 남아 있어도 보던 화면을 잇는다
+      similarEntry && saved?.loginReturnTo !== currentUrl()
+        ? 'similar'
+        : undefined,
     );
     // 새로고침·로그인 왕복·술 상세 페이지 복귀는 새 진입이 아니다
     if (isNewVisit) campaign.view();
@@ -386,9 +391,9 @@ export default function BartenderExperience({
     if (step === 'detail' && selected) campaign.reach('curation', 'RESULT');
   }, [step, hasCandidates, !!selected, authLoading, isLoggedIn]);
 
-  const leave = (resume?: Step, { loginReturn = false } = {}) =>
+  const leave = (resume?: Step, { forLogin = false } = {}) =>
     saveSnapshot({
-      loginReturn,
+      loginReturnTo: forLogin ? currentUrl() : undefined,
       journey: journey.journey,
       scenario: {
         context,
@@ -424,7 +429,7 @@ export default function BartenderExperience({
   };
   const goToLogin = () => {
     if (!loginPrompt) return;
-    leave(loginPrompt.resume, { loginReturn: true });
+    leave(loginPrompt.resume, { forLogin: true });
     bridgeToLogin(
       { trigger: LOGIN_PROMPT[loginPrompt.kind].trigger },
       { trackPrompt: false },
