@@ -36,6 +36,7 @@ import {
   useAlcoholDetailQuery,
 } from '@/queries/useAlcoholDetailQuery';
 import AlcoholDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/AlcoholDetailsSkeleton';
+import ReviewItemSkeleton from '@/components/ui/Loading/Skeletons/ReviewItemSkeleton';
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import AlcoholRatingInput from '@/components/domain/alcohol/AlcoholRatingInput';
 import ShareDropdown from '@/components/share/ShareDropdown';
@@ -44,11 +45,15 @@ import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
 import type { ShareConfig, ShareChannel } from '@/types/share';
 import FloatingReviewButton from './FloatingReviewButton';
 import AlcoholDetailHeader from './AlcoholDetailHeader';
-import { GuestAlcoholDetailGate } from './GuestAlcoholDetailGate';
 import AlcoholImportClearance from './AlcoholImportClearance';
 import { useAlcoholImportClearanceItems } from './useAlcoholImportClearanceItems';
 import RatingSuccessModal from './RatingSuccessModal';
+import SimilarAlcoholsSection from './SimilarAlcoholsSection';
 import ProfileDefaultImg from 'public/profile-default.svg';
+
+const GUEST_REVIEW_PREVIEW_COUNT = 2;
+/** 테이스팅 태그가 두 개 겹치면 비슷한 위스키로 본다. 더 늘리면 겹치는 위스키가 거의 없다. */
+const SIMILAR_TAG_LIMIT = 2;
 
 interface DetailItem {
   title: string;
@@ -311,10 +316,24 @@ export default function AlcoholDetailPage({
   const reviewList = data?.reviewInfo?.reviewList ?? [];
   const reviewTotalCount = data?.reviewInfo?.totalCount;
   const isGuest = !isLoggedIn;
+  const reviewsHref = `${ROUTES.ALCOHOL.REVIEWS(String(alcoholId))}?${new URLSearchParams(
+    { name: data?.alcohols?.korName ?? '' },
+  ).toString()}`;
+  // 리뷰는 서버의 하루 캐시(초기 데이터)가 아니라 브라우저에서 새로 받은 응답으로만 그린다.
+  // 그 사이 지워지거나 비공개로 바뀐 리뷰가 공개 HTML에 남지 않게 하기 위해서다.
+  const visibleReviews = isGuest
+    ? reviewList.slice(0, GUEST_REVIEW_PREVIEW_COUNT)
+    : reviewList;
+  const reviewCount = data?.alcohols?.reviewCount;
+  const guestMoreReviewsLabel = reviewCount
+    ? `로그인하고 리뷰 ${reviewCount}개 모두 보기`
+    : '로그인하고 리뷰 모두 보기';
   const isPersonalizedReady =
     !isAuthLoading && (!isLoggedIn || (isFetchedAfterMount && isSuccess));
 
-  const hasFlavorTags = Boolean(data?.alcohols?.alcoholsTastingTags?.length);
+  const flavorTags = data?.alcohols?.alcoholsTastingTags ?? [];
+  const hasFlavorTags = flavorTags.length > 0;
+  const similarTags = flavorTags.slice(0, SIMILAR_TAG_LIMIT);
   const description = data?.alcohols?.description?.trim();
   useEffect(() => {
     if (descriptionRef.current && !isDescriptionExpanded) {
@@ -369,7 +388,7 @@ export default function AlcoholDetailPage({
       <section
         className={`mx-20 py-16 ${
           description ? '' : 'border-t border-stroke-neutral-subtle'
-        } ${hasFlavorTags || hasImportInfo ? 'border-b' : ''}`}
+        } border-b`}
       >
         <div className="grid gap-6">
           {alcoholDetails.map((item: DetailItem) => (
@@ -384,9 +403,14 @@ export default function AlcoholDetailPage({
           ))}
         </div>
       </section>
-      {data?.alcohols?.alcoholsTastingTags && (
-        <FlavorTags
-          tagList={data.alcohols.alcoholsTastingTags}
+      {hasFlavorTags && (
+        <FlavorTags tagList={flavorTags} showBottomBorder={false} />
+      )}
+      {data?.alcohols && (
+        <SimilarAlcoholsSection
+          alcoholId={data.alcohols.alcoholId}
+          alcoholName={data.alcohols.korName}
+          tags={similarTags}
           showBottomBorder={hasImportInfo}
         />
       )}
@@ -441,16 +465,8 @@ export default function AlcoholDetailPage({
         {!data || !data.alcohols ? (
           <AlcoholDetailsSkeleton />
         ) : (
-          <div
-            className={
-              isGuest
-                ? 'grid h-dvh grid-rows-[minmax(0,auto)_minmax(min-content,1fr)] pb-navbar'
-                : undefined
-            }
-          >
-            <div
-              className={`relative border-b border-stroke-neutral-subtle bg-bg-neutral-weak ${isGuest ? 'overflow-y-auto' : ''}`}
-            >
+          <div>
+            <div className="relative border-b border-stroke-neutral-subtle bg-bg-neutral-weak">
               {/* 콘텐츠 레이어 */}
               <div className="relative z-10">
                 <SubHeader bgColor="bg-bg-transparent">
@@ -487,13 +503,7 @@ export default function AlcoholDetailPage({
                 />
               </div>
             </div>
-            <div
-              className={
-                isGuest
-                  ? 'grid min-h-0 grid-rows-[auto_minmax(min-content,1fr)]'
-                  : 'mb-20'
-              }
-            >
+            <div className="mb-20">
               {isPersonalizedReady ? (
                 <article className="grid place-items-center space-y-8 py-16">
                   {getRatingMessage(
@@ -512,76 +522,69 @@ export default function AlcoholDetailPage({
               ) : (
                 <div aria-hidden="true" className="h-96 animate-pulse" />
               )}
-              {isGuest ? (
-                <GuestAlcoholDetailGate
-                  isAuthLoading={isAuthLoading}
-                  title="지금 보고 계신 위스키, 관심있으신가요?"
-                  description="보틀노트에 기록하고 나만의 취향 노트를 쌓아보세요!"
-                  buttonLabel="로그인하고 기록 시작하기"
-                  onLogin={() => bridgeToLogin({ gatePage: 'alcohol_detail' })}
-                >
-                  {alcoholMetadataAndTags}
-                  {friendsRating}
-                </GuestAlcoholDetailGate>
-              ) : (
-                <>
-                  {alcoholMetadataAndTags}
-                  {friendsRating}
-                </>
-              )}
+              {alcoholMetadataAndTags}
+              {friendsRating}
             </div>
-            {!isGuest && (
-              <>
-                <div className="h-16 bg-bg-layer-basement" />
-                {reviewList.length > 0 ? (
-                  <>
-                    <section id="reviews" className="mx-20 pt-34 pb-20">
-                      {typeof reviewTotalCount === 'number' && (
-                        <div className="mb-10">
-                          <List.Total total={reviewTotalCount} />
-                        </div>
-                      )}
-                      <div className="border-b border-stroke-neutral-subtle" />
-                      {reviewList.map((review) => (
-                        <React.Fragment key={review.reviewId}>
-                          <ReviewListItem
-                            data={review}
-                            onRefresh={refreshAlcoholDetails}
-                          />
-                        </React.Fragment>
-                      ))}
-                    </section>
-                    <section className="mx-20 mb-96">
-                      <PrimaryLinkButton
-                        data={{
-                          engName: 'MORE COMMENTS',
-                          korName: '리뷰 더 보기',
-                          icon: true,
-                          linkSrc: {
-                            pathname: ROUTES.ALCOHOL.REVIEWS(String(alcoholId)),
-                            query: {
-                              name: data?.alcohols?.korName,
-                            },
-                          },
-                          handleBeforeRouteChange: (
-                            e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-                          ) => {
-                            if (!isLoggedIn) {
-                              e.preventDefault();
-                              bridgeToLogin({ trigger: 'comment' });
-                            }
-                          },
-                        }}
-                      />
-                    </section>
-                  </>
-                ) : (
-                  <section className="py-20">
-                    <EmptyView text="아직 리뷰가 없어요!" />
+            <>
+              <div className="h-16 bg-bg-layer-basement" />
+              {!isFetchedAfterMount ? (
+                <div aria-hidden="true" className="mx-20 space-y-24 pt-34">
+                  <ReviewItemSkeleton />
+                  <ReviewItemSkeleton />
+                </div>
+              ) : !isSuccess ? null : visibleReviews.length > 0 ? (
+                <>
+                  <section id="reviews" className="mx-20 pt-34 pb-20">
+                    {typeof reviewTotalCount === 'number' && (
+                      <div className="mb-10">
+                        <List.Total total={reviewTotalCount} />
+                      </div>
+                    )}
+                    <div className="border-b border-stroke-neutral-subtle" />
+                    {visibleReviews.map((review) => (
+                      <React.Fragment key={review.reviewId}>
+                        <ReviewListItem
+                          data={review}
+                          onRefresh={refreshAlcoholDetails}
+                        />
+                      </React.Fragment>
+                    ))}
                   </section>
-                )}
-              </>
-            )}
+                  <section className="mx-20 mb-96">
+                    <PrimaryLinkButton
+                      data={{
+                        engName: 'MORE COMMENTS',
+                        korName: isGuest
+                          ? guestMoreReviewsLabel
+                          : '리뷰 더 보기',
+                        icon: true,
+                        linkSrc: {
+                          pathname: ROUTES.ALCOHOL.REVIEWS(String(alcoholId)),
+                          query: {
+                            name: data?.alcohols?.korName,
+                          },
+                        },
+                        handleBeforeRouteChange: (
+                          e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+                        ) => {
+                          if (!isLoggedIn) {
+                            e.preventDefault();
+                            bridgeToLogin(
+                              { trigger: 'comment' },
+                              { returnTo: reviewsHref },
+                            );
+                          }
+                        },
+                      }}
+                    />
+                  </section>
+                </>
+              ) : (
+                <section className="py-20">
+                  <EmptyView text="아직 리뷰가 없어요!" />
+                </section>
+              )}
+            </>
           </div>
         )}
         {shareConfig && (

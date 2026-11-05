@@ -6,6 +6,8 @@ export type Step =
   /** 추천 결과의 1위를 먼저 건네는 단계. 상세와 같은 화면이고, 나머지 후보는 recommendations에서 본다. */
   | 'first-pick'
   | 'recommendations'
+  /** 주류 상세에서 고른 태그가 모두 겹치는 위스키 목록. 상세에서 넘어올 때만 이 단계로 시작한다. */
+  | 'similar'
   | 'curations'
   | 'curation-list'
   | 'favorites'

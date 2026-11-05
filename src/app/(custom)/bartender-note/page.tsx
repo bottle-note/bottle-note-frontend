@@ -1,4 +1,5 @@
 import BartenderExperience from './_components/BartenderExperience';
+import { parseSimilarEntry } from './_components/similarEntry';
 
 export const metadata = {
   title: '바텐더 노트 | 보틀노트',
@@ -6,12 +7,17 @@ export const metadata = {
     '바텐더 노트와 함께 취향에 맞는 위스키를 찾고, 오늘 마신 술을 기록하세요.',
 };
 
-export default function BartenderNotePage() {
+export default function BartenderNotePage({
+  searchParams = {},
+}: {
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
   return (
     <BartenderExperience
       scenarioContext={{
         scenarioId: Number(process.env.BARTENDER_SCENARIO_ID ?? 3),
       }}
+      similarEntry={parseSimilarEntry(searchParams)}
     />
   );
 }

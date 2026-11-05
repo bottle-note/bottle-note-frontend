@@ -174,6 +174,8 @@ export function useDialoguePlayback(
     dialogueRef,
     rulerRef,
     text: text.slice(0, typed),
+    /** 지금 페이지의 전체 대사. 강조 구간을 타이핑 중에도 같은 자리에 두는 데 쓴다. */
+    pageText: text,
     introPhase,
     introReady,
     isTyping,

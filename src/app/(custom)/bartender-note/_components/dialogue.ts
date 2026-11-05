@@ -27,7 +27,27 @@ export type DialogueInput = {
   pickCount?: number;
   /** 질문 추천(시나리오)이 준비 중이다. 빈 큐레이션·빈 찜에서 다른 길을 권한다. */
   scenarioUnavailable?: boolean;
+  /** 주류 상세에서 넘어온 기준 위스키 이름. 비슷한 위스키를 건넬 때 부른다. */
+  similarBaseName?: string;
+  /** 비슷한 위스키 조회 상태. 비면 다른 추천으로 잇는다. */
+  similarState?: 'loading' | 'error' | 'empty' | 'ready';
 };
+
+/** 이름 끝 글자의 받침에 따라 '과'/'와'를 고른다. 한글·숫자가 아니면 '와'로 둔다. */
+export function withAnd(name: string) {
+  const last = name.trim().at(-1) ?? '';
+  const code = last.charCodeAt(0) - 0xac00;
+  if (code >= 0 && code <= 11171) return `${name}${code % 28 ? '과' : '와'}`;
+  // 숫자는 읽는 소리의 받침을 따른다: 0영 1일 3삼 6육 7칠 8팔은 받침이 있다
+  if (/\d/.test(last)) return `${name}${'013678'.includes(last) ? '과' : '와'}`;
+  return `${name}와`;
+}
+
+export function similarGreeting(name?: string) {
+  return name
+    ? `${withAnd(name)} 비슷한 위스키를 추천해드릴게요.`
+    : '비슷한 위스키를 추천해드릴게요.';
+}
 
 const notices: Record<Notice, string> = {
   'pick-added': '찜해 두었습니다. 처음 화면에서 다시 볼 수 있어요.',
@@ -73,6 +93,8 @@ export function getDialogue(input: DialogueInput): string[] {
     curationsState,
     selected,
     scenarioUnavailable,
+    similarBaseName,
+    similarState,
   } = input;
   if (input.notice) return [notices[input.notice]];
   const reason = detailReason(input);
@@ -86,6 +108,13 @@ export function getDialogue(input: DialogueInput): string[] {
       hasCandidates
         ? '다른 후보도 함께 보여 드릴게요.\n마음에 드는 위스키가 있나요?'
         : '추천 후보가 없어요.\n이전 질문으로 돌아가 다시 골라 볼까요?',
+    ],
+    similar: [
+      similarState === 'empty'
+        ? '고르신 태그가 모두 겹치는 병이 지금은 없네요.\n다른 방법으로 골라 드릴까요?'
+        : similarState === 'error'
+          ? '위스키를 불러오지 못했어요.\n다시 시도해 주세요.'
+          : similarGreeting(similarBaseName),
     ],
     curations: [
       curationsState === 'empty'
@@ -146,6 +175,7 @@ export type TalkOrigin =
   | 'recommendations'
   | 'favorites'
   | 'curation-list'
+  | 'similar'
   | 'other';
 
 /** 술 이야기 화면의 첫 말풍선, 카드 이름표, 들어온 목록으로 돌아가는 대답. */
@@ -179,6 +209,12 @@ export function getTalkCopy(
           : '큐레이션에 담긴 병이에요.',
         label: curationTitle ?? '큐레이션',
         more: '이 큐레이션 더 볼게요',
+      };
+    case 'similar':
+      return {
+        opening: '이 병도 잘 맞으실 거예요.',
+        label: '비슷한 위스키',
+        more: '비슷한 위스키 더 볼게요',
       };
     default:
       return { opening: '좋은 선택이에요.', label: '고른 술' };

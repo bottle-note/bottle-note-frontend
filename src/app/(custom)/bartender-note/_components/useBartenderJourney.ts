@@ -119,7 +119,11 @@ export function useBartenderJourney(
    * 처음 열릴 때 지나온 길을 맞춘다.
    * 새로고침·뒤로 가기로 돌아오면 브라우저가 기억한 항목에서, 링크로 새로 들어오면 남겨 둔 길을 다시 쌓아 이어 간다.
    */
-  const init = (saved?: JourneyState): { isNewVisit: boolean } => {
+  const init = (
+    saved?: JourneyState,
+    /** 링크로 새로 들어올 때 처음 화면 대신 열 단계. 남겨 둔 길보다 앞선다. */
+    startAt?: Step,
+  ): { isNewVisit: boolean; started: boolean } => {
     const entry = indexOf(window.history.state);
     if (entry !== undefined) {
       if (saved && entry < saved.stack.length) {
@@ -128,14 +132,20 @@ export function useBartenderJourney(
         apply({ stack: [START], index: 0 });
         rewind(entry, 0);
       }
-      return { isNewVisit: false };
+      return { isNewVisit: false, started: false };
     }
     window.history.replaceState({ [KEY]: { index: 0 } }, '');
+    // 다른 화면에서 특정 단계로 보내 왔다. 뒤로 가기는 처음 화면이다
+    if (startAt) {
+      apply({ stack: [START, { ...START, step: startAt }], index: 1 });
+      push(1);
+      return { isNewVisit: true, started: true };
+    }
     // 브라우저가 기억한 항목도, 남겨 둔 길도 없으면 새로 들어온 것이다
-    if (!saved) return { isNewVisit: true };
+    if (!saved) return { isNewVisit: true, started: false };
     apply({ stack: saved.stack.slice(0, saved.index + 1), index: saved.index });
     rewind(0, saved.index);
-    return { isNewVisit: false };
+    return { isNewVisit: false, started: false };
   };
 
   const position = journey.stack[journey.index];
