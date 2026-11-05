@@ -52,7 +52,7 @@ import SimilarAlcoholsSection from './SimilarAlcoholsSection';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 const GUEST_REVIEW_PREVIEW_COUNT = 2;
-/** 태그를 많이 고를수록 모두 겹치는 위스키가 줄어들어 두 개까지만 고른다. */
+/** 테이스팅 태그가 두 개 겹치면 비슷한 위스키로 본다. 더 늘리면 겹치는 위스키가 거의 없다. */
 const SIMILAR_TAG_LIMIT = 2;
 
 interface DetailItem {
@@ -110,8 +110,6 @@ export default function AlcoholDetailPage({
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isRatingSuccessOpen, setIsRatingSuccessOpen] = useState(false);
   const [successfulRating, setSuccessfulRating] = useState(0);
-  /** 사용자가 직접 고른 태그. 고르기 전에는 null이고 기본값을 쓴다. */
-  const [pickedTags, setPickedTags] = useState<string[] | null>(null);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [isDescriptionClamped, setIsDescriptionClamped] = useState(true);
   const [collapsedDescriptionHeight, setCollapsedDescriptionHeight] =
@@ -336,20 +334,7 @@ export default function AlcoholDetailPage({
 
   const flavorTags = data?.alcohols?.alcoholsTastingTags ?? [];
   const hasFlavorTags = flavorTags.length > 0;
-  // 고르기 전에는 앞의 두 태그로 비슷한 위스키를 보여 준다
-  const selectedTags = pickedTags ?? flavorTags.slice(0, SIMILAR_TAG_LIMIT);
-  const toggleTag = (tag: string) => {
-    const isSelected = selectedTags.includes(tag);
-    trackGA4Event('similar_tag_select', {
-      alcohol_id: alcoholIdString,
-      action: isSelected ? 'deselect' : 'select',
-    });
-    setPickedTags(
-      isSelected
-        ? selectedTags.filter((selected) => selected !== tag)
-        : [...selectedTags, tag].slice(-SIMILAR_TAG_LIMIT),
-    );
-  };
+  const similarTags = flavorTags.slice(0, SIMILAR_TAG_LIMIT);
   const description = data?.alcohols?.description?.trim();
   useEffect(() => {
     if (descriptionRef.current && !isDescriptionExpanded) {
@@ -420,18 +405,13 @@ export default function AlcoholDetailPage({
         </div>
       </section>
       {hasFlavorTags && (
-        <FlavorTags
-          tagList={flavorTags}
-          showBottomBorder={false}
-          selectedTags={selectedTags}
-          onToggleTag={toggleTag}
-        />
+        <FlavorTags tagList={flavorTags} showBottomBorder={false} />
       )}
       {data?.alcohols && (
         <SimilarAlcoholsSection
           alcoholId={data.alcohols.alcoholId}
           alcoholName={data.alcohols.korName}
-          selectedTags={selectedTags}
+          tags={similarTags}
           showBottomBorder={hasImportInfo}
         />
       )}
