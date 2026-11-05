@@ -32,7 +32,13 @@ export type LoginGatePage =
 export type FeatureSource = 'bartender_note' | 'home';
 
 // 바텐더 노트 안에서 리뷰를 시작한 경로. 일반 리뷰 작성 페이지에는 보내지 않는다.
-export type ReviewEntryFlow = 'direct' | 'recommend' | 'curation' | 'picks';
+export type ReviewEntryFlow =
+  | 'direct'
+  | 'recommend'
+  | 'curation'
+  | 'picks'
+  // 주류 상세에서 넘어온 비슷한 위스키 목록
+  | 'similar';
 
 // 홈 바로가기
 export type HomeQuickLink =
@@ -172,7 +178,7 @@ export interface GA4EventMap {
 
   // 바텐더 노트
   bartender_start: {
-    entry: 'recommend' | 'situation' | 'review' | 'picks';
+    entry: 'recommend' | 'situation' | 'review' | 'picks' | 'similar';
   };
   bartender_recommend_result: {
     mode: 'taste' | 'situation';
@@ -181,7 +187,7 @@ export interface GA4EventMap {
   };
   bartender_select_alcohol: {
     alcohol_id: string;
-    source: 'taste' | 'situation' | 'picks';
+    source: 'taste' | 'situation' | 'picks' | 'similar';
   };
   bartender_open_alcohol_page: {
     alcohol_id: string;

@@ -7,7 +7,23 @@ import AlcoholItem from '@/components/feature/home/AlcoholItem';
 import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import { ROUTES } from '@/constants/routes';
 import { trackGA4Event } from '@/utils/analytics/ga4';
-import { useSimilarAlcohols } from './useSimilarAlcohols';
+import { useSimilarAlcohols } from '@/queries/useSimilarAlcohols';
+import type { Alcohol } from '@/api/alcohol/types';
+import type { ExploreAlcohol } from '@/api/explore/types';
+import { similarEntryHref } from '@/app/(custom)/bartender-note/_components/similarEntry';
+
+/** 둘러보기 응답을 홈 카드(AlcoholItem)가 받는 모양으로 바꾼다. */
+const toAlcoholItem = (item: ExploreAlcohol): Alcohol => ({
+  alcoholId: item.alcoholId,
+  korName: item.korName,
+  engName: item.engName,
+  rating: item.rating,
+  ratingCount: item.totalRatingsCount,
+  korCategory: item.korCategory,
+  engCategory: item.engCategory,
+  imageUrl: item.alcoholUrlImg,
+  isPicked: item.isPicked,
+});
 
 interface Props {
   alcoholId: number;
@@ -15,21 +31,6 @@ interface Props {
   tags: string[];
   showBottomBorder: boolean;
 }
-
-/** 바텐더 노트가 상세에서 넘어온 위스키를 기준으로 시작할 때 읽는 주소. */
-export const bartenderSimilarHref = (
-  alcoholId: number,
-  alcoholName: string,
-  tags: string[],
-) => {
-  const params = new URLSearchParams({
-    from: 'similar',
-    alcoholId: String(alcoholId),
-    name: alcoholName,
-  });
-  if (tags.length > 0) params.set('tags', tags.join(','));
-  return `${ROUTES.BARTENDER_NOTE}?${params.toString()}`;
-};
 
 export default function SimilarAlcoholsSection({
   alcoholId,
@@ -96,7 +97,7 @@ export default function SimilarAlcoholsSection({
                       })
                     }
                   >
-                    <AlcoholItem data={alcohol} />
+                    <AlcoholItem data={toAlcoholItem(alcohol)} />
                   </li>
                 ))}
               </ul>
@@ -109,7 +110,7 @@ export default function SimilarAlcoholsSection({
         </>
       )}
       <Link
-        href={bartenderSimilarHref(alcoholId, alcoholName, tags)}
+        href={similarEntryHref({ alcoholId, name: alcoholName, tags })}
         onClick={() =>
           trackGA4Event('bartender_entry_click', { source: 'alcohol_detail' })
         }

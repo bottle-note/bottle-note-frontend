@@ -5,8 +5,11 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
+import type { ComponentProps } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ExploreApi } from '@/api/explore/explore.api';
+import type { ExploreAlcohol } from '@/api/explore/types';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import type {
   AlcoholDetailsResponse,
@@ -409,13 +412,15 @@ function stubReviewApi() {
   });
 }
 
-function renderExperience() {
+function renderExperience(
+  props: Partial<ComponentProps<typeof BartenderExperience>> = {},
+) {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
   return render(
     <QueryClientProvider client={client}>
-      <BartenderExperience scenarioContext={SCENARIO_CONTEXT} />
+      <BartenderExperience scenarioContext={SCENARIO_CONTEXT} {...props} />
     </QueryClientProvider>,
   );
 }
@@ -2718,5 +2723,167 @@ describe('바텐더 노트 캠페인 지표', () => {
     expect(save).toHaveBeenCalledTimes(2);
     expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
     expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH']);
+  });
+});
+
+describe('바텐더 노트 비슷한 위스키', () => {
+  const events = (name: string) =>
+    vi.mocked(trackGA4Event).mock.calls.filter(([event]) => event === name);
+  const exploreItem = (id: number): ExploreAlcohol => {
+    const alcohol = alcohols.find((item) => item.id === id)!;
+    return {
+      alcoholId: id,
+      alcoholUrlImg: '',
+      korName: alcohol.name,
+      engName: alcohol.name,
+      korCategory: alcohol.category,
+      engCategory: alcohol.category,
+      rating: alcohol.rating ?? 0,
+      totalRatingsCount: alcohol.rating === null ? 0 : 12,
+      alcoholsTastingTags: alcohol.tags,
+    } as ExploreAlcohol;
+  };
+  const stubExplore = (ids: number[]) =>
+    vi.spyOn(ExploreApi, 'getAlcohols').mockResolvedValue({
+      success: true,
+      code: 200,
+      data: { items: ids.map(exploreItem) },
+      errors: [],
+      meta,
+    });
+  const entry = {
+    alcoholId: 101,
+    name: '라프로익 10년',
+    tags: ['피트', '스모키'],
+  };
+
+  it('주류 상세에서 넘어오면 고른 태그가 겹치는 위스키부터 보여 주고, 고른 병의 이야기로 이어진다', async () => {
+    auth.loggedIn = false;
+    // 둘러보기 검색에는 기준 위스키도 섞여 온다
+    const explore = stubExplore([101, 102, 104]);
+
+    renderExperience({ similarEntry: entry });
+
+    expect(dialogue()).toHaveTextContent(
+      '라프로익 10년과 비슷한 위스키를 추천해드릴게요.',
+    );
+    expect(
+      within(screen.getByRole('banner')).getByText('바텐더 추천'),
+    ).toBeInTheDocument();
+    const row = await screen.findByRole('button', { name: /아드벡 10년/ });
+    expect(row).toHaveTextContent('싱글 몰트 · ★ 4.2');
+    expect(within(row).getByText('피트')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /조니워커 블랙/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /라프로익 10년/ }),
+    ).not.toBeInTheDocument();
+    expect(explore).toHaveBeenCalledWith(
+      expect.objectContaining({ keyword: '피트 스모키', sortType: 'POPULAR' }),
+    );
+    expect(
+      screen.getByRole('link', { name: '다른 위스키 더 볼게요' }),
+    ).toHaveAttribute(
+      'href',
+      `/explore?tab=EXPLORER_WHISKEY&keyword=${encodeURIComponent('피트 스모키')}`,
+    );
+    expect(events('bartender_start')).toEqual([
+      ['bartender_start', { entry: 'similar' }],
+    ]);
+
+    await press(/아드벡 10년/);
+
+    const card = await screen.findByRole('region', { name: '비슷한 위스키' });
+    expect(
+      within(card).getByRole('heading', { name: '아드벡 10년' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('이 병도 잘 맞으실 거예요.')).toBeInTheDocument();
+    expect(events('bartender_select_alcohol')).toEqual([
+      ['bartender_select_alcohol', { alcohol_id: '102', source: 'similar' }],
+    ]);
+  });
+
+  it('비슷한 위스키에서 로그인하고 돌아오면 목록이 아니라 쓰려던 리뷰로 잇는다', async () => {
+    auth.loggedIn = false;
+    stubExplore([101, 102, 104]);
+    // 이름의 공백이 %20으로 적힌 주소로 들어온다
+    window.history.replaceState(
+      null,
+      '',
+      '/bartender-note?from=similar&alcoholId=101&name=Laphroaig%2010&tags=%ED%94%BC%ED%8A%B8',
+    );
+    const view = renderExperience({ similarEntry: entry });
+
+    await press(/아드벡 10년/);
+    await screen.findByRole('region', { name: '비슷한 위스키' });
+    await press('리뷰 작성');
+    const prompt = await screen.findByRole('dialog', {
+      name: '지금 드신 술, 기록해 둘까요?',
+    });
+    fireEvent.click(
+      within(prompt).getByRole('button', { name: '로그인하고 기록하기' }),
+    );
+
+    // 로그인 화면은 주소를 바꿔 끼우며 돌아와 히스토리 표시가 남지 않고,
+    // 돌아올 주소는 검색어를 다시 적어 공백이 +가 된다
+    view.unmount();
+    window.history.replaceState(
+      null,
+      '',
+      '/bartender-note?from=similar&alcoholId=101&name=Laphroaig+10&tags=%ED%94%BC%ED%8A%B8',
+    );
+    auth.loggedIn = true;
+    renderExperience({ similarEntry: entry });
+
+    expect(
+      await screen.findByRole('button', { name: /내 느낌 한 줄로 쓸게요/ }),
+    ).toBeInTheDocument();
+    expect(events('bartender_start')).toEqual([
+      ['bartender_start', { entry: 'similar' }],
+    ]);
+    window.history.replaceState(null, '', '/');
+  });
+
+  it('로그인을 그만두고 주류 상세에서 새로 넘어오면 예전 화면 대신 비슷한 위스키부터 연다', async () => {
+    auth.loggedIn = false;
+    stubExplore([101, 102, 104]);
+    window.history.replaceState(null, '', '/bartender-note');
+    const view = renderExperience();
+
+    await choose('바텐더님과 함께 리뷰를 쓸게요');
+    const prompt = await screen.findByRole('dialog', {
+      name: '지금 드신 술, 기록해 둘까요?',
+    });
+    fireEvent.click(
+      within(prompt).getByRole('button', { name: '로그인하고 기록하기' }),
+    );
+
+    // 로그인 화면에서 뒤로 나간 뒤, 주류 상세의 비슷한 위스키 링크로 새로 들어온다
+    view.unmount();
+    window.history.replaceState(
+      null,
+      '',
+      '/bartender-note?from=similar&alcoholId=101&tags=피트,스모키',
+    );
+    renderExperience({ similarEntry: entry });
+
+    expect(
+      await screen.findByRole('button', { name: /아드벡 10년/ }),
+    ).toBeInTheDocument();
+    window.history.replaceState(null, '', '/');
+  });
+
+  it('겹치는 위스키가 없으면 다른 추천으로 잇는다', async () => {
+    stubExplore([101]);
+
+    renderExperience({ similarEntry: entry });
+
+    expect(
+      await screen.findByRole('button', { name: '위스키 추천해 주세요' }),
+    ).toBeInTheDocument();
+    expect(dialogue()).toHaveTextContent(
+      '고르신 태그가 모두 겹치는 병이 지금은 없네요.',
+    );
   });
 });
