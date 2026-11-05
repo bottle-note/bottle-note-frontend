@@ -36,6 +36,7 @@ import {
   useAlcoholDetailQuery,
 } from '@/queries/useAlcoholDetailQuery';
 import AlcoholDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/AlcoholDetailsSkeleton';
+import ReviewItemSkeleton from '@/components/ui/Loading/Skeletons/ReviewItemSkeleton';
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import AlcoholRatingInput from '@/components/domain/alcohol/AlcoholRatingInput';
 import ShareDropdown from '@/components/share/ShareDropdown';
@@ -47,9 +48,12 @@ import AlcoholDetailHeader from './AlcoholDetailHeader';
 import AlcoholImportClearance from './AlcoholImportClearance';
 import { useAlcoholImportClearanceItems } from './useAlcoholImportClearanceItems';
 import RatingSuccessModal from './RatingSuccessModal';
+import SimilarAlcoholsSection from './SimilarAlcoholsSection';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 const GUEST_REVIEW_PREVIEW_COUNT = 2;
+/** 테이스팅 태그가 두 개 겹치면 비슷한 위스키로 본다. 더 늘리면 겹치는 위스키가 거의 없다. */
+const SIMILAR_TAG_LIMIT = 2;
 
 interface DetailItem {
   title: string;
@@ -312,7 +316,11 @@ export default function AlcoholDetailPage({
   const reviewList = data?.reviewInfo?.reviewList ?? [];
   const reviewTotalCount = data?.reviewInfo?.totalCount;
   const isGuest = !isLoggedIn;
-  // 비회원은 리뷰를 맛보기로만 보여 주고, 나머지는 로그인 후 전체 리뷰에서 본다
+  const reviewsHref = `${ROUTES.ALCOHOL.REVIEWS(String(alcoholId))}?${new URLSearchParams(
+    { name: data?.alcohols?.korName ?? '' },
+  ).toString()}`;
+  // 리뷰는 서버의 하루 캐시(초기 데이터)가 아니라 브라우저에서 새로 받은 응답으로만 그린다.
+  // 그 사이 지워지거나 비공개로 바뀐 리뷰가 공개 HTML에 남지 않게 하기 위해서다.
   const visibleReviews = isGuest
     ? reviewList.slice(0, GUEST_REVIEW_PREVIEW_COUNT)
     : reviewList;
@@ -323,7 +331,9 @@ export default function AlcoholDetailPage({
   const isPersonalizedReady =
     !isAuthLoading && (!isLoggedIn || (isFetchedAfterMount && isSuccess));
 
-  const hasFlavorTags = Boolean(data?.alcohols?.alcoholsTastingTags?.length);
+  const flavorTags = data?.alcohols?.alcoholsTastingTags ?? [];
+  const hasFlavorTags = flavorTags.length > 0;
+  const similarTags = flavorTags.slice(0, SIMILAR_TAG_LIMIT);
   const description = data?.alcohols?.description?.trim();
   useEffect(() => {
     if (descriptionRef.current && !isDescriptionExpanded) {
@@ -378,7 +388,7 @@ export default function AlcoholDetailPage({
       <section
         className={`mx-20 py-16 ${
           description ? '' : 'border-t border-stroke-neutral-subtle'
-        } ${hasFlavorTags || hasImportInfo ? 'border-b' : ''}`}
+        } border-b`}
       >
         <div className="grid gap-6">
           {alcoholDetails.map((item: DetailItem) => (
@@ -393,9 +403,14 @@ export default function AlcoholDetailPage({
           ))}
         </div>
       </section>
-      {data?.alcohols?.alcoholsTastingTags && (
-        <FlavorTags
-          tagList={data.alcohols.alcoholsTastingTags}
+      {hasFlavorTags && (
+        <FlavorTags tagList={flavorTags} showBottomBorder={false} />
+      )}
+      {data?.alcohols && (
+        <SimilarAlcoholsSection
+          alcoholId={data.alcohols.alcoholId}
+          alcoholName={data.alcohols.korName}
+          tags={similarTags}
           showBottomBorder={hasImportInfo}
         />
       )}
@@ -512,7 +527,12 @@ export default function AlcoholDetailPage({
             </div>
             <>
               <div className="h-16 bg-bg-layer-basement" />
-              {visibleReviews.length > 0 ? (
+              {!isFetchedAfterMount ? (
+                <div aria-hidden="true" className="mx-20 space-y-24 pt-34">
+                  <ReviewItemSkeleton />
+                  <ReviewItemSkeleton />
+                </div>
+              ) : !isSuccess ? null : visibleReviews.length > 0 ? (
                 <>
                   <section id="reviews" className="mx-20 pt-34 pb-20">
                     {typeof reviewTotalCount === 'number' && (
@@ -549,7 +569,10 @@ export default function AlcoholDetailPage({
                         ) => {
                           if (!isLoggedIn) {
                             e.preventDefault();
-                            bridgeToLogin({ trigger: 'comment' });
+                            bridgeToLogin(
+                              { trigger: 'comment' },
+                              { returnTo: reviewsHref },
+                            );
                           }
                         },
                       }}

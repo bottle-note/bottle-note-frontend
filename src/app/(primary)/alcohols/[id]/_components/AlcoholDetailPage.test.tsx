@@ -1,10 +1,12 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import type {
   AlcoholDetailsResponse,
   ReviewInDetails,
 } from '@/api/alcohol/types';
+import { ExploreApi } from '@/api/explore/explore.api';
+import type { ExploreAlcohol } from '@/api/explore/types';
 import { MfdsApi } from '@/api/mfds/mfds.api';
 import { RateApi } from '@/api/rate/rate.api';
 import { UserApi } from '@/api/user/user.api';
@@ -78,7 +80,7 @@ const detail: AlcoholDetailsResponse = {
     totalRatingsCount: 19,
     isPicked: false,
     reviewCount: 16,
-    alcoholsTastingTags: ['보리', '씨리얼'],
+    alcoholsTastingTags: ['보리', '씨리얼', '시나몬'],
   },
   friendsInfo: { followerCount: 0, friends: [] },
   reviewInfo: {
@@ -90,7 +92,13 @@ const detail: AlcoholDetailsResponse = {
   },
 };
 
-const renderPage = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
+const renderPage = ({
+  isLoggedIn,
+  initialData = detail,
+}: {
+  isLoggedIn: boolean;
+  initialData?: AlcoholDetailsResponse;
+}) => {
   jest.mocked(useAuthSession).mockReturnValue({
     isLoading: false,
     isLoggedIn,
@@ -101,7 +109,7 @@ const renderPage = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   });
   return render(
     <QueryClientProvider client={queryClient}>
-      <AlcoholDetailPage initialData={detail} />
+      <AlcoholDetailPage initialData={initialData} />
     </QueryClientProvider>,
   );
 };
@@ -122,7 +130,34 @@ beforeEach(() => {
   jest.spyOn(UserApi, 'getCurUserInfo').mockResolvedValue({
     data: { nickname: '회원' },
   } as Awaited<ReturnType<typeof UserApi.getCurUserInfo>>);
+  jest.spyOn(ExploreApi, 'getAlcohols').mockImplementation(
+    async ({ keyword }) =>
+      ({
+        data: { items: similarByKeyword[keyword ?? ''] ?? [] },
+      }) as unknown as Awaited<ReturnType<typeof ExploreApi.getAlcohols>>,
+  );
 });
+
+const exploreAlcohol = (alcoholId: number, korName: string) =>
+  ({
+    alcoholId,
+    korName,
+    engName: korName,
+    alcoholUrlImg: '',
+    korCategory: '싱글 몰트',
+    engCategory: 'Single Malt',
+    rating: 3,
+    totalRatingsCount: 1,
+    isPicked: false,
+  }) as ExploreAlcohol;
+
+// 둘러보기 검색 결과에는 지금 보는 위스키도 섞여 온다
+const similarByKeyword: Record<string, ExploreAlcohol[]> = {
+  '보리 씨리얼': [
+    exploreAlcohol(482, '스프링뱅크 10년'),
+    exploreAlcohol(389, '카듀 12년'),
+  ],
+};
 
 afterEach(() => {
   jest.restoreAllMocks();
@@ -141,12 +176,17 @@ it('비회원도 설명과 태그를 읽고, 리뷰 2개를 본 뒤 로그인해
     screen.queryByText('지금 보고 계신 위스키, 관심있으신가요?'),
   ).not.toBeInTheDocument();
 
-  expect(screen.getByText('첫 번째 리뷰')).toBeInTheDocument();
+  expect(await screen.findByText('첫 번째 리뷰')).toBeInTheDocument();
   expect(screen.getByText('두 번째 리뷰')).toBeInTheDocument();
   expect(screen.queryByText('세 번째 리뷰')).not.toBeInTheDocument();
 
   fireEvent.click(screen.getByText('로그인하고 리뷰 16개 모두 보기'));
-  expect(bridgeToLogin).toHaveBeenCalledWith({ trigger: 'comment' });
+  expect(bridgeToLogin).toHaveBeenCalledWith(
+    { trigger: 'comment' },
+    {
+      returnTo: `/alcohols/482/reviews?name=${encodeURIComponent('스프링뱅크 10년').replace(/%20/g, '+')}`,
+    },
+  );
 });
 
 it('회원은 받은 리뷰를 모두 보고 리뷰 더 보기로 전체 리뷰로 간다', async () => {
@@ -158,4 +198,65 @@ it('회원은 받은 리뷰를 모두 보고 리뷰 더 보기로 전체 리뷰�
   expect(
     screen.queryByText('로그인하고 리뷰 16개 모두 보기'),
   ).not.toBeInTheDocument();
+});
+
+it('앞의 두 태그가 겹치는 위스키를 비슷한 위스키로 보여 주고, 탐색과 바텐더 노트로 잇는다', async () => {
+  renderPage({ isLoggedIn: false });
+
+  const similar = await screen.findByRole('region', {
+    name: '비슷한 위스키 추천',
+  });
+  expect(await within(similar).findByText('카듀 12년')).toBeInTheDocument();
+  expect(
+    within(similar).queryByText('스프링뱅크 10년'),
+  ).not.toBeInTheDocument();
+  // 태그는 읽기 전용이다
+  expect(
+    screen.queryByRole('button', { name: '보리' }),
+  ).not.toBeInTheDocument();
+
+  expect(
+    within(similar).getByRole('link', { name: /더 보기/ }),
+  ).toHaveAttribute(
+    'href',
+    `/explore?tab=EXPLORER_WHISKEY&keyword=${encodeURIComponent('보리 씨리얼')}`,
+  );
+  const bartender = new URL(
+    within(similar)
+      .getByRole('link', { name: /바텐더 노트에게 다양한 위스키 추천받기/ })
+      .getAttribute('href') ?? '',
+    'http://localhost',
+  );
+  expect(bartender.pathname).toBe('/bartender-note');
+  expect(Object.fromEntries(bartender.searchParams)).toEqual({
+    from: 'similar',
+    alcoholId: '482',
+    name: '스프링뱅크 10년',
+    tags: '보리,씨리얼',
+  });
+});
+
+it('태그가 겹치는 다른 위스키가 없으면 안내 문구를 보여 준다', async () => {
+  jest.spyOn(ExploreApi, 'getAlcohols').mockResolvedValue({
+    data: { items: [exploreAlcohol(482, '스프링뱅크 10년')] },
+  } as unknown as Awaited<ReturnType<typeof ExploreApi.getAlcohols>>);
+  renderPage({ isLoggedIn: false });
+
+  expect(
+    await screen.findByText('비슷한 위스키를 찾지 못했어요'),
+  ).toBeInTheDocument();
+});
+
+it('서버 캐시에 남은 리뷰는 그리지 않고, 브라우저에서 새로 받은 리뷰만 보여 준다', async () => {
+  renderPage({
+    isLoggedIn: false,
+    initialData: {
+      ...detail,
+      reviewInfo: { reviewList: [review(99, '지워진 리뷰')] },
+    },
+  });
+
+  expect(screen.queryByText('지워진 리뷰')).not.toBeInTheDocument();
+  expect(await screen.findByText('첫 번째 리뷰')).toBeInTheDocument();
+  expect(screen.queryByText('지워진 리뷰')).not.toBeInTheDocument();
 });
