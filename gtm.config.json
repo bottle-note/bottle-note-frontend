@@ -55,6 +55,16 @@
       "parameters": ["alcohol_id", "alcohol_name"]
     },
     {
+      "name": "similar_tag_select",
+      "parameters": ["alcohol_id", "action"]
+    },
+    {
+      "name": "similar_alcohol_click",
+      "parameters": ["alcohol_id", "target_alcohol_id", "position"]
+    },
+    { "name": "similar_alcohol_more_click", "parameters": ["alcohol_id"] },
+    { "name": "bartender_entry_click", "parameters": ["source"] },
+    {
       "name": "view_import_clearance_list",
       "parameters": ["access_state", "result_state"]
     },

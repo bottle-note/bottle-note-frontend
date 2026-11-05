@@ -47,9 +47,12 @@ import AlcoholDetailHeader from './AlcoholDetailHeader';
 import AlcoholImportClearance from './AlcoholImportClearance';
 import { useAlcoholImportClearanceItems } from './useAlcoholImportClearanceItems';
 import RatingSuccessModal from './RatingSuccessModal';
+import SimilarAlcoholsSection from './SimilarAlcoholsSection';
 import ProfileDefaultImg from 'public/profile-default.svg';
 
 const GUEST_REVIEW_PREVIEW_COUNT = 2;
+/** 태그를 많이 고를수록 모두 겹치는 위스키가 줄어들어 두 개까지만 고른다. */
+const SIMILAR_TAG_LIMIT = 2;
 
 interface DetailItem {
   title: string;
@@ -106,6 +109,8 @@ export default function AlcoholDetailPage({
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isRatingSuccessOpen, setIsRatingSuccessOpen] = useState(false);
   const [successfulRating, setSuccessfulRating] = useState(0);
+  /** 사용자가 직접 고른 태그. 고르기 전에는 null이고 기본값을 쓴다. */
+  const [pickedTags, setPickedTags] = useState<string[] | null>(null);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [isDescriptionClamped, setIsDescriptionClamped] = useState(true);
   const [collapsedDescriptionHeight, setCollapsedDescriptionHeight] =
@@ -323,7 +328,22 @@ export default function AlcoholDetailPage({
   const isPersonalizedReady =
     !isAuthLoading && (!isLoggedIn || (isFetchedAfterMount && isSuccess));
 
-  const hasFlavorTags = Boolean(data?.alcohols?.alcoholsTastingTags?.length);
+  const flavorTags = data?.alcohols?.alcoholsTastingTags ?? [];
+  const hasFlavorTags = flavorTags.length > 0;
+  // 고르기 전에는 앞의 두 태그로 비슷한 위스키를 보여 준다
+  const selectedTags = pickedTags ?? flavorTags.slice(0, SIMILAR_TAG_LIMIT);
+  const toggleTag = (tag: string) => {
+    const isSelected = selectedTags.includes(tag);
+    trackGA4Event('similar_tag_select', {
+      alcohol_id: alcoholIdString,
+      action: isSelected ? 'deselect' : 'select',
+    });
+    setPickedTags(
+      isSelected
+        ? selectedTags.filter((selected) => selected !== tag)
+        : [...selectedTags, tag].slice(-SIMILAR_TAG_LIMIT),
+    );
+  };
   const description = data?.alcohols?.description?.trim();
   useEffect(() => {
     if (descriptionRef.current && !isDescriptionExpanded) {
@@ -378,7 +398,7 @@ export default function AlcoholDetailPage({
       <section
         className={`mx-20 py-16 ${
           description ? '' : 'border-t border-stroke-neutral-subtle'
-        } ${hasFlavorTags || hasImportInfo ? 'border-b' : ''}`}
+        } border-b`}
       >
         <div className="grid gap-6">
           {alcoholDetails.map((item: DetailItem) => (
@@ -393,9 +413,19 @@ export default function AlcoholDetailPage({
           ))}
         </div>
       </section>
-      {data?.alcohols?.alcoholsTastingTags && (
+      {hasFlavorTags && (
         <FlavorTags
-          tagList={data.alcohols.alcoholsTastingTags}
+          tagList={flavorTags}
+          showBottomBorder={false}
+          selectedTags={selectedTags}
+          onToggleTag={toggleTag}
+        />
+      )}
+      {data?.alcohols && (
+        <SimilarAlcoholsSection
+          alcoholId={data.alcohols.alcoholId}
+          alcoholName={data.alcohols.korName}
+          selectedTags={selectedTags}
           showBottomBorder={hasImportInfo}
         />
       )}
