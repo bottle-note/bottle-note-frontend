@@ -316,7 +316,6 @@ export default function AlcoholDetailPage({
   const reviewList = data?.reviewInfo?.reviewList ?? [];
   const reviewTotalCount = data?.reviewInfo?.totalCount;
   const isGuest = !isLoggedIn;
-  // 비회원은 리뷰를 맛보기로만 보여 주고, 나머지는 로그인 후 전체 리뷰에서 본다
   const reviewsHref = `${ROUTES.ALCOHOL.REVIEWS(String(alcoholId))}?${new URLSearchParams(
     { name: data?.alcohols?.korName ?? '' },
   ).toString()}`;
@@ -570,7 +569,6 @@ export default function AlcoholDetailPage({
                         ) => {
                           if (!isLoggedIn) {
                             e.preventDefault();
-                            // 로그인 후 상세가 아니라 누르려던 전체 리뷰로 바로 보낸다
                             bridgeToLogin(
                               { trigger: 'comment' },
                               { returnTo: reviewsHref },
