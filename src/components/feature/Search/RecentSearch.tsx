@@ -3,13 +3,19 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
+import { cn } from '@/lib/utils';
 
 interface Props {
   handleSearch: (keyword: string) => void;
   keyValue?: string;
+  className?: string;
 }
 
-export default function RecentSearch({ handleSearch, keyValue }: Props) {
+export default function RecentSearch({
+  handleSearch,
+  keyValue,
+  className,
+}: Props) {
   const SearchHistory = new SearchHistoryService(keyValue);
   const [list, setList] = useState(SearchHistory.get());
 
@@ -25,7 +31,12 @@ export default function RecentSearch({ handleSearch, keyValue }: Props) {
   };
 
   return (
-    <section className="content-container h-full bg-bg-layer-default px-20 text-fg-neutral">
+    <section
+      className={cn(
+        'content-container h-full bg-bg-layer-default px-20 text-fg-neutral',
+        className,
+      )}
+    >
       <h2 className="text-sm font-bold text-fg-brand">최근 검색어</h2>
       <article className="my-12 border-t border-stroke-brand-weak text-xs">
         {list.map((text) => (

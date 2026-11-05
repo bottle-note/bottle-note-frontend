@@ -64,12 +64,21 @@ async function submitReview({
       alcoholId: String(alcoholId),
       status: review.public ? 'PUBLIC' : 'PRIVATE',
       content: getReviewText(review),
-      sizeType: review.price ? SIZE_TYPE[review.unit] : null,
-      price: review.price ? Number(review.price) : null,
+      sizeType: review.price && review.unit ? SIZE_TYPE[review.unit] : null,
+      price: review.price && review.unit ? Number(review.price) : null,
       imageUrlList: uploadedImages.length ? uploadedImages : null,
       tastingTagList: getReviewTags(review),
       tastingProfile,
-      locationInfo: { locationName: review.place.trim() || null },
+      locationInfo: review.place
+        ? {
+            locationName: review.place.name,
+            address: review.place.address,
+            category: review.place.category,
+            mapUrl: review.place.mapUrl,
+            latitude: review.place.latitude,
+            longitude: review.place.longitude,
+          }
+        : { locationName: null },
       rating: review.rating,
     });
     reviewId = response.data.id;

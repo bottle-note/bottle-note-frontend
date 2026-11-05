@@ -160,6 +160,7 @@ export function getDialogue(input: DialogueInput): string[] {
       '오늘의 한 잔은 몇 점인가요?\n반 점 단위로 고를 수 있어요.',
     ],
     'review-where': ['어디에서 드셨나요?\n장소와 가격은 건너뛰셔도 됩니다.'],
+    'review-place': ['가게 이름이나 주소를 알려 주세요.\n찾아 드릴게요.'],
     'review-preview': ['다 적었습니다.\n이렇게 올리면 될까요?'],
     'review-done': [
       '올렸습니다. 좋은 기록이 하나 늘었네요.\n한 잔 더 기록하시겠어요?',

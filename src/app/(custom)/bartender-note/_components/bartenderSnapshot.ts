@@ -7,8 +7,8 @@ import type {
 } from './useBartenderCampaign';
 import type { ScenarioAnswer, ScenarioContext } from '../_scenario/model';
 
-// v5: 상황 단계(situation·curation-empty)를 없애고 큐레이션 API로 바꿨다
-const STORAGE_KEY = 'bartender-note:snapshot:v5';
+// v6: 리뷰 장소를 검색해서 고른 곳(객체)으로, 가격 단위를 고르지 않은 상태(null)도 둘 수 있게 바꿨다
+const STORAGE_KEY = 'bartender-note:snapshot:v6';
 /** 다른 페이지에 다녀온 뒤 이어 보기를 허용하는 시간. 지나면 처음 화면부터 시작한다. */
 const RESUME_WITHIN_MS = 30 * 60 * 1000;
 

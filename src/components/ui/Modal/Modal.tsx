@@ -21,7 +21,7 @@ function Modal({ children }: Props) {
   };
 
   return (
-    <BackDrop isShow={state.isShowModal}>
+    <BackDrop isShow={state.isShowModal} className="z-[60]">
       <div className="content-container h-full flex flex-col justify-center items-center px-16 gap-12">
         <section className="relative w-full min-h-208 pt-64 pb-16 bg-bg-layer-floating text-fg-neutral rounded-xl text-center flex flex-col items-center space-y-12 px-16">
           <article className="absolute top-[-10px]">

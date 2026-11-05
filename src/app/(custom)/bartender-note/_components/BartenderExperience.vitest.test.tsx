@@ -27,6 +27,7 @@ import type {
   CurationV2FeedItem,
 } from '@/api/curation-v2/types';
 import { ApiError } from '@/utils/ApiError';
+import type { KakaoPlace } from '@/types/Review';
 import BartenderExperience from './BartenderExperience';
 import {
   SCENARIO_CONTEXT,
@@ -410,6 +411,78 @@ function stubReviewApi() {
     errors: [],
     meta,
   });
+}
+
+type KakaoStatus = 'OK' | 'ZERO_RESULT' | 'ERROR';
+
+function kakaoPlace(name: string, address: string): KakaoPlace {
+  return {
+    id: name,
+    place_name: name,
+    category_name: '음식점 > 술집 > 칵테일바',
+    category_group_code: 'FD6',
+    category_group_name: '음식점',
+    road_address_name: address,
+    address_name: `${address} (지번)`,
+    place_url: `https://place.map.kakao.com/${encodeURIComponent(name)}`,
+    phone: '',
+    distance: '',
+    x: '126.92',
+    y: '37.55',
+  };
+}
+
+/**
+ * Kakao 장소 검색은 브라우저에서 부르는 외부 SDK다.
+ * 검색어·페이지마다 돌려줄 응답을 정해 window.kakao 자리에 둔다.
+ */
+function stubKakaoPlaces(
+  respond: (
+    keyword: string,
+    page: number,
+  ) => { status: KakaoStatus; places?: KakaoPlace[]; hasNextPage?: boolean },
+) {
+  window.localStorage.clear();
+  const keywordSearch = vi.fn(
+    (
+      keyword: string,
+      callback: (
+        data: KakaoPlace[],
+        status: KakaoStatus,
+        pagination: { hasNextPage: boolean },
+      ) => void,
+      { page }: { page: number },
+    ) => {
+      const result = respond(keyword, page);
+      callback(result.places ?? [], result.status, {
+        hasNextPage: result.hasNextPage ?? false,
+      });
+    },
+  );
+  window.kakao = {
+    maps: {
+      load: (ready: () => void) => ready(),
+      services: {
+        Places: class {
+          keywordSearch = keywordSearch;
+        },
+        Status: { OK: 'OK', ZERO_RESULT: 'ZERO_RESULT', ERROR: 'ERROR' },
+      },
+    },
+  };
+  return keywordSearch;
+}
+
+/** 장소·가격 단계에서 장소 검색을 열고 검색어로 찾는다. */
+async function searchPlace(keyword: string) {
+  await press('장소 검색');
+  await waitFor(() =>
+    expect(dialogue()).toHaveTextContent('가게 이름이나 주소를 알려 주세요.'),
+  );
+  fireEvent.change(screen.getByRole('textbox', { name: '검색어 입력' }), {
+    target: { value: keyword },
+  });
+  await press('검색');
 }
 
 function renderExperience(
@@ -1779,8 +1852,12 @@ describe('바텐더 노트 리뷰', () => {
     );
   });
 
-  it('장소·가격 단계는 버튼 하나로 넘어가고, 입력하면 문구가 바뀌며 입력한 값을 저장한다', async () => {
+  it('장소를 검색해 고르면 장소·가격 단계로 돌아와 보이고, 등록하면 장소 정보를 함께 저장한다', async () => {
     const register = stubReviewApi();
+    stubKakaoPlaces(() => ({
+      status: 'OK',
+      places: [kakaoPlace('참나무 바', '서울 마포구 와우산로 1')],
+    }));
     renderExperience();
     await openCurationDetail('글렌피딕 12년');
     await writeQuickReview('사과 향이 산뜻해요');
@@ -1789,15 +1866,20 @@ describe('바텐더 노트 리뷰', () => {
     expect(
       await screen.findByRole('button', { name: '장소·가격 없이 넘어갈게요' }),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: /건너뛰기/ }),
-    ).not.toBeInTheDocument();
 
-    fireEvent.change(screen.getByRole('textbox', { name: /장소/ }), {
-      target: { value: '동네 바' },
-    });
+    await searchPlace('참나무');
+    await press(/참나무 바/);
+
+    // 고르면 장소·가격 단계로 돌아온다
+    expect(
+      await screen.findByRole('button', { name: '장소 참나무 바 바꾸기' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('칵테일바 · 서울 마포구 와우산로 1'),
+    ).toBeInTheDocument();
+
     await press('보틀(1병)');
-    fireEvent.change(screen.getByRole('textbox', { name: /가격/ }), {
+    fireEvent.change(screen.getByRole('textbox', { name: '가격' }), {
       target: { value: '85,000' },
     });
     await press('다 됐어요');
@@ -1810,8 +1892,167 @@ describe('바텐더 노트 리뷰', () => {
       expect.objectContaining({
         sizeType: 'BOTTLE',
         price: 85000,
-        locationInfo: { locationName: '동네 바' },
+        locationInfo: {
+          locationName: '참나무 바',
+          address: '서울 마포구 와우산로 1',
+          category: '칵테일바',
+          mapUrl:
+            'https://place.map.kakao.com/%EC%B0%B8%EB%82%98%EB%AC%B4%20%EB%B0%94',
+          latitude: '37.55',
+          longitude: '126.92',
+        },
       }),
+    );
+
+    // 같은 자리에서 다른 술을 기록하면 장소를 이어 쓴다고 알려 준다
+    expect(
+      await screen.findByRole('button', {
+        name: /「참나무 바」 장소는 이어서 채워 둘게요/,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it('고른 장소를 지우면 장소 없이 넘어가고 저장한다', async () => {
+    const register = stubReviewApi();
+    stubKakaoPlaces(() => ({
+      status: 'OK',
+      places: [kakaoPlace('참나무 바', '서울 마포구 와우산로 1')],
+    }));
+    renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+    await writeQuickReview('사과 향이 산뜻해요');
+    await press('별점 없이 넘어갈게요');
+    await searchPlace('참나무');
+    await press(/참나무 바/);
+    await screen.findByRole('button', { name: '장소 참나무 바 바꾸기' });
+
+    // 지우기 버튼의 키 입력이 바깥 칸으로 번져 장소 검색이 열리면 안 된다
+    const clear = screen.getByRole('button', { name: '검색어 지우기' });
+    fireEvent.keyDown(clear, { key: 'Enter' });
+    expect(dialogue()).toHaveTextContent('어디에서 드셨나요?');
+
+    fireEvent.click(clear);
+
+    expect(
+      await screen.findByRole('button', { name: '장소 검색' }),
+    ).toBeInTheDocument();
+    await press('장소·가격 없이 넘어갈게요');
+    await press('이걸로 등록할게요');
+    await waitFor(() =>
+      expect(screen.getByText('✓ 등록됨 · 공개')).toBeInTheDocument(),
+    );
+    expect(register).toHaveBeenCalledWith(
+      expect.objectContaining({ locationInfo: { locationName: null } }),
+    );
+  });
+
+  it('검색 결과가 없으면 빈 화면을, 검색에 실패하면 다시 시도할 수 있게 보여 준다', async () => {
+    let failOnce = true;
+    stubKakaoPlaces((keyword) => {
+      if (keyword === '없는 가게') return { status: 'ZERO_RESULT' };
+      if (failOnce) {
+        failOnce = false;
+        return { status: 'ERROR' };
+      }
+      return {
+        status: 'OK',
+        places: [kakaoPlace('참나무 바', '서울 마포구 와우산로 1')],
+      };
+    });
+    renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+    await writeQuickReview('사과 향이 산뜻해요');
+    await press('별점 없이 넘어갈게요');
+
+    await searchPlace('없는 가게');
+    expect(await screen.findByText('검색 결과가 없어요!')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole('textbox', { name: '검색어 입력' }), {
+      target: { value: '참나무' },
+    });
+    await press('검색');
+    expect(
+      await screen.findByText('검색 중 문제가 생겼어요.'),
+    ).toBeInTheDocument();
+
+    await press('다시 시도');
+    expect(
+      await screen.findByRole('button', { name: /참나무 바/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('더 보기를 누르면 다음 검색 결과를 이어 붙이고, 마지막 결과면 더 보기를 숨긴다', async () => {
+    const keywordSearch = stubKakaoPlaces((_, page) =>
+      page === 1
+        ? {
+            status: 'OK',
+            places: [kakaoPlace('참나무 바', '서울 마포구 와우산로 1')],
+            hasNextPage: true,
+          }
+        : {
+            status: 'OK',
+            places: [kakaoPlace('참나무 몰트하우스', '서울 성동구 성수이로 2')],
+            hasNextPage: false,
+          },
+    );
+    renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+    await writeQuickReview('사과 향이 산뜻해요');
+    await press('별점 없이 넘어갈게요');
+    await searchPlace('참나무');
+    await screen.findByText('검색 결과 1곳');
+
+    await press('더 보기');
+
+    expect(await screen.findByText('검색 결과 2곳')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /참나무 바/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /참나무 몰트하우스/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '더 보기' }),
+    ).not.toBeInTheDocument();
+    expect(keywordSearch).toHaveBeenLastCalledWith(
+      '참나무',
+      expect.any(Function),
+      { page: 2 },
+    );
+  });
+
+  it('가격은 단위를 고른 뒤에 적고, 고른 단위를 다시 누르면 단위와 금액을 비운다', async () => {
+    const register = stubReviewApi();
+    renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+    await writeQuickReview('사과 향이 산뜻해요');
+    await press('별점 없이 넘어갈게요');
+
+    const price = await screen.findByRole('textbox', { name: '가격' });
+    expect(price).toBeDisabled();
+
+    await press('1잔');
+    expect(price).toBeEnabled();
+    fireEvent.change(price, { target: { value: '18000' } });
+    expect(
+      screen.getByRole('button', { name: '다 됐어요' }),
+    ).toBeInTheDocument();
+
+    await press('1잔');
+    expect(screen.getByRole('button', { name: '1잔' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    expect(price).toBeDisabled();
+    expect(price).toHaveValue('');
+
+    await press('장소·가격 없이 넘어갈게요');
+    await press('이걸로 등록할게요');
+    await waitFor(() =>
+      expect(screen.getByText('✓ 등록됨 · 공개')).toBeInTheDocument(),
+    );
+    expect(register).toHaveBeenCalledWith(
+      expect.objectContaining({ sizeType: null, price: null }),
     );
   });
 

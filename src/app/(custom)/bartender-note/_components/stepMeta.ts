@@ -34,6 +34,7 @@ const STEP_META: Record<Step, StepMeta> = {
   'review-photo': { title: REVIEW, subtitle: '사진', pose: 'idle' },
   'review-rating': { title: REVIEW, subtitle: '별점', pose: 'idle' },
   'review-where': { title: REVIEW, subtitle: '장소', pose: 'idle' },
+  'review-place': { title: REVIEW, subtitle: '장소 찾기', pose: 'idle' },
   'review-preview': { title: REVIEW, subtitle: '다 됐습니다', pose: 'idle' },
   'review-done': {
     title: REVIEW,
@@ -70,7 +71,10 @@ export function getStepHeader(
 ) {
   const meta = STEP_META[step];
   const reviewSteps = reviewProgressSteps(reviewMode);
-  const review = reviewSteps.indexOf(step);
+  // 장소 찾기는 장소·가격 단계 안에서 잠깐 여는 화면이라 같은 진행률을 쓴다
+  const review = reviewSteps.indexOf(
+    step === 'review-place' ? 'review-where' : step,
+  );
   const subtitle =
     step === 'scenario' ? `질문 ${questionNumber}` : meta.subtitle ?? '';
   const progress =

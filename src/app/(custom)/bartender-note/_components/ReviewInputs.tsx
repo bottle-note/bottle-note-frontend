@@ -1,4 +1,5 @@
 import type { InputHTMLAttributes, ReactNode } from 'react';
+import Image from 'next/image';
 import { Search } from 'lucide-react';
 
 /** 리뷰 작성 단계의 태그·키워드 칩. 모바일에서 읽기 쉽게 14px로 둔다. */
@@ -11,31 +12,24 @@ export const reviewChip = {
   add: `${chipBase} border-stroke-brand-solid bg-transparent text-fg-brand`,
 };
 
-/** 리뷰 작성 단계의 한 줄 입력 칸. 검색 칸과 같은 높이·테두리·포커스 표시를 쓴다. */
-export const reviewTextInput =
-  'h-44 w-full rounded-lg border border-stroke-neutral-weak bg-bg-neutral-weak px-12 text-16 text-fg-neutral outline-none placeholder:text-fg-placeholder focus-visible:border-stroke-focus-ring focus-visible:ring-2 focus-visible:ring-stroke-focus-ring';
-
-/** 입력 칸 위에 두는 항목 이름. 선택 입력이면 회색으로 (선택)을 붙인다. */
-export function ReviewFieldLabel({
-  htmlFor,
+/** 일반 리뷰 작성의 선택 항목(장소·가격)과 같은 제목. 아이콘 옆에 이름과 (선택)을 둔다. */
+export function OptionTitle({
+  iconSrc,
   children,
-  optional = false,
 }: {
-  htmlFor?: string;
+  iconSrc: string;
   children: ReactNode;
-  optional?: boolean;
 }) {
   return (
-    <label className="text-13 font-bold text-fg-neutral" htmlFor={htmlFor}>
+    <h3 className="m-0 flex items-center gap-4 text-15 font-bold text-fg-neutral">
+      <Image src={iconSrc} alt="" width={20} height={20} />
       {children}
-      {optional && (
-        <span className="font-normal text-fg-neutral-muted"> (선택)</span>
-      )}
-    </label>
+      <span className="text-13 font-normal text-fg-neutral-muted">(선택)</span>
+    </h3>
   );
 }
 
-/** 둘 중 하나를 고르는 칸. 잔·병 단위와 공개 범위가 같이 쓴다. */
+/** 둘 중 하나를 고르는 칸. 잔·병 단위와 공개 범위가 같이 쓴다. value가 null이면 아무것도 고르지 않은 상태다. */
 export function ReviewSegmented<T extends string>({
   label,
   value,
@@ -43,7 +37,7 @@ export function ReviewSegmented<T extends string>({
   onChange,
 }: {
   label: string;
-  value: T;
+  value: T | null;
   options: { value: T; label: string }[];
   onChange: (value: T) => void;
 }) {

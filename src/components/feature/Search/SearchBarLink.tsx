@@ -9,6 +9,9 @@ interface Props {
   keyword?: string;
   returnUrl?: string;
   onClear?: () => void;
+  /** 검색 페이지 대신 다른 검색 화면을 연다. */
+  onOpen?: () => void;
+  ariaLabel?: string;
   className?: string;
 }
 
@@ -17,11 +20,17 @@ export default function SearchBarLink({
   keyword,
   returnUrl,
   onClear,
+  onOpen,
+  ariaLabel,
   className,
 }: Props) {
   const router = useRouter();
 
   const handleNavigate = () => {
+    if (onOpen) {
+      onOpen();
+      return;
+    }
     const params = new URLSearchParams();
     if (keyword) params.set('keyword', keyword);
     if (returnUrl) params.set('returnUrl', returnUrl);
@@ -34,6 +43,8 @@ export default function SearchBarLink({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // 안쪽 지우기 버튼의 키 입력은 그 버튼이 처리한다
+    if (e.target !== e.currentTarget) return;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleNavigate();
@@ -47,6 +58,7 @@ export default function SearchBarLink({
       onKeyDown={handleKeyDown}
       role="button"
       tabIndex={0}
+      aria-label={ariaLabel}
     >
       <SearchBar
         placeholder={placeholder}

@@ -826,6 +826,7 @@ export default function BartenderExperience({
           updateReview={updateReview}
           selected={selected}
           move={move}
+          back={back}
           home={home}
           onPickAlcohol={(id) => chooseAlcohol({ id, source: 'api' })}
           lastReviewMode={lastReviewMode}
