@@ -158,11 +158,6 @@ export default function CandidateList({
             : '보여 드릴 병이 없어요. 다른 주제로 골라 볼까요?'}
         </p>
       )}
-      {!empty && (
-        <p className="m-0 text-13 text-fg-neutral-muted">
-          술을 누르면 자세한 정보를 볼 수 있어요.
-        </p>
-      )}
       <div className="flex flex-col">
         {step === 'curation-list'
           ? curationItems.map((item, index) => (
