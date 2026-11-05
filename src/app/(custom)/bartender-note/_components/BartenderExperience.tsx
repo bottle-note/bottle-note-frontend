@@ -646,6 +646,7 @@ export default function BartenderExperience({
       subtitle={header.subtitle}
       progress={header.progress}
       lines={dialogueLines}
+      emphasis={step === 'similar' ? similarEntry?.name : undefined}
       pose={
         talkStory?.pose ?? (thinking && scenarioView ? 'think' : bartender.pose)
       }

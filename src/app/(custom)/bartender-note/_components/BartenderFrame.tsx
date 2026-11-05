@@ -20,6 +20,20 @@ const DialogueSettledContext = createContext(true);
 /** 바텐더가 지금 대사를 끝까지 말했는지. 대답은 말이 끝난 뒤에 내놓는다. */
 export const useDialogueSettled = () => useContext(DialogueSettledContext);
 
+/** 타이핑 중인 대사에서 강조 낱말 구간만 굵게 그린다. 낱말이 페이지에 없으면 평문이다. */
+function emphasizeTyped(typed: string, pageText: string, emphasis?: string) {
+  const start = emphasis ? pageText.indexOf(emphasis) : -1;
+  if (!emphasis || start < 0 || typed.length <= start) return typed;
+  const end = start + emphasis.length;
+  return (
+    <>
+      {typed.slice(0, start)}
+      <strong className="font-bold">{typed.slice(start, end)}</strong>
+      {typed.slice(end)}
+    </>
+  );
+}
+
 type Props = {
   step: Step;
   title: string;
@@ -27,6 +41,8 @@ type Props = {
   progress?: number;
   questionId?: number;
   lines: string[];
+  /** 대사에서 굵게 보일 낱말(예: 기준 위스키 이름). */
+  emphasis?: string;
   pose: Pose;
   onBack?: () => void;
   backLabel?: string;
@@ -41,6 +57,7 @@ export default function BartenderFrame({
   progress,
   questionId,
   lines,
+  emphasis,
   pose,
   onBack,
   backLabel,
@@ -142,7 +159,7 @@ export default function BartenderFrame({
               노트
             </span>
             <span className="block min-h-38 whitespace-pre-wrap break-keep">
-              {dialogue.text}
+              {emphasizeTyped(dialogue.text, dialogue.pageText, emphasis)}
             </span>
             <span
               ref={dialogue.rulerRef}
