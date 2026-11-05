@@ -16,6 +16,7 @@ import PromptModal from '@/components/ui/Modal/PromptModal';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { ApiError } from '@/utils/ApiError';
 import type { LoginTrigger, ReviewEntryFlow } from '@/utils/analytics/types';
+import { useSimilarAlcohols } from '@/queries/useSimilarAlcohols';
 import {
   OptionList,
   FlowAction,
@@ -26,6 +27,8 @@ import BartenderFrame from './BartenderFrame';
 import ScenarioQuestionView from './ScenarioQuestionView';
 import ScenarioCandidateList from './ScenarioCandidateList';
 import CandidateList, { isCandidateStep } from './CandidateList';
+import SimilarCandidateList from './SimilarCandidateList';
+import type { SimilarEntry } from './similarEntry';
 import CurationFlow from './CurationFlow';
 import ReviewFlow from './ReviewFlow';
 import { reviewAlcoholFromDetails } from './reviewAlcohol';
@@ -61,6 +64,7 @@ const SELECT_SOURCE = {
   recommendations: 'taste',
   'curation-list': 'situation',
   favorites: 'picks',
+  similar: 'similar',
 } as const;
 
 const CAMPAIGN_BY_ENTRY = {
@@ -74,6 +78,7 @@ const REVIEW_ENTRY_BY_ORIGIN: Record<TalkOrigin, ReviewEntryFlow> = {
   recommendations: 'recommend',
   'curation-list': 'curation',
   favorites: 'picks',
+  similar: 'similar',
   other: 'direct',
 };
 
@@ -191,8 +196,11 @@ function StepError({
 
 export default function BartenderExperience({
   scenarioContext,
+  similarEntry = null,
 }: {
   scenarioContext: ScenarioContext;
+  /** 주류 상세에서 넘어왔을 때의 기준 위스키와 태그. 있으면 비슷한 위스키 목록부터 연다. */
+  similarEntry?: SimilarEntry | null;
 }) {
   const router = useRouter();
   const { user, isLoggedIn, isLoading: authLoading } = useAuthSession();
@@ -280,12 +288,31 @@ export default function BartenderExperience({
     scenarioUnavailable: scenarioClosed,
   });
   const campaign = useBartenderCampaign();
+  const similar = useSimilarAlcohols(
+    similarEntry?.alcoholId ?? 0,
+    similarEntry?.tags ?? [],
+  );
+  const similarState = similar.isError
+    ? 'error'
+    : similar.isPending
+      ? 'loading'
+      : similar.data.length === 0
+        ? 'empty'
+        : 'ready';
 
   useEffect(() => {
     const saved = takeSnapshot();
-    const { isNewVisit } = journey.init(saved?.journey);
+    const { isNewVisit, started } = journey.init(
+      saved?.journey,
+      similarEntry ? 'similar' : undefined,
+    );
     // 새로고침·로그인 왕복·술 상세 페이지 복귀는 새 진입이 아니다
     if (isNewVisit) campaign.view();
+    // 주류 상세에서 새로 넘어왔다. 이전에 보던 화면은 이어 가지 않는다
+    if (started) {
+      trackGA4Event('bartender_start', { entry: 'similar' });
+      return;
+    }
     if (!saved) return;
     campaign.restore(saved.campaign, saved.reviewCampaign);
     setContext(saved.scenario.context);
@@ -441,7 +468,11 @@ export default function BartenderExperience({
     move('scenario', { answers: flow.answers.length + 1 });
   };
   const chooseAlcohol = (next: AlcoholSelection) => {
-    if (step === 'recommendations' || isCandidateStep(step)) {
+    if (
+      step === 'recommendations' ||
+      step === 'similar' ||
+      isCandidateStep(step)
+    ) {
       trackGA4Event('bartender_select_alcohol', {
         alcohol_id: String(next.id),
         source: SELECT_SOURCE[step],
@@ -560,6 +591,8 @@ export default function BartenderExperience({
     firstPickName: firstPick?.name,
     pickCount: picks.isLoading ? undefined : picks.items.length,
     scenarioUnavailable: flow.unavailable,
+    similarBaseName: similarEntry?.name,
+    similarState,
   });
   const {
     story,
@@ -576,7 +609,8 @@ export default function BartenderExperience({
       ? 'first-pick'
       : previous?.step === 'recommendations' ||
           previous?.step === 'favorites' ||
-          previous?.step === 'curation-list'
+          previous?.step === 'curation-list' ||
+          previous?.step === 'similar'
         ? previous.step
         : 'other';
   const dialogueLines = scenarioClosed
@@ -681,6 +715,27 @@ export default function BartenderExperience({
                 />
               )}
           </>
+        ))}
+      {step === 'similar' &&
+        (similarEntry ? (
+          <SimilarCandidateList
+            query={similar}
+            tags={similarEntry.tags}
+            onChoose={chooseAlcohol}
+            home={home}
+            onLeave={() => leave()}
+            emptyAction={
+              flow.unavailable
+                ? {
+                    label: CURATION_OPTION.title,
+                    onClick: () => start('situation', 'curations'),
+                  }
+                : { label: '위스키 추천해 주세요', onClick: startRecommend }
+            }
+          />
+        ) : (
+          // 주소에서 기준 위스키가 빠진 채 복원됐다. 다시 고를 수 있게 처음으로 보낸다
+          <FlowAction onClick={home}>처음으로</FlowAction>
         ))}
       {step === 'favorites' && picks.isLoading && <LoadingStep />}
       {isCandidateStep(step) && !(step === 'favorites' && picks.isLoading) && (

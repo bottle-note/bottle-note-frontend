@@ -19,6 +19,7 @@ const STEP_META: Record<Step, StepMeta> = {
   scenario: { title: NOTE, pose: 'idle' },
   'first-pick': { title: PICKS, pose: 'serve', progress: 100 },
   recommendations: { title: PICKS, pose: 'think', progress: 100 },
+  similar: { title: PICKS, pose: 'serve', progress: 100 },
   curations: { title: CURATION, pose: 'idle' },
   'curation-list': { title: CURATION, pose: 'idle', progress: 100 },
   favorites: { title: '찜한 술', pose: 'idle' },

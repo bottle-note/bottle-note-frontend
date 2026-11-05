@@ -22,7 +22,7 @@ export const isCandidateStep = (step: Step): step is CandidateStep =>
 /** 한 줄에 보이는 태그 수 */
 const TAG_LIMIT = 4;
 
-function AlcoholRow({
+export function AlcoholRow({
   rank,
   imageUrl,
   name,
