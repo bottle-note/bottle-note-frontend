@@ -482,6 +482,7 @@ async function searchPlace(keyword: string) {
   await press('검색');
 }
 
+// FIXME(HYE-102): 질문 추천 진입을 막아 둔 동안 추천으로 들어가는 테스트는 it.skip으로 꺼 둔다. SCENARIO_PAUSED를 풀 때 함께 되돌린다
 function renderExperience() {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -616,7 +617,7 @@ beforeEach(() => {
 });
 
 describe('바텐더 노트 취향 추천', () => {
-  it('응답의 질문·보기로 진행하고 1위를 상세 그대로 먼저 건넨다', async () => {
+  it.skip('응답의 질문·보기로 진행하고 1위를 상세 그대로 먼저 건넨다', async () => {
     renderExperience();
     await choose('위스키 추천해 주세요');
     expect(await screen.findByText('질문 1')).toBeInTheDocument();
@@ -662,7 +663,7 @@ describe('바텐더 노트 취향 추천', () => {
     expect(await screen.findByText('질문 5')).toBeInTheDocument();
   });
 
-  it('첫 잔에서 다른 후보 목록을 보고, 뒤로 가면 첫 잔과 마지막 질문 순서로 돌아간다', async () => {
+  it.skip('첫 잔에서 다른 후보 목록을 보고, 뒤로 가면 첫 잔과 마지막 질문 순서로 돌아간다', async () => {
     renderExperience();
     await answerTasteQuestions({
       kind: '상관없어요',
@@ -691,7 +692,7 @@ describe('바텐더 노트 취향 추천', () => {
     expect(await screen.findByText('질문 5')).toBeInTheDocument();
   });
 
-  it('후보가 1위 한 병뿐이면 다른 후보 보기를 내놓지 않는다', async () => {
+  it.skip('후보가 1위 한 병뿐이면 다른 후보 보기를 내놓지 않는다', async () => {
     const evaluate = vi.mocked(ScenarioApi.evaluate);
     const fixture = evaluate.getMockImplementation()!;
     evaluate.mockImplementation(async (id, request, signal) => {
@@ -720,7 +721,7 @@ describe('바텐더 노트 취향 추천', () => {
     expect(screen.getByRole('button', { name: '리뷰 작성' })).toBeEnabled();
   });
 
-  it('1위 술 상세를 미리 받지 못해도 결과로 넘어가 첫 잔에서 다시 조회한다', async () => {
+  it.skip('1위 술 상세를 미리 받지 못해도 결과로 넘어가 첫 잔에서 다시 조회한다', async () => {
     vi.mocked(AlcoholsApi.getAlcoholDetails).mockRejectedValueOnce(
       new Error('상세 조회 실패'),
     );
@@ -737,7 +738,7 @@ describe('바텐더 노트 취향 추천', () => {
     ).toBeInTheDocument();
   });
 
-  it('빈 후보 결과에서 이전 질문으로 돌아가 답변을 다시 고를 수 있다', async () => {
+  it.skip('빈 후보 결과에서 이전 질문으로 돌아가 답변을 다시 고를 수 있다', async () => {
     renderExperience();
     await choose('위스키 추천해 주세요');
     await choose('라이');
@@ -758,7 +759,7 @@ describe('바텐더 노트 취향 추천', () => {
     expect(await firstPick()).toBeInTheDocument();
   });
 
-  it('서버 ANY 보기도 기존 choiceId 답변으로 누적하고 중복 보기 없이 표시한다', async () => {
+  it.skip('서버 ANY 보기도 기존 choiceId 답변으로 누적하고 중복 보기 없이 표시한다', async () => {
     const request = vi.spyOn(scenarioApi, 'getScenarioStep');
     renderExperience();
     await choose('위스키 추천해 주세요');
@@ -785,7 +786,7 @@ describe('바텐더 노트 취향 추천', () => {
     );
   });
 
-  it('다음 질문을 받는 동안 방금 답한 질문과 고른 보기를 그대로 두고, 오면 바로 바꾼다', async () => {
+  it.skip('다음 질문을 받는 동안 방금 답한 질문과 고른 보기를 그대로 두고, 오면 바로 바꾼다', async () => {
     const real = scenarioApi.getScenarioStep;
     const request = vi.spyOn(scenarioApi, 'getScenarioStep');
     let release!: () => void;
@@ -814,7 +815,7 @@ describe('바텐더 노트 취향 추천', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('종류를 다시 고르면 향 질문과 보기가 바뀌고 입력 중인 값은 초기화한다', async () => {
+  it.skip('종류를 다시 고르면 향 질문과 보기가 바뀌고 입력 중인 값은 초기화한다', async () => {
     renderExperience();
     await choose('위스키 추천해 주세요');
     await choose('버번');
@@ -831,7 +832,7 @@ describe('바텐더 노트 취향 추천', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('질문 조회 실패는 오류로 표시하고 같은 답변으로 다시 시도한다', async () => {
+  it.skip('질문 조회 실패는 오류로 표시하고 같은 답변으로 다시 시도한다', async () => {
     const request = vi.spyOn(scenarioApi, 'getScenarioStep');
     renderExperience();
     await choose('위스키 추천해 주세요');
@@ -846,7 +847,7 @@ describe('바텐더 노트 취향 추천', () => {
     ).toBeInTheDocument();
   });
 
-  it('게시 버전이 바뀌면 처음부터 다시 조회하고 이전 답변을 보내지 않는다', async () => {
+  it.skip('게시 버전이 바뀌면 처음부터 다시 조회하고 이전 답변을 보내지 않는다', async () => {
     renderExperience();
     await choose('위스키 추천해 주세요');
     vi.mocked(ScenarioApi.evaluate).mockRejectedValueOnce(
@@ -873,7 +874,7 @@ describe('바텐더 노트 취향 추천', () => {
     );
   });
 
-  it('추천 더 보기는 목록을 유지하며 실패 후 같은 cursor로 재시도한다', async () => {
+  it.skip('추천 더 보기는 목록을 유지하며 실패 후 같은 cursor로 재시도한다', async () => {
     const evaluate = vi.mocked(ScenarioApi.evaluate);
     const fixture = evaluate.getMockImplementation()!;
     evaluate.mockImplementation(async (id, request, signal) => {
@@ -949,7 +950,7 @@ describe('바텐더 노트 취향 추천', () => {
     ).toBeInTheDocument();
   });
 
-  it('잔·병 선택과 예산은 서버가 제공한 별도 질문의 답변으로 제출한다', async () => {
+  it.skip('잔·병 선택과 예산은 서버가 제공한 별도 질문의 답변으로 제출한다', async () => {
     const request = vi.spyOn(scenarioApi, 'getScenarioStep');
     renderExperience();
     await choose('위스키 추천해 주세요');
@@ -1015,7 +1016,7 @@ describe('바텐더 노트 첫 잔 이야기', () => {
   const conversation = () =>
     screen.getByRole('log', { name: '노트와 나눈 대화' });
 
-  it('들려달라고 하면 카드 아래 말풍선으로 들려주고, 다 들으면 맺은 뒤 다시 듣기와 전체 글을 남긴다', async () => {
+  it.skip('들려달라고 하면 카드 아래 말풍선으로 들려주고, 다 들으면 맺은 뒤 다시 듣기와 전체 글을 남긴다', async () => {
     renderExperience();
     await answerTasteQuestions(anyAnswers);
     await firstPick();
@@ -1050,7 +1051,7 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     });
   });
 
-  it('이야기를 듣고 술 상세 페이지에 다녀오면 들은 이야기를 펼친 채로 돌려준다', async () => {
+  it.skip('이야기를 듣고 술 상세 페이지에 다녀오면 들은 이야기를 펼친 채로 돌려준다', async () => {
     const { unmount } = renderExperience();
     await answerTasteQuestions(anyAnswers);
     await firstPick();
@@ -1075,7 +1076,7 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     ).toBeInTheDocument();
   });
 
-  it('첫 문단을 한 문장씩 이어 들려주고, 문단이 더 있으면 전체 글로 안내한다', async () => {
+  it.skip('첫 문단을 한 문장씩 이어 들려주고, 문단이 더 있으면 전체 글로 안내한다', async () => {
     withLeadDescription(
       '첫 문장입니다. 둘째 \n문장입니다.\n\n \n\n다음 문단입니다.',
     );
@@ -1107,7 +1108,7 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     ).toBeInTheDocument();
   });
 
-  it('다음에 듣겠다고 하면 답하고, 다른 후보를 보고 돌아와도 같은 술은 다시 묻지 않는다', async () => {
+  it.skip('다음에 듣겠다고 하면 답하고, 다른 후보를 보고 돌아와도 같은 술은 다시 묻지 않는다', async () => {
     renderExperience();
     await answerTasteQuestions(anyAnswers);
     await firstPick();
@@ -1136,7 +1137,7 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     expect(dialogue()).toHaveTextContent('글렌피딕 12년입니다.');
   });
 
-  it('이야기 도중 그만 들을 수 있다', async () => {
+  it.skip('이야기 도중 그만 들을 수 있다', async () => {
     withLeadDescription('첫 문장입니다. 둘째 문장입니다.');
     renderExperience();
     await answerTasteQuestions(anyAnswers);
@@ -1169,7 +1170,7 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     expect(events('bartender_story_complete')).toHaveLength(0);
   });
 
-  it('설명이 없는 술은 이야기를 꺼내지 않고 다른 후보만 권한다', async () => {
+  it.skip('설명이 없는 술은 이야기를 꺼내지 않고 다른 후보만 권한다', async () => {
     withLeadDescription(' \n\n ');
     renderExperience();
     await answerTasteQuestions(anyAnswers);
@@ -1187,7 +1188,7 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('추천 목록에서 고른 술도 같은 화면에서 이야기를 들려주고, 대답으로 목록에 돌아간다', async () => {
+  it.skip('추천 목록에서 고른 술도 같은 화면에서 이야기를 들려주고, 대답으로 목록에 돌아간다', async () => {
     renderExperience();
     await answerTasteQuestions(anyAnswers);
     await firstPick();
@@ -1230,7 +1231,7 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     ).toBeInTheDocument();
   });
 
-  it('첫 잔에서 다른 후보를 보면 그 선택을 기록한다', async () => {
+  it.skip('첫 잔에서 다른 후보를 보면 그 선택을 기록한다', async () => {
     renderExperience();
     await answerTasteQuestions(anyAnswers);
     await firstPick();
@@ -1487,7 +1488,7 @@ describe('바텐더 노트 큐레이션 추천', () => {
     ).toBeInTheDocument();
   });
 
-  it('보여 줄 큐레이션이 없으면 취향 질문으로 이어갈 수 있다', async () => {
+  it.skip('보여 줄 큐레이션이 없으면 취향 질문으로 이어갈 수 있다', async () => {
     stubCurationApi([]);
     renderExperience();
 
@@ -1540,7 +1541,7 @@ describe('바텐더 노트 질문 추천 준비 중', () => {
     expect(results()).toEqual([]);
   });
 
-  it('첫 질문 미리 받기가 404가 아닌 오류면 추천을 시작할 수 있고, 들어가면 다시 받아 온다', async () => {
+  it.skip('첫 질문 미리 받기가 404가 아닌 오류면 추천을 시작할 수 있고, 들어가면 다시 받아 온다', async () => {
     vi.mocked(ScenarioApi.get).mockRejectedValueOnce(
       new ApiError('서버 오류', new Response(null, { status: 500 })),
     );
@@ -1604,7 +1605,7 @@ describe('바텐더 노트 질문 추천 준비 중', () => {
     ).toBeInTheDocument();
   });
 
-  it('답하던 중 게시가 내려가면(404) 다시 시도 없이 다른 추천을 권하고 결과를 한 번만 기록한다', async () => {
+  it.skip('답하던 중 게시가 내려가면(404) 다시 시도 없이 다른 추천을 권하고 결과를 한 번만 기록한다', async () => {
     renderExperience();
     await choose('위스키 추천해 주세요');
     vi.mocked(ScenarioApi.evaluate).mockRejectedValueOnce(notFound());
@@ -2175,7 +2176,7 @@ describe('바텐더 노트 비로그인 행동', () => {
     ).toBeInTheDocument();
   });
 
-  it('찜한 술이 없으면 로그인 후 빈 찜 목록을 알리고 취향 추천으로 이어 준다', async () => {
+  it.skip('찜한 술이 없으면 로그인 후 빈 찜 목록을 알리고 취향 추천으로 이어 준다', async () => {
     auth.loggedIn = false;
     const { unmount } = renderExperience();
 
@@ -2303,7 +2304,7 @@ describe('바텐더 노트 비로그인 행동', () => {
 });
 
 describe('바텐더 노트 공통 이동', () => {
-  it('첫 잔에서 술 상세 페이지에 다녀와 빈 캐시로 복원해도 같은 첫 잔으로 돌아가고 결과 이벤트는 중복되지 않는다', async () => {
+  it.skip('첫 잔에서 술 상세 페이지에 다녀와 빈 캐시로 복원해도 같은 첫 잔으로 돌아가고 결과 이벤트는 중복되지 않는다', async () => {
     const { unmount } = renderExperience();
     await answerTasteQuestions({
       kind: '싱글 몰트',
@@ -2405,7 +2406,7 @@ describe('바텐더 노트 공통 이동', () => {
     ).toBeInTheDocument();
   });
 
-  it('기기 뒤로 가기로 이전 질문에 돌아가면 그때 고른 답을 표시하고, 첫 질문 다음은 처음 화면이다', async () => {
+  it.skip('기기 뒤로 가기로 이전 질문에 돌아가면 그때 고른 답을 표시하고, 첫 질문 다음은 처음 화면이다', async () => {
     renderExperience();
     await choose('위스키 추천해 주세요');
     await choose('싱글 몰트');
@@ -2430,7 +2431,7 @@ describe('바텐더 노트 공통 이동', () => {
     ).toBeInTheDocument();
   });
 
-  it('새로고침해도 보던 질문에서 이어 가고, 뒤로 가면 앞 질문과 고른 답이 나온다', async () => {
+  it.skip('새로고침해도 보던 질문에서 이어 가고, 뒤로 가면 앞 질문과 고른 답이 나온다', async () => {
     const { unmount } = renderExperience();
     await choose('위스키 추천해 주세요');
     await choose('싱글 몰트');
@@ -2449,7 +2450,7 @@ describe('바텐더 노트 공통 이동', () => {
     ).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('뒤로 가기는 이전 질문으로, 닫기는 제품 홈으로 이동한다', async () => {
+  it.skip('뒤로 가기는 이전 질문으로, 닫기는 제품 홈으로 이동한다', async () => {
     renderExperience();
 
     await choose('위스키 추천해 주세요');
@@ -2469,7 +2470,7 @@ describe('바텐더 노트 공통 이동', () => {
 describe('바텐더 노트 화면 안 이전으로', () => {
   const prevButton = () => screen.queryByRole('button', { name: '이전으로' });
 
-  it('첫 질문에는 두지 않고, 다음 질문부터 눌러 앞 질문으로 돌아가면 고른 답이 선택돼 있다', async () => {
+  it.skip('첫 질문에는 두지 않고, 다음 질문부터 눌러 앞 질문으로 돌아가면 고른 답이 선택돼 있다', async () => {
     renderExperience();
     await choose('위스키 추천해 주세요');
     await screen.findByText('질문 1');
@@ -2486,7 +2487,7 @@ describe('바텐더 노트 화면 안 이전으로', () => {
     expect(prevButton()).not.toBeInTheDocument();
   });
 
-  it('첫 잔·추천 목록·목록에서 고른 술에서 누르면 한 단계씩 되짚는다', async () => {
+  it.skip('첫 잔·추천 목록·목록에서 고른 술에서 누르면 한 단계씩 되짚는다', async () => {
     renderExperience();
     await answerTasteQuestions({
       kind: '상관없어요',
@@ -2517,7 +2518,7 @@ describe('바텐더 노트 화면 안 이전으로', () => {
     ).toBe(true);
   });
 
-  it('빈 추천 결과에서 누르면 마지막 질문으로 돌아간다', async () => {
+  it.skip('빈 추천 결과에서 누르면 마지막 질문으로 돌아간다', async () => {
     renderExperience();
     await choose('위스키 추천해 주세요');
     await choose('라이');
@@ -2607,7 +2608,7 @@ describe('바텐더 노트 캠페인 지표', () => {
     expect(sent().filter((event) => event.endsWith(':VIEW'))).toHaveLength(3);
   });
 
-  it('추천은 첫 잔에서 완료, 다른 후보 목록에서 결과를 한 번씩 보내고, 후보 상세를 더 봐도 늘지 않는다', async () => {
+  it.skip('추천은 첫 잔에서 완료, 다른 후보 목록에서 결과를 한 번씩 보내고, 후보 상세를 더 봐도 늘지 않는다', async () => {
     renderExperience();
     await answerTasteQuestions({
       kind: '상관없어요',
@@ -2637,7 +2638,7 @@ describe('바텐더 노트 캠페인 지표', () => {
     expect(sent(REVIEW)).toEqual(['VIEW']);
   });
 
-  it('비로그인은 첫 잔까지 보고, 다른 후보는 로그인 안내를 거쳐 로그인 후 목록에서 결과를 보낸다', async () => {
+  it.skip('비로그인은 첫 잔까지 보고, 다른 후보는 로그인 안내를 거쳐 로그인 후 목록에서 결과를 보낸다', async () => {
     auth.loggedIn = false;
     const { unmount } = renderExperience();
     await answerTasteQuestions({
@@ -2675,7 +2676,7 @@ describe('바텐더 노트 캠페인 지표', () => {
     expect(await firstPick()).toBeInTheDocument();
   });
 
-  it('비로그인이 다른 후보 로그인 안내를 닫으면 첫 잔에 머문다', async () => {
+  it.skip('비로그인이 다른 후보 로그인 안내를 닫으면 첫 잔에 머문다', async () => {
     auth.loggedIn = false;
     renderExperience();
     await answerTasteQuestions({
@@ -2702,7 +2703,7 @@ describe('바텐더 노트 캠페인 지표', () => {
     expect(replace).not.toHaveBeenCalled();
   });
 
-  it('추천 후보가 없어도 질문을 끝까지 답하면 완료를 보낸다', async () => {
+  it.skip('추천 후보가 없어도 질문을 끝까지 답하면 완료를 보낸다', async () => {
     renderExperience();
     await choose('위스키 추천해 주세요');
     await choose('라이');
@@ -2740,7 +2741,7 @@ describe('바텐더 노트 캠페인 지표', () => {
     expect(sent(RECOMMEND)).toEqual(['VIEW']);
   });
 
-  it('비로그인으로 추천·큐레이션 상세를 보면 결과를 보내지 않는다', async () => {
+  it.skip('비로그인으로 추천·큐레이션 상세를 보면 결과를 보내지 않는다', async () => {
     auth.loggedIn = false;
     renderExperience();
     await openCurationDetail('조니워커 블랙');
@@ -2813,7 +2814,8 @@ describe('바텐더 노트 캠페인 지표', () => {
     expect(sent(CURATION)).toEqual(['VIEW']);
   });
 
-  it.each(['recommend', 'curation', 'picks'] as const)(
+  // FIXME(HYE-102): 질문 추천 진입을 다시 열면 'recommend'를 되돌린다
+  it.each<'recommend' | 'curation' | 'picks'>(['curation', 'picks'])(
     '%s에서 이어 쓴 리뷰를 별도 집계하고 GA4에 같은 유입 경로를 보낸다',
     async (entryFlow) => {
       stubReviewApi();
@@ -2853,7 +2855,7 @@ describe('바텐더 노트 캠페인 지표', () => {
     },
   );
 
-  it('추천에서 리뷰를 열었다 돌아와도 추천 시도를 보존해 목록에서 결과를 보낸다', async () => {
+  it.skip('추천에서 리뷰를 열었다 돌아와도 추천 시도를 보존해 목록에서 결과를 보낸다', async () => {
     renderExperience();
     await answerTasteQuestions({
       kind: '상관없어요',
@@ -2881,7 +2883,7 @@ describe('바텐더 노트 캠페인 지표', () => {
     expect(sent(REVIEW)).toEqual(['VIEW', 'START']);
   });
 
-  it('추천에서 리뷰 로그인·새로고침 후에도 유입 경로와 리뷰 시도를 복원한다', async () => {
+  it.skip('추천에서 리뷰 로그인·새로고침 후에도 유입 경로와 리뷰 시도를 복원한다', async () => {
     auth.loggedIn = false;
     stubReviewApi();
     let view = renderExperience();
@@ -2936,7 +2938,7 @@ describe('바텐더 노트 캠페인 지표', () => {
     expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH']);
   });
 
-  it('추천에서 리뷰 저장 실패·재시도에도 유입 경로를 유지하고 결과는 성공 때만 보낸다', async () => {
+  it.skip('추천에서 리뷰 저장 실패·재시도에도 유입 경로를 유지하고 결과는 성공 때만 보낸다', async () => {
     const save = stubReviewApi().mockRejectedValueOnce(new Error('저장 실패'));
     renderExperience();
     await answerTasteQuestions(TASTE);

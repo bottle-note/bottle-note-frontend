@@ -117,6 +117,9 @@ type LoginPromptKind = keyof typeof LOGIN_PROMPT;
 /** 다음 질문이 이보다 늦으면 생각하는 자세를 보인다. */
 const THINKING_DELAY_MS = 400;
 
+// FIXME(HYE-102): 시나리오 식별 방식이 바뀔 때까지 질문 추천 진입을 막는다. 풀 때 테스트 skip도 함께 되돌린다
+const SCENARIO_PAUSED = true;
+
 /** 시나리오 응답을 읽는 단계. 질문과 추천 결과가 같은 조회를 쓴다. */
 const isScenarioStep = (step: Step) =>
   step === 'scenario' || step === 'first-pick' || step === 'recommendations';
@@ -559,7 +562,8 @@ export default function BartenderExperience({
     hasCandidates: (scenarioData?.candidates?.totalCount ?? 0) > 0,
     firstPickName: firstPick?.name,
     pickCount: picks.isLoading ? undefined : picks.items.length,
-    scenarioUnavailable: flow.unavailable,
+    // FIXME(HYE-102)
+    scenarioUnavailable: SCENARIO_PAUSED || flow.unavailable,
   });
   const {
     story,
@@ -613,10 +617,12 @@ export default function BartenderExperience({
               {
                 title: '위스키 추천해 주세요',
                 // 준비 중이면 메뉴는 그대로 두고 누를 수 없게 한다. 확인 전에는 지금처럼 들어간다
-                description: flow.unavailable
-                  ? '지금은 준비하고 있어요'
-                  : '몇 가지 여쭤보고 골라 드려요',
-                disabled: flow.unavailable,
+                // FIXME(HYE-102)
+                description:
+                  SCENARIO_PAUSED || flow.unavailable
+                    ? '지금은 준비하고 있어요'
+                    : '몇 가지 여쭤보고 골라 드려요',
+                disabled: SCENARIO_PAUSED || flow.unavailable,
                 action: startRecommend,
               },
               {
@@ -695,7 +701,8 @@ export default function BartenderExperience({
           home={home}
           onLeave={() => leave()}
           emptyPicksAction={
-            flow.unavailable
+            // FIXME(HYE-102)
+            SCENARIO_PAUSED || flow.unavailable
               ? {
                   label: CURATION_OPTION.title,
                   onClick: () => start('situation', 'curations'),
@@ -746,7 +753,8 @@ export default function BartenderExperience({
         move={move}
         home={home}
         onStartScenario={startRecommend}
-        scenarioUnavailable={flow.unavailable}
+        // FIXME(HYE-102)
+        scenarioUnavailable={SCENARIO_PAUSED || flow.unavailable}
         onStartReview={() => start('review', 'review-pick')}
         onShowPicks={() => start('picks', 'favorites')}
       />
