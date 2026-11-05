@@ -304,7 +304,8 @@ export default function BartenderExperience({
     const saved = takeSnapshot();
     const { isNewVisit, started } = journey.init(
       saved?.journey,
-      similarEntry ? 'similar' : undefined,
+      // 로그인하고 돌아온 길이면 주소에 비슷한 위스키 진입이 남아 있어도 보던 화면을 잇는다
+      similarEntry && !saved?.loginReturn ? 'similar' : undefined,
     );
     // 새로고침·로그인 왕복·술 상세 페이지 복귀는 새 진입이 아니다
     if (isNewVisit) campaign.view();
@@ -385,8 +386,9 @@ export default function BartenderExperience({
     if (step === 'detail' && selected) campaign.reach('curation', 'RESULT');
   }, [step, hasCandidates, !!selected, authLoading, isLoggedIn]);
 
-  const leave = (resume?: Step) =>
+  const leave = (resume?: Step, { loginReturn = false } = {}) =>
     saveSnapshot({
+      loginReturn,
       journey: journey.journey,
       scenario: {
         context,
@@ -422,7 +424,7 @@ export default function BartenderExperience({
   };
   const goToLogin = () => {
     if (!loginPrompt) return;
-    leave(loginPrompt.resume);
+    leave(loginPrompt.resume, { loginReturn: true });
     bridgeToLogin(
       { trigger: LOGIN_PROMPT[loginPrompt.kind].trigger },
       { trackPrompt: false },

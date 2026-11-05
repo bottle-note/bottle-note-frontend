@@ -30,6 +30,11 @@ export interface BartenderSnapshot {
   stories?: StoryStates;
   /** 로그인하러 나갈 때 이어서 열 단계. 로그인한 채로 돌아온 경우에만 연다. */
   resumeAfterLogin?: Step;
+  /**
+   * 로그인하러 나갔다. 로그인 화면은 주소를 바꿔 끼우며 돌아와 히스토리 표시가 남지 않으므로,
+   * 다른 화면에서 새로 넘어온 것(주류 상세의 비슷한 위스키 링크 등)과 구분해 보던 화면을 잇는다.
+   */
+  loginReturn?: boolean;
   /** 진행 중인 캠페인 시도. 돌아와서 같은 완료·결과를 다시 보내지 않게 남긴다. */
   campaign?: CampaignAttempt | null;
   /** 원래 캠페인과 독립된 리뷰 시도·유입 경로. 로그인 왕복·새로고침에도 유지한다. */

@@ -2804,6 +2804,35 @@ describe('바텐더 노트 비슷한 위스키', () => {
     ]);
   });
 
+  it('비슷한 위스키에서 로그인하고 돌아오면 목록이 아니라 쓰려던 리뷰로 잇는다', async () => {
+    auth.loggedIn = false;
+    stubExplore([101, 102, 104]);
+    const view = renderExperience({ similarEntry: entry });
+
+    await press(/아드벡 10년/);
+    await screen.findByRole('region', { name: '비슷한 위스키' });
+    await press('리뷰 작성');
+    const prompt = await screen.findByRole('dialog', {
+      name: '지금 드신 술, 기록해 둘까요?',
+    });
+    fireEvent.click(
+      within(prompt).getByRole('button', { name: '로그인하고 기록하기' }),
+    );
+
+    // 로그인 화면은 주소를 바꿔 끼우며 돌아와 히스토리 표시가 남지 않는다
+    view.unmount();
+    window.history.replaceState(null, '');
+    auth.loggedIn = true;
+    renderExperience({ similarEntry: entry });
+
+    expect(
+      await screen.findByRole('button', { name: /내 느낌 한 줄로 쓸게요/ }),
+    ).toBeInTheDocument();
+    expect(events('bartender_start')).toEqual([
+      ['bartender_start', { entry: 'similar' }],
+    ]);
+  });
+
   it('겹치는 위스키가 없으면 다른 추천으로 잇는다', async () => {
     stubExplore([101]);
 
