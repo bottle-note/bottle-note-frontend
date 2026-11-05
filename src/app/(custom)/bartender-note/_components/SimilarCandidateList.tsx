@@ -78,9 +78,6 @@ export default function SimilarCandidateList({
         </FlowAction>
       ) : (
         <>
-          <p className="m-0 text-13 text-fg-neutral-muted">
-            술을 누르면 자세한 정보를 볼 수 있어요.
-          </p>
           <div className="flex flex-col">
             {items.map((alcohol, index) => (
               <AlcoholRow
