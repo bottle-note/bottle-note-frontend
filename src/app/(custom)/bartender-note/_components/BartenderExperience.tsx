@@ -119,8 +119,14 @@ const LOGIN_PROMPT = {
 >;
 type LoginPromptKind = keyof typeof LOGIN_PROMPT;
 
-/** 로그인 화면이 돌아올 주소(returnTo)와 같은 모양의 지금 주소. */
-const currentUrl = () => `${window.location.pathname}${window.location.search}`;
+/**
+ * 로그인 화면이 돌아올 주소(returnTo)와 같은 모양의 지금 주소.
+ * 로그인 연결은 검색어를 URLSearchParams로 다시 적어(공백 %20 → +) 보내므로 같은 방식으로 맞춘다.
+ */
+const currentUrl = () => {
+  const query = new URLSearchParams(window.location.search).toString();
+  return `${window.location.pathname}${query ? `?${query}` : ''}`;
+};
 
 /** 다음 질문이 이보다 늦으면 생각하는 자세를 보인다. */
 const THINKING_DELAY_MS = 400;

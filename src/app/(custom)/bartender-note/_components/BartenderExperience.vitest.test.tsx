@@ -2807,6 +2807,12 @@ describe('바텐더 노트 비슷한 위스키', () => {
   it('비슷한 위스키에서 로그인하고 돌아오면 목록이 아니라 쓰려던 리뷰로 잇는다', async () => {
     auth.loggedIn = false;
     stubExplore([101, 102, 104]);
+    // 이름의 공백이 %20으로 적힌 주소로 들어온다
+    window.history.replaceState(
+      null,
+      '',
+      '/bartender-note?from=similar&alcoholId=101&name=Laphroaig%2010&tags=%ED%94%BC%ED%8A%B8',
+    );
     const view = renderExperience({ similarEntry: entry });
 
     await press(/아드벡 10년/);
@@ -2819,9 +2825,14 @@ describe('바텐더 노트 비슷한 위스키', () => {
       within(prompt).getByRole('button', { name: '로그인하고 기록하기' }),
     );
 
-    // 로그인 화면은 주소를 바꿔 끼우며 돌아와 히스토리 표시가 남지 않는다
+    // 로그인 화면은 주소를 바꿔 끼우며 돌아와 히스토리 표시가 남지 않고,
+    // 돌아올 주소는 검색어를 다시 적어 공백이 +가 된다
     view.unmount();
-    window.history.replaceState(null, '');
+    window.history.replaceState(
+      null,
+      '',
+      '/bartender-note?from=similar&alcoholId=101&name=Laphroaig+10&tags=%ED%94%BC%ED%8A%B8',
+    );
     auth.loggedIn = true;
     renderExperience({ similarEntry: entry });
 
@@ -2831,6 +2842,7 @@ describe('바텐더 노트 비슷한 위스키', () => {
     expect(events('bartender_start')).toEqual([
       ['bartender_start', { entry: 'similar' }],
     ]);
+    window.history.replaceState(null, '', '/');
   });
 
   it('로그인을 그만두고 주류 상세에서 새로 넘어오면 예전 화면 대신 비슷한 위스키부터 연다', async () => {
