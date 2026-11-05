@@ -36,6 +36,7 @@ import {
   useAlcoholDetailQuery,
 } from '@/queries/useAlcoholDetailQuery';
 import AlcoholDetailsSkeleton from '@/components/ui/Loading/Skeletons/custom/AlcoholDetailsSkeleton';
+import ReviewItemSkeleton from '@/components/ui/Loading/Skeletons/ReviewItemSkeleton';
 import FlavorTags from '@/components/domain/alcohol/FlavorTags';
 import AlcoholRatingInput from '@/components/domain/alcohol/AlcoholRatingInput';
 import ShareDropdown from '@/components/share/ShareDropdown';
@@ -318,6 +319,11 @@ export default function AlcoholDetailPage({
   const reviewTotalCount = data?.reviewInfo?.totalCount;
   const isGuest = !isLoggedIn;
   // 비회원은 리뷰를 맛보기로만 보여 주고, 나머지는 로그인 후 전체 리뷰에서 본다
+  const reviewsHref = `${ROUTES.ALCOHOL.REVIEWS(String(alcoholId))}?${new URLSearchParams(
+    { name: data?.alcohols?.korName ?? '' },
+  ).toString()}`;
+  // 리뷰는 서버의 하루 캐시(초기 데이터)가 아니라 브라우저에서 새로 받은 응답으로만 그린다.
+  // 그 사이 지워지거나 비공개로 바뀐 리뷰가 공개 HTML에 남지 않게 하기 위해서다.
   const visibleReviews = isGuest
     ? reviewList.slice(0, GUEST_REVIEW_PREVIEW_COUNT)
     : reviewList;
@@ -542,7 +548,12 @@ export default function AlcoholDetailPage({
             </div>
             <>
               <div className="h-16 bg-bg-layer-basement" />
-              {visibleReviews.length > 0 ? (
+              {!isFetchedAfterMount ? (
+                <div aria-hidden="true" className="mx-20 space-y-24 pt-34">
+                  <ReviewItemSkeleton />
+                  <ReviewItemSkeleton />
+                </div>
+              ) : !isSuccess ? null : visibleReviews.length > 0 ? (
                 <>
                   <section id="reviews" className="mx-20 pt-34 pb-20">
                     {typeof reviewTotalCount === 'number' && (
@@ -579,7 +590,11 @@ export default function AlcoholDetailPage({
                         ) => {
                           if (!isLoggedIn) {
                             e.preventDefault();
-                            bridgeToLogin({ trigger: 'comment' });
+                            // 로그인 후 상세가 아니라 누르려던 전체 리뷰로 바로 보낸다
+                            bridgeToLogin(
+                              { trigger: 'comment' },
+                              { returnTo: reviewsHref },
+                            );
                           }
                         },
                       }}

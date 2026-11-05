@@ -15,16 +15,22 @@ export const useLoginBridge = () => {
 
   /**
    * trackPrompt: 로그인 안내를 이미 화면(모달 등)에서 보여 주고 이벤트를 보냈다면 false로 넘겨 중복 발화를 막는다.
+   * returnTo: 로그인 후 현재 화면이 아닌 곳(누르려던 링크의 목적지 등)으로 보낼 때 넘긴다.
    */
   const bridgeToLogin = (
     { trigger, gatePage }: LoginContext = {},
-    { trackPrompt = true }: { trackPrompt?: boolean } = {},
+    {
+      trackPrompt = true,
+      returnTo: destination,
+    }: { trackPrompt?: boolean; returnTo?: string } = {},
   ) => {
     setLoginContext({ trigger, gatePage });
     if (trigger && trackPrompt) {
       trackGA4Event('login_prompt_shown', { trigger });
     }
-    const returnTo = `${pathname}${searchParams?.toString() ? `?${searchParams.toString()}` : ''}`;
+    const returnTo =
+      destination ??
+      `${pathname}${searchParams?.toString() ? `?${searchParams.toString()}` : ''}`;
     router.replace(`/login?returnTo=${encodeURIComponent(returnTo)}`);
   };
 

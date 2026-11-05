@@ -92,7 +92,13 @@ const detail: AlcoholDetailsResponse = {
   },
 };
 
-const renderPage = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
+const renderPage = ({
+  isLoggedIn,
+  initialData = detail,
+}: {
+  isLoggedIn: boolean;
+  initialData?: AlcoholDetailsResponse;
+}) => {
   jest.mocked(useAuthSession).mockReturnValue({
     isLoading: false,
     isLoggedIn,
@@ -103,7 +109,7 @@ const renderPage = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   });
   return render(
     <QueryClientProvider client={queryClient}>
-      <AlcoholDetailPage initialData={detail} />
+      <AlcoholDetailPage initialData={initialData} />
     </QueryClientProvider>,
   );
 };
@@ -171,12 +177,17 @@ it('비회원도 설명과 태그를 읽고, 리뷰 2개를 본 뒤 로그인해
     screen.queryByText('지금 보고 계신 위스키, 관심있으신가요?'),
   ).not.toBeInTheDocument();
 
-  expect(screen.getByText('첫 번째 리뷰')).toBeInTheDocument();
+  expect(await screen.findByText('첫 번째 리뷰')).toBeInTheDocument();
   expect(screen.getByText('두 번째 리뷰')).toBeInTheDocument();
   expect(screen.queryByText('세 번째 리뷰')).not.toBeInTheDocument();
 
   fireEvent.click(screen.getByText('로그인하고 리뷰 16개 모두 보기'));
-  expect(bridgeToLogin).toHaveBeenCalledWith({ trigger: 'comment' });
+  expect(bridgeToLogin).toHaveBeenCalledWith(
+    { trigger: 'comment' },
+    {
+      returnTo: `/alcohols/482/reviews?name=${encodeURIComponent('스프링뱅크 10년').replace(/%20/g, '+')}`,
+    },
+  );
 });
 
 it('회원은 받은 리뷰를 모두 보고 리뷰 더 보기로 전체 리뷰로 간다', async () => {
@@ -240,4 +251,18 @@ it('고른 태그가 모두 겹치는 위스키가 없으면 안내 문구를 �
   expect(
     await screen.findByText('고른 태그가 모두 겹치는 위스키가 없어요'),
   ).toBeInTheDocument();
+});
+
+it('서버 캐시에 남은 리뷰는 그리지 않고, 브라우저에서 새로 받은 리뷰만 보여 준다', async () => {
+  renderPage({
+    isLoggedIn: false,
+    initialData: {
+      ...detail,
+      reviewInfo: { reviewList: [review(99, '지워진 리뷰')] },
+    },
+  });
+
+  expect(screen.queryByText('지워진 리뷰')).not.toBeInTheDocument();
+  expect(await screen.findByText('첫 번째 리뷰')).toBeInTheDocument();
+  expect(screen.queryByText('지워진 리뷰')).not.toBeInTheDocument();
 });
