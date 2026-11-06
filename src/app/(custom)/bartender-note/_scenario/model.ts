@@ -1,10 +1,11 @@
-/** 화면이 사용할 시나리오. Product API는 scenarioId로 조회한다. */
+/** 화면이 사용할 시나리오. 환경마다 다른 scenarioId 대신 시나리오 목록의 code로 찾는다. */
 export interface ScenarioContext {
-  scenarioId: number;
+  code: string;
 }
 
 export interface ScenarioStepRequest {
-  context: ScenarioContext;
+  /** context.code로 찾은 ID. Product API는 ID로 조회·평가한다. */
+  scenarioId: number;
   answers: ScenarioAnswer[];
   versionId?: number | null;
   cursor?: string;

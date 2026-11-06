@@ -1,6 +1,13 @@
 import type { PaginationMeta } from '@/api/_shared/types';
 
 /** Product OpenAPI의 시나리오 DTO. 화면 모델은 route의 _scenario/model.ts에 둔다. */
+export interface ScenarioListItemDto {
+  scenarioId: number;
+  /** 스키마엔 nullable 표시가 없지만 문서 설명과 실제 응답은 코드 미지정 시 null이다. */
+  code: string | null;
+  title: string;
+}
+
 export interface ScenarioSubmittedAnswerDto {
   questionId: number;
   optionId: string;

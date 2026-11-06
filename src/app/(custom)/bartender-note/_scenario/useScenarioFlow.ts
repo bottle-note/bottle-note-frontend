@@ -12,14 +12,19 @@ import type {
   ScenarioContext,
   ScenarioStepResponse,
 } from './model';
-import { getScenarioStep } from './scenarioApi';
+import {
+  findScenarioId,
+  getScenarioStep,
+  ScenarioNotFoundError,
+} from './scenarioApi';
 
 /**
- * 없거나 비활성이거나 게시본이 없는 시나리오(404). 진행 중에 게시가 내려가도 같다.
+ * 목록에 code가 없거나, 없거나 비활성이거나 게시본이 없는 시나리오(404). 진행 중에 게시가 내려가도 같다.
  * 다시 시도해도 같은 결과라 재시도 대신 다른 추천 방법으로 안내한다.
  */
 export const isScenarioUnavailable = (error: unknown) =>
-  error instanceof ApiError && error.response.status === 404;
+  error instanceof ScenarioNotFoundError ||
+  (error instanceof ApiError && error.response.status === 404);
 
 /** 조회 키 끝의 [버전, 답변]. */
 const sessionOf = (key: QueryKey) =>
@@ -46,7 +51,15 @@ export function useScenarioFlow({
     versionId: number | null;
   }>({ trail: [], count: 0, versionId: null });
   const answers = trail.slice(0, count);
-  const queryKey = ['bartender-note', 'scenario-step', context.scenarioId];
+  const queryKey = ['bartender-note', 'scenario-step', context.code];
+  /** code → ID는 처음 한 번만 찾는다. 실패하면 캐시하지 않아 단계 재시도 때 다시 찾는다. */
+  const scenarioIdOf = () =>
+    client.fetchQuery({
+      queryKey: ['bartender-note', 'scenario-id', context.code],
+      queryFn: ({ signal }) => findScenarioId(context.code, signal),
+      retry: false,
+      staleTime: Infinity,
+    });
   /** 답변·버전 하나에 대한 조회. 첫 질문(답 없음·버전 없음)은 게시 여부 확인과 같은 캐시를 쓴다. */
   const stepQuery = (
     stepAnswers: ScenarioAnswer[],
@@ -56,9 +69,10 @@ export function useScenarioFlow({
       queryKey: [...queryKey, stepVersionId, stepAnswers],
       initialPageParam: undefined as string | undefined,
       queryFn: async ({ signal, pageParam }) => {
+        const scenarioId = await scenarioIdOf();
         const step = await getScenarioStep(
           {
-            context,
+            scenarioId,
             answers: stepAnswers,
             versionId: stepVersionId,
             cursor: pageParam,

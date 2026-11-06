@@ -4,6 +4,20 @@ import { ScenarioApi } from './scenario.api';
 afterEach(() => vi.restoreAllMocks());
 
 describe('Product 시나리오 HTTP 연결', () => {
+  it('공개 목록 GET의 data 배열을 반환한다', async () => {
+    const data = [{ scenarioId: 3, code: 'bartender-note', title: '바텐더' }];
+    const fetch = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(
+        new Response(JSON.stringify({ success: true, data, errors: [] })),
+      );
+    await expect(ScenarioApi.list()).resolves.toEqual(data);
+    expect(fetch).toHaveBeenCalledWith(
+      '/bottle-api/v1/scenarios',
+      expect.objectContaining({ method: 'GET' }),
+    );
+  });
+
   it('공개 GET의 data를 반환하고 취소 signal을 전달한다', async () => {
     const data = { scenarioId: 3, versionId: 7 };
     const fetch = vi
