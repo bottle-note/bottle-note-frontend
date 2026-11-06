@@ -12,8 +12,11 @@ import type { ScenarioContext, ScenarioStepRequest } from '../model';
 
 /** 테스트에서만 사용하는 시나리오와 응답 대역. */
 export const SCENARIO_CONTEXT: ScenarioContext = {
-  scenarioId: 3,
+  code: 'bartender-note',
 };
+
+/** 시나리오 목록에서 SCENARIO_CONTEXT.code로 찾는 ID. */
+export const SCENARIO_ID = 3;
 
 // 서버 추천 품질·서명 검증을 재현하지 않는 작은 fixture다.
 const candidates = [
@@ -78,11 +81,11 @@ function option(
 
 /** 실제 Product DTO를 반환한다. 진행은 누적 답변만으로 계산한다. */
 export async function getScenarioFixture(
-  { context, answers }: ScenarioStepRequest,
+  { scenarioId, answers }: ScenarioStepRequest,
   signal?: AbortSignal,
 ): Promise<ScenarioEvaluationResponseDto> {
   signal?.throwIfAborted();
-  if (context.scenarioId !== SCENARIO_CONTEXT.scenarioId) {
+  if (scenarioId !== SCENARIO_ID) {
     throw new Error('목에서 지원하지 않는 시나리오입니다.');
   }
   const kindValue = answers[0]?.value;
@@ -241,7 +244,7 @@ export async function getScenarioFixture(
   }
   const current = questions[answers.length] ?? null;
   return {
-    scenarioId: context.scenarioId,
+    scenarioId,
     title: '바텐더 추천 목 시나리오',
     versionId: 3,
     state: current ? 'QUESTION' : 'SCENARIO_END',
@@ -273,8 +276,16 @@ export async function getScenarioFixture(
 
 /** 화면 테스트에서도 실제 HTTP 경계 바로 앞까지는 제품 코드를 사용한다. */
 export function mockScenarioApi() {
+  vi.spyOn(ScenarioApi, 'list').mockResolvedValue([
+    { scenarioId: 1, code: null, title: '코드 없는 시나리오' },
+    {
+      scenarioId: SCENARIO_ID,
+      code: SCENARIO_CONTEXT.code,
+      title: '바텐더 추천',
+    },
+  ]);
   vi.spyOn(ScenarioApi, 'get').mockImplementation((scenarioId, signal) =>
-    getScenarioFixture({ context: { scenarioId }, answers: [] }, signal),
+    getScenarioFixture({ scenarioId, answers: [] }, signal),
   );
   vi.spyOn(ScenarioApi, 'evaluate').mockImplementation(
     (scenarioId, request, signal) => {
@@ -282,7 +293,7 @@ export function mockScenarioApi() {
         return Promise.reject(new Error('시나리오 버전 불일치'));
       return getScenarioFixture(
         {
-          context: { scenarioId },
+          scenarioId,
           answers: request.answers.map(({ questionId, optionId }) => ({
             questionId,
             value: { kind: 'choice', choiceId: optionId },

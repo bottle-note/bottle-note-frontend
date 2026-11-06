@@ -11,7 +11,7 @@ import type {
 
 type Result = GA4EventMap['bartender_recommend_result'];
 const scenarioKey = (context: ScenarioContext, answers: ScenarioAnswer[]) =>
-  `scenario:${JSON.stringify([context.scenarioId, answers])}`;
+  `scenario:${JSON.stringify([context.code, answers])}`;
 
 /** 성공한 결과만 추적하며 재조회·상세 복귀로 같은 결과를 다시 보내지 않는다. */
 export function useTrackRecommendResult({
@@ -59,7 +59,7 @@ export function useTrackRecommendResult({
       };
     } else if (scenarioUnavailable) {
       viewed = {
-        key: `scenario-unavailable:${context.scenarioId}`,
+        key: `scenario-unavailable:${context.code}`,
         result: { mode: 'taste', result_state: 'unavailable' },
       };
     } else if (step === 'curations' && curationsEmpty) {
@@ -73,7 +73,7 @@ export function useTrackRecommendResult({
     trackGA4Event('bartender_recommend_result', viewed.result);
   }, [
     step,
-    context.scenarioId,
+    context.code,
     answers,
     response,
     isSuccess,

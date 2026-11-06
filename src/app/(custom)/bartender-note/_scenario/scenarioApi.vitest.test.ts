@@ -2,8 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ScenarioEvaluationResponseDto } from '@/api/scenario/types';
 import { adaptScenarioStep } from './adaptScenarioStep';
 import { ScenarioApi } from '@/api/scenario/scenario.api';
-import { SCENARIO_CONTEXT, mockScenarioApi } from './__fixtures__/scenario';
-import { getScenarioStep } from './scenarioApi';
+import {
+  SCENARIO_CONTEXT,
+  SCENARIO_ID,
+  mockScenarioApi,
+} from './__fixtures__/scenario';
+import { findScenarioId, getScenarioStep } from './scenarioApi';
 
 const rawQuestion: ScenarioEvaluationResponseDto = {
   scenarioId: 3,
@@ -170,10 +174,27 @@ describe('실제 서버 DTO → 화면 모델', () => {
 beforeEach(() => mockScenarioApi());
 afterEach(() => vi.restoreAllMocks());
 
+describe('시나리오 code로 ID 찾기', () => {
+  it('활성 시나리오 목록에서 code가 같은 시나리오의 ID를 쓴다', async () => {
+    await expect(findScenarioId(SCENARIO_CONTEXT.code)).resolves.toBe(
+      SCENARIO_ID,
+    );
+  });
+
+  it('목록에 code가 없으면 준비 중으로 판단할 수 있는 오류를 낸다', async () => {
+    vi.mocked(ScenarioApi.list).mockResolvedValueOnce([
+      { scenarioId: SCENARIO_ID, code: null, title: '바텐더 추천' },
+    ]);
+    await expect(findScenarioId(SCENARIO_CONTEXT.code)).rejects.toMatchObject({
+      name: 'ScenarioNotFoundError',
+    });
+  });
+});
+
 describe('실제 시나리오 API 요청 연결', () => {
   it('최초 조회는 GET하고, 이후에는 조회한 버전과 누적 optionId로 평가한다', async () => {
     const first = await getScenarioStep({
-      context: SCENARIO_CONTEXT,
+      scenarioId: SCENARIO_ID,
       answers: [],
     });
     expect(ScenarioApi.get).toHaveBeenCalledWith(3, undefined);
@@ -182,7 +203,7 @@ describe('실제 시나리오 API 요청 연결', () => {
       throw new Error('보기 질문 필요');
     const choiceId = first.question.input.options[0].id;
     const next = await getScenarioStep({
-      context: SCENARIO_CONTEXT,
+      scenarioId: SCENARIO_ID,
       versionId: first.versionId,
       answers: [
         { questionId: first.question.id, value: { kind: 'choice', choiceId } },
@@ -202,7 +223,7 @@ describe('실제 시나리오 API 요청 연결', () => {
 
   it('첫 질문으로 돌아와도 기존 버전으로 빈 답변을 평가한다', async () => {
     await getScenarioStep({
-      context: SCENARIO_CONTEXT,
+      scenarioId: SCENARIO_ID,
       answers: [],
       versionId: 3,
     });
@@ -221,7 +242,7 @@ describe('실제 시나리오 API 요청 연결', () => {
   it('버전 없는 복원이나 서버 보기가 아닌 답변은 전송하지 않는다', async () => {
     await expect(
       getScenarioStep({
-        context: SCENARIO_CONTEXT,
+        scenarioId: SCENARIO_ID,
         answers: [
           {
             questionId: 11,
@@ -232,7 +253,7 @@ describe('실제 시나리오 API 요청 연결', () => {
     ).rejects.toThrow('버전');
     await expect(
       getScenarioStep({
-        context: SCENARIO_CONTEXT,
+        scenarioId: SCENARIO_ID,
         versionId: 3,
         answers: [{ questionId: 11, value: { kind: 'any' } }],
       }),
@@ -248,7 +269,7 @@ describe('실제 시나리오 API 요청 연결', () => {
       nextQuestionId: null,
     });
     await getScenarioStep({
-      context: SCENARIO_CONTEXT,
+      scenarioId: SCENARIO_ID,
       versionId: 3,
       answers: [],
       cursor: 'signed-cursor',
@@ -268,7 +289,7 @@ describe('실제 시나리오 API 요청 연결', () => {
   it('취소된 요청은 결과를 전달하지 않는다', async () => {
     const controller = new AbortController();
     const result = getScenarioStep(
-      { context: SCENARIO_CONTEXT, answers: [] },
+      { scenarioId: SCENARIO_ID, answers: [] },
       controller.signal,
     );
     controller.abort();

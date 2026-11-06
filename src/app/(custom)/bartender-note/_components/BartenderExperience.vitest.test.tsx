@@ -1545,6 +1545,21 @@ describe('바텐더 노트 질문 추천 준비 중', () => {
     expect(results()).toEqual([]);
   });
 
+  it('시나리오 목록에 바텐더 노트 code가 없으면 질문을 받지 않고 준비 중이라고 알린다', async () => {
+    vi.mocked(ScenarioApi.list).mockResolvedValue([
+      { scenarioId: 3, code: null, title: '바텐더 추천' },
+    ]);
+    renderExperience();
+
+    await waitFor(async () =>
+      expect(await recommendMenu()).toHaveAccessibleName(
+        '위스키 추천해 주세요 지금은 준비하고 있어요',
+      ),
+    );
+    expect(await recommendMenu()).toBeDisabled();
+    expect(ScenarioApi.get).not.toHaveBeenCalled();
+  });
+
   it('첫 질문 미리 받기가 404가 아닌 오류면 추천을 시작할 수 있고, 들어가면 다시 받아 온다', async () => {
     vi.mocked(ScenarioApi.get).mockRejectedValueOnce(
       new ApiError('서버 오류', new Response(null, { status: 500 })),
