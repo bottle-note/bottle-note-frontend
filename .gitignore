@@ -48,3 +48,4 @@ HANDOFF.md
 
 # 회고문서
 .retro/*
+.gstack/
