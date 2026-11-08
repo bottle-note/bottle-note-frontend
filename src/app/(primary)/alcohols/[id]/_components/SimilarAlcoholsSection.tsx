@@ -112,7 +112,9 @@ export default function SimilarAlcoholsSection({
       <Link
         href={similarEntryHref({ alcoholId, name: alcoholName, tags })}
         onClick={() =>
-          trackGA4Event('bartender_entry_click', { source: 'alcohol_detail' })
+          trackGA4Event('bartender_entry_click', {
+            entry_source: 'alcohol_detail',
+          })
         }
         className={`mx-20 flex min-h-64 items-center gap-12 rounded-xl border border-stroke-neutral-basement bg-bg-neutral-weak py-10 pl-10 pr-12 text-fg-neutral ${
           showList ? 'mt-16' : 'mt-20'

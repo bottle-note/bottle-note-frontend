@@ -26,7 +26,7 @@ export default function ImportClearanceCompactItem({ item }: Props) {
       onClick={() =>
         trackGA4Event('select_import_clearance', {
           declaration_id: String(item.id),
-          source: 'related',
+          entry_source: 'related',
         })
       }
     >

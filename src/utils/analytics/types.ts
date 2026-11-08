@@ -64,49 +64,34 @@ export interface GA4EventMap {
     trigger?: LoginTrigger;
     gate_page?: LoginGatePage;
   };
-  sign_up: {
-    method: LoginMethod;
-    trigger?: LoginTrigger;
-  };
   rate_alcohol: {
     alcohol_id: string;
     alcohol_name: string;
   };
   write_review_start: {
     alcohol_id: string;
-    source?: FeatureSource;
+    entry_source?: FeatureSource;
     entry_flow?: ReviewEntryFlow;
   };
   write_review_complete: {
     alcohol_id: string;
-    source?: FeatureSource;
+    entry_source?: FeatureSource;
     entry_flow?: ReviewEntryFlow;
   };
   write_review_failed: {
     alcohol_id: string;
     failure_type: 'image_upload' | 'rating_save' | 'review_save';
-    source?: FeatureSource;
+    entry_source?: FeatureSource;
     entry_flow?: ReviewEntryFlow;
   };
   add_to_picks: {
     alcohol_id: string;
     alcohol_name: string;
     action: 'add' | 'remove';
-    source?: FeatureSource;
+    entry_source?: FeatureSource;
   };
 
   // 🟡 2순위 — 탐색 행동
-  search: {
-    result_count: number;
-    query_length: number;
-  };
-  search_result_click: {
-    alcohol_id: string;
-    result_position: number;
-  };
-  search_no_results: {
-    query_length: number;
-  };
   view_alcohol_detail: {
     alcohol_id: string;
     alcohol_name: string;
@@ -121,7 +106,7 @@ export interface GA4EventMap {
     alcohol_id: string;
   };
   bartender_entry_click: {
-    source: 'alcohol_detail';
+    entry_source: 'alcohol_detail';
   };
   view_import_clearance_list: {
     access_state: 'guest' | 'member';
@@ -129,7 +114,7 @@ export interface GA4EventMap {
   };
   select_import_clearance: {
     declaration_id: string;
-    source: 'list' | 'related';
+    entry_source: 'list' | 'related';
   };
   view_import_clearance_detail: {
     declaration_id: string;
@@ -139,7 +124,7 @@ export interface GA4EventMap {
   select_import_clearance_alcohol: {
     declaration_id: string;
     alcohol_id: string;
-    source: 'summary' | 'sticky_cta';
+    entry_source: 'summary' | 'sticky_cta';
   };
   login_prompt_shown: {
     trigger: LoginTrigger;
@@ -187,11 +172,11 @@ export interface GA4EventMap {
   };
   bartender_select_alcohol: {
     alcohol_id: string;
-    source: 'taste' | 'situation' | 'picks' | 'similar';
+    entry_source: 'taste' | 'situation' | 'picks' | 'similar';
   };
   bartender_open_alcohol_page: {
     alcohol_id: string;
-    source: 'detail' | 'picks';
+    entry_source: 'detail' | 'picks';
   };
   bartender_show_other_candidates: Record<string, never>;
   bartender_story_start: {

@@ -2,8 +2,8 @@
   "templateEnvironment": "dev",
   "templates": {
     "baseTag": "Google Tag - GA4 Dev",
-    "eventTag": "GA4 Event - search",
-    "trigger": "CE - search",
+    "eventTag": "GA4 Event - login",
+    "trigger": "CE - login",
     "variable": "DLV - alcohol_id"
   },
   "environments": {
@@ -23,33 +23,26 @@
   },
   "events": [
     { "name": "login", "parameters": ["method", "trigger", "gate_page"] },
-    { "name": "sign_up", "parameters": ["method", "trigger"] },
     {
       "name": "rate_alcohol",
       "parameters": ["alcohol_id", "alcohol_name"]
     },
     {
       "name": "write_review_start",
-      "parameters": ["alcohol_id", "source", "entry_flow"]
+      "parameters": ["alcohol_id", "entry_source", "entry_flow"]
     },
     {
       "name": "write_review_complete",
-      "parameters": ["alcohol_id", "source", "entry_flow"]
+      "parameters": ["alcohol_id", "entry_source", "entry_flow"]
     },
     {
       "name": "write_review_failed",
-      "parameters": ["alcohol_id", "failure_type", "source", "entry_flow"]
+      "parameters": ["alcohol_id", "failure_type", "entry_source", "entry_flow"]
     },
     {
       "name": "add_to_picks",
-      "parameters": ["alcohol_id", "alcohol_name", "action", "source"]
+      "parameters": ["alcohol_id", "alcohol_name", "action", "entry_source"]
     },
-    { "name": "search", "parameters": ["result_count", "query_length"] },
-    {
-      "name": "search_result_click",
-      "parameters": ["alcohol_id", "result_position"]
-    },
-    { "name": "search_no_results", "parameters": ["query_length"] },
     {
       "name": "view_alcohol_detail",
       "parameters": ["alcohol_id", "alcohol_name"]
@@ -59,14 +52,14 @@
       "parameters": ["alcohol_id", "target_alcohol_id", "position"]
     },
     { "name": "similar_alcohol_more_click", "parameters": ["alcohol_id"] },
-    { "name": "bartender_entry_click", "parameters": ["source"] },
+    { "name": "bartender_entry_click", "parameters": ["entry_source"] },
     {
       "name": "view_import_clearance_list",
       "parameters": ["access_state", "result_state"]
     },
     {
       "name": "select_import_clearance",
-      "parameters": ["declaration_id", "source"]
+      "parameters": ["declaration_id", "entry_source"]
     },
     {
       "name": "view_import_clearance_detail",
@@ -74,7 +67,7 @@
     },
     {
       "name": "select_import_clearance_alcohol",
-      "parameters": ["declaration_id", "alcohol_id", "source"]
+      "parameters": ["declaration_id", "alcohol_id", "entry_source"]
     },
     { "name": "login_prompt_shown", "parameters": ["trigger"] },
     { "name": "login_prompt_converted", "parameters": ["trigger"] },
@@ -101,11 +94,11 @@
     },
     {
       "name": "bartender_select_alcohol",
-      "parameters": ["alcohol_id", "source"]
+      "parameters": ["alcohol_id", "entry_source"]
     },
     {
       "name": "bartender_open_alcohol_page",
-      "parameters": ["alcohol_id", "source"]
+      "parameters": ["alcohol_id", "entry_source"]
     },
     { "name": "bartender_show_other_candidates", "parameters": [] },
     {

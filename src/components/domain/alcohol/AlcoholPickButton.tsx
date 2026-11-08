@@ -68,7 +68,7 @@ const AlcoholPickButton = ({
       alcohol_id: String(alcoholId),
       alcohol_name: alcoholName,
       action: newPickState ? 'add' : 'remove',
-      ...(source && { source }),
+      ...(source && { entry_source: source }),
     });
     handleToggle(newPickState);
   };

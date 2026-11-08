@@ -1205,7 +1205,7 @@ describe('바텐더 노트 첫 잔 이야기', () => {
     const card = await screen.findByRole('region', { name: '추천 후보' });
     expect(trackGA4Event).toHaveBeenCalledWith('bartender_select_alcohol', {
       alcohol_id: expect.any(String),
-      source: 'taste',
+      entry_source: 'taste',
     });
     expect(conversation()).toHaveTextContent('이 병도 잘 맞으실 거예요.');
     expect(within(card).getByRole('button', { name: '찜하기' })).toBeEnabled();
@@ -1393,7 +1393,10 @@ describe('바텐더 노트 큐레이션 추천', () => {
     );
     expect(AlcoholsApi.getAlcoholDetails).toHaveBeenCalledWith('104');
     expect(events('bartender_select_alcohol')).toEqual([
-      ['bartender_select_alcohol', { alcohol_id: '104', source: 'situation' }],
+      [
+        'bartender_select_alcohol',
+        { alcohol_id: '104', entry_source: 'situation' },
+      ],
     ]);
   });
 
@@ -2352,7 +2355,7 @@ describe('바텐더 노트 공통 이동', () => {
     fireEvent.click(screen.getByRole('link', { name: '자세히 볼게요' }));
     expect(trackGA4Event).toHaveBeenCalledWith('bartender_open_alcohol_page', {
       alcohol_id: '247',
-      source: 'detail',
+      entry_source: 'detail',
     });
     unmount();
     renderExperience();
@@ -2810,12 +2813,12 @@ describe('바텐더 노트 캠페인 지표', () => {
 
     expect(trackGA4Event).toHaveBeenCalledWith('write_review_start', {
       alcohol_id: '900',
-      source: 'bartender_note',
+      entry_source: 'bartender_note',
       entry_flow: 'direct',
     });
     expect(trackGA4Event).toHaveBeenCalledWith('write_review_complete', {
       alcohol_id: '900',
-      source: 'bartender_note',
+      entry_source: 'bartender_note',
       entry_flow: 'direct',
     });
 
@@ -2865,7 +2868,7 @@ describe('바텐더 노트 캠페인 지표', () => {
         expect(trackGA4Event).toHaveBeenCalledWith(
           event,
           expect.objectContaining({
-            source: 'bartender_note',
+            entry_source: 'bartender_note',
             entry_flow: entryFlow,
           }),
         );
@@ -2969,7 +2972,7 @@ describe('바텐더 노트 캠페인 지표', () => {
       expect(trackGA4Event).toHaveBeenCalledWith('write_review_failed', {
         alcohol_id: expect.any(String),
         failure_type: 'review_save',
-        source: 'bartender_note',
+        entry_source: 'bartender_note',
         entry_flow: 'recommend',
       }),
     );
@@ -3056,7 +3059,10 @@ describe('바텐더 노트 비슷한 위스키', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('이 병도 잘 맞으실 거예요.')).toBeInTheDocument();
     expect(events('bartender_select_alcohol')).toEqual([
-      ['bartender_select_alcohol', { alcohol_id: '102', source: 'similar' }],
+      [
+        'bartender_select_alcohol',
+        { alcohol_id: '102', entry_source: 'similar' },
+      ],
     ]);
   });
 

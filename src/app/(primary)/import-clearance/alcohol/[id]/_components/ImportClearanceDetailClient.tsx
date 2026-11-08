@@ -479,7 +479,7 @@ export default function ImportClearanceDetailClient({
             trackGA4Event('select_import_clearance_alcohol', {
               declaration_id: String(data.id),
               alcohol_id: String(data.alcoholId),
-              source: 'sticky_cta',
+              entry_source: 'sticky_cta',
             });
             router.push(ROUTES.ALCOHOL.DETAIL(data.alcoholId!));
           }}
