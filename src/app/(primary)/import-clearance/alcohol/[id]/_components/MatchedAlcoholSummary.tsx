@@ -80,7 +80,7 @@ export function MatchedAlcoholSummary({ alcohol, declarationId }: Props) {
           trackGA4Event('select_import_clearance_alcohol', {
             declaration_id: String(declarationId),
             alcohol_id: String(alcohol.alcoholId),
-            source: 'summary',
+            entry_source: 'summary',
           })
         }
       >

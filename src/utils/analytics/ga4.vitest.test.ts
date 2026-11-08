@@ -16,13 +16,13 @@ describe('리뷰 이벤트 유입 경로', () => {
     (event, params) => {
       trackGA4Event(event, {
         ...params,
-        source: 'bartender_note',
+        entry_source: 'bartender_note',
         entry_flow: 'recommend',
       });
       expect(sendGTMEvent).toHaveBeenLastCalledWith({
         event,
         ...params,
-        source: 'bartender_note',
+        entry_source: 'bartender_note',
         entry_flow: 'recommend',
       });
 
@@ -30,21 +30,21 @@ describe('리뷰 이벤트 유입 경로', () => {
       expect(sendGTMEvent).toHaveBeenLastCalledWith({
         event,
         ...params,
-        source: null,
+        entry_source: null,
         entry_flow: null,
       });
     },
   );
 
-  it('다른 source는 보존하고 리뷰 유입 경로만 비운다', () => {
+  it('다른 entry_source는 보존하고 리뷰 유입 경로만 비운다', () => {
     trackGA4Event('write_review_complete', {
       alcohol_id: '900',
-      source: 'home',
+      entry_source: 'home',
     });
     expect(sendGTMEvent).toHaveBeenCalledWith({
       event: 'write_review_complete',
       alcohol_id: '900',
-      source: 'home',
+      entry_source: 'home',
       entry_flow: null,
     });
   });

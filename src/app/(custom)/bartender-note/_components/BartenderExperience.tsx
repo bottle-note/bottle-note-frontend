@@ -488,7 +488,7 @@ export default function BartenderExperience({
     ) {
       trackGA4Event('bartender_select_alcohol', {
         alcohol_id: String(next.id),
-        source: SELECT_SOURCE[step],
+        entry_source: SELECT_SOURCE[step],
       });
     }
     move('detail', { selection: next });
@@ -499,7 +499,7 @@ export default function BartenderExperience({
       alcohol_id: String(selected.id),
       alcohol_name: selected.name,
       action: picks.isPicked(selected.id) ? 'remove' : 'add',
-      source: 'bartender_note',
+      entry_source: 'bartender_note',
     });
     try {
       const picked = await picks.toggle(selected.id);
@@ -516,7 +516,7 @@ export default function BartenderExperience({
     reviewStartedFor.current = selected.id;
     trackGA4Event('write_review_start', {
       alcohol_id: String(selected.id),
-      source: 'bartender_note',
+      entry_source: 'bartender_note',
       entry_flow: campaign.reviewEntryFlow(),
     });
   };
@@ -532,14 +532,14 @@ export default function BartenderExperience({
       });
       trackGA4Event('write_review_complete', {
         alcohol_id: alcoholId,
-        source: 'bartender_note',
+        entry_source: 'bartender_note',
         entry_flow: entryFlow,
       });
       if (!ratingSaved)
         trackGA4Event('write_review_failed', {
           alcohol_id: alcoholId,
           failure_type: 'rating_save',
-          source: 'bartender_note',
+          entry_source: 'bartender_note',
           entry_flow: entryFlow,
         });
       reviewStartedFor.current = null;
@@ -553,7 +553,7 @@ export default function BartenderExperience({
         alcohol_id: alcoholId,
         failure_type:
           error instanceof ReviewSubmitError ? error.stage : 'review_save',
-        source: 'bartender_note',
+        entry_source: 'bartender_note',
         entry_flow: entryFlow,
       });
       setNotice('review-failed');
@@ -563,7 +563,7 @@ export default function BartenderExperience({
     if (!selection) return;
     trackGA4Event('bartender_open_alcohol_page', {
       alcohol_id: String(selection.id),
-      source: 'detail',
+      entry_source: 'detail',
     });
     leave();
   };

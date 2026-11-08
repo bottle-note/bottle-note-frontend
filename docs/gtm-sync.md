@@ -2,6 +2,8 @@
 
 `gtm.config.json`을 기준으로 데이터 영역 변수, 맞춤 이벤트 트리거, GA4 이벤트 태그를 GTM 작업공간에 맞춘다. 같은 이름의 항목이 있으면 수정하고 없으면 생성한다.
 
+설정에서 이벤트나 매개변수를 빼면 해당 항목을 삭제한다. 삭제 대상은 스크립트가 관리하는 이름(`GA4 Event - `·`CE - `·`DLV - `로 시작) 중 설정에 없는 것이며, 기본 Google 태그와 `templates`에 지정한 항목, 다른 태그·트리거·변수가 참조 중인 항목은 지우지 않고 `SKIP`으로 표시한다. 비교 실행에서 `DELETE`로 표시한 항목은 `--apply`(CI 포함) 때 작업공간에서 지워지며, prod는 게시 전까지 운영 컨테이너에 그대로 남는다.
+
 ## 배포 흐름
 
 `main`에 `gtm.config.json`, `scripts/gtm-sync.mjs`, `.github/workflows/gtm_sync.yml` 변경이 머지되면 GitHub Actions의 GTM Sync가 실행된다. Actions 화면에서 수동으로 실행할 수도 있다.
@@ -56,29 +58,30 @@ pnpm run gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 
 운영 측정 ID는 `gtm.config.json`의 `prod.measurementId`에 설정한다. 운영 컨테이너의 작업공간이 여러 개라면 `gtm.config.json`의 `prod.workspaceId`도 지정한다. 운영 페이지에서 GTM 스크립트가 로드되는 것과 GA4 태그가 컨테이너에 게시된 것은 별개로 확인한다.
 
-## 리뷰·검색 이벤트 기준
+## 진입 위치 매개변수 `entry_source`
 
-| 이벤트                  | 발화 조건                                | 매개변수                        | 중복 방지                    |
-| ----------------------- | ---------------------------------------- | ------------------------------- | ---------------------------- |
-| `write_review_start`    | 새 리뷰 폼을 처음 수정한 시점            | `alcohol_id`                    | 작성 화면당 1회              |
-| `write_review_complete` | 새 리뷰 저장 성공                        | `alcohol_id`                    | 저장 성공 응답 뒤 1회        |
-| `write_review_failed`   | 이미지 업로드, 별점 저장, 리뷰 저장 실패 | `alcohol_id`, `failure_type`    | 실패한 단계에서 1회          |
-| `search`                | 검색어의 첫 결과 페이지 수신             | `result_count`, `query_length`  | 검색어당 1회                 |
-| `search_result_click`   | 검색 결과의 주류 상세 링크 선택          | `alcohol_id`, `result_position` | 사용자 클릭 시 1회           |
-| `search_no_results`     | 검색어의 첫 결과가 0건                   | `query_length`                  | `search`와 함께 검색어당 1회 |
+같은 이벤트를 여러 위치에서 보낼 때 위치는 `entry_source`로 구분한다. GA4는 이벤트 매개변수 `entry_source`·`medium`·`campaign`을 트래픽 출처로 해석해 세션 출처를 덮어쓰므로, 이 이름들을 이벤트 매개변수로 쓰지 않는다.
 
-위 맞춤 이벤트의 매개변수에는 검색어 원문을 넣지 않고 길이만 넣는다.
+## 리뷰 이벤트 기준
+
+| 이벤트                  | 발화 조건                                | 매개변수                     | 중복 방지             |
+| ----------------------- | ---------------------------------------- | ---------------------------- | --------------------- |
+| `write_review_start`    | 새 리뷰 폼을 처음 수정한 시점            | `alcohol_id`                 | 작성 화면당 1회       |
+| `write_review_complete` | 새 리뷰 저장 성공                        | `alcohol_id`                 | 저장 성공 응답 뒤 1회 |
+| `write_review_failed`   | 이미지 업로드, 별점 저장, 리뷰 저장 실패 | `alcohol_id`, `failure_type` | 실패한 단계에서 1회   |
+
+검색 이벤트는 현재 보내지 않는다. 다시 추가할 때도 검색어 원문은 넣지 않고 길이만 넣는다.
 
 ## 수입통관 이벤트 기준
 
 | 이벤트                            | 발화 조건                             | 매개변수                                         | 중복 방지       |
 | --------------------------------- | ------------------------------------- | ------------------------------------------------ | --------------- |
 | `view_import_clearance_list`      | 첫 목록 페이지 수신 및 인증 상태 확정 | `access_state`, `result_state`                   | 화면 진입당 1회 |
-| `select_import_clearance`         | 목록 또는 관련 수입 내역 링크 선택    | `declaration_id`, `source`                       | 클릭당 1회      |
+| `select_import_clearance`         | 목록 또는 관련 수입 내역 링크 선택    | `declaration_id`, `entry_source`                 | 클릭당 1회      |
 | `view_import_clearance_detail`    | 상세 응답 수신 및 인증 상태 확정      | `declaration_id`, `access_state`, `match_status` | 신고 ID당 1회   |
-| `select_import_clearance_alcohol` | 매칭 요약 링크 또는 하단 CTA 선택     | `declaration_id`, `alcohol_id`, `source`         | 클릭당 1회      |
+| `select_import_clearance_alcohol` | 매칭 요약 링크 또는 하단 CTA 선택     | `declaration_id`, `alcohol_id`, `entry_source`   | 클릭당 1회      |
 
-`declaration_id`는 수입 신고 레코드 ID이며 `alcohol_id`와 다르다. GA4 맞춤 측정기준에는 `access_state`, `result_state`, `match_status`, `source`처럼 값이 제한된 항목만 등록한다.
+`declaration_id`는 수입 신고 레코드 ID이며 `alcohol_id`와 다르다. GA4 맞춤 측정기준에는 `access_state`, `result_state`, `match_status`, `entry_source`처럼 값이 제한된 항목만 등록한다.
 
 ## 로그인 게이트 이벤트 기준
 
@@ -93,25 +96,25 @@ pnpm run gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 
 ## 바텐더 노트 이벤트 기준
 
-| 이벤트                            | 발화 조건                                                             | 매개변수                | 중복 방지                     |
-| --------------------------------- | --------------------------------------------------------------------- | ----------------------- | ----------------------------- |
-| `bartender_start`                 | 첫 화면에서 추천·상황별·리뷰·찜 흐름을 시작                           | `entry`                 | 선택당 1회                    |
-| `bartender_recommend_result`      | 취향 추천 결과(첫 잔 또는 목록)나 큐레이션 목록을 처음 보는 시점      | `mode`, `result_state`  | 같은 답변·큐레이션 결과당 1회 |
-| `bartender_select_alcohol`        | 추천 목록·큐레이션·찜에서 술을 골라 바텐더 상세로 이동                | `alcohol_id`, `source`  | 선택당 1회                    |
-| `bartender_open_alcohol_page`     | 바텐더 상세나 찜에서 실제 술 상세 페이지로 이동                       | `alcohol_id`, `source`  | 클릭당 1회                    |
-| `bartender_show_other_candidates` | 첫 잔 대화에서 「다른 술도 보여주세요」 선택                          | 없음                    | 클릭당 1회                    |
-| `bartender_story_start`           | 술 이야기를 「들려주세요」, 「이야기 듣기」 또는 「다시 듣기」로 시작 | `alcohol_id`, `trigger` | 클릭당 1회                    |
-| `bartender_story_complete`        | 첫 문단의 마지막 문장 말풍선까지 들음                                 | `alcohol_id`            | 들려주기 1회당 1회            |
-| `bartender_story_skip`            | 「다음에요」(제안) 또는 「그만 들을게요」(이야기 중) 선택             | `alcohol_id`, `stage`   | 클릭당 1회                    |
-| `bartender_story_full_text`       | 「전체 글 보기」로 설명 전체 시트를 엶                                | `alcohol_id`            | 클릭당 1회                    |
+| 이벤트                            | 발화 조건                                                             | 매개변수                     | 중복 방지                     |
+| --------------------------------- | --------------------------------------------------------------------- | ---------------------------- | ----------------------------- |
+| `bartender_start`                 | 첫 화면에서 추천·상황별·리뷰·찜 흐름을 시작                           | `entry`                      | 선택당 1회                    |
+| `bartender_recommend_result`      | 취향 추천 결과(첫 잔 또는 목록)나 큐레이션 목록을 처음 보는 시점      | `mode`, `result_state`       | 같은 답변·큐레이션 결과당 1회 |
+| `bartender_select_alcohol`        | 추천 목록·큐레이션·찜에서 술을 골라 바텐더 상세로 이동                | `alcohol_id`, `entry_source` | 선택당 1회                    |
+| `bartender_open_alcohol_page`     | 바텐더 상세나 찜에서 실제 술 상세 페이지로 이동                       | `alcohol_id`, `entry_source` | 클릭당 1회                    |
+| `bartender_show_other_candidates` | 첫 잔 대화에서 「다른 술도 보여주세요」 선택                          | 없음                         | 클릭당 1회                    |
+| `bartender_story_start`           | 술 이야기를 「들려주세요」, 「이야기 듣기」 또는 「다시 듣기」로 시작 | `alcohol_id`, `trigger`      | 클릭당 1회                    |
+| `bartender_story_complete`        | 첫 문단의 마지막 문장 말풍선까지 들음                                 | `alcohol_id`                 | 들려주기 1회당 1회            |
+| `bartender_story_skip`            | 「다음에요」(제안) 또는 「그만 들을게요」(이야기 중) 선택             | `alcohol_id`, `stage`        | 클릭당 1회                    |
+| `bartender_story_full_text`       | 「전체 글 보기」로 설명 전체 시트를 엶                                | `alcohol_id`                 | 클릭당 1회                    |
 
 `bartender_recommend_result`의 `result_state`는 `exact`·`similar`·`available`·`empty`·`unavailable`이다. `unavailable`은 질문·결과 화면에서 시나리오 조회가 404(없음·비활성·게시본 없음, 진행 중 게시 내림)여서 결과 대신 큐레이션·리뷰를 권한 경우이며 `mode: taste`로 시나리오당 1회 보낸다. 이때 추천 캠페인 FINISH는 보내지 않는다. 첫 화면에서 추천 메뉴가 비활성으로 보이는 것만으로는 보내지 않는다.
 
-첫 잔은 상세와 같은 화면이라 건네는 것만으로 `bartender_select_alcohol`을 보내지 않는다. 첫 잔에서 바로 행동한 비율은 결과 이벤트 대비 `write_review_start`·`bartender_open_alcohol_page`·`add_to_picks`와 `bartender_show_other_candidates`를 함께 본다. 비로그인 사용자가 다른 후보를 누르면 `bartender_show_other_candidates` 뒤에 `login_prompt_shown`(`trigger: other_candidates`)이 나가고, 로그인하면 후보 목록이 열린다. 이야기는 첫 잔과 모든 바텐더 상세에서 설명이 있는 술에만 제안하므로, 제안 수는 결과 이벤트 수와 같지 않다. GA4 맞춤 측정기준에는 `entry`, `mode`, `result_state`, `source`, `trigger`, `stage`처럼 값이 제한된 항목만 등록하고 `alcohol_id`는 등록하지 않는다.
+첫 잔은 상세와 같은 화면이라 건네는 것만으로 `bartender_select_alcohol`을 보내지 않는다. 첫 잔에서 바로 행동한 비율은 결과 이벤트 대비 `write_review_start`·`bartender_open_alcohol_page`·`add_to_picks`와 `bartender_show_other_candidates`를 함께 본다. 비로그인 사용자가 다른 후보를 누르면 `bartender_show_other_candidates` 뒤에 `login_prompt_shown`(`trigger: other_candidates`)이 나가고, 로그인하면 후보 목록이 열린다. 이야기는 첫 잔과 모든 바텐더 상세에서 설명이 있는 술에만 제안하므로, 제안 수는 결과 이벤트 수와 같지 않다. GA4 맞춤 측정기준에는 `entry`, `mode`, `result_state`, `entry_source`, `trigger`, `stage`처럼 값이 제한된 항목만 등록하고 `alcohol_id`는 등록하지 않는다.
 
 ### 리뷰 유입 경로와 캠페인 집계
 
-바텐더 노트의 `write_review_start`·`write_review_complete`·`write_review_failed`는 기존 `source: bartender_note`에 `entry_flow`를 함께 보낸다. 바텐더 밖의 기존 리뷰 작성 이벤트에는 경로 값을 추가하지 않는다. GTM 데이터 영역에 이전 값이 남아 일반 리뷰로 섞이지 않도록, 리뷰 이벤트 전달 시 없는 `source`·`entry_flow`는 `null`로 명시적으로 비운다.
+바텐더 노트의 `write_review_start`·`write_review_complete`·`write_review_failed`는 기존 `entry_source: bartender_note`에 `entry_flow`를 함께 보낸다. 바텐더 밖의 기존 리뷰 작성 이벤트에는 경로 값을 추가하지 않는다. GTM 데이터 영역에 이전 값이 남아 일반 리뷰로 섞이지 않도록, 리뷰 이벤트 전달 시 없는 `entry_source`·`entry_flow`는 `null`로 명시적으로 비운다.
 
 - `direct`: 첫 화면의 리뷰 메뉴 또는 등록 완료 후 「다른 술도 기록할게요」에서 시작한 리뷰.
 - `recommend`: 추천 첫 잔 또는 다른 추천 후보에서 이어 쓴 리뷰.
@@ -128,12 +131,12 @@ pnpm run gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 
 ## 홈 이벤트 기준
 
-| 이벤트                  | 발화 조건                                                                             | 매개변수                         | 중복 방지  |
-| ----------------------- | ------------------------------------------------------------------------------------- | -------------------------------- | ---------- |
-| `home_quick_link_click` | 배너 아래 바로가기 선택                                                               | `link`                           | 클릭당 1회 |
-| `home_item_click`       | 홈 섹션 항목(주간 TOP 5, 최근 본 위스키, 에디터 추천, 카테고리, 국가·지역, 리뷰) 선택 | `section`, `item_id`, `position` | 클릭당 1회 |
-| `home_more_click`       | 섹션의 「전체 보기」 선택                                                             | `section`                        | 클릭당 1회 |
-| `add_to_picks`          | 홈 목록에서 찜 추가·취소                                                              | 기존 매개변수 + `source: home`   | 클릭당 1회 |
-| `header_search_click`   | 상단 바 검색 아이콘 선택(홈·둘러보기·마이페이지 상단 바)                              | 없음                             | 클릭당 1회 |
+| 이벤트                  | 발화 조건                                                                             | 매개변수                             | 중복 방지  |
+| ----------------------- | ------------------------------------------------------------------------------------- | ------------------------------------ | ---------- |
+| `home_quick_link_click` | 배너 아래 바로가기 선택                                                               | `link`                               | 클릭당 1회 |
+| `home_item_click`       | 홈 섹션 항목(주간 TOP 5, 최근 본 위스키, 에디터 추천, 카테고리, 국가·지역, 리뷰) 선택 | `section`, `item_id`, `position`     | 클릭당 1회 |
+| `home_more_click`       | 섹션의 「전체 보기」 선택                                                             | `section`                            | 클릭당 1회 |
+| `add_to_picks`          | 홈 목록에서 찜 추가·취소                                                              | 기존 매개변수 + `entry_source: home` | 클릭당 1회 |
+| `header_search_click`   | 상단 바 검색 아이콘 선택(홈·둘러보기·마이페이지 상단 바)                              | 없음                                 | 클릭당 1회 |
 
 `link`는 `bartender_note`·`whisky_search`·`review_write`·`my_records`, `section`은 `weekly_top`·`recent_viewed`·`curation`·`category`·`region`·`review`다. `item_id`는 섹션에 따라 주류 ID, 큐레이션 ID, 카테고리 영문명, 지역 ID, 리뷰 ID다. 국가별 보기의 `position`은 나라 행 순서이며 하위 지역 칩을 눌러도 그 나라의 순서를 보낸다. `position`은 섹션 안에서 1부터 센다. GA4 맞춤 측정기준에는 `link`, `section`만 등록하고 `item_id`는 등록하지 않는다.

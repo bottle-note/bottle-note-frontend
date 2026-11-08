@@ -23,6 +23,7 @@ const AUTO_FIELDS = [
   'workspaceId',
 ];
 
+// 명령행 옵션을 읽어 실행 모드(검사·비교·반영·게시)와 대상 환경을 정한다.
 function parseArgs(argv) {
   const args = {
     apply: false,
@@ -60,6 +61,7 @@ function parseArgs(argv) {
   return args;
 }
 
+// --help 사용법을 출력한다.
 function printHelp() {
   console.log(`Bottle Note GTM sync
 
@@ -69,7 +71,8 @@ function printHelp() {
   pnpm gtm:sync -- --env dev --apply
   pnpm gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 
-기본 실행은 GTM을 변경하지 않고 생성/수정 예정 항목만 보여줍니다.
+기본 실행은 GTM을 변경하지 않고 생성/수정/삭제 예정 항목만 보여줍니다.
+삭제 대상은 'GA4 Event - '·'CE - '·'DLV - ' 이름의 항목 중 설정에 없고 참조되지 않는 것입니다.
 --apply를 지정해야 작업공간에 반영하며, 컨테이너 게시는 수행하지 않습니다.
 --publish는 반영 후 작업공간 변경을 버전으로 만들어 게시합니다.
 gtm.config.json에서 allowPublish가 true인 환경만 게시할 수 있습니다.
@@ -78,6 +81,7 @@ gtm.config.json에서 allowPublish가 true인 환경만 게시할 수 있습니�
   Application Default Credentials(gcloud 서비스 계정 대행 또는 CI의 Workload Identity Federation)`);
 }
 
+// gtm.config.json의 필수 값과 이벤트·매개변수 중복을 검사한다.
 function validateConfig(config) {
   const errors = [];
   const eventNames = new Set();
@@ -120,12 +124,14 @@ function validateConfig(config) {
   if (errors.length > 0) throw new Error(errors.join('\n'));
 }
 
+// GTM 항목을 복제하면서 GTM이 부여하는 ID·경로 필드를 지운다.
 function cloneResource(resource) {
   const clone = structuredClone(resource);
   for (const field of AUTO_FIELDS) delete clone[field];
   return clone;
 }
 
+// 지정한 필드만 뽑아 문자열로 만들어 현재 항목과 원하는 항목을 비교할 수 있게 한다.
 function comparable(resource, fields) {
   const selected = {};
   for (const field of fields) {
@@ -134,6 +140,7 @@ function comparable(resource, fields) {
   return JSON.stringify(selected);
 }
 
+// 템플릿 매개변수 중 key에 해당하는 값을 단일 문자열 값으로 바꾼다.
 function setTemplateParameter(parameters, key, value) {
   const parameter = parameters.find((item) => item.key === key);
   if (!parameter)
@@ -144,12 +151,14 @@ function setTemplateParameter(parameters, key, value) {
   delete parameter.map;
 }
 
+// 태그 종류마다 다른 측정 ID 매개변수를 찾는다.
 function findMeasurementParameter(parameters) {
   return parameters.find((parameter) =>
     ['measurementId', 'measurementIdOverride', 'tagId'].includes(parameter.key),
   );
 }
 
+// 매개변수 하나를 읽는 데이터 영역 변수(DLV - <name>)를 만든다.
 function buildVariable(template, name) {
   const variable = cloneResource(template);
   variable.name = `DLV - ${name}`;
@@ -157,6 +166,7 @@ function buildVariable(template, name) {
   return variable;
 }
 
+// 이벤트 이름으로 발동하는 맞춤 이벤트 트리거(CE - <event>)를 만든다.
 function buildTrigger(template, eventName) {
   const trigger = cloneResource(template);
   trigger.name = `CE - ${eventName}`;
@@ -172,6 +182,7 @@ function buildTrigger(template, eventName) {
   return trigger;
 }
 
+// 트리거·측정 ID·매개변수를 연결한 GA4 이벤트 태그(GA4 Event - <event>)를 만든다.
 function buildEventTag(template, event, measurementId, triggerId) {
   const tag = cloneResource(template);
   tag.name = `GA4 Event - ${event.name}`;
@@ -221,6 +232,7 @@ function buildEventTag(template, event, measurementId, triggerId) {
   return tag;
 }
 
+// 환경별 측정 ID를 넣은 기본 Google 태그를 만든다.
 function buildBaseTag(template, name, measurementId) {
   const tag = cloneResource(template);
   tag.name = name;
@@ -232,6 +244,7 @@ function buildBaseTag(template, name, measurementId) {
   return tag;
 }
 
+// ADC로 인증하고, 요청 한도(429) 시 재시도하는 GTM API 요청 함수를 돌려준다.
 async function createApiClient({ publish }) {
   const { GoogleAuth } = await import('google-auth-library');
   const auth = new GoogleAuth({
@@ -263,7 +276,9 @@ async function createApiClient({ publish }) {
         },
       });
 
-      const body = response.status === 204 ? null : await response.json();
+      // 삭제 응답은 본문이 비어 있다.
+      const text = response.status === 204 ? '' : await response.text();
+      const body = text ? JSON.parse(text) : null;
       if (response.ok) return body;
 
       if (response.status === 429 && attempt < 2) {
@@ -286,6 +301,7 @@ async function createApiClient({ publish }) {
   };
 }
 
+// 공개 컨테이너 ID로 컨테이너를 찾고 동기화할 작업공간을 고른다.
 async function resolveWorkspace(api, environment) {
   const containers = await api(`accounts/${environment.accountId}/containers`);
   const container = containers.container?.find(
@@ -322,6 +338,7 @@ async function resolveWorkspace(api, environment) {
   return workspace;
 }
 
+// 작업공간의 변수·트리거·태그를 한 번에 불러온다.
 async function listResources(api, workspacePath) {
   const [variables, triggers, tags] = await Promise.all([
     api(`${workspacePath}/variables`),
@@ -335,12 +352,14 @@ async function listResources(api, workspacePath) {
   };
 }
 
+// 작업공간 변경 한 건을 "상태 종류 이름" 한 줄로 표시한다.
 function describeChange(change) {
   const resource = change.tag ?? change.trigger ?? change.variable;
   const kind = change.tag ? 'tag' : change.trigger ? 'trigger' : 'variable';
   return `${change.changeStatus} ${kind} ${resource?.name ?? '(알 수 없음)'}`;
 }
 
+// 충돌이 없으면 작업공간 변경으로 버전을 만들어 게시한다.
 async function publishWorkspace(api, workspace, { versionName, versionNotes }) {
   const status = await api(`${workspace.path}/status`);
   const changes = status.workspaceChange ?? [];
@@ -370,12 +389,14 @@ async function publishWorkspace(api, workspace, { versionName, versionNotes }) {
   );
 }
 
+// 복제 원본으로 쓸 템플릿 항목을 이름으로 찾고, 없으면 중단한다.
 function requireTemplate(resources, kind, name) {
   const resource = resources[kind].find((item) => item.name === name);
   if (!resource) throw new Error(`${kind} 템플릿을 찾지 못했습니다: ${name}`);
   return resource;
 }
 
+// 항목 하나를 현재 상태와 비교해 생성·유지·수정하고, 반영 후 모습을 돌려준다.
 async function syncOne({
   api,
   apply,
@@ -410,6 +431,7 @@ async function syncOne({
   });
 }
 
+// 같은 종류(변수·트리거·태그)의 원하는 항목들을 이름으로 짝지어 차례로 동기화한다.
 async function syncCollection({
   api,
   apply,
@@ -438,6 +460,110 @@ async function syncCollection({
   return results;
 }
 
+const MANAGED_PREFIXES = {
+  tags: 'GA4 Event - ',
+  triggers: 'CE - ',
+  variables: 'DLV - ',
+};
+
+// 중첩된 객체·배열 안의 문자열 값을 모두 모은다.
+function collectStrings(value, out = []) {
+  if (typeof value === 'string') out.push(value);
+  else if (Array.isArray(value))
+    value.forEach((item) => collectStrings(item, out));
+  else if (value && typeof value === 'object')
+    Object.values(value).forEach((item) => collectStrings(item, out));
+  return out;
+}
+
+// 남을 항목 중 이 태그·트리거·변수를 참조하는 것이 있는지 확인한다.
+function isReferenced(kind, item, remaining) {
+  if (kind === 'tags') {
+    return remaining.tags.some((tag) =>
+      [...(tag.setupTag ?? []), ...(tag.teardownTag ?? [])].some(
+        (link) => link.tagName === item.name,
+      ),
+    );
+  }
+  if (kind === 'triggers') {
+    const byTag = remaining.tags.some((tag) =>
+      [
+        ...(tag.firingTriggerId ?? []),
+        ...(tag.blockingTriggerId ?? []),
+      ].includes(item.triggerId),
+    );
+    const byGroup = remaining.triggers.some(
+      (trigger) =>
+        trigger.type === 'triggerGroup' &&
+        collectStrings(trigger.parameter).includes(item.triggerId),
+    );
+    return byTag || byGroup;
+  }
+  const reference = `{{${item.name}}}`;
+  return [
+    ...remaining.tags,
+    ...remaining.triggers,
+    ...remaining.variables,
+  ].some(
+    (resource) =>
+      resource !== item &&
+      collectStrings(resource).some((text) => text.includes(reference)),
+  );
+}
+
+// 스크립트가 만든 이름 규칙의 항목 중 설정에서 빠지고 아무도 참조하지 않는 것만 지운다.
+async function pruneResources({
+  api,
+  apply,
+  existing,
+  desired,
+  protectedNames,
+}) {
+  const candidates = {};
+  const remaining = {};
+  for (const kind of Object.keys(MANAGED_PREFIXES)) {
+    const desiredNames = new Set(desired[kind].map((item) => item.name));
+    candidates[kind] = existing[kind].filter(
+      (item) =>
+        item.name.startsWith(MANAGED_PREFIXES[kind]) &&
+        !desiredNames.has(item.name) &&
+        !protectedNames.has(item.name),
+    );
+    // 설정 항목은 반영 후 모습, 그 밖의 항목은 현재 모습으로 참조 여부를 본다.
+    remaining[kind] = [
+      ...desired[kind],
+      ...existing[kind].filter(
+        (item) =>
+          !desiredNames.has(item.name) && !candidates[kind].includes(item),
+      ),
+    ];
+  }
+
+  // 참조 중인 후보는 남기고, 남긴 항목이 참조하는 후보도 남을 때까지 반복한다.
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const kind of Object.keys(candidates)) {
+      for (const item of [...candidates[kind]]) {
+        if (!isReferenced(kind, item, remaining)) continue;
+        console.log(`SKIP   ${kind.padEnd(9)} ${item.name} (참조 중)`);
+        candidates[kind] = candidates[kind].filter((other) => other !== item);
+        remaining[kind].push(item);
+        changed = true;
+      }
+    }
+  }
+
+  // 태그 → 트리거 → 변수 순으로 지워 참조 오류를 피한다.
+  for (const kind of ['tags', 'triggers', 'variables']) {
+    for (const item of candidates[kind]) {
+      console.log(`DELETE ${kind.padEnd(9)} ${item.name}`);
+      if (apply) await api(item.path, { method: 'DELETE' });
+    }
+  }
+}
+
+// 설정을 읽어 변수 → 트리거 → 태그 순으로 동기화하고, 빠진 항목 정리와 게시까지 진행한다.
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
@@ -513,7 +639,7 @@ async function main() {
   const parameterNames = [
     ...new Set(config.events.flatMap((event) => event.parameters)),
   ].sort();
-  await syncCollection({
+  const variables = await syncCollection({
     api,
     apply: args.apply,
     workspacePath: workspace.path,
@@ -556,7 +682,7 @@ async function main() {
     environment.baseTagName,
     measurementId,
   );
-  await syncCollection({
+  const tags = await syncCollection({
     api,
     apply: args.apply,
     workspacePath: workspace.path,
@@ -565,6 +691,17 @@ async function main() {
     existingItems: resources.tags,
     fields: ['name', 'type', 'parameter', 'firingTriggerId'],
     idField: 'tagId',
+  });
+
+  await pruneResources({
+    api,
+    apply: args.apply,
+    existing: resources,
+    desired: { tags, triggers, variables },
+    protectedNames: new Set([
+      environment.baseTagName,
+      ...Object.values(config.templates),
+    ]),
   });
 
   if (args.publish) {
