@@ -2,6 +2,8 @@
 
 `gtm.config.json`을 기준으로 데이터 영역 변수, 맞춤 이벤트 트리거, GA4 이벤트 태그를 GTM 작업공간에 맞춘다. 같은 이름의 항목이 있으면 수정하고 없으면 생성한다.
 
+설정에서 이벤트나 매개변수를 빼면 해당 항목을 삭제한다. 삭제 대상은 스크립트가 관리하는 이름(`GA4 Event - `·`CE - `·`DLV - `로 시작) 중 설정에 없는 것이며, 기본 Google 태그와 `templates`에 지정한 항목, 다른 태그·트리거·변수가 참조 중인 항목은 지우지 않고 `SKIP`으로 표시한다. 비교 실행에서 `DELETE`로 표시한 항목은 `--apply`(CI 포함) 때 작업공간에서 지워지며, prod는 게시 전까지 운영 컨테이너에 그대로 남는다.
+
 ## 배포 흐름
 
 `main`에 `gtm.config.json`, `scripts/gtm-sync.mjs`, `.github/workflows/gtm_sync.yml` 변경이 머지되면 GitHub Actions의 GTM Sync가 실행된다. Actions 화면에서 수동으로 실행할 수도 있다.

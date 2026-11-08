@@ -69,7 +69,8 @@ function printHelp() {
   pnpm gtm:sync -- --env dev --apply
   pnpm gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 
-기본 실행은 GTM을 변경하지 않고 생성/수정 예정 항목만 보여줍니다.
+기본 실행은 GTM을 변경하지 않고 생성/수정/삭제 예정 항목만 보여줍니다.
+삭제 대상은 'GA4 Event - '·'CE - '·'DLV - ' 이름의 항목 중 설정에 없고 참조되지 않는 것입니다.
 --apply를 지정해야 작업공간에 반영하며, 컨테이너 게시는 수행하지 않습니다.
 --publish는 반영 후 작업공간 변경을 버전으로 만들어 게시합니다.
 gtm.config.json에서 allowPublish가 true인 환경만 게시할 수 있습니다.
@@ -263,7 +264,9 @@ async function createApiClient({ publish }) {
         },
       });
 
-      const body = response.status === 204 ? null : await response.json();
+      // 삭제 응답은 본문이 비어 있다.
+      const text = response.status === 204 ? '' : await response.text();
+      const body = text ? JSON.parse(text) : null;
       if (response.ok) return body;
 
       if (response.status === 429 && attempt < 2) {
@@ -438,6 +441,107 @@ async function syncCollection({
   return results;
 }
 
+const MANAGED_PREFIXES = {
+  tags: 'GA4 Event - ',
+  triggers: 'CE - ',
+  variables: 'DLV - ',
+};
+
+function collectStrings(value, out = []) {
+  if (typeof value === 'string') out.push(value);
+  else if (Array.isArray(value))
+    value.forEach((item) => collectStrings(item, out));
+  else if (value && typeof value === 'object')
+    Object.values(value).forEach((item) => collectStrings(item, out));
+  return out;
+}
+
+function isReferenced(kind, item, remaining) {
+  if (kind === 'tags') {
+    return remaining.tags.some((tag) =>
+      [...(tag.setupTag ?? []), ...(tag.teardownTag ?? [])].some(
+        (link) => link.tagName === item.name,
+      ),
+    );
+  }
+  if (kind === 'triggers') {
+    const byTag = remaining.tags.some((tag) =>
+      [
+        ...(tag.firingTriggerId ?? []),
+        ...(tag.blockingTriggerId ?? []),
+      ].includes(item.triggerId),
+    );
+    const byGroup = remaining.triggers.some(
+      (trigger) =>
+        trigger.type === 'triggerGroup' &&
+        collectStrings(trigger.parameter).includes(item.triggerId),
+    );
+    return byTag || byGroup;
+  }
+  const reference = `{{${item.name}}}`;
+  return [
+    ...remaining.tags,
+    ...remaining.triggers,
+    ...remaining.variables,
+  ].some(
+    (resource) =>
+      resource !== item &&
+      collectStrings(resource).some((text) => text.includes(reference)),
+  );
+}
+
+// 스크립트가 만든 이름 규칙의 항목 중 설정에서 빠지고 아무도 참조하지 않는 것만 지운다.
+async function pruneResources({
+  api,
+  apply,
+  existing,
+  desired,
+  protectedNames,
+}) {
+  const candidates = {};
+  const remaining = {};
+  for (const kind of Object.keys(MANAGED_PREFIXES)) {
+    const desiredNames = new Set(desired[kind].map((item) => item.name));
+    candidates[kind] = existing[kind].filter(
+      (item) =>
+        item.name.startsWith(MANAGED_PREFIXES[kind]) &&
+        !desiredNames.has(item.name) &&
+        !protectedNames.has(item.name),
+    );
+    // 설정 항목은 반영 후 모습, 그 밖의 항목은 현재 모습으로 참조 여부를 본다.
+    remaining[kind] = [
+      ...desired[kind],
+      ...existing[kind].filter(
+        (item) =>
+          !desiredNames.has(item.name) && !candidates[kind].includes(item),
+      ),
+    ];
+  }
+
+  // 참조 중인 후보는 남기고, 남긴 항목이 참조하는 후보도 남을 때까지 반복한다.
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const kind of Object.keys(candidates)) {
+      for (const item of [...candidates[kind]]) {
+        if (!isReferenced(kind, item, remaining)) continue;
+        console.log(`SKIP   ${kind.padEnd(9)} ${item.name} (참조 중)`);
+        candidates[kind] = candidates[kind].filter((other) => other !== item);
+        remaining[kind].push(item);
+        changed = true;
+      }
+    }
+  }
+
+  // 태그 → 트리거 → 변수 순으로 지워 참조 오류를 피한다.
+  for (const kind of ['tags', 'triggers', 'variables']) {
+    for (const item of candidates[kind]) {
+      console.log(`DELETE ${kind.padEnd(9)} ${item.name}`);
+      if (apply) await api(item.path, { method: 'DELETE' });
+    }
+  }
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
@@ -513,7 +617,7 @@ async function main() {
   const parameterNames = [
     ...new Set(config.events.flatMap((event) => event.parameters)),
   ].sort();
-  await syncCollection({
+  const variables = await syncCollection({
     api,
     apply: args.apply,
     workspacePath: workspace.path,
@@ -556,7 +660,7 @@ async function main() {
     environment.baseTagName,
     measurementId,
   );
-  await syncCollection({
+  const tags = await syncCollection({
     api,
     apply: args.apply,
     workspacePath: workspace.path,
@@ -565,6 +669,17 @@ async function main() {
     existingItems: resources.tags,
     fields: ['name', 'type', 'parameter', 'firingTriggerId'],
     idField: 'tagId',
+  });
+
+  await pruneResources({
+    api,
+    apply: args.apply,
+    existing: resources,
+    desired: { tags, triggers, variables },
+    protectedNames: new Set([
+      environment.baseTagName,
+      ...Object.values(config.templates),
+    ]),
   });
 
   if (args.publish) {
