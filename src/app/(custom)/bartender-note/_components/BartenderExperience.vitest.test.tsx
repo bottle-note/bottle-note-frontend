@@ -547,11 +547,15 @@ async function writeQuickReview(text: string) {
   await press('사진 없이 넘어갈게요');
 }
 
-/** 별점 단계에서 키보드로 별점을 고른다. 고르면 잠시 뒤 장소·가격 단계로 넘어간다. */
+/** 별점 단계에서 키보드로 별점을 고르고 다음으로 눌러 장소·가격 단계로 넘어간다. */
 async function giveRating(key: 'End' | 'ArrowRight' = 'End') {
   const rating = await screen.findByRole('slider', { name: '내 별점' });
   fireEvent.keyDown(rating, { key });
   fireEvent.keyUp(rating, { key });
+  await screen.findByText(key === 'End' ? '5.0점' : '0.5점');
+  // 별점을 골라도 자동으로 넘어가지 않는다.
+  expect(dialogue()).toHaveTextContent('오늘의 한 잔은 몇 점인가요?');
+  await press('다음으로');
   await waitFor(() =>
     expect(dialogue()).toHaveTextContent('어디에서 드셨나요?'),
   );
@@ -1831,9 +1835,7 @@ describe('바텐더 노트 리뷰', () => {
 
     const next = await screen.findByRole('button', { name: '다음으로' });
     expect(next).toBeDisabled();
-    expect(
-      screen.getByText('별점을 골라야 리뷰를 올릴 수 있어요'),
-    ).toBeInTheDocument();
+    expect(screen.queryByText(/^\d\.\d점$/)).not.toBeInTheDocument();
     fireEvent.click(next);
     expect(dialogue()).toHaveTextContent('오늘의 한 잔은 몇 점인가요?');
 
@@ -1978,13 +1980,7 @@ describe('바텐더 노트 리뷰', () => {
     await openCurationDetail('글렌피딕 12년');
     await writeQuickReview('사과 향이 산뜻해요');
 
-    const rating = await screen.findByRole('slider', { name: '내 별점' });
-    fireEvent.keyDown(rating, { key: 'End' });
-    fireEvent.keyUp(rating, { key: 'End' });
-    // 별점을 고르면 잠시 뒤 장소 단계로 넘어간다.
-    await waitFor(() =>
-      expect(dialogue()).toHaveTextContent('어디에서 드셨나요?'),
-    );
+    await giveRating('End');
     await press('장소·가격 없이 넘어갈게요');
     await press('이걸로 등록할게요');
 

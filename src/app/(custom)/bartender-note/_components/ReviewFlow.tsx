@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 import AlcoholRatingInput from '@/components/domain/alcohol/AlcoholRatingInput';
+import RatingScorePop from '@/components/domain/alcohol/RatingScorePop';
 import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import TastingRadarChart from '@/components/domain/review/TastingRadarChart';
@@ -12,7 +13,6 @@ import type { ReviewDraft, Step } from './types';
 import { OptionList, FlowAction } from './FlowControls';
 import ReviewPickStep from './ReviewPickStep';
 import PlaceSearchStep from './PlaceSearchStep';
-import { prefersReducedMotion } from './prefersReducedMotion';
 import ReviewComposer from './ReviewComposer';
 import { OptionTitle, ReviewSegmented, reviewChip } from './ReviewInputs';
 import type { ReviewAlcohol } from './reviewAlcohol';
@@ -92,11 +92,6 @@ export default function ReviewFlow({
   startAnotherReview,
 }: Props) {
   const [infoOpen, setInfoOpen] = useState(false);
-  const ratingCommitTimer = useRef<number | null>(null);
-  useEffect(() => {
-    if (ratingCommitTimer.current !== null)
-      window.clearTimeout(ratingCommitTimer.current);
-  }, [step]);
   const optionList = (items: Parameters<typeof OptionList>[0]['items']) => (
     <OptionList items={items} />
   );
@@ -180,7 +175,6 @@ export default function ReviewFlow({
     name: axis.labelKo,
     score: review.tasting[index] ?? 0,
   }));
-  /** 그래프와 슬라이더가 함께 쓴다. 점수가 바뀔 때만 일반 리뷰 작성과 같은 햅틱을 보낸다. */
   const changeTasting = (index: number, value: number) => {
     if (review.tasting[index] === value) return;
     triggerTastingHaptic(value);
@@ -431,33 +425,17 @@ export default function ReviewFlow({
           <div className="flex justify-center overflow-x-auto">
             <AlcoholRatingInput
               value={review.rating}
-              onChange={(rating) => {
-                if (ratingCommitTimer.current !== null)
-                  window.clearTimeout(ratingCommitTimer.current);
-                updateReview({ rating });
-              }}
-              onCommit={() => {
-                ratingCommitTimer.current = window.setTimeout(
-                  () => move('review-where'),
-                  prefersReducedMotion() ? 0 : 850,
-                );
-              }}
+              onChange={(rating) => updateReview({ rating })}
             />
           </div>
-          <p className="text-center font-extrabold text-fg-rating">
-            {hasRating
-              ? `${review.rating.toFixed(1)}점`
-              : '별점을 골라야 리뷰를 올릴 수 있어요'}
-          </p>
-          {action(
-            '다음으로',
-            () => {
-              if (ratingCommitTimer.current !== null)
-                window.clearTimeout(ratingCommitTimer.current);
-              move('review-where');
-            },
-            !hasRating,
+          {hasRating && (
+            <RatingScorePop
+              rating={review.rating}
+              unit="점"
+              className="text-center font-extrabold text-fg-rating"
+            />
           )}
+          {action('다음으로', () => move('review-where'), !hasRating)}
         </>
       )}
       {step === 'review-where' && (
