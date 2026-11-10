@@ -123,14 +123,14 @@ export default function ReviewFlow({
       >
         {bottleImage(40)}
         <span className="flex min-w-0 flex-1 flex-col gap-2">
-          <b className="truncate text-14 font-bold">{selected.name}</b>
-          <small className="text-12 text-fg-neutral-muted">
+          <b className="truncate text-15 font-bold">{selected.name}</b>
+          <small className="text-13 text-fg-neutral-muted">
             {[selected.category, selected.abv && `${selected.abv}%`]
               .filter(Boolean)
               .join(' · ')}
           </small>
         </span>
-        <span className="flex shrink-0 items-center gap-2 text-13 text-fg-brand">
+        <span className="flex shrink-0 items-center gap-2 text-14 text-fg-brand">
           {infoOpen ? '접기' : '술 정보'}
           <ChevronDown
             aria-hidden="true"
@@ -139,7 +139,7 @@ export default function ReviewFlow({
         </span>
       </button>
       <AnimatedCollapse isOpen={infoOpen}>
-        <div className="border-t border-stroke-neutral-subtle px-12 py-10 text-13 text-fg-neutral-muted">
+        <div className="break-keep border-t border-stroke-neutral-subtle px-12 py-10 text-14 leading-21 text-fg-neutral-muted">
           <p className="m-0">
             {[
               selected.category,
@@ -252,7 +252,6 @@ export default function ReviewFlow({
               [
                 {
                   title: '내 느낌 한 줄로 쓸게요',
-                  description: '키워드를 고르거나 직접 적어요',
                   action: () => {
                     chooseMode('quick');
                     move('review-text');
@@ -260,7 +259,6 @@ export default function ReviewFlow({
                 },
                 {
                   title: '노즈 · 팔레트 · 피니시로 쓸게요',
-                  description: '향 · 맛 · 여운을 따로 적어요',
                   action: () => {
                     chooseMode('detail');
                     move('review-nose');
@@ -415,9 +413,6 @@ export default function ReviewFlow({
       {step === 'review-rating' && (
         <>
           {whiskeySummary}
-          <p className="text-center text-13 text-fg-neutral-muted">
-            이 술에 대한 평가를 남겨보세요.
-          </p>
           <div className="flex justify-center overflow-x-auto">
             <AlcoholRatingInput
               value={review.rating}
@@ -544,19 +539,18 @@ export default function ReviewFlow({
           {optionList([
             {
               title: '내 리뷰 볼게요',
-              description: '방금 남긴 기록 보기',
               action: onViewPostedReview,
             },
             {
               title: '다른 술도 기록할게요',
+              // 장소를 이어 채운다는 건 설명이 아니라 다음 동작이라 남긴다
               description: review.place
                 ? `「${review.place.name}」 장소는 이어서 채워 둘게요`
-                : '지금 자리에서 마신 다른 술',
+                : undefined,
               action: startAnotherReview,
             },
             {
               title: '처음으로 갈게요',
-              description: '추천받거나 다른 걸 해요',
               action: home,
             },
           ])}

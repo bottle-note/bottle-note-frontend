@@ -282,17 +282,17 @@ function AlcoholCard({
         />
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-2 pr-32">
-        <p className="m-0 truncate text-11 font-extrabold text-fg-brand">
+        <p className="m-0 truncate text-13 font-extrabold text-fg-brand">
           {label}
         </p>
-        <h1 className="m-0 line-clamp-2 break-keep text-17 font-extrabold leading-22">
+        <h1 className="m-0 line-clamp-2 break-keep text-18 font-extrabold leading-24">
           {alcohol.name}
         </h1>
         {metadata && (
-          <p className="m-0 text-12 text-fg-neutral-muted">{metadata}</p>
+          <p className="m-0 text-14 text-fg-neutral-muted">{metadata}</p>
         )}
         <p
-          className={`m-0 text-12 ${alcohol.rating === null ? 'text-fg-neutral-muted' : 'text-fg-rating'}`}
+          className={`m-0 text-14 ${alcohol.rating === null ? 'text-fg-neutral-muted' : 'text-fg-rating'}`}
         >
           {alcohol.rating === null
             ? '아직 평가가 없어요'
@@ -306,7 +306,7 @@ function AlcoholCard({
             {tags.map((tag) => (
               <li
                 key={tag}
-                className="rounded bg-bg-brand-weak px-6 py-2 text-11 leading-15 text-fg-brand"
+                className="rounded bg-bg-brand-weak px-6 py-2 text-13 leading-18 text-fg-brand"
               >
                 {tag}
               </li>
@@ -343,7 +343,7 @@ function BartenderBubble({
   className?: string;
 }) {
   return (
-    <div className={`flex max-w-[300px] items-start gap-8 ${className}`}>
+    <div className={`flex max-w-[320px] items-start gap-8 ${className}`}>
       <Image
         src="/images/bartender-note/note-avatar.webp"
         alt=""
@@ -352,7 +352,7 @@ function BartenderBubble({
         className="h-32 w-32 shrink-0 rounded-full"
       />
       <div className="min-w-0 overflow-hidden rounded-[4px_14px_14px_14px] bg-bg-neutral-weak">
-        <p className="m-0 break-keep px-12 py-9 text-14 leading-21">
+        <p className="m-0 break-keep px-12 py-9 text-16 leading-24">
           <span className="sr-only">노트: </span>
           {children}
         </p>
@@ -377,7 +377,7 @@ function Message({
     );
   return (
     <p
-      className={`m-0 self-end rounded-[14px_4px_14px_14px] bg-bg-brand-weak px-12 py-7 text-14 font-bold leading-20 text-fg-brand ${appear}`}
+      className={`m-0 self-end rounded-[14px_4px_14px_14px] bg-bg-brand-weak px-12 py-7 text-16 font-bold leading-22 text-fg-brand ${appear}`}
     >
       <span className="sr-only">나: </span>
       {message.text}
@@ -403,7 +403,7 @@ function Reply({
     <button
       type="button"
       onClick={onClick}
-      className={`flex min-h-40 flex-1 items-center justify-center gap-4 whitespace-nowrap border-l border-stroke-neutral-basement px-12 text-13 font-bold transition-colors first:border-l-0 hover:bg-bg-brand-weak focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-stroke-focus-ring ${replyTone[tone]}`}
+      className={`flex min-h-40 flex-1 items-center justify-center gap-4 whitespace-nowrap border-l border-stroke-neutral-basement px-12 text-15 font-bold transition-colors first:border-l-0 hover:bg-bg-brand-weak focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-stroke-focus-ring ${replyTone[tone]}`}
     >
       {children}
     </button>

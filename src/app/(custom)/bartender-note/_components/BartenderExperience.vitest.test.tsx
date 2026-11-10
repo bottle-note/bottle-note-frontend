@@ -1766,7 +1766,9 @@ describe('바텐더 노트 리뷰', () => {
     await press('별점 없이 넘어갈게요');
     await press('장소·가격 없이 넘어갈게요');
 
-    expect(await screen.findByText('다 됐습니다')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: '이걸로 등록할게요' }),
+    ).toBeInTheDocument();
     expect(
       screen.getByText('사과 향이 산뜻하고 부드러워요'),
     ).toBeInTheDocument();
@@ -1777,7 +1779,9 @@ describe('바텐더 노트 리뷰', () => {
     await waitFor(() =>
       expect(screen.getByText('✓ 등록됨 · 비공개')).toBeInTheDocument(),
     );
-    expect(screen.getByText('등록 완료')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '내 리뷰 볼게요' }),
+    ).toBeInTheDocument();
     expect(register).toHaveBeenCalledWith(
       expect.objectContaining({
         alcoholId: '103',
@@ -1825,7 +1829,9 @@ describe('바텐더 노트 리뷰', () => {
     await waitFor(() =>
       expect(dialogue()).toHaveTextContent('리뷰를 올리지 못했어요.'),
     );
-    expect(screen.getByText('다 됐습니다')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '이걸로 등록할게요' }),
+    ).toBeInTheDocument();
 
     await press('이걸로 등록할게요');
 
@@ -2107,7 +2113,9 @@ describe('바텐더 노트 리뷰', () => {
       await screen.findByRole('heading', { name: '탈리스커 10년' }),
     ).toBeInTheDocument();
     await press('리뷰 작성');
-    expect(await screen.findByText('어떻게 남길까요')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: '내 느낌 한 줄로 쓸게요' }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /탈리스커 10년/ }),
     ).toBeInTheDocument();
@@ -2247,7 +2255,9 @@ describe('바텐더 노트 비로그인 행동', () => {
     expect(replace).toHaveBeenCalledWith(LOGIN_URL);
     returnAfterLogin(unmount);
 
-    expect(await screen.findByText('어떻게 남길까요')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: '내 느낌 한 줄로 쓸게요' }),
+    ).toBeInTheDocument();
     // 돌아오면 고른 술의 상세를 다시 받은 뒤 리뷰 방식을 보여 준다
     expect(
       await screen.findByRole('button', { name: /내 느낌 한 줄로 쓸게요/ }),
@@ -2274,7 +2284,9 @@ describe('바텐더 노트 비로그인 행동', () => {
     expect(
       screen.getByRole('heading', { name: '글렌피딕 12년' }),
     ).toBeInTheDocument();
-    expect(screen.queryByText('어떻게 남길까요')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '내 느낌 한 줄로 쓸게요' }),
+    ).not.toBeInTheDocument();
   });
 
   it('로그인 안내가 떠 있을 때 기기 뒤로 가기로 이전 단계에 가면 안내도 닫힌다', async () => {
@@ -2804,11 +2816,11 @@ describe('바텐더 노트 캠페인 지표', () => {
     await writeQuickReview('바다 향이 짭짤해요');
     await press('별점 없이 넘어갈게요');
     await press('장소·가격 없이 넘어갈게요');
-    await screen.findByText('다 됐습니다');
+    await screen.findByRole('button', { name: '이걸로 등록할게요' });
     expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH']);
 
     await press('이걸로 등록할게요');
-    await screen.findByText('등록 완료');
+    await screen.findByRole('button', { name: '내 리뷰 볼게요' });
     expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
 
     expect(trackGA4Event).toHaveBeenCalledWith('write_review_start', {
@@ -2855,10 +2867,10 @@ describe('바텐더 노트 캠페인 지표', () => {
       await writeQuickReview('사과 향이 산뜻해요');
       await press('별점 없이 넘어갈게요');
       await press('장소·가격 없이 넘어갈게요');
-      await screen.findByText('다 됐습니다');
+      await screen.findByRole('button', { name: '이걸로 등록할게요' });
       expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH']);
       await press('이걸로 등록할게요');
-      await screen.findByText('등록 완료');
+      await screen.findByRole('button', { name: '내 리뷰 볼게요' });
 
       expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
       expect(sent().filter((event) => !event.startsWith(REVIEW))).toEqual(
@@ -2886,12 +2898,12 @@ describe('바텐더 노트 캠페인 지표', () => {
     });
     await firstPick();
     await press('리뷰 작성');
-    await screen.findByText('어떻게 남길까요');
+    await screen.findByRole('button', { name: '내 느낌 한 줄로 쓸게요' });
     expect(sent(REVIEW)).toEqual(['VIEW', 'START']);
     await press('이전 단계');
     await firstPick();
     await press('리뷰 작성');
-    await screen.findByText('어떻게 남길까요');
+    await screen.findByRole('button', { name: '내 느낌 한 줄로 쓸게요' });
     expect(sent(REVIEW)).toEqual(['VIEW', 'START']);
     await press('이전 단계');
     await firstPick();
@@ -2933,15 +2945,15 @@ describe('바텐더 노트 캠페인 지표', () => {
     await press('사진 없이 넘어갈게요');
     await press('별점 없이 넘어갈게요');
     await press('장소·가격 없이 넘어갈게요');
-    await screen.findByText('다 됐습니다');
+    await screen.findByRole('button', { name: '이걸로 등록할게요' });
     expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH']);
     fireEvent(window, new Event('pagehide'));
     view.unmount();
     view = renderExperience();
-    await screen.findByText('다 됐습니다');
+    await screen.findByRole('button', { name: '이걸로 등록할게요' });
     expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH']);
     await press('이걸로 등록할게요');
-    await screen.findByText('등록 완료');
+    await screen.findByRole('button', { name: '내 리뷰 볼게요' });
     expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
     expect(trackGA4Event).toHaveBeenCalledWith(
       'write_review_complete',
@@ -2954,7 +2966,7 @@ describe('바텐더 노트 캠페인 지표', () => {
     fireEvent(window, new Event('pagehide'));
     view.unmount();
     renderExperience();
-    await screen.findByText('등록 완료');
+    await screen.findByRole('button', { name: '내 리뷰 볼게요' });
     expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
     expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH']);
   });
@@ -2978,7 +2990,7 @@ describe('바텐더 노트 캠페인 지표', () => {
     );
     expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH']);
     await press('이걸로 등록할게요');
-    await screen.findByText('등록 완료');
+    await screen.findByRole('button', { name: '내 리뷰 볼게요' });
     expect(save).toHaveBeenCalledTimes(2);
     expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH', 'RESULT']);
     expect(sent(RECOMMEND)).toEqual(['VIEW', 'START', 'FINISH']);

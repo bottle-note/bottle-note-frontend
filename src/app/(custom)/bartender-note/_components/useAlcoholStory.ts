@@ -10,11 +10,11 @@ import {
 } from '../_scenario/descriptionParagraphs';
 
 /** 첫 문장을 떠올리는 뜸. 이 동안 말풍선 자리에 입력 중 표시를 둔다. */
-const SENTENCE_MS = 900;
-/** 다음 문장은 앞 문장을 읽을 만큼 기다렸다 잇는다. */
-const READ_MS_PER_CHAR = 60;
-const READ_MS_MIN = 1500;
-const READ_MS_MAX = 4500;
+const SENTENCE_MS = 600;
+/** 다음 문장은 앞 문장을 읽을 만큼 기다렸다 잇는다. 기다림이 길다는 의견에 1.5배 빠르게 잇는다. */
+const READ_MS_PER_CHAR = 40;
+const READ_MS_MIN = 1000;
+const READ_MS_MAX = 3000;
 
 const readingMs = (sentence: string) =>
   Math.min(
