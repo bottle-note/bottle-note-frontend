@@ -24,7 +24,7 @@ const STEP_META: Record<Step, StepMeta> = {
   'curation-list': { title: CURATION, pose: 'idle', progress: 100 },
   favorites: { title: '찜한 술', pose: 'idle' },
   detail: { title: '오늘의 한 잔', pose: 'serve' },
-  'review-pick': { title: REVIEW, subtitle: '어떤 술인가요', pose: 'idle' },
+  'review-pick': { title: REVIEW, pose: 'idle' },
   'review-mode': { title: REVIEW, subtitle: '어떻게 남길까요', pose: 'serve' },
   'review-text': { title: REVIEW, subtitle: '코멘트', pose: 'idle' },
   'review-nose': { title: REVIEW, subtitle: '노즈 1 / 3', pose: 'nose' },
