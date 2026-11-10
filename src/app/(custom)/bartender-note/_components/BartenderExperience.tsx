@@ -59,6 +59,7 @@ import {
   isScenarioUnavailable,
   useScenarioFlow,
 } from '../_scenario/useScenarioFlow';
+import { isValidRating } from '../_data/reviewHelpers';
 
 const SELECT_SOURCE = {
   recommendations: 'taste',
@@ -521,7 +522,8 @@ export default function BartenderExperience({
     });
   };
   const postReview = async () => {
-    if (!selected) return;
+    // 별점 없는 리뷰는 등록 버튼에서 막는다. 실패로 집계하지 않게 여기서도 보내지 않는다
+    if (!selected || !isValidRating(review.rating)) return;
     const alcoholId = String(selected.id);
     const entryFlow = campaign.reviewEntryFlow();
     setNotice(null);

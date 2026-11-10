@@ -7,7 +7,11 @@ import {
 } from '@/api/review/tastingProfile';
 import { uploadImages } from '@/utils/S3Upload';
 import type { ReviewDraft } from './types';
-import { getReviewTags, getReviewText } from '../_data/reviewHelpers';
+import {
+  getReviewTags,
+  getReviewText,
+  isValidRating,
+} from '../_data/reviewHelpers';
 
 const SIZE_TYPE = { glass: 'GLASS', bottle: 'BOTTLE' } as const;
 
@@ -33,6 +37,7 @@ async function uploadReviewImages(review: ReviewDraft) {
 
 /**
  * 사진을 올리고 리뷰를 저장한 뒤 별점을 남긴다.
+ * 별점이 없으면 아무것도 보내지 않는다.
  * 리뷰가 저장되면 성공으로 보고, 별점만 실패했으면 ratingSaved로 알린다.
  */
 async function submitReview({
@@ -42,6 +47,9 @@ async function submitReview({
   alcoholId: number;
   review: ReviewDraft;
 }) {
+  if (!isValidRating(review.rating))
+    throw new Error('별점 없이는 리뷰를 등록할 수 없습니다.');
+
   let uploadedImages;
   try {
     uploadedImages = await uploadReviewImages(review);
@@ -86,7 +94,6 @@ async function submitReview({
     throw new ReviewSubmitError('review_save', error);
   }
 
-  if (review.rating === 0) return { reviewId, ratingSaved: true };
   try {
     await RateApi.postRating({ alcoholId, rating: review.rating });
     return { reviewId, ratingSaved: true };
