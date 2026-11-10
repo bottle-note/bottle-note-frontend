@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
-import SearchBar from '@/components/feature/Search/SearchBar';
 import EmptyView from '@/components/ui/Display/EmptyView';
 import Label from '@/components/ui/Display/Label';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
 import type { AlcoholLookupItem } from '@/api/alcohol/types';
 import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
+import StepSearchBar from './StepSearchBar';
 
 const PAGE_SIZE = 20;
 const DEBOUNCE_DELAY_MS = 300;
@@ -90,10 +90,10 @@ export default function ReviewPickStep({
 
   return (
     <>
-      <SearchBar
+      <StepSearchBar
         value={query}
         onValueChange={setQuery}
-        handleSearch={(value) => {
+        onSearch={(value) => {
           setQuery(value);
           setLookupQuery(normalize(value));
         }}

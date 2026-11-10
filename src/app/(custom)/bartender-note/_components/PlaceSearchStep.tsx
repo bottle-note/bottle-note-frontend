@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import SearchBar from '@/components/feature/Search/SearchBar';
 import RecentSearch from '@/components/feature/Search/RecentSearch';
 import Button from '@/components/ui/Button/Button';
 import EmptyView from '@/components/ui/Display/EmptyView';
 import { SearchHistoryService } from '@/lib/SearchHistoryService';
+import StepSearchBar from './StepSearchBar';
 import type { ReviewPlace } from './types';
 import { usePlaceSearch } from './usePlaceSearch';
 
@@ -31,11 +31,8 @@ export default function PlaceSearchStep({
 }: {
   onPick: (place: ReviewPlace) => void;
 }) {
+  const [text, setText] = useState('');
   const [keyword, setKeyword] = useState('');
-  // 최근 검색어를 누르면 검색창 글자도 그 검색어로 바꾼다 (SearchContainer와 같은 방식)
-  const [setSearchText, setSetSearchText] = useState<
-    ((text: string) => void) | null
-  >(null);
   const search = usePlaceSearch(keyword);
   const places = search.data?.pages.flatMap((page) => page.places) ?? [];
 
@@ -47,11 +44,12 @@ export default function PlaceSearchStep({
 
   return (
     <>
-      <SearchBar
+      <StepSearchBar
+        value={text}
         placeholder="가게 이름 또는 주소"
-        handleSearch={runSearch}
-        setUpdateSearchText={setSetSearchText}
+        onSearch={runSearch}
         onValueChange={(value) => {
+          setText(value);
           if (!value.trim()) setKeyword('');
         }}
       />
@@ -59,7 +57,7 @@ export default function PlaceSearchStep({
         <RecentSearch
           keyValue={HISTORY_KEY}
           handleSearch={(recent) => {
-            setSearchText?.(recent);
+            setText(recent);
             runSearch(recent);
           }}
           className="h-auto px-0"
