@@ -161,6 +161,11 @@ export function flavorFromText(text: string) {
   };
 }
 
+/** 리뷰에 붙일 수 있는 별점. 0.5점부터 5점까지 0.5점 단위이며, 0은 아직 고르지 않은 상태다. */
+export function isValidRating(rating: number) {
+  return rating >= 0.5 && rating <= 5 && Number.isInteger(rating * 2);
+}
+
 /** 리뷰 본문. 노즈·팔레트·피니시로 쓴 리뷰는 항목 이름을 붙여 한 줄씩 잇는다. */
 export function getReviewText(review: ReviewDraft) {
   if (review.mode === 'quick') return review.text;

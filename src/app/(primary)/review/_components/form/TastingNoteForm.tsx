@@ -9,7 +9,7 @@ import {
 } from '@/api/review/tastingProfile';
 import { TASTING_MAX_VALUE } from '@/constants/tastingNote';
 import { FormValues } from '@/types/Review';
-import TastingRadarChart from './TastingRadarChart';
+import TastingRadarChart from '@/components/domain/review/TastingRadarChart';
 import TastingNoteModal from './TastingNoteModal';
 import OptionsContainer from '../OptionsContainer';
 

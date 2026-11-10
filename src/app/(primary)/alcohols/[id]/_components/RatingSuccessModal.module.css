@@ -49,9 +49,6 @@
   font-weight: 900;
   line-height: 1;
   letter-spacing: -0.05em;
-  opacity: 0;
-  transform: translateY(10px) scale(0.8);
-  animation: score-pop 0.45s cubic-bezier(0.2, 1.25, 0.3, 1) 0.32s forwards;
 }
 
 .message {
@@ -147,23 +144,6 @@
   }
 }
 
-@keyframes score-pop {
-  0% {
-    opacity: 0;
-    transform: translateY(10px) scale(0.8);
-  }
-
-  70% {
-    opacity: 1;
-    transform: translateY(-2px) scale(1.06);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 @keyframes fade-up {
   to {
     opacity: 1;
@@ -203,7 +183,6 @@
   .card,
   .heroStar,
   .kicker,
-  .score,
   .message,
   .confirmButton,
   .ring,
@@ -213,7 +192,6 @@
 
   .heroStar,
   .kicker,
-  .score,
   .message,
   .confirmButton {
     opacity: 1;

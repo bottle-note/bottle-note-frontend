@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, type CSSProperties } from 'react';
+import RatingScorePop from '@/components/domain/alcohol/RatingScorePop';
 import Button from '@/components/ui/Button/Button';
 import BackDrop from '@/components/ui/Modal/BackDrop';
 import { handleWebViewMessage } from '@/utils/flutterUtil';
@@ -98,7 +99,11 @@ export default function RatingSuccessModal({
             ★
           </div>
           <p className={styles.kicker}>평가 완료!</p>
-          <p className={styles.score}>{rating.toFixed(1)}</p>
+          <RatingScorePop
+            rating={rating}
+            delayMs={320}
+            className={styles.score}
+          />
           <p id="rating-success-title" className={styles.message}>
             완료됐습니다!
           </p>

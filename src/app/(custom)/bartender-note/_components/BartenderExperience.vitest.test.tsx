@@ -547,6 +547,20 @@ async function writeQuickReview(text: string) {
   await press('사진 없이 넘어갈게요');
 }
 
+/** 별점 단계에서 키보드로 별점을 고르고 다음으로 눌러 장소·가격 단계로 넘어간다. */
+async function giveRating(key: 'End' | 'ArrowRight' = 'End') {
+  const rating = await screen.findByRole('slider', { name: '내 별점' });
+  fireEvent.keyDown(rating, { key });
+  fireEvent.keyUp(rating, { key });
+  await screen.findByText(key === 'End' ? '5.0점' : '0.5점');
+  // 별점을 골라도 자동으로 넘어가지 않는다.
+  expect(dialogue()).toHaveTextContent('오늘의 한 잔은 몇 점인가요?');
+  await press('다음으로');
+  await waitFor(() =>
+    expect(dialogue()).toHaveTextContent('어디에서 드셨나요?'),
+  );
+}
+
 /** 큐레이션 목록 → 큐레이션의 술 목록 → 술 상세 순서로 연다. */
 async function openCurationDetail(
   name: string,
@@ -1763,7 +1777,7 @@ describe('바텐더 노트 리뷰', () => {
     await openCurationDetail('글렌피딕 12년');
 
     await writeQuickReview('사과 향이 산뜻하고 부드러워요');
-    await press('별점 없이 넘어갈게요');
+    await giveRating();
     await press('장소·가격 없이 넘어갈게요');
 
     expect(await screen.findByText('다 됐습니다')).toBeInTheDocument();
@@ -1785,7 +1799,7 @@ describe('바텐더 노트 리뷰', () => {
         content: '사과 향이 산뜻하고 부드러워요',
         sizeType: null,
         price: null,
-        rating: 0,
+        rating: 5,
         locationInfo: { locationName: null },
         imageUrlList: null,
         tastingProfile: {
@@ -1798,7 +1812,10 @@ describe('바텐더 노트 리뷰', () => {
         },
       }),
     );
-    expect(RateApi.postRating).not.toHaveBeenCalled();
+    expect(RateApi.postRating).toHaveBeenCalledWith({
+      alcoholId: 103,
+      rating: 5,
+    });
 
     await choose('내 리뷰 볼게요');
     expect(push).toHaveBeenCalledWith('/review/77');
@@ -1810,6 +1827,124 @@ describe('바텐더 노트 리뷰', () => {
     ).toBeInTheDocument();
   });
 
+  it('별점을 고르기 전에는 넘어갈 수 없고, 0.5점을 고르면 등록할 수 있다', async () => {
+    const register = stubReviewApi();
+    renderExperience();
+    await openCurationDetail('글렌피딕 12년');
+    await writeQuickReview('사과 향이 산뜻해요');
+
+    const next = await screen.findByRole('button', { name: '다음으로' });
+    expect(next).toBeDisabled();
+    expect(screen.queryByText(/^\d\.\d점$/)).not.toBeInTheDocument();
+    fireEvent.click(next);
+    expect(dialogue()).toHaveTextContent('오늘의 한 잔은 몇 점인가요?');
+
+    await giveRating('ArrowRight');
+    await press('장소·가격 없이 넘어갈게요');
+    expect(await screen.findByText('★ 0.5')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '이걸로 등록할게요' }),
+    ).toBeEnabled();
+    await press('이걸로 등록할게요');
+
+    await waitFor(() =>
+      expect(screen.getByText('✓ 등록됨 · 공개')).toBeInTheDocument(),
+    );
+    expect(register).toHaveBeenCalledWith(
+      expect.objectContaining({ rating: 0.5 }),
+    );
+    expect(RateApi.postRating).toHaveBeenCalledWith({
+      alcoholId: 103,
+      rating: 0.5,
+    });
+  });
+
+  it('그래프로 그린 풍미가 등록하는 테이스팅 프로필에 담기고, 앱에는 점수가 바뀔 때만 햅틱을 보낸다', async () => {
+    const register = stubReviewApi();
+    const postMessage = vi.fn();
+    window.isInApp = true;
+    window.FlutterMessageQueue = { postMessage };
+    // 그래프는 화면 좌표를 차트 좌표로 바꾸므로 차트 크기(280)만큼 그려진 것으로 둔다
+    vi.spyOn(SVGElement.prototype, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      top: 0,
+      width: 280,
+      height: 280,
+    } as DOMRect);
+    const haptics = () =>
+      postMessage.mock.calls.filter(([message]) => message === 'triggerHaptic');
+    try {
+      const view = renderExperience();
+      await openCurationDetail('글렌피딕 12년');
+      await press('리뷰 작성');
+      await choose('내 느낌 한 줄로 쓸게요');
+      fireEvent.change(
+        await screen.findByRole('textbox', { name: '리뷰 본문' }),
+        { target: { value: '좋았어요' } },
+      );
+      await press('다 썼어요');
+      await screen.findByText('차트를 누르거나 원을 끌어서 조절하세요');
+
+      // 위쪽 스모키 축의 3/5 지점을 두 번 누른다. 두 번째는 점수가 같아 햅틱을 보내지 않는다
+      const chartArea = view.container.querySelector(
+        'circle[cursor="pointer"]',
+      )!;
+      // jsdom에는 PointerEvent가 없어 좌표를 담은 MouseEvent로 누른다
+      const tap = () =>
+        fireEvent(
+          chartArea,
+          new MouseEvent('pointerup', {
+            bubbles: true,
+            clientX: 140,
+            clientY: 74,
+          }),
+        );
+      tap();
+      tap();
+      expect(screen.getByRole('slider', { name: /^스모키/ })).toHaveValue('3');
+      expect(haptics()).toEqual([['triggerHaptic', { type: 'medium' }]]);
+
+      fireEvent.change(screen.getByRole('slider', { name: /^과일/ }), {
+        target: { value: '5' },
+      });
+      expect(haptics()).toEqual([
+        ['triggerHaptic', { type: 'medium' }],
+        ['triggerHaptic', { type: 'heavy' }],
+      ]);
+
+      await press('다 그렸어요');
+      await press('사진 없이 넘어갈게요');
+      await giveRating();
+      await press('장소·가격 없이 넘어갈게요');
+      expect(
+        await screen.findByRole('img', { name: '풍미 그래프 미리보기' }),
+      ).toBeInTheDocument();
+      await press('이걸로 등록할게요');
+
+      await waitFor(() =>
+        expect(screen.getByText('✓ 등록됨 · 공개')).toBeInTheDocument(),
+      );
+      expect(register).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tastingProfile: {
+            version: 1,
+            maxScore: 5,
+            axes: [
+              expect.objectContaining({ code: 'SMOKY', score: 3 }),
+              expect.objectContaining({ code: 'FRUITY', score: 5 }),
+              expect.objectContaining({ code: 'FLORAL', score: 0 }),
+              expect.objectContaining({ code: 'SWEET', score: 0 }),
+              expect.objectContaining({ code: 'SPICY', score: 0 }),
+              expect.objectContaining({ code: 'BODY', score: 0 }),
+            ],
+          },
+        }),
+      );
+    } finally {
+      window.isInApp = false;
+    }
+  });
+
   it('리뷰 저장에 실패하면 미리보기에 남아 다시 등록할 수 있다', async () => {
     const register = stubReviewApi().mockRejectedValueOnce(
       new Error('리뷰 등록에 실패했습니다.'),
@@ -1817,7 +1952,7 @@ describe('바텐더 노트 리뷰', () => {
     renderExperience();
     await openCurationDetail('글렌피딕 12년');
     await writeQuickReview('사과 향이 산뜻해요');
-    await press('별점 없이 넘어갈게요');
+    await giveRating();
     await press('장소·가격 없이 넘어갈게요');
 
     await press('이걸로 등록할게요');
@@ -1845,13 +1980,7 @@ describe('바텐더 노트 리뷰', () => {
     await openCurationDetail('글렌피딕 12년');
     await writeQuickReview('사과 향이 산뜻해요');
 
-    const rating = await screen.findByRole('slider', { name: '내 별점' });
-    fireEvent.keyDown(rating, { key: 'End' });
-    fireEvent.keyUp(rating, { key: 'End' });
-    // 별점을 고르면 잠시 뒤 장소 단계로 넘어간다.
-    await waitFor(() =>
-      expect(dialogue()).toHaveTextContent('어디에서 드셨나요?'),
-    );
+    await giveRating('End');
     await press('장소·가격 없이 넘어갈게요');
     await press('이걸로 등록할게요');
 
@@ -1879,7 +2008,7 @@ describe('바텐더 노트 리뷰', () => {
     renderExperience();
     await openCurationDetail('글렌피딕 12년');
     await writeQuickReview('사과 향이 산뜻해요');
-    await press('별점 없이 넘어갈게요');
+    await giveRating();
 
     expect(
       await screen.findByRole('button', { name: '장소·가격 없이 넘어갈게요' }),
@@ -1939,7 +2068,7 @@ describe('바텐더 노트 리뷰', () => {
     renderExperience();
     await openCurationDetail('글렌피딕 12년');
     await writeQuickReview('사과 향이 산뜻해요');
-    await press('별점 없이 넘어갈게요');
+    await giveRating();
     await searchPlace('참나무');
     await press(/참나무 바/);
     await screen.findByRole('button', { name: '장소 참나무 바 바꾸기' });
@@ -1980,7 +2109,7 @@ describe('바텐더 노트 리뷰', () => {
     renderExperience();
     await openCurationDetail('글렌피딕 12년');
     await writeQuickReview('사과 향이 산뜻해요');
-    await press('별점 없이 넘어갈게요');
+    await giveRating();
 
     await searchPlace('없는 가게');
     expect(await screen.findByText('검색 결과가 없어요!')).toBeInTheDocument();
@@ -2016,7 +2145,7 @@ describe('바텐더 노트 리뷰', () => {
     renderExperience();
     await openCurationDetail('글렌피딕 12년');
     await writeQuickReview('사과 향이 산뜻해요');
-    await press('별점 없이 넘어갈게요');
+    await giveRating();
     await searchPlace('참나무');
     await screen.findByText('검색 결과 1곳');
 
@@ -2044,7 +2173,7 @@ describe('바텐더 노트 리뷰', () => {
     renderExperience();
     await openCurationDetail('글렌피딕 12년');
     await writeQuickReview('사과 향이 산뜻해요');
-    await press('별점 없이 넘어갈게요');
+    await giveRating();
 
     const price = await screen.findByRole('textbox', { name: '가격' });
     expect(price).toBeDisabled();
@@ -2802,7 +2931,7 @@ describe('바텐더 노트 캠페인 지표', () => {
     await press(/탈리스커 10년/);
     await screen.findByRole('heading', { name: '탈리스커 10년' });
     await writeQuickReview('바다 향이 짭짤해요');
-    await press('별점 없이 넘어갈게요');
+    await giveRating();
     await press('장소·가격 없이 넘어갈게요');
     await screen.findByText('다 됐습니다');
     expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH']);
@@ -2853,7 +2982,7 @@ describe('바텐더 노트 캠페인 지표', () => {
       }
       const originEvents = sent().filter((event) => !event.startsWith(REVIEW));
       await writeQuickReview('사과 향이 산뜻해요');
-      await press('별점 없이 넘어갈게요');
+      await giveRating();
       await press('장소·가격 없이 넘어갈게요');
       await screen.findByText('다 됐습니다');
       expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH']);
@@ -2931,7 +3060,7 @@ describe('바텐더 노트 캠페인 지표', () => {
     await press('다 썼어요');
     await press(/다 그렸어요|그래프 없이 넘어갈게요/);
     await press('사진 없이 넘어갈게요');
-    await press('별점 없이 넘어갈게요');
+    await giveRating();
     await press('장소·가격 없이 넘어갈게요');
     await screen.findByText('다 됐습니다');
     expect(sent(REVIEW)).toEqual(['VIEW', 'START', 'FINISH']);
@@ -2965,7 +3094,7 @@ describe('바텐더 노트 캠페인 지표', () => {
     await answerTasteQuestions(TASTE);
     await firstPick();
     await writeQuickReview('실패해도 같은 리뷰를 다시 저장합니다');
-    await press('별점 없이 넘어갈게요');
+    await giveRating();
     await press('장소·가격 없이 넘어갈게요');
     await press('이걸로 등록할게요');
     await waitFor(() =>

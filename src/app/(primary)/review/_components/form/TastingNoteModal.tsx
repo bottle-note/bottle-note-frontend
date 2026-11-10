@@ -4,7 +4,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFormContext } from 'react-hook-form';
-import { getTastingHapticType } from '@/constants/tastingNote';
 import type { ReviewTastingProfile } from '@/api/review/types';
 import {
   createDefaultTastingProfile,
@@ -12,9 +11,9 @@ import {
   isTastingProfileEmpty,
 } from '@/api/review/tastingProfile';
 import { FormValues } from '@/types/Review';
-import { handleWebViewMessage } from '@/utils/flutterUtil';
 import Button from '@/components/ui/Button/Button';
-import TastingRadarChart from './TastingRadarChart';
+import TastingRadarChart from '@/components/domain/review/TastingRadarChart';
+import { triggerTastingHaptic } from '@/components/domain/review/tastingHaptic';
 import FlavorAxisControl from './FlavorAxisControl';
 import TastingConfirmDialog from './TastingConfirmDialog';
 import TastingAxisEditSheet from './TastingAxisEditSheet';
@@ -133,10 +132,7 @@ export default function TastingNoteModal({
   const handleAxisChange = (index: number, value: number) => {
     if (draft.axes[index]?.score === value) return;
 
-    const hapticType = getTastingHapticType(value, draft.maxScore);
-    if (hapticType) {
-      handleWebViewMessage('triggerHaptic', { type: hapticType });
-    }
+    triggerTastingHaptic(value, draft.maxScore);
     setActiveIndex(index);
     setNewAxisNames((prev) =>
       prev.filter((name) => name !== draft.axes[index].name),
