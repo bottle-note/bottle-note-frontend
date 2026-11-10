@@ -4,7 +4,8 @@ import { ChevronDown } from 'lucide-react';
 import AlcoholRatingInput from '@/components/domain/alcohol/AlcoholRatingInput';
 import AnimatedCollapse from '@/components/ui/Display/AnimatedCollapse';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
-import TastingRadarChart from '@/app/(primary)/review/_components/form/TastingRadarChart';
+import TastingRadarChart from '@/components/domain/review/TastingRadarChart';
+import { triggerTastingHaptic } from '@/components/domain/review/tastingHaptic';
 import { TASTING_AXES, TASTING_MAX_VALUE } from '@/constants/tastingNote';
 import SearchBarLink from '@/components/feature/Search/SearchBarLink';
 import type { ReviewDraft, Step } from './types';
@@ -12,7 +13,6 @@ import { OptionList, FlowAction } from './FlowControls';
 import ReviewPickStep from './ReviewPickStep';
 import PlaceSearchStep from './PlaceSearchStep';
 import { prefersReducedMotion } from './prefersReducedMotion';
-import RadarPreview from './RadarPreview';
 import ReviewComposer from './ReviewComposer';
 import { OptionTitle, ReviewSegmented, reviewChip } from './ReviewInputs';
 import type { ReviewAlcohol } from './reviewAlcohol';
@@ -20,6 +20,7 @@ import {
   flavorFromText,
   getReviewTags,
   getReviewText,
+  isValidRating,
 } from '../_data/reviewHelpers';
 
 const graphLabels = TASTING_AXES.map((axis) => axis.labelKo);
@@ -179,6 +180,17 @@ export default function ReviewFlow({
     name: axis.labelKo,
     score: review.tasting[index] ?? 0,
   }));
+  /** 그래프와 슬라이더가 함께 쓴다. 점수가 바뀔 때만 일반 리뷰 작성과 같은 햅틱을 보낸다. */
+  const changeTasting = (index: number, value: number) => {
+    if (review.tasting[index] === value) return;
+    triggerTastingHaptic(value);
+    updateReview({
+      tasting: review.tasting.map((current, position) =>
+        position === index ? value : current,
+      ),
+    });
+  };
+  const hasRating = isValidRating(review.rating);
   const renderReviewCard = (posted = false) => (
     <div className="flex flex-col gap-8 rounded-xl bg-bg-neutral-weak p-16">
       {posted && (
@@ -193,12 +205,20 @@ export default function ReviewFlow({
         </div>
       )}
       <b className="text-fg-rating">
-        {review.rating ? `★ ${review.rating.toFixed(1)}` : '별점 없음'}
+        {hasRating ? `★ ${review.rating.toFixed(1)}` : '별점 없음'}
       </b>
       <p className="m-0 whitespace-pre-wrap text-15">{reviewText}</p>
       {review.tasting.some(Boolean) && (
-        <div className="flex justify-center">
-          <RadarPreview values={review.tasting} />
+        <div
+          className="mx-auto h-250 w-250"
+          role="img"
+          aria-label="풍미 그래프 미리보기"
+        >
+          <TastingRadarChart
+            axes={tastingAxes}
+            maxScore={TASTING_MAX_VALUE}
+            size={250}
+          />
         </div>
       )}
       {reviewTags.length > 0 && (
@@ -296,13 +316,7 @@ export default function ReviewFlow({
                 axes={tastingAxes}
                 maxScore={TASTING_MAX_VALUE}
                 size={280}
-                onAxisChange={(index, value) => {
-                  updateReview({
-                    tasting: review.tasting.map((current, position) =>
-                      position === index ? value : current,
-                    ),
-                  });
-                }}
+                onAxisChange={changeTasting}
               />
             </div>
             <p className="m-0 text-center text-13 text-fg-neutral-muted">
@@ -328,11 +342,7 @@ export default function ReviewFlow({
                   step="1"
                   value={review.tasting[index]}
                   onChange={(event) =>
-                    updateReview({
-                      tasting: review.tasting.map((value, position) =>
-                        position === index ? Number(event.target.value) : value,
-                      ),
-                    })
+                    changeTasting(index, Number(event.target.value))
                   }
                 />
               </label>
@@ -435,15 +445,19 @@ export default function ReviewFlow({
             />
           </div>
           <p className="text-center font-extrabold text-fg-rating">
-            {review.rating
+            {hasRating
               ? `${review.rating.toFixed(1)}점`
-              : '별점은 선택 사항이에요'}
+              : '별점을 골라야 리뷰를 올릴 수 있어요'}
           </p>
-          {action(review.rating ? '다음으로' : '별점 없이 넘어갈게요', () => {
-            if (ratingCommitTimer.current !== null)
-              window.clearTimeout(ratingCommitTimer.current);
-            move('review-where');
-          })}
+          {action(
+            '다음으로',
+            () => {
+              if (ratingCommitTimer.current !== null)
+                window.clearTimeout(ratingCommitTimer.current);
+              move('review-where');
+            },
+            !hasRating,
+          )}
         </>
       )}
       {step === 'review-where' && (
@@ -534,7 +548,7 @@ export default function ReviewFlow({
           {action(
             isPosting ? '올리고 있어요…' : '이걸로 등록할게요',
             postReview,
-            isPosting,
+            isPosting || !hasRating,
           )}
         </>
       )}
