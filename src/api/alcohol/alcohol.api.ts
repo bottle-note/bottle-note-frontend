@@ -24,7 +24,30 @@ export const AlcoholsApi = {
     keyword: string,
     signal?: AbortSignal,
   ): Promise<AlcoholLookupItem[]> {
-    const params = buildQueryParams({ keyword, size: 6 });
+    const response = await AlcoholsApi.lookupPage({
+      keyword,
+      size: 6,
+      signal,
+    });
+    return response.data.items;
+  },
+
+  /**
+   * 술 이름 검색 결과를 한 페이지씩 조회합니다.
+   * 다음 페이지 cursor는 meta.pagination에 담깁니다.
+   */
+  async lookupPage({
+    keyword,
+    cursor,
+    size,
+    signal,
+  }: {
+    keyword: string;
+    cursor?: string;
+    size: number;
+    signal?: AbortSignal;
+  }): Promise<ApiResponse<{ items: AlcoholLookupItem[] }>> {
+    const params = buildQueryParams({ keyword, cursor, size });
     const response = await apiClient.get<
       ApiResponse<{ items: AlcoholLookupItem[] }>
     >(`/alcohols/lookup?${params}`, { authRequired: false, signal });
@@ -33,7 +56,7 @@ export const AlcoholsApi = {
       throw new Error(ERROR_MESSAGES.ALCOHOL_LIST_FETCH_FAILED);
     }
 
-    return response.data.items;
+    return response;
   },
 
   /**
