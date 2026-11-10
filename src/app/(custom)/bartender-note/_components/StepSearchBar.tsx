@@ -15,7 +15,7 @@ export default function StepSearchBar({
   onSearch,
 }: Props) {
   return (
-    <div className="sticky -top-14 z-10 -mx-20 -mt-14 bg-bg-layer-default px-20 pt-14">
+    <div className="sticky -top-14 z-10 -mx-20 -mb-12 -mt-14 bg-bg-layer-default px-20 pb-12 pt-14">
       <UnderlineSearchBar
         value={value}
         onValueChange={onValueChange}
