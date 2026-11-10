@@ -1,12 +1,8 @@
-import { useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import Button from '@/components/ui/Button/Button';
-import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
-import type { AlcoholLookupItem } from '@/api/alcohol/types';
 import { FlowAction } from './FlowControls';
-
-const normalize = (value: string) => value.trim().replace(/\s+/g, ' ');
+import { useAlcoholLookup } from './useAlcoholLookup';
 
 interface SelectedAlcohol {
   id: number;
@@ -27,30 +23,9 @@ export default function LikesStep({
 }: Props) {
   const [selected, setSelected] = useState<SelectedAlcohol[]>([]);
   const [query, setQuery] = useState('');
-  const [lookupQuery, setLookupQuery] = useState('');
   const full = selected.length >= maxSelections;
-  const normalizedQuery = normalize(query);
-
-  useEffect(() => {
-    const timer = window.setTimeout(
-      () => setLookupQuery(normalize(query)),
-      300,
-    );
-    return () => window.clearTimeout(timer);
-  }, [query]);
-
-  const lookup = useQuery({
-    queryKey: ['bartender-note', 'alcohol-lookup', lookupQuery],
-    queryFn: ({ signal }) => AlcoholsApi.lookup(lookupQuery, signal),
-    enabled: lookupQuery.length > 0 && !disabled && !full,
-    staleTime: 5 * 60 * 1000,
-    retry: false,
-  });
-  const loading =
-    !!normalizedQuery && (normalizedQuery !== lookupQuery || lookup.isFetching);
-  const results: AlcoholLookupItem[] =
-    normalizedQuery === lookupQuery ? lookup.data ?? [] : [];
-  const showResults = !!normalizedQuery && !loading && !lookup.isError;
+  const lookup = useAlcoholLookup(query, !disabled && !full);
+  const { normalizedQuery, results } = lookup;
 
   return (
     <>
@@ -84,12 +59,12 @@ export default function LikesStep({
           </button>
         ))}
       </div>
-      {loading && (
+      {lookup.searching && (
         <p className="text-14 text-fg-neutral-muted" role="status">
           술을 찾고 있어요…
         </p>
       )}
-      {!!normalizedQuery && !loading && lookup.isError && (
+      {!!normalizedQuery && lookup.firstPageError && (
         <div
           role="alert"
           className="flex items-center gap-10 text-15 text-fg-neutral"
@@ -99,17 +74,14 @@ export default function LikesStep({
             size="md"
             variant="secondary"
             disabled={disabled}
-            onClick={() => void lookup.refetch()}
+            onClick={lookup.retryFirstPage}
           >
             다시 시도
           </Button>
         </div>
       )}
-      {showResults && (
+      {!!normalizedQuery && lookup.loaded && (
         <>
-          <p className="m-0 text-13 text-fg-neutral-muted">
-            검색 결과 {results.length}개
-          </p>
           {results.length === 0 && (
             <p className="text-15 text-fg-neutral">
               그 이름으로는 못 찾겠네요. 철자를 조금 바꿔 보시겠어요?
@@ -153,6 +125,30 @@ export default function LikesStep({
               </button>
             ))}
           </div>
+          {lookup.isFetchingNextPage && (
+            <p className="m-0 text-14 text-fg-neutral-muted" role="status">
+              술을 더 불러오고 있어요…
+            </p>
+          )}
+          {lookup.nextPageError && (
+            <div
+              role="alert"
+              className="flex items-center gap-10 text-15 text-fg-neutral"
+            >
+              <span>더 불러오지 못했어요.</span>
+              <Button
+                size="md"
+                variant="secondary"
+                disabled={disabled}
+                onClick={lookup.retryNextPage}
+              >
+                다시 시도
+              </Button>
+            </div>
+          )}
+          {lookup.canLoadMore && (
+            <div ref={lookup.targetRef} aria-hidden="true" className="h-1" />
+          )}
         </>
       )}
       <FlowAction

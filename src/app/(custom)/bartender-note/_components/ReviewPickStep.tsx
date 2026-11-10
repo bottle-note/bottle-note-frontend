@@ -1,17 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import AlcoholImage from '@/components/domain/alcohol/AlcoholImage';
 import EmptyView from '@/components/ui/Display/EmptyView';
 import Label from '@/components/ui/Display/Label';
 import { AlcoholsApi } from '@/api/alcohol/alcohol.api';
-import type { AlcoholLookupItem } from '@/api/alcohol/types';
-import { usePaginatedQuery } from '@/queries/usePaginatedQuery';
 import StepSearchBar from './StepSearchBar';
-
-const PAGE_SIZE = 20;
-const DEBOUNCE_DELAY_MS = 300;
-
-const normalize = (value: string) => value.trim().replace(/\s+/g, ' ');
+import { useAlcoholLookup } from './useAlcoholLookup';
 
 function RetryLine({
   message,
@@ -41,16 +35,8 @@ export default function ReviewPickStep({
   onPick: (alcoholId: number) => void;
 }) {
   const [query, setQuery] = useState('');
-  const [lookupQuery, setLookupQuery] = useState('');
-  const normalizedQuery = normalize(query);
-
-  useEffect(() => {
-    const timer = window.setTimeout(
-      () => setLookupQuery(normalizedQuery),
-      DEBOUNCE_DELAY_MS,
-    );
-    return () => window.clearTimeout(timer);
-  }, [normalizedQuery]);
+  const lookup = useAlcoholLookup(query);
+  const { normalizedQuery, results } = lookup;
 
   const popular = useQuery({
     queryKey: ['bartender-note', 'popular-alcohols'],
@@ -59,34 +45,6 @@ export default function ReviewPickStep({
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
-  const lookup = usePaginatedQuery({
-    queryKey: ['bartender-note', 'alcohol-lookup', lookupQuery],
-    queryFn: ({ pageParam, signal }) =>
-      AlcoholsApi.lookupPage({
-        keyword: lookupQuery,
-        cursor: pageParam,
-        size: PAGE_SIZE,
-        signal,
-      }),
-    enabled: lookupQuery.length > 0,
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const typing = normalizedQuery !== lookupQuery;
-  const pages = typing ? undefined : lookup.data;
-  const results: AlcoholLookupItem[] = [];
-  const seen = new Set<number>();
-  pages?.forEach((page) =>
-    page.data.items.forEach((item) => {
-      if (seen.has(item.alcoholId)) return;
-      seen.add(item.alcoholId);
-      results.push(item);
-    }),
-  );
-  // 첫 페이지를 받기 전(입력 중 포함)과 이어 받기를 나눈다. 이어 받기 중에는 받은 목록을 그대로 둔다
-  const searching = !!normalizedQuery && (typing || (!pages && !lookup.error));
-  const firstPageError = !typing && !pages && !!lookup.error;
-  const nextPageError = !!pages && !!lookup.error && !lookup.isFetching;
 
   return (
     <>
@@ -95,7 +53,7 @@ export default function ReviewPickStep({
         onValueChange={setQuery}
         onSearch={(value) => {
           setQuery(value);
-          setLookupQuery(normalize(value));
+          lookup.searchNow(value);
         }}
         placeholder="마시고 있는 술 이름 검색"
       />
@@ -128,18 +86,18 @@ export default function ReviewPickStep({
       )}
       {!!normalizedQuery && (
         <>
-          {searching && (
+          {lookup.searching && (
             <p className="m-0 text-14 text-fg-neutral-muted" role="status">
               술을 찾고 있어요…
             </p>
           )}
-          {firstPageError && (
+          {lookup.firstPageError && (
             <RetryLine
               message="검색 중 문제가 생겼어요."
-              onRetry={() => void lookup.refetch()}
+              onRetry={lookup.retryFirstPage}
             />
           )}
-          {pages && results.length === 0 && <EmptyView />}
+          {lookup.loaded && results.length === 0 && <EmptyView />}
           {results.length > 0 && (
             <div className="flex flex-col">
               {results.map((alcohol) => (
@@ -176,14 +134,13 @@ export default function ReviewPickStep({
               술을 더 불러오고 있어요…
             </p>
           )}
-          {nextPageError && (
+          {lookup.nextPageError && (
             <RetryLine
               message="더 불러오지 못했어요."
-              onRetry={() => void lookup.fetchNextPage()}
+              onRetry={lookup.retryNextPage}
             />
           )}
-          {/* 목록 끝 감지용. 다음 페이지가 없거나 이어 받기에 실패하면 떼어 더 요청하지 않는다 */}
-          {pages && lookup.hasNextPage && !nextPageError && (
+          {lookup.canLoadMore && (
             <div ref={lookup.targetRef} aria-hidden="true" className="h-1" />
           )}
         </>

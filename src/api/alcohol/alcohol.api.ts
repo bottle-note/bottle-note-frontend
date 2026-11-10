@@ -20,18 +20,6 @@ import type {
 } from './types';
 
 export const AlcoholsApi = {
-  async lookup(
-    keyword: string,
-    signal?: AbortSignal,
-  ): Promise<AlcoholLookupItem[]> {
-    const response = await AlcoholsApi.lookupPage({
-      keyword,
-      size: 6,
-      signal,
-    });
-    return response.data.items;
-  },
-
   /**
    * 술 이름 검색 결과를 한 페이지씩 조회합니다.
    * 다음 페이지 cursor는 meta.pagination에 담깁니다.
