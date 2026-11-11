@@ -5,7 +5,36 @@ const CONFIG = {
   API_KEY: process.env.PSI_API_KEY,
   BASE_URL: process.env.CLIENT_URL,
   WEBHOOK_URL: process.env.CORE_VITAL_WEBHOOK_URL,
+  // true면 Discord로 보내지 않고 리포트를 콘솔에 출력한다 (수동 확인용)
+  DRY_RUN: process.env.DRY_RUN === 'true',
 };
+
+// ============================================
+// 실사용자 지표 (CrUX)
+// ============================================
+const CRUX_API_URL = 'https://chromeuxreport.googleapis.com/v1/records';
+const TREND_WEEKS = 4;
+
+// name: 리포트 표기, crux: CrUX API 지표 키, psi: PSI loadingExperience 지표 키
+const FIELD_METRICS = [
+  {
+    name: 'LCP',
+    crux: 'largest_contentful_paint',
+    psi: 'LARGEST_CONTENTFUL_PAINT_MS',
+  },
+  {
+    name: 'INP',
+    crux: 'interaction_to_next_paint',
+    psi: 'INTERACTION_TO_NEXT_PAINT',
+  },
+  {
+    name: 'CLS',
+    crux: 'cumulative_layout_shift',
+    psi: 'CUMULATIVE_LAYOUT_SHIFT_SCORE',
+  },
+];
+
+const DISCORD_FIELD_VALUE_LIMIT = 1024;
 
 // ============================================
 // 측정 그룹
@@ -90,6 +119,7 @@ const getMetricRating = (name, value) => {
     LCP: { good: 2500, poor: 4000 },
     CLS: { good: 0.1, poor: 0.25 },
     TBT: { good: 200, poor: 600 },
+    INP: { good: 200, poor: 500 },
   };
 
   const t = thresholds[name];
@@ -101,6 +131,86 @@ const getMetricRating = (name, value) => {
 };
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const toNumber = (value) => {
+  if (value === null || value === undefined || value === '') return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+};
+
+const formatFieldValue = (name, value) => {
+  if (value === null || value === undefined) return '-';
+  if (name === 'CLS') return value.toFixed(2);
+  if (name === 'LCP') return `${(value / 1000).toFixed(1)}s`;
+  return `${Math.round(value)}ms`;
+};
+
+const formatCruxDate = (date) =>
+  date
+    ? `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`
+    : '';
+
+const truncate = (text, limit) =>
+  text.length <= limit ? text : `${text.slice(0, limit - 1)}…`;
+
+// PSI loadingExperience → { LCP, INP, CLS } (페이지 자체 데이터가 없으면 null)
+// origin_fallback이면 페이지 값이 아니라 사이트 전체 값이므로 페이지별 값으로 쓰지 않는다
+const parsePageFieldMetrics = (loadingExperience) => {
+  if (!loadingExperience?.metrics || loadingExperience.origin_fallback) {
+    return null;
+  }
+
+  const values = {};
+  FIELD_METRICS.forEach(({ name, psi }) => {
+    const percentile = toNumber(loadingExperience.metrics[psi]?.percentile);
+    if (percentile === null) return;
+    // PSI는 CLS p75를 100배 정수로 준다 (예: 5 → 0.05)
+    values[name] = name === 'CLS' ? percentile / 100 : percentile;
+  });
+
+  return Object.keys(values).length > 0 ? values : null;
+};
+
+// CrUX queryRecord 응답 → { period, values: { LCP, INP, CLS } }
+const parseCruxRecord = (data) => {
+  const metrics = data?.record?.metrics;
+  if (!metrics) return null;
+
+  const values = {};
+  FIELD_METRICS.forEach(({ name, crux }) => {
+    const p75 = toNumber(metrics[crux]?.percentiles?.p75);
+    if (p75 !== null) values[name] = p75;
+  });
+
+  if (Object.keys(values).length === 0) return null;
+
+  const period = data.record.collectionPeriod;
+  return {
+    period: period
+      ? {
+          first: formatCruxDate(period.firstDate),
+          last: formatCruxDate(period.lastDate),
+        }
+      : null,
+    values,
+  };
+};
+
+// CrUX queryHistoryRecord 응답 → { LCP: [오래된 값, ..., 최신 값] } (최근 TREND_WEEKS개)
+const parseCruxHistory = (data, weeks = TREND_WEEKS) => {
+  const metrics = data?.record?.metrics;
+  if (!metrics) return null;
+
+  const trend = {};
+  FIELD_METRICS.forEach(({ name, crux }) => {
+    const p75s = metrics[crux]?.percentilesTimeseries?.p75s;
+    if (!Array.isArray(p75s)) return;
+    const series = p75s.slice(-weeks).map(toNumber);
+    if (series.some((value) => value !== null)) trend[name] = series;
+  });
+
+  return Object.keys(trend).length > 0 ? trend : null;
+};
 
 const getAverageScore = (results) => {
   if (results.length === 0) return null;
@@ -212,6 +322,65 @@ async function getSampledPages() {
 }
 
 // ============================================
+// CrUX API 호출 (사이트 전체, 모바일)
+// ============================================
+async function queryCrux(endpoint, origin) {
+  const res = await fetch(`${CRUX_API_URL}:${endpoint}?key=${CONFIG.API_KEY}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      origin,
+      formFactor: 'PHONE',
+      metrics: FIELD_METRICS.map(({ crux }) => crux),
+    }),
+  });
+  const data = await res.json().catch(() => ({}));
+
+  // 404는 CrUX에 집계될 만큼 방문 데이터가 없다는 뜻
+  if (res.status === 404) {
+    return { data: null, reason: 'CrUX에 집계된 데이터 없음' };
+  }
+  if (!res.ok) {
+    throw new Error(data.error?.message || `HTTP ${res.status}`);
+  }
+  return { data, reason: null };
+}
+
+async function fetchSiteFieldData(origin) {
+  const [current, history] = await Promise.allSettled([
+    queryCrux('queryRecord', origin),
+    queryCrux('queryHistoryRecord', origin),
+  ]);
+
+  const record =
+    current.status === 'fulfilled' ? parseCruxRecord(current.value.data) : null;
+  const trend =
+    history.status === 'fulfilled'
+      ? parseCruxHistory(history.value.data)
+      : null;
+
+  let reason = null;
+  if (!record) {
+    reason =
+      current.status === 'rejected'
+        ? `CrUX 조회 실패: ${current.reason.message}`
+        : current.value.reason || 'CrUX 응답에 지표 없음';
+  }
+  if (history.status === 'rejected') {
+    console.warn('⚠️ CrUX 추이 조회 실패:', history.reason.message);
+  }
+
+  return { origin, record, trend, reason };
+}
+
+const describeLoadingExperience = (loadingExperience) => {
+  if (!loadingExperience?.metrics) return '없음';
+  if (loadingExperience.origin_fallback)
+    return '페이지 데이터 없음(사이트 전체로 대체됨)';
+  return '있음';
+};
+
+// ============================================
 // PSI API 호출
 // ============================================
 async function measurePage(url, page) {
@@ -235,6 +404,8 @@ async function measurePage(url, page) {
     group,
     url,
     score,
+    field: parsePageFieldMetrics(data.loadingExperience),
+    fieldStatus: describeLoadingExperience(data.loadingExperience),
     metrics: {
       LCP: {
         value: metrics['largest-contentful-paint'].displayValue,
@@ -255,7 +426,75 @@ async function measurePage(url, page) {
 // ============================================
 // Discord 메시지 생성
 // ============================================
-function buildDiscordMessage(results) {
+const RATING_COLORS = { '🟢': 0x22c55e, '🟡': 0xeab308, '🔴': 0xef4444 };
+const NO_DATA_COLOR = 0x9ca3af;
+
+function formatTrend(name, series) {
+  if (!series || series.length < 2) return '';
+  return ` · 추이 ${series.map((value) => formatFieldValue(name, value)).join(' → ')}`;
+}
+
+function buildFieldEmbed(siteField) {
+  const title = '👥 실사용자 · 사이트 전체 모바일 p75';
+
+  if (!siteField?.record) {
+    return {
+      title,
+      description: [
+        '실사용자 데이터가 없어 이번 주는 실험실 값만 보냅니다.',
+        siteField?.reason ? `사유: ${siteField.reason}` : null,
+      ]
+        .filter(Boolean)
+        .join('\n'),
+      color: NO_DATA_COLOR,
+    };
+  }
+
+  const { record, trend, origin } = siteField;
+  const ratings = [];
+  const lines = FIELD_METRICS.map(({ name }) => {
+    const value = record.values[name];
+    if (value === undefined) return `⚪ **${name}** 데이터 없음`;
+    const rating = getMetricRating(name, value);
+    ratings.push(rating);
+    return `${rating} **${name}** ${formatFieldValue(name, value)}${formatTrend(name, trend?.[name])}`;
+  });
+
+  const worst = ratings.includes('🔴')
+    ? '🔴'
+    : ratings.includes('🟡')
+      ? '🟡'
+      : '🟢';
+  const period = record.period
+    ? `집계 기간: ${record.period.first} ~ ${record.period.last} (28일)`
+    : null;
+
+  return {
+    title,
+    description: [
+      ...lines,
+      '',
+      [`대상: ${origin}`, period].filter(Boolean).join(' | '),
+      trend ? `추이: 최근 ${TREND_WEEKS}주, 주 단위 28일 집계` : null,
+    ]
+      .filter((line) => line !== null)
+      .join('\n'),
+    color: RATING_COLORS[worst],
+  };
+}
+
+function formatPageFieldLine(field) {
+  if (!field) return null;
+  const parts = FIELD_METRICS.filter(
+    ({ name }) => field[name] !== undefined,
+  ).map(
+    ({ name }) =>
+      `${getMetricRating(name, field[name])} ${name} ${formatFieldValue(name, field[name])}`,
+  );
+  return `👥 실사용자 ${parts.join(' | ')}`;
+}
+
+function buildDiscordMessage(results, siteField = null) {
   const successfulResults = results.filter((result) => !result.error);
   const coreResults = successfulResults.filter(
     (result) => result.group !== PAGE_GROUPS.DETAIL,
@@ -305,14 +544,17 @@ function buildDiscordMessage(results) {
             `**${result.label}** ${getRatingEmoji(result.score)} ${result.score}점`,
             `\`${result.path}\``,
             `${lcpRating} LCP ${result.metrics.LCP.value} | ${clsRating} CLS ${result.metrics.CLS.value} | ${tbtRating} TBT ${result.metrics.TBT.value}`,
-          ].join('\n');
+            formatPageFieldLine(result.field),
+          ]
+            .filter(Boolean)
+            .join('\n');
         })
         .join('\n\n');
 
       return [
         {
           name: `${icon} ${label} · ${averageLabel}`,
-          value,
+          value: truncate(value, DISCORD_FIELD_VALUE_LIMIT),
           inline: false,
         },
       ];
@@ -321,12 +563,13 @@ function buildDiscordMessage(results) {
 
   const title =
     coreAverageScore === null
-      ? '🔴 핵심 화면 측정 실패'
-      : `${getRatingEmoji(coreAverageScore)} 핵심 화면 평균: ${coreAverageScore}점`;
+      ? '🧪 실험실 · 🔴 핵심 화면 측정 실패'
+      : `🧪 실험실 · ${getRatingEmoji(coreAverageScore)} 핵심 화면 평균: ${coreAverageScore}점`;
 
   return {
     content: `📊 **주간 성능 리포트**가 도착했습니다!`,
     embeds: [
+      buildFieldEmbed(siteField),
       {
         title,
         description: `측정 대상: ${CONFIG.BASE_URL}\n고정 화면: ${results.length - results.filter((result) => result.group === PAGE_GROUPS.DETAIL).length}개 | 상세 샘플: ${results.filter((result) => result.group === PAGE_GROUPS.DETAIL).length}개`,
@@ -338,11 +581,30 @@ function buildDiscordMessage(results) {
               : 0xef4444,
         fields,
         footer: {
-          text: `측정 시간: ${new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })} | Mobile 기준 | 상세 샘플은 핵심 평균에서 제외`,
+          text: `측정 시간: ${new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })} | Mobile Lighthouse 기준 | 상세 샘플은 핵심 평균에서 제외 | 👥 줄은 페이지 실사용자 데이터가 있을 때만 표시`,
         },
       },
     ],
   };
+}
+
+// DRY_RUN 출력용: Discord embed를 읽을 수 있는 텍스트로 펼친다
+function renderPayloadAsText(payload) {
+  return [
+    payload.content,
+    ...payload.embeds.map((embed) =>
+      [
+        `\n== ${embed.title} ==`,
+        embed.description,
+        ...(embed.fields || []).map(
+          (field) => `\n# ${field.name}\n${field.value}`,
+        ),
+        embed.footer ? `\n(${embed.footer.text})` : null,
+      ]
+        .filter(Boolean)
+        .join('\n'),
+    ),
+  ].join('\n');
 }
 
 // ============================================
@@ -364,7 +626,9 @@ async function main() {
     try {
       const result = await measurePage(url, page);
       results.push(result);
-      console.log(`   ✅ ${result.score}점\n`);
+      console.log(
+        `   ✅ ${result.score}점 | 실사용자(loadingExperience): ${result.fieldStatus}\n`,
+      );
 
       // API 레이트 리밋 방지 (2초 대기)
       await delay(2000);
@@ -390,8 +654,30 @@ async function main() {
     process.exit(1);
   }
 
+  // 실사용자 데이터는 실패해도 실험실 리포트는 보낸다
+  const siteField = await fetchSiteFieldData(
+    new URL(CONFIG.BASE_URL).origin,
+  ).catch((error) => ({
+    record: null,
+    trend: null,
+    reason: `CrUX 조회 실패: ${error.message}`,
+  }));
+  console.log(
+    siteField.record
+      ? `👥 CrUX 사이트 전체 p75: ${JSON.stringify(siteField.record.values)}`
+      : `👥 CrUX 데이터 없음: ${siteField.reason}`,
+  );
+
   // Discord 메시지 전송
-  const payload = buildDiscordMessage(results);
+  const payload = buildDiscordMessage(results, siteField);
+
+  if (CONFIG.DRY_RUN) {
+    console.log('\n🧪 DRY_RUN: Discord로 보내지 않고 리포트를 출력합니다.\n');
+    console.log(renderPayloadAsText(payload));
+    console.log('\n--- payload JSON ---');
+    console.log(JSON.stringify(payload, null, 2));
+    return;
+  }
 
   const webhookResponse = await fetch(CONFIG.WEBHOOK_URL, {
     method: 'POST',
@@ -419,4 +705,9 @@ if (require.main === module) {
   });
 }
 
-module.exports = { buildDiscordMessage };
+module.exports = {
+  buildDiscordMessage,
+  parsePageFieldMetrics,
+  parseCruxRecord,
+  parseCruxHistory,
+};
