@@ -153,12 +153,9 @@ const formatCruxDate = (date) =>
 const truncate = (text, limit) =>
   text.length <= limit ? text : `${text.slice(0, limit - 1)}…`;
 
-// PSI loadingExperience → { LCP, INP, CLS } (페이지 자체 데이터가 없으면 null)
-// origin_fallback이면 페이지 값이 아니라 사이트 전체 값이므로 페이지별 값으로 쓰지 않는다
-const parsePageFieldMetrics = (loadingExperience) => {
-  if (!loadingExperience?.metrics || loadingExperience.origin_fallback) {
-    return null;
-  }
+// PSI loadingExperience/originLoadingExperience → { LCP, INP, CLS } (값이 없으면 null)
+const parseLoadingExperienceMetrics = (loadingExperience) => {
+  if (!loadingExperience?.metrics) return null;
 
   const values = {};
   FIELD_METRICS.forEach(({ name, psi }) => {
@@ -170,6 +167,12 @@ const parsePageFieldMetrics = (loadingExperience) => {
 
   return Object.keys(values).length > 0 ? values : null;
 };
+
+// origin_fallback이면 페이지 값이 아니라 사이트 전체 값이므로 페이지별 값으로 쓰지 않는다
+const parsePageFieldMetrics = (loadingExperience) =>
+  loadingExperience?.origin_fallback
+    ? null
+    : parseLoadingExperienceMetrics(loadingExperience);
 
 // CrUX queryRecord 응답 → { period, values: { LCP, INP, CLS } }
 const parseCruxRecord = (data) => {
@@ -346,6 +349,22 @@ async function queryCrux(endpoint, origin) {
   return { data, reason: null };
 }
 
+// CrUX API로 현재 값을 못 받으면 같은 원천인 PSI originLoadingExperience로 대체한다 (추이는 없음)
+function withPsiOriginFallback(siteField, results) {
+  if (siteField.record) return siteField;
+
+  const originValues = results.find(
+    (result) => result.originField,
+  )?.originField;
+  if (!originValues) return siteField;
+
+  return {
+    ...siteField,
+    record: { period: null, values: originValues },
+    source: 'PSI originLoadingExperience',
+  };
+}
+
 async function fetchSiteFieldData(origin) {
   const [current, history] = await Promise.allSettled([
     queryCrux('queryRecord', origin),
@@ -370,7 +389,14 @@ async function fetchSiteFieldData(origin) {
     console.warn('⚠️ CrUX 추이 조회 실패:', history.reason.message);
   }
 
-  return { origin, record, trend, reason };
+  const trendReason =
+    history.status === 'rejected'
+      ? `CrUX 추이 조회 실패: ${history.reason.message}`
+      : trend
+        ? null
+        : history.value.reason || 'CrUX 추이 응답에 지표 없음';
+
+  return { origin, record, trend, reason, trendReason, source: 'CrUX API' };
 }
 
 const describeLoadingExperience = (loadingExperience) => {
@@ -405,6 +431,7 @@ async function measurePage(url, page) {
     url,
     score,
     field: parsePageFieldMetrics(data.loadingExperience),
+    originField: parseLoadingExperienceMetrics(data.originLoadingExperience),
     fieldStatus: describeLoadingExperience(data.loadingExperience),
     metrics: {
       LCP: {
@@ -450,7 +477,7 @@ function buildFieldEmbed(siteField) {
     };
   }
 
-  const { record, trend, origin } = siteField;
+  const { record, trend, origin, source, trendReason } = siteField;
   const ratings = [];
   const lines = FIELD_METRICS.map(({ name }) => {
     const value = record.values[name];
@@ -466,16 +493,20 @@ function buildFieldEmbed(siteField) {
       ? '🟡'
       : '🟢';
   const period = record.period
-    ? `집계 기간: ${record.period.first} ~ ${record.period.last} (28일)`
-    : null;
+    ? `집계 기간: ${record.period.first} ~ ${record.period.last}`
+    : '최근 28일 집계';
 
   return {
     title,
     description: [
       ...lines,
       '',
-      [`대상: ${origin}`, period].filter(Boolean).join(' | '),
-      trend ? `추이: 최근 ${TREND_WEEKS}주, 주 단위 28일 집계` : null,
+      [`대상: ${origin}`, period, source ? `출처: ${source}` : null]
+        .filter(Boolean)
+        .join(' | '),
+      trend
+        ? `추이: 최근 ${TREND_WEEKS}주, 주 단위 28일 집계`
+        : `추이 없음${trendReason ? ` (${trendReason})` : ''}`,
     ]
       .filter((line) => line !== null)
       .join('\n'),
@@ -655,17 +686,18 @@ async function main() {
   }
 
   // 실사용자 데이터는 실패해도 실험실 리포트는 보낸다
-  const siteField = await fetchSiteFieldData(
-    new URL(CONFIG.BASE_URL).origin,
-  ).catch((error) => ({
+  const origin = new URL(CONFIG.BASE_URL).origin;
+  const cruxField = await fetchSiteFieldData(origin).catch((error) => ({
+    origin,
     record: null,
     trend: null,
     reason: `CrUX 조회 실패: ${error.message}`,
   }));
+  const siteField = withPsiOriginFallback(cruxField, successResults);
   console.log(
     siteField.record
-      ? `👥 CrUX 사이트 전체 p75: ${JSON.stringify(siteField.record.values)}`
-      : `👥 CrUX 데이터 없음: ${siteField.reason}`,
+      ? `👥 사이트 전체 실사용자 p75 (${siteField.source}): ${JSON.stringify(siteField.record.values)}`
+      : `👥 실사용자 데이터 없음: ${siteField.reason}`,
   );
 
   // Discord 메시지 전송
@@ -708,6 +740,7 @@ if (require.main === module) {
 module.exports = {
   buildDiscordMessage,
   parsePageFieldMetrics,
+  withPsiOriginFallback,
   parseCruxRecord,
   parseCruxHistory,
 };

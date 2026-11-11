@@ -4,6 +4,7 @@
 const {
   buildDiscordMessage,
   parsePageFieldMetrics,
+  withPsiOriginFallback,
   parseCruxRecord,
   parseCruxHistory,
 } = require('../check-performance');
@@ -79,6 +80,34 @@ describe('parsePageFieldMetrics', () => {
         metrics: { LARGEST_CONTENTFUL_PAINT_MS: { percentile: 2400 } },
       }),
     ).toBeNull();
+  });
+});
+
+describe('withPsiOriginFallback', () => {
+  const failedCrux = {
+    origin: 'https://bottle-note.com',
+    record: null,
+    trend: null,
+    reason: 'CrUX 조회 실패: blocked',
+    trendReason: 'CrUX 추이 조회 실패: blocked',
+  };
+
+  it('CrUX API가 실패하면 PSI originLoadingExperience 값으로 사이트 p75를 채운다', () => {
+    const siteField = withPsiOriginFallback(failedCrux, [
+      labResult({ originField: { LCP: 2600, INP: 210, CLS: 0.03 } }),
+    ]);
+
+    expect(siteField.record.values).toEqual({ LCP: 2600, INP: 210, CLS: 0.03 });
+    const [field] = buildDiscordMessage([labResult()], siteField).embeds;
+    expect(field.description).toContain('🟡 **LCP** 2.6s');
+    expect(field.description).toContain('출처: PSI originLoadingExperience');
+    expect(field.description).toContain(
+      '추이 없음 (CrUX 추이 조회 실패: blocked)',
+    );
+  });
+
+  it('대체할 값도 없으면 그대로 둔다', () => {
+    expect(withPsiOriginFallback(failedCrux, [labResult()])).toBe(failedCrux);
   });
 });
 
