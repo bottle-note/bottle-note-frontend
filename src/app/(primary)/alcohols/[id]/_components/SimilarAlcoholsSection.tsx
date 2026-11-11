@@ -8,6 +8,7 @@ import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import { ROUTES } from '@/constants/routes';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { useSimilarAlcohols } from '@/queries/useSimilarAlcohols';
+import { useHorizontalWheelScroll } from '@/hooks/useHorizontalWheelScroll';
 import type { Alcohol } from '@/api/alcohol/types';
 import type { ExploreAlcohol } from '@/api/explore/types';
 import { similarEntryHref } from '@/app/(custom)/bartender-note/_components/similarEntry';
@@ -43,6 +44,7 @@ export default function SimilarAlcoholsSection({
   const hasTags = tags.length > 0;
   // 요청이 실패하면 목록 자리만 비운다. 상세 본문과 바텐더 진입은 그대로 둔다.
   const showList = hasTags && !isError;
+  const listRef = useHorizontalWheelScroll<HTMLUListElement>();
 
   return (
     <section
@@ -84,7 +86,10 @@ export default function SimilarAlcoholsSection({
                 ))}
               </div>
             ) : data && data.length > 0 ? (
-              <ul className="m-0 flex list-none gap-8 overflow-x-auto px-20 py-0 scrollbar-hide">
+              <ul
+                ref={listRef}
+                className="m-0 flex list-none gap-8 overflow-x-auto px-20 py-0 scrollbar-hide"
+              >
                 {data.map((alcohol, index) => (
                   <li
                     key={alcohol.alcoholId}

@@ -9,6 +9,7 @@ import {
 import type { HomeEditorPick } from '@/app/(primary)/_utils/fetchHomeEditorPicks';
 import { ROUTES } from '@/constants/routes';
 import { trackGA4Event } from '@/utils/analytics/ga4';
+import { useHorizontalWheelScroll } from '@/hooks/useHorizontalWheelScroll';
 
 import SectionHeader from '@/components/ui/Display/SectionHeader';
 
@@ -28,6 +29,8 @@ interface Props {
 
 /** 에디터 추천: 서버에서 미리 받은 시음회·프로그램·큐레이션·페어링을 가로로 넘기는 커버 카드. 비어 있으면 섹션을 숨긴다. */
 export default function HomeEditorPickSection({ editorPicks }: Props) {
+  const listRef = useHorizontalWheelScroll<HTMLUListElement>();
+
   if (editorPicks.length === 0) {
     return null;
   }
@@ -42,7 +45,10 @@ export default function HomeEditorPickSection({ editorPicks }: Props) {
           trackGA4Event('home_more_click', { section: 'curation' })
         }
       />
-      <ul className="flex gap-12 overflow-x-auto px-20 scrollbar-hide">
+      <ul
+        ref={listRef}
+        className="flex gap-12 overflow-x-auto px-20 scrollbar-hide"
+      >
         {editorPicks.map((editorPick, index) => (
           <li key={editorPick.id} className="w-260 shrink-0">
             <HomeEditorPickCard
