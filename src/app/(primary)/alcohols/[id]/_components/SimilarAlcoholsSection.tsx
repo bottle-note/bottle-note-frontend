@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
@@ -43,6 +44,27 @@ export default function SimilarAlcoholsSection({
   const hasTags = tags.length > 0;
   // 요청이 실패하면 목록 자리만 비운다. 상세 본문과 바텐더 진입은 그대로 둔다.
   const showList = hasTags && !isError;
+  const listRef = useRef<HTMLUListElement>(null);
+
+  // 마우스 세로 휠을 가로 스크롤로 옮긴다. 끝에 닿으면 페이지 세로 스크롤로 넘긴다.
+  // React onWheel은 passive라 preventDefault가 막혀 직접 등록한다.
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const handleWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+      const maxScrollLeft = list.scrollWidth - list.clientWidth;
+      const canScroll =
+        event.deltaY > 0
+          ? list.scrollLeft < maxScrollLeft
+          : list.scrollLeft > 0;
+      if (!canScroll) return;
+      event.preventDefault();
+      list.scrollLeft += event.deltaY;
+    };
+    list.addEventListener('wheel', handleWheel, { passive: false });
+    return () => list.removeEventListener('wheel', handleWheel);
+  }, [showList, data]);
 
   return (
     <section
@@ -84,7 +106,10 @@ export default function SimilarAlcoholsSection({
                 ))}
               </div>
             ) : data && data.length > 0 ? (
-              <ul className="m-0 flex list-none gap-8 overflow-x-auto px-20 py-0 scrollbar-hide">
+              <ul
+                ref={listRef}
+                className="m-0 flex list-none gap-8 overflow-x-auto px-20 py-0 scrollbar-hide"
+              >
                 {data.map((alcohol, index) => (
                   <li
                     key={alcohol.alcoholId}
