@@ -31,5 +31,6 @@
 - 공유 K8s Preview는 `preview-deploy` 라벨과 `https://preview.development.bottle-note.com/`을 사용한다. 공유 환경의 소유 PR은 하나이므로, 기존 소유 PR을 확인하고 사용자 승인 없이 라벨을 이동하지 않는다.
 - 실행하지 않은 검증을 통과했다고 보고하지 않는다.
 - PR 설명은 템플릿의 소제목 구조를 유지하고 각 섹션을 짧은 불렛으로 쓴다. 스크린샷은 접지 않고 본문에 표시한다.
+- 화면이 바뀌는 PR은 변경사항 섹션에 스크린샷을 넣는다. 한 화면의 스크린샷이 3장 이상이면 GIF 하나로 합쳐 올린다.
 - Bottle Note 제품 이슈의 원본 저장소는 `bottle-note/workspace`다. PR 전 `gh issue view <번호> --repo bottle-note/workspace`로 제목, 범위, 라벨, 완료 조건을 확인한다. 번호를 모르면 그 저장소에서 현재 사용자에게 할당된 프론트엔드 이슈를 찾는다.
 - PR에는 관련 이슈를 `https://github.com/bottle-note/workspace/issues/<번호>`처럼 URL만 그대로 적는다. 대괄호를 쓰는 Markdown 링크 형식과 이슈를 자동 종료하는 키워드는 사용하지 않는다.
