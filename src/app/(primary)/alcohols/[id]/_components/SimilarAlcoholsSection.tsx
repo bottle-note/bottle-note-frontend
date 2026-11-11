@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
@@ -9,6 +8,7 @@ import SkeletonBase from '@/components/ui/Loading/Skeletons/SkeletonBase';
 import { ROUTES } from '@/constants/routes';
 import { trackGA4Event } from '@/utils/analytics/ga4';
 import { useSimilarAlcohols } from '@/queries/useSimilarAlcohols';
+import { useHorizontalWheelScroll } from '@/hooks/useHorizontalWheelScroll';
 import type { Alcohol } from '@/api/alcohol/types';
 import type { ExploreAlcohol } from '@/api/explore/types';
 import { similarEntryHref } from '@/app/(custom)/bartender-note/_components/similarEntry';
@@ -44,27 +44,7 @@ export default function SimilarAlcoholsSection({
   const hasTags = tags.length > 0;
   // 요청이 실패하면 목록 자리만 비운다. 상세 본문과 바텐더 진입은 그대로 둔다.
   const showList = hasTags && !isError;
-  const listRef = useRef<HTMLUListElement>(null);
-
-  // 마우스 세로 휠을 가로 스크롤로 옮긴다. 끝에 닿으면 페이지 세로 스크롤로 넘긴다.
-  // React onWheel은 passive라 preventDefault가 막혀 직접 등록한다.
-  useEffect(() => {
-    const list = listRef.current;
-    if (!list) return;
-    const handleWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-      const maxScrollLeft = list.scrollWidth - list.clientWidth;
-      const canScroll =
-        event.deltaY > 0
-          ? list.scrollLeft < maxScrollLeft
-          : list.scrollLeft > 0;
-      if (!canScroll) return;
-      event.preventDefault();
-      list.scrollLeft += event.deltaY;
-    };
-    list.addEventListener('wheel', handleWheel, { passive: false });
-    return () => list.removeEventListener('wheel', handleWheel);
-  }, [showList, data]);
+  const listRef = useHorizontalWheelScroll<HTMLUListElement>();
 
   return (
     <section
