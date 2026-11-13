@@ -1585,6 +1585,39 @@ describe('바텐더 노트 큐레이션 추천', () => {
   });
 });
 
+describe('바텐더 노트 첫 화면', () => {
+  const menus = [
+    '위스키 추천해 주세요',
+    '큐레이션으로 추천해 주세요',
+    '바텐더님과 함께 리뷰를 쓸게요',
+  ];
+
+  it('보기는 설명 없이 기능 이름만으로 고른다', async () => {
+    renderExperience();
+
+    for (const name of menus) {
+      expect(await screen.findByRole('button', { name })).toBeEnabled();
+    }
+    for (const description of [
+      '몇 가지 여쭤보고 골라 드려요',
+      '주제별로 모은 위스키에서 골라 드려요',
+      '지금 드시는 술을 기록해 드려요',
+    ]) {
+      expect(screen.queryByText(description)).not.toBeInTheDocument();
+    }
+  });
+
+  it('바텐더 대사만 읽어도 취향 질문, 주제별 모음, 술 기록 세 가지를 알 수 있다', async () => {
+    renderExperience();
+
+    await waitFor(() =>
+      expect(dialogue()).toHaveTextContent(
+        '어서 오십시오. 취향을 여쭤보거나 주제별 모음에서 골라 드리고, 드시는 술 기록도 도와드립니다.',
+      ),
+    );
+  });
+});
+
 describe('바텐더 노트 질문 추천 준비 중', () => {
   /** 없거나 비활성이거나 게시본이 없는 시나리오, 또는 진행 중에 게시가 내려간 시나리오의 응답. */
   const notFound = () =>
@@ -1592,7 +1625,7 @@ describe('바텐더 노트 질문 추천 준비 중', () => {
   const closeScenario = () =>
     vi.mocked(ScenarioApi.get).mockRejectedValue(notFound());
   const recommendMenu = () =>
-    screen.findByRole('button', { name: /^위스키 추천해 주세요/ });
+    screen.findByRole('button', { name: '위스키 추천해 주세요' });
   const results = () =>
     vi
       .mocked(trackGA4Event)
@@ -1602,12 +1635,10 @@ describe('바텐더 노트 질문 추천 준비 중', () => {
     closeScenario();
     renderExperience();
 
-    await waitFor(async () =>
-      expect(await recommendMenu()).toHaveAccessibleName(
-        '위스키 추천해 주세요 지금은 준비하고 있어요',
-      ),
+    await waitFor(async () => expect(await recommendMenu()).toBeDisabled());
+    await waitFor(() =>
+      expect(dialogue()).toHaveTextContent('질문 추천은 지금 준비하고 있어요.'),
     );
-    expect(await recommendMenu()).toBeDisabled();
     expect(
       screen.getByRole('button', { name: /^큐레이션으로 추천해 주세요/ }),
     ).toBeEnabled();
@@ -1621,12 +1652,10 @@ describe('바텐더 노트 질문 추천 준비 중', () => {
     ]);
     renderExperience();
 
-    await waitFor(async () =>
-      expect(await recommendMenu()).toHaveAccessibleName(
-        '위스키 추천해 주세요 지금은 준비하고 있어요',
-      ),
+    await waitFor(async () => expect(await recommendMenu()).toBeDisabled());
+    await waitFor(() =>
+      expect(dialogue()).toHaveTextContent('질문 추천은 지금 준비하고 있어요.'),
     );
-    expect(await recommendMenu()).toBeDisabled();
     expect(ScenarioApi.get).not.toHaveBeenCalled();
   });
 
@@ -1638,9 +1667,7 @@ describe('바텐더 노트 질문 추천 준비 중', () => {
 
     await waitFor(() => expect(ScenarioApi.get).toHaveBeenCalledTimes(1));
     expect(await recommendMenu()).toBeEnabled();
-    expect(
-      screen.getByText('몇 가지 여쭤보고 골라 드려요'),
-    ).toBeInTheDocument();
+    expect(dialogue()).not.toHaveTextContent('준비하고 있어요');
     await choose('위스키 추천해 주세요');
 
     expect(await screen.findByText('질문 1')).toBeInTheDocument();

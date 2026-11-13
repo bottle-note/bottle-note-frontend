@@ -99,8 +99,11 @@ export function getDialogue(input: DialogueInput): string[] {
   if (input.notice) return [notices[input.notice]];
   const reason = detailReason(input);
   const dialogue: Record<Step, string[]> = {
+    // 첫 화면 보기에는 설명이 없어서, 세 가지가 무엇인지 대사가 알려 준다
     intro: [
-      '어서 오십시오. 편한 자리에 앉으시면 됩니다.\n오늘은 어떻게 도와드릴까요?',
+      scenarioUnavailable
+        ? '어서 오십시오. 질문 추천은 지금 준비하고 있어요.\n주제별 모음이나 리뷰 쓰기는 바로 도와드릴게요.'
+        : '어서 오십시오. 취향을 여쭤보거나 주제별 모음에서\n골라 드리고, 드시는 술 기록도 도와드립니다.',
     ],
     scenario: ['질문을 준비하고 있어요.'],
     'first-pick': [firstPickGreeting(firstPickName)],
