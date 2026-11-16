@@ -21,6 +21,9 @@
 
 - 화면 전용 코드는 route의 `_components`에 두는 것을 출발점으로 삼는다. 재사용 범위에 따라 도메인 로직은 `domain`, 도메인 독립 기능은 `feature`, 기본 UI 요소는 `ui`에 둔다.
 - UI 작업은 `DESIGN.md`, `tailwind.config.ts`, 인접한 기존 컴포넌트를 확인한다.
+- 스타일은 Tailwind 클래스로 쓰고, `style` 속성은 진행률처럼 실행 중에 계산되는 값에만 쓴다. 상태에 따른 스타일은 `&>*` 같은 자식 셀렉터 대신 해당 요소에 직접 클래스를 붙인다.
+- 함수·변수 이름은 무엇을 확인하거나 계산하는지 그대로 드러낸다(`isTextEntry`보다 `opensKeyboard`). 함수 이름은 행위와 대상을 함께 쓴다(`syncSpace`보다 `updateSpaceForFocused`, `measure`보다 `measureWritingSpace`). 함수는 한 가지 일만 하도록 5줄 안팎을 목표로 나누고, 계산은 훅·컴포넌트 밖 순수 함수로 뺀다. 이벤트 구독·해제처럼 짝을 이루는 코드는 억지로 쪼개지 않는다.
+- 주석은 코드만 봐서는 알 수 없는 이유만 문장으로 쓴다. 이름으로 설명되는 내용은 주석으로 되풀이하지 않는다.
 - 화면 처리 방향, 레이아웃 선택지, 상태별 화면을 제안할 때는 ASCII나 마크다운 표 대신 사용자가 열어 볼 수 있는 시각 시안으로 전달한다. 디자인·아티팩트 도구를 우선 쓰고, 없으면 HTML 파일을 만들어 브라우저로 연다.
 - API 작업 전 [Product API OpenAPI 문서](https://docs.bottle-note.com/#product)에서 경로, 메서드, 인증 여부와 요청·응답 스키마를 확인한다. 스펙에 없는 필드, 기본값, 성공·오류 동작은 추측하지 않고 차이를 드러낸다.
 - GA4 이벤트와 GTM 설정을 변경할 때는 `.agents/skills/bottle-note-ga4/SKILL.md`를 따른다.
