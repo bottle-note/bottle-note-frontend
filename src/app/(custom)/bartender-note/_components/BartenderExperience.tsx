@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
+import { Layers, MessageCircleQuestion, PenLine } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 import { useAuthSession } from '@/hooks/auth/useAuthSession';
 import { useLoginBridge } from '@/hooks/useLoginBridge';
@@ -19,6 +20,7 @@ import type { LoginTrigger, ReviewEntryFlow } from '@/utils/analytics/types';
 import { useSimilarAlcohols } from '@/queries/useSimilarAlcohols';
 import {
   OptionList,
+  MenuOptionList,
   FlowAction,
   FlowNavigation,
   FlowTextAction,
@@ -658,29 +660,29 @@ export default function BartenderExperience({
     >
       {step === 'intro' && (
         <>
-          <OptionList
+          <MenuOptionList
             items={[
               {
                 title: '위스키 추천해 주세요',
-                // 준비 중이면 메뉴는 그대로 두고 누를 수 없게 한다. 확인 전에는 지금처럼 들어간다
-                description: flow.unavailable
-                  ? '지금은 준비하고 있어요'
-                  : '몇 가지 여쭤보고 골라 드려요',
+                icon: MessageCircleQuestion,
+                // 준비 중이면 보기는 그대로 두고 누를 수 없게 하며, 바텐더 대사로 알린다. 확인 전에는 지금처럼 들어간다
                 disabled: flow.unavailable,
                 action: startRecommend,
               },
               {
-                ...CURATION_OPTION,
+                title: CURATION_OPTION.title,
+                icon: Layers,
                 // GTM 기준을 지키려고 entry 값은 'situation'을 유지한다
                 action: () => start('situation', 'curations'),
               },
               {
-                ...REVIEW_OPTION,
+                title: REVIEW_OPTION.title,
+                icon: PenLine,
                 action: () => start('review', 'review-pick'),
               },
             ]}
           />
-          <FlowNavigation>
+          <FlowNavigation divider={false}>
             <FlowTextAction onClick={() => start('picks', 'favorites')}>
               찜한 술 보기
             </FlowTextAction>
