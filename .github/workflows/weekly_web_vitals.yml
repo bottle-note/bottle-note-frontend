@@ -16,7 +16,7 @@ on:
 
 jobs:
   run-audit:
-    name: Measure Performance
+    name: Report Field Web Vitals
     runs-on: ubuntu-latest
 
     steps:
@@ -28,11 +28,12 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Run Performance Script
+      - name: Send CrUX Report
         run: node scripts/check-performance.js
         env:
-          PSI_API_KEY: ${{ secrets.PSI_API_KEY }}
+          # CrUX API도 같은 GCP 키를 쓴다
+          CRUX_API_KEY: ${{ secrets.PSI_API_KEY }}
           CORE_VITAL_WEBHOOK_URL: ${{ secrets.CORE_VITAL_WEBHOOK_URL }}
-          # 측정할 주소
+          # 조회할 사이트 origin
           CLIENT_URL: 'https://bottle-note.com'
           DRY_RUN: ${{ inputs.dry_run || 'false' }}
