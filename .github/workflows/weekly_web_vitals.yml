@@ -8,6 +8,11 @@ on:
 
   # 2. 수동 실행 버튼
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Discord로 보내지 않고 리포트를 로그에만 출력'
+        type: boolean
+        default: false
 
 jobs:
   run-audit:
@@ -30,3 +35,4 @@ jobs:
           CORE_VITAL_WEBHOOK_URL: ${{ secrets.CORE_VITAL_WEBHOOK_URL }}
           # 측정할 주소
           CLIENT_URL: 'https://bottle-note.com'
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
