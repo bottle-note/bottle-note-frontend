@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { cn } from '@/lib/utils';
 import { prefersReducedMotion } from './prefersReducedMotion';
 
 export type Pose =
@@ -39,10 +40,12 @@ export default function BarScene({
   pose,
   talking,
   onReady,
+  className,
 }: {
   pose: Pose;
   talking: boolean;
   onReady?: () => void;
+  className?: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const poseRef = useRef(pose);
@@ -141,7 +144,10 @@ export default function BarScene({
   return (
     <canvas
       ref={canvasRef}
-      className="mb-[-6%] block aspect-[750/480] h-auto w-full -translate-y-[6%]"
+      className={cn(
+        'mb-[-6%] block aspect-[750/480] h-auto w-full -translate-y-[6%]',
+        className,
+      )}
       width={SCENE_SIZE.width}
       height={SCENE_SIZE.height}
       role="img"
