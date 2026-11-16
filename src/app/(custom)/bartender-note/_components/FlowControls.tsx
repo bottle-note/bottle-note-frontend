@@ -1,6 +1,7 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import Link from 'next/link';
 import { createPortal } from 'react-dom';
+import { ChevronRight, type LucideIcon } from 'lucide-react';
 import Button from '@/components/ui/Button/Button';
 
 export interface Option {
@@ -62,6 +63,40 @@ export function OptionList({
   );
 }
 
+export interface MenuOption
+  extends Pick<Option, 'title' | 'disabled' | 'action'> {
+  icon: LucideIcon;
+}
+
+/** 들어갈 곳을 고르는 메뉴. 기능 이름만 두고, 무엇을 하는지는 바텐더 대사가 알려 준다. */
+export function MenuOptionList({ items }: { items: MenuOption[] }) {
+  return (
+    <div className="flex flex-col gap-6">
+      {items.map(({ title, icon: Icon, disabled, action }) => (
+        <button
+          key={title}
+          type="button"
+          disabled={disabled}
+          onClick={action}
+          className="group flex min-h-56 w-full items-center gap-12 rounded-lg border border-transparent bg-bg-neutral-weak px-14 py-10 text-left text-fg-neutral transition-[color,background-color,border-color,opacity] duration-150 hover:border-stroke-brand-solid hover:bg-bg-brand-weak focus-visible:border-stroke-brand-solid focus-visible:bg-bg-brand-weak focus-visible:outline-none disabled:pointer-events-none disabled:opacity-60"
+        >
+          <span className="flex h-36 w-36 shrink-0 items-center justify-center rounded-full bg-bg-layer-default text-fg-brand group-disabled:text-fg-disabled">
+            <Icon size={20} aria-hidden="true" />
+          </span>
+          <b className="min-w-0 flex-1 text-15 font-bold leading-20 group-hover:text-fg-brand group-focus-visible:text-fg-brand">
+            {title}
+          </b>
+          <ChevronRight
+            size={20}
+            aria-hidden="true"
+            className="shrink-0 text-fg-neutral-muted"
+          />
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function FlowAction({
   children,
   onClick,
@@ -83,11 +118,18 @@ export function FlowAction({
 const navigationClassName =
   'inline-flex min-h-40 items-center text-13 font-semibold text-fg-neutral-muted underline decoration-stroke-neutral-weak underline-offset-4 transition-colors hover:text-fg-brand focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-focus-ring';
 
-export function FlowNavigation({ children }: { children: ReactNode }) {
+export function FlowNavigation({
+  children,
+  divider = true,
+}: {
+  children: ReactNode;
+  /** 위 보기와 나누는 선. 카드 메뉴 바로 아래처럼 이미 나뉘어 보이면 뺀다. */
+  divider?: boolean;
+}) {
   return (
     <nav
       aria-label="다른 보기"
-      className="flex flex-wrap items-center gap-x-16 gap-y-2 border-t border-stroke-neutral-subtle pt-8"
+      className={`flex flex-wrap items-center gap-x-16 gap-y-2 ${divider ? 'border-t border-stroke-neutral-subtle pt-8' : ''}`}
     >
       {children}
     </nav>
