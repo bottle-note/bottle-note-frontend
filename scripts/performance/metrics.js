@@ -1,29 +1,29 @@
-// ============================================
-// 유틸리티 함수
-// ============================================
-const getRatingEmoji = (score) => {
-  if (score >= 90) return '🟢';
-  if (score >= 50) return '🟡';
-  return '🔴';
+// Core Web Vitals 공식 기준값 (https://web.dev/articles/vitals)
+const METRIC_THRESHOLDS = {
+  LCP: { good: 2500, poor: 4000 },
+  INP: { good: 200, poor: 500 },
+  CLS: { good: 0.1, poor: 0.25 },
 };
 
-const getMetricRating = (name, value) => {
-  const thresholds = {
-    LCP: { good: 2500, poor: 4000 },
-    CLS: { good: 0.1, poor: 0.25 },
-    TBT: { good: 200, poor: 600 },
-    INP: { good: 200, poor: 500 },
-  };
-
-  const t = thresholds[name];
-  if (!t) return '⚪';
-
-  if (value <= t.good) return '🟢';
-  if (value <= t.poor) return '🟡';
-  return '🔴';
+const RATINGS = {
+  good: { emoji: '🟢', label: '좋음', color: 0x22c55e },
+  needsImprovement: { emoji: '🟡', label: '개선 필요', color: 0xeab308 },
+  poor: { emoji: '🔴', label: '나쁨', color: 0xef4444 },
 };
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const RATING_ORDER = ['good', 'needsImprovement', 'poor'];
+
+const rateMetric = (name, value) => {
+  const threshold = METRIC_THRESHOLDS[name];
+  if (value <= threshold.good) return 'good';
+  if (value <= threshold.poor) return 'needsImprovement';
+  return 'poor';
+};
+
+const findWorstRating = (ratings) =>
+  RATING_ORDER[
+    Math.max(...ratings.map((rating) => RATING_ORDER.indexOf(rating)))
+  ];
 
 const toNumber = (value) => {
   if (value === null || value === undefined || value === '') return null;
@@ -31,7 +31,7 @@ const toNumber = (value) => {
   return Number.isFinite(number) ? number : null;
 };
 
-const formatFieldValue = (name, value) => {
+const formatMetricValue = (name, value) => {
   if (value === null || value === undefined) return '-';
   if (name === 'CLS') return value.toFixed(2);
   if (name === 'LCP') return `${(value / 1000).toFixed(1)}s`;
@@ -43,24 +43,11 @@ const formatCruxDate = (date) =>
     ? `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`
     : '';
 
-const truncate = (text, limit) =>
-  text.length <= limit ? text : `${text.slice(0, limit - 1)}…`;
-
-const getAverageScore = (results) => {
-  if (results.length === 0) return null;
-
-  return Math.round(
-    results.reduce((sum, result) => sum + result.score, 0) / results.length,
-  );
-};
-
 module.exports = {
-  getRatingEmoji,
-  getMetricRating,
-  delay,
+  RATINGS,
+  rateMetric,
+  findWorstRating,
   toNumber,
-  formatFieldValue,
+  formatMetricValue,
   formatCruxDate,
-  truncate,
-  getAverageScore,
 };

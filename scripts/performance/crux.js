@@ -6,6 +6,14 @@ const {
 } = require('./config');
 const { toNumber, formatCruxDate } = require('./metrics');
 
+const readCollectionPeriod = (period) =>
+  period
+    ? {
+        first: formatCruxDate(period.firstDate),
+        last: formatCruxDate(period.lastDate),
+      }
+    : null;
+
 // CrUX queryRecord 응답 → { period, values: { LCP, INP, CLS } }
 const parseCruxRecord = (data) => {
   const metrics = data?.record?.metrics;
@@ -19,16 +27,7 @@ const parseCruxRecord = (data) => {
 
   if (Object.keys(values).length === 0) return null;
 
-  const period = data.record.collectionPeriod;
-  return {
-    period: period
-      ? {
-          first: formatCruxDate(period.firstDate),
-          last: formatCruxDate(period.lastDate),
-        }
-      : null,
-    values,
-  };
+  return { period: readCollectionPeriod(data.record.collectionPeriod), values };
 };
 
 // CrUX queryHistoryRecord 응답 → { LCP: [오래된 값, ..., 최신 값] } (최근 TREND_WEEKS개)
@@ -47,9 +46,6 @@ const parseCruxHistory = (data, weeks = TREND_WEEKS) => {
   return Object.keys(trend).length > 0 ? trend : null;
 };
 
-// ============================================
-// CrUX API 호출 (사이트 전체, 모바일)
-// ============================================
 async function queryCrux(endpoint, origin) {
   const res = await fetch(`${CRUX_API_URL}:${endpoint}?key=${CONFIG.API_KEY}`, {
     method: 'POST',
@@ -62,7 +58,7 @@ async function queryCrux(endpoint, origin) {
   });
   const data = await res.json().catch(() => ({}));
 
-  // 404는 CrUX에 집계될 만큼 방문 데이터가 없다는 뜻
+  // 404는 오류가 아니라 CrUX에 집계될 만큼 방문 데이터가 없다는 뜻
   if (res.status === 404) {
     return { data: null, reason: 'CrUX에 집계된 데이터 없음' };
   }
@@ -72,21 +68,15 @@ async function queryCrux(endpoint, origin) {
   return { data, reason: null };
 }
 
-// CrUX API로 현재 값을 못 받으면 같은 원천인 PSI originLoadingExperience로 대체한다 (추이는 없음)
-function withPsiOriginFallback(siteField, results) {
-  if (siteField.record) return siteField;
+const describeMissingRecord = (current) =>
+  current.status === 'rejected'
+    ? `CrUX 조회 실패: ${current.reason.message}`
+    : current.value.reason || 'CrUX 응답에 지표 없음';
 
-  const originValues = results.find(
-    (result) => result.originField,
-  )?.originField;
-  if (!originValues) return siteField;
-
-  return {
-    ...siteField,
-    record: { period: null, values: originValues },
-    source: 'PSI originLoadingExperience',
-  };
-}
+const describeMissingTrend = (history) =>
+  history.status === 'rejected'
+    ? `CrUX 추이 조회 실패: ${history.reason.message}`
+    : history.value.reason || 'CrUX 추이 응답에 지표 없음';
 
 async function fetchSiteFieldData(origin) {
   const [current, history] = await Promise.allSettled([
@@ -101,31 +91,19 @@ async function fetchSiteFieldData(origin) {
       ? parseCruxHistory(history.value.data)
       : null;
 
-  let reason = null;
-  if (!record) {
-    reason =
-      current.status === 'rejected'
-        ? `CrUX 조회 실패: ${current.reason.message}`
-        : current.value.reason || 'CrUX 응답에 지표 없음';
-  }
-  if (history.status === 'rejected') {
-    console.warn('⚠️ CrUX 추이 조회 실패:', history.reason.message);
-  }
-
-  const trendReason =
-    history.status === 'rejected'
-      ? `CrUX 추이 조회 실패: ${history.reason.message}`
-      : trend
-        ? null
-        : history.value.reason || 'CrUX 추이 응답에 지표 없음';
-
-  return { origin, record, trend, reason, trendReason, source: 'CrUX API' };
+  return {
+    origin,
+    record,
+    trend,
+    reason: record ? null : describeMissingRecord(current),
+    trendReason: trend ? null : describeMissingTrend(history),
+    failed: current.status === 'rejected',
+  };
 }
 
 module.exports = {
   parseCruxRecord,
   parseCruxHistory,
   queryCrux,
-  withPsiOriginFallback,
   fetchSiteFieldData,
 };
