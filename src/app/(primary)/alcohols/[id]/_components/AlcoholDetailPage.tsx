@@ -30,6 +30,8 @@ import { ERROR_MESSAGES } from '@/api/_shared/errorMessages';
 import useModalStore from '@/store/modalStore';
 import { useLoginBridge } from '@/hooks/useLoginBridge';
 import { trackGA4Event } from '@/utils/analytics/ga4';
+import { getAlcoholDetailEntrySource } from '@/utils/analytics/screenHistory';
+import type { AlcoholDetailEntrySource } from '@/utils/analytics/types';
 import { ROUTES } from '@/constants/routes';
 import {
   alcoholDetailKeys,
@@ -117,6 +119,7 @@ export default function AlcoholDetailPage({
 
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const viewTrackedAlcoholIdRef = useRef<string | null>(null);
+  const entrySourceRef = useRef<AlcoholDetailEntrySource | null>(null);
   const currentRateRef = useRef(0);
   const viewerRequestIdRef = useRef(0);
   const latestRatingRequestIdRef = useRef(0);
@@ -153,9 +156,13 @@ export default function AlcoholDetailPage({
     if (viewTrackedAlcoholIdRef.current === alcoholIdString) return;
 
     viewTrackedAlcoholIdRef.current = alcoholIdString;
+    entrySourceRef.current = getAlcoholDetailEntrySource(
+      ROUTES.ALCOHOL.DETAIL(alcoholIdString),
+    );
     trackGA4Event('view_alcohol_detail', {
       alcohol_id: alcoholIdString,
       alcohol_name: data.alcohols.korName,
+      entry_source: entrySourceRef.current,
     });
   }, [alcoholIdString, data, isAuthLoading, isFetchedAfterMount, isSuccess]);
 
@@ -221,6 +228,11 @@ export default function AlcoholDetailPage({
             trackGA4Event('rate_alcohol', {
               alcohol_id: String(alcoholId),
               alcohol_name: data?.alcohols.korName ?? '',
+              entry_source:
+                entrySourceRef.current ??
+                getAlcoholDetailEntrySource(
+                  ROUTES.ALCOHOL.DETAIL(alcoholIdString),
+                ),
             });
             setSuccessfulRating(selectedRate);
             setIsRatingSuccessOpen(true);
@@ -242,6 +254,7 @@ export default function AlcoholDetailPage({
     },
     [
       alcoholId,
+      alcoholIdString,
       bridgeToLogin,
       data?.alcohols.korName,
       handleModalState,

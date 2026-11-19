@@ -61,6 +61,7 @@ export const AuthApi = {
         accessToken: data.accessToken,
         refreshToken,
         agreementRequired: data.agreementRequired,
+        isFirstLogin: data.isFirstLogin === true,
       };
     },
 
@@ -103,6 +104,7 @@ export const AuthApi = {
         accessToken: data.accessToken,
         refreshToken,
         agreementRequired: data.agreementRequired,
+        isFirstLogin: data.isFirstLogin === true,
       };
     },
 

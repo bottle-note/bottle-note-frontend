@@ -21,11 +21,18 @@
       "baseTagName": "Google Tag - GA4 Prod"
     }
   },
+  "googleTag": {
+    "trigger": "auth_state",
+    "tagFiringOption": "oncePerLoad",
+    "configParameters": ["user_id"]
+  },
+  "commonEventParameters": ["user_id"],
   "events": [
     { "name": "login", "parameters": ["method", "trigger", "gate_page"] },
+    { "name": "sign_up", "parameters": ["method", "trigger", "gate_page"] },
     {
       "name": "rate_alcohol",
-      "parameters": ["alcohol_id", "alcohol_name"]
+      "parameters": ["alcohol_id", "alcohol_name", "entry_source"]
     },
     {
       "name": "write_review_start",
@@ -45,7 +52,7 @@
     },
     {
       "name": "view_alcohol_detail",
-      "parameters": ["alcohol_id", "alcohol_name"]
+      "parameters": ["alcohol_id", "alcohol_name", "entry_source"]
     },
     {
       "name": "similar_alcohol_click",

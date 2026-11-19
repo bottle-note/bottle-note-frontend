@@ -67,12 +67,12 @@ export const useSocialLogin = () => {
   ) => {
     const result = await loginAuthSession(payload);
     const { trigger, gatePage } = consumeLoginContext();
+    const loginParams = { method, trigger, gate_page: gatePage };
 
-    trackGA4Event('login', {
-      method,
-      trigger,
-      gate_page: gatePage,
-    });
+    if (result.isFirstLogin) {
+      trackGA4Event('sign_up', loginParams);
+    }
+    trackGA4Event('login', loginParams);
 
     if (trigger) {
       trackGA4Event('login_prompt_converted', { trigger });

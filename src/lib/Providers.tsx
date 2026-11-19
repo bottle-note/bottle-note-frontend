@@ -8,6 +8,7 @@ import Modal from '@/components/ui/Modal/Modal';
 import { AuthProvider } from '@/lib/auth/AuthProvider';
 import { ThemeProvider } from '@/lib/theme/ThemeProvider';
 import { NotificationPollingBridge } from '@/components/domain/notification/NotificationPollingBridge';
+import { AnalyticsContextRecorder } from '@/components/feature/analytics/AnalyticsContextRecorder';
 import { FocusScrollProvider } from './FocusScrollProvider';
 
 interface Props {
@@ -38,6 +39,7 @@ export const Providers = ({ children }: Props) => {
         <QueryClientProvider client={queryClient}>
           <FocusScrollProvider>
             <AuthInitializer />
+            <AnalyticsContextRecorder />
             <NotificationPollingBridge />
             {children}
             <Modal />
