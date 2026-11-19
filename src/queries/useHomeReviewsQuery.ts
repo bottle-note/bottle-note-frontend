@@ -8,13 +8,13 @@ export const homeReviewsKeys = {
   all: ['homeReviews'] as const,
 };
 
-/** 홈 인기 리뷰: 둘러보기 리뷰 API의 인기순 첫 3개 */
+/** 홈 리뷰: 둘러보기 리뷰 API의 최신순 첫 3개 */
 export const useHomeReviewsQuery = () =>
   useQuery({
     queryKey: homeReviewsKeys.all,
     queryFn: async (): Promise<ExploreReview[]> => {
       const response = await ExploreApi.getReviews({
-        sortType: 'POPULAR',
+        sortType: 'LATEST',
         sortOrder: 'DESC',
         size: HOME_REVIEW_SIZE,
       });

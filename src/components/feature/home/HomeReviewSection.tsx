@@ -9,6 +9,7 @@ import { REVIEW_EXPLORE_TAB_ID } from '@/app/(primary)/explore/_constants/explor
 import { ROUTES } from '@/constants/routes';
 import { useHomeReviewsQuery } from '@/queries/useHomeReviewsQuery';
 import { trackGA4Event } from '@/utils/analytics/ga4';
+import { formatDate } from '@/utils/formatDate';
 
 import SectionHeader from '@/components/ui/Display/SectionHeader';
 import { HomeFeaturedErrorState } from './_components/HomeFeaturedErrorState';
@@ -17,7 +18,7 @@ const SECTION_LABEL = 'REVIEW';
 const SECTION_TITLE = '한 잔에 담긴 이야기';
 const MAX_TAGS = 3;
 
-/** 인기 리뷰 3개. 비어 있으면 섹션을 숨긴다. */
+/** 최신 리뷰 3개. 비어 있으면 섹션을 숨긴다. */
 export default function HomeReviewSection() {
   const { data: reviews, isLoading, isError, refetch } = useHomeReviewsQuery();
 
@@ -26,7 +27,7 @@ export default function HomeReviewSection() {
   }
 
   return (
-    <section aria-label="인기 리뷰" className="space-y-8">
+    <section aria-label="최신 리뷰" className="space-y-8">
       <SectionHeader
         label={SECTION_LABEL}
         title={SECTION_TITLE}
@@ -85,6 +86,12 @@ function HomeReviewItem({ review, position }: ItemProps) {
             <span className="truncate text-13 font-bold">
               {review.userInfo.nickName}
             </span>
+            <time
+              dateTime={review.createAt}
+              className="shrink-0 text-12 text-fg-neutral-muted"
+            >
+              {formatDate(review.createAt) as string}
+            </time>
           </span>
           <Star rating={review.reviewRating} size={14} tone="brand" />
         </span>

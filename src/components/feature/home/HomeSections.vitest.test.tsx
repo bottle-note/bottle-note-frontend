@@ -317,8 +317,8 @@ describe('홈 에디터 추천', () => {
   });
 });
 
-describe('홈 인기 리뷰', () => {
-  it('인기순 리뷰 3개를 보여주고 리뷰 상세와 둘러보기 리뷰 탭으로 연결한다', async () => {
+describe('홈 최신 리뷰', () => {
+  it('최신순 리뷰 3개를 작성일과 함께 보여주고 리뷰 상세와 둘러보기 리뷰 탭으로 연결한다', async () => {
     vi.mocked(ExploreApi.getReviews).mockResolvedValue({
       data: {
         items: [
@@ -333,7 +333,7 @@ describe('홈 인기 리뷰', () => {
     const items = await screen.findAllByRole('listitem');
     expect(screen.getByText('한 잔에 담긴 이야기')).toBeInTheDocument();
     expect(ExploreApi.getReviews).toHaveBeenCalledWith({
-      sortType: 'POPULAR',
+      sortType: 'LATEST',
       sortOrder: 'DESC',
       size: 3,
     });
@@ -342,6 +342,7 @@ describe('홈 인기 리뷰', () => {
     const second = within(items[1]).getByRole('link');
     expect(second).toHaveAttribute('href', ROUTES.REVIEW.DETAIL(32));
     expect(second).toHaveTextContent('라프로익 10년 리뷰 본문');
+    expect(second).toHaveTextContent('2026.10.20');
     fireEvent.click(second);
     expect(trackGA4Event).toHaveBeenCalledWith('home_item_click', {
       section: 'review',
