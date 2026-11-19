@@ -150,13 +150,17 @@
   :root {
     --radius: 0.5rem;
 
-    /* 웹 화면 중 시스템 UI(상태 표시줄, 홈 인디케이터)에 가려지는 높이.
-     * 브라우저가 env()로 알려 주고, 이 값을 padding으로 줘야 내용이 가려지지 않는다.
-     * - iOS: 웹이 시스템 UI 밑까지 그려져(layout.tsx viewportFit: 'cover') 값이 있다 (하단 34px 등)
-     * - Android 앱: 앱이 시스템 UI 자리를 비우고 그 사이에만 웹을 그려서 0
-     * FIXME(HYE-95): Android 앱도 웹이 이 여백을 맡도록 통일한다 */
-    --safe-area-top: env(safe-area-inset-top, 0px);
-    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    /* 배경은 시스템 바 뒤까지 그리고, 내용만 이 높이만큼 안쪽으로 둔다.
+     * 앱 1.0.10부터 시스템 바 높이를 CSS px로 전달한다.
+     * env()가 0인 WebView도 지원하도록 브라우저 값과 앱 값 중 큰 값을 쓴다. */
+    --safe-area-top: max(
+      env(safe-area-inset-top, 0px),
+      var(--app-safe-area-top, 0px)
+    );
+    --safe-area-bottom: max(
+      env(safe-area-inset-bottom, 0px),
+      var(--app-safe-area-bottom, 0px)
+    );
 
     /* Header heights */
     --header-height: 20px;
@@ -181,6 +185,12 @@
     --floating-bottom-offset: calc(
       var(--safe-area-bottom) + var(--bottom-cta-gap)
     );
+  }
+
+  /* 구버전 Android 앱은 이미 시스템 바 자리를 비워 이중 여백을 막아야 한다. */
+  :root:has(#bottle-note-native-safe-area) {
+    --safe-area-top: 0px;
+    --safe-area-bottom: 0px;
   }
 }
 
