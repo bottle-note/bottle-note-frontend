@@ -5,6 +5,7 @@ import '@/style/globals.css';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { Providers } from '@/lib/Providers';
 import { THEME_INITIALIZER_SCRIPT } from '@/lib/theme/theme';
+import { SAFE_AREA_INITIALIZER_SCRIPT } from '@/lib/safe-area';
 import { BASE_URL } from '@/constants/common';
 import { isProductionDeployment } from '@/lib/environment';
 import { SITE_TITLE_TEMPLATE } from '@/shared/seo/site';
@@ -98,7 +99,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  // iOS specific - cover로 설정하면 safe area까지 확장, CSS env()로 처리
+  // 시스템 바 뒤까지 배경을 그리고, 내용 여백은 웹의 safe area 변수로 처리한다.
   viewportFit: 'cover',
 };
 
@@ -115,6 +116,10 @@ export default function RootLayout({
         {/* eslint-disable-next-line react/no-danger */}
         <script
           dangerouslySetInnerHTML={{ __html: THEME_INITIALIZER_SCRIPT }}
+        />
+        {/* eslint-disable-next-line react/no-danger */}
+        <script
+          dangerouslySetInnerHTML={{ __html: SAFE_AREA_INITIALIZER_SCRIPT }}
         />
         <link
           rel="preconnect"

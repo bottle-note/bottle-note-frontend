@@ -1,5 +1,8 @@
 declare global {
   interface Window {
+    BottleNoteApp?: {
+      safeArea?: { top: number; bottom: number };
+    };
     kakao: any;
     Kakao: any;
     FlutterMessageQueue: {
