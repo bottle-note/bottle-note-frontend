@@ -22,17 +22,14 @@
     }
   },
   "googleTag": {
-    "trigger": "auth_state",
-    "tagFiringOption": "oncePerLoad",
     "configParameters": ["user_id"]
   },
-  "commonEventParameters": ["user_id"],
   "events": [
     { "name": "login", "parameters": ["method", "trigger", "gate_page"] },
     { "name": "sign_up", "parameters": ["method", "trigger", "gate_page"] },
     {
       "name": "rate_alcohol",
-      "parameters": ["alcohol_id", "alcohol_name", "entry_source"]
+      "parameters": ["alcohol_id", "alcohol_name"]
     },
     {
       "name": "write_review_start",
@@ -52,7 +49,7 @@
     },
     {
       "name": "view_alcohol_detail",
-      "parameters": ["alcohol_id", "alcohol_name", "entry_source"]
+      "parameters": ["alcohol_id", "alcohol_name"]
     },
     {
       "name": "similar_alcohol_click",

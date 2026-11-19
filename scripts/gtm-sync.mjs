@@ -109,23 +109,9 @@ function validateConfig(config) {
       errors.push(`${name}: baseTagName이 필요합니다.`);
   }
 
-  const googleTag = config.googleTag;
-  if (!googleTag?.trigger) errors.push('googleTag.trigger가 필요합니다.');
-  if (!['oncePerEvent', 'oncePerLoad'].includes(googleTag?.tagFiringOption)) {
-    errors.push(
-      'googleTag.tagFiringOption은 oncePerEvent 또는 oncePerLoad여야 합니다.',
-    );
-  }
-  if (!Array.isArray(googleTag?.configParameters)) {
+  const configParameters = config.googleTag?.configParameters;
+  if (!Array.isArray(configParameters)) {
     errors.push('googleTag.configParameters는 배열이어야 합니다.');
-  }
-  if (!Array.isArray(config.commonEventParameters)) {
-    errors.push('commonEventParameters는 배열이어야 합니다.');
-  }
-  if (config.events?.some((event) => event.name === googleTag?.trigger)) {
-    errors.push(
-      `${googleTag.trigger}: 기본 태그 트리거는 GA4 이벤트로 등록하지 않습니다.`,
-    );
   }
 
   for (const event of config.events ?? []) {
@@ -138,12 +124,11 @@ function validateConfig(config) {
     } else if (new Set(event.parameters).size !== event.parameters.length) {
       errors.push(`${event.name}: 중복 매개변수가 있습니다.`);
     } else if (
-      event.parameters.some((name) =>
-        config.commonEventParameters?.includes(name),
-      )
+      event.parameters.some((name) => configParameters?.includes(name))
     ) {
+      // user_id 같은 구성 매개변수는 이벤트 매개변수로 보내면 GA4가 사용자 식별에 쓰지 않는다.
       errors.push(
-        `${event.name}: 공통 매개변수는 이벤트에 따로 적지 않습니다.`,
+        `${event.name}: 기본 태그 구성 매개변수는 이벤트 매개변수로 보내지 않습니다.`,
       );
     }
   }
@@ -151,19 +136,11 @@ function validateConfig(config) {
   if (errors.length > 0) throw new Error(errors.join('\n'));
 }
 
-// 모든 이벤트 태그에 공통 매개변수(예: user_id)를 덧붙인다.
-function withCommonParameters(config) {
-  return config.events.map((event) => ({
-    ...event,
-    parameters: [...event.parameters, ...config.commonEventParameters],
-  }));
-}
-
 // 이벤트·기본 태그 구성에 쓰이는 데이터 영역 변수 이름을 모은다.
-function listParameterNames(config, events) {
+function listParameterNames(config) {
   return [
     ...new Set([
-      ...events.flatMap((event) => event.parameters),
+      ...config.events.flatMap((event) => event.parameters),
       ...config.googleTag.configParameters,
     ]),
   ].sort();
@@ -291,8 +268,8 @@ function setConfigSettings(tag, names) {
   });
 }
 
-// 환경별 측정 ID·구성 매개변수·실행 트리거를 넣은 기본 Google 태그를 만든다.
-function buildBaseTag(template, { name, measurementId, googleTag, triggerId }) {
+// 환경별 측정 ID·구성 매개변수를 넣은 기본 Google 태그를 만든다. 실행 트리거는 템플릿을 따른다.
+function buildBaseTag(template, { name, measurementId, configParameters }) {
   const tag = cloneResource(template);
   tag.name = name;
   const measurementParameter = findMeasurementParameter(tag.parameter);
@@ -300,9 +277,7 @@ function buildBaseTag(template, { name, measurementId, googleTag, triggerId }) {
     throw new Error('Google 태그 템플릿에서 측정 ID를 찾지 못했습니다.');
   }
   measurementParameter.value = measurementId;
-  setConfigSettings(tag, googleTag.configParameters);
-  tag.firingTriggerId = [triggerId];
-  tag.tagFiringOption = googleTag.tagFiringOption;
+  setConfigSettings(tag, configParameters);
   return tag;
 }
 
@@ -636,10 +611,7 @@ async function main() {
   const config = JSON.parse(await fs.readFile(CONFIG_PATH, 'utf8'));
   validateConfig(config);
   if (args.validate) {
-    const parameterCount = listParameterNames(
-      config,
-      withCommonParameters(config),
-    ).length;
+    const parameterCount = listParameterNames(config).length;
     console.log(
       `GTM 설정 정상: 이벤트 ${config.events.length}개, 변수 ${parameterCount}개`,
     );
@@ -699,8 +671,7 @@ async function main() {
     `${args.apply ? 'APPLY' : 'DRY-RUN'} ${args.env} → ${workspace.path}`,
   );
 
-  const events = withCommonParameters(config);
-  const parameterNames = listParameterNames(config, events);
+  const parameterNames = listParameterNames(config);
   const variables = await syncCollection({
     api,
     apply: args.apply,
@@ -719,10 +690,9 @@ async function main() {
     apply: args.apply,
     workspacePath: workspace.path,
     collection: 'triggers',
-    desiredItems: [
-      config.googleTag.trigger,
-      ...events.map(({ name }) => name),
-    ].map((eventName) => buildTrigger(triggerTemplate, eventName)),
+    desiredItems: config.events.map((event) =>
+      buildTrigger(triggerTemplate, event.name),
+    ),
     existingItems: resources.triggers,
     fields: ['name', 'type', 'customEventFilter', 'filter', 'parameter'],
     idField: 'triggerId',
@@ -731,7 +701,7 @@ async function main() {
     triggers.map((trigger) => [trigger.name, trigger]),
   );
 
-  const eventTags = events.map((event) => {
+  const eventTags = config.events.map((event) => {
     const trigger = triggerByName.get(`CE - ${event.name}`);
     return buildEventTag(
       eventTagTemplate,
@@ -743,8 +713,7 @@ async function main() {
   const baseTag = buildBaseTag(baseTagTemplate, {
     name: environment.baseTagName,
     measurementId,
-    googleTag: config.googleTag,
-    triggerId: triggerByName.get(`CE - ${config.googleTag.trigger}`).triggerId,
+    configParameters: config.googleTag.configParameters,
   });
   const tags = await syncCollection({
     api,
@@ -753,7 +722,7 @@ async function main() {
     collection: 'tags',
     desiredItems: [baseTag, ...eventTags],
     existingItems: resources.tags,
-    fields: ['name', 'type', 'parameter', 'firingTriggerId', 'tagFiringOption'],
+    fields: ['name', 'type', 'parameter', 'firingTriggerId'],
     idField: 'tagId',
   });
 

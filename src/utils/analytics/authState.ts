@@ -1,9 +1,6 @@
 import { sendGTMEvent } from '@next/third-parties/google';
 import type { AuthStatus, ClientSession } from '@/lib/auth/session-store';
 
-// GTM 기본 Google 태그는 auth_state 이후 실행되므로, 세션 확인이 늦어도 첫 page_view가 이보다 늦어지지 않게 한다.
-export const AUTH_STATE_FALLBACK_MS = 3000;
-
 interface AuthSnapshot {
   status: AuthStatus;
   session: ClientSession | null;
@@ -20,19 +17,13 @@ export function getUserIdForAnalytics(snapshot: AuthSnapshot) {
     : null;
 }
 
-export function reportAuthState(userId: string | null) {
-  if (typeof window === 'undefined' || reportedUserId === userId) return;
-  reportedUserId = userId;
-  sendGTMEvent({ event: 'auth_state', user_id: userId });
-}
-
+// GTM 기본 Google 태그가 구성 매개변수 user_id로 읽는 데이터 영역 값을 바꾼다.
 export function reportAuthSnapshot(snapshot: AuthSnapshot) {
   const userId = getUserIdForAnalytics(snapshot);
-  if (userId !== undefined) reportAuthState(userId);
-}
-
-export function reportGuestIfUnconfirmed() {
-  if (reportedUserId === undefined) reportAuthState(null);
+  if (typeof window === 'undefined' || userId === undefined) return;
+  if (reportedUserId === userId) return;
+  reportedUserId = userId;
+  sendGTMEvent({ event: 'auth_state', user_id: userId });
 }
 
 export function resetAuthStateReportForTest() {

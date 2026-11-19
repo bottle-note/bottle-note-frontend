@@ -2,6 +2,10 @@
 
 import { UserData } from '@/types/Auth';
 import type { LoginPayload } from '@/lib/auth/login-payload';
+import {
+  reportAuthSnapshot,
+  resetAuthStateReportForTest,
+} from '@/utils/analytics/authState';
 
 export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
@@ -39,6 +43,8 @@ const notify = () => {
 
 const setSnapshot = (nextSnapshot: SessionSnapshot) => {
   snapshot = nextSnapshot;
+  // 로그인 직후의 sign_up·login보다 먼저 회원 번호가 데이터 영역에 들어가야 한다.
+  reportAuthSnapshot(nextSnapshot);
   notify();
 };
 
@@ -207,5 +213,6 @@ export const resetAuthSessionForTest = () => {
   };
   restorePromise = null;
   refreshPromise = null;
+  resetAuthStateReportForTest();
   notify();
 };

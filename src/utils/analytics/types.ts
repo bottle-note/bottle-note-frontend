@@ -56,24 +56,6 @@ export type HomeSection =
   | 'category'
   | 'region';
 
-// 술 상세 직전에 본 앱 내 화면. external은 앱 안에 직전 화면이 없는 진입(외부 링크·새 탭·앱 첫 화면)이다.
-export type AlcoholDetailEntrySource =
-  | 'home'
-  | 'search'
-  | 'explore_review'
-  | 'similar'
-  | 'alcohol_reviews'
-  | 'review'
-  | 'curation'
-  | 'bartender_note'
-  | 'import_clearance'
-  | 'my_bottle'
-  | 'profile'
-  | 'history'
-  | 'whiskey_test'
-  | 'other'
-  | 'external';
-
 // GA4 이벤트별 파라미터 타입 정의
 export interface GA4EventMap {
   // 🔴 1순위 — 핵심 전환
@@ -91,7 +73,6 @@ export interface GA4EventMap {
   rate_alcohol: {
     alcohol_id: string;
     alcohol_name: string;
-    entry_source: AlcoholDetailEntrySource;
   };
   write_review_start: {
     alcohol_id: string;
@@ -120,7 +101,6 @@ export interface GA4EventMap {
   view_alcohol_detail: {
     alcohol_id: string;
     alcohol_name: string;
-    entry_source: AlcoholDetailEntrySource;
   };
   // 주류 상세의 비슷한 위스키 추천. alcohol_id는 보고 있던 상세의 위스키다.
   similar_alcohol_click: {
