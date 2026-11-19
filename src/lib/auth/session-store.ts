@@ -2,6 +2,10 @@
 
 import { UserData } from '@/types/Auth';
 import type { LoginPayload } from '@/lib/auth/login-payload';
+import {
+  reportAuthSnapshot,
+  resetAuthStateReportForTest,
+} from '@/utils/analytics/authState';
 
 export type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
@@ -13,6 +17,7 @@ export interface ClientSession {
 export interface LoginResult {
   session: ClientSession;
   agreementRequired: boolean;
+  isFirstLogin: boolean;
 }
 
 type SessionListener = () => void;
@@ -38,6 +43,8 @@ const notify = () => {
 
 const setSnapshot = (nextSnapshot: SessionSnapshot) => {
   snapshot = nextSnapshot;
+  // 로그인 직후의 sign_up·login보다 먼저 회원 번호가 데이터 영역에 들어가야 한다.
+  reportAuthSnapshot(nextSnapshot);
   notify();
 };
 
@@ -169,9 +176,10 @@ export const loginAuthSession = async (
     throw new Error(errorBody?.message || 'Login failed');
   }
 
-  const { agreementRequired, ...session } =
+  const { agreementRequired, isFirstLogin, ...session } =
     (await response.json()) as ClientSession & {
       agreementRequired: boolean;
+      isFirstLogin?: boolean;
     };
 
   if (typeof agreementRequired !== 'boolean') {
@@ -182,6 +190,8 @@ export const loginAuthSession = async (
   return {
     session,
     agreementRequired,
+    // 스펙상 필수 필드가 아니므로 없으면 기존 회원으로 본다.
+    isFirstLogin: isFirstLogin === true,
   };
 };
 
@@ -203,5 +213,6 @@ export const resetAuthSessionForTest = () => {
   };
   restorePromise = null;
   refreshPromise = null;
+  resetAuthStateReportForTest();
   notify();
 };

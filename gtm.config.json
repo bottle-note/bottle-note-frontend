@@ -21,8 +21,12 @@
       "baseTagName": "Google Tag - GA4 Prod"
     }
   },
+  "googleTag": {
+    "configParameters": ["user_id"]
+  },
   "events": [
     { "name": "login", "parameters": ["method", "trigger", "gate_page"] },
+    { "name": "sign_up", "parameters": ["method", "trigger", "gate_page"] },
     {
       "name": "rate_alcohol",
       "parameters": ["alcohol_id", "alcohol_name"]

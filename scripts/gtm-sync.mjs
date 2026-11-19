@@ -109,6 +109,11 @@ function validateConfig(config) {
       errors.push(`${name}: baseTagName이 필요합니다.`);
   }
 
+  const configParameters = config.googleTag?.configParameters;
+  if (!Array.isArray(configParameters)) {
+    errors.push('googleTag.configParameters는 배열이어야 합니다.');
+  }
+
   for (const event of config.events ?? []) {
     if (!event.name) errors.push('이름이 없는 이벤트가 있습니다.');
     if (eventNames.has(event.name)) errors.push(`중복 이벤트: ${event.name}`);
@@ -118,10 +123,27 @@ function validateConfig(config) {
       errors.push(`${event.name}: parameters는 배열이어야 합니다.`);
     } else if (new Set(event.parameters).size !== event.parameters.length) {
       errors.push(`${event.name}: 중복 매개변수가 있습니다.`);
+    } else if (
+      event.parameters.some((name) => configParameters?.includes(name))
+    ) {
+      // user_id 같은 구성 매개변수는 이벤트 매개변수로 보내면 GA4가 사용자 식별에 쓰지 않는다.
+      errors.push(
+        `${event.name}: 기본 태그 구성 매개변수는 이벤트 매개변수로 보내지 않습니다.`,
+      );
     }
   }
 
   if (errors.length > 0) throw new Error(errors.join('\n'));
+}
+
+// 이벤트·기본 태그 구성에 쓰이는 데이터 영역 변수 이름을 모은다.
+function listParameterNames(config) {
+  return [
+    ...new Set([
+      ...config.events.flatMap((event) => event.parameters),
+      ...config.googleTag.configParameters,
+    ]),
+  ].sort();
 }
 
 // GTM 항목을 복제하면서 GTM이 부여하는 ID·경로 필드를 지운다.
@@ -211,29 +233,43 @@ function buildEventTag(template, event, measurementId, triggerId) {
   }
   const isEventSettingsTable = eventParameters.key === 'eventSettingsTable';
   eventParameters.type = 'list';
-  eventParameters.list = event.parameters.map((name) => ({
-    type: 'map',
-    map: [
-      {
-        type: 'template',
-        key: isEventSettingsTable ? 'parameter' : 'name',
-        value: name,
-      },
-      {
-        type: 'template',
-        key: isEventSettingsTable ? 'parameterValue' : 'value',
-        value: `{{DLV - ${name}}}`,
-      },
-    ],
-  }));
+  eventParameters.list = buildSettingsRows(
+    event.parameters,
+    isEventSettingsTable ? 'parameter' : 'name',
+    isEventSettingsTable ? 'parameterValue' : 'value',
+  );
   delete eventParameters.value;
   delete eventParameters.map;
 
   return tag;
 }
 
-// 환경별 측정 ID를 넣은 기본 Google 태그를 만든다.
-function buildBaseTag(template, name, measurementId) {
+// 매개변수 이름마다 같은 이름의 데이터 영역 변수를 읽는 설정 표 항목을 만든다.
+function buildSettingsRows(names, nameKey, valueKey) {
+  return names.map((name) => ({
+    type: 'map',
+    map: [
+      { type: 'template', key: nameKey, value: name },
+      { type: 'template', key: valueKey, value: `{{DLV - ${name}}}` },
+    ],
+  }));
+}
+
+// 기본 Google 태그의 구성 매개변수 표를 설정 값으로 바꾼다.
+function setConfigSettings(tag, names) {
+  tag.parameter = tag.parameter.filter(
+    (parameter) => parameter.key !== 'configSettingsTable',
+  );
+  if (names.length === 0) return;
+  tag.parameter.push({
+    type: 'list',
+    key: 'configSettingsTable',
+    list: buildSettingsRows(names, 'parameter', 'parameterValue'),
+  });
+}
+
+// 환경별 측정 ID·구성 매개변수를 넣은 기본 Google 태그를 만든다. 실행 트리거는 템플릿을 따른다.
+function buildBaseTag(template, { name, measurementId, configParameters }) {
   const tag = cloneResource(template);
   tag.name = name;
   const measurementParameter = findMeasurementParameter(tag.parameter);
@@ -241,6 +277,7 @@ function buildBaseTag(template, name, measurementId) {
     throw new Error('Google 태그 템플릿에서 측정 ID를 찾지 못했습니다.');
   }
   measurementParameter.value = measurementId;
+  setConfigSettings(tag, configParameters);
   return tag;
 }
 
@@ -574,9 +611,7 @@ async function main() {
   const config = JSON.parse(await fs.readFile(CONFIG_PATH, 'utf8'));
   validateConfig(config);
   if (args.validate) {
-    const parameterCount = new Set(
-      config.events.flatMap((event) => event.parameters),
-    ).size;
+    const parameterCount = listParameterNames(config).length;
     console.log(
       `GTM 설정 정상: 이벤트 ${config.events.length}개, 변수 ${parameterCount}개`,
     );
@@ -636,9 +671,7 @@ async function main() {
     `${args.apply ? 'APPLY' : 'DRY-RUN'} ${args.env} → ${workspace.path}`,
   );
 
-  const parameterNames = [
-    ...new Set(config.events.flatMap((event) => event.parameters)),
-  ].sort();
+  const parameterNames = listParameterNames(config);
   const variables = await syncCollection({
     api,
     apply: args.apply,
@@ -677,11 +710,11 @@ async function main() {
       trigger.triggerId,
     );
   });
-  const baseTag = buildBaseTag(
-    baseTagTemplate,
-    environment.baseTagName,
+  const baseTag = buildBaseTag(baseTagTemplate, {
+    name: environment.baseTagName,
     measurementId,
-  );
+    configParameters: config.googleTag.configParameters,
+  });
   const tags = await syncCollection({
     api,
     apply: args.apply,

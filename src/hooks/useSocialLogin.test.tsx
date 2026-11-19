@@ -41,8 +41,9 @@ jest.mock('@/utils/analytics/ga4', () => ({
   trackGA4Event: jest.fn(),
 }));
 
-const loginResult = (agreementRequired: boolean) => ({
+const loginResult = (agreementRequired: boolean, isFirstLogin = false) => ({
   agreementRequired,
+  isFirstLogin,
   session: {
     accessToken: 'access-token',
     user: {
@@ -231,6 +232,33 @@ describe('useSocialLogin', () => {
     expect(trackGA4Event).toHaveBeenCalledWith('login_prompt_converted', {
       trigger: 'review_write',
     });
+    expect(trackGA4Event).not.toHaveBeenCalledWith(
+      'sign_up',
+      expect.anything(),
+    );
+  });
+
+  it('첫 로그인 응답이면 login 전에 sign_up을 한 번 보낸다', async () => {
+    // 필수 동의가 없어도 첫 로그인이면 가입으로 본다.
+    loginAuthSessionMock.mockResolvedValueOnce(loginResult(false, true));
+    setLoginContext({ trigger: 'rating', gatePage: 'curation_detail' });
+    const { result } = renderHook(() => useSocialLogin());
+
+    await act(async () => {
+      await result.current.onAppleAppLoginSuccess(
+        JSON.stringify({ idToken: 'id-token', nonce: 'nonce' }),
+      );
+    });
+
+    const params = {
+      method: 'apple',
+      trigger: 'rating',
+      gate_page: 'curation_detail',
+    };
+    expect(jest.mocked(trackGA4Event).mock.calls.slice(0, 2)).toEqual([
+      ['sign_up', params],
+      ['login', params],
+    ]);
   });
 
   it('로그인 게이트를 거쳐 로그인하면 게이트 위치를 로그인 이벤트에 기록한다', async () => {

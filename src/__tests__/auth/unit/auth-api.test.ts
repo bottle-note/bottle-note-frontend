@@ -71,8 +71,34 @@ describe('카카오 v2 로그인 API 계약', () => {
       accessToken: 'bottle-access-token',
       refreshToken: 'bottle-refresh-token',
       agreementRequired: false,
+      isFirstLogin: false,
     });
   });
+
+  it.each([
+    [true, true],
+    [undefined, false],
+  ])(
+    '응답의 isFirstLogin=%s를 첫 로그인 여부 %s로 전달한다',
+    async (isFirstLogin, expected) => {
+      fetchMock.mockResolvedValueOnce(
+        createResponse({
+          body: {
+            accessToken: 'bottle-access-token',
+            isFirstLogin,
+            agreementRequired: true,
+          },
+          refreshToken: 'bottle-refresh-token',
+        }),
+      );
+
+      const tokens = await AuthApi.server.kakaoLogin({
+        accessToken: 'kakao-sdk-access-token',
+      });
+
+      expect(tokens.isFirstLogin).toBe(expected);
+    },
+  );
 
   it('v2 검증 API가 실패하면 로그인 실패로 처리한다', async () => {
     fetchMock.mockResolvedValueOnce(

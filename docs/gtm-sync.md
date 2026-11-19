@@ -1,6 +1,9 @@
 # GTM 일괄 동기화
 
-`gtm.config.json`을 기준으로 데이터 영역 변수, 맞춤 이벤트 트리거, GA4 이벤트 태그를 GTM 작업공간에 맞춘다. 같은 이름의 항목이 있으면 수정하고 없으면 생성한다.
+`gtm.config.json`을 기준으로 데이터 영역 변수, 맞춤 이벤트 트리거, GA4 이벤트 태그, 기본 Google 태그의 측정 ID·구성 매개변수를 GTM 작업공간에 맞춘다. 같은 이름의 항목이 있으면 수정하고 없으면 생성한다.
+
+- `googleTag.configParameters`: 기본 태그 구성 매개변수(구성 설정 표). 같은 이름의 `DLV - ` 변수 값을 넣는다. 이벤트 `parameters`에는 같은 이름을 쓸 수 없다.
+- 기본 태그의 실행 트리거(`Initialization - All Pages`)와 실행 옵션은 템플릿 태그를 그대로 따른다.
 
 설정에서 이벤트나 매개변수를 빼면 해당 항목을 삭제한다. 삭제 대상은 스크립트가 관리하는 이름(`GA4 Event - `·`CE - `·`DLV - `로 시작) 중 설정에 없는 것이며, 기본 Google 태그와 `templates`에 지정한 항목, 다른 태그·트리거·변수가 참조 중인 항목은 지우지 않고 `SKIP`으로 표시한다. 비교 실행에서 `DELETE`로 표시한 항목은 `--apply`(CI 포함) 때 작업공간에서 지워지며, prod는 게시 전까지 운영 컨테이너에 그대로 남는다.
 
@@ -61,6 +64,23 @@ pnpm run gtm:sync -- --env dev --publish --version-name "2026-10-24 요약"
 ## 진입 위치 매개변수 `entry_source`
 
 같은 이벤트를 여러 위치에서 보낼 때 위치는 `entry_source`로 구분한다. GA4는 이벤트 매개변수 `entry_source`·`medium`·`campaign`을 트래픽 출처로 해석해 세션 출처를 덮어쓰므로, 이 이름들을 이벤트 매개변수로 쓰지 않는다.
+
+## 회원 번호 `user_id`와 `auth_state`
+
+모든 이벤트의 GA4 `user_id`는 숫자 회원 번호(`UserData.userId`)를 문자열로 보낸 값이며 비회원은 비운다. 회원·비회원 구분은 GA4 기본 측정기준 `signedInWithUserId`로 본다.
+
+- 세션 스토어(`src/lib/auth/session-store.ts`)가 상태를 바꿀 때(복원·로그인·갱신·로그아웃) 데이터 영역에 `{ event: 'auth_state', user_id }`를 넣는다. 비회원·로그아웃은 `null`이며 빈 문자열이나 `'null'`은 쓰지 않는다. 확인 중(`loading`)에는 넣지 않고 같은 값은 다시 넣지 않는다.
+- 상태 변경과 같은 호출 안에서 넣으므로 로그인 직후의 `sign_up`·`login`보다 먼저 들어간다.
+- `user_id`는 [공식 안내](https://developers.google.com/analytics/devguides/collection/ga4/user-id?client_type=gtm)대로 기본 Google 태그의 구성 매개변수(`{{DLV - user_id}}`)로만 보내고 이벤트 매개변수로는 보내지 않는다. `auth_state`는 GTM 트리거로 쓰지 않는다.
+- 기본 태그는 `Initialization - All Pages`에서 실행되므로 세션 복원 전에 나가는 첫 `page_view`에는 회원 번호가 없다.
+
+## 가입 이벤트 `sign_up`
+
+| 이벤트    | 발화 조건                                                                      | 매개변수                         | 중복 방지             |
+| --------- | ------------------------------------------------------------------------------ | -------------------------------- | --------------------- |
+| `sign_up` | 카카오·애플 로그인 응답(`OauthResponse`)의 `isFirstLogin`이 true. `login` 직전 | `method`, `trigger`, `gate_page` | 첫 로그인 응답 뒤 1회 |
+
+필수 동의 필요 여부(`agreementRequired`)로 가입을 판단하지 않는다. `isFirstLogin`이 없으면 기존 회원으로 본다. 같은 로그인에서 `login`도 함께 나간다.
 
 ## 리뷰 이벤트 기준
 

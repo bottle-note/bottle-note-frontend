@@ -64,6 +64,12 @@ export interface GA4EventMap {
     trigger?: LoginTrigger;
     gate_page?: LoginGatePage;
   };
+  // 백엔드가 첫 로그인(회원 생성)으로 응답한 로그인. 같은 로그인의 login보다 먼저 보낸다.
+  sign_up: {
+    method: LoginMethod;
+    trigger?: LoginTrigger;
+    gate_page?: LoginGatePage;
+  };
   rate_alcohol: {
     alcohol_id: string;
     alcohol_name: string;
