@@ -35,12 +35,9 @@ export default function AutoHideLogoHeader({
         sticky && 'sticky top-0',
         shouldShowHeader
           ? 'translate-y-0 opacity-100'
-          : cn(
-              'pointer-events-none opacity-0',
-              sticky
-                ? '-translate-y-full'
-                : '-translate-y-[var(--logo-header-slide-distance)]',
-            ),
+          : sticky
+            ? 'pointer-events-none -translate-y-full opacity-0'
+            : 'hidden',
         className,
       )}
     >

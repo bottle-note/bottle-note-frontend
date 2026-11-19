@@ -14,8 +14,6 @@ interface StickySearchBarProps
   description?: string;
   containerClassName?: string;
   testId?: string;
-  headerExpandedHeight?: string;
-  headerSlideDistance?: string;
 }
 
 export default function StickySearchBar({
@@ -24,36 +22,23 @@ export default function StickySearchBar({
   description,
   containerClassName,
   testId,
-  headerExpandedHeight = 'var(--logo-header-expanded-height)',
-  headerSlideDistance = 'var(--logo-header-slide-distance)',
   placeholder = '키워드를 입력하세요',
   ...searchBarProps
 }: StickySearchBarProps) {
   const { isNavigationVisible } = useNavLayout();
   const shouldShowSearchBar = isSearchActive || isNavigationVisible;
-  const searchBarTransform = isSearchActive
-    ? `translateY(calc(-1 * ${headerSlideDistance}))`
-    : isNavigationVisible
-      ? 'translateY(0)'
-      : `translateY(calc(-100% - ${headerSlideDistance}))`;
 
   return (
     <section
       data-testid={testId}
+      data-visible={shouldShowSearchBar}
       className={cn(
-        'scroll-navigation-motion sticky z-[9] bg-bg-layer-default text-fg-neutral transition-[transform,opacity,margin-bottom]',
+        'scroll-navigation-motion sticky top-[calc(var(--safe-area-top)+var(--bookmark-tab-height))] z-[9] bg-bg-layer-default text-fg-neutral transition-[transform,opacity]',
         shouldShowSearchBar
-          ? 'pointer-events-auto opacity-100'
-          : 'pointer-events-none opacity-0',
+          ? 'pointer-events-auto translate-y-0 opacity-100'
+          : 'pointer-events-none -translate-y-full opacity-0',
         containerClassName,
       )}
-      style={{
-        top: headerExpandedHeight,
-        transform: searchBarTransform,
-        marginBottom: isSearchActive
-          ? `calc(-1 * ${headerSlideDistance})`
-          : '0px',
-      }}
     >
       <article className="relative w-full">
         <UnderlineSearchBar

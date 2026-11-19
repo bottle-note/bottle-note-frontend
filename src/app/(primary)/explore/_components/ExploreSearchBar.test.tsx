@@ -127,36 +127,29 @@ describe('ExploreSearchBar', () => {
     const searchBar = screen.getByTestId('explore-search-bar');
     expect(searchBar).toHaveClass(
       'sticky',
-      'transition-[transform,opacity,margin-bottom]',
-      'scroll-navigation-motion',
+      'top-[calc(var(--safe-area-top)+var(--bookmark-tab-height))]',
+      'translate-y-0',
       'opacity-100',
     );
-    expect(searchBar).toHaveStyle({
-      top: 'var(--logo-header-expanded-height)',
-      transform: 'translateY(0)',
-      marginBottom: '0px',
-    });
 
     mockUseNavLayout.mockReturnValue({ isNavigationVisible: false });
     rerender(<ExploreSearchBar {...props} />);
 
+    expect(searchBar).toHaveAttribute('data-visible', 'false');
     expect(searchBar).toHaveClass(
       'pointer-events-none',
-      'transition-[transform,opacity,margin-bottom]',
-      'scroll-navigation-motion',
+      '-translate-y-full',
       'opacity-0',
     );
-    expect(searchBar).toHaveStyle({
-      transform: 'translateY(calc(-100% - var(--logo-header-slide-distance)))',
-    });
 
     rerender(<ExploreSearchBar {...props} isSearchActive />);
 
-    expect(searchBar).toHaveClass('pointer-events-auto', 'opacity-100');
-    expect(searchBar).toHaveStyle({
-      transform: 'translateY(calc(-1 * var(--logo-header-slide-distance)))',
-      marginBottom: 'calc(-1 * var(--logo-header-slide-distance))',
-    });
+    expect(searchBar).toHaveAttribute('data-visible', 'true');
+    expect(searchBar).toHaveClass(
+      'pointer-events-auto',
+      'translate-y-0',
+      'opacity-100',
+    );
   });
 
   it('리뷰도 검색어 추가 버튼 없이 실시간 입력 변경을 전달한다', () => {

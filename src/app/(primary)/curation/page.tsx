@@ -218,12 +218,7 @@ export default function CurationPage() {
       onTabChange={handleTabChange}
     >
       {({ isSearchActive, onSearchActiveChange }) => (
-        <section
-          className="w-full bg-bg-layer-default text-fg-neutral"
-          style={{
-            marginTop: 'var(--logo-header-expanded-height)',
-          }}
-        >
+        <section className="w-full bg-bg-layer-default text-fg-neutral">
           <StickySearchBar
             testId="curation-search-bar"
             containerClassName="px-20 pb-28 pt-5"

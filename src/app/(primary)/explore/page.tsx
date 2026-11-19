@@ -57,7 +57,6 @@ function ExploreContent({ currentTabId }: { currentTabId: ExploreTabId }) {
       <section
         data-testid="explore-content"
         className="h-full w-full px-20 pb-16 pt-0"
-        style={{ marginTop: 'var(--logo-header-expanded-height)' }}
       >
         {currentTabId === WHISKEY_EXPLORE_TAB_ID && (
           <WhiskeyExplorerList
