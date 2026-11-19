@@ -83,10 +83,6 @@ describe('ExplorePage scroll header', () => {
       'bg-bg-layer-default',
       'text-fg-neutral',
     );
-    expect(screen.getByTestId('tabbed-list-page')).toHaveAttribute(
-      'data-header-collapsed',
-      'false',
-    );
     expect(screen.getByTestId('explore-logo-row')).toBeInTheDocument();
     expect(screen.getByTestId('explore-logo-row')).toHaveAttribute(
       'data-visible',
@@ -94,7 +90,7 @@ describe('ExplorePage scroll header', () => {
     );
   });
 
-  it('아래로 스크롤하면 BottleNote 로고 영역을 접고 탭만 유지한다', () => {
+  it('로고는 문서 흐름에 남아 스크롤로 사라지고, 책갈피는 safe area 아래에 붙는다', () => {
     mockUseNavLayout.mockReturnValue({
       isNavigationVisible: false,
       setNavbarSuppressed: mockSetNavbarSuppressed,
@@ -102,13 +98,13 @@ describe('ExplorePage scroll header', () => {
 
     render(<ExplorePage />);
 
-    expect(screen.getByTestId('tabbed-list-page')).toHaveAttribute(
-      'data-header-collapsed',
-      'true',
-    );
     expect(screen.getByTestId('explore-logo-row')).toHaveAttribute(
       'data-visible',
-      'false',
+      'true',
+    );
+    expect(screen.getByTestId('tabbed-list-bookmark')).toHaveClass(
+      'sticky',
+      'top-[var(--safe-area-top)]',
     );
     expect(screen.getByTestId('explore-tabs')).toBeInTheDocument();
   });
@@ -122,10 +118,6 @@ describe('ExplorePage scroll header', () => {
 
     expect(screen.getByTestId('tabbed-list-page')).toHaveAttribute(
       'data-search-active',
-      'true',
-    );
-    expect(screen.getByTestId('tabbed-list-page')).toHaveAttribute(
-      'data-header-collapsed',
       'true',
     );
     expect(screen.getByTestId('explore-logo-row')).toHaveAttribute(

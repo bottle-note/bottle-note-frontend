@@ -50,7 +50,7 @@ export default function TabbedListPageHeader<T extends TabItem>({
   onTabChange,
   children,
 }: TabbedListPageHeaderProps<T>) {
-  const { isNavigationVisible, setNavbarSuppressed } = useNavLayout();
+  const { setNavbarSuppressed } = useNavLayout();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const {
     currentTab: activeTab,
@@ -61,7 +61,6 @@ export default function TabbedListPageHeader<T extends TabItem>({
     activeTab: currentTab,
     scroll: true,
   });
-  const isHeaderCollapsed = isSearchActive || !isNavigationVisible;
 
   const onSearchActiveChange = useCallback(
     (active: boolean) => {
@@ -89,30 +88,25 @@ export default function TabbedListPageHeader<T extends TabItem>({
 
   return (
     <TabbedListPageSearchContext.Provider value={searchContextValue}>
-      <div
-        data-testid="tabbed-list-page"
-        data-search-active={isSearchActive}
-        data-header-collapsed={isHeaderCollapsed}
-      >
-        <div className="fixed-content top-0 z-10 bg-bg-layer-default">
-          <AutoHideLogoHeader isVisible={!isHeaderCollapsed} sticky={false} />
-          <div
-            className="scroll-navigation-motion absolute inset-x-0 top-[var(--header-height-with-safe)] transition-transform"
-            style={{
-              transform: isHeaderCollapsed
-                ? 'translateY(0)'
-                : 'translateY(var(--logo-header-slide-distance))',
-            }}
-          >
-            <Tab
-              variant="bookmark"
-              tabList={[...tabList]}
-              handleTab={onTabChange}
-              currentTab={activeTab}
-              scrollContainerRef={refs.scrollContainerRef}
-              registerTab={registerTab}
-            />
-          </div>
+      <div data-testid="tabbed-list-page" data-search-active={isSearchActive}>
+        {/* 로고가 스크롤되어 사라진 뒤에도 시스템 바 뒤로 목록이 비치지 않게 가린다 */}
+        <div
+          aria-hidden
+          className="fixed-content top-0 z-20 h-[var(--safe-area-top)] bg-bg-layer-default"
+        />
+        <AutoHideLogoHeader isVisible={!isSearchActive} sticky={false} />
+        <div
+          data-testid="tabbed-list-bookmark"
+          className="sticky top-[var(--safe-area-top)] z-10 bg-bg-layer-default"
+        >
+          <Tab
+            variant="bookmark"
+            tabList={[...tabList]}
+            handleTab={onTabChange}
+            currentTab={activeTab}
+            scrollContainerRef={refs.scrollContainerRef}
+            registerTab={registerTab}
+          />
         </div>
         {typeof children === 'function'
           ? children(searchContextValue)

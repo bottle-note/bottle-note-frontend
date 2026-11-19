@@ -112,10 +112,7 @@ export default function ImporterList() {
 
   return (
     <div className="min-h-safe-screen bg-bg-layer-default text-fg-neutral">
-      <section
-        className="w-full px-20 pb-navbar"
-        style={{ marginTop: 'var(--logo-header-expanded-height)' }}
-      >
+      <section className="w-full px-20 pb-navbar">
         <h1 className="sr-only">수입사</h1>
         <ImporterFilter
           isSearchActive={isSearchActive}
