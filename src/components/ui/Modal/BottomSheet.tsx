@@ -2,7 +2,6 @@
 
 import { Drawer } from 'vaul';
 import { cn } from '@/lib/utils';
-import { useOverlayWidthClass } from '@/components/ui/Layout/ContentWidth';
 
 interface BottomSheetProps {
   isOpen: boolean;
@@ -22,8 +21,6 @@ export default function BottomSheet({
   className = '',
   overlayClassName = '',
 }: BottomSheetProps) {
-  const overlayWidthClass = useOverlayWidthClass();
-
   return (
     <Drawer.Root
       open={isOpen}
@@ -36,8 +33,7 @@ export default function BottomSheet({
         />
         <Drawer.Content
           className={cn(
-            'fixed bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-2xl bg-bg-layer-floating text-fg-neutral max-w-content mx-auto',
-            overlayWidthClass,
+            'fixed bottom-0 left-0 right-0 z-50 flex flex-col rounded-t-2xl bg-bg-layer-floating text-fg-neutral content-width-overlay max-w-content mx-auto',
             className,
           )}
           style={{ height: `${height}vh` }}

@@ -2,7 +2,6 @@ import Image from 'next/image';
 import BackDrop from '@/components/ui/Modal/BackDrop';
 import useModalStore from '@/store/modalStore';
 import Button, { DualButton } from '@/components/ui/Button/Button';
-import { useOverlayWidthClass } from '@/components/ui/Layout/ContentWidth';
 
 interface Props {
   children?: React.ReactNode;
@@ -10,7 +9,6 @@ interface Props {
 
 function Modal({ children }: Props) {
   const { handleCloseModal, state } = useModalStore();
-  const overlayWidthClass = useOverlayWidthClass();
 
   const handleOkayClick = () => {
     if (state.handleConfirm) state.handleConfirm();
@@ -24,9 +22,7 @@ function Modal({ children }: Props) {
 
   return (
     <BackDrop isShow={state.isShowModal} className="z-[60]">
-      <div
-        className={`content-container ${overlayWidthClass} h-full flex flex-col justify-center items-center px-16 gap-12`}
-      >
+      <div className="content-container content-width-overlay h-full flex flex-col justify-center items-center px-16 gap-12">
         <section className="relative w-full min-h-208 pt-64 pb-16 bg-bg-layer-floating text-fg-neutral rounded-xl text-center flex flex-col items-center space-y-12 px-16">
           <article className="absolute top-[-10px]">
             <Image

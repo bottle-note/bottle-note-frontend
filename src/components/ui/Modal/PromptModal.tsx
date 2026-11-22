@@ -4,7 +4,6 @@ import { useId } from 'react';
 import Image from 'next/image';
 import Button from '@/components/ui/Button/Button';
 import BackDrop from '@/components/ui/Modal/BackDrop';
-import { useOverlayWidthClass } from '@/components/ui/Layout/ContentWidth';
 
 interface Props {
   mainText: string;
@@ -25,13 +24,10 @@ function PromptModal({
 }: Props) {
   const titleId = useId();
   const descriptionId = useId();
-  const overlayWidthClass = useOverlayWidthClass();
 
   return (
     <BackDrop isShow>
-      <div
-        className={`content-container ${overlayWidthClass} flex h-full w-full flex-col items-center justify-end gap-12 px-16 pb-safe`}
-      >
+      <div className="content-container content-width-overlay flex h-full w-full flex-col items-center justify-end gap-12 px-16 pb-safe">
         <section
           aria-describedby={descriptionId}
           aria-labelledby={titleId}
