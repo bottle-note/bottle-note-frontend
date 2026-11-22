@@ -320,13 +320,14 @@ describe('홈 에디터 추천', () => {
 });
 
 describe('홈 최신 리뷰', () => {
-  it('최신순 리뷰 3개를 작성일과 함께 보여주고 리뷰 상세와 둘러보기 리뷰 탭으로 연결한다', async () => {
+  it('최신순 리뷰 4개를 작성일과 함께 보여주고 리뷰 상세와 둘러보기 리뷰 탭으로 연결한다', async () => {
     vi.mocked(ExploreApi.getReviews).mockResolvedValue({
       data: {
         items: [
           review(31, '스프링뱅크 10년'),
           review(32, '라프로익 10년'),
           review(33, '야마자키 12년'),
+          review(34, '글렌드로낙 12년'),
         ],
       },
     } as never);
@@ -341,9 +342,9 @@ describe('홈 최신 리뷰', () => {
     expect(ExploreApi.getReviews).toHaveBeenCalledWith({
       sortType: 'LATEST',
       sortOrder: 'DESC',
-      size: 3,
+      size: 4,
     });
-    expect(items).toHaveLength(3);
+    expect(items).toHaveLength(4);
 
     const second = within(items[1]).getByRole('link');
     expect(second).toHaveAttribute('href', ROUTES.REVIEW.DETAIL(32));
