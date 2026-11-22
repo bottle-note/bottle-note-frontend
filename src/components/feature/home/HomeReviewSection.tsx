@@ -14,8 +14,7 @@ import { formatDate } from '@/utils/formatDate';
 import SectionHeader from '@/components/ui/Display/SectionHeader';
 import { HomeFeaturedErrorState } from './_components/HomeFeaturedErrorState';
 
-const SECTION_LABEL = 'REVIEW';
-const SECTION_TITLE = '한 잔에 담긴 이야기';
+const SECTION_TITLE = '다른 사람들이 남긴 최근 리뷰를 확인해보세요';
 const MAX_TAGS = 3;
 
 /** 최신 리뷰 3개. 비어 있으면 섹션을 숨긴다. */
@@ -29,7 +28,6 @@ export default function HomeReviewSection() {
   return (
     <section aria-label="최신 리뷰" className="space-y-8">
       <SectionHeader
-        label={SECTION_LABEL}
         title={SECTION_TITLE}
         moreHref={`${ROUTES.EXPLORE.BASE}?tab=${REVIEW_EXPLORE_TAB_ID}`}
         moreLabel="리뷰 더 보기"
@@ -44,7 +42,7 @@ export default function HomeReviewSection() {
       )}
       {isError && <HomeFeaturedErrorState onRetry={() => refetch()} />}
       {reviews && reviews.length > 0 && (
-        <ul className="px-20">
+        <ul className="px-20 fold:grid fold:grid-cols-2 fold:gap-x-32">
           {reviews.map((review, index) => (
             <HomeReviewItem
               key={review.reviewId}

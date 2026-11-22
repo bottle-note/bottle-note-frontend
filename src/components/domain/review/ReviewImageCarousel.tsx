@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures';
 
 import {
   Carousel,
@@ -39,11 +41,40 @@ export const convertImageUrlsToProductImageArray = (
 
 interface ReviewImageCarouselProps {
   images: ProductImage[];
-  /** 있으면 사진 앞 첫 장에 테이스팅 그래프를 둔다. */
+  /** 있으면 사진 뒤 마지막 장에 테이스팅 그래프를 둔다. */
   tastingProfile?: ReviewTastingProfile | null;
   priority?: boolean;
   className?: string;
+  /** 있으면 각 장을 누를 때 이 주소로 간다. 카드의 대표 링크와 같은 곳이라 탭 순서에서는 뺀다. */
+  slideHref?: string;
 }
+
+// 사진은 대표 링크와 같은 곳으로 가는 중복 링크라 읽기 대상에서도 뺀다.
+// 테이스팅 그래프는 본문에 없는 정보를 담고 있어 읽을 수 있게 남긴다.
+function SlideLink({
+  href,
+  hideFromReader,
+  children,
+}: {
+  href?: string;
+  hideFromReader: boolean;
+  children: React.ReactNode;
+}) {
+  if (!href) return children;
+  return (
+    <Link
+      href={href}
+      tabIndex={-1}
+      aria-hidden={hideFromReader || undefined}
+      className="block"
+    >
+      {children}
+    </Link>
+  );
+}
+
+const CAROUSEL_ARROW_CLASS =
+  'hidden border-0 bg-bg-overlay-muted text-palette-static-white hover:bg-bg-overlay-muted hover:text-palette-static-white disabled:opacity-0 [@media(hover:hover)]:inline-flex';
 
 const SLIDE_FRAME_CLASS =
   'relative aspect-square overflow-hidden rounded-md border border-stroke-neutral-subtle';
@@ -53,9 +84,12 @@ export const ReviewImageCarousel = ({
   tastingProfile,
   priority = false,
   className,
+  slideHref,
 }: ReviewImageCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+  // 트랙패드·매직 마우스 가로 스와이프로도 넘긴다. 렌더마다 새로 만들면 캐러셀이 다시 초기화된다.
+  const [plugins] = useState(() => [WheelGesturesPlugin()]);
 
   useEffect(() => {
     if (!api) {
@@ -84,6 +118,7 @@ export const ReviewImageCarousel = ({
   return (
     <Carousel
       setApi={setApi}
+      plugins={plugins}
       opts={{
         align: 'start',
         loop: true,
@@ -91,30 +126,37 @@ export const ReviewImageCarousel = ({
       className={cn('w-full bg-bg-layer-default', className)}
     >
       <CarouselContent>
-        {hasGraph && (
-          <CarouselItem className={itemClassName}>
-            <div
-              className={`${SLIDE_FRAME_CLASS} flex items-center justify-center p-12`}
-            >
-              <ReviewTastingProfileChart profile={tastingProfile} size={340} />
-            </div>
-          </CarouselItem>
-        )}
         {images.map((image, index) => (
           <CarouselItem key={image.id} className={itemClassName}>
-            <div className={`${SLIDE_FRAME_CLASS} bg-bg-neutral-weak`}>
-              <BaseImage
-                src={image.src}
-                alt={image.alt}
-                fill
-                quality={80}
-                sizes={CONTENT_INSET_IMAGE_SIZES}
-                priority={priority && index === 0 && !hasGraph}
-                className="object-cover"
-              />
-            </div>
+            <SlideLink href={slideHref} hideFromReader>
+              <div className={`${SLIDE_FRAME_CLASS} bg-bg-neutral-weak`}>
+                <BaseImage
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  quality={80}
+                  sizes={CONTENT_INSET_IMAGE_SIZES}
+                  priority={priority && index === 0}
+                  className="object-cover"
+                />
+              </div>
+            </SlideLink>
           </CarouselItem>
         ))}
+        {hasGraph && (
+          <CarouselItem className={itemClassName}>
+            <SlideLink href={slideHref} hideFromReader={false}>
+              <div
+                className={`${SLIDE_FRAME_CLASS} flex items-center justify-center p-12`}
+              >
+                <ReviewTastingProfileChart
+                  profile={tastingProfile}
+                  size={340}
+                />
+              </div>
+            </SlideLink>
+          </CarouselItem>
+        )}
       </CarouselContent>
       {slideCount > 1 && (
         <div className="absolute bottom-16 left-1/2 flex -translate-x-1/2 gap-6 rounded-full bg-bg-overlay-muted px-8 py-5">
@@ -129,9 +171,19 @@ export const ReviewImageCarousel = ({
           ))}
         </div>
       )}
-      {/* 사진 밖 50px에 두는 버튼이라, 최대 너비(768) 바깥에 그만큼 여백이 생기는 폭부터만 보인다. */}
-      <CarouselPrevious className="absolute left-[-50px] top-1/2 -translate-y-1/2 hidden min-[900px]:inline-flex disabled:opacity-50" />
-      <CarouselNext className="absolute right-[-50px] top-1/2 -translate-y-1/2 hidden min-[900px]:inline-flex disabled:opacity-50" />
+      {slideCount > 1 && (
+        <>
+          {/* 터치 기기는 스와이프로 넘기므로 마우스를 쓰는 기기에서만 사진 안쪽에 버튼을 둔다. */}
+          <CarouselPrevious
+            aria-label="이전 사진"
+            className={cn(CAROUSEL_ARROW_CLASS, 'left-8')}
+          />
+          <CarouselNext
+            aria-label="다음 사진"
+            className={cn(CAROUSEL_ARROW_CLASS, 'right-8')}
+          />
+        </>
+      )}
     </Carousel>
   );
 };

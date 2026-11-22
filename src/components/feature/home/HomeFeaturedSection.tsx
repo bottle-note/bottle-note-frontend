@@ -23,8 +23,8 @@ export default function HomeFeaturedSection() {
       tabList={TAB_LIST}
       scroll
       renderHeader={(currentTab) => {
-        const { label, title } = HOME_FEATURED_CONFIG[currentTab.id];
-        return <SectionHeader label={label} title={title} />;
+        const { title } = HOME_FEATURED_CONFIG[currentTab.id];
+        return <SectionHeader title={title} />;
       }}
     >
       {(currentTab) => (

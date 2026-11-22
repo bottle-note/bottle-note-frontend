@@ -289,7 +289,7 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
           {banners.map((banner, index) => (
             <CarouselItem key={banner.id} className="!pl-0">
               <div
-                className="relative w-full h-227 overflow-hidden flex items-center justify-center"
+                className="relative w-full h-227 overflow-hidden flex items-center justify-center fold:h-280"
                 style={
                   failedBannerIds.has(banner.id)
                     ? { visibility: 'hidden', height: 0 }

@@ -24,7 +24,7 @@ function CategoryList() {
   ];
 
   return (
-    <ul>
+    <ul className="fold:grid fold:grid-cols-2 fold:gap-x-32">
       {menu.map((data, index) => (
         <li
           key={data.engName}
