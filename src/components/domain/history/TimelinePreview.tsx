@@ -80,10 +80,7 @@ export default function TimelinePreview({
   return (
     <>
       <div className="my-12 border-t border-stroke-neutral-subtle" />
-      <div
-        data-testid="timeline-preview"
-        className="relative mx-auto w-full max-w-399"
-      >
+      <div data-testid="timeline-preview" className="relative w-full">
         <div
           data-testid="timeline-axis"
           className="absolute bottom-0 left-44 top-24 z-0 w-1 border-l border-dashed border-stroke-brand-solid"

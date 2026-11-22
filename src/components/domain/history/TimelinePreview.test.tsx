@@ -51,13 +51,12 @@ const historyData: ApiResponse<{
 ];
 
 describe('TimelinePreview', () => {
-  it('가용 폭을 사용하되 399px을 넘지 않는다', () => {
+  it('콘텐츠 폭을 모두 쓰고, 점선 축은 왼쪽 날짜 칸 기준 위치를 유지한다', () => {
     render(<TimelinePreview data={historyData} />);
 
-    expect(screen.getByTestId('timeline-preview')).toHaveClass(
-      'w-full',
-      'max-w-399',
-    );
+    const preview = screen.getByTestId('timeline-preview');
+    expect(preview).toHaveClass('w-full');
+    expect(preview).not.toHaveClass('max-w-399');
     expect(screen.getByTestId('timeline-axis')).toHaveClass('left-44');
   });
 });

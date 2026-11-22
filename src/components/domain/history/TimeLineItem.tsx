@@ -6,7 +6,6 @@ import {
 } from '@/app/(primary)/history/_components/HistoryDescription';
 import BaseImage from '@/components/ui/Display/BaseImage';
 import { formatDate } from '@/utils/formatDate';
-import { truncStr } from '@/utils/truncStr';
 import { TimeFormat } from '@/types/FormatDate';
 import { Rate } from '@/types/History';
 
@@ -79,15 +78,15 @@ function TimeLineItem(props: Props) {
         style={{ width: 20, height: 20 }}
       />
       {isStart ? (
-        <div className="w-full max-w-336 rounded-md bg-bg-brand-solid px-12 py-[10.4px] text-12 font-bold text-fg-brand-contrast">
+        <div className="w-full rounded-md bg-bg-brand-solid px-12 py-[10.4px] text-12 font-bold text-fg-brand-contrast">
           보틀노트를 시작하신 날이에요.
         </div>
       ) : (
-        <Link href={redirectUrl || '#'} className="min-w-0 w-full max-w-336">
-          <div className="flex h-56 w-full justify-between rounded-md bg-bg-neutral-weak p-12">
-            <div>
-              <p className="text-12 font-bold text-fg-neutral">
-                {truncStr(alcoholName, 23)}
+        <Link href={redirectUrl || '#'} className="min-w-0 w-full">
+          <div className="flex h-56 w-full justify-between gap-8 rounded-md bg-bg-neutral-weak p-12">
+            <div className="min-w-0">
+              <p className="truncate text-12 font-bold text-fg-neutral">
+                {alcoholName}
               </p>
               {renderDescription && renderDescription(getDescriptionProps())}
             </div>
