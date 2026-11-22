@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures';
 
 import {
@@ -44,6 +45,32 @@ interface ReviewImageCarouselProps {
   tastingProfile?: ReviewTastingProfile | null;
   priority?: boolean;
   className?: string;
+  /** 있으면 각 장을 누를 때 이 주소로 간다. 카드의 대표 링크와 같은 곳이라 탭 순서에서는 뺀다. */
+  slideHref?: string;
+}
+
+// 사진은 대표 링크와 같은 곳으로 가는 중복 링크라 읽기 대상에서도 뺀다.
+// 테이스팅 그래프는 본문에 없는 정보를 담고 있어 읽을 수 있게 남긴다.
+function SlideLink({
+  href,
+  hideFromReader,
+  children,
+}: {
+  href?: string;
+  hideFromReader: boolean;
+  children: React.ReactNode;
+}) {
+  if (!href) return children;
+  return (
+    <Link
+      href={href}
+      tabIndex={-1}
+      aria-hidden={hideFromReader || undefined}
+      className="block"
+    >
+      {children}
+    </Link>
+  );
 }
 
 const CAROUSEL_ARROW_CLASS =
@@ -57,6 +84,7 @@ export const ReviewImageCarousel = ({
   tastingProfile,
   priority = false,
   className,
+  slideHref,
 }: ReviewImageCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
@@ -100,26 +128,33 @@ export const ReviewImageCarousel = ({
       <CarouselContent>
         {images.map((image, index) => (
           <CarouselItem key={image.id} className={itemClassName}>
-            <div className={`${SLIDE_FRAME_CLASS} bg-bg-neutral-weak`}>
-              <BaseImage
-                src={image.src}
-                alt={image.alt}
-                fill
-                quality={80}
-                sizes={CONTENT_INSET_IMAGE_SIZES}
-                priority={priority && index === 0}
-                className="object-cover"
-              />
-            </div>
+            <SlideLink href={slideHref} hideFromReader>
+              <div className={`${SLIDE_FRAME_CLASS} bg-bg-neutral-weak`}>
+                <BaseImage
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  quality={80}
+                  sizes={CONTENT_INSET_IMAGE_SIZES}
+                  priority={priority && index === 0}
+                  className="object-cover"
+                />
+              </div>
+            </SlideLink>
           </CarouselItem>
         ))}
         {hasGraph && (
           <CarouselItem className={itemClassName}>
-            <div
-              className={`${SLIDE_FRAME_CLASS} flex items-center justify-center p-12`}
-            >
-              <ReviewTastingProfileChart profile={tastingProfile} size={340} />
-            </div>
+            <SlideLink href={slideHref} hideFromReader={false}>
+              <div
+                className={`${SLIDE_FRAME_CLASS} flex items-center justify-center p-12`}
+              >
+                <ReviewTastingProfileChart
+                  profile={tastingProfile}
+                  size={340}
+                />
+              </div>
+            </SlideLink>
           </CarouselItem>
         )}
       </CarouselContent>
