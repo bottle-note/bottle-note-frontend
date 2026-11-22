@@ -27,7 +27,7 @@ function PromptModal({
 
   return (
     <BackDrop isShow>
-      <div className="content-container flex h-full w-full flex-col items-center justify-end gap-12 px-16 pb-safe">
+      <div className="content-container content-width-overlay flex h-full w-full flex-col items-center justify-end gap-12 px-16 pb-safe">
         <section
           aria-describedby={descriptionId}
           aria-labelledby={titleId}

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { ProgramFeedItem } from '@/api/curation-v2/types';
 import BaseImage from '@/components/ui/Display/BaseImage';
 import { ROUTES } from '@/constants/routes';
+import { CONTENT_INSET_IMAGE_SIZES } from '@/constants/imageSizes';
 import { getProgramSummary } from '@/app/(primary)/curation/_utils/parseProgramPayload';
 
 interface ProgramFeedCardProps {
@@ -27,7 +28,7 @@ export function ProgramFeedCard({
             alt=""
             fill
             priority={priority}
-            sizes="(max-width: 468px) calc(100vw - 40px), 428px"
+            sizes={CONTENT_INSET_IMAGE_SIZES}
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/30" />

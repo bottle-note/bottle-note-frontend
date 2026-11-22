@@ -145,6 +145,15 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    // fold를 기본 sm보다 앞에 둬야 큰 화면 접두어가 fold 스타일을 덮는다. 나머지는 Tailwind 기본값이다.
+    screens: {
+      fold: '481px',
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1280px',
+      '2xl': '1536px',
+    },
     spacing: { ...pixelSpacing, px: '1px' },
     lineHeight: {
       ...pixelSpacing,
@@ -158,7 +167,7 @@ const config: Config = {
     },
     extend: {
       maxWidth: {
-        content: '468px',
+        content: 'var(--content-max-width)',
       },
       colors: {
         palette: paletteColors,

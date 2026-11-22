@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Autoplay from 'embla-carousel-autoplay';
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { CONTENT_FULL_IMAGE_SIZES } from '@/constants/imageSizes';
 import {
   Carousel,
   CarouselContent,
@@ -99,7 +100,7 @@ function BannerImage({
         src={banner.imageUrl}
         alt={banner.name}
         fill
-        sizes="(max-width: 430px) 100vw, 430px"
+        sizes={CONTENT_FULL_IMAGE_SIZES}
         priority={isPriority}
         quality={100}
         onLoad={() => setIsLoaded(true)}
@@ -288,7 +289,7 @@ export default function HomeCarousel({ banners }: HomeCarouselProps) {
           {banners.map((banner, index) => (
             <CarouselItem key={banner.id} className="!pl-0">
               <div
-                className="relative w-full h-227 overflow-hidden flex items-center justify-center"
+                className="relative w-full h-227 overflow-hidden flex items-center justify-center fold:h-280"
                 style={
                   failedBannerIds.has(banner.id)
                     ? { visibility: 'hidden', height: 0 }

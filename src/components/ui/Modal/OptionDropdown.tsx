@@ -15,7 +15,7 @@ export default function OptionDropdown({
 }: Props) {
   return (
     <BackDrop isShow onBackdropClick={handleClose}>
-      <div className="content-container absolute bottom-0 left-0 right-0 flex flex-col items-center px-16 gap-12 pb-safe">
+      <div className="content-container content-width-overlay absolute bottom-0 left-0 right-0 flex flex-col items-center px-16 gap-12 pb-safe">
         <section className="w-full bg-bg-layer-floating text-fg-neutral rounded-xl divide-y divide-stroke-neutral-subtle max-h-400 overflow-y-scroll">
           <article className="py-16 text-center text-fg-neutral-muted text-sm">
             {title}

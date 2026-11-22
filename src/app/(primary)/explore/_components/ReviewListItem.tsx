@@ -125,14 +125,18 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
           </div>
         </div>
 
-        {/* 리뷰 본문 */}
-        <Link href={ROUTES.REVIEW.DETAIL(content.reviewId)}>
-          <div className="flex flex-col gap-14">
-            <ReviewImageCarousel
-              images={productImages}
-              tastingProfile={content.tastingProfile}
-              priority={priority}
-            />
+        {/* 리뷰 본문. 캐러셀은 넘김 버튼이 있어 링크 밖에 두고, 사진은 캐러셀 안에서 같은 상세로 연결한다. */}
+        <div className="flex flex-col gap-14">
+          <ReviewImageCarousel
+            images={productImages}
+            tastingProfile={content.tastingProfile}
+            priority={priority}
+            slideHref={ROUTES.REVIEW.DETAIL(content.reviewId)}
+          />
+          <Link
+            href={ROUTES.REVIEW.DETAIL(content.reviewId)}
+            className="flex flex-col gap-14"
+          >
             <ReviewContentPreview content={content.reviewContent} />
             <div className="flex flex-wrap gap-6">
               {reviewTags.map((tag) => (
@@ -141,8 +145,8 @@ const ReviewListItem = ({ content, priority = false, onLikeChange }: Props) => {
                 </div>
               ))}
             </div>
-          </div>
-        </Link>
+          </Link>
+        </div>
 
         {/* 리뷰 좋아요, 댓글 */}
         <div className="flex items-center justify-between mt-14">

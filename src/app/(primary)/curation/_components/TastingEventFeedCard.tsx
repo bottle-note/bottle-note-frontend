@@ -3,6 +3,7 @@ import type { TastingEventFeedItem } from '@/api/curation-v2/types';
 import AutoMarqueeText from '@/components/ui/Display/AutoMarqueeText';
 import BaseImage from '@/components/ui/Display/BaseImage';
 import { ROUTES } from '@/constants/routes';
+import { CONTENT_INSET_IMAGE_SIZES } from '@/constants/imageSizes';
 import { TastingEventInfoCard } from '@/app/(primary)/curation/_components/TastingEventInfoCard';
 
 interface TastingEventFeedCardProps {
@@ -23,7 +24,7 @@ export function TastingEventFeedCard({
             alt=""
             fill
             priority={priority}
-            sizes="(max-width: 468px) calc(100vw - 40px), 428px"
+            sizes={CONTENT_INSET_IMAGE_SIZES}
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/25" />

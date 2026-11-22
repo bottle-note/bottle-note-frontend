@@ -20,7 +20,7 @@ interface Props {
 
 export function HomeRankList({ items, section, ranked = false }: Props) {
   return (
-    <ol className="px-20">
+    <ol className="px-20 fold:grid fold:grid-cols-2 fold:gap-x-32">
       {items.map((item, index) => (
         <HomeRankItem
           key={item.alcoholId}

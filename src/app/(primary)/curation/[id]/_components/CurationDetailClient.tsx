@@ -12,6 +12,7 @@ import type {
   WhiskyPairingDetailItem,
 } from '@/api/curation-v2/types';
 import BaseImage from '@/components/ui/Display/BaseImage';
+import { CONTENT_FULL_IMAGE_SIZES } from '@/constants/imageSizes';
 import {
   STICKY_BOTTOM_CTA_PADDING_CLASS,
   StickyBottomCta,
@@ -100,7 +101,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
           alt=""
           fill
           priority
-          sizes="(max-width: 468px) 100vw, 468px"
+          sizes={CONTENT_FULL_IMAGE_SIZES}
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/10 to-black/70" />
@@ -159,7 +160,7 @@ function TastingEventDetail({ event }: { event: TastingEventDetailItem }) {
                       src={url}
                       alt=""
                       fill
-                      sizes="(max-width: 468px) 100vw, 468px"
+                      sizes={CONTENT_FULL_IMAGE_SIZES}
                       className="object-cover"
                       priority={index === 0}
                     />
@@ -271,7 +272,7 @@ function CurationDetail({
           alt=""
           fill
           priority
-          sizes="(max-width: 468px) 100vw, 468px"
+          sizes={CONTENT_FULL_IMAGE_SIZES}
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/75" />
@@ -306,7 +307,7 @@ function CurationDetail({
                       src={url}
                       alt=""
                       fill
-                      sizes="(max-width: 468px) 100vw, 468px"
+                      sizes={CONTENT_FULL_IMAGE_SIZES}
                       className="object-cover"
                       priority={index === 0}
                     />

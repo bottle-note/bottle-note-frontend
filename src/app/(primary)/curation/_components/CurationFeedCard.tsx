@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { CurationV2FeedItem } from '@/api/curation-v2/types';
 import BaseImage from '@/components/ui/Display/BaseImage';
 import { ROUTES } from '@/constants/routes';
+import { CONTENT_INSET_IMAGE_SIZES } from '@/constants/imageSizes';
 
 interface CurationFeedCardProps {
   curation: CurationV2FeedItem;
@@ -23,7 +24,7 @@ export function CurationFeedCard({
             alt=""
             fill
             priority={priority}
-            sizes="(max-width: 468px) calc(100vw - 40px), 428px"
+            sizes={CONTENT_INSET_IMAGE_SIZES}
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/35" />

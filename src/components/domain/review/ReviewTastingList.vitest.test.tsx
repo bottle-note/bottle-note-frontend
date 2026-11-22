@@ -3,6 +3,7 @@ import { vi } from 'vitest';
 import type { ExploreReview } from '@/api/explore/types';
 import type { ReviewInDetails } from '@/api/alcohol/types';
 import type { ReviewTastingProfile } from '@/api/review/types';
+import { ROUTES } from '@/constants/routes';
 import ExploreReviewCard from '@/app/(primary)/explore/_components/ReviewListItem';
 import AlcoholReviewCard from '@/app/(primary)/alcohols/[id]/_components/ReviewListItem';
 import ReviewDetails from '@/app/(primary)/review/[id]/_components/ReviewDetails';
@@ -12,10 +13,15 @@ vi.mock('next/link', () => ({
   default: ({
     children,
     href,
-  }: {
+    ...rest
+  }: React.AnchorHTMLAttributes<HTMLAnchorElement> & {
     children: React.ReactNode;
     href: string;
-  }) => <a href={href}>{children}</a>,
+  }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
 }));
 vi.mock('next/image', () => ({
   default: ({ alt, src }: { alt: string; src: string }) => (
@@ -178,15 +184,34 @@ const renderDetails = ({
 };
 
 describe('리뷰 목록 카드의 저장된 프로필 표시', () => {
-  it('둘러보기: 그래프를 첫 장에 두고 과거 PNG만 제외하며 일반 사진은 유지한다', () => {
+  it('둘러보기: 사진 뒤 마지막 장에 그래프를 두고 과거 PNG만 제외하며 일반 사진은 유지한다', () => {
     render(<ExploreReviewCard content={explore} />);
     const slides = screen.getAllByRole('group');
     expect(slides).toHaveLength(2);
+    // 목록의 사진은 상세 링크와 겹쳐 읽기 대상에서 빠져 있어 역할 대신 요소로 찾는다.
+    expect(slides[0].querySelector('img')).toHaveAttribute('src', photo);
     expect(
-      within(slides[0]).getByRole('img', { name: /바디감 7\/10/ }),
+      within(slides[1]).getByRole('img', { name: /바디감 7\/10/ }),
     ).toBeInTheDocument();
-    expect(within(slides[1]).getByRole('img')).toHaveAttribute('src', photo);
     expect(document.querySelector(`img[src="${oldGraph}"]`)).toBeNull();
+  });
+
+  it('둘러보기: 넘김 버튼은 상세 링크 밖에 두고, 사진은 탭 순서에서 빠진 링크로 상세에 연결한다', () => {
+    render(<ExploreReviewCard content={explore} />);
+
+    // 버튼이 링크 안에 있으면 누를 때 상세로 넘어간다.
+    expect(
+      screen.getByRole('button', { name: '다음 사진' }).closest('a'),
+    ).toBeNull();
+    const photoLink = document
+      .querySelector(`img[src="${photo}"]`)
+      ?.closest('a');
+    expect(photoLink).toHaveAttribute(
+      'href',
+      ROUTES.REVIEW.DETAIL(explore.reviewId),
+    );
+    expect(photoLink).toHaveAttribute('tabindex', '-1');
+    expect(photoLink).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('위스키 리뷰: 프로필을 즉시 그리고 예전 그래프 썸네일은 가린다', () => {
@@ -208,7 +233,7 @@ describe('리뷰 목록 카드의 저장된 프로필 표시', () => {
     expect(screen.getByAltText('content_img')).toHaveAttribute('src', oldGraph);
   });
 
-  it('상세: 그래프를 첫 장에 두고 이전 그래프 PNG는 사진에서 제외한다', () => {
+  it('상세: 사진 뒤 마지막 장에 그래프를 두고 이전 그래프 PNG는 사진에서 제외한다', () => {
     renderDetails({
       tastingProfile: profile,
       viewUrls: [oldGraph, photo],
@@ -216,15 +241,15 @@ describe('리뷰 목록 카드의 저장된 프로필 표시', () => {
 
     const slides = screen.getAllByRole('group');
     expect(slides).toHaveLength(2);
+    expect(within(slides[0]).getByRole('img')).toHaveAttribute('src', photo);
     expect(
-      within(slides[0]).getByRole('img', { name: /바디감 7\/10, 묵직함/ }),
+      within(slides[1]).getByRole('img', { name: /바디감 7\/10, 묵직함/ }),
     ).toBeInTheDocument();
     expect(
-      within(slides[0])
+      within(slides[1])
         .getAllByTestId('tasting-score-badge')
         .map((n) => n.textContent),
     ).toContain('7');
-    expect(within(slides[1]).getByRole('img')).toHaveAttribute('src', photo);
     expect(document.querySelector(`img[src="${oldGraph}"]`)).toBeNull();
   });
 

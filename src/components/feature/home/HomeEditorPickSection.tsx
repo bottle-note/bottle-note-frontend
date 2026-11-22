@@ -13,7 +13,6 @@ import { useHorizontalWheelScroll } from '@/hooks/useHorizontalWheelScroll';
 
 import SectionHeader from '@/components/ui/Display/SectionHeader';
 
-const SECTION_LABEL = "EDITOR'S PICK";
 const SECTION_TITLE = '보틀노트 에디터가 직접 골라봤어요';
 
 const KIND_LABEL: Record<CurationV2SpecCode, string> = {
@@ -38,7 +37,6 @@ export default function HomeEditorPickSection({ editorPicks }: Props) {
   return (
     <section aria-label="에디터 추천" className="space-y-14">
       <SectionHeader
-        label={SECTION_LABEL}
         title={SECTION_TITLE}
         moreHref={ROUTES.CURATION.BASE}
         onMoreClick={() =>

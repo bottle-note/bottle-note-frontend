@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import type { WhiskyPairingDetailItem } from '@/api/curation-v2/types';
 import BaseImage from '@/components/ui/Display/BaseImage';
+import { CONTENT_FULL_IMAGE_SIZES } from '@/constants/imageSizes';
 import { CurationDetailHeader } from '@/app/(primary)/curation/_components/CurationDetailHeader';
 import { TastingEventLineupItem } from '@/app/(primary)/curation/_components/TastingEventLineupItem';
 import { WhiskyPairingFoodList } from '@/app/(primary)/curation/_components/WhiskyPairingFoodList';
@@ -25,7 +26,7 @@ export function WhiskyPairingDetail({ pairing }: WhiskyPairingDetailProps) {
           alt=""
           fill
           priority
-          sizes="(max-width: 468px) 100vw, 468px"
+          sizes={CONTENT_FULL_IMAGE_SIZES}
           className="object-cover"
         />
         <div className="absolute inset-0 bg-[#5F3826]/25" />
