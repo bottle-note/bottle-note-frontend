@@ -221,7 +221,6 @@ describe('홈 주간 TOP 5', () => {
   it('탭 위 섹션 머리와 함께 1~5위를 순서대로 보여주고 선택한 위스키를 기록한다', async () => {
     renderWithQuery(<HomeFeaturedSection />);
 
-    expect(screen.getByText('WEEKLY TOP 5')).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
         name: '이번 주 사람들이 가장 많이 본 위스키',
@@ -262,7 +261,6 @@ describe('홈 주간 TOP 5', () => {
     fireEvent.click(screen.getByRole('button', { name: '최근에 본 위스키' }));
 
     // 탭을 바꾸면 탭 위 섹션 머리도 바뀐다.
-    expect(screen.getByText('VIEW HISTORY')).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: '내가 최근 본 위스키' }),
     ).toBeInTheDocument();
@@ -284,7 +282,11 @@ describe('홈 에디터 추천', () => {
   it('서버에서 받은 순서대로 종류 배지와 함께 보여주고 선택과 전체 보기를 기록한다', () => {
     render(<HomeEditorPickSection editorPicks={curations} />);
 
-    expect(screen.getByText("EDITOR'S PICK")).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', {
+        name: '보틀노트 에디터가 직접 골라봤어요',
+      }),
+    ).toBeInTheDocument();
     const cards = screen.getAllByRole('listitem');
     expect(cards.map((card) => card.textContent)).toEqual([
       expect.stringContaining('시음회11월 시음회'),
@@ -331,7 +333,11 @@ describe('홈 최신 리뷰', () => {
     renderWithQuery(<HomeReviewSection />);
 
     const items = await screen.findAllByRole('listitem');
-    expect(screen.getByText('한 잔에 담긴 이야기')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', {
+        name: '다른 사람들이 남긴 최근 리뷰를 확인해보세요',
+      }),
+    ).toBeInTheDocument();
     expect(ExploreApi.getReviews).toHaveBeenCalledWith({
       sortType: 'LATEST',
       sortOrder: 'DESC',
@@ -412,7 +418,11 @@ describe('홈 둘러보기(카테고리·국가별)', () => {
   it('카테고리를 목록으로 보여주고 선택한 카테고리 필터로 연결하며 기록한다', () => {
     renderWithQuery(<HomeExploreSection />);
 
-    expect(screen.getByText('EXPLORE')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', {
+        name: '싱글 몰트부터 버번까지 골라보세요',
+      }),
+    ).toBeInTheDocument();
     const singleMalt = screen.getByRole('link', { name: /싱글몰트/ });
     const href = new URL(
       singleMalt.getAttribute('href') ?? '',
