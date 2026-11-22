@@ -178,14 +178,14 @@ const renderDetails = ({
 };
 
 describe('리뷰 목록 카드의 저장된 프로필 표시', () => {
-  it('둘러보기: 그래프를 첫 장에 두고 과거 PNG만 제외하며 일반 사진은 유지한다', () => {
+  it('둘러보기: 사진 뒤 마지막 장에 그래프를 두고 과거 PNG만 제외하며 일반 사진은 유지한다', () => {
     render(<ExploreReviewCard content={explore} />);
     const slides = screen.getAllByRole('group');
     expect(slides).toHaveLength(2);
+    expect(within(slides[0]).getByRole('img')).toHaveAttribute('src', photo);
     expect(
-      within(slides[0]).getByRole('img', { name: /바디감 7\/10/ }),
+      within(slides[1]).getByRole('img', { name: /바디감 7\/10/ }),
     ).toBeInTheDocument();
-    expect(within(slides[1]).getByRole('img')).toHaveAttribute('src', photo);
     expect(document.querySelector(`img[src="${oldGraph}"]`)).toBeNull();
   });
 
@@ -208,7 +208,7 @@ describe('리뷰 목록 카드의 저장된 프로필 표시', () => {
     expect(screen.getByAltText('content_img')).toHaveAttribute('src', oldGraph);
   });
 
-  it('상세: 그래프를 첫 장에 두고 이전 그래프 PNG는 사진에서 제외한다', () => {
+  it('상세: 사진 뒤 마지막 장에 그래프를 두고 이전 그래프 PNG는 사진에서 제외한다', () => {
     renderDetails({
       tastingProfile: profile,
       viewUrls: [oldGraph, photo],
@@ -216,15 +216,15 @@ describe('리뷰 목록 카드의 저장된 프로필 표시', () => {
 
     const slides = screen.getAllByRole('group');
     expect(slides).toHaveLength(2);
+    expect(within(slides[0]).getByRole('img')).toHaveAttribute('src', photo);
     expect(
-      within(slides[0]).getByRole('img', { name: /바디감 7\/10, 묵직함/ }),
+      within(slides[1]).getByRole('img', { name: /바디감 7\/10, 묵직함/ }),
     ).toBeInTheDocument();
     expect(
-      within(slides[0])
+      within(slides[1])
         .getAllByTestId('tasting-score-badge')
         .map((n) => n.textContent),
     ).toContain('7');
-    expect(within(slides[1]).getByRole('img')).toHaveAttribute('src', photo);
     expect(document.querySelector(`img[src="${oldGraph}"]`)).toBeNull();
   });
 

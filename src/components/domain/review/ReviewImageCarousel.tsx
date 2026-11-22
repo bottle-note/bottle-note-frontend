@@ -39,7 +39,7 @@ export const convertImageUrlsToProductImageArray = (
 
 interface ReviewImageCarouselProps {
   images: ProductImage[];
-  /** 있으면 사진 앞 첫 장에 테이스팅 그래프를 둔다. */
+  /** 있으면 사진 뒤 마지막 장에 테이스팅 그래프를 둔다. */
   tastingProfile?: ReviewTastingProfile | null;
   priority?: boolean;
   className?: string;
@@ -91,15 +91,6 @@ export const ReviewImageCarousel = ({
       className={cn('w-full bg-bg-layer-default', className)}
     >
       <CarouselContent>
-        {hasGraph && (
-          <CarouselItem className={itemClassName}>
-            <div
-              className={`${SLIDE_FRAME_CLASS} flex items-center justify-center p-12`}
-            >
-              <ReviewTastingProfileChart profile={tastingProfile} size={340} />
-            </div>
-          </CarouselItem>
-        )}
         {images.map((image, index) => (
           <CarouselItem key={image.id} className={itemClassName}>
             <div className={`${SLIDE_FRAME_CLASS} bg-bg-neutral-weak`}>
@@ -109,12 +100,21 @@ export const ReviewImageCarousel = ({
                 fill
                 quality={80}
                 sizes={CONTENT_INSET_IMAGE_SIZES}
-                priority={priority && index === 0 && !hasGraph}
+                priority={priority && index === 0}
                 className="object-cover"
               />
             </div>
           </CarouselItem>
         ))}
+        {hasGraph && (
+          <CarouselItem className={itemClassName}>
+            <div
+              className={`${SLIDE_FRAME_CLASS} flex items-center justify-center p-12`}
+            >
+              <ReviewTastingProfileChart profile={tastingProfile} size={340} />
+            </div>
+          </CarouselItem>
+        )}
       </CarouselContent>
       {slideCount > 1 && (
         <div className="absolute bottom-16 left-1/2 flex -translate-x-1/2 gap-6 rounded-full bg-bg-overlay-muted px-8 py-5">
