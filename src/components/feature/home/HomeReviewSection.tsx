@@ -17,7 +17,7 @@ import { HomeFeaturedErrorState } from './_components/HomeFeaturedErrorState';
 const SECTION_TITLE = '다른 사람들이 남긴 최근 리뷰를 확인해보세요';
 const MAX_TAGS = 3;
 
-/** 최신 리뷰 3개. 비어 있으면 섹션을 숨긴다. */
+/** 최신 리뷰 4개. 비어 있으면 섹션을 숨긴다. */
 export default function HomeReviewSection() {
   const { data: reviews, isLoading, isError, refetch } = useHomeReviewsQuery();
 
@@ -37,7 +37,7 @@ export default function HomeReviewSection() {
       />
       {isLoading && (
         <div className="space-y-12 px-20" aria-busy="true">
-          <SkeletonBase count={3} height={120} />
+          <SkeletonBase count={4} height={120} />
         </div>
       )}
       {isError && <HomeFeaturedErrorState onRetry={() => refetch()} />}
