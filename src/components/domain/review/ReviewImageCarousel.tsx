@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures';
 
 import {
   Carousel,
@@ -45,6 +46,9 @@ interface ReviewImageCarouselProps {
   className?: string;
 }
 
+const CAROUSEL_ARROW_CLASS =
+  'hidden border-0 bg-bg-overlay-muted text-palette-static-white hover:bg-bg-overlay-muted hover:text-palette-static-white disabled:opacity-0 [@media(hover:hover)]:inline-flex';
+
 const SLIDE_FRAME_CLASS =
   'relative aspect-square overflow-hidden rounded-md border border-stroke-neutral-subtle';
 
@@ -56,6 +60,8 @@ export const ReviewImageCarousel = ({
 }: ReviewImageCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+  // 트랙패드·매직 마우스 가로 스와이프로도 넘긴다. 렌더마다 새로 만들면 캐러셀이 다시 초기화된다.
+  const [plugins] = useState(() => [WheelGesturesPlugin()]);
 
   useEffect(() => {
     if (!api) {
@@ -84,6 +90,7 @@ export const ReviewImageCarousel = ({
   return (
     <Carousel
       setApi={setApi}
+      plugins={plugins}
       opts={{
         align: 'start',
         loop: true,
@@ -129,9 +136,19 @@ export const ReviewImageCarousel = ({
           ))}
         </div>
       )}
-      {/* 사진 밖 50px에 두는 버튼이라, 최대 너비(768) 바깥에 그만큼 여백이 생기는 폭부터만 보인다. */}
-      <CarouselPrevious className="absolute left-[-50px] top-1/2 -translate-y-1/2 hidden min-[900px]:inline-flex disabled:opacity-50" />
-      <CarouselNext className="absolute right-[-50px] top-1/2 -translate-y-1/2 hidden min-[900px]:inline-flex disabled:opacity-50" />
+      {slideCount > 1 && (
+        <>
+          {/* 터치 기기는 스와이프로 넘기므로 마우스를 쓰는 기기에서만 사진 안쪽에 버튼을 둔다. */}
+          <CarouselPrevious
+            aria-label="이전 사진"
+            className={cn(CAROUSEL_ARROW_CLASS, 'left-8')}
+          />
+          <CarouselNext
+            aria-label="다음 사진"
+            className={cn(CAROUSEL_ARROW_CLASS, 'right-8')}
+          />
+        </>
+      )}
     </Carousel>
   );
 };
