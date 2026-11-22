@@ -117,7 +117,7 @@ export default function TimelineFull({
         </div>
       </div>
       {data.userHistories.length !== 0 && !error ? (
-        <div className="w-full max-w-399">
+        <div className="w-full">
           <List
             isListFirstLoading={false}
             isScrollLoading={isFetching}
