@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useBlockScroll } from '@/hooks/useBlockScroll';
 import { cn } from '@/lib/utils';
+import { useContentWidthClass } from '@/components/ui/Layout/ContentWidth';
 
 interface Props {
   isShow: boolean;
@@ -25,10 +26,12 @@ function BackDrop({
       onBackdropClick();
     }
   };
+  const contentWidthClass = useContentWidthClass();
   const ModalContents = (
     <div
       className={cn(
         'fixed inset-0 z-40',
+        contentWidthClass,
         isModal && 'bg-bg-overlay',
         isShow ? 'block' : 'hidden',
         className,

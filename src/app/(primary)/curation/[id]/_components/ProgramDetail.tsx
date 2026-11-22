@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronRight, ExternalLink } from 'lucide-react';
 import type { ProgramDetailItem } from '@/api/curation-v2/types';
 import BaseImage from '@/components/ui/Display/BaseImage';
+import { CONTENT_FULL_IMAGE_SIZES } from '@/constants/imageSizes';
 import {
   Carousel,
   CarouselContent,
@@ -68,7 +69,7 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
           alt=""
           fill
           priority
-          sizes="(max-width: 468px) 100vw, 468px"
+          sizes={CONTENT_FULL_IMAGE_SIZES}
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/75" />
@@ -140,7 +141,7 @@ export function ProgramDetail({ program }: ProgramDetailProps) {
                       src={url}
                       alt=""
                       fill
-                      sizes="(max-width: 468px) 100vw, 468px"
+                      sizes={CONTENT_FULL_IMAGE_SIZES}
                       className="object-cover"
                       priority={index === 0}
                     />

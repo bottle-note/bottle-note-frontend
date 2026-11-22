@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Autoplay from 'embla-carousel-autoplay';
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { CONTENT_FULL_IMAGE_SIZES } from '@/constants/imageSizes';
 import {
   Carousel,
   CarouselContent,
@@ -99,7 +100,7 @@ function BannerImage({
         src={banner.imageUrl}
         alt={banner.name}
         fill
-        sizes="(max-width: 430px) 100vw, 430px"
+        sizes={CONTENT_FULL_IMAGE_SIZES}
         priority={isPriority}
         quality={100}
         onLoad={() => setIsLoaded(true)}

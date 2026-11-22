@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/Display/carousel';
 import BaseImage from '@/components/ui/Display/BaseImage';
 import { cn } from '@/lib/utils';
+import { CONTENT_INSET_IMAGE_SIZES } from '@/constants/imageSizes';
 import type { ReviewTastingProfile } from '@/api/review/types';
 import ReviewTastingProfileChart, {
   isDisplayableTastingProfile,
@@ -107,7 +108,7 @@ export const ReviewImageCarousel = ({
                 alt={image.alt}
                 fill
                 quality={80}
-                sizes="(max-width: 768px) calc(100vw - 40px), 600px"
+                sizes={CONTENT_INSET_IMAGE_SIZES}
                 priority={priority && index === 0 && !hasGraph}
                 className="object-cover"
               />
@@ -128,8 +129,9 @@ export const ReviewImageCarousel = ({
           ))}
         </div>
       )}
-      <CarouselPrevious className="absolute left-[-50px] top-1/2 -translate-y-1/2 hidden sm:inline-flex disabled:opacity-50" />
-      <CarouselNext className="absolute right-[-50px] top-1/2 -translate-y-1/2 hidden sm:inline-flex disabled:opacity-50" />
+      {/* 사진 밖 50px에 두는 버튼이라, 최대 너비(768) 바깥에 그만큼 여백이 생기는 폭부터만 보인다. */}
+      <CarouselPrevious className="absolute left-[-50px] top-1/2 -translate-y-1/2 hidden min-[900px]:inline-flex disabled:opacity-50" />
+      <CarouselNext className="absolute right-[-50px] top-1/2 -translate-y-1/2 hidden min-[900px]:inline-flex disabled:opacity-50" />
     </Carousel>
   );
 };

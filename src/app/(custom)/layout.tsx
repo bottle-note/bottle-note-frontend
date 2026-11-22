@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useWebViewInit } from '@/hooks/useWebViewInit';
+import ContentWidth from '@/components/ui/Layout/ContentWidth';
 import '@/style/globals.css';
 
 export default function RootLayout({
@@ -16,10 +17,13 @@ export default function RootLayout({
   }, [isMobile]);
 
   return (
-    <div className="flex flex-col w-full min-h-safe-screen bg-subCoral">
+    <ContentWidth
+      size="mobile"
+      className="flex flex-col min-h-safe-screen bg-subCoral"
+    >
       <main className="flex flex-col flex-grow overflow-y-auto">
         {children}
       </main>
-    </div>
+    </ContentWidth>
   );
 }

@@ -126,7 +126,7 @@ function Navbar({
       )}
       style={{ paddingBottom: 'var(--safe-area-bottom)' }}
     >
-      <section className="h-[var(--navbar-height)] grid grid-cols-5 text-fg-neutral">
+      <section className="mx-auto h-[var(--navbar-height)] max-w-[600px] grid grid-cols-5 text-fg-neutral">
         {navItems.map((menu) => (
           <button
             key={menu.link}
